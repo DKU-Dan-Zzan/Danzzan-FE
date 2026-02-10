@@ -10,7 +10,7 @@ export default function TokenRequired() {
     <div className="min-h-screen flex items-center justify-center px-6 bg-background">
       <Card className="w-full max-w-lg p-8 space-y-4">
         <div className="space-y-2">
-          <p className="text-sm text-primary font-semibold">DANZZAN Operations</p>
+          <p className="text-sm text-primary font-semibold">DAN-ZZAN Operations</p>
           <h1 className="text-2xl font-semibold text-foreground">접근 토큰이 필요합니다</h1>
           <p className="text-sm text-muted-foreground">
             현재 모드는 <span className="font-semibold">{env.apiMode.toUpperCase()}</span>입니다.

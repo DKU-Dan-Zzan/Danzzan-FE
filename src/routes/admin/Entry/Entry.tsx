@@ -22,7 +22,7 @@ export default function AdminEntry() {
     <div className="min-h-screen bg-background flex items-center justify-center px-6">
       <Card className="w-full max-w-3xl p-10">
         <div className="space-y-2">
-          <p className="text-sm text-primary font-semibold">DANZZAN Operations</p>
+          <p className="text-sm text-primary font-semibold">DAN-ZZAN Operations</p>
           <h1 className="text-2xl font-semibold text-foreground">관리 시스템 선택</h1>
           <p className="text-sm text-muted-foreground">접속할 운영 시스템을 선택하세요.</p>
         </div>

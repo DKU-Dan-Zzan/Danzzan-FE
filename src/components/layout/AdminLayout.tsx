@@ -22,7 +22,7 @@ export function AdminLayout() {
       <header className="border-b border-[#c7d3e6] bg-card">
         <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between px-8 py-6">
           <div>
-            <p className="text-sm text-primary font-semibold">DANZZAN Operations</p>
+            <p className="text-sm text-primary font-semibold">DAN-ZZAN Operations</p>
             <h1 className="text-2xl font-semibold text-foreground">통합 관리자 포털</h1>
           </div>
           <div className="flex items-center gap-3">

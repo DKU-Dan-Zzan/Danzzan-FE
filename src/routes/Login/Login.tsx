@@ -36,7 +36,7 @@ export default function Login() {
     <div className="flex min-h-screen items-center justify-center px-6">
       <Card className="w-full max-w-md p-8 shadow-xl">
         <div className="space-y-2">
-          <p className="text-sm text-blue-600 font-semibold">DANZZAN Ticketing</p>
+          <p className="text-sm text-blue-600 font-semibold">DAN-ZZAN Ticketing</p>
           <h1 className="text-2xl font-semibold text-gray-900">학생 로그인</h1>
           <p className="text-sm text-gray-500">
             학번과 비밀번호로 티켓 시스템에 로그인하세요.

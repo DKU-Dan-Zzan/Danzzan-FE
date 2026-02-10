@@ -75,7 +75,7 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-10">
       <div className="text-center space-y-2">
-        <p className="text-3xl font-bold tracking-tight text-foreground">DAN-SPOT</p>
+        <p className="text-3xl font-bold tracking-tight text-foreground">DAN-ZZAN</p>
         <p className="text-sm text-muted-foreground">Festival Operations Admin System</p>
       </div>
 
