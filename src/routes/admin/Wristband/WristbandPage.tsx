@@ -1,18 +1,21 @@
 import { useState } from "react";
 import { WristbandDashboard } from "@/components/admin/WristbandDashboard";
 import { WristbandOperationScreen } from "@/components/admin/WristbandOperationScreen";
+import type { WristbandSession } from "@/types/model/wristband.model";
 
 export default function WristbandPage() {
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedSession, setSelectedSession] = useState<WristbandSession | null>(null);
 
-  if (selectedDate) {
+  if (selectedSession) {
     return (
       <WristbandOperationScreen
-        date={selectedDate}
-        onBack={() => setSelectedDate(null)}
+        eventId={selectedSession.id}
+        date={selectedSession.date}
+        title={selectedSession.title}
+        onBack={() => setSelectedSession(null)}
       />
     );
   }
 
-  return <WristbandDashboard onSelectDate={setSelectedDate} />;
+  return <WristbandDashboard onSelectSession={setSelectedSession} />;
 }

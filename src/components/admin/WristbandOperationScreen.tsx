@@ -24,11 +24,13 @@ import { useWristband } from "@/hooks/useWristband";
 import type { WristbandAttendee, WristbandStats } from "@/types/model/wristband.model";
 
 interface WristbandOperationScreenProps {
+  eventId: string;
   date: string;
+  title?: string;
   onBack: () => void;
 }
 
-export function WristbandOperationScreen({ date, onBack }: WristbandOperationScreenProps) {
+export function WristbandOperationScreen({ eventId, date, title, onBack }: WristbandOperationScreenProps) {
   const { getStats, findAttendee, issueWristband, error } = useWristband();
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
@@ -43,7 +45,7 @@ export function WristbandOperationScreen({ date, onBack }: WristbandOperationScr
   useEffect(() => {
     let active = true;
     setStatsLoading(true);
-    getStats(date)
+    getStats(eventId)
       .then((data) => {
         if (active) {
           setStats(data);
@@ -58,7 +60,7 @@ export function WristbandOperationScreen({ date, onBack }: WristbandOperationScr
     return () => {
       active = false;
     };
-  }, [date, getStats]);
+  }, [eventId, getStats]);
 
   const resolvedStats = useMemo(() => {
     return (
@@ -89,7 +91,7 @@ export function WristbandOperationScreen({ date, onBack }: WristbandOperationScr
 
     setSearching(true);
     try {
-      const result = await findAttendee(keyword, date);
+      const result = await findAttendee(keyword, eventId);
       setSearchResults(result ? [result] : []);
     } finally {
       setSearching(false);
@@ -108,11 +110,10 @@ export function WristbandOperationScreen({ date, onBack }: WristbandOperationScr
 
     setIssuing(true);
     try {
-      const identifier = selectedAttendee.ticketId || selectedAttendee.studentId;
-      await issueWristband(identifier, date);
+      await issueWristband(eventId, selectedAttendee.ticketId);
       setSearchResults((prev) =>
         prev.map((item) =>
-          item.studentId === selectedAttendee.studentId
+          item.ticketId === selectedAttendee.ticketId
             ? { ...item, hasWristband: true }
             : item,
         ),
@@ -145,7 +146,7 @@ export function WristbandOperationScreen({ date, onBack }: WristbandOperationScr
         </Button>
         <div>
           <h2 className="text-2xl font-semibold text-foreground">
-            {formatDate(date)} 공연 팔찌 지급 시스템
+            {title || `${formatDate(date)} 공연 팔찌 지급 시스템`}
           </h2>
           <p className="text-sm text-muted-foreground">운영자: 관리자</p>
         </div>
@@ -208,10 +209,10 @@ export function WristbandOperationScreen({ date, onBack }: WristbandOperationScr
 
         <Card className="p-6">
           <div className="space-y-4">
-            <Label className="text-base font-medium text-foreground">학생 티켓 학번/티켓ID로 조회</Label>
+            <Label className="text-base font-medium text-foreground">학번으로 티켓 조회</Label>
             <div className="flex gap-4">
               <Input
-                placeholder="학번 또는 티켓ID 입력"
+                placeholder="학번 입력"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -239,28 +240,17 @@ export function WristbandOperationScreen({ date, onBack }: WristbandOperationScr
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-sm">학번</TableHead>
-                  <TableHead className="text-sm">티켓ID / 순번</TableHead>
                   <TableHead className="text-sm">이름</TableHead>
                   <TableHead className="text-sm">단과대학</TableHead>
                   <TableHead className="text-sm">학과</TableHead>
-                  <TableHead className="text-sm">팔찌 지급 여부 (상태)</TableHead>
+                  <TableHead className="text-sm">팔찌 지급 여부</TableHead>
                   <TableHead className="text-sm">지급 버튼</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {searchResults.map((student) => (
-                  <TableRow key={`${student.studentId}-${student.ticketId}`}>
+                  <TableRow key={student.ticketId}>
                     <TableCell className="font-medium text-sm py-2">{student.studentId}</TableCell>
-                    <TableCell className="text-base">
-                      <div className="space-y-1">
-                        <div className="text-sm font-semibold text-foreground">
-                          {student.ticketId || "-"}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          순번: {student.queueNumber ?? "-"}
-                        </div>
-                      </div>
-                    </TableCell>
                     <TableCell className="text-base">{student.name}</TableCell>
                     <TableCell className="text-base">{student.college}</TableCell>
                     <TableCell className="text-base">{student.department}</TableCell>
