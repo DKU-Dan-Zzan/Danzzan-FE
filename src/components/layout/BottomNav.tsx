@@ -20,7 +20,7 @@ const BottomNav = () => {
         z-50
       "
     >
-      {/* 바탕 + notch (SVG로 정확한 곡선) */}
+      {/* 네비게이션 배경 레이어 */}
       <div
         className="
           absolute inset-0
@@ -30,7 +30,7 @@ const BottomNav = () => {
           rounded-t-2xl
         "
       >
-        {/* notch 컷아웃 */}
+        {/* 중앙 notch 영역 */}
         <svg
           className="absolute left-1/2 -translate-x-1/2 -top-[1px]"
           width="160"
@@ -39,7 +39,7 @@ const BottomNav = () => {
           fill="none"
           aria-hidden="true"
         >
-          {/* 바 색상과 동일하게 채우고, 아래로 파인 곡선을 만든다 */}
+    
           <path
             d="
               M0 0
@@ -74,6 +74,7 @@ const BottomNav = () => {
           >
             {({ isActive }) => (
               <>
+                {/* 중앙 홈 버튼 */}
                 {isCenter ? (
                   <div
                     className={`
@@ -93,10 +94,15 @@ const BottomNav = () => {
                   </div>
                 ) : (
                   <>
+                    {/* 일반 네비 아이콘 */}
                     <Icon size={22} strokeWidth={2} />
+
+                    {/* 활성 인디케이터 바 */}
                     {isActive && (
                       <div className="absolute -bottom-3 w-5 h-1 rounded-full bg-blue-600" />
                     )}
+
+                    {/* 라벨 텍스트 */}
                     <span className="mt-2">{label}</span>
                   </>
                 )}
