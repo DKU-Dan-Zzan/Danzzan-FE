@@ -19,11 +19,12 @@ const EmergencyNotice = ({ notice }: Props) => {
       <div
         className="
           flex items-start gap-3
-          bg-red-50
-          text-red-700
-          rounded-2xl
+          rounded-[22px]
           px-4 py-4
-          shadow-sm
+          bg-white-500/8
+          text-gray-700
+          border border-gray-200/60
+          shadow-[0_10px_30px_rgba(0,0,0,0.06)]
         "
       >
         <div className="mt-0.5">
@@ -31,10 +32,10 @@ const EmergencyNotice = ({ notice }: Props) => {
         </div>
 
         <div className="flex flex-col">
-          <span className="font-semibold text-sm">
+          <span className="font-semibold text-[13px]">
             {notice.title}
           </span>
-          <span className="text-sm leading-relaxed mt-1">
+          <span className="mt-1 text-[13px] leading-relaxed text-gray-700/90">
             {notice.content}
           </span>
         </div>

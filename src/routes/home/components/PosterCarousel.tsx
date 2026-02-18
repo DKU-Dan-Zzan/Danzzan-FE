@@ -10,20 +10,14 @@ type Props = {
   posters: Poster[]
   /** 자동 슬라이드 간격(ms). 기본 3500 */
   intervalMs?: number
-  /** 카드 비율. 기본 16/10 */
+  /** 카드 비율. 기본 4/3 */
   aspect?: `${number}/${number}` | string
-  /** 상단 라벨(선택) */
-  topBadgeText?: string
-  /** 보조 텍스트(선택) */
-  topBadgeSubText?: string
 }
 
 export default function PosterCarousel({
   posters,
   intervalMs = 3500,
-  aspect = "16/10",
-  topBadgeText,
-  topBadgeSubText,
+  aspect = "4/3",
 }: Props) {
   const count = posters.length
   const [index, setIndex] = useState(0)
@@ -79,9 +73,10 @@ export default function PosterCarousel({
       <div
         className="
           relative overflow-hidden
-          rounded-[26px]
-          shadow-[0_18px_40px_rgba(0,0,0,0.10)]
+          rounded-[28px]
+          shadow-[0_24px_70px_rgba(0,0,0,0.14)]
           bg-white
+          ring-1 ring-black/5
         "
       >
         {/* 비율 고정 */}
@@ -104,20 +99,6 @@ export default function PosterCarousel({
               </div>
             ))}
           </div>
-
-          {/* 상단 배지(선택) */}
-          {(topBadgeText || topBadgeSubText) && (
-            <div className="absolute left-4 top-4">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/85 backdrop-blur px-3 py-1 text-[12px] font-semibold text-gray-900">
-                {topBadgeText ?? "DAN-ZZAN"}
-                {topBadgeSubText && (
-                  <span className="text-gray-500 font-medium">
-                    {topBadgeSubText}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -133,7 +114,7 @@ export default function PosterCarousel({
                 onClick={() => setIndex(i)}
                 aria-label={`포스터 ${i + 1}로 이동`}
                 className={`
-                  h-2 rounded-full transition-all
+                  h-1.5 rounded-full transition-all duration-300
                   ${active ? "w-8 bg-blue-600" : "w-2 bg-gray-300"}
                 `}
               />

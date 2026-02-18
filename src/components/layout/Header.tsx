@@ -3,17 +3,19 @@ const Header = () => {
     <header
       className="
         sticky top-0 z-50
-        bg-primary text-white
-        shadow-[0_4px_16px_rgba(0,0,0,0.08)]
+        bg-white/85 backdrop-blur-xl
+        border-b border-slate-200/70
       "
     >
-      <div className="max-w-[430px] mx-auto h-14 flex items-center justify-center">
-        <div className="text-[16px] font-semibold tracking-tight">
-          DAN-ZZAN
-        </div>
+      <div className="max-w-[430px] mx-auto h-14 flex items-center justify-center px-4">
+        <img
+          src="/DAN-ZZAN.png"
+          alt="DAN-ZZAN"
+          className="h-7 object-contain select-none"
+          draggable={false}
+        />
       </div>
     </header>
   )
 }
-
 export default Header

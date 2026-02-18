@@ -27,16 +27,14 @@ const ticketingCta = {
 
 function Home() {
   return (
-    <div className="pb-[100px]">
-      <PosterCarousel
-        posters={dummyPosters}
-      />
-
-      <EmergencyNotice notice={mockEmergencyNotice} />
-      <TicketingCtaCard data={ticketingCta} />
-      
-    </div>
+    <main className="min-h-screen bg-white pb-[120px]">
+      <div className="space-y-4">
+        <PosterCarousel posters={dummyPosters} />
+        <EmergencyNotice notice={mockEmergencyNotice} />
+        <TicketingCtaCard data={ticketingCta} />
+      </div>
+    </main>
   )
 }
 
-export default Home;
+export default Home

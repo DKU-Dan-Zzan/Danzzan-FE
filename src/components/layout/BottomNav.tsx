@@ -27,7 +27,6 @@ const BottomNav = () => {
           bg-white/95 backdrop-blur-xl
           border-t border-gray-200
           shadow-[0_-8px_24px_rgba(0,0,0,0.06)]
-          rounded-t-2xl
         "
       >
         {/* 중앙 notch 영역 */}
