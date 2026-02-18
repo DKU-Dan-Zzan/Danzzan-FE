@@ -27,7 +27,7 @@ const ticketingCta = {
 
 function Home() {
   return (
-    <main className="min-h-screen bg-white pb-[120px]">
+    <main className="min-h-screen bg-white pb-6">
       <div className="space-y-4">
         <PosterCarousel posters={dummyPosters} />
         <EmergencyNotice notice={mockEmergencyNotice} />
