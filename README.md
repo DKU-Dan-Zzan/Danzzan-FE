@@ -84,6 +84,15 @@ The original Figma design can be found [here](https://www.figma.com/design/PCtyZ
 
 Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
+## 개발 환경 설정
+
+```bash
+git clone <repository-url>
+cd "Admin Dashboard for DAN-ZZAN"
+npm install
+npm run setup:githooks
+```
+
 ### Prerequisites
 
 - Node.js (v18.x or later recommended)
