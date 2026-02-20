@@ -7,47 +7,108 @@
 
 :root {
   --font-size: 16px;
-  --background: #f8fbff;
-  --foreground: #1b2a3a;
-  --card: #ffffff;
-  --card-foreground: #1b2a3a;
+
+  /*
+   * Design token policy
+   * - No raw colors in components. Always use semantic tokens/CSS vars.
+   * - For stronger emphasis, use surface strong/tint strong variants (no new hex blues).
+   *
+   * Examples:
+   * - Card: bg-[var(--surface)] border-[var(--border)]
+   * - Primary panel: bg-[var(--surface-tint)] border-[var(--border-strong)]
+   * - Badge/chip: bg-[var(--surface-tint-subtle)] text-[var(--accent)] border-[var(--border-strong)]
+   * - Alert(success): bg-[var(--status-success-bg)] text-[var(--status-success-text)] border-[var(--status-success-border)]
+   * - Alert(warning): bg-[var(--status-warning-bg)] text-[var(--status-warning-text)] border-[var(--status-warning-border)]
+   * - Neutral state: bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)] border-[var(--status-neutral-border)]
+   */
+
+  /* App-wide blue foundation tokens (fixed base blue) */
+  --bg-base: #eaf2ff;
+  --surface-subtle: rgba(255, 255, 255, 0.9);
+  --surface-base: rgba(255, 255, 255, 0.84);
+  --surface-strong: rgba(255, 255, 255, 0.78);
+  --surface-tint-subtle: rgba(59, 130, 246, 0.1);
+  --surface-tint-base: rgba(59, 130, 246, 0.14);
+  --surface-tint-strong: rgba(59, 130, 246, 0.18);
+  --border-subtle: rgba(147, 197, 253, 0.46);
+  --border-base: rgba(147, 197, 253, 0.56);
+  --border-strong: rgba(147, 197, 253, 0.66);
+  --shadow-color: rgba(15, 23, 42, 0.12);
+
+  /* Stable aliases used by existing components */
+  --surface: var(--surface-base);
+  --surface-tint: var(--surface-tint-base);
+  --border: var(--border-base);
+  --accent: #2563eb;
+  --text: #0f172a;
+  --text-muted: #475569;
+
+  /* Status semantic tokens */
+  --status-success: #2e7d32;
+  --status-success-bg: rgba(46, 125, 50, 0.12);
+  --status-success-border: rgba(46, 125, 50, 0.28);
+  --status-success-text: #1b5e20;
+
+  --status-warning: #b26a00;
+  --status-warning-bg: rgba(178, 106, 0, 0.12);
+  --status-warning-border: rgba(178, 106, 0, 0.28);
+  --status-warning-text: #7c4a00;
+
+  --status-danger: #b3261e;
+  --status-danger-bg: rgba(179, 38, 30, 0.1);
+  --status-danger-border: rgba(179, 38, 30, 0.26);
+  --status-danger-text: #8a1c16;
+
+  --status-info: var(--accent);
+  --status-info-bg: var(--surface-tint-subtle);
+  --status-info-border: var(--border-strong);
+  --status-info-text: var(--accent);
+
+  --status-neutral: var(--text-muted);
+  --status-neutral-bg: var(--surface-subtle);
+  --status-neutral-border: var(--border-subtle);
+  --status-neutral-text: var(--text-muted);
+
+  --background: var(--bg-base);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
   --popover: #ffffff;
-  --popover-foreground: #1b2a3a;
-  --primary: #3662F2;
+  --popover-foreground: var(--text);
+  --primary: var(--accent);
   --primary-foreground: #ffffff;
-  --primary-soft: #eaf0fe;
-  --secondary: #f1f6fd;
-  --secondary-foreground: #1b2a3a;
-  --muted: #eef4fb;
-  --muted-foreground: #5f6f82;
-  --accent: #e0e9fd;
-  --accent-foreground: #3662F2;
+  --primary-soft: rgba(59, 130, 246, 0.12);
+  --secondary: rgba(255, 255, 255, 0.8);
+  --secondary-foreground: var(--text);
+  --muted: rgba(255, 255, 255, 0.72);
+  --muted-foreground: var(--text-muted);
+  --accent-soft: rgba(59, 130, 246, 0.16);
+  --accent-foreground: var(--accent);
   --destructive: #b3261e;
   --destructive-foreground: #ffffff;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
+  --input: var(--border);
   --input-background: #ffffff;
-  --switch-background: #c9d6ea;
+  --switch-background: rgba(148, 163, 184, 0.5);
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: #608cfb;
-  --success: #2e7d32;
-  --warning: #b26a00;
-  --danger: #b3261e;
+  --ring: rgba(37, 99, 235, 0.45);
+  --success: var(--status-success);
+  --warning: var(--status-warning);
+  --danger: var(--status-danger);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.5rem;
-  --sidebar: #f1f6fd;
-  --sidebar-foreground: #1b2a3a;
-  --sidebar-primary: #3662F2;
+  --sidebar: rgba(255, 255, 255, 0.8);
+  --sidebar-foreground: var(--text);
+  --sidebar-primary: var(--accent);
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eaf0fe;
-  --sidebar-accent-foreground: #3662F2;
-  --sidebar-border: #e2e8f0;
-  --sidebar-ring: #608cfb;
+  --sidebar-accent: rgba(59, 130, 246, 0.12);
+  --sidebar-accent-foreground: var(--accent);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
 }
 
 .dark {
@@ -88,6 +149,22 @@
 }
 
 @theme inline {
+  --color-bg-base: var(--bg-base);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-surface-tint-subtle: var(--surface-tint-subtle);
+  --color-surface-tint: var(--surface-tint);
+  --color-surface-tint-strong: var(--surface-tint-strong);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-base: var(--border-base);
+  --color-border-strong: var(--border-strong);
+  --color-shadow: var(--shadow-color);
+
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-accent-solid: var(--accent);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -101,13 +178,35 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
+  --color-accent: var(--accent-soft);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-danger: var(--danger);
+  --color-success: var(--status-success);
+  --color-warning: var(--status-warning);
+  --color-danger: var(--status-danger);
+  --color-info: var(--status-info);
+  --color-neutral: var(--status-neutral);
+  --color-status-success: var(--status-success);
+  --color-status-success-bg: var(--status-success-bg);
+  --color-status-success-border: var(--status-success-border);
+  --color-status-success-text: var(--status-success-text);
+  --color-status-warning: var(--status-warning);
+  --color-status-warning-bg: var(--status-warning-bg);
+  --color-status-warning-border: var(--status-warning-border);
+  --color-status-warning-text: var(--status-warning-text);
+  --color-status-danger: var(--status-danger);
+  --color-status-danger-bg: var(--status-danger-bg);
+  --color-status-danger-border: var(--status-danger-border);
+  --color-status-danger-text: var(--status-danger-text);
+  --color-status-info: var(--status-info);
+  --color-status-info-bg: var(--status-info-bg);
+  --color-status-info-border: var(--status-info-border);
+  --color-status-info-text: var(--status-info-text);
+  --color-status-neutral: var(--status-neutral);
+  --color-status-neutral-bg: var(--status-neutral-bg);
+  --color-status-neutral-border: var(--status-neutral-border);
+  --color-status-neutral-text: var(--status-neutral-text);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-input-background: var(--input-background);

@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { CircleAlert, GraduationCap, House, ShieldCheck } from "lucide-react";
+import { AuthSegmentedControl } from "@/components/auth/AuthSegmentedControl";
 import { Button } from "@/components/common/ui/button";
-import { Card } from "@/components/common/ui/card";
 import { Input } from "@/components/common/ui/input";
 import { Label } from "@/components/common/ui/label";
 import { useAuth } from "@/hooks/useAuth";
@@ -14,6 +15,11 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const festivalHomeUrl = (import.meta.env.VITE_FESTIVAL_HOME_URL as string | undefined)?.trim() ?? "";
+  const hasFestivalHomeUrl = Boolean(festivalHomeUrl);
+  const canSubmit = studentId.trim().length > 0 && password.trim().length > 0;
+  const inputClassName =
+    "h-11 rounded-2xl border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20";
 
   const redirect = searchParams.get("redirect");
 
@@ -33,61 +39,114 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-6">
-      <Card className="w-full max-w-md p-8 shadow-xl">
-        <div className="space-y-2">
-          <p className="text-sm text-blue-600 font-semibold">DAN-ZZAN Ticketing</p>
-          <h1 className="text-2xl font-semibold text-gray-900">학생 로그인</h1>
-          <p className="text-sm text-gray-500">
-            학번과 비밀번호로 티켓 시스템에 로그인하세요.
-          </p>
+    <div className="min-h-screen bg-[var(--bg-base)]">
+      <div className="mx-auto w-full max-w-[420px] px-5 py-6">
+        <button
+          type="button"
+          onClick={() => {
+            if (hasFestivalHomeUrl) {
+              window.location.href = festivalHomeUrl;
+            }
+          }}
+          disabled={!hasFestivalHomeUrl}
+          className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-55"
+        >
+          <House className="h-4 w-4" strokeWidth={2.3} />
+          축제 홈으로
+        </button>
+
+        <div className="mt-9">
+          <h1 className="text-[2.1rem] leading-[1.12] font-black tracking-tight text-[var(--text)]">
+            티켓팅 시작하기
+          </h1>
         </div>
 
-        <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <Label htmlFor="studentId">학번</Label>
-            <Input
-              id="studentId"
-              value={studentId}
-              onChange={(event) => setStudentId(event.target.value)}
-              placeholder="학번을 입력하세요"
-              required
-            />
+        <section className="mt-6 rounded-2xl border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] px-3.5 py-3">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-strong)_100%)] text-[var(--accent)]">
+              <ShieldCheck className="h-4 w-4" strokeWidth={2.3} />
+            </div>
+            <div className="pt-0.5">
+              <span className="inline-flex items-center rounded-full border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-strong)_100%)] px-2 py-0.5 text-[11px] font-semibold text-[var(--accent)]">
+                재학생 전용
+              </span>
+              <p className="mt-1 text-sm font-semibold text-[var(--text)]">
+                단국존 티켓팅 및 이용은 단국대학교 재학생만 가능합니다
+              </p>
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">비밀번호</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              placeholder="비밀번호를 입력하세요"
-              required
-            />
-          </div>
+        </section>
 
-          {error && (
-            <p className="text-sm text-red-600">
-              {error}
-            </p>
-          )}
+        <div className="mt-6">
+          <AuthSegmentedControl activeTab="login" />
+        </div>
 
-          <Button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700"
-            disabled={submitting}
-          >
-            {submitting ? "로그인 중..." : "로그인"}
-          </Button>
+        <main className="pt-6">
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            <section className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="studentId" className="text-sm font-semibold text-[var(--text)]">
+                  학번
+                </Label>
+                <Input
+                  id="studentId"
+                  value={studentId}
+                  onChange={(event) => setStudentId(event.target.value)}
+                  placeholder="학번 8자리를 입력해 주세요"
+                  className={inputClassName}
+                  required
+                />
+              </div>
 
-          <p className="text-center text-sm text-gray-500">
-            계정이 없으신가요?{" "}
-            <Link to="/signup" className="text-blue-600 hover:underline">
-              회원가입
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-semibold text-[var(--text)]">
+                  비밀번호
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="비밀번호를 입력해 주세요"
+                  className={inputClassName}
+                  required
+                />
+              </div>
+
+              <p className="flex items-start gap-1.5 text-[11px] font-medium leading-5 text-[var(--text-muted)]">
+                <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={2.3} />
+                가입한 티켓팅 계정 비밀번호를 입력해 주세요.
+              </p>
+            </section>
+
+            {error && (
+              <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+                {error}
+              </p>
+            )}
+
+            <Button
+              type="submit"
+              className="h-11 w-full rounded-2xl bg-[var(--accent)] text-white shadow-[0_10px_18px_-12px_rgba(15,23,42,0.24)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:opacity-55"
+              disabled={submitting || !canSubmit}
+            >
+              <GraduationCap className="h-4 w-4" strokeWidth={2.3} />
+              {submitting ? "로그인 중..." : "티켓팅 계정으로 로그인"}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-[var(--text-muted)]">티켓팅 서비스를 처음 이용하시나요?</p>
+            <Link
+              to="/signup"
+              state={{ authTabFrom: "login" }}
+              className="mt-2 inline-block text-sm font-semibold text-[var(--accent)]"
+            >
+              회원가입하러 가기
             </Link>
-          </p>
-        </form>
-      </Card>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

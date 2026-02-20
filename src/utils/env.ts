@@ -7,7 +7,6 @@ const resolveApiMode = (value?: string): ApiMode => {
 export const env = {
   apiBaseUrl: import.meta.env.VITE_API_URL ?? "",
   ticketingApiBaseUrl: import.meta.env.VITE_TICKETING_API_BASE_URL ?? "",
-  boardApiBaseUrl: import.meta.env.VITE_BOARD_API_BASE_URL ?? "",
   apiMode: resolveApiMode(import.meta.env.VITE_API_MODE),
   devAccessToken: import.meta.env.VITE_DEV_ACCESS_TOKEN ?? "",
   isDev: import.meta.env.DEV,

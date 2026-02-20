@@ -1,7 +1,14 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  BadgeCheck,
+  CircleAlert,
+  House,
+  KeyRound,
+} from "lucide-react";
+import { AuthSegmentedControl } from "@/components/auth/AuthSegmentedControl";
 import { Button } from "@/components/common/ui/button";
-import { Card } from "@/components/common/ui/card";
+import { Checkbox } from "@/components/common/ui/checkbox";
 import { Input } from "@/components/common/ui/input";
 import { Label } from "@/components/common/ui/label";
 import { signupApi } from "@/api/signupApi";
@@ -13,9 +20,21 @@ export default function Signup() {
   const [dkuPassword, setDkuPassword] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [privacyConsent, setPrivacyConsent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
+  const festivalHomeUrl = (import.meta.env.VITE_FESTIVAL_HOME_URL as string | undefined)?.trim() ?? "";
+  const hasFestivalHomeUrl = Boolean(festivalHomeUrl);
+  const canSubmit =
+    dkuStudentId.trim().length > 0 &&
+    dkuPassword.trim().length > 0 &&
+    password.length >= 4 &&
+    passwordConfirm.trim().length > 0 &&
+    password === passwordConfirm &&
+    privacyConsent;
+  const inputClassName =
+    "h-11 rounded-2xl border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20";
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -28,6 +47,11 @@ export default function Signup() {
 
     if (password.length < 4) {
       setError("비밀번호는 4자 이상이어야 합니다.");
+      return;
+    }
+
+    if (!privacyConsent) {
+      setError("개인정보 이용 동의(필수)에 체크해주세요.");
       return;
     }
 
@@ -68,85 +92,180 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-6">
-      <Card className="w-full max-w-md p-8 shadow-xl">
-        <div className="space-y-2">
-          <p className="text-sm text-blue-600 font-semibold">
-            DAN-ZZAN Ticketing
-          </p>
-          <h1 className="text-2xl font-semibold text-gray-900">회원가입</h1>
-          <p className="text-sm text-gray-500">
-            단국대 포털 계정으로 인증 후 회원가입을 진행합니다.
-          </p>
+    <div className="min-h-screen bg-[var(--bg-base)]">
+      <div className="mx-auto w-full max-w-[420px] px-5 py-6">
+        <button
+          type="button"
+          onClick={() => {
+            if (hasFestivalHomeUrl) {
+              window.location.href = festivalHomeUrl;
+            }
+          }}
+          disabled={!hasFestivalHomeUrl}
+          className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-55"
+        >
+          <House className="h-4 w-4" strokeWidth={2.3} />
+          축제 홈으로
+        </button>
+
+        <div className="mt-9">
+          <h1 className="text-[2.1rem] leading-[1.12] font-black tracking-tight text-[var(--text)]">
+            티켓팅 시작하기
+          </h1>
         </div>
 
-        <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <Label htmlFor="dkuStudentId">단국대 포털 학번</Label>
-            <Input
-              id="dkuStudentId"
-              value={dkuStudentId}
-              onChange={(event) => setDkuStudentId(event.target.value)}
-              placeholder="학번을 입력하세요"
-              required
-              disabled={submitting}
-            />
+        <section className="mt-6 rounded-2xl border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] px-3.5 py-3">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-strong)_100%)] text-[var(--accent)]">
+              <BadgeCheck className="h-4 w-4" strokeWidth={2.3} />
+            </div>
+            <div className="pt-0.5">
+              <span className="inline-flex items-center rounded-full border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-strong)_100%)] px-2 py-0.5 text-[11px] font-semibold text-[var(--accent)]">
+                재학생 전용
+              </span>
+              <p className="mt-1 text-sm font-semibold text-[var(--text)]">
+                단국존 티켓팅 및 이용은 단국대학교 재학생만 가능합니다
+              </p>
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="dkuPassword">포털 비밀번호</Label>
-            <Input
-              id="dkuPassword"
-              type="password"
-              value={dkuPassword}
-              onChange={(event) => setDkuPassword(event.target.value)}
-              placeholder="포털 비밀번호를 입력하세요"
-              required
-              disabled={submitting}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">웹 비밀번호</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              placeholder="사용할 비밀번호를 입력하세요 (4자 이상)"
-              required
-              disabled={submitting}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="passwordConfirm">비밀번호 확인</Label>
-            <Input
-              id="passwordConfirm"
-              type="password"
-              value={passwordConfirm}
-              onChange={(event) => setPasswordConfirm(event.target.value)}
-              placeholder="비밀번호를 다시 입력하세요"
-              required
-              disabled={submitting}
-            />
-          </div>
+        </section>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+        <div className="mt-6">
+          <AuthSegmentedControl activeTab="signup" />
+        </div>
 
-          <Button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700"
-            disabled={submitting}
-          >
-            {submitting ? loadingMessage || "처리 중..." : "회원가입"}
-          </Button>
+        <main className="pt-6">
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            <section className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="dkuStudentId" className="text-sm font-semibold text-[var(--text)]">
+                  학번
+                </Label>
+                <Input
+                  id="dkuStudentId"
+                  value={dkuStudentId}
+                  onChange={(event) => setDkuStudentId(event.target.value)}
+                  placeholder="학번 8자리를 입력해 주세요"
+                  className={inputClassName}
+                  required
+                  disabled={submitting}
+                />
+              </div>
 
-          <p className="text-center text-sm text-gray-500">
-            이미 계정이 있으신가요?{" "}
-            <Link to="/login" className="text-blue-600 hover:underline">
-              로그인
+              <div className="space-y-2">
+                <Label htmlFor="dkuPassword" className="text-sm font-semibold text-[var(--text)]">
+                  포털 비밀번호
+                </Label>
+                <Input
+                  id="dkuPassword"
+                  type="password"
+                  value={dkuPassword}
+                  onChange={(event) => setDkuPassword(event.target.value)}
+                  placeholder="포털 비밀번호를 입력해 주세요"
+                  className={inputClassName}
+                  required
+                  disabled={submitting}
+                />
+              </div>
+
+              <p className="flex items-start gap-1.5 text-[11px] font-medium leading-5 text-[var(--text-muted)]">
+                <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={2.3} />
+                재학생 인증을 위해 1회성으로만 사용되며 저장되지 않습니다.
+              </p>
+            </section>
+
+            <div className="h-px bg-[var(--border-subtle)]" />
+
+            <section className="space-y-4">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-strong)_100%)] px-3 py-1.5 text-xs font-semibold text-[var(--accent)]">
+                <KeyRound className="h-3.5 w-3.5" strokeWidth={2.3} />
+                서비스 비밀번호
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-semibold text-[var(--text)]">
+                  서비스 비밀번호
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="새로운 비밀번호를 입력해 주세요"
+                  className={inputClassName}
+                  required
+                  disabled={submitting}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="passwordConfirm" className="text-sm font-semibold text-[var(--text)]">
+                  서비스용 비밀번호 확인
+                </Label>
+                <Input
+                  id="passwordConfirm"
+                  type="password"
+                  value={passwordConfirm}
+                  onChange={(event) => setPasswordConfirm(event.target.value)}
+                  placeholder="새로운 비밀번호를 다시 입력해 주세요"
+                  className={inputClassName}
+                  required
+                  disabled={submitting}
+                />
+              </div>
+            </section>
+
+            {error && (
+              <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+                {error}
+              </p>
+            )}
+
+            <section className="rounded-2xl border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] px-4 py-4">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="privacyConsent"
+                  checked={privacyConsent}
+                  onCheckedChange={(checked) => setPrivacyConsent(checked === true)}
+                  disabled={submitting}
+                  className="mt-0.5 size-6 rounded-full border-[var(--border-base)] data-[state=checked]:border-[var(--accent)] data-[state=checked]:bg-[var(--accent)]"
+                />
+                <div>
+                  <Label
+                    htmlFor="privacyConsent"
+                    className="cursor-pointer text-base font-semibold text-[var(--text)]"
+                  >
+                    개인정보 이용 동의 (필수)
+                  </Label>
+                  <p className="mt-1 text-sm leading-6 text-[var(--text-muted)]">
+                    티켓팅 서비스 이용을 위해 학번, 연락처, 재학정보, 소속 대학, 학과 정보의 수집 및 이용에 동의합니다.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <Button
+              type="submit"
+              className="h-11 w-full rounded-2xl bg-[var(--accent)] text-white shadow-[0_10px_18px_-12px_rgba(15,23,42,0.24)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:opacity-55"
+              disabled={submitting || !canSubmit}
+            >
+              <KeyRound className="h-4 w-4" strokeWidth={2.3} />
+              {submitting ? loadingMessage || "처리 중..." : "재학생 인증 및 티켓팅 시작"}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-[var(--text-muted)]">이미 계정이 있으신가요?</p>
+            <Link
+              to="/login"
+              state={{ authTabFrom: "signup" }}
+              className="mt-2 inline-block text-sm font-semibold text-[var(--accent)]"
+            >
+              로그인하러 가기
             </Link>
-          </p>
-        </form>
-      </Card>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

@@ -8,11 +8,6 @@ const systems = [
     title: "팔찌 배부 운영",
     description: "티켓 확인 및 팔찌 지급 현황을 관리합니다.",
   },
-  {
-    id: "board",
-    title: "공지/분실물 게시판",
-    description: "공지사항과 분실물 게시글을 관리합니다.",
-  },
 ];
 
 export default function AdminEntry() {
@@ -35,7 +30,7 @@ export default function AdminEntry() {
                 <p className="text-sm text-muted-foreground">{system.description}</p>
                 <Button
                   className="w-full"
-                  onClick={() => navigate(`/admin/login?target=${system.id}`)}
+                  onClick={() => navigate("/admin/login")}
                 >
                   로그인으로 이동
                 </Button>

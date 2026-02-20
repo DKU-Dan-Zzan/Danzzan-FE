@@ -61,6 +61,19 @@ export const useWristband = () => {
     }
   }, []);
 
+  const cancelWristband = useCallback(async (eventId: string, ticketId: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await wristbandApi.cancelWristband(eventId, ticketId);
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     loading,
     error,
@@ -68,5 +81,6 @@ export const useWristband = () => {
     getStats,
     findAttendee,
     issueWristband,
+    cancelWristband,
   };
 };

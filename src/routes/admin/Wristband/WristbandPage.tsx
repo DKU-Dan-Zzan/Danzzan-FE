@@ -11,7 +11,7 @@ export default function WristbandPage() {
       <WristbandOperationScreen
         eventId={selectedSession.id}
         date={selectedSession.date}
-        title={selectedSession.title}
+        dayLabel={selectedSession.dayLabel}
         onBack={() => setSelectedSession(null)}
       />
     );

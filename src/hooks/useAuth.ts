@@ -1,7 +1,6 @@
 import { useCallback, useSyncExternalStore } from "react";
 import { authApi } from "@/api/authApi";
 import { adminAuthApi } from "@/api/adminAuthApi";
-import { adminSystemStore, type AdminSystem } from "@/store/adminSystemStore";
 import { authStore } from "@/store/authStore";
 import type { AuthCredentials, UserRole } from "@/types/model/auth.model";
 
@@ -15,18 +14,10 @@ export const useAuth = () => {
   const isAuthenticated = Boolean(state.tokens?.accessToken);
 
   const login = useCallback(
-    async (
-      payload: AuthCredentials,
-      role: UserRole,
-      adminSystem?: AdminSystem,
-    ) => {
+    async (payload: AuthCredentials, role: UserRole) => {
       if (role === "admin") {
-        if (!adminSystem) {
-          throw new Error("관리 시스템을 선택해주세요.");
-        }
-        const session = await adminAuthApi.login(payload, adminSystem);
+        const session = await adminAuthApi.login(payload);
         authStore.setSession(session, "admin");
-        adminSystemStore.setSystem(adminSystem);
         return session;
       }
 
@@ -45,7 +36,6 @@ export const useAuth = () => {
 
   const logout = useCallback(() => {
     authStore.clear();
-    adminSystemStore.clear();
   }, []);
 
   return {

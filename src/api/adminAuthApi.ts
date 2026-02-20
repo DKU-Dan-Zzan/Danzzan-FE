@@ -1,6 +1,5 @@
 import { createHttpClient } from "@/api/httpClient";
 import { authStore } from "@/store/authStore";
-import type { AdminSystem } from "@/store/adminSystemStore";
 import type { AuthCredentials, AuthSession } from "@/types/model/auth.model";
 import { env, requireEnv } from "@/utils/env";
 
@@ -20,10 +19,7 @@ const getClient = () =>
   });
 
 export const adminAuthApi = {
-  login: async (
-    payload: AuthCredentials,
-    _system: AdminSystem,
-  ): Promise<AuthSession> => {
+  login: async (payload: AuthCredentials): Promise<AuthSession> => {
     if (env.apiMode === "mock") {
       return Promise.resolve({
         tokens: {

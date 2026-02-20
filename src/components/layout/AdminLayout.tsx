@@ -1,16 +1,11 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { Button } from "@/components/common/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { useAdminSystem } from "@/hooks/useAdminSystem";
 import { env } from "@/utils/env";
-
-const linkBase =
-  "rounded-md px-4 py-2 text-sm font-semibold transition-colors";
 
 export function AdminLayout() {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const adminSystem = useAdminSystem();
 
   const handleLogout = () => {
     logout();
@@ -19,11 +14,13 @@ export function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-[#c7d3e6] bg-card">
-        <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between px-8 py-4">
+      <header className="border-b border-[var(--border-base)] bg-[var(--surface-subtle)]">
+        <div className="mx-auto flex w-full max-w-[1360px] items-center justify-between px-8 py-4">
           <div>
-            <p className="text-base text-primary font-semibold">DAN-ZZAN Operations</p>
-            <h1 className="text-3xl font-semibold text-foreground">통합 관리자 포털</h1>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
+              ADMIN PORTAL
+            </p>
+            <h1 className="text-3xl font-semibold text-foreground">팔찌 배부 관리자 포털</h1>
           </div>
           <div className="flex items-center gap-3">
             {env.apiMode === "mock" && (
@@ -31,19 +28,9 @@ export function AdminLayout() {
                 MOCK MODE
               </span>
             )}
-            <span className="rounded-full bg-primary-soft px-3 py-1 text-sm font-semibold text-primary">
-              관리자
+            <span className="rounded-full border border-[var(--border-base)] bg-[var(--surface-base)] px-3 py-1 text-sm font-semibold text-muted-foreground">
+              운영자: 관리자
             </span>
-            {adminSystem === "wristband" && (
-              <span className="rounded-full border border-[#c7d3e6] bg-white px-3 py-1 text-sm font-semibold text-muted-foreground">
-                분실물/공지사항은 로그아웃 후 이용 가능합니다
-              </span>
-            )}
-            {adminSystem === "board" && (
-              <span className="rounded-full border border-[#c7d3e6] bg-white px-3 py-1 text-sm font-semibold text-muted-foreground">
-                팔찌배부시스템은 로그아웃 후 이용가능합니다
-              </span>
-            )}
             <Button variant="outline" onClick={handleLogout} className="h-9">
               로그아웃
             </Button>
@@ -51,58 +38,8 @@ export function AdminLayout() {
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-[1600px] px-8 py-6">
-        <nav className="flex flex-wrap items-center gap-2">
-          {/* {adminSystem === "wristband" && (
-            <NavLink
-              to="/admin/wristband"
-              end
-              className={({ isActive }) =>
-                `${linkBase} ${
-                  isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-card text-muted-foreground hover:bg-muted"
-                }`
-              }
-            >
-              Wristband
-            </NavLink>
-          )} */}
-          {adminSystem === "board" && (
-            <>
-              <NavLink
-                to="/admin/board"
-                end
-                className={({ isActive }) =>
-                  `${linkBase} ${
-                    isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-card text-muted-foreground hover:bg-muted"
-                  }`
-                }
-              >
-                Notice
-              </NavLink>
-              <NavLink
-                to="/admin/board/lostfound"
-                end
-                className={({ isActive }) =>
-                  `${linkBase} ${
-                    isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-card text-muted-foreground hover:bg-muted"
-                  }`
-                }
-              >
-                Lost&Found
-              </NavLink>
-            </>
-          )}
-        </nav>
-
-        <div className="mt-6">
-          <Outlet />
-        </div>
+      <div className="mx-auto w-full max-w-[1360px] px-8 py-6">
+        <Outlet />
       </div>
     </div>
   );

@@ -39,18 +39,6 @@ export function WristbandDashboard({ onSelectSession }: WristbandDashboardProps)
     return `${month}월 ${day}일`;
   };
 
-  const statusLabel: Record<WristbandSession["status"], string> = {
-    open: "운영중",
-    closed: "마감",
-    unknown: "미정",
-  };
-
-  const statusStyle: Record<WristbandSession["status"], string> = {
-    open: "bg-success/15 text-success",
-    closed: "bg-muted text-muted-foreground",
-    unknown: "bg-warning/15 text-warning",
-  };
-
   return (
     <div className="space-y-8">
       <div>
@@ -72,13 +60,10 @@ export function WristbandDashboard({ onSelectSession }: WristbandDashboardProps)
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {sortedSessions.map((session) => (
             <Card key={session.id} className="p-8 hover:shadow-md transition-shadow">
-              <div className="space-y-6">
+                <div className="space-y-6">
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2">
+                  <div>
                     <span className="text-sm font-semibold text-primary">{session.dayLabel}</span>
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusStyle[session.status]}`}>
-                      {statusLabel[session.status]}
-                    </span>
                   </div>
                   <h3 className="text-2xl font-bold text-foreground">
                     {session.title || `${formatDate(session.date)} 공연 팔찌 배부`}

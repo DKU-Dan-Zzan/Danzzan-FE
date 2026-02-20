@@ -4,8 +4,14 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
+    "lint": "npm run lint:colors",
+    "lint:colors": "node scripts/lint-colors.mjs",
+    "lint:colors:staged": "node scripts/lint-colors.mjs --staged",
+    "setup:githooks": "git config core.hooksPath .githooks",
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "dev:user": "vite --open /login",
+    "dev:admin": "vite --open /admin"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
