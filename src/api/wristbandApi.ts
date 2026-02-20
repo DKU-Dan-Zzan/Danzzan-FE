@@ -1,15 +1,17 @@
 import { createHttpClient } from "@/api/httpClient";
 import { wristbandMock } from "@/mocks/wristband.mock";
 import {
-  mapWristbandAttendeeDtoToModel,
-  mapWristbandSessionDtoToModel,
-  mapWristbandStatsDtoToModel,
+  mapEventSummaryToSession,
+  mapEventStatsToWristbandStats,
+  mapTicketSearchItemToAttendee,
 } from "@/mappers/wristbandMapper";
 import { authStore } from "@/store/authStore";
 import type {
-  WristbandAttendeeDto,
-  WristbandSessionDto,
-  WristbandStatsDto,
+  ApiResponse,
+  EventListResponseDto,
+  EventStatsResponseDto,
+  TicketSearchResponseDto,
+  IssueTicketResponseDto,
 } from "@/types/dto/wristband.dto";
 import type {
   WristbandAttendee,
@@ -20,66 +22,85 @@ import { env, requireEnv } from "@/utils/env";
 
 const isMockMode = env.apiMode === "mock";
 
-const getWristbandClient = () =>
+const getClient = () =>
   createHttpClient({
     baseUrl: requireEnv(
-      env.ticketingApiBaseUrl,
-      "VITE_TICKETING_API_BASE_URL",
+      env.apiBaseUrl || env.ticketingApiBaseUrl,
+      "VITE_API_URL",
     ),
     getAccessToken: authStore.getAccessToken,
   });
 
+/** ApiResponse 래퍼에서 data를 추출 */
+function unwrap<T>(response: ApiResponse<T> | T): T {
+  if (response && typeof response === "object" && "success" in response) {
+    const apiResp = response as ApiResponse<T>;
+    if (!apiResp.success || apiResp.data == null) {
+      const errorMsg = apiResp.error?.message ?? "요청에 실패했습니다.";
+      throw new Error(errorMsg);
+    }
+    return apiResp.data;
+  }
+  return response as T;
+}
+
 export const wristbandApi = {
+  /** 이벤트 목록 조회 (= 운영 세션 목록) */
   listSessions: async (): Promise<WristbandSession[]> => {
     if (isMockMode) {
       return wristbandMock.listSessions();
     }
-    const client = getWristbandClient();
-    // TODO: Confirm wristband session endpoint.
-    const dto = await client.get<{ items?: WristbandSessionDto[] }>(
-      "/wristband/sessions",
+    const client = getClient();
+    const raw = await client.get<ApiResponse<EventListResponseDto>>(
+      "/api/admin/events",
     );
-    const items = dto?.items ?? [];
-    return items.map((item) => mapWristbandSessionDtoToModel(item));
+    const data = unwrap(raw);
+    return (data.events ?? []).map(mapEventSummaryToSession);
   },
-  getStats: async (date: string): Promise<WristbandStats> => {
+
+  /** 이벤트 통계 조회 (eventId 기반) */
+  getStats: async (eventId: string): Promise<WristbandStats> => {
     if (isMockMode) {
-      return wristbandMock.getStats(date);
+      return wristbandMock.getStats(eventId);
     }
-    const client = getWristbandClient();
-    // TODO: Confirm wristband stats endpoint.
-    const dto = await client.get<WristbandStatsDto>("/wristband/stats", {
-      params: { date },
-    });
-    return mapWristbandStatsDtoToModel(dto);
+    const client = getClient();
+    const raw = await client.get<ApiResponse<EventStatsResponseDto>>(
+      `/api/admin/events/${eventId}/stats`,
+    );
+    const data = unwrap(raw);
+    return mapEventStatsToWristbandStats(data);
   },
+
+  /** 학번으로 티켓 검색 */
   findAttendee: async (
-    keyword: string,
-    date: string,
+    studentId: string,
+    eventId: string,
   ): Promise<WristbandAttendee | null> => {
     if (isMockMode) {
-      return wristbandMock.findAttendee(keyword, date);
+      return wristbandMock.findAttendee(studentId, eventId);
     }
-    const client = getWristbandClient();
-    // TODO: Confirm wristband attendee lookup endpoint + param name (studentId/ticketId).
-    const dto = await client.get<WristbandAttendeeDto | null>(
-      "/wristband/attendees/search",
-      {
-        params: { studentId: keyword, date },
-      },
+    const client = getClient();
+    const raw = await client.get<ApiResponse<TicketSearchResponseDto>>(
+      `/api/admin/events/${eventId}/tickets/search`,
+      { params: { studentId } },
     );
-    if (!dto) {
+    const data = unwrap(raw);
+    const results = data.results ?? [];
+    if (results.length === 0) {
       return null;
     }
-    return mapWristbandAttendeeDtoToModel(dto);
+    return mapTicketSearchItemToAttendee(results[0]);
   },
-  issueWristband: async (keyword: string, date: string): Promise<void> => {
+
+  /** 팔찌 지급 (eventId + ticketId) */
+  issueWristband: async (eventId: string, ticketId: number): Promise<void> => {
     if (isMockMode) {
-      wristbandMock.issueWristband(keyword, date);
+      wristbandMock.issueWristband(String(ticketId), eventId);
       return;
     }
-    const client = getWristbandClient();
-    // TODO: Confirm wristband issuance endpoint + payload shape.
-    await client.post<void>("/wristband/issue", { studentId: keyword, date });
+    const client = getClient();
+    await client.patch<ApiResponse<IssueTicketResponseDto>>(
+      `/api/admin/events/${eventId}/tickets/${ticketId}/issue`,
+    );
   },
 };

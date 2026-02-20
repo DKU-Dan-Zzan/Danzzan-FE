@@ -4,96 +4,83 @@ import type {
   WristbandStats,
 } from "@/types/model/wristband.model";
 
-type MockAttendeeRecord = WristbandAttendee;
+type MockAttendeeRecord = WristbandAttendee & { eventId: string };
 
 const sessions: WristbandSession[] = [
   {
-    id: "session-2026-05-13",
+    id: "1",
+    title: "5월 13일 공연 팔찌 배부",
+    dayLabel: "DAY 1",
     date: "2026-05-13",
     status: "open",
+    totalCapacity: 5000,
   },
   {
-    id: "session-2026-05-14",
+    id: "2",
+    title: "5월 14일 공연 팔찌 배부",
+    dayLabel: "DAY 2",
     date: "2026-05-14",
     status: "open",
+    totalCapacity: 5000,
   },
 ];
 
 const attendees: MockAttendeeRecord[] = [
   {
+    ticketId: 1,
     studentId: "20240001",
-    ticketId: "T-2026-0513-0001",
-    queueNumber: 12,
     name: "박주희",
     college: "공과대학",
     department: "컴퓨터공학과",
     hasWristband: false,
-    ticketDate: "2026-05-13",
+    issuedAt: null,
+    issuerAdminName: null,
+    eventId: "1",
   },
   {
+    ticketId: 2,
     studentId: "20240002",
-    ticketId: "T-2026-0513-0002",
-    queueNumber: 1,
     name: "박민수",
     college: "경영대학",
     department: "경영학과",
     hasWristband: true,
-    ticketDate: "2026-05-13",
+    issuedAt: "2026-05-13T10:30:00",
+    issuerAdminName: "김관리",
+    eventId: "1",
   },
   {
+    ticketId: 3,
     studentId: "20231234",
-    ticketId: "T-2026-0513-0048",
-    queueNumber: 48,
     name: "이서연",
     college: "인문대학",
     department: "국어국문학과",
     hasWristband: false,
-    ticketDate: "2026-05-13",
+    issuedAt: null,
+    issuerAdminName: null,
+    eventId: "1",
   },
   {
+    ticketId: 4,
     studentId: "20227890",
-    ticketId: "T-2026-0514-0008",
-    queueNumber: 8,
     name: "정다은",
     college: "사회과학대학",
     department: "심리학과",
     hasWristband: false,
-    ticketDate: "2026-05-14",
-  },
-  {
-    studentId: "20225555",
-    ticketId: "T-2026-0514-0030",
-    queueNumber: 30,
-    name: "홍지훈",
-    college: "자연과학대학",
-    department: "물리학과",
-    hasWristband: true,
-    ticketDate: "2026-05-14",
+    issuedAt: null,
+    issuerAdminName: null,
+    eventId: "2",
   },
 ];
 
-const normalize = (value: string) => value.trim().toLowerCase();
-
-const matchesIdentifier = (attendee: MockAttendeeRecord, keyword: string) => {
-  const target = normalize(keyword);
-  if (!target) {
-    return false;
-  }
-  return (
-    normalize(attendee.studentId) === target ||
-    normalize(attendee.ticketId) === target
-  );
-};
-
-const getAttendeesByDate = (date: string) =>
-  attendees.filter((attendee) => attendee.ticketDate === date);
+const getAttendeesByEvent = (eventId: string) =>
+  attendees.filter((a) => a.eventId === eventId);
 
 export const wristbandMock = {
   listSessions: (): WristbandSession[] => {
     return [...sessions].sort((a, b) => a.date.localeCompare(b.date));
   },
-  getStats: (date: string): WristbandStats => {
-    const scoped = getAttendeesByDate(date);
+  getStats: (eventId: string): WristbandStats => {
+    const scoped = getAttendeesByEvent(eventId);
     const totalTickets = scoped.length;
     const issuedCount = scoped.filter((item) => item.hasWristband).length;
     return {
@@ -102,17 +89,21 @@ export const wristbandMock = {
       pendingCount: totalTickets - issuedCount,
     };
   },
-  findAttendee: (keyword: string, date: string): WristbandAttendee | null => {
-    const scoped = getAttendeesByDate(date);
-    const found = scoped.find((attendee) => matchesIdentifier(attendee, keyword));
-    return found ?? null;
+  findAttendee: (studentId: string, eventId: string): WristbandAttendee | null => {
+    const scoped = getAttendeesByEvent(eventId);
+    const found = scoped.find((a) => a.studentId === studentId.trim());
+    if (!found) return null;
+    const { eventId: _, ...attendee } = found;
+    return attendee;
   },
-  issueWristband: (keyword: string, date: string): void => {
-    const scoped = getAttendeesByDate(date);
-    const attendee = scoped.find((item) => matchesIdentifier(item, keyword));
+  issueWristband: (keyword: string, eventId: string): void => {
+    const scoped = getAttendeesByEvent(eventId);
+    const attendee = scoped.find((a) => a.studentId === keyword || String(a.ticketId) === keyword);
     if (!attendee) {
-      throw new Error("해당 학번/티켓ID를 찾을 수 없습니다.");
+      throw new Error("해당 학번을 찾을 수 없습니다.");
     }
     attendee.hasWristband = true;
+    attendee.issuedAt = new Date().toISOString();
+    attendee.issuerAdminName = "관리자";
   },
 };

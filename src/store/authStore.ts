@@ -109,7 +109,7 @@ export const authStore = {
     const nextState: AuthState = {
       tokens: session.tokens,
       user: session.user,
-      role: roleOverride ?? session.user?.role ?? null,
+      role: roleOverride ?? (session.user?.role === "student" || session.user?.role === "admin" ? session.user.role : null),
     };
     state = nextState;
     persistState(nextState);

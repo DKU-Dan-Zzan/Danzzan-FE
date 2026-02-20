@@ -5,8 +5,9 @@ import { useAdminSystem } from "@/hooks/useAdminSystem";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { UserLayout } from "@/components/layout/UserLayout";
 import Login from "@/routes/Login/Login";
-// import Ticketing from "@/routes/Ticketing/Ticketing";
-// import MyTicket from "@/routes/MyTicket/MyTicket";
+import Signup from "@/routes/Signup/Signup";
+import Ticketing from "@/routes/Ticketing/Ticketing";
+import MyTicket from "@/routes/MyTicket/MyTicket";
 import AdminLogin from "@/routes/admin/Login/AdminLogin";
 import AdminDashboard from "@/routes/admin/Dashboard/Dashboard";
 import WristbandPage from "@/routes/admin/Wristband/WristbandPage";
@@ -73,6 +74,7 @@ export default function App() {
 
         <Route element={<UserLayout />}>
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route element={<RequireStudentAuth />}>
             {/* <Route path="/ticketing" element={<Ticketing />} /> */}
             {/* <Route path="/myticket" element={<MyTicket />} /> */}

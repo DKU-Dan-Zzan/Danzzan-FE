@@ -1,7 +1,7 @@
 import type {
-  WristbandAttendeeDto,
-  WristbandSessionDto,
-  WristbandStatsDto,
+  EventSummaryDto,
+  EventStatsResponseDto,
+  TicketSearchItemDto,
 } from "@/types/dto/wristband.dto";
 import type {
   WristbandAttendee,
@@ -10,47 +10,45 @@ import type {
   WristbandStats,
 } from "@/types/model/wristband.model";
 
-const mapSessionStatus = (status?: string): WristbandSessionStatus => {
+const mapTicketingStatus = (status: string): WristbandSessionStatus => {
   switch (status) {
-    case "open":
-    case "closed":
-      return status;
+    case "OPEN":
+      return "open";
+    case "CLOSED":
+      return "closed";
     default:
       return "unknown";
   }
 };
 
-export const mapWristbandStatsDtoToModel = (
-  dto?: WristbandStatsDto,
-): WristbandStats => {
-  return {
-    totalTickets: dto?.totalTickets ?? 0,
-    issuedCount: dto?.issuedCount ?? 0,
-    pendingCount: dto?.pendingCount ?? 0,
-  };
-};
+export const mapEventSummaryToSession = (
+  dto: EventSummaryDto,
+): WristbandSession => ({
+  id: String(dto.eventId),
+  title: dto.title,
+  dayLabel: dto.dayLabel,
+  date: dto.eventDate,
+  status: mapTicketingStatus(dto.ticketingStatus),
+  totalCapacity: dto.totalCapacity,
+});
 
-export const mapWristbandAttendeeDtoToModel = (
-  dto: WristbandAttendeeDto,
-): WristbandAttendee => {
-  return {
-    studentId: dto.studentId ?? "",
-    ticketId: dto.ticketId ?? "",
-    queueNumber: dto.queueNumber ?? null,
-    name: dto.name ?? "",
-    college: dto.college ?? "",
-    department: dto.department ?? "",
-    hasWristband: dto.hasWristband ?? false,
-    ticketDate: dto.ticketDate ?? "",
-  };
-};
+export const mapEventStatsToWristbandStats = (
+  dto: EventStatsResponseDto,
+): WristbandStats => ({
+  totalTickets: dto.totalTickets,
+  issuedCount: dto.ticketsIssued,
+  pendingCount: dto.ticketsConfirmed,
+});
 
-export const mapWristbandSessionDtoToModel = (
-  dto: WristbandSessionDto,
-): WristbandSession => {
-  return {
-    id: dto.id?.toString() ?? "",
-    date: dto.date ?? "",
-    status: mapSessionStatus(dto.status),
-  };
-};
+export const mapTicketSearchItemToAttendee = (
+  dto: TicketSearchItemDto,
+): WristbandAttendee => ({
+  ticketId: dto.ticketId,
+  studentId: dto.studentId,
+  name: dto.name,
+  college: dto.college,
+  department: dto.major,
+  hasWristband: dto.status === "ISSUED",
+  issuedAt: dto.issuedAt,
+  issuerAdminName: dto.issuerAdminName,
+});

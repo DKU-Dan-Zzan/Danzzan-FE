@@ -5,10 +5,10 @@ import { useWristband } from "@/hooks/useWristband";
 import type { WristbandSession } from "@/types/model/wristband.model";
 
 interface WristbandDashboardProps {
-  onSelectDate: (date: string) => void;
+  onSelectSession: (session: WristbandSession) => void;
 }
 
-export function WristbandDashboard({ onSelectDate }: WristbandDashboardProps) {
+export function WristbandDashboard({ onSelectSession }: WristbandDashboardProps) {
   const { listSessions, loading, error } = useWristband();
   const [sessions, setSessions] = useState<WristbandSession[]>([]);
 
@@ -74,19 +74,22 @@ export function WristbandDashboard({ onSelectDate }: WristbandDashboardProps) {
             <Card key={session.id} className="p-8 hover:shadow-md transition-shadow">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-bold text-foreground">
-                    {formatDate(session.date)} 공연 팔찌 배부
-                  </h3>
-                  <div className="flex items-center gap-2 text-base text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-primary">{session.dayLabel}</span>
                     <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusStyle[session.status]}`}>
                       {statusLabel[session.status]}
                     </span>
-                    <span>운영 일자: {session.date}</span>
                   </div>
+                  <h3 className="text-2xl font-bold text-foreground">
+                    {session.title || `${formatDate(session.date)} 공연 팔찌 배부`}
+                  </h3>
+                  <p className="text-base text-muted-foreground">
+                    운영 일자: {session.date}
+                  </p>
                 </div>
                 <Button
                   className="w-full h-12 text-base"
-                  onClick={() => onSelectDate(session.date)}
+                  onClick={() => onSelectSession(session)}
                 >
                   관리하기
                 </Button>

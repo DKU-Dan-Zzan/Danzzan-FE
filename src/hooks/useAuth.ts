@@ -1,6 +1,6 @@
 import { useCallback, useSyncExternalStore } from "react";
-import { adminAuthApi } from "@/api/adminAuthApi";
 import { authApi } from "@/api/authApi";
+import { adminAuthApi } from "@/api/adminAuthApi";
 import { adminSystemStore, type AdminSystem } from "@/store/adminSystemStore";
 import { authStore } from "@/store/authStore";
 import type { AuthCredentials, UserRole } from "@/types/model/auth.model";
@@ -25,7 +25,7 @@ export const useAuth = () => {
           throw new Error("관리 시스템을 선택해주세요.");
         }
         const session = await adminAuthApi.login(payload, adminSystem);
-        authStore.setSession(session, role);
+        authStore.setSession(session, "admin");
         adminSystemStore.setSystem(adminSystem);
         return session;
       }

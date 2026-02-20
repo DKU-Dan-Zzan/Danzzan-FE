@@ -11,14 +11,14 @@ import { useAuth } from "@/hooks/useAuth";
 
 const systems = [
   {
-    id: "wristband",
+    id: "wristband" as const,
     label: "팔찌 배부 운영 시스템",
     icon: Ticket,
     iconBg: "bg-primary-soft",
     iconColor: "text-primary",
   },
   {
-    id: "board",
+    id: "board" as const,
     label: "공지사항 · 분실물 게시판 관리",
     icon: Megaphone,
     iconBg: "bg-muted",
@@ -26,7 +26,7 @@ const systems = [
   },
 ];
 
-type SystemId = (typeof systems)[number]["id"];
+type SystemId = "wristband" | "board";
 
 export default function AdminLogin() {
   const [searchParams] = useSearchParams();

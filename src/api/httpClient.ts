@@ -1,4 +1,4 @@
-import axios, { AxiosError, type AxiosRequestConfig } from "axios";
+import axios, { AxiosError } from "axios";
 
 export type RequestParams = Record<string, string | number | boolean | null | undefined>;
 
@@ -59,16 +59,18 @@ export const createHttpClient = (options: {
     },
   );
 
+  // The response interceptor unwraps response.data, so the actual return type is T, not AxiosResponse<T>.
+  // We cast through `unknown` to reflect this runtime behavior.
   return {
-    get: <T>(path: string, requestOptions?: RequestOptions) =>
-      instance.get<T>(path, requestOptions),
-    post: <T>(path: string, body?: unknown, requestOptions?: RequestOptions) =>
-      instance.post<T>(path, body, requestOptions),
-    put: <T>(path: string, body?: unknown, requestOptions?: RequestOptions) =>
-      instance.put<T>(path, body, requestOptions),
-    patch: <T>(path: string, body?: unknown, requestOptions?: RequestOptions) =>
-      instance.patch<T>(path, body, requestOptions),
-    delete: <T>(path: string, requestOptions?: RequestOptions) =>
-      instance.delete<T>(path, requestOptions),
+    get: <T>(path: string, requestOptions?: RequestOptions): Promise<T> =>
+      instance.get(path, requestOptions) as unknown as Promise<T>,
+    post: <T>(path: string, body?: unknown, requestOptions?: RequestOptions): Promise<T> =>
+      instance.post(path, body, requestOptions) as unknown as Promise<T>,
+    put: <T>(path: string, body?: unknown, requestOptions?: RequestOptions): Promise<T> =>
+      instance.put(path, body, requestOptions) as unknown as Promise<T>,
+    patch: <T>(path: string, body?: unknown, requestOptions?: RequestOptions): Promise<T> =>
+      instance.patch(path, body, requestOptions) as unknown as Promise<T>,
+    delete: <T>(path: string, requestOptions?: RequestOptions): Promise<T> =>
+      instance.delete(path, requestOptions) as unknown as Promise<T>,
   };
 };

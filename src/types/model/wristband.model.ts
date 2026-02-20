@@ -5,20 +5,23 @@ export interface WristbandStats {
 }
 
 export interface WristbandAttendee {
+  ticketId: number;
   studentId: string;
-  ticketId: string;
-  queueNumber: number | null;
   name: string;
   college: string;
   department: string;
   hasWristband: boolean;
-  ticketDate: string;
+  issuedAt: string | null;
+  issuerAdminName: string | null;
 }
 
 export type WristbandSessionStatus = "open" | "closed" | "unknown";
 
 export interface WristbandSession {
   id: string;
+  title: string;
+  dayLabel: string;
   date: string;
   status: WristbandSessionStatus;
+  totalCapacity: number;
 }

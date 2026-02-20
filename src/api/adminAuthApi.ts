@@ -4,75 +4,25 @@ import type { AdminSystem } from "@/store/adminSystemStore";
 import type { AuthCredentials, AuthSession } from "@/types/model/auth.model";
 import { env, requireEnv } from "@/utils/env";
 
-type AdminAuthResponse = {
-  accessToken?: string;
-  token?: string;
-  admin?: {
-    id?: number;
-    name?: string;
-    studentId?: string;
-    role?: string;
-  };
-};
+/**
+ * 관리자 로그인 API
+ * 백엔드는 학생/관리자 구분 없이 POST /user/login 을 사용하며,
+ * JWT 토큰의 role 클레임으로 ROLE_ADMIN / ROLE_USER를 구분합니다.
+ */
 
-const resolveBaseUrl = (system: AdminSystem) => {
-  const base =
-    system === "board"
-      ? env.boardApiBaseUrl || env.apiBaseUrl
-      : env.ticketingApiBaseUrl || env.apiBaseUrl;
-
-  return requireEnv(
-    base,
-    system === "board"
-      ? "VITE_BOARD_API_BASE_URL"
-      : "VITE_TICKETING_API_BASE_URL",
-  );
-};
-
-const getAdminAuthClient = (system: AdminSystem) =>
+const getClient = () =>
   createHttpClient({
-    baseUrl: resolveBaseUrl(system),
+    baseUrl: requireEnv(
+      env.apiBaseUrl || env.ticketingApiBaseUrl,
+      "VITE_API_URL",
+    ),
     getAccessToken: authStore.getAccessToken,
   });
-
-const mapAdminAuthResponse = (payload: unknown): AuthSession => {
-  const body = (payload && typeof payload === "object"
-    ? payload
-    : {}) as Record<string, any>;
-  const data =
-    body.data && typeof body.data === "object" ? body.data : body;
-
-  const accessToken =
-    typeof data?.accessToken === "string"
-      ? data.accessToken
-      : typeof data?.token === "string"
-        ? data.token
-        : "";
-
-  const admin = data?.admin ?? null;
-
-  return {
-    tokens: {
-      accessToken,
-      refreshToken: "",
-      expiresIn: null,
-    },
-    user: admin
-      ? {
-          id: String(admin.id ?? ""),
-          name: admin.name ?? "",
-          role: "admin",
-          department: "",
-          studentId: admin.studentId ?? "",
-        }
-      : null,
-  };
-};
 
 export const adminAuthApi = {
   login: async (
     payload: AuthCredentials,
-    system: AdminSystem,
+    _system: AdminSystem,
   ): Promise<AuthSession> => {
     if (env.apiMode === "mock") {
       return Promise.resolve({
@@ -91,15 +41,49 @@ export const adminAuthApi = {
       });
     }
 
-    const client = getAdminAuthClient(system);
-    const dto = await client.post<AdminAuthResponse | { data?: AdminAuthResponse }>(
-      "/api/admin/auth/login",
+    const client = getClient();
+    const dto = await client.post<{ accessToken: string; refreshToken: string }>(
+      "/user/login",
       {
         studentId: payload.studentId,
         password: payload.password,
       },
     );
 
-    return mapAdminAuthResponse(dto);
+    // JWT에서 role 정보를 디코딩하여 ADMIN인지 확인
+    const accessToken = dto?.accessToken ?? "";
+    const refreshToken = dto?.refreshToken ?? "";
+
+    let user = null;
+    if (accessToken) {
+      try {
+        const payloadPart = accessToken.split(".")[1];
+        const decoded = JSON.parse(atob(payloadPart));
+        user = {
+          id: decoded.sub ?? "",
+          name: "",
+          role: decoded.role === "ROLE_ADMIN" ? "admin" as const : "unknown" as const,
+          department: "",
+          studentId: decoded.studentId ?? "",
+        };
+
+        if (decoded.role !== "ROLE_ADMIN") {
+          throw new Error("관리자 권한이 없는 계정입니다.");
+        }
+      } catch (e) {
+        if (e instanceof Error && e.message.includes("관리자 권한")) {
+          throw e;
+        }
+      }
+    }
+
+    return {
+      tokens: {
+        accessToken,
+        refreshToken,
+        expiresIn: null,
+      },
+      user,
+    };
   },
 };

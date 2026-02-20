@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
 import { Input } from "@/components/common/ui/input";
@@ -79,6 +79,13 @@ export default function Login() {
           >
             {submitting ? "로그인 중..." : "로그인"}
           </Button>
+
+          <p className="text-center text-sm text-gray-500">
+            계정이 없으신가요?{" "}
+            <Link to="/signup" className="text-blue-600 hover:underline">
+              회원가입
+            </Link>
+          </p>
         </form>
       </Card>
     </div>

@@ -19,11 +19,11 @@ export const useWristband = () => {
     }
   }, []);
 
-  const getStats = useCallback(async (date: string): Promise<WristbandStats | null> => {
+  const getStats = useCallback(async (eventId: string): Promise<WristbandStats | null> => {
     setLoading(true);
     setError(null);
     try {
-      return await wristbandApi.getStats(date);
+      return await wristbandApi.getStats(eventId);
     } catch (err) {
       setError(err as Error);
       return null;
@@ -33,11 +33,11 @@ export const useWristband = () => {
   }, []);
 
   const findAttendee = useCallback(
-    async (keyword: string, date: string): Promise<WristbandAttendee | null> => {
+    async (studentId: string, eventId: string): Promise<WristbandAttendee | null> => {
       setLoading(true);
       setError(null);
       try {
-        return await wristbandApi.findAttendee(keyword, date);
+        return await wristbandApi.findAttendee(studentId, eventId);
       } catch (err) {
         setError(err as Error);
         return null;
@@ -48,11 +48,11 @@ export const useWristband = () => {
     [],
   );
 
-  const issueWristband = useCallback(async (keyword: string, date: string) => {
+  const issueWristband = useCallback(async (eventId: string, ticketId: number) => {
     setLoading(true);
     setError(null);
     try {
-      await wristbandApi.issueWristband(keyword, date);
+      await wristbandApi.issueWristband(eventId, ticketId);
     } catch (err) {
       setError(err as Error);
       throw err;
