@@ -24,7 +24,7 @@ export function ReservationSuccessPanel({
         </div>
 
         <div className="relative mt-4 flex items-center gap-4 rounded-[20px] border border-[var(--border-base)] bg-[var(--surface-base)] px-4 py-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] bg-[var(--accent)] text-white shadow-[0_12px_20px_-14px_rgba(15,23,42,0.24)]">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] bg-[var(--accent)] text-white shadow-[0_12px_20px_-14px_var(--shadow-color)]">
             <CheckCircle2 className="h-8 w-8" />
           </div>
           <div>

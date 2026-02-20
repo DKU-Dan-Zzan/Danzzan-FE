@@ -50,7 +50,7 @@ export function UserLayout() {
   return (
       <div className="min-h-screen overflow-x-hidden bg-[var(--bg-base)]">
       {showHeader && (
-        <header className="sticky top-0 z-40 border-b border-[var(--border-base)] bg-[var(--surface-subtle)] shadow-[0_1px_0_rgba(255,255,255,0.7)] backdrop-blur supports-[backdrop-filter]:bg-[var(--surface-base)]">
+        <header className="sticky top-0 z-40 border-b border-[var(--border-base)] bg-[var(--surface-subtle)] shadow-[0_1px_0_var(--surface-subtle)] backdrop-blur supports-[backdrop-filter]:bg-[var(--surface-base)]">
           <div className="mx-auto flex h-16 w-full max-w-md items-center gap-2 px-4">
             <Button
               variant="ghost"
