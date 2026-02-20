@@ -1,20 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ReservationSoldOutPanel } from "@/components/ticketing/ReservationSoldOutPanel";
 import { ReservationSuccessPanel } from "@/components/ticketing/ReservationSuccessPanel";
 import { TicketingEventListPanel } from "@/components/ticketing/TicketingEventListPanel";
 import { TicketingHomePanel } from "@/components/ticketing/TicketingHomePanel";
 import { TicketingReservationPanel } from "@/components/ticketing/TicketingReservationPanel";
+import { REQUIRED_ACKNOWLEDGEMENT_CODE } from "@/components/ticketing/ticketingConstants";
 import { useTicketing } from "@/hooks/useTicketing";
 import type { TicketingEvent } from "@/types/model/ticket.model";
 
-const RESERVATION_LIMIT_SECONDS = 180;
-
-type TicketingStep = "home" | "list" | "in-progress" | "success";
-
-const generateCaptcha = (): string => {
-  const randomText = Math.random().toString(36).slice(2, 8);
-  return randomText.toUpperCase();
-};
+type TicketingStep = "home" | "list" | "in-progress" | "soldout" | "success";
 
 export default function Ticketing() {
   const navigate = useNavigate();
@@ -32,15 +27,13 @@ export default function Ticketing() {
   const [events, setEvents] = useState<TicketingEvent[]>([]);
   const [now, setNow] = useState(() => Date.now());
   const [selectedEvent, setSelectedEvent] = useState<TicketingEvent | null>(null);
-  const [captchaCode, setCaptchaCode] = useState(generateCaptcha);
-  const [captchaInput, setCaptchaInput] = useState("");
-  const [reservationSeconds, setReservationSeconds] = useState(RESERVATION_LIMIT_SECONDS);
-  const [reservationTimedOut, setReservationTimedOut] = useState(false);
+  const [agreementInput, setAgreementInput] = useState("");
   const [reservationError, setReservationError] = useState<string | null>(null);
 
-  const loadEvents = useCallback(async () => {
+  const loadEvents = useCallback(async (): Promise<TicketingEvent[]> => {
     const fetched = await getTicketingEvents();
     setEvents(fetched);
+    return fetched;
   }, [getTicketingEvents]);
 
   useEffect(() => {
@@ -55,34 +48,9 @@ export default function Ticketing() {
     return () => window.clearInterval(intervalId);
   }, [step]);
 
-  useEffect(() => {
-    if (step !== "in-progress") {
-      return;
-    }
-
-    setReservationSeconds(RESERVATION_LIMIT_SECONDS);
-    setReservationTimedOut(false);
-
-    const intervalId = window.setInterval(() => {
-      setReservationSeconds((prev) => {
-        if (prev <= 1) {
-          window.clearInterval(intervalId);
-          setReservationTimedOut(true);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => window.clearInterval(intervalId);
-  }, [step, selectedEvent?.id]);
-
   const resetReservationState = useCallback(() => {
     setSelectedEvent(null);
-    setCaptchaInput("");
-    setCaptchaCode(generateCaptcha());
-    setReservationTimedOut(false);
-    setReservationSeconds(RESERVATION_LIMIT_SECONDS);
+    setAgreementInput("");
     setReservationError(null);
   }, []);
 
@@ -114,10 +82,16 @@ export default function Ticketing() {
   const handleStartReservation = (event: TicketingEvent) => {
     clearError();
     setSelectedEvent(event);
-    setCaptchaInput("");
-    setCaptchaCode(generateCaptcha());
+    setAgreementInput("");
     setReservationError(null);
     setStep("in-progress");
+  };
+
+  const handleAgreementInputChange = (value: string) => {
+    setAgreementInput(value);
+    if (reservationError) {
+      setReservationError(null);
+    }
   };
 
   const handleSubmitReservation = async () => {
@@ -125,26 +99,35 @@ export default function Ticketing() {
       return;
     }
 
-    if (reservationTimedOut) {
-      setReservationError("예매 가능 시간이 종료되었습니다.");
+    if (!agreementInput.trim()) {
+      setReservationError("확인 코드를 입력해주세요.");
       return;
     }
 
-    if (!captchaInput.trim()) {
-      setReservationError("보안문자를 입력해주세요.");
-      return;
-    }
-
-    if (captchaInput.trim().toUpperCase() !== captchaCode) {
-      setReservationError("보안문자가 일치하지 않습니다.");
+    if (agreementInput.trim() !== REQUIRED_ACKNOWLEDGEMENT_CODE) {
+      setReservationError(`"${REQUIRED_ACKNOWLEDGEMENT_CODE}" 코드를 정확히 입력해주세요.`);
       return;
     }
 
     setReservationError(null);
     clearError();
 
-    const reservation = await reserveTicket(selectedEvent.id, captchaInput.trim().toUpperCase());
+    const reservation = await reserveTicket(selectedEvent.id, REQUIRED_ACKNOWLEDGEMENT_CODE);
     if (!reservation) {
+      const refreshedEvents = await loadEvents();
+      const latestEvent = refreshedEvents.find((event) => event.id === selectedEvent.id);
+      const isSoldOutNow =
+        latestEvent?.status === "soldout" ||
+        (typeof latestEvent?.remainingCount === "number" && latestEvent.remainingCount <= 0) ||
+        selectedEvent.status === "soldout" ||
+        (typeof selectedEvent.remainingCount === "number" && selectedEvent.remainingCount <= 0);
+
+      if (isSoldOutNow) {
+        setReservationError(null);
+        setStep("soldout");
+        return;
+      }
+
       setReservationError("예매에 실패했습니다. 다시 시도해주세요.");
       return;
     }
@@ -166,16 +149,6 @@ export default function Ticketing() {
       }),
     );
     setStep("success");
-  };
-
-  const handleTimeoutConfirm = () => {
-    resetReservationState();
-    void moveToList();
-  };
-
-  const handleSuccessBackToList = () => {
-    resetReservationState();
-    void moveToList();
   };
 
   if (step === "home") {
@@ -204,15 +177,22 @@ export default function Ticketing() {
     return (
       <TicketingReservationPanel
         eventTitle={selectedEvent?.title ?? ""}
-        captchaCode={captchaCode}
-        captchaInput={captchaInput}
-        remainingSeconds={reservationSeconds}
+        agreementInput={agreementInput}
         submitting={reservationLoading}
-        timedOut={reservationTimedOut}
         errorMessage={reservationError}
-        onCaptchaInputChange={setCaptchaInput}
+        onAgreementInputChange={handleAgreementInputChange}
         onSubmit={handleSubmitReservation}
-        onTimeoutConfirm={handleTimeoutConfirm}
+      />
+    );
+  }
+
+  if (step === "soldout") {
+    return (
+      <ReservationSoldOutPanel
+        onBackToList={() => {
+          resetReservationState();
+          void moveToList();
+        }}
       />
     );
   }
@@ -220,7 +200,6 @@ export default function Ticketing() {
   return (
     <ReservationSuccessPanel
       onGoMyTickets={() => navigate("/myticket")}
-      onBackToList={handleSuccessBackToList}
     />
   );
 }

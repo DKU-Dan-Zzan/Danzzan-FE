@@ -14,10 +14,10 @@ export function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-[#c7d3e6] bg-card">
+      <header className="border-b border-[var(--border-base)] bg-[var(--surface-subtle)]">
         <div className="mx-auto flex w-full max-w-[1360px] items-center justify-between px-8 py-4">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#5f7eb1]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
               ADMIN PORTAL
             </p>
             <h1 className="text-3xl font-semibold text-foreground">팔찌 배부 관리자 포털</h1>
@@ -28,7 +28,7 @@ export function AdminLayout() {
                 MOCK MODE
               </span>
             )}
-            <span className="rounded-full border border-[#c7d3e6] bg-white px-3 py-1 text-sm font-semibold text-muted-foreground">
+            <span className="rounded-full border border-[var(--border-base)] bg-[var(--surface-base)] px-3 py-1 text-sm font-semibold text-muted-foreground">
               운영자: 관리자
             </span>
             <Button variant="outline" onClick={handleLogout} className="h-9">

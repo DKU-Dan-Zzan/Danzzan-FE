@@ -1,5 +1,7 @@
+import type { LucideIcon } from "lucide-react";
 import { ArrowRight, ClipboardList, Ticket, TicketCheck } from "lucide-react";
 import { Card } from "@/components/common/ui/card";
+import { TICKETING_CLASSES, TICKETING_MIDDLE_PANEL_CLASS } from "@/components/ticketing/ticketingShared";
 
 interface TicketingHomePanelProps {
   onOpenTicketingList: () => void;
@@ -42,59 +44,88 @@ const noticeItems = [
   "팔찌 미수령 시 단국존 입장이 불가하오니, 수령 시간에 맞추어 입장 팔찌를 수령해가시길 바랍니다.",
 ];
 
+interface HomeQuickAction {
+  key: string;
+  title: string;
+  description: string;
+  cardClassName: string;
+  icon: LucideIcon;
+  iconStrokeWidth: number;
+  onClick: () => void;
+}
+
 export function TicketingHomePanel({
   onOpenTicketingList,
   onOpenMyTickets,
 }: TicketingHomePanelProps) {
+  const quickActions: HomeQuickAction[] = [
+    {
+      key: "ticketing-list",
+      title: "공연 티켓팅 하러가기",
+      description: "새로운 공연 티켓을 예매하세요",
+      cardClassName:
+        "relative isolate min-h-[116px] overflow-hidden rounded-[20px] p-4 shadow-[0_8px_20px_rgba(15,23,42,0.08)] transition-all duration-200 group-hover:-translate-y-[1px] group-hover:shadow-[0_10px_24px_rgba(15,23,42,0.1)] group-active:translate-y-[1px] group-active:shadow-[0_6px_16px_rgba(15,23,42,0.07)]",
+      icon: Ticket,
+      iconStrokeWidth: 2.1,
+      onClick: onOpenTicketingList,
+    },
+    {
+      key: "my-ticket",
+      title: "내 티켓 확인하기",
+      description: "예매한 티켓을 확인하세요",
+      cardClassName:
+        "relative isolate min-h-[116px] overflow-hidden rounded-[20px] p-4 shadow-[0_8px_20px_rgba(15,23,42,0.08)] transition-all duration-200 group-hover:-translate-y-[1px] group-hover:shadow-[0_10px_24px_rgba(15,23,42,0.1)] group-active:translate-y-[1px] group-active:shadow-[0_6px_16px_rgba(15,23,42,0.07)]",
+      icon: TicketCheck,
+      iconStrokeWidth: 2.2,
+      onClick: onOpenMyTickets,
+    },
+  ];
+
   return (
-    <div className="mx-auto w-full max-w-md space-y-5 pb-4">
-      <button
-        type="button"
-        onClick={onOpenTicketingList}
-        className="group block w-full text-left focus-visible:outline-none"
-      >
-        <Card className="min-h-[116px] rounded-[24px] border border-[#4a6fcd] bg-gradient-to-br from-[#2472f5] via-[#1556cf] to-[#0b3ca8] p-4 shadow-[0_18px_34px_-18px_rgba(11,60,168,0.8),0_8px_16px_-10px_rgba(15,23,42,0.34)] transition-all duration-200 group-hover:-translate-y-[1px] group-hover:shadow-[0_22px_38px_-18px_rgba(11,60,168,0.88),0_10px_18px_-10px_rgba(15,23,42,0.38)] group-active:translate-y-[1px] group-active:shadow-[0_12px_22px_-12px_rgba(11,60,168,0.7),0_5px_10px_-8px_rgba(15,23,42,0.3)]">
-          <div className="grid min-h-[84px] grid-cols-[60px_1fr_24px] items-center gap-3.5">
-            <div className="flex h-[60px] w-[60px] shrink-0 items-center justify-center rounded-[18px] border border-white/30 bg-white/14 text-white">
-              <Ticket className="h-[30px] w-[30px]" strokeWidth={2.1} />
-            </div>
-            <div className="flex min-h-[56px] flex-col justify-center">
-              <h2 className="text-[1.28rem] leading-[1.2] font-bold text-white">공연 티켓팅 하러가기</h2>
-              <p className="mt-1 text-[0.96rem] leading-[1.35] font-medium text-white/95">
-                새로운 공연 티켓을 예매하세요
-              </p>
-            </div>
-            <ArrowRight
-              className="h-6 w-6 shrink-0 text-white transition-transform duration-200 group-active:translate-x-0.5"
-              strokeWidth={2.3}
-            />
-          </div>
-        </Card>
-      </button>
+    <div className={`${TICKETING_MIDDLE_PANEL_CLASS} bg-[var(--bg-base)]`}>
+      {quickActions.map((action) => {
+        const ActionIcon = action.icon;
+        return (
+          <button
+            key={action.key}
+            type="button"
+            onClick={action.onClick}
+            className="group block w-full text-left focus-visible:outline-none"
+          >
+            <Card className={action.cardClassName}>
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 z-0 rounded-[20px] border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]"
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 z-0 rounded-[20px] bg-[linear-gradient(180deg,rgba(255,255,255,0.72)_0%,rgba(255,255,255,0)_66%)]"
+              />
+              <div className="relative z-10 grid min-h-[84px] grid-cols-[60px_1fr_24px] items-center gap-3.5">
+                <div className={`flex h-[60px] w-[60px] shrink-0 ${TICKETING_CLASSES.badge.iconCircle} rounded-[18px]`}>
+                  <ActionIcon className="h-[30px] w-[30px]" strokeWidth={action.iconStrokeWidth} />
+                </div>
+                <div className="flex min-h-[56px] flex-col justify-center">
+                  <h2 className={`${TICKETING_CLASSES.typography.cardTitle} text-[var(--text)]`}>
+                    {action.title}
+                  </h2>
+                  <p className={`mt-1 ${TICKETING_CLASSES.typography.heroDescription} font-normal text-[var(--text-muted)]`}>
+                    {action.description}
+                  </p>
+                </div>
+                <ArrowRight
+                  className="h-6 w-6 shrink-0 text-[var(--accent)] opacity-90 transition-transform duration-200 group-active:translate-x-0.5"
+                  strokeWidth={2.3}
+                />
+              </div>
+            </Card>
+          </button>
+        );
+      })}
 
-      <button type="button" onClick={onOpenMyTickets} className="group block w-full text-left">
-        <Card className="min-h-[116px] rounded-[24px] border border-[#5a80d6] bg-gradient-to-br from-[#317ff8] via-[#1a62df] to-[#1451bf] p-4 shadow-[0_16px_30px_-18px_rgba(20,81,191,0.72),0_7px_14px_-10px_rgba(15,23,42,0.3)] transition-all duration-200 group-hover:-translate-y-[1px] group-hover:shadow-[0_20px_34px_-18px_rgba(20,81,191,0.78),0_9px_16px_-10px_rgba(15,23,42,0.34)] group-active:translate-y-[1px] group-active:shadow-[0_11px_20px_-12px_rgba(20,81,191,0.62),0_5px_10px_-8px_rgba(15,23,42,0.26)]">
-          <div className="grid min-h-[84px] grid-cols-[60px_1fr_24px] items-center gap-3.5">
-            <div className="flex h-[60px] w-[60px] shrink-0 items-center justify-center rounded-[18px] border border-white/30 bg-white/14 text-white">
-              <TicketCheck className="h-[30px] w-[30px]" strokeWidth={2.2} />
-            </div>
-            <div className="flex min-h-[56px] flex-col justify-center">
-              <h2 className="text-[1.28rem] leading-[1.2] font-bold text-white">내 티켓 확인하기</h2>
-              <p className="mt-1 text-[0.96rem] leading-[1.35] font-medium text-white/95">
-                예매한 티켓을 확인하세요
-              </p>
-            </div>
-            <ArrowRight
-              className="h-6 w-6 shrink-0 text-white transition-transform duration-200 group-active:translate-x-0.5"
-              strokeWidth={2.3}
-            />
-          </div>
-        </Card>
-      </button>
-
-      <Card className="rounded-[24px] border border-[#b4cff3] bg-[#f9fcff] p-5 shadow-[0_10px_20px_-16px_rgba(37,99,235,0.35)]">
-        <h3 className="flex items-center gap-2 text-[1rem] leading-[1.25] font-bold text-[#111827]">
-          <ClipboardList className="h-[17px] w-[17px] text-[#64748b]" strokeWidth={2.1} />
+      <Card className="rounded-[24px] border border-[var(--border-base)] bg-[var(--surface-base)] p-5 shadow-[0_10px_20px_-16px_rgba(15,23,42,0.12)]">
+        <h3 className={`flex items-center gap-2 ${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--text)]`}>
+          <ClipboardList className="h-[17px] w-[17px] text-[var(--text-muted)]" strokeWidth={2.1} />
           티켓팅 이용 가이드
         </h3>
         <div className="mt-0 px-2">
@@ -103,19 +134,19 @@ export function TicketingHomePanel({
               key={item.step}
               className={
                 index === 0
-                  ? "border-b border-[#d8e4f7] pt-0 pb-2"
+                  ? "border-b border-[var(--border-subtle)] pt-0 pb-2"
                   : index === guideItems.length - 1
                     ? "pt-3"
-                    : "border-b border-[#d8e4f7] py-3"
+                    : "border-b border-[var(--border-subtle)] py-3"
               }
             >
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#3b82f6] text-[13px] font-bold text-white">
+                <div className={`mt-0.5 flex h-8 w-8 shrink-0 ${TICKETING_CLASSES.badge.iconCircle} text-[13px] font-bold`}>
                   {item.step}
                 </div>
                 <div>
-                  <p className="text-[0.96rem] font-bold leading-snug text-[#111827]">{item.title}</p>
-                  <p className="mt-1 text-[0.88rem] leading-[1.43] text-[#4b5563]">
+                  <p className={`${TICKETING_CLASSES.typography.heroDescription} font-bold text-[var(--text)]`}>{item.title}</p>
+                  <p className={`mt-1 ${TICKETING_CLASSES.typography.sectionBody} text-[var(--text-muted)]`}>
                     {item.description}
                   </p>
                 </div>
@@ -123,11 +154,11 @@ export function TicketingHomePanel({
             </section>
           ))}
         </div>
-        <section className="mt-4 border-t border-[#d8e4f7] pt-4">
-          <h4 className="text-[1rem] leading-[1.25] font-bold text-[#1d4ed8]">
+        <section className="mt-4 border-t border-[var(--border-subtle)] pt-4">
+          <h4 className={`${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--accent)]`}>
             💡 유의사항
           </h4>
-          <ul className="mt-3 list-disc space-y-2 pl-5 text-[0.92rem] leading-[1.5] text-[#1d4ed8]">
+          <ul className={`mt-3 list-disc space-y-2 pl-5 ${TICKETING_CLASSES.typography.sectionBody} text-[var(--accent)]`}>
             {noticeItems.map((notice) => (
               <li key={notice}>{notice}</li>
             ))}

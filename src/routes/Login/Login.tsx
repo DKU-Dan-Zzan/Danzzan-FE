@@ -19,7 +19,7 @@ export default function Login() {
   const hasFestivalHomeUrl = Boolean(festivalHomeUrl);
   const canSubmit = studentId.trim().length > 0 && password.trim().length > 0;
   const inputClassName =
-    "h-11 rounded-2xl border-[#9fc3f5] bg-white px-4 placeholder:text-[#9aa4b2] transition-all duration-200 focus-visible:border-[#2563eb] focus-visible:ring-[#2563eb]/20";
+    "h-11 rounded-2xl border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20";
 
   const redirect = searchParams.get("redirect");
 
@@ -39,7 +39,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#e4f0ff]">
+    <div className="min-h-screen bg-[var(--bg-base)]">
       <div className="mx-auto w-full max-w-[420px] px-5 py-6">
         <button
           type="button"
@@ -49,28 +49,28 @@ export default function Login() {
             }
           }}
           disabled={!hasFestivalHomeUrl}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-[#2563eb] disabled:cursor-not-allowed disabled:opacity-55"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-55"
         >
           <House className="h-4 w-4" strokeWidth={2.3} />
           축제 홈으로
         </button>
 
         <div className="mt-9">
-          <h1 className="text-[2.1rem] leading-[1.12] font-black tracking-tight text-[#111827]">
+          <h1 className="text-[2.1rem] leading-[1.12] font-black tracking-tight text-[var(--text)]">
             티켓팅 시작하기
           </h1>
         </div>
 
-        <section className="mt-6 rounded-2xl border border-[#9fc3f5] bg-[#cfe0f6]/75 px-3.5 py-3">
+        <section className="mt-6 rounded-2xl border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] px-3.5 py-3">
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2563eb] text-white">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-strong)_100%)] text-[var(--accent)]">
               <ShieldCheck className="h-4 w-4" strokeWidth={2.3} />
             </div>
             <div className="pt-0.5">
-              <span className="inline-flex items-center rounded-full bg-[#2563eb] px-2 py-0.5 text-[11px] font-semibold text-white">
+              <span className="inline-flex items-center rounded-full border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-strong)_100%)] px-2 py-0.5 text-[11px] font-semibold text-[var(--accent)]">
                 재학생 전용
               </span>
-              <p className="mt-1 text-sm font-semibold text-[#1e3a8a]">
+              <p className="mt-1 text-sm font-semibold text-[var(--text)]">
                 단국존 티켓팅 및 이용은 단국대학교 재학생만 가능합니다
               </p>
             </div>
@@ -85,7 +85,7 @@ export default function Login() {
           <form className="space-y-5" onSubmit={handleSubmit}>
             <section className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="studentId" className="text-sm font-semibold text-[#111827]">
+                <Label htmlFor="studentId" className="text-sm font-semibold text-[var(--text)]">
                   학번
                 </Label>
                 <Input
@@ -99,7 +99,7 @@ export default function Login() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-semibold text-[#111827]">
+                <Label htmlFor="password" className="text-sm font-semibold text-[var(--text)]">
                   비밀번호
                 </Label>
                 <Input
@@ -113,7 +113,7 @@ export default function Login() {
                 />
               </div>
 
-              <p className="flex items-start gap-1.5 text-[11px] font-medium leading-5 text-[#4b5563]">
+              <p className="flex items-start gap-1.5 text-[11px] font-medium leading-5 text-[var(--text-muted)]">
                 <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={2.3} />
                 가입한 티켓팅 계정 비밀번호를 입력해 주세요.
               </p>
@@ -127,7 +127,7 @@ export default function Login() {
 
             <Button
               type="submit"
-              className="h-11 w-full rounded-2xl bg-gradient-to-r from-[#3b82f6] to-[#2563eb] text-white shadow-[0_16px_24px_-18px_rgba(37,99,235,0.75)] transition-all duration-200 hover:translate-y-[-1px] hover:from-[#3478ef] hover:to-[#1f59db] disabled:translate-y-0 disabled:opacity-55"
+              className="h-11 w-full rounded-2xl bg-[var(--accent)] text-white shadow-[0_10px_18px_-12px_rgba(15,23,42,0.24)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:opacity-55"
               disabled={submitting || !canSubmit}
             >
               <GraduationCap className="h-4 w-4" strokeWidth={2.3} />
@@ -136,11 +136,11 @@ export default function Login() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-[#4b5563]">티켓팅 서비스를 처음 이용하시나요?</p>
+            <p className="text-sm text-[var(--text-muted)]">티켓팅 서비스를 처음 이용하시나요?</p>
             <Link
               to="/signup"
               state={{ authTabFrom: "login" }}
-              className="mt-2 inline-block text-sm font-semibold text-[#2563eb]"
+              className="mt-2 inline-block text-sm font-semibold text-[var(--accent)]"
             >
               회원가입하러 가기
             </Link>

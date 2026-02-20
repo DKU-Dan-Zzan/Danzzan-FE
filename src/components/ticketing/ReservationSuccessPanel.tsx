@@ -1,44 +1,63 @@
-import { CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, ShieldCheck, Ticket } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
+import { TICKETING_CLASSES, TICKETING_NARROW_PANEL_CLASS } from "@/components/ticketing/ticketingShared";
 
 interface ReservationSuccessPanelProps {
   onGoMyTickets: () => void;
-  onBackToList: () => void;
 }
 
 export function ReservationSuccessPanel({
   onGoMyTickets,
-  onBackToList,
 }: ReservationSuccessPanelProps) {
   return (
-    <div className="mx-auto flex w-full max-w-xl items-center justify-center pb-6">
-      <Card className="relative w-full overflow-hidden border-emerald-100 bg-white/95 p-8 text-center shadow-lg shadow-emerald-100/70">
-        <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-emerald-200/40 blur-xl" />
-        <div className="pointer-events-none absolute -bottom-10 -left-10 h-24 w-24 rounded-full bg-blue-200/40 blur-xl" />
+    <div className={TICKETING_NARROW_PANEL_CLASS}>
+      <Card className={`${TICKETING_CLASSES.card.success} px-5 py-6`}>
+        <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-[var(--surface-tint-strong)] opacity-70 blur-xl" />
+        <div className="pointer-events-none absolute -bottom-12 -left-8 h-28 w-28 rounded-full bg-[var(--surface-tint-strong)] opacity-65 blur-xl" />
 
-        <div className="relative mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-200">
-          <CheckCircle2 className="h-12 w-12" />
+        <div className="relative">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-strong)_100%)] px-3 py-1 text-[0.72rem] font-semibold tracking-[0.01em] text-[var(--accent)]">
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            예약 완료
+          </span>
         </div>
 
-        <h2 className="mt-6 text-2xl font-semibold text-gray-900">티켓팅 성공</h2>
-        <p className="mt-2 text-sm text-gray-600">
-          예매가 완료되었습니다. 내 티켓에서 상세 정보를 확인하세요.
-        </p>
+        <div className="relative mt-4 flex items-center gap-4 rounded-[20px] border border-[var(--border-base)] bg-[var(--surface-base)] px-4 py-4">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] bg-[var(--accent)] text-white shadow-[0_12px_20px_-14px_rgba(15,23,42,0.24)]">
+            <CheckCircle2 className="h-8 w-8" />
+          </div>
+          <div>
+            <h2 className={`${TICKETING_CLASSES.typography.stateTitle} text-[var(--text)]`}>
+              티켓팅 성공
+            </h2>
+            <p className={`mt-1 ${TICKETING_CLASSES.typography.stateBody} text-[var(--text-muted)]`}>
+              예매가 완료되었습니다. 아래에서 다음 단계를 진행하세요.
+            </p>
+          </div>
+        </div>
 
-        <div className="mt-8 grid gap-2 sm:grid-cols-2">
-          <Button
-            variant="outline"
-            onClick={onBackToList}
-            className="rounded-xl border-slate-300 bg-white hover:bg-slate-50"
-          >
-            다른 일정 보기
-          </Button>
+        <div className="relative mt-5 rounded-[20px] border border-[var(--border-base)] bg-[var(--surface-base)] px-4 py-4">
+          <p className={`${TICKETING_CLASSES.typography.overline} text-[var(--accent)]`}>NEXT STEP</p>
+          <ul className={`mt-2 space-y-2.5 ${TICKETING_CLASSES.typography.sectionBody} text-[var(--text-muted)]`}>
+            <li className="flex items-start gap-2.5">
+              <Ticket className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
+              <span>내 티켓에서 발급 상태와 상세 정보를 확인하세요.</span>
+            </li>
+            <li className="flex items-start gap-2.5">
+              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
+              <span>공연 당일 신분증 미지참 시 입장이 제한될 수 있습니다.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div className="relative mt-6 flex justify-center">
           <Button
             onClick={onGoMyTickets}
-            className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700"
+            className={TICKETING_CLASSES.button.primaryWide}
           >
             내 티켓 확인하기
+            <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
       </Card>

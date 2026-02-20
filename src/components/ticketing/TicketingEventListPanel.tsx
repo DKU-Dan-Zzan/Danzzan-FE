@@ -1,8 +1,14 @@
-import { CalendarClock, Clock3, RefreshCw } from "lucide-react";
+import { useMemo } from "react";
+import { CalendarClock, Clock3 } from "lucide-react";
 import { Badge } from "@/components/common/ui/badge";
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
 import { cn } from "@/components/common/ui/utils";
+import {
+  TICKETING_CLASSES,
+  TICKETING_WIDE_PANEL_CLASS,
+  TicketingRefreshButton,
+} from "@/components/ticketing/ticketingShared";
 import type { TicketingEvent } from "@/types/model/ticket.model";
 
 interface TicketingEventListPanelProps {
@@ -21,23 +27,20 @@ const statusMeta: Record<
   {
     label: string;
     badgeClassName: string;
-    cardClassName: string;
   }
 > = {
   upcoming: {
     label: "오픈 예정",
-    badgeClassName: "border-transparent bg-slate-100 text-slate-700",
-    cardClassName: "border-blue-100 bg-white/95",
+    badgeClassName: "border-[var(--border-subtle)] bg-[var(--surface-subtle)] text-[var(--text-muted)]",
   },
   open: {
     label: "실시간 예매 중",
-    badgeClassName: "border-transparent bg-emerald-100 text-emerald-700",
-    cardClassName: "border-emerald-200 bg-gradient-to-r from-emerald-50/90 to-white",
+    badgeClassName:
+      "border-transparent bg-[#07be4f] text-white shadow-[0_8px_14px_-10px_rgba(5,150,105,0.95)]",
   },
   soldout: {
-    label: "전석 매진",
-    badgeClassName: "border-transparent bg-slate-200 text-slate-700",
-    cardClassName: "border-slate-200 bg-slate-50/80",
+    label: "예매 마감",
+    badgeClassName: "border-transparent bg-[#a3abbb] text-white",
   },
 };
 
@@ -112,56 +115,9 @@ export function TicketingEventListPanel({
   onRefresh,
   onSelectEvent,
 }: TicketingEventListPanelProps) {
-  return (
-    <div className="mx-auto w-full max-w-3xl space-y-4 pb-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-semibold text-gray-900">티켓팅</h2>
-          <p className="mt-0.5 text-sm text-gray-600">공연별 오픈 시간과 잔여 좌석을 확인하세요.</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={onRefresh}
-            disabled={loading}
-            className="rounded-xl border-blue-200 bg-white/90 hover:bg-white"
-          >
-            <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
-            새로고침
-          </Button>
-        </div>
-      </div>
-
-      <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 p-4">
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white">
-            <CalendarClock className="h-4 w-4" />
-          </div>
-          <p className="text-sm text-blue-900">
-            오픈 10분 전부터 카운트다운이 시작되며, 0초 이후 예매 버튼이 활성화됩니다.
-          </p>
-        </div>
-      </Card>
-
-      {errorMessage && (
-        <Card className="border-red-200 bg-red-50 p-4">
-          <p className="text-sm text-red-700">{errorMessage}</p>
-        </Card>
-      )}
-
-      {loading && events.length === 0 && (
-        <Card className="p-6">
-          <p className="text-sm text-gray-600">티켓 정보를 불러오는 중입니다...</p>
-        </Card>
-      )}
-
-      {!loading && events.length === 0 && (
-        <Card className="p-6">
-          <p className="text-sm text-gray-600">진행 중인 티켓팅 일정이 없습니다.</p>
-        </Card>
-      )}
-
-      {events.map((event) => {
+  const eventViewModels = useMemo(
+    () =>
+      events.map((event) => {
         const openAtMs = parseTimestamp(event.ticketOpenAt);
         const status = resolveViewStatus(event, openAtMs, now);
         const currentStatusMeta = statusMeta[status];
@@ -170,60 +126,112 @@ export function TicketingEventListPanel({
             ? Math.max(0, Math.floor((openAtMs - now) / 1000))
             : 0;
 
+        return {
+          event,
+          status,
+          currentStatusMeta,
+          openAtMs,
+          countdown,
+        };
+      }),
+    [events, now],
+  );
+
+  return (
+    <div className={TICKETING_WIDE_PANEL_CLASS}>
+      <div>
+        <h2 className="sr-only">티켓팅</h2>
+        <Card className={`${TICKETING_CLASSES.card.infoBanner} p-4`}>
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex min-w-0 items-start gap-3">
+              <div className={`mt-0.5 flex h-8 w-8 shrink-0 ${TICKETING_CLASSES.badge.iconCircle}`}>
+                <CalendarClock className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className={`${TICKETING_CLASSES.typography.infoBannerTitle} text-[var(--text)]`}>
+                  공연별 예매 오픈 시각을 확인하여 단국존 티켓팅에 참여하세요.
+                </p>
+                <p className={`mt-1 ${TICKETING_CLASSES.typography.infoBannerBody} text-[var(--text-muted)]`}>
+                  오픈 10분 전부터 카운트다운이 시작되며, 0초 이후 예매 버튼이 활성화됩니다.
+                </p>
+              </div>
+            </div>
+            <TicketingRefreshButton
+              onClick={onRefresh}
+              loading={loading}
+            />
+          </div>
+        </Card>
+      </div>
+
+      {errorMessage && (
+        <Card className="border-red-200 bg-red-50 p-4">
+          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-red-700`}>{errorMessage}</p>
+        </Card>
+      )}
+
+      {loading && events.length === 0 && (
+        <Card className={`${TICKETING_CLASSES.card.emptyState} p-6`}>
+          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>티켓 정보를 불러오는 중입니다...</p>
+        </Card>
+      )}
+
+      {!loading && events.length === 0 && (
+        <Card className={`${TICKETING_CLASSES.card.emptyState} p-6`}>
+          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>진행 중인 티켓팅 일정이 없습니다.</p>
+        </Card>
+      )}
+
+      {eventViewModels.map(({ event, openAtMs, status, currentStatusMeta, countdown }) => {
         return (
           <Card
             key={event.id}
-            className={cn(
-              "relative overflow-hidden p-6 shadow-sm shadow-blue-100/60",
-              currentStatusMeta.cardClassName,
-            )}
+            className={`${TICKETING_CLASSES.card.event} px-5 py-6`}
           >
-            {status === "open" && (
-              <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-emerald-200/50 blur-xl" />
-            )}
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className={`truncate ${TICKETING_CLASSES.typography.cardTitle} text-[var(--text)]`}>
                   {event.title || "공연 티켓팅"}
                 </h3>
-                <p className="mt-1 text-sm font-medium text-blue-700">
+                <p className={`mt-2 ${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--accent)]`}>
                   {formatEventDateTime(event, openAtMs)}
                 </p>
               </div>
-              <Badge className={currentStatusMeta.badgeClassName}>
+              <Badge
+                className={cn(
+                  TICKETING_CLASSES.badge.event,
+                  currentStatusMeta.badgeClassName,
+                )}
+              >
                 {currentStatusMeta.label}
               </Badge>
             </div>
 
-            <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
-              <p>
-                잔여 좌석: {event.remainingCount ?? "-"}
-                {event.totalCount ? ` / ${event.totalCount}` : ""}
-              </p>
-              <p>공연 ID: {event.id || "-"}</p>
-            </div>
-
-            <div className="mt-4">
+            <div className="mt-6">
               {status === "upcoming" && openAtMs !== null && (
                 <Button
-                  className="w-full rounded-xl border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-100"
+                  className={TICKETING_CLASSES.button.disabledFull}
                   variant="outline"
                   disabled
                 >
-                  <Clock3 className="h-4 w-4" />
-                  오픈까지 {formatCountdown(countdown)}
+                  <Clock3 className="h-[0.8rem] w-[0.8rem]" />
+                  오픈까지 남은 시간 {formatCountdown(countdown)}
                 </Button>
               )}
 
               {status === "upcoming" && openAtMs === null && (
-                <Button className="w-full rounded-xl" variant="secondary" disabled>
+                <Button
+                  className={TICKETING_CLASSES.button.disabledCompactFull}
+                  variant="outline"
+                  disabled
+                >
                   오픈 예정
                 </Button>
               )}
 
               {status === "open" && (
                 <Button
-                  className="w-full rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-200 hover:from-emerald-600 hover:to-teal-600"
+                  className={TICKETING_CLASSES.button.primaryFull}
                   onClick={() => onSelectEvent(event)}
                 >
                   단국존 선착순 예매
@@ -232,7 +240,7 @@ export function TicketingEventListPanel({
 
               {status === "soldout" && (
                 <Button
-                  className="w-full rounded-xl border-slate-300 bg-slate-200 text-slate-600 hover:bg-slate-200"
+                  className={TICKETING_CLASSES.button.disabledSoldoutFull}
                   variant="outline"
                   disabled
                 >
