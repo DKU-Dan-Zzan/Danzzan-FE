@@ -64,7 +64,7 @@ export function TicketingHomePanel({
       title: "공연 티켓팅 하러가기",
       description: "새로운 공연 티켓을 예매하세요",
       cardClassName:
-        "relative isolate min-h-[116px] overflow-hidden rounded-[20px] p-4 shadow-[0_8px_20px_rgba(15,23,42,0.08)] transition-all duration-200 group-hover:-translate-y-[1px] group-hover:shadow-[0_10px_24px_rgba(15,23,42,0.1)] group-active:translate-y-[1px] group-active:shadow-[0_6px_16px_rgba(15,23,42,0.07)]",
+        "relative isolate min-h-[116px] overflow-hidden rounded-[20px] p-4 shadow-[0_8px_20px_var(--shadow-color)] transition-all duration-200 group-hover:-translate-y-[1px] group-hover:shadow-[0_10px_24px_var(--shadow-color)] group-active:translate-y-[1px] group-active:shadow-[0_6px_16px_var(--shadow-color)]",
       icon: Ticket,
       iconStrokeWidth: 2.1,
       onClick: onOpenTicketingList,
@@ -74,7 +74,7 @@ export function TicketingHomePanel({
       title: "내 티켓 확인하기",
       description: "예매한 티켓을 확인하세요",
       cardClassName:
-        "relative isolate min-h-[116px] overflow-hidden rounded-[20px] p-4 shadow-[0_8px_20px_rgba(15,23,42,0.08)] transition-all duration-200 group-hover:-translate-y-[1px] group-hover:shadow-[0_10px_24px_rgba(15,23,42,0.1)] group-active:translate-y-[1px] group-active:shadow-[0_6px_16px_rgba(15,23,42,0.07)]",
+        "relative isolate min-h-[116px] overflow-hidden rounded-[20px] p-4 shadow-[0_8px_20px_var(--shadow-color)] transition-all duration-200 group-hover:-translate-y-[1px] group-hover:shadow-[0_10px_24px_var(--shadow-color)] group-active:translate-y-[1px] group-active:shadow-[0_6px_16px_var(--shadow-color)]",
       icon: TicketCheck,
       iconStrokeWidth: 2.2,
       onClick: onOpenMyTickets,
@@ -95,11 +95,11 @@ export function TicketingHomePanel({
             <Card className={action.cardClassName}>
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 z-0 rounded-[20px] border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]"
+                className="pointer-events-none absolute inset-0 z-0 rounded-[20px] border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] shadow-[inset_0_1px_0_var(--surface-subtle)]"
               />
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 z-0 rounded-[20px] bg-[linear-gradient(180deg,rgba(255,255,255,0.72)_0%,rgba(255,255,255,0)_66%)]"
+                className="pointer-events-none absolute inset-0 z-0 rounded-[20px] bg-[linear-gradient(180deg,var(--surface-subtle)_0%,transparent_66%)]"
               />
               <div className="relative z-10 grid min-h-[84px] grid-cols-[60px_1fr_24px] items-center gap-3.5">
                 <div className={`flex h-[60px] w-[60px] shrink-0 ${TICKETING_CLASSES.badge.iconCircle} rounded-[18px]`}>
@@ -123,7 +123,7 @@ export function TicketingHomePanel({
         );
       })}
 
-      <Card className="rounded-[24px] border border-[var(--border-base)] bg-[var(--surface-base)] p-5 shadow-[0_10px_20px_-16px_rgba(15,23,42,0.12)]">
+      <Card className="rounded-[24px] border border-[var(--border-base)] bg-[var(--surface-base)] p-5 shadow-[0_10px_20px_-16px_var(--shadow-color)]">
         <h3 className={`flex items-center gap-2 ${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--text)]`}>
           <ClipboardList className="h-[17px] w-[17px] text-[var(--text-muted)]" strokeWidth={2.1} />
           티켓팅 이용 가이드

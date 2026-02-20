@@ -46,7 +46,7 @@ const patterns = [
   },
   {
     code: "RAW_COLOR_FN",
-    regex: /\b(?:rgba?|hsla?|color)\s*\(/gi,
+    regex: /(?<![a-zA-Z])(?:rgba?|hsla?|color)\s*\(/gi,
     message: "raw color function literal",
   },
   {

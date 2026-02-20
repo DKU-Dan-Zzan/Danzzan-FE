@@ -34,7 +34,7 @@ export function AuthSegmentedControl({ activeTab }: AuthSegmentedControlProps) {
   return (
     <div className="relative grid grid-cols-2 rounded-2xl border border-[var(--border-base)] bg-[linear-gradient(145deg,var(--surface-tint-base)_0%,var(--surface-base)_100%)] p-1">
       <div
-        className="absolute left-1 top-1 h-[calc(100%-8px)] w-[calc(50%-4px)] rounded-xl border border-[var(--border-strong)] bg-[var(--surface-subtle)] shadow-[0_12px_20px_-16px_rgba(15,23,42,0.16)] transition-transform duration-300 ease-out"
+        className="absolute left-1 top-1 h-[calc(100%-8px)] w-[calc(50%-4px)] rounded-xl border border-[var(--border-strong)] bg-[var(--surface-subtle)] shadow-[0_12px_20px_-16px_var(--shadow-color)] transition-transform duration-300 ease-out"
         style={{ transform: `translateX(${indicatorIndex * 100}%)` }}
       />
 

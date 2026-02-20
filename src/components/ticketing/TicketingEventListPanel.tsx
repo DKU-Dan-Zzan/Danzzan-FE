@@ -36,11 +36,11 @@ const statusMeta: Record<
   open: {
     label: "실시간 예매 중",
     badgeClassName:
-      "border-transparent bg-[#07be4f] text-white shadow-[0_8px_14px_-10px_rgba(5,150,105,0.95)]",
+      "border-[var(--status-success-border)] bg-[var(--status-success)] text-white shadow-[0_8px_14px_-10px_var(--shadow-color)]",
   },
   soldout: {
     label: "예매 마감",
-    badgeClassName: "border-transparent bg-[#a3abbb] text-white",
+    badgeClassName: "border-[var(--status-neutral-border)] bg-[var(--status-neutral)] text-white",
   },
 };
 
@@ -165,8 +165,8 @@ export function TicketingEventListPanel({
       </div>
 
       {errorMessage && (
-        <Card className="border-red-200 bg-red-50 p-4">
-          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-red-700`}>{errorMessage}</p>
+        <Card className="border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] p-4">
+          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--status-danger-text)]`}>{errorMessage}</p>
         </Card>
       )}
 

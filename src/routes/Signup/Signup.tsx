@@ -216,7 +216,7 @@ export default function Signup() {
             </section>
 
             {error && (
-              <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+              <p className="rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-sm text-[var(--status-danger-text)]">
                 {error}
               </p>
             )}

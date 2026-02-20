@@ -79,8 +79,8 @@ export function MyTicketListPanel({
       ))}
 
       {errorMessage && (
-        <Card className="border-red-200 bg-red-50 p-4">
-          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-red-700`}>{errorMessage}</p>
+        <Card className="border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] p-4">
+          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--status-danger-text)]`}>{errorMessage}</p>
         </Card>
       )}
 

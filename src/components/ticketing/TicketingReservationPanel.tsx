@@ -89,12 +89,12 @@ export function TicketingReservationPanel({
         </div>
       </div>
 
-      <Card className="border-[var(--border-base)] bg-[var(--surface-base)] p-6 shadow-[0_10px_20px_-16px_rgba(15,23,42,0.14)]">
+      <Card className="border-[var(--border-base)] bg-[var(--surface-base)] p-6 shadow-[0_10px_20px_-16px_var(--shadow-color)]">
         <div className="space-y-5">
           <section className="space-y-2">
             <TicketingStepTitle step={1} title="주의사항" />
             <div className={`${TICKETING_CLASSES.card.caution} px-4 py-3`}>
-              <ul className={`space-y-1.5 ${TICKETING_CLASSES.typography.sectionBodySm} text-[#7a3410]`}>
+              <ul className={`space-y-1.5 ${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--status-warning-text)]`}>
                 {cautionItems.map((item) => (
                   <li key={item}>• {item}</li>
                 ))}
@@ -168,12 +168,12 @@ export function TicketingReservationPanel({
                   )}
                 />
                 {hasTypedAgreement && isAcknowledgementMatched && (
-                  <CheckCircle2 className="pointer-events-none absolute top-1/2 right-3 h-5 w-5 -translate-y-1/2 text-[#16a34a]" />
+                  <CheckCircle2 className="pointer-events-none absolute top-1/2 right-3 h-5 w-5 -translate-y-1/2 text-[var(--status-success)]" />
                 )}
               </div>
             </div>
 
-            {errorMessage && <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-red-600`}>{errorMessage}</p>}
+            {errorMessage && <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--status-danger-text)]`}>{errorMessage}</p>}
 
             <Button
               className={cn(

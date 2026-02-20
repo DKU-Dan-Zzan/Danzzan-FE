@@ -13,13 +13,13 @@ const statusDisplayMap: Record<
 > = {
   issued: {
     label: "팔찌 미수령 상태",
-    badgeClassName: "border-[#f7cf8e] bg-[#fff7e8] text-[#b45309]",
-    stripColor: "#f59e0b",
+    badgeClassName: "border-[var(--status-warning-border)] bg-[var(--status-warning-bg)] text-[var(--status-warning-text)]",
+    stripColor: "var(--status-warning)",
   },
   used: {
     label: "팔찌 수령 완료",
-    badgeClassName: "border-[#a7e7bf] bg-[#ecfdf3] text-[#166534]",
-    stripColor: "#16a34a",
+    badgeClassName: "border-[var(--status-success-border)] bg-[var(--status-success-bg)] text-[var(--status-success-text)]",
+    stripColor: "var(--status-success)",
   },
   cancelled: {
     label: "예매 취소",
@@ -69,13 +69,13 @@ const getGuideLines = (
 };
 
 const NOTCH_CLASS_NAME =
-  "pointer-events-none absolute top-1/2 h-7 w-7 -translate-y-1/2 rounded-full border border-[var(--border-strong)] bg-[linear-gradient(135deg,var(--surface-subtle)_0%,var(--surface-tint-strong)_48%,var(--surface-subtle)_100%)] shadow-[inset_0_1.5px_2px_rgba(255,255,255,0.88),inset_0_-2px_3px_rgba(148,163,184,0.26),0_1px_2px_rgba(148,163,184,0.2)]";
+  "pointer-events-none absolute top-1/2 h-7 w-7 -translate-y-1/2 rounded-full border border-[var(--border-strong)] bg-[linear-gradient(135deg,var(--surface-subtle)_0%,var(--surface-tint-strong)_48%,var(--surface-subtle)_100%)] shadow-[inset_0_1.5px_2px_var(--surface-subtle),inset_0_-2px_3px_var(--border-base),0_1px_2px_var(--border-base)]";
 
 const PAPER_NOISE_TEXTURE_STYLE = {
   backgroundImage: [
-    "radial-gradient(circle at 22% 24%, #000 0.6px, transparent 0.8px)",
-    "radial-gradient(circle at 74% 36%, #000 0.5px, transparent 0.72px)",
-    "radial-gradient(circle at 48% 72%, #000 0.52px, transparent 0.74px)",
+    "radial-gradient(circle at 22% 24%, var(--text) 0.6px, transparent 0.8px)",
+    "radial-gradient(circle at 74% 36%, var(--text) 0.5px, transparent 0.72px)",
+    "radial-gradient(circle at 48% 72%, var(--text) 0.52px, transparent 0.74px)",
   ].join(","),
   backgroundSize: "19px 19px, 23px 23px, 27px 27px",
 } as const;
