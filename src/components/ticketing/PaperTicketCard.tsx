@@ -13,28 +13,47 @@ const statusDisplayMap: Record<
 > = {
   issued: {
     label: "팔찌 미수령 상태",
-    badgeClassName: "border-[var(--status-warning-border)] bg-[var(--status-warning-bg)] text-[var(--status-warning-text)]",
-    stripColor: "var(--status-warning)",
+    badgeClassName:
+      "border-[var(--status-pending-border)] bg-[var(--status-pending-bg)] text-[var(--status-pending-text)]",
+    stripColor: "var(--status-pending)",
   },
   used: {
     label: "팔찌 수령 완료",
-    badgeClassName: "border-[var(--status-success-border)] bg-[var(--status-success-bg)] text-[var(--status-success-text)]",
+    badgeClassName:
+      "border-[var(--status-success-border)] bg-[var(--status-success-bg)] text-[var(--status-success-text)]",
     stripColor: "var(--status-success)",
   },
   cancelled: {
     label: "예매 취소",
-    badgeClassName: "border-[var(--border-base)] bg-[linear-gradient(145deg,var(--surface-tint-base)_0%,var(--surface-base)_100%)] text-[var(--text-muted)]",
+    badgeClassName:
+      "border-[var(--border-base)] bg-[linear-gradient(180deg,var(--surface-base)_0%,var(--ticket-paper-top)_100%)] text-[var(--text-muted)]",
     stripColor: "var(--text-muted)",
   },
   unknown: {
     label: "상태 확인 필요",
-    badgeClassName: "border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] text-[var(--accent)]",
+    badgeClassName:
+      "border-[var(--border-strong)] bg-[linear-gradient(180deg,var(--surface-tint-strong)_0%,var(--ticket-paper-top)_100%)] text-[var(--accent)]",
     stripColor: "var(--accent)",
   },
 };
 
 const stripTimeFromEventDate = (value: string): string => {
   return value.replace(/\s+\d{1,2}:\d{2}.*$/, "").trim();
+};
+
+const toCompactEventDate = (value: string): string => {
+  const normalized = stripTimeFromEventDate(value);
+  const monthDayKorean = normalized.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
+  if (monthDayKorean) {
+    return `${Number(monthDayKorean[1])}/${Number(monthDayKorean[2])}`;
+  }
+
+  const isoLike = normalized.match(/(\d{4})[-./](\d{1,2})[-./](\d{1,2})/);
+  if (isoLike) {
+    return `${Number(isoLike[2])}/${Number(isoLike[3])}`;
+  }
+
+  return normalized;
 };
 
 const getDayNumberFromEventName = (value: string): string | null => {
@@ -49,65 +68,109 @@ const getDayNumberFromEventName = (value: string): string | null => {
 const getGuideLines = (
   ticket: Ticket,
 ): {
-  ticketTitle: string;
-  wristbandLabel: string;
+  dayLabel: string;
+  dateLabel: string;
+  venueLabel: string;
+  queueLabel: string;
   wristbandValue: string;
   entryLabel: string;
   entryValue: string;
 } => {
-  const baseDate = ticket.eventDate ? stripTimeFromEventDate(ticket.eventDate) : "일정 공지 예정";
+  const dateLabel = ticket.eventDate ? toCompactEventDate(ticket.eventDate) : "미정";
   const dayNumber = ticket.eventName ? getDayNumberFromEventName(ticket.eventName) : null;
-  const ticketTitle = dayNumber ? `DAY ${dayNumber} · ${baseDate}` : baseDate;
   const venueLabel = ticket.venue || "단국존";
+  const dayLabel = dayNumber ? `DAY ${dayNumber}` : "DAY 미정";
+  const queueLabel = ticket.queueNumber != null
+    ? String(ticket.queueNumber)
+    : ticket.id.slice(-4).toUpperCase();
+
   return {
-    ticketTitle,
-    wristbandLabel: "팔찌 배부 시각",
+    dayLabel,
+    dateLabel,
+    venueLabel,
+    queueLabel,
     wristbandValue: "추후 공지",
     entryLabel: `${venueLabel} 입장 시각`,
     entryValue: "추후 공지",
   };
 };
 
-const NOTCH_CLASS_NAME =
-  "pointer-events-none absolute top-1/2 h-7 w-7 -translate-y-1/2 rounded-full border border-[var(--border-strong)] bg-[linear-gradient(135deg,var(--surface-subtle)_0%,var(--surface-tint-strong)_48%,var(--surface-subtle)_100%)] shadow-[inset_0_1.5px_2px_var(--surface-subtle),inset_0_-2px_3px_var(--border-base),0_1px_2px_var(--border-base)]";
+const PAPER_SURFACE_STYLE = {
+  backgroundImage:
+    "linear-gradient(180deg,var(--ticket-paper-top)_0%,var(--ticket-paper-base)_100%)",
+} as const;
 
 const PAPER_NOISE_TEXTURE_STYLE = {
   backgroundImage: [
-    "radial-gradient(circle at 22% 24%, var(--text) 0.6px, transparent 0.8px)",
-    "radial-gradient(circle at 74% 36%, var(--text) 0.5px, transparent 0.72px)",
-    "radial-gradient(circle at 48% 72%, var(--text) 0.52px, transparent 0.74px)",
+    "radial-gradient(circle at 22% 24%, var(--ticket-fiber) 0.58px, transparent 0.84px)",
+    "radial-gradient(circle at 74% 36%, var(--ticket-fiber-soft) 0.52px, transparent 0.76px)",
+    "radial-gradient(circle at 48% 72%, var(--ticket-fiber) 0.56px, transparent 0.8px)",
+    "repeating-linear-gradient(-8deg, transparent 0px, transparent 9px, var(--ticket-fiber-soft) 9px, var(--ticket-fiber-soft) 10px)",
   ].join(","),
-  backgroundSize: "19px 19px, 23px 23px, 27px 27px",
+  backgroundSize: "23px 23px, 29px 29px, 31px 31px, 100% 100%",
 } as const;
+
+const SIDE_CUTOUT_CLASS_NAME =
+  "pointer-events-none absolute top-1/2 size-9 -translate-y-1/2 rounded-full border border-[var(--ticket-paper-border)] bg-[var(--bg-base)] shadow-[0_1px_3px_var(--shadow-color)]";
 
 export function PaperTicketCard({ ticket }: PaperTicketCardProps) {
   const status = statusDisplayMap[ticket.status];
-  const queue = ticket.queueNumber ?? ticket.id;
-  const { ticketTitle, wristbandLabel, wristbandValue, entryLabel, entryValue } =
+  const { dayLabel, dateLabel, venueLabel, queueLabel, wristbandValue, entryLabel, entryValue } =
     getGuideLines(ticket);
-  const queueLabel = String(queue);
 
   return (
-    <Card className={`${TICKETING_CLASSES.card.paper} px-5 py-6`}>
+    <Card className={`${TICKETING_CLASSES.card.paper} px-0 py-0`}>
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0 opacity-[0.02]"
+        className="pointer-events-none absolute inset-0 z-0"
+        style={PAPER_SURFACE_STYLE}
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 opacity-[0.07]"
         style={PAPER_NOISE_TEXTURE_STYLE}
       />
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute top-5 bottom-5 left-0 z-10 w-[3px] rounded-r-full"
+        className="pointer-events-none absolute inset-x-4 top-0 z-0 h-8 bg-[linear-gradient(180deg,var(--ticket-paper-top)_0%,transparent_100%)]"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute top-6 bottom-6 left-0 z-10 w-[5px] rounded-r-full opacity-80"
         style={{ backgroundColor: status.stripColor }}
       />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute top-6 bottom-6 right-0 z-10 w-[5px] rounded-l-full opacity-80"
+        style={{ backgroundColor: status.stripColor }}
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute left-4 top-3 bottom-3 z-0 border-l border-dashed border-[var(--ticket-perf)] opacity-90"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute right-4 top-3 bottom-3 z-0 border-l border-dashed border-[var(--ticket-perf)] opacity-90"
+      />
+      <span
+        aria-hidden="true"
+        className={`${SIDE_CUTOUT_CLASS_NAME} -left-[16px] z-10`}
+      />
+      <span
+        aria-hidden="true"
+        className={`${SIDE_CUTOUT_CLASS_NAME} -right-[16px] z-10`}
+      />
 
-      <div className="relative z-10 pl-2">
-        <div className="flex items-start justify-between gap-3">
-          <h3 className={`${TICKETING_CLASSES.typography.paperTitle} text-[var(--text)]`}>
-            {ticketTitle}
-          </h3>
+      <div className="relative z-10 px-6 py-4">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-[length:var(--ticketing-text-overline)] font-bold tracking-[0.1em] text-[var(--text-muted)]">
+              DANKOOK ZONE TICKET
+            </p>
+          </div>
           <span
             className={cn(
-              TICKETING_CLASSES.badge.paperStatus,
+              "inline-flex rounded-full border px-2.5 py-0.5 text-[length:var(--ticketing-text-paper-status)] leading-none font-semibold tracking-[0.01em]",
               status.badgeClassName,
             )}
           >
@@ -115,41 +178,72 @@ export function PaperTicketCard({ ticket }: PaperTicketCardProps) {
           </span>
         </div>
 
-        <div className="relative mt-5 mb-6">
-          <span className={`${NOTCH_CLASS_NAME} -left-9`} />
-          <span className={`${NOTCH_CLASS_NAME} -right-9`} />
-          <span className={`block ${TICKETING_CLASSES.divider.paper}`} />
+        <div className="mt-2.5 border-t border-dashed border-[var(--ticket-perf)] opacity-90" />
+
+        <div className="mt-2.5 grid grid-cols-[0.9fr_auto_1.35fr_auto_0.85fr] items-start gap-x-3">
+          <div>
+            <p className="text-[length:var(--ticketing-text-paper-label)] font-semibold leading-none tracking-[0.03em] text-[var(--text-muted)]">
+              일차
+            </p>
+            <p className="mt-1 text-[length:var(--ticketing-text-paper-value)] leading-none font-bold text-[var(--text)]">
+              {dayLabel}
+            </p>
+          </div>
+
+          <span
+            aria-hidden="true"
+            className="mt-0.5 block h-[2.55rem] border-l border-dashed border-[var(--ticket-perf)] opacity-90"
+          />
+
+          <div>
+            <p className="text-[length:var(--ticketing-text-paper-label)] font-semibold leading-none tracking-[0.03em] text-[var(--text-muted)]">
+              공연 일자
+            </p>
+            <p className="mt-1 text-[length:var(--ticketing-text-paper-value)] leading-none font-bold text-[var(--text)] [font-variant-numeric:tabular-nums]">
+              {dateLabel}
+            </p>
+          </div>
+
+          <span
+            aria-hidden="true"
+            className="mt-0.5 block h-[2.55rem] border-l border-dashed border-[var(--ticket-perf)] opacity-90"
+          />
+
+          <div>
+            <p className="text-[length:var(--ticketing-text-paper-label)] font-semibold leading-none tracking-[0.03em] text-[var(--text-muted)]">
+              예매 순번
+            </p>
+            <p className="mt-1 font-mono text-[length:var(--ticketing-text-paper-queue)] leading-none font-extrabold tracking-[0.02em] text-[var(--accent)] [font-variant-numeric:tabular-nums]">
+              NO.{queueLabel}
+            </p>
+          </div>
         </div>
 
-        <div>
-          <p className={`text-center ${TICKETING_CLASSES.typography.queueLabel} text-[var(--text-muted)]`}>예매 순번</p>
-          <p className={`mt-1 text-center ${TICKETING_CLASSES.typography.queueValue} text-[var(--accent)]`}>
-            NO. {queueLabel}
-          </p>
-        </div>
+        <div className="mt-2.5 border-t border-dashed border-[var(--ticket-perf)] opacity-90" />
 
-        <div className={`my-6 ${TICKETING_CLASSES.divider.paper}`} />
+        <div className="mt-2.5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-x-4">
+          <div>
+            <p className="text-[length:var(--ticketing-text-paper-label)] font-semibold leading-none tracking-[0.03em] text-[var(--text-muted)]">
+              팔찌 배부 시각
+            </p>
+            <p className="mt-1 text-[length:var(--ticketing-text-paper-time)] leading-none font-bold text-[var(--text)]">
+              {wristbandValue}
+            </p>
+          </div>
 
-        <div className="space-y-2.5 pt-5">
-          <p className={`flex flex-wrap items-center gap-1.5 ${TICKETING_CLASSES.typography.ticketMeta} text-[var(--text-muted)]`}>
-            <span className="font-medium text-[var(--accent)]">[{wristbandLabel}]</span>
-            <span className="font-normal text-[var(--text-muted)]">{wristbandValue}</span>
-          </p>
-          <p className={`flex flex-wrap items-center gap-1.5 ${TICKETING_CLASSES.typography.ticketMeta} text-[var(--text-muted)]`}>
-            <span className="font-medium text-[var(--accent)]">[{entryLabel}]</span>
-            <span className="font-normal text-[var(--text-muted)]">{entryValue}</span>
-          </p>
-        </div>
+          <span
+            aria-hidden="true"
+            className="mt-0.5 block h-[2.25rem] border-l border-dashed border-[var(--ticket-perf)] opacity-90"
+          />
 
-        <div className={`my-5 ${TICKETING_CLASSES.divider.paper}`} />
-
-        <div className="rounded-lg bg-[var(--surface-subtle)] px-3 py-2">
-          <p className={`text-center ${TICKETING_CLASSES.typography.ticketFooter} text-[var(--text-muted)]`}>
-            입장 시 제시하세요
-          </p>
-          <p className={`mt-1 text-center ${TICKETING_CLASSES.typography.watermark} text-[var(--text-muted)] opacity-70`}>
-            DANKOOK FESTA 2026 · LOU:D · DANKOOK FESTA 2026 · LOU:D
-          </p>
+          <div>
+            <p className="text-[length:var(--ticketing-text-paper-label)] font-semibold leading-none tracking-[0.03em] text-[var(--text-muted)]">
+              {entryLabel}
+            </p>
+            <p className="mt-1 text-[length:var(--ticketing-text-paper-time)] leading-none font-bold text-[var(--text)]">
+              {entryValue}
+            </p>
+          </div>
         </div>
       </div>
     </Card>

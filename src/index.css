@@ -8,6 +8,40 @@
 :root {
   --font-size: 16px;
 
+  /* Ticketing typography scale tokens */
+  --ticketing-text-button: 0.82rem;
+  --ticketing-text-button-compact: 0.79rem;
+  --ticketing-text-badge: 0.82rem;
+  --ticketing-text-hero-title: 1.2rem;
+  --ticketing-text-hero-description: 0.88rem;
+  --ticketing-text-card-title: 1.12rem;
+  --ticketing-text-card-subtitle: 0.9rem;
+  --ticketing-text-section-title: 0.8rem;
+  --ticketing-text-section-body: 0.82rem;
+  --ticketing-text-section-body-sm: 0.74rem;
+  --ticketing-text-helper: 0.84rem;
+  --ticketing-text-step-title: 0.78rem;
+  --ticketing-text-info-banner-title: 0.85rem;
+  --ticketing-text-info-banner-body: 0.88rem;
+  --ticketing-text-paper-title: 0.87rem;
+  --ticketing-text-queue-label: 0.78rem;
+  --ticketing-text-queue-value: 1.25rem;
+  --ticketing-text-ticket-meta: 0.86rem;
+  --ticketing-text-ticket-footer: 0.7rem;
+  --ticketing-text-watermark: 0.58rem;
+  --ticketing-text-state-title: 1.3rem;
+  --ticketing-text-state-body: 0.82rem;
+  --ticketing-text-overline: 0.7rem;
+  --ticketing-text-header-overline: 0.62rem;
+  --ticketing-text-step-index: 0.7125rem;
+  --ticketing-text-holder-overline: 0.82rem;
+  --ticketing-text-paper-status: 0.82rem;
+  --ticketing-text-paper-label: 0.78rem;
+  --ticketing-text-paper-value: 0.96rem;
+  --ticketing-text-paper-queue: 1.02rem;
+  --ticketing-text-paper-time: 0.86rem;
+  --ticketing-text-reservation-countdown: 1.02rem;
+
   /*
    * Design token policy
    * - No raw colors in components. Always use semantic tokens/CSS vars.
@@ -30,10 +64,22 @@
   --surface-tint-subtle: rgba(59, 130, 246, 0.1);
   --surface-tint-base: rgba(59, 130, 246, 0.14);
   --surface-tint-strong: rgba(59, 130, 246, 0.18);
+  --surface-tint-emphasis: rgba(59, 130, 246, 0.29);
   --border-subtle: rgba(147, 197, 253, 0.46);
   --border-base: rgba(147, 197, 253, 0.56);
   --border-strong: rgba(147, 197, 253, 0.66);
+  --border-emphasis: rgba(147, 197, 253, 0.82);
   --shadow-color: rgba(15, 23, 42, 0.12);
+
+  /* Ticket paper tokens */
+  --ticket-paper-base: rgba(255, 252, 243, 0.96);
+  --ticket-paper-top: rgba(255, 255, 255, 0.98);
+  --ticket-paper-border: rgba(160, 193, 236, 0.76);
+  --ticket-fiber: rgba(15, 23, 42, 0.055);
+  --ticket-fiber-soft: rgba(15, 23, 42, 0.03);
+  --ticket-notch-border: rgba(160, 193, 236, 0.84);
+  --ticket-notch-shadow: rgba(213, 228, 248, 0.9);
+  --ticket-perf: rgba(147, 197, 253, 0.62);
 
   /* Stable aliases used by existing components */
   --surface: var(--surface-base);
@@ -42,6 +88,12 @@
   --accent: #2563eb;
   --text: #0f172a;
   --text-muted: #475569;
+  --header-bg: var(--accent);
+  --header-border: rgba(255, 255, 255, 0.3);
+  --header-text: var(--primary-foreground);
+  --header-text-muted: rgba(255, 255, 255, 0.82);
+  --header-button-bg: rgba(255, 255, 255, 0.14);
+  --header-button-hover: rgba(255, 255, 255, 0.22);
 
   /* Status semantic tokens */
   --status-success: #2e7d32;
@@ -53,6 +105,11 @@
   --status-warning-bg: rgba(178, 106, 0, 0.12);
   --status-warning-border: rgba(178, 106, 0, 0.28);
   --status-warning-text: #7c4a00;
+
+  --status-pending: #e3776a;
+  --status-pending-bg: rgba(227, 119, 106, 0.16);
+  --status-pending-border: rgba(227, 119, 106, 0.38);
+  --status-pending-text: #a9473d;
 
   --status-danger: #b3261e;
   --status-danger-bg: rgba(179, 38, 30, 0.1);
@@ -238,11 +295,13 @@
 
   body {
     @apply bg-background text-foreground;
+    background-color: var(--bg-base);
     font-family: "Pretendard Variable", "Pretendard", "SUIT", "Noto Sans KR",
       system-ui, -apple-system, "Segoe UI", sans-serif;
   }
 
   html {
+    background-color: var(--bg-base);
     font-size: var(--font-size);
   }
 

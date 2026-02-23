@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  BadgeCheck,
   CircleAlert,
   House,
   KeyRound,
@@ -112,26 +111,13 @@ export default function Signup() {
         </button>
 
         <div className="mt-9">
-          <h1 className="text-[2.1rem] leading-[1.12] font-black tracking-tight text-[var(--text)]">
-            티켓팅 시작하기
+          <p className="text-[length:var(--ticketing-text-helper)] font-semibold text-[var(--text-muted)]">
+            재학생 전용 서비스
+          </p>
+          <h1 className="mt-1 leading-[1.12] font-black tracking-tight text-[var(--text)]">
+            티켓팅 포털 회원가입
           </h1>
         </div>
-
-        <section className="mt-6 rounded-2xl border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] px-3.5 py-3">
-          <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-strong)_100%)] text-[var(--accent)]">
-              <BadgeCheck className="h-4 w-4" strokeWidth={2.3} />
-            </div>
-            <div className="pt-0.5">
-              <span className="inline-flex items-center rounded-full border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-strong)_100%)] px-2 py-0.5 text-[11px] font-semibold text-[var(--accent)]">
-                재학생 전용
-              </span>
-              <p className="mt-1 text-sm font-semibold text-[var(--text)]">
-                단국존 티켓팅 및 이용은 단국대학교 재학생만 가능합니다
-              </p>
-            </div>
-          </div>
-        </section>
 
         <main className="mt-6">
           <form className="space-y-5" onSubmit={handleSubmit}>
@@ -176,14 +162,9 @@ export default function Signup() {
             <div className="h-px bg-[var(--border-subtle)]" />
 
             <section className="space-y-4">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-strong)_100%)] px-3 py-1.5 text-xs font-semibold text-[var(--accent)]">
-                <KeyRound className="h-3.5 w-3.5" strokeWidth={2.3} />
-                서비스 비밀번호
-              </div>
-
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-semibold text-[var(--text)]">
-                  서비스 비밀번호
+                  서비스용 비밀번호
                 </Label>
                 <Input
                   id="password"

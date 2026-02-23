@@ -95,11 +95,11 @@ export function TicketingHomePanel({
             <Card className={action.cardClassName}>
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 z-0 rounded-[20px] border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] shadow-[inset_0_1px_0_var(--surface-subtle)]"
+                className="pointer-events-none absolute inset-0 z-0 rounded-[20px] border border-[var(--border-emphasis)] bg-[linear-gradient(145deg,var(--surface-tint-emphasis)_0%,var(--surface-tint-strong)_48%,var(--surface-base)_100%)] shadow-[inset_0_1px_0_var(--surface-subtle)]"
               />
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 z-0 rounded-[20px] bg-[linear-gradient(180deg,var(--surface-subtle)_0%,transparent_66%)]"
+                className="pointer-events-none absolute inset-0 z-0 rounded-[20px] bg-[linear-gradient(180deg,var(--surface-tint-base)_0%,transparent_72%)]"
               />
               <div className="relative z-10 grid min-h-[84px] grid-cols-[60px_1fr_24px] items-center gap-3.5">
                 <div className={`flex h-[60px] w-[60px] shrink-0 ${TICKETING_CLASSES.badge.iconCircle} rounded-[18px]`}>
@@ -141,7 +141,9 @@ export function TicketingHomePanel({
               }
             >
               <div className="flex items-start gap-3">
-                <div className={`mt-0.5 flex h-8 w-8 shrink-0 ${TICKETING_CLASSES.badge.iconCircle} text-[13px] font-bold`}>
+                <div
+                  className={`mt-0.5 flex h-8 w-8 shrink-0 ${TICKETING_CLASSES.badge.iconCircle} text-[length:var(--ticketing-text-step-index)] font-bold`}
+                >
                   {item.step}
                 </div>
                 <div>

@@ -4,7 +4,6 @@ import { TicketCheck } from "lucide-react";
 import { PaperTicketCard } from "@/components/ticketing/PaperTicketCard";
 import {
   TICKETING_CLASSES,
-  TICKETING_WIDE_PANEL_CLASS,
   TicketingRefreshButton,
 } from "@/components/ticketing/ticketingShared";
 import type { Ticket } from "@/types/model/ticket.model";
@@ -31,46 +30,54 @@ export function MyTicketListPanel({
   onRefresh,
   onGoTicketing,
 }: MyTicketListPanelProps) {
+  const panelClassName = "mx-auto w-full max-w-3xl space-y-2.5 pb-2";
+
   return (
-    <div className={TICKETING_WIDE_PANEL_CLASS}>
-      <Card className={`${TICKETING_CLASSES.card.heroInfo} px-4 py-4`}>
-        <div className="flex items-start gap-3">
-          <span className={`mt-0.5 inline-flex h-8 w-8 shrink-0 ${TICKETING_CLASSES.badge.iconCircle}`}>
-            <TicketCheck className="h-4 w-4" />
+    <div className={panelClassName}>
+      <Card className={`${TICKETING_CLASSES.card.heroInfo} px-3 py-2.5`}>
+        <div className="flex items-center gap-2.5">
+          <span className={`inline-flex h-6 w-6 shrink-0 ${TICKETING_CLASSES.badge.iconCircle}`}>
+            <TicketCheck className="h-3.5 w-3.5" />
           </span>
           <div className="min-w-0 flex-1">
-            <h2 className={`${TICKETING_CLASSES.typography.infoBannerTitle} text-[var(--text)]`}>
+            <h2 className={`${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--text)]`}>
               단국존 선예매 티켓
             </h2>
-            <p className={`mt-1 ${TICKETING_CLASSES.typography.infoBannerBody} text-[var(--text-muted)]`}>
-              예매 내역과 현재 팔찌 수령 상태를 확인하세요.
+            <p className={`mt-1 ${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>
+              예매 내역과 팔찌 상태
             </p>
           </div>
           <TicketingRefreshButton
             onClick={onRefresh}
             loading={loading}
-            size="lg"
+            size="sm"
+            className="h-9 w-9 rounded-lg border-[var(--border-base)] bg-[var(--surface-subtle)] p-0 text-[var(--text-muted)] hover:bg-[var(--surface-tint-subtle)]"
+            iconClassName="h-3.5 w-3.5"
           />
         </div>
       </Card>
 
-      <Card className={`${TICKETING_CLASSES.card.summaryInfo} px-4 py-3`}>
-        <div className="flex items-start">
-          <div className="min-w-0">
-            <p className={`${TICKETING_CLASSES.typography.sectionTitle} text-[var(--text-muted)]`}>티켓 소지자 정보</p>
-            <div className={`mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 ${TICKETING_CLASSES.typography.sectionBodySm} leading-none`}>
-              <p className="font-semibold text-[var(--text-muted)]">
-                학번
-                <span className="ml-1 font-extrabold tracking-tight text-[var(--accent)]">
-                  {student.studentId}
-                </span>
-              </p>
-              <p className="font-semibold text-[var(--text-muted)]">
-                이름
-                <span className="ml-1 font-extrabold tracking-tight text-[var(--text)]">{student.name}</span>
-              </p>
-            </div>
+      <Card className="rounded-[18px] border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] px-2.5 py-2 shadow-[0_10px_18px_-16px_var(--shadow-color)]">
+        <div className="relative rounded-xl border border-[var(--border-base)] px-2.5 py-2">
+          <div className="relative z-10 flex items-center justify-between gap-2">
+            <p className="text-[length:var(--ticketing-text-holder-overline)] font-bold tracking-[0.1em] text-[var(--text-muted)]">
+              TICKET HOLDER
+            </p>
+            <p className={`${TICKETING_CLASSES.typography.sectionBodySm} font-semibold text-[var(--text-muted)]`}>티켓 소지자 정보</p>
           </div>
+
+          <div className="relative z-10 mt-1.5 border-t border-[var(--border-subtle)]" />
+
+          <dl className={`relative z-10 mt-1.5 grid grid-cols-[2.1rem_1fr] items-start gap-x-2 gap-y-1.5 ${TICKETING_CLASSES.typography.sectionBodySm}`}>
+            <dt className="font-semibold text-[var(--text-muted)]">학번</dt>
+            <dd className="font-extrabold tracking-tight text-[var(--accent)] [overflow-wrap:anywhere]">
+              {student.studentId}
+            </dd>
+            <dt className="font-semibold text-[var(--text-muted)]">이름</dt>
+            <dd className="font-extrabold tracking-tight text-[var(--text)] [overflow-wrap:anywhere]">
+              {student.name}
+            </dd>
+          </dl>
         </div>
       </Card>
 

@@ -153,7 +153,7 @@ export function TicketingReservationPanel({
               <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>
                 아래 문구를 정확히 입력하세요:
               </p>
-              <div className="rounded-xl border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] px-3 py-3 text-center font-mono text-[1.12rem] font-bold tracking-[0.05em] text-[var(--accent)]">
+              <div className="rounded-xl border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] px-3 py-3 text-center font-mono text-[length:var(--ticketing-text-reservation-countdown)] font-bold tracking-[0.05em] text-[var(--accent)]">
                 {REQUIRED_ACKNOWLEDGEMENT_CODE}
               </div>
               <div className="relative">

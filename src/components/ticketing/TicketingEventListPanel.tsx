@@ -55,6 +55,12 @@ const parseTimestamp = (value: string): number | null => {
   return parsed;
 };
 
+const normalizeKoreanMonthDay = (value: string): string => {
+  return value
+    .replace(/(^|[^0-9])0([1-9])(?=\s*월)/g, "$1$2")
+    .replace(/월(\s*)0([1-9])(?=\s*일)/g, "월$1$2");
+};
+
 const formatCountdown = (seconds: number): string => {
   const clamped = Math.max(0, seconds);
   const hours = Math.floor(clamped / 3600);
@@ -91,20 +97,23 @@ const resolveViewStatus = (
 const formatEventDateTime = (event: TicketingEvent, openAtMs: number | null): string => {
   const eventDateTime = [event.eventDate, event.eventTime].filter(Boolean).join(" ");
   if (eventDateTime) {
-    return eventDateTime;
+    return normalizeKoreanMonthDay(eventDateTime);
   }
 
   if (openAtMs === null) {
     return "오픈 일정 추후 공지";
   }
 
-  return new Date(openAtMs).toLocaleString("ko-KR", {
-    month: "2-digit",
-    day: "2-digit",
-    weekday: "short",
+  const date = new Date(openAtMs);
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const weekday = date.toLocaleDateString("ko-KR", { weekday: "short" });
+  const time = date.toLocaleTimeString("ko-KR", {
     hour: "2-digit",
     minute: "2-digit",
+    hour12: false,
   });
+  return `${month}월 ${day}일 (${weekday}) ${time}`;
 };
 
 export function TicketingEventListPanel({
@@ -186,14 +195,14 @@ export function TicketingEventListPanel({
         return (
           <Card
             key={event.id}
-            className={`${TICKETING_CLASSES.card.event} px-5 py-6`}
+            className={`${TICKETING_CLASSES.card.event} px-5 py-4`}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <h3 className={`truncate ${TICKETING_CLASSES.typography.cardTitle} text-[var(--text)]`}>
-                  {event.title || "공연 티켓팅"}
+                  {normalizeKoreanMonthDay(event.title || "공연 티켓팅")}
                 </h3>
-                <p className={`mt-2 ${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--accent)]`}>
+                <p className={`mt-1 ${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--accent)]`}>
                   {formatEventDateTime(event, openAtMs)}
                 </p>
               </div>
@@ -207,10 +216,10 @@ export function TicketingEventListPanel({
               </Badge>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-3">
               {status === "upcoming" && openAtMs !== null && (
                 <Button
-                  className={TICKETING_CLASSES.button.disabledFull}
+                  className={`${TICKETING_CLASSES.button.disabledFull} h-12`}
                   variant="outline"
                   disabled
                 >
@@ -221,7 +230,7 @@ export function TicketingEventListPanel({
 
               {status === "upcoming" && openAtMs === null && (
                 <Button
-                  className={TICKETING_CLASSES.button.disabledCompactFull}
+                  className={`${TICKETING_CLASSES.button.disabledCompactFull} h-12`}
                   variant="outline"
                   disabled
                 >
@@ -231,7 +240,7 @@ export function TicketingEventListPanel({
 
               {status === "open" && (
                 <Button
-                  className={TICKETING_CLASSES.button.primaryFull}
+                  className={`${TICKETING_CLASSES.button.primaryFull} h-12`}
                   onClick={() => onSelectEvent(event)}
                 >
                   단국존 선착순 예매
@@ -240,7 +249,7 @@ export function TicketingEventListPanel({
 
               {status === "soldout" && (
                 <Button
-                  className={TICKETING_CLASSES.button.disabledSoldoutFull}
+                  className={`${TICKETING_CLASSES.button.disabledSoldoutFull} h-12`}
                   variant="outline"
                   disabled
                 >

@@ -3,8 +3,8 @@
   "short_name": "DANZZAN",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1d4ed8",
+  "background_color": "#eaf2ff",
+  "theme_color": "#2563eb",
   "icons": [
     {
       "src": "/favicon.svg",
