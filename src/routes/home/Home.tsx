@@ -95,11 +95,13 @@ function Home() {
         </div>
       )}
 
-      <PosterCarousel posters={posters} />
+      <div className="space-y-4">
+        <PosterCarousel posters={posters} />
 
-      <EmergencyNotice notice={notice} />
+        <EmergencyNotice notice={notice} />
 
-      <TicketingCtaCard data={ticketingCta} />
+        <TicketingCtaCard data={ticketingCta} />
+      </div>
 
       {/* 로딩 상태 */}
       {loading && (
