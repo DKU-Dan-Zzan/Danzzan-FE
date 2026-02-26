@@ -23,10 +23,19 @@ dist-ssr
 *.sln
 *.sw?
 
-# Local env files
-.env.*
+# Local env files (API URL, 시크릿 등 절대 커밋 금지)
 .env
+.env.*
+!.env.example
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Vite
+.vite
+
+# 기타
+.cache
+coverage
+*.tsbuildinfo
