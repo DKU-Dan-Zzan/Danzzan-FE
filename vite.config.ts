@@ -31,5 +31,23 @@ export default defineConfig({
         ]
       }
     })
-  ]
+  ],
+  server: {
+    proxy: {
+      "/home": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+
+      /* 만약 /api/home/images 같은 경로를 원한다면 
+      위의 코드를 지우고 아래 코드 주석 해제 */
+      /*
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+      */
+    },
+  },
 })
