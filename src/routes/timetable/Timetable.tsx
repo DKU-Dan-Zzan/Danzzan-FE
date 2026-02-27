@@ -76,7 +76,7 @@ export default function Timetable() {
       {/* 상단 영역(화이트, 붙어있는 레이아웃) */}
       <div className="bg-white">
         <div className="px-5 pt-5 pb-4">
-          <div className="text-[38px] font-extrabold tracking-tight text-blue-600 font-cute">{title}</div>
+          <div className="text-[38px] font-extrabold text-blue-600 font-cute">{title}</div>
           <div className="mt-1 text-sm text-gray-500">{subtitle}</div>
 
           <div className="mt-4">
