@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import AppLayout from './components/layout/AppLayout'
 import AdminLayout from './components/layout/AdminLayout'
 
@@ -9,6 +9,31 @@ import BoothMap from "./routes/boothmap/BoothMap";
 import LostItem from "./routes/lostitem/LostItem";
 
 import Admin from "./routes/admin/Admin";
+import AdminLogin from "./routes/admin/AdminLogin";
+import { useAdminAuth } from "./hooks/useAdminAuth";
+import { useEffect, useState } from "react";
+
+function ProtectedAdmin() {
+  const { isAuthenticated, tryRestoreSession } = useAdminAuth();
+  const [restoreDone, setRestoreDone] = useState(false);
+
+  useEffect(() => {
+    if (restoreDone) return;
+    tryRestoreSession().then(() => setRestoreDone(true));
+  }, [restoreDone, tryRestoreSession]);
+
+  if (!restoreDone) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center text-[var(--text-muted)]">
+        세션 확인 중...
+      </div>
+    );
+  }
+  if (!isAuthenticated) {
+    return <Navigate to="/admin/login" replace />;
+  }
+  return <Admin />;
+}
 
 function App() {
   return (
@@ -20,13 +45,12 @@ function App() {
         <Route path="/timetable" element={<Timetable />} />
         <Route path="/map" element={<BoothMap />} />
         <Route path="/lost-item" element={<LostItem />} />
-        <Route path="/admin" element={<Admin />} />
       </Route>
 
-      {/* admin/* : 헤더/바텀네비 미적용 */}
+      {/* admin: 헤더/바텀네비 미적용, 로그인 필요 */}
       <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<Admin />} />
-        {/* 필요하면 더 추가 */}
+        <Route index element={<ProtectedAdmin />} />
+        <Route path="login" element={<AdminLogin />} />
       </Route>
     </Routes>
   )
