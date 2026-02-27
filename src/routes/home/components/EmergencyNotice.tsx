@@ -1,10 +1,10 @@
-import { AlertCircle } from "lucide-react"
+import { Megaphone } from "lucide-react"
 
 export interface EmergencyNoticeData {
   id: number
   title: string
   content: string
-  isActive: boolean
+  createdAt?: string
 }
 
 interface Props {
@@ -12,34 +12,71 @@ interface Props {
 }
 
 const EmergencyNotice = ({ notice }: Props) => {
-  if (!notice || !notice.isActive) return null
+  if (!notice) return null
+
+  const isNew = notice.createdAt === "방금 전"
 
   return (
-    <section className="px-4 mt-4">
+    <section className="px-4 mt-6">
       <div
         className="
           relative
-          flex items-start gap-3
-          rounded-[20px]
-          px-4 py-4
-          bg-blue-50
-          border border-blue-100
+          rounded-2xl
+          bg-white
+          border border-gray-200
+          shadow-[0_12px_30px_rgba(10,85,156,0.12)]
+          overflow-hidden
         "
       >
-        {/* 왼쪽 포인트 바 */}
-        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary rounded-l-[20px]" />
+        {/* 얇은 상단 액센트 바 */}
+        <div className="absolute top-0 left-0 right-0 h-[5px] bg-primary" />
 
-        <div className="ml-2 mt-0.5 text-primary">
-          <AlertCircle size={20} strokeWidth={2.2} />
-        </div>
+        <div className="px-4 py-4 flex items-start gap-3">
+          {/* 아이콘 */}
+          <div
+            className="
+              flex items-center justify-center
+              w-9 h-9 rounded-full
+              bg-primary/10 text-primary
+              flex-shrink-0
+            "
+          >
+            <Megaphone size={18} strokeWidth={2.2} />
+          </div>
 
-        <div className="flex flex-col">
-          <span className="font-semibold text-[14px] text-primary">
-            {notice.title}
-          </span>
-          <span className="mt-1 text-[13px] leading-relaxed text-gray-700">
-            {notice.content}
-          </span>
+          {/* 텍스트 영역 */}
+          <div className="flex-1">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-[14px] text-gray-900">
+                  {notice.title}
+                </span>
+
+                {isNew && (
+                  <span
+                    className="
+                      px-2 py-[2px]
+                      text-[10px] font-semibold
+                      rounded-full
+                      bg-primary text-white
+                    "
+                  >
+                    NEW
+                  </span>
+                )}
+              </div>
+
+              {notice.createdAt && (
+                <span className="text-[11px] text-gray-500 whitespace-nowrap">
+                  {notice.createdAt}
+                </span>
+              )}
+            </div>
+
+            <p className="mt-2 text-[13px] leading-relaxed text-gray-700">
+              {notice.content}
+            </p>
+          </div>
         </div>
       </div>
     </section>
