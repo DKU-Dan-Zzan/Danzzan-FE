@@ -150,6 +150,17 @@ export const ticketApi = {
     return mapTicketReservationDtoToModel(dto ?? {});
   },
 
+  getRemainingCount: async (eventId: string): Promise<{ eventId: number; remaining: number }> => {
+    if (env.apiMode === "mock") {
+      return { eventId: Number(eventId), remaining: Math.floor(Math.random() * 100) };
+    }
+
+    const client = getTicketingClient();
+    return await client.get<{ eventId: number; remaining: number }>(
+      `/tickets/events/${eventId}/remaining`,
+    );
+  },
+
   getMyTickets: async (): Promise<Ticket[]> => {
     if (env.apiMode === "mock") {
       return mapTicketListDtoToModel(mockMyTicketsDto);

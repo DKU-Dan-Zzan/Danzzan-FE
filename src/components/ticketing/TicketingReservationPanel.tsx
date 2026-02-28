@@ -15,6 +15,7 @@ interface TicketingReservationPanelProps {
   agreementInput: string;
   submitting: boolean;
   errorMessage: string | null;
+  remainingCount?: number | null;
   onAgreementInputChange: (value: string) => void;
   onSubmit: () => void;
 }
@@ -69,6 +70,7 @@ export function TicketingReservationPanel({
   agreementInput,
   submitting,
   errorMessage,
+  remainingCount,
   onAgreementInputChange,
   onSubmit,
 }: TicketingReservationPanelProps) {
@@ -81,11 +83,25 @@ export function TicketingReservationPanel({
   return (
     <div className={`${TICKETING_NARROW_PANEL_CLASS} space-y-4`}>
       <div>
-        <div>
-          <h2 className={`${TICKETING_CLASSES.typography.heroTitle} text-[var(--text)]`}>예매 진행 중</h2>
-          <p className={`mt-0.5 ${TICKETING_CLASSES.typography.sectionBody} text-[var(--text-muted)]`}>
-            주의사항을 확인하고 확인 문구를 정확히 입력해 예매를 완료하세요.
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className={`${TICKETING_CLASSES.typography.heroTitle} text-[var(--text)]`}>예매 진행 중</h2>
+            <p className={`mt-0.5 ${TICKETING_CLASSES.typography.sectionBody} text-[var(--text-muted)]`}>
+              주의사항을 확인하고 확인 문구를 정확히 입력해 예매를 완료하세요.
+            </p>
+          </div>
+          {remainingCount != null && (
+            <div
+              className={cn(
+                "shrink-0 rounded-full px-3 py-1 text-sm font-semibold",
+                remainingCount > 0
+                  ? "bg-[var(--status-success-bg)] text-[var(--status-success-text)]"
+                  : "bg-[var(--status-danger-bg)] text-[var(--status-danger-text)]",
+              )}
+            >
+              {remainingCount > 0 ? `잔여석: ${remainingCount.toLocaleString()}석` : "매진"}
+            </div>
+          )}
         </div>
       </div>
 

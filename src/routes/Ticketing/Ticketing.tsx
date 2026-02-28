@@ -6,6 +6,7 @@ import { TicketingEventListPanel } from "@/components/ticketing/TicketingEventLi
 import { TicketingHomePanel } from "@/components/ticketing/TicketingHomePanel";
 import { TicketingReservationPanel } from "@/components/ticketing/TicketingReservationPanel";
 import { REQUIRED_ACKNOWLEDGEMENT_CODE } from "@/components/ticketing/ticketingConstants";
+import { useRemainingPolling } from "@/hooks/useRemainingPolling";
 import { useTicketing } from "@/hooks/useTicketing";
 import type { TicketingEvent } from "@/types/model/ticket.model";
 
@@ -29,6 +30,17 @@ export default function Ticketing() {
   const [selectedEvent, setSelectedEvent] = useState<TicketingEvent | null>(null);
   const [agreementInput, setAgreementInput] = useState("");
   const [reservationError, setReservationError] = useState<string | null>(null);
+
+  // 잔여석 폴링: in-progress 단계에서만 활성화
+  const { remaining: polledRemaining } = useRemainingPolling({
+    eventId: selectedEvent?.id ?? null,
+    enabled: step === "in-progress",
+    intervalMs: 2000,
+    onSoldOut: () => {
+      setReservationError(null);
+      setStep("soldout");
+    },
+  });
 
   const loadEvents = useCallback(async (): Promise<TicketingEvent[]> => {
     const fetched = await getTicketingEvents();
@@ -180,6 +192,7 @@ export default function Ticketing() {
         agreementInput={agreementInput}
         submitting={reservationLoading}
         errorMessage={reservationError}
+        remainingCount={polledRemaining}
         onAgreementInputChange={handleAgreementInputChange}
         onSubmit={handleSubmitReservation}
       />
