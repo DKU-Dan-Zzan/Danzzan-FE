@@ -4,7 +4,7 @@ export type Performance = {
   endTime: string
   artistId: number
   artistName: string
-  artistImage: string | null
+  artistImageUrl: string | null
   artistDescription: string | null
   stage: string | null
 }

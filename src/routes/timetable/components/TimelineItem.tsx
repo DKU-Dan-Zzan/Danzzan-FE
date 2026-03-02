@@ -48,7 +48,7 @@ export default function TimelineItem({
         {/* 이미지 */}
         <div className="w-40 overflow-hidden rounded-3xl bg-gray-100 border border-gray-200">
           <img
-            src={item.artistImage ?? "/placeholder-artist.png"}
+            src={item.artistImageUrl ?? "/placeholder-artist.png"}
             alt=""
             className="h-32 w-40 object-cover"
             onError={(e) => {

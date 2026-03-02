@@ -6,82 +6,13 @@ import type { FestivalDay, Performance } from "./timetable.types"
 
 import { InformationCircleIcon } from "@heroicons/react/24/outline"
 import Footer from "../../components/layout/Footer"
+import { getPerformances } from "../../api/timetableApi" 
 
 const FESTIVAL_DAYS: FestivalDay[] = [
   { key: "DAY-1", label: "1일차", date: "2026-05-12" },
-  { key: "DAY-2", label: "2일차", date: "2026-02-27" },
+  { key: "DAY-2", label: "2일차", date: "2026-05-13" },
   { key: "DAY-3", label: "3일차", date: "2026-05-14" },
 ]
-
-// UI용 Mock (나중에 API 붙이면 이 부분만 교체)
-const MOCK_BY_DATE: Record<string, Performance[]> = {
-  "2026-05-12": [
-    {
-      performanceId: 101,
-      startTime: "17:00",
-      endTime: "18:30",
-      artistId: 1,
-      artistName: "컴퓨터공학과 공연",
-      artistImage: null,
-      artistDescription: "신나는 무대를 준비했습니다.",
-      stage: "메인 무대",
-    },
-  ],
-  "2026-02-27": [
-    {
-      performanceId: 201,
-      startTime: "9:00",
-      endTime: "10:00",
-      artistId: 10,
-      artistName: "뮤지컬 공연",
-      artistImage: null,
-      artistDescription: "신나는 무대를 준비했습니다.",
-      stage: "메인 무대",
-    },
-    {
-      performanceId: 202,
-      startTime: "10:00",
-      endTime: "10:30",
-      artistId: 11,
-      artistName: "경영학과 공연",
-      artistImage: null,
-      artistDescription: "신나는 무대를 준비했습니다.",
-      stage: "메인 무대",
-    },
-    {
-      performanceId: 203,
-      startTime: "10:30",
-      endTime: "11:30",
-      artistId: 12,
-      artistName: "초청 가수 A",
-      artistImage: null,
-      artistDescription: "대표곡 라이브 공연",
-      stage: "중앙 무대",
-    },
-    {
-      performanceId: 204,
-      startTime: "11:30",
-      endTime: "12:00",
-      artistId: 1,
-      artistName: "초청 가수 B",
-      artistImage: null,
-      artistDescription: "대표곡 라이브 공연",
-      stage: "중앙 무대",
-    },
-  ],
-  "2026-05-14": [
-    {
-      performanceId: 301,
-      startTime: "18:10",
-      endTime: "19:00",
-      artistId: 20,
-      artistName: "게스트 가수 B",
-      artistImage: null,
-      artistDescription: "히트곡 메들리",
-      stage: "메인 무대",
-    },
-  ],
-}
 
 function todayISODateLocal() {
   const d = new Date()
@@ -124,6 +55,11 @@ export default function Timetable() {
   const [scrollTargetId, setScrollTargetId] = useState<number | null>(null)
   const [nowTargetId, setNowTargetId] = useState<number | null>(null)
 
+  // API 연동용 상태 추가 
+  const [items, setItems] = useState<Performance[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
+
   const didAutoInitRef = useRef(false)
   const didAutoScrollRef = useRef(false)
 
@@ -137,11 +73,39 @@ export default function Timetable() {
   }, [])
 
   const activeDate = FESTIVAL_DAYS[activeIdx].date
-  const items = MOCK_BY_DATE[activeDate] ?? []
 
   const title = useMemo(() => "타임테이블", [])
   const subtitle = useMemo(() => "공연 일정을 확인하세요", [])
 
+  // activeDate 바뀔 때마다 API 호출해서 items 채움
+  useEffect(() => {
+    let mounted = true
+
+    async function run() {
+      setIsLoading(true)
+      setLoadError(null)
+      try {
+        const data = await getPerformances(activeDate)
+        if (!mounted) return
+        setItems(data.performances ?? [])
+      } catch (e: any) {
+        if (!mounted) return
+        setItems([])
+        // 에러 메시지는 너무 길게 안 보이게 최소화
+        setLoadError("공연 정보를 불러오지 못했습니다.")
+      } finally {
+        if (!mounted) return
+        setIsLoading(false)
+      }
+    }
+
+    run()
+    return () => {
+      mounted = false
+    }
+  }, [activeDate])
+
+  // 오늘 탭이면 now/scroll 타겟 계산 + 최초 1회 자동 스크롤
   useEffect(() => {
     const today = todayISODateLocal()
     const isTodayTab = activeDate === today
@@ -165,6 +129,7 @@ export default function Timetable() {
     }
   }, [activeDate, items])
 
+  // 1분마다 현재 공연 업데이트
   useEffect(() => {
     const today = todayISODateLocal()
     const isTodayTab = activeDate === today
@@ -183,6 +148,9 @@ export default function Timetable() {
   const handleChangeDay = (idx: number) => {
     setActiveIdx(idx)
     setScrollTargetId(null)
+
+    // 날짜 바뀌면 해당 날짜에서 다시 “최초 1회” 자동스크롤 동작 가능하게 초기화
+    didAutoScrollRef.current = false
   }
 
   return (
@@ -208,34 +176,45 @@ export default function Timetable() {
 
       {/* 여기부터만 스크롤 */}
       <div className="flex-1 overflow-y-auto scrollbar-hide px-5 pt-4 pb-[calc(84px+env(safe-area-inset-bottom))]">
-        {/* 날짜칩 */}
-        <DateChip date={activeDate} />
+        <div className="min-h-full flex flex-col">
+          {/* 날짜칩 */}
+          <DateChip date={activeDate} />
 
-        <div className="mt-4">
-          {items.length === 0 ? (
-            <div className="py-12 text-center text-gray-400">
-              등록된 공연이 없습니다.
-            </div>
-          ) : (
-            <>
-              <Timeline
-                items={items}
-                scrollTargetId={scrollTargetId}
-                nowTargetId={nowTargetId}
-              />
-
-              <div className="mt-10 rounded-2xl bg-blue-50 border border-blue-100 px-4 py-3 flex items-start gap-2">
-                <InformationCircleIcon className="w-5 h-5 text-blue-600 mt-0.5" />
-                <p className="text-sm text-blue-700 font-medium">
-                  일정은 현장 상황에 따라 변경될 수 있습니다.
-                </p>
+          <div className="mt-4 flex-1">
+            {isLoading ? (
+              <div className="py-12 text-center text-gray-400">
+                공연 정보를 불러오는 중입니다...
               </div>
-            </>
-          )}
-        </div>
+            ) : loadError ? (
+              <div className="py-12 text-center text-gray-400">
+                공연 정보를 불러오지 못했습니다.
+              </div>
+            ) : items.length === 0 ? (
+              <div className="py-12 text-center text-gray-400">
+                등록된 공연이 없습니다.
+              </div>
+            ) : (
+              <>
+                <Timeline
+                  items={items}
+                  scrollTargetId={scrollTargetId}
+                  nowTargetId={nowTargetId}
+                />
 
-        <div className="mt-16 -mx-5">
-          <Footer />
+                <div className="mt-10 rounded-2xl bg-blue-50 border border-blue-100 px-4 py-3 flex items-start gap-2">
+                  <InformationCircleIcon className="w-5 h-5 text-blue-600 mt-0.5" />
+                  <p className="text-sm text-blue-700 font-medium">
+                    일정은 현장 상황에 따라 변경될 수 있습니다.
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Footer는 맨 아래로 */}
+          <div className="mt-16 -mx-5">
+            <Footer />
+          </div>
         </div>
       </div>
     </div>
