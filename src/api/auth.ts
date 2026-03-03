@@ -1,4 +1,4 @@
-const getBaseUrl = () =>
+export const getBaseUrl = () =>
   (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim()?.replace(/\/$/, "") ?? "http://localhost:8080";
 
 export type LoginRequest = {
