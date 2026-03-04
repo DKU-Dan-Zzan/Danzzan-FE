@@ -1,4 +1,5 @@
 import { defineConfig } from "vite"
+import path from "path"
 import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
 import { VitePWA } from "vite-plugin-pwa"
@@ -13,7 +14,7 @@ export default defineConfig({
       manifest: {
         name: "DAN-ZZAN",
         short_name: "DAN-ZZAN",
-        description: "단국대학교 축제 서비스",
+        description: "DAN-ZZAN festival service",
         theme_color: "#0a559c",
         background_color: "#ffffff",
         display: "standalone",
@@ -31,5 +32,10 @@ export default defineConfig({
         ]
       }
     })
-  ]
+  ],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
 })
