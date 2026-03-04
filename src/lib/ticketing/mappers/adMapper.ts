@@ -1,5 +1,5 @@
-import type { PlacementAdDto } from "@/ticketing/types/dto/ad.dto";
-import type { AdPlacementKey, PlacementAd } from "@/ticketing/types/model/ad.model";
+import type { PlacementAdDto } from "@/types/ticketing/dto/ad.dto";
+import type { AdPlacementKey, PlacementAd } from "@/types/ticketing/model/ad.model";
 
 const DEFAULT_PLACEMENT: AdPlacementKey = "WAITING_ROOM_MAIN";
 

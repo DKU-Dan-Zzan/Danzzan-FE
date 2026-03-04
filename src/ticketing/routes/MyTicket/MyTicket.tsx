@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { adApi } from "@/ticketing/api/adApi";
+import { adApi } from "@/api/ticketing/adApi";
 import { MyTicketListPanel } from "@/ticketing/components/ticketing/MyTicketListPanel";
-import { useAuth } from "@/ticketing/hooks/useAuth";
-import { useTicketing } from "@/ticketing/hooks/useTicketing";
-import type { PlacementAd } from "@/ticketing/types/model/ad.model";
-import type { Ticket } from "@/ticketing/types/model/ticket.model";
+import { useAuth } from "@/hooks/ticketing/useAuth";
+import { useTicketing } from "@/hooks/ticketing/useTicketing";
+import type { PlacementAd } from "@/types/ticketing/model/ad.model";
+import type { Ticket } from "@/types/ticketing/model/ticket.model";
 
 export default function MyTicket() {
   const navigate = useNavigate();

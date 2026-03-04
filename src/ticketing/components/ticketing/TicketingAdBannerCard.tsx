@@ -1,7 +1,7 @@
 import { Megaphone } from "lucide-react";
 import { Card } from "@/ticketing/components/common/ui/card";
 import { TICKETING_CLASSES } from "@/ticketing/components/ticketing/ticketingShared";
-import type { PlacementAd } from "@/ticketing/types/model/ad.model";
+import type { PlacementAd } from "@/types/ticketing/model/ad.model";
 
 const AD_PLACEHOLDER_IMAGE = "/ads/waiting-room-sample-banner.svg";
 

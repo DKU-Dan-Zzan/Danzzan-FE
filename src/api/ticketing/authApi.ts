@@ -1,9 +1,9 @@
-import { createHttpClient } from "@/ticketing/api/httpClient";
-import { mapAuthLoginResponse } from "@/ticketing/mappers/authMapper";
-import { authStore } from "@/ticketing/store/authStore";
-import type { AuthLoginResponseDto } from "@/ticketing/types/dto/auth.dto";
-import type { AuthCredentials, AuthSession } from "@/ticketing/types/model/auth.model";
-import { env, requireEnv } from "@/ticketing/utils/env";
+import { createHttpClient } from "@/api/ticketing/httpClient";
+import { mapAuthLoginResponse } from "@/lib/ticketing/mappers/authMapper";
+import { authStore } from "@/store/ticketing/authStore";
+import type { AuthLoginResponseDto } from "@/types/ticketing/dto/auth.dto";
+import type { AuthCredentials, AuthSession } from "@/types/ticketing/model/auth.model";
+import { env, requireEnv } from "@/utils/ticketing/env";
 
 const getAuthClient = () =>
   createHttpClient({

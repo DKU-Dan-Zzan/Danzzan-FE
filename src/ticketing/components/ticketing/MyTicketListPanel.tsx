@@ -7,8 +7,8 @@ import {
   TICKETING_CLASSES,
   TicketingRefreshButton,
 } from "@/ticketing/components/ticketing/ticketingShared";
-import type { PlacementAd } from "@/ticketing/types/model/ad.model";
-import type { Ticket } from "@/ticketing/types/model/ticket.model";
+import type { PlacementAd } from "@/types/ticketing/model/ad.model";
+import type { Ticket } from "@/types/ticketing/model/ticket.model";
 
 interface StudentSummary {
   studentId: string;

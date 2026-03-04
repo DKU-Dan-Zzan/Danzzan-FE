@@ -4,7 +4,7 @@ import {
   normalizeQueueStatusContract,
   normalizeReserveContract,
   unwrapApiObjectEnvelope,
-} from "@/ticketing/api/ticketContract";
+} from "@/api/ticketing/ticketContract";
 
 describe("ticketContract smoke", () => {
   it("queue enter 응답을 정규화한다", () => {

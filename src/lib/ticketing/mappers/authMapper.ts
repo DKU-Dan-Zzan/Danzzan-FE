@@ -1,5 +1,5 @@
-﻿import type { AuthLoginResponseDto } from "@/ticketing/types/dto/auth.dto";
-import type { AuthSession, AuthTokens, AuthUser } from "@/ticketing/types/model/auth.model";
+﻿import type { AuthLoginResponseDto } from "@/types/ticketing/dto/auth.dto";
+import type { AuthSession, AuthTokens, AuthUser } from "@/types/ticketing/model/auth.model";
 
 const mapUserRole = (role?: string): AuthUser["role"] => {
   if (role === "student" || role === "admin") {

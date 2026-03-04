@@ -1,8 +1,8 @@
 ﻿import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import { OpenAPI } from "@/ticketing/api/generated";
-import { env } from "@/ticketing/utils/env";
+import { OpenAPI } from "@/api/ticketing/generated";
+import { env } from "@/utils/ticketing/env";
 
 OpenAPI.BASE = env.apiBaseUrl;
 

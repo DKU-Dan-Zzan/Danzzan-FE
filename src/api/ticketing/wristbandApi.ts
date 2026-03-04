@@ -1,24 +1,24 @@
-import { createHttpClient } from "@/ticketing/api/httpClient";
-import { wristbandMock } from "@/ticketing/mocks/wristband.mock";
+import { createHttpClient } from "@/api/ticketing/httpClient";
+import { wristbandMock } from "@/mocks/ticketing/wristband.mock";
 import {
   mapEventSummaryToSession,
   mapEventStatsToWristbandStats,
   mapTicketSearchItemToAttendee,
-} from "@/ticketing/mappers/wristbandMapper";
-import { authStore } from "@/ticketing/store/authStore";
+} from "@/lib/ticketing/mappers/wristbandMapper";
+import { authStore } from "@/store/ticketing/authStore";
 import type {
   ApiResponse,
   EventListResponseDto,
   EventStatsResponseDto,
   TicketSearchResponseDto,
   IssueTicketResponseDto,
-} from "@/ticketing/types/dto/wristband.dto";
+} from "@/types/ticketing/dto/wristband.dto";
 import type {
   WristbandAttendee,
   WristbandSession,
   WristbandStats,
-} from "@/ticketing/types/model/wristband.model";
-import { env, requireEnv } from "@/ticketing/utils/env";
+} from "@/types/ticketing/model/wristband.model";
+import { env, requireEnv } from "@/utils/ticketing/env";
 
 const isMockMode = env.apiMode === "mock";
 

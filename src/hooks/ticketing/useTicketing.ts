@@ -1,10 +1,10 @@
 import { useCallback, useState } from "react";
-import { ticketApi } from "@/ticketing/api/ticketApi";
+import { ticketApi } from "@/api/ticketing/ticketApi";
 import type {
   Ticket,
   TicketingEvent,
   TicketReservationResult,
-} from "@/ticketing/types/model/ticket.model";
+} from "@/types/ticketing/model/ticket.model";
 
 export const useTicketing = () => {
   const [loading, setLoading] = useState(false);

@@ -5,7 +5,7 @@ import { Button } from "@/ticketing/components/common/ui/button";
 import { Card } from "@/ticketing/components/common/ui/card";
 import { Input } from "@/ticketing/components/common/ui/input";
 import { Label } from "@/ticketing/components/common/ui/label";
-import { useAuth } from "@/ticketing/hooks/useAuth";
+import { useAuth } from "@/hooks/ticketing/useAuth";
 
 export default function AdminLogin() {
   const [searchParams] = useSearchParams();

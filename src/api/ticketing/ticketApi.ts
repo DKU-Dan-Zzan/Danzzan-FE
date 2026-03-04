@@ -1,33 +1,33 @@
-import { createHttpClient } from "@/ticketing/api/httpClient";
+import { createHttpClient } from "@/api/ticketing/httpClient";
 import {
   normalizeQueueEnterContract,
   normalizeQueueStatusContract,
   normalizeReserveContract,
   unwrapApiObjectEnvelope,
-} from "@/ticketing/api/ticketContract";
+} from "@/api/ticketing/ticketContract";
 import {
   mapQueueEnterDtoToModel,
   mapQueueStatusDtoToModel,
   mapTicketEventListDtoToModel,
   mapTicketListDtoToModel,
   mapTicketReservationDtoToModel,
-} from "@/ticketing/mappers/ticketMapper";
-import { authStore } from "@/ticketing/store/authStore";
+} from "@/lib/ticketing/mappers/ticketMapper";
+import { authStore } from "@/store/ticketing/authStore";
 import type {
   TicketEventListResponseDto,
   TicketListResponseDto,
   TicketQueueEnterResponseDto,
   TicketQueueStatusResponseDto,
   TicketReservationResponseDto,
-} from "@/ticketing/types/dto/ticket.dto";
+} from "@/types/ticketing/dto/ticket.dto";
 import type {
   QueueEnterResult,
   QueueStatusResult,
   Ticket,
   TicketingEvent,
   TicketReservationResult,
-} from "@/ticketing/types/model/ticket.model";
-import { env, requireEnv } from "@/ticketing/utils/env";
+} from "@/types/ticketing/model/ticket.model";
+import { env, requireEnv } from "@/utils/ticketing/env";
 
 const getTicketingClient = () =>
   createHttpClient({

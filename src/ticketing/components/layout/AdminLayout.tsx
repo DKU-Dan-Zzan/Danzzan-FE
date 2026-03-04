@@ -1,7 +1,7 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { Button } from "@/ticketing/components/common/ui/button";
-import { useAuth } from "@/ticketing/hooks/useAuth";
-import { env } from "@/ticketing/utils/env";
+import { useAuth } from "@/hooks/ticketing/useAuth";
+import { env } from "@/utils/ticketing/env";
 
 export function AdminLayout() {
   const navigate = useNavigate();

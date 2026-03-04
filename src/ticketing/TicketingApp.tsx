@@ -1,5 +1,5 @@
 ﻿import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
-import { useAuth } from "@/ticketing/hooks/useAuth";
+import { useAuth } from "@/hooks/ticketing/useAuth";
 import { AdminLayout } from "@/ticketing/components/layout/AdminLayout";
 import { UserLayout } from "@/ticketing/components/layout/UserLayout";
 import Login from "@/ticketing/routes/Login/Login";
@@ -10,7 +10,7 @@ import AdminLogin from "@/ticketing/routes/admin/Login/AdminLogin";
 import WristbandPage from "@/ticketing/routes/admin/Wristband/WristbandPage";
 import TokenRequired from "@/ticketing/routes/admin/TokenRequired/TokenRequired";
 import NotFoundPage from "@/ticketing/routes/NotFound/NotFoundPage";
-import { env } from "@/ticketing/utils/env";
+import { env } from "@/utils/ticketing/env";
 import "@/ticketing/index.css";
 
 function RequireStudentAuth() {

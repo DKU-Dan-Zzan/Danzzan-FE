@@ -1,4 +1,4 @@
-import type { QueueRequestStatus } from "@/ticketing/types/model/ticket.model";
+import type { QueueRequestStatus } from "@/types/ticketing/model/ticket.model";
 import {
   BACKGROUND_POLL_INTERVAL,
   FOREGROUND_POLL_INTERVAL,

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { adApi } from "@/ticketing/api/adApi";
-import { HttpError } from "@/ticketing/api/httpClient";
-import { ticketApi } from "@/ticketing/api/ticketApi";
+import { adApi } from "@/api/ticketing/adApi";
+import { HttpError } from "@/api/ticketing/httpClient";
+import { ticketApi } from "@/api/ticketing/ticketApi";
 import { ReservationAlreadyPanel } from "@/ticketing/components/ticketing/ReservationAlreadyPanel";
 import { ReservationProcessingPanel } from "@/ticketing/components/ticketing/ReservationProcessingPanel";
 import { ReservationSoldOutPanel } from "@/ticketing/components/ticketing/ReservationSoldOutPanel";
@@ -11,7 +11,7 @@ import { TicketingEventListPanel } from "@/ticketing/components/ticketing/Ticket
 import { TicketingHomePanel } from "@/ticketing/components/ticketing/TicketingHomePanel";
 import { TicketingReservationPanel } from "@/ticketing/components/ticketing/TicketingReservationPanel";
 import { WaitingRoomPanel } from "@/ticketing/components/ticketing/WaitingRoomPanel";
-import { useTicketing } from "@/ticketing/hooks/useTicketing";
+import { useTicketing } from "@/hooks/ticketing/useTicketing";
 import {
   BACKGROUND_POLL_INTERVAL,
   FOREGROUND_POLL_INTERVAL,
@@ -22,8 +22,8 @@ import {
   releaseSingleFlight,
   resolveQueueStatusAction,
 } from "@/ticketing/routes/Ticketing/queueFlowUtils";
-import type { PlacementAd } from "@/ticketing/types/model/ad.model";
-import type { QueueRequestStatus, ReserveErrorCode, TicketingEvent } from "@/ticketing/types/model/ticket.model";
+import type { PlacementAd } from "@/types/ticketing/model/ad.model";
+import type { QueueRequestStatus, ReserveErrorCode, TicketingEvent } from "@/types/ticketing/model/ticket.model";
 
 type TicketingStep = "home" | "list" | "waiting" | "in-progress" | "reserving" | "soldout" | "already" | "success";
 

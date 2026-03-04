@@ -1,8 +1,8 @@
 ﻿import { useCallback, useSyncExternalStore } from "react";
-import { authApi } from "@/ticketing/api/authApi";
-import { adminAuthApi } from "@/ticketing/api/adminAuthApi";
-import { authStore } from "@/ticketing/store/authStore";
-import type { AuthCredentials, UserRole } from "@/ticketing/types/model/auth.model";
+import { authApi } from "@/api/ticketing/authApi";
+import { adminAuthApi } from "@/api/ticketing/adminAuthApi";
+import { authStore } from "@/store/ticketing/authStore";
+import type { AuthCredentials, UserRole } from "@/types/ticketing/model/auth.model";
 
 export const useAuth = () => {
   const state = useSyncExternalStore(

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/ticketing/components/common/ui/button";
 import { Card } from "@/ticketing/components/common/ui/card";
-import { env } from "@/ticketing/utils/env";
+import { env } from "@/utils/ticketing/env";
 
 export default function TokenRequired() {
   const navigate = useNavigate();

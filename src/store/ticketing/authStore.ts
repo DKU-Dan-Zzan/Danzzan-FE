@@ -1,5 +1,5 @@
-﻿import type { AuthSession, AuthUser, AuthTokens, UserRole } from "@/ticketing/types/model/auth.model";
-import { env } from "@/ticketing/utils/env";
+﻿import type { AuthSession, AuthUser, AuthTokens, UserRole } from "@/types/ticketing/model/auth.model";
+import { env } from "@/utils/ticketing/env";
 
 const STORAGE_KEY = "danzzan.auth";
 

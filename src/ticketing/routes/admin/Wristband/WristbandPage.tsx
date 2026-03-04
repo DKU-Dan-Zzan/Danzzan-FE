@@ -1,7 +1,7 @@
 ﻿import { useState } from "react";
 import { WristbandDashboard } from "@/ticketing/components/admin/WristbandDashboard";
 import { WristbandOperationScreen } from "@/ticketing/components/admin/WristbandOperationScreen";
-import type { WristbandSession } from "@/ticketing/types/model/wristband.model";
+import type { WristbandSession } from "@/types/ticketing/model/wristband.model";
 
 export default function WristbandPage() {
   const [selectedSession, setSelectedSession] = useState<WristbandSession | null>(null);

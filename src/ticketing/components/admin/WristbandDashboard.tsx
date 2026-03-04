@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/ticketing/components/common/ui/card";
 import { Button } from "@/ticketing/components/common/ui/button";
-import { useWristband } from "@/ticketing/hooks/useWristband";
-import type { WristbandSession } from "@/ticketing/types/model/wristband.model";
+import { useWristband } from "@/hooks/ticketing/useWristband";
+import type { WristbandSession } from "@/types/ticketing/model/wristband.model";
 
 interface WristbandDashboardProps {
   onSelectSession: (session: WristbandSession) => void;

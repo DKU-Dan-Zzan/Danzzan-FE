@@ -1,9 +1,9 @@
-import { createHttpClient } from "@/ticketing/api/httpClient";
-import { mapPlacementAdDtoToModel } from "@/ticketing/mappers/adMapper";
-import { authStore } from "@/ticketing/store/authStore";
-import type { PlacementAdDto } from "@/ticketing/types/dto/ad.dto";
-import type { AdPlacementKey, PlacementAd } from "@/ticketing/types/model/ad.model";
-import { env, requireEnv } from "@/ticketing/utils/env";
+import { createHttpClient } from "@/api/ticketing/httpClient";
+import { mapPlacementAdDtoToModel } from "@/lib/ticketing/mappers/adMapper";
+import { authStore } from "@/store/ticketing/authStore";
+import type { PlacementAdDto } from "@/types/ticketing/dto/ad.dto";
+import type { AdPlacementKey, PlacementAd } from "@/types/ticketing/model/ad.model";
+import { env, requireEnv } from "@/utils/ticketing/env";
 
 const getAdClient = () =>
   createHttpClient({

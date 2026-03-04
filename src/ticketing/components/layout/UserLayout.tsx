@@ -1,7 +1,7 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, House, LogOut } from "lucide-react";
 import { Button } from "@/ticketing/components/common/ui/button";
-import { useAuth } from "@/ticketing/hooks/useAuth";
+import { useAuth } from "@/hooks/ticketing/useAuth";
 
 export function UserLayout() {
   const location = useLocation();

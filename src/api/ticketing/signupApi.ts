@@ -1,5 +1,5 @@
-﻿import { createHttpClient } from "@/ticketing/api/httpClient";
-import { env, requireEnv } from "@/ticketing/utils/env";
+﻿import { createHttpClient } from "@/api/ticketing/httpClient";
+import { env, requireEnv } from "@/utils/ticketing/env";
 
 const getClient = () =>
   createHttpClient({

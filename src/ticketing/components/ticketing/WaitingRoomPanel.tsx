@@ -8,7 +8,7 @@ import {
   TICKETING_NARROW_PANEL_CLASS,
 } from "@/ticketing/components/ticketing/ticketingShared";
 import { isRemainingFresh } from "@/ticketing/routes/Ticketing/queueFlowUtils";
-import type { PlacementAd } from "@/ticketing/types/model/ad.model";
+import type { PlacementAd } from "@/types/ticketing/model/ad.model";
 
 interface WaitingRoomPanelProps {
   eventTitle: string;

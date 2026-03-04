@@ -2,7 +2,7 @@ import type {
   WristbandAttendee,
   WristbandSession,
   WristbandStats,
-} from "@/ticketing/types/model/wristband.model";
+} from "@/types/ticketing/model/wristband.model";
 
 type MockAttendeeRecord = WristbandAttendee & { eventId: string };
 

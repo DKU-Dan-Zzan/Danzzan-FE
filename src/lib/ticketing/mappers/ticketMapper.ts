@@ -6,7 +6,7 @@
   TicketQueueEnterResponseDto,
   TicketQueueStatusResponseDto,
   TicketReservationResponseDto,
-} from "@/ticketing/types/dto/ticket.dto";
+} from "@/types/ticketing/dto/ticket.dto";
 import type {
   QueueEnterResult,
   QueueRequestStatus,
@@ -16,7 +16,7 @@ import type {
   TicketingEventStatus,
   TicketReservationResult,
   TicketStatus,
-} from "@/ticketing/types/model/ticket.model";
+} from "@/types/ticketing/model/ticket.model";
 
 const mapTicketStatus = (status?: string): TicketStatus => {
   const normalized = status?.trim().toLowerCase();

@@ -20,8 +20,8 @@ import {
   TableRow,
 } from "@/ticketing/components/common/ui/table";
 import { ArrowLeft, Info } from "lucide-react";
-import { useWristband } from "@/ticketing/hooks/useWristband";
-import type { WristbandAttendee, WristbandStats } from "@/ticketing/types/model/wristband.model";
+import { useWristband } from "@/hooks/ticketing/useWristband";
+import type { WristbandAttendee, WristbandStats } from "@/types/ticketing/model/wristband.model";
 
 interface WristbandOperationScreenProps {
   eventId: string;

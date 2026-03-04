@@ -2,13 +2,13 @@
   EventSummaryDto,
   EventStatsResponseDto,
   TicketSearchItemDto,
-} from "@/ticketing/types/dto/wristband.dto";
+} from "@/types/ticketing/dto/wristband.dto";
 import type {
   WristbandAttendee,
   WristbandSession,
   WristbandSessionStatus,
   WristbandStats,
-} from "@/ticketing/types/model/wristband.model";
+} from "@/types/ticketing/model/wristband.model";
 
 const mapTicketingStatus = (status: string): WristbandSessionStatus => {
   switch (status) {

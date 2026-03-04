@@ -1,6 +1,6 @@
 ﻿import { useCallback, useState } from "react";
-import { wristbandApi } from "@/ticketing/api/wristbandApi";
-import type { WristbandAttendee, WristbandSession, WristbandStats } from "@/ticketing/types/model/wristband.model";
+import { wristbandApi } from "@/api/ticketing/wristbandApi";
+import type { WristbandAttendee, WristbandSession, WristbandStats } from "@/types/ticketing/model/wristband.model";
 
 export const useWristband = () => {
   const [loading, setLoading] = useState(false);

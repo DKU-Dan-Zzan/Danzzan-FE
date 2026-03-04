@@ -9,7 +9,7 @@ import {
   TICKETING_WIDE_PANEL_CLASS,
   TicketingRefreshButton,
 } from "@/ticketing/components/ticketing/ticketingShared";
-import type { TicketingEvent } from "@/ticketing/types/model/ticket.model";
+import type { TicketingEvent } from "@/types/ticketing/model/ticket.model";
 
 interface TicketingEventListPanelProps {
   events: TicketingEvent[];

@@ -2,8 +2,8 @@ import type {
   TicketQueueEnterResponseDto,
   TicketQueueStatusResponseDto,
   TicketReservationResponseDto,
-} from "@/ticketing/types/dto/ticket.dto";
-import type { QueueRequestStatus } from "@/ticketing/types/model/ticket.model";
+} from "@/types/ticketing/dto/ticket.dto";
+import type { QueueRequestStatus } from "@/types/ticketing/model/ticket.model";
 
 const QUEUE_STATUS_VALUES: QueueRequestStatus[] = [
   "NONE",

@@ -1,4 +1,4 @@
-﻿import type { QueueRequestStatus } from "@/ticketing/types/model/ticket.model";
+﻿import type { QueueRequestStatus } from "@/types/ticketing/model/ticket.model";
 
 export const FOREGROUND_POLL_INTERVAL = 2000;
 export const BACKGROUND_POLL_INTERVAL = 8000;

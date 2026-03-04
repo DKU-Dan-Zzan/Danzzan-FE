@@ -1,7 +1,7 @@
-import { createHttpClient } from "@/ticketing/api/httpClient";
-import { authStore } from "@/ticketing/store/authStore";
-import type { AuthCredentials, AuthSession } from "@/ticketing/types/model/auth.model";
-import { env, requireEnv } from "@/ticketing/utils/env";
+import { createHttpClient } from "@/api/ticketing/httpClient";
+import { authStore } from "@/store/ticketing/authStore";
+import type { AuthCredentials, AuthSession } from "@/types/ticketing/model/auth.model";
+import { env, requireEnv } from "@/utils/ticketing/env";
 
 /**
  * 관리자 로그인 API

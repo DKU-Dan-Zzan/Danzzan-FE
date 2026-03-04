@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ticketApi } from "@/ticketing/api/ticketApi";
+import { ticketApi } from "@/api/ticketing/ticketApi";
 
 interface UseRemainingPollingOptions {
   eventId: string | null;

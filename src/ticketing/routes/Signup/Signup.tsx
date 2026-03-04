@@ -9,8 +9,8 @@ import { Button } from "@/ticketing/components/common/ui/button";
 import { Checkbox } from "@/ticketing/components/common/ui/checkbox";
 import { Input } from "@/ticketing/components/common/ui/input";
 import { Label } from "@/ticketing/components/common/ui/label";
-import { signupApi } from "@/ticketing/api/signupApi";
-import { HttpError } from "@/ticketing/api/httpClient";
+import { signupApi } from "@/api/ticketing/signupApi";
+import { HttpError } from "@/api/ticketing/httpClient";
 
 export default function Signup() {
   const navigate = useNavigate();
