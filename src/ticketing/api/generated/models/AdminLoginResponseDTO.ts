@@ -1,27 +1,29 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 import type { AdminInfoDTO } from './AdminInfoDTO';
 /**
- * 愿由ъ옄 濡쒓렇???묐떟
+ * 관리자 로그인 응답
  */
 export type AdminLoginResponseDTO = {
     /**
-     * ?꾩떆 access token
+     * 임시 access token
      */
     accessToken?: string;
     /**
-     * 愿由ъ옄 ?뺣낫
+     * 관리자 정보
      */
     admin?: AdminInfoDTO;
     /**
-     * ?쒖뒪?????     */
+     * 시스템 타입
+     */
     system?: AdminLoginResponseDTO.system;
 };
 export namespace AdminLoginResponseDTO {
     /**
-     * ?쒖뒪?????     */
+     * 시스템 타입
+     */
     export enum system {
         DANSPOT = 'DANSPOT',
     }

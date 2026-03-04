@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   TicketQueueEnterResponseDto,
   TicketQueueStatusResponseDto,
   TicketReservationResponseDto,
@@ -47,12 +47,12 @@ export class TicketContractError extends Error {
 
 const assertQueueStatus = (raw: unknown, endpoint: string): QueueRequestStatus => {
   if (typeof raw !== "string" || !raw.trim()) {
-    throw new TicketContractError(endpoint, "status 媛믪씠 鍮꾩뼱 ?덉뒿?덈떎.");
+    throw new TicketContractError(endpoint, "status 값이 비어 있습니다.");
   }
 
   const normalized = raw.trim().toUpperCase() as QueueRequestStatus;
   if (!queueStatusSet.has(normalized)) {
-    throw new TicketContractError(endpoint, `status 媛믪씠 ?좏슚?섏? ?딆뒿?덈떎. (${raw})`);
+    throw new TicketContractError(endpoint, `status 값이 유효하지 않습니다. (${raw})`);
   }
 
   return normalized;
@@ -63,7 +63,7 @@ export const unwrapApiObjectEnvelope = <T>(
   endpoint: string,
 ): T => {
   if (!isRecord(payload)) {
-    throw new TicketContractError(endpoint, "?묐떟 蹂몃Ц??媛앹껜 ?뺥깭媛 ?꾨떃?덈떎.");
+    throw new TicketContractError(endpoint, "응답 본문이 객체 형태가 아닙니다.");
   }
 
   const data = payload.data;
@@ -72,7 +72,7 @@ export const unwrapApiObjectEnvelope = <T>(
   }
 
   if (!isRecord(data)) {
-    throw new TicketContractError(endpoint, "data ?꾨뱶媛 媛앹껜 ?뺥깭媛 ?꾨떃?덈떎.");
+    throw new TicketContractError(endpoint, "data 필드가 객체 형태가 아닙니다.");
   }
 
   return data as T;
@@ -85,7 +85,7 @@ export const normalizeQueueEnterContract = (
   const status = assertQueueStatus(rawDto.status, endpoint);
 
   if (!Object.prototype.hasOwnProperty.call(rawDto, "remaining")) {
-    throw new TicketContractError(endpoint, "remaining ?꾨뱶媛 ?꾨씫?섏뿀?듬땲??");
+    throw new TicketContractError(endpoint, "remaining 필드가 누락되었습니다.");
   }
 
   const remainingRaw = rawDto.remaining;
@@ -98,7 +98,7 @@ export const normalizeQueueEnterContract = (
 
   const remaining = toFiniteNumber(remainingRaw);
   if (remaining === null) {
-    throw new TicketContractError(endpoint, "remaining 媛믪씠 ?レ옄 ?뺤떇???꾨떃?덈떎.");
+    throw new TicketContractError(endpoint, "remaining 값이 숫자 형식이 아닙니다.");
   }
 
   return {
@@ -121,7 +121,7 @@ export const normalizeReserveContract = (
   endpoint: string,
 ): TicketReservationResponseDto => {
   if (!isRecord(rawDto.ticket)) {
-    throw new TicketContractError(endpoint, "ticket 媛앹껜媛 ?꾨씫?섏뿀?듬땲??");
+    throw new TicketContractError(endpoint, "ticket 객체가 누락되었습니다.");
   }
 
   const ticketRecord = rawDto.ticket;
@@ -129,13 +129,13 @@ export const normalizeReserveContract = (
     .some((key) => ticketRecord[key] !== undefined && ticketRecord[key] !== null);
 
   if (!hasCoreField) {
-    throw new TicketContractError(endpoint, "ticket 媛앹껜???듭떖 ?꾨뱶媛 ?놁뒿?덈떎.");
+    throw new TicketContractError(endpoint, "ticket 객체에 핵심 필드가 없습니다.");
   }
 
   if (rawDto.queueNumber !== undefined && rawDto.queueNumber !== null) {
     const queueNumber = toFiniteNumber(rawDto.queueNumber);
     if (queueNumber === null) {
-      throw new TicketContractError(endpoint, "queueNumber 媛믪씠 ?レ옄 ?뺤떇???꾨떃?덈떎.");
+      throw new TicketContractError(endpoint, "queueNumber 값이 숫자 형식이 아닙니다.");
     }
   }
 

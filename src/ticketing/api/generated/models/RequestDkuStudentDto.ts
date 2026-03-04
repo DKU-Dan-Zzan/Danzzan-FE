@@ -1,17 +1,17 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 /**
- * ?④뎅? ?숈깮 ?몄쬆 ?붿껌
+ * 단국대 학생 인증 요청
  */
 export type RequestDkuStudentDto = {
     /**
-     * ?④뎅? ?숇쾲
+     * 단국대 학번
      */
     dkuStudentId?: string;
     /**
-     * ?④뎅? ?ы꽭 鍮꾨?踰덊샇
+     * 단국대 포털 비밀번호
      */
     dkuPassword?: string;
 };

@@ -1,31 +1,31 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 /**
- * 愿由ъ옄 ?뺣낫
+ * 관리자 정보
  */
 export type AdminInfoDTO = {
     /**
-     * 愿由ъ옄 ID
+     * 관리자 ID
      */
     id?: number;
     /**
-     * 愿由ъ옄 ?대쫫
+     * 관리자 이름
      */
     name?: string;
     /**
-     * 愿由ъ옄 ?숇쾲
+     * 관리자 학번
      */
     studentId?: string;
     /**
-     * 沅뚰븳
+     * 권한
      */
     role?: AdminInfoDTO.role;
 };
 export namespace AdminInfoDTO {
     /**
-     * 沅뚰븳
+     * 권한
      */
     export enum role {
         ROLE_USER = 'ROLE_USER',

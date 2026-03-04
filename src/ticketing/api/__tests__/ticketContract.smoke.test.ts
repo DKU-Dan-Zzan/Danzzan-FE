@@ -1,4 +1,4 @@
-﻿import {
+import {
   TicketContractError,
   normalizeQueueEnterContract,
   normalizeQueueStatusContract,
@@ -7,7 +7,7 @@
 } from "@/ticketing/api/ticketContract";
 
 describe("ticketContract smoke", () => {
-  it("queue enter ?묐떟???뺢퇋?뷀븳??, () => {
+  it("queue enter 응답을 정규화한다", () => {
     const dto = normalizeQueueEnterContract(
       {
         status: " waiting ",
@@ -22,7 +22,7 @@ describe("ticketContract smoke", () => {
     });
   });
 
-  it("queue enter remaining ?꾨씫 ???먮윭瑜??섏쭊??, () => {
+  it("queue enter remaining 누락 시 에러를 던진다", () => {
     expect(() =>
       normalizeQueueEnterContract(
         {
@@ -33,7 +33,7 @@ describe("ticketContract smoke", () => {
     ).toThrow(TicketContractError);
   });
 
-  it("queue status ?묐떟??status瑜?寃利앺븳??, () => {
+  it("queue status 응답의 status를 검증한다", () => {
     expect(() =>
       normalizeQueueStatusContract(
         {
@@ -44,7 +44,7 @@ describe("ticketContract smoke", () => {
     ).toThrow(TicketContractError);
   });
 
-  it("reserve ?묐떟?먯꽌 ticket 媛앹껜 ?꾨씫 ???먮윭瑜??섏쭊??, () => {
+  it("reserve 응답에서 ticket 객체 누락 시 에러를 던진다", () => {
     expect(() =>
       normalizeReserveContract(
         {
@@ -55,7 +55,7 @@ describe("ticketContract smoke", () => {
     ).toThrow(TicketContractError);
   });
 
-  it("data envelope瑜??덉쟾?섍쾶 ?몃옪?쒕떎", () => {
+  it("data envelope를 안전하게 언랩한다", () => {
     const dto = unwrapApiObjectEnvelope<{ status: string }>(
       {
         data: {

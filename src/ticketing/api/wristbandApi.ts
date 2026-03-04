@@ -1,4 +1,4 @@
-﻿import { createHttpClient } from "@/ticketing/api/httpClient";
+import { createHttpClient } from "@/ticketing/api/httpClient";
 import { wristbandMock } from "@/ticketing/mocks/wristband.mock";
 import {
   mapEventSummaryToSession,
@@ -31,12 +31,12 @@ const getClient = () =>
     getAccessToken: authStore.getAccessToken,
   });
 
-/** ApiResponse ?섑띁?먯꽌 data瑜?異붿텧 */
+/** ApiResponse 래퍼에서 data를 추출 */
 function unwrap<T>(response: ApiResponse<T> | T): T {
   if (response && typeof response === "object" && "success" in response) {
     const apiResp = response as ApiResponse<T>;
     if (!apiResp.success || apiResp.data == null) {
-      const errorMsg = apiResp.error?.message ?? "?붿껌???ㅽ뙣?덉뒿?덈떎.";
+      const errorMsg = apiResp.error?.message ?? "요청에 실패했습니다.";
       throw new Error(errorMsg);
     }
     return apiResp.data;
@@ -45,7 +45,7 @@ function unwrap<T>(response: ApiResponse<T> | T): T {
 }
 
 export const wristbandApi = {
-  /** ?대깽??紐⑸줉 議고쉶 (= ?댁쁺 ?몄뀡 紐⑸줉) */
+  /** 이벤트 목록 조회 (= 운영 세션 목록) */
   listSessions: async (): Promise<WristbandSession[]> => {
     if (isMockMode) {
       return wristbandMock.listSessions();
@@ -58,7 +58,7 @@ export const wristbandApi = {
     return (data.events ?? []).map(mapEventSummaryToSession);
   },
 
-  /** ?대깽???듦퀎 議고쉶 (eventId 湲곕컲) */
+  /** 이벤트 통계 조회 (eventId 기반) */
   getStats: async (eventId: string): Promise<WristbandStats> => {
     if (isMockMode) {
       return wristbandMock.getStats(eventId);
@@ -71,7 +71,7 @@ export const wristbandApi = {
     return mapEventStatsToWristbandStats(data);
   },
 
-  /** ?숇쾲?쇰줈 ?곗폆 寃??*/
+  /** 학번으로 티켓 검색 */
   findAttendee: async (
     studentId: string,
     eventId: string,
@@ -92,7 +92,7 @@ export const wristbandApi = {
     return mapTicketSearchItemToAttendee(results[0]);
   },
 
-  /** ?붿컡 吏湲?(eventId + ticketId) */
+  /** 팔찌 지급 (eventId + ticketId) */
   issueWristband: async (eventId: string, ticketId: number): Promise<void> => {
     if (isMockMode) {
       wristbandMock.issueWristband(String(ticketId), eventId);
@@ -104,7 +104,7 @@ export const wristbandApi = {
     );
   },
 
-  /** ?붿컡 吏湲?痍⑥냼 (mock 紐⑤뱶 ?곗꽑 吏?? */
+  /** 팔찌 지급 취소 (mock 모드 우선 지원) */
   cancelWristband: async (eventId: string, ticketId: number): Promise<void> => {
     if (isMockMode) {
       wristbandMock.cancelWristband(String(ticketId), eventId);

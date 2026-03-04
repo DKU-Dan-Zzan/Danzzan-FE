@@ -1,13 +1,13 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 /**
- * ?붿컡 吏湲?泥섎━ ?붿껌
+ * 팔찌 지급 처리 요청
  */
 export type IssueTicketRequestDTO = {
     /**
-     * 吏湲?泥섎━ 硫붾え(?좏깮). ?꾩옱 ?쒕쾭 ????놁씠 ?ъ슜
+     * 지급 처리 메모(선택). 현재 서버 저장 없이 사용
      */
     note?: string;
 };

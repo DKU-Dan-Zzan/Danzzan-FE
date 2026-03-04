@@ -1,18 +1,18 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 import type { ResponseScrappedStudentInfoDto } from './ResponseScrappedStudentInfoDto';
 /**
- * ?④뎅? ?숈깮 ?몄쬆 ?묐떟
+ * 단국대 학생 인증 응답
  */
 export type ResponseVerifyStudentDto = {
     /**
-     * ?뚯썝媛?낆슜 ?좏겙
+     * 회원가입용 토큰
      */
     signupToken?: string;
     /**
-     * ?숈깮 ?뺣낫
+     * 학생 정보
      */
     student?: ResponseScrappedStudentInfoDto;
 };

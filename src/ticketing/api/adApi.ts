@@ -1,4 +1,4 @@
-﻿import { createHttpClient } from "@/ticketing/api/httpClient";
+import { createHttpClient } from "@/ticketing/api/httpClient";
 import { mapPlacementAdDtoToModel } from "@/ticketing/mappers/adMapper";
 import { authStore } from "@/ticketing/store/authStore";
 import type { PlacementAdDto } from "@/ticketing/types/dto/ad.dto";
@@ -38,7 +38,7 @@ const mockWaitingRoomAd: PlacementAd = {
   placement: "WAITING_ROOM_MAIN",
   imageUrl: "/ads/waiting-room-sample-banner.svg",
   linkUrl: "https://danzzan.example.com/notice",
-  altText: "?⑥쭬 異뺤젣 怨듭? 諛곕꼫",
+  altText: "단짠 축제 공지 배너",
   isActive: true,
   updatedAt: "2026-03-04T00:00:00Z",
 };

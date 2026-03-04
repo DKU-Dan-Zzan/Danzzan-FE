@@ -1,17 +1,17 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 /**
- * 濡쒓렇???붿껌
+ * 로그인 요청
  */
 export type RequestLoginDto = {
     /**
-     * ?숇쾲
+     * 학번
      */
     studentId?: string;
     /**
-     * 鍮꾨?踰덊샇
+     * 비밀번호
      */
     password?: string;
 };

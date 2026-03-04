@@ -1,13 +1,13 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 /**
- * 愿由ъ옄 濡쒓렇?꾩썐 ?묐떟
+ * 관리자 로그아웃 응답
  */
 export type AdminLogoutResponseDTO = {
     /**
-     * 濡쒓렇?꾩썐 ?깃났 ?щ?
+     * 로그아웃 성공 여부
      */
     ok?: boolean;
 };

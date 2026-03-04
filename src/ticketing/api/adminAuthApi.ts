@@ -1,12 +1,12 @@
-﻿import { createHttpClient } from "@/ticketing/api/httpClient";
+import { createHttpClient } from "@/ticketing/api/httpClient";
 import { authStore } from "@/ticketing/store/authStore";
 import type { AuthCredentials, AuthSession } from "@/ticketing/types/model/auth.model";
 import { env, requireEnv } from "@/ticketing/utils/env";
 
 /**
- * 愿由ъ옄 濡쒓렇??API
- * 諛깆뿏?쒕뒗 ?숈깮/愿由ъ옄 援щ텇 ?놁씠 POST /user/login ???ъ슜?섎ŉ,
- * JWT ?좏겙??role ?대젅?꾩쑝濡?ROLE_ADMIN / ROLE_USER瑜?援щ텇?⑸땲??
+ * 관리자 로그인 API
+ * 백엔드는 학생/관리자 구분 없이 POST /user/login 을 사용하며,
+ * JWT 토큰의 role 클레임으로 ROLE_ADMIN / ROLE_USER를 구분합니다.
  */
 
 const getClient = () =>
@@ -29,7 +29,7 @@ export const adminAuthApi = {
         },
         user: {
           id: "admin",
-          name: "愿由ъ옄",
+          name: "관리자",
           role: "admin",
           department: "",
           studentId: payload.studentId,
@@ -46,7 +46,7 @@ export const adminAuthApi = {
       },
     );
 
-    // JWT?먯꽌 role ?뺣낫瑜??붿퐫?⑺븯??ADMIN?몄? ?뺤씤
+    // JWT에서 role 정보를 디코딩하여 ADMIN인지 확인
     const accessToken = dto?.accessToken ?? "";
     const refreshToken = dto?.refreshToken ?? "";
 
@@ -64,10 +64,10 @@ export const adminAuthApi = {
         };
 
         if (decoded.role !== "ROLE_ADMIN") {
-          throw new Error("愿由ъ옄 沅뚰븳???녿뒗 怨꾩젙?낅땲??");
+          throw new Error("관리자 권한이 없는 계정입니다.");
         }
       } catch (e) {
-        if (e instanceof Error && e.message.includes("愿由ъ옄 沅뚰븳")) {
+        if (e instanceof Error && e.message.includes("관리자 권한")) {
           throw e;
         }
       }

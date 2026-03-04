@@ -1,4 +1,4 @@
-﻿import { createHttpClient } from "@/ticketing/api/httpClient";
+import { createHttpClient } from "@/ticketing/api/httpClient";
 import { mapAuthLoginResponse } from "@/ticketing/mappers/authMapper";
 import { authStore } from "@/ticketing/store/authStore";
 import type { AuthLoginResponseDto } from "@/ticketing/types/dto/auth.dto";
@@ -26,9 +26,9 @@ export const authApi = {
         },
         user: {
           id: "1",
-          name: "Mock User",
+          name: "단짠",
           role: "student",
-          department: "Computer Science",
+          department: "소프트웨어학과",
           studentId: payload.studentId,
         },
       });

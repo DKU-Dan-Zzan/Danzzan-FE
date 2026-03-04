@@ -1,4 +1,4 @@
-﻿// 諛깆뿏??ApiResponse ?섑띁
+// 백엔드 ApiResponse 래퍼
 export interface ApiResponse<T> {
   success: boolean;
   data: T | null;
@@ -11,7 +11,7 @@ export interface ApiResponse<T> {
   } | null;
 }
 
-// GET /api/admin/events ?묐떟
+// GET /api/admin/events 응답
 export interface EventSummaryDto {
   eventId: number;
   title: string;
@@ -25,7 +25,7 @@ export interface EventListResponseDto {
   events: EventSummaryDto[];
 }
 
-// GET /api/admin/events/{eventId}/stats ?묐떟
+// GET /api/admin/events/{eventId}/stats 응답
 export interface EventStatsResponseDto {
   eventId: number;
   title: string;
@@ -38,7 +38,7 @@ export interface EventStatsResponseDto {
   remainingCapacity: number;
 }
 
-// GET /api/admin/events/{eventId}/tickets/search ?묐떟
+// GET /api/admin/events/{eventId}/tickets/search 응답
 export interface TicketSearchItemDto {
   ticketId: number;
   studentId: string;
@@ -56,7 +56,7 @@ export interface TicketSearchResponseDto {
   results: TicketSearchItemDto[];
 }
 
-// PATCH /api/admin/events/{eventId}/tickets/{ticketId}/issue ?묐떟
+// PATCH /api/admin/events/{eventId}/tickets/{ticketId}/issue 응답
 export interface IssueTicketResponseDto {
   ticketId: number;
   status: "ISSUED";

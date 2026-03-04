@@ -1,35 +1,35 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 /**
- * ?붿컡 吏湲?泥섎━ ?묐떟
+ * 팔찌 지급 처리 응답
  */
 export type IssueTicketResponseDTO = {
     /**
-     * ?곗폆 ID
+     * 티켓 ID
      */
     ticketId?: number;
     /**
-     * 蹂寃쎈맂 ?곗폆 ?곹깭
+     * 변경된 티켓 상태
      */
     status?: IssueTicketResponseDTO.status;
     /**
-     * ?붿컡 吏湲??쒓컖 (ISO-8601)
+     * 팔찌 지급 시각 (ISO-8601)
      */
     issuedAt?: string;
     /**
-     * 吏湲?泥섎━ 愿由ъ옄 ID
+     * 지급 처리 관리자 ID
      */
     issuerAdminId?: number;
     /**
-     * 吏湲?泥섎━ 愿由ъ옄 ?대쫫
+     * 지급 처리 관리자 이름
      */
     issuerAdminName?: string;
 };
 export namespace IssueTicketResponseDTO {
     /**
-     * 蹂寃쎈맂 ?곗폆 ?곹깭
+     * 변경된 티켓 상태
      */
     export enum status {
         CONFIRMED = 'CONFIRMED',

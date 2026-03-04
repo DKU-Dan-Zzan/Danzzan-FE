@@ -1,39 +1,39 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 /**
- * 怨듭뿰 ?붿빟 ?뺣낫
+ * 공연 요약 정보
  */
 export type EventSummaryDTO = {
     /**
-     * 怨듭뿰 ID (festival_events.id)
+     * 공연 ID (festival_events.id)
      */
     eventId?: number;
     /**
-     * 怨듭뿰/?댁쁺 ?쒕ぉ (festival_events.title)
+     * 공연/운영 제목 (festival_events.title)
      */
     title?: string;
     /**
-     * ?붾㈃ ?쒓린??DAY ?쇰꺼
+     * 화면 표기용 DAY 라벨
      */
     dayLabel?: string;
     /**
-     * 怨듭뿰 ?좎쭨 (YYYY-MM-DD)
+     * 공연 날짜 (YYYY-MM-DD)
      */
     eventDate?: string;
     /**
-     * ?곗폆???곹깭
+     * 티켓팅 상태
      */
     ticketingStatus?: EventSummaryDTO.ticketingStatus;
     /**
-     * ?뺤썝 (festival_events.total_capacity)
+     * 정원 (festival_events.total_capacity)
      */
     totalCapacity?: number;
 };
 export namespace EventSummaryDTO {
     /**
-     * ?곗폆???곹깭
+     * 티켓팅 상태
      */
     export enum ticketingStatus {
         READY = 'READY',

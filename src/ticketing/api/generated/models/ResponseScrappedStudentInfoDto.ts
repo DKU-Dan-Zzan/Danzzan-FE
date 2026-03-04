@@ -1,24 +1,25 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 /**
- * ?④뎅? ?숈깮 ?몄쬆 寃곌낵 - ?숈깮 ?뺣낫
+ * 단국대 학생 인증 결과 - 학생 정보
  */
 export type ResponseScrappedStudentInfoDto = {
     /**
-     * ?숈깮 ?대쫫
+     * 학생 이름
      */
     studentName?: string;
     /**
-     * ?숇쾲
+     * 학번
      */
     studentId?: string;
     /**
-     * ?④낵???     */
+     * 단과대학
+     */
     college?: string;
     /**
-     * ?숆낵
+     * 학과
      */
     major?: string;
 };

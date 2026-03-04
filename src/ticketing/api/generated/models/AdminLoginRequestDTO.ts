@@ -1,26 +1,28 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 /**
- * 愿由ъ옄 濡쒓렇???붿껌
+ * 관리자 로그인 요청
  */
 export type AdminLoginRequestDTO = {
     /**
-     * ?쒖뒪?????     */
+     * 시스템 타입
+     */
     system: AdminLoginRequestDTO.system;
     /**
-     * 愿由ъ옄 ?숇쾲
+     * 관리자 학번
      */
     studentId?: string;
     /**
-     * 鍮꾨?踰덊샇
+     * 비밀번호
      */
     password?: string;
 };
 export namespace AdminLoginRequestDTO {
     /**
-     * ?쒖뒪?????     */
+     * 시스템 타입
+     */
     export enum system {
         DANSPOT = 'DANSPOT',
     }

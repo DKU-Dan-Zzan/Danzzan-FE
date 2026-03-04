@@ -1,4 +1,4 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -18,8 +18,8 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class Service {
     /**
-     * ?뚯썝媛???꾨즺
-     * 1?④퀎?먯꽌 諛쏆? ?좏겙?쇰줈 鍮꾨?踰덊샇瑜??ㅼ젙?섏뿬 ?뚯썝媛???꾨즺
+     * 회원가입 완료
+     * 1단계에서 받은 토큰으로 비밀번호를 설정하여 회원가입 완료
      * @returns any OK
      * @throws ApiError
      */
@@ -41,7 +41,8 @@ export class Service {
         });
     }
     /**
-     * ?좏겙 ?щ컻湲?     * Access Token 留뚮즺 ??Refresh Token?쇰줈 ???좏겙 諛쒓툒
+     * 토큰 재발급
+     * Access Token 만료 시 Refresh Token으로 새 토큰 발급
      * @returns ResponseRefreshTokenDto OK
      * @throws ApiError
      */
@@ -58,7 +59,9 @@ export class Service {
         });
     }
     /**
-     * 濡쒓렇??     * ?숇쾲怨?鍮꾨?踰덊샇濡?濡쒓렇??     * @returns ResponseLoginDto OK
+     * 로그인
+     * 학번과 비밀번호로 로그인
+     * @returns ResponseLoginDto OK
      * @throws ApiError
      */
     public static login({
@@ -74,8 +77,8 @@ export class Service {
         });
     }
     /**
-     * ?숈깮 ?몄쬆
-     * ?④뎅? ?ы꽭 ID/PW濡??숈깮 ?몄쬆 ???뚯썝媛???좏겙 諛쒓툒
+     * 학생 인증
+     * 단국대 포털 ID/PW로 학생 인증 후 회원가입 토큰 발급
      * @returns ResponseVerifyStudentDto OK
      * @throws ApiError
      */
@@ -92,9 +95,9 @@ export class Service {
         });
     }
     /**
-     * 愿由ъ옄 濡쒓렇?꾩썐
-     * ?꾩떆 ?좏겙??臾댄슚?뷀븯??濡쒓렇?꾩썐 泥섎━
-     * @returns ApiResponse 濡쒓렇?꾩썐 ?깃났
+     * 관리자 로그아웃
+     * 임시 토큰을 무효화하여 로그아웃 처리
+     * @returns ApiResponse 로그아웃 성공
      * @throws ApiError
      */
     public static logout(): CancelablePromise<ApiResponse> {
@@ -102,13 +105,14 @@ export class Service {
             method: 'POST',
             url: '/api/admin/auth/logout',
             errors: {
-                401: `?몄쬆 ?ㅽ뙣`,
+                401: `인증 실패`,
             },
         });
     }
     /**
-     * 愿由ъ옄 濡쒓렇??     * 愿由ъ옄 ?숇쾲怨?鍮꾨?踰덊샇濡?濡쒓렇?????꾩떆 ?좏겙 諛쒓툒
-     * @returns ApiResponse 濡쒓렇???깃났
+     * 관리자 로그인
+     * 관리자 학번과 비밀번호로 로그인 후 임시 토큰 발급
+     * @returns ApiResponse 로그인 성공
      * @throws ApiError
      */
     public static login1({
@@ -122,16 +126,16 @@ export class Service {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                401: `?몄쬆 ?ㅽ뙣(鍮꾨?踰덊샇 ?ㅻ쪟)`,
-                403: `愿由ъ옄 沅뚰븳 ?놁쓬`,
-                404: `愿由ъ옄 怨꾩젙 ?놁쓬`,
+                401: `인증 실패(비밀번호 오류)`,
+                403: `관리자 권한 없음`,
+                404: `관리자 계정 없음`,
             },
         });
     }
     /**
-     * ?붿컡 吏湲?泥섎━
-     * ?곗폆 ?곹깭瑜?ISSUED濡?蹂寃쏀븯怨?吏湲??쒓컖 諛?吏湲?愿由ъ옄 湲곕줉
-     * @returns ApiResponse ?붿컡 吏湲?泥섎━ ?깃났
+     * 팔찌 지급 처리
+     * 티켓 상태를 ISSUED로 변경하고 지급 시각 및 지급 관리자 기록
+     * @returns ApiResponse 팔찌 지급 처리 성공
      * @throws ApiError
      */
     public static issueTicket({
@@ -153,18 +157,18 @@ export class Service {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `?붿껌 ?뺤떇 ?ㅻ쪟`,
-                401: `?몄쬆 ?ㅽ뙣`,
-                403: `沅뚰븳 ?놁쓬`,
-                404: `?곗폆 ?먮뒗 怨듭뿰??議댁옱?섏? ?딆쓬`,
-                409: `?대? 吏湲??꾨즺???곗폆`,
-                500: `?쒕쾭 ?ㅻ쪟`,
+                400: `요청 형식 오류`,
+                401: `인증 실패`,
+                403: `권한 없음`,
+                404: `티켓 또는 공연이 존재하지 않음`,
+                409: `이미 지급 완료된 티켓`,
+                500: `서버 오류`,
             },
         });
     }
     /**
-     * ?숈깮 ?뺣낫 議고쉶
-     * ?뚯썝媛???좏겙?쇰줈 ?몄쬆???숈깮 ?뺣낫 議고쉶
+     * 학생 정보 조회
+     * 회원가입 토큰으로 인증된 학생 정보 조회
      * @returns ResponseScrappedStudentInfoDto OK
      * @throws ApiError
      */
@@ -182,9 +186,9 @@ export class Service {
         });
     }
     /**
-     * ?붿컡諛곕????怨듭뿰??湲곗??쇰줈 紐⑸줉 議고쉶
-     * JWT ?몄쬆???꾩슂??愿由ъ옄 ?꾩슜 紐⑸줉 議고쉶 API
-     * @returns ApiResponse 紐⑸줉 議고쉶 ?깃났
+     * 팔찌배부대상 공연일 기준으로 목록 조회
+     * JWT 인증이 필요한 관리자 전용 목록 조회 API
+     * @returns ApiResponse 목록 조회 성공
      * @throws ApiError
      */
     public static listEvents(): CancelablePromise<ApiResponse> {
@@ -192,15 +196,15 @@ export class Service {
             method: 'GET',
             url: '/api/admin/events',
             errors: {
-                401: `?몄쬆 ?꾩슂`,
-                403: `沅뚰븳 ?놁쓬`,
+                401: `인증 필요`,
+                403: `권한 없음`,
             },
         });
     }
     /**
-     * ?숈깮 ?숇쾲 湲곗? ?곗폆 議고쉶
-     * ?뱀젙 怨듭뿰?먯꽌 ?숈깮 ?숇쾲?쇰줈 ?곗폆 ?뺣낫瑜?議고쉶
-     * @returns ApiResponse ?곗폆 議고쉶 ?깃났
+     * 학생 학번 기준 티켓 조회
+     * 특정 공연에서 학생 학번으로 티켓 정보를 조회
+     * @returns ApiResponse 티켓 조회 성공
      * @throws ApiError
      */
     public static searchTickets({
@@ -220,18 +224,18 @@ export class Service {
                 'studentId': studentId,
             },
             errors: {
-                400: `studentId ?꾨씫 ?먮뒗 ?뺤떇 ?ㅻ쪟`,
-                401: `?몄쬆 ?ㅽ뙣`,
-                403: `沅뚰븳 ?놁쓬`,
-                404: `?대떦 怨듭뿰?먯꽌 ?대떦 ?숇쾲???곗폆??議댁옱?섏? ?딆쓬`,
-                500: `?쒕쾭 ?ㅻ쪟`,
+                400: `studentId 누락 또는 형식 오류`,
+                401: `인증 실패`,
+                403: `권한 없음`,
+                404: `해당 공연에서 해당 학번의 티켓이 존재하지 않음`,
+                500: `서버 오류`,
             },
         });
     }
     /**
-     * ?붿컡 吏湲??듦퀎 議고쉶
-     * 怨듭뿰蹂??꾩껜 ?곗폆 ??諛??붿컡 吏湲??꾨즺 ???듦퀎 議고쉶
-     * @returns ApiResponse ?듦퀎 議고쉶 ?깃났
+     * 팔찌 지급 통계 조회
+     * 공연별 전체 티켓 수 및 팔찌 지급 완료 수 통계 조회
+     * @returns ApiResponse 통계 조회 성공
      * @throws ApiError
      */
     public static getEventStats({
@@ -246,17 +250,17 @@ export class Service {
                 'eventId': eventId,
             },
             errors: {
-                401: `?몄쬆 ?ㅽ뙣`,
-                403: `沅뚰븳 ?놁쓬`,
-                404: `?대떦 怨듭뿰(eventId)??議댁옱?섏? ?딆쓬`,
-                500: `?쒕쾭 ?ㅻ쪟`,
+                401: `인증 실패`,
+                403: `권한 없음`,
+                404: `해당 공연(eventId)이 존재하지 않음`,
+                500: `서버 오류`,
             },
         });
     }
     /**
-     * ?꾩옱 濡쒓렇?명븳 愿由ъ옄 ?뺣낫 議고쉶
-     * Authorization ?ㅻ뜑???꾩떆 ?좏겙?쇰줈 愿由ъ옄 怨꾩젙 ?뺣낫 諛섑솚
-     * @returns ApiResponse 議고쉶 ?깃났
+     * 현재 로그인한 관리자 정보 조회
+     * Authorization 헤더의 임시 토큰으로 관리자 계정 정보 반환
+     * @returns ApiResponse 조회 성공
      * @throws ApiError
      */
     public static me(): CancelablePromise<ApiResponse> {
@@ -264,8 +268,8 @@ export class Service {
             method: 'GET',
             url: '/api/admin/auth/me',
             errors: {
-                401: `?몄쬆 ?ㅽ뙣`,
-                403: `沅뚰븳 ?놁쓬`,
+                401: `인증 실패`,
+                403: `권한 없음`,
             },
         });
     }

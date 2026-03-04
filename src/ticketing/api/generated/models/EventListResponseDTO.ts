@@ -1,14 +1,14 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 import type { EventSummaryDTO } from './EventSummaryDTO';
 /**
- * ?붿컡 諛곕? ???怨듭뿰 紐⑸줉 ?묐떟
+ * 팔찌 배부 대상 공연 목록 응답
  */
 export type EventListResponseDTO = {
     /**
-     * ?붿컡 諛곕? ???怨듭뿰 紐⑸줉
+     * 팔찌 배부 대상 공연 목록
      */
     events?: Array<EventSummaryDTO>;
 };

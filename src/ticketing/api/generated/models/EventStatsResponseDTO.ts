@@ -1,42 +1,45 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 /**
- * 怨듭뿰蹂??붿컡 吏湲??듦퀎 ?묐떟
+ * 공연별 팔찌 지급 통계 응답
  */
 export type EventStatsResponseDTO = {
     /**
-     * 怨듭뿰 ID
+     * 공연 ID
      */
     eventId?: number;
     /**
-     * 怨듭뿰 ?쒕ぉ
+     * 공연 제목
      */
     title?: string;
     /**
-     * 怨듭뿰 ?좎쭨 (YYYY-MM-DD)
+     * 공연 날짜 (YYYY-MM-DD)
      */
     eventDate?: string;
     /**
-     * ?뺤썝
+     * 정원
      */
     totalCapacity?: number;
     /**
-     * ?대떦 怨듭뿰?????諛쒓툒???곗폆 ??     */
+     * 해당 공연에 대해 발급된 티켓 수
+     */
     totalTickets?: number;
     /**
-     * status=CONFIRMED ?곗폆 ??     */
+     * status=CONFIRMED 티켓 수
+     */
     ticketsConfirmed?: number;
     /**
-     * status=ISSUED ?곗폆 ??     */
+     * status=ISSUED 티켓 수
+     */
     ticketsIssued?: number;
     /**
-     * 吏湲??꾨즺 鍮꾩쑉(%)
+     * 지급 완료 비율(%)
      */
     issueRate?: number;
     /**
-     * ?⑥? ?섏슜 媛???몄썝
+     * 남은 수용 가능 인원
      */
     remainingCapacity?: number;
 };
