@@ -2,6 +2,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, House, LogOut } from "lucide-react";
 import { Button } from "@/components/ticketing/common/ui/button";
 import { useAuth } from "@/hooks/ticketing/useAuth";
+import BottomNav from "@/components/layout/BottomNav";
 
 export function UserLayout() {
   const location = useLocation();
@@ -46,6 +47,7 @@ export function UserLayout() {
       state: { resetToHome: Date.now() },
     });
   };
+  const bottomNavPaddingClass = "pb-[calc(84px+env(safe-area-inset-bottom)+0.75rem)]";
 
   return (
       <div className="min-h-screen overflow-x-hidden bg-[var(--bg-base)]">
@@ -105,12 +107,13 @@ export function UserLayout() {
       <main
         className={
           showHeader
-            ? `relative mx-auto w-full max-w-md px-4 ${isMyTicketPage ? "pt-3 pb-2" : "pt-6 pb-4"}`
-            : "relative mx-auto min-h-screen w-full max-w-md"
+            ? `relative mx-auto w-full max-w-md px-4 ${isMyTicketPage ? "pt-3" : "pt-6"} ${bottomNavPaddingClass}`
+            : `relative mx-auto min-h-screen w-full max-w-md ${bottomNavPaddingClass}`
         }
       >
         <Outlet />
       </main>
+      <BottomNav />
     </div>
   );
 }
