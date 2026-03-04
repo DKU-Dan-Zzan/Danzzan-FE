@@ -77,11 +77,11 @@ const estimateProgress = (remaining: number | null): number => {
     return 25;
   }
   if (remaining <= 0) {
-    return 100;
+    return 95;
   }
   const max = 300;
   const normalized = Math.min(remaining, max);
-  return Math.max(8, Math.round((1 - normalized / max) * 100));
+  return Math.max(8, Math.round((1 - normalized / max) * 95));
 };
 
 export function WaitingRoomPanel({
@@ -95,8 +95,9 @@ export function WaitingRoomPanel({
 }: WaitingRoomPanelProps) {
   const [displayRemaining, setDisplayRemaining] = useState<number | null>(remaining);
   const displayRemainingRef = useRef<number | null>(remaining);
-  const [activityTick, setActivityTick] = useState(0);
   const [now, setNow] = useState(() => Date.now());
+  const [displayProgress, setDisplayProgress] = useState(() => estimateProgress(remaining));
+  const displayProgressRef = useRef<number>(estimateProgress(remaining));
 
   useEffect(() => {
     if (remaining === null) {
@@ -137,19 +138,6 @@ export function WaitingRoomPanel({
   }, [remaining]);
 
   useEffect(() => {
-    if (!polling) {
-      setActivityTick(0);
-      return;
-    }
-
-    const intervalId = window.setInterval(() => {
-      setActivityTick((prev) => (prev + 1) % 4);
-    }, 540);
-
-    return () => window.clearInterval(intervalId);
-  }, [polling]);
-
-  useEffect(() => {
     const intervalId = window.setInterval(() => {
       setNow(Date.now());
     }, 1000);
@@ -157,11 +145,10 @@ export function WaitingRoomPanel({
     return () => window.clearInterval(intervalId);
   }, []);
 
-  const pulsePattern = [0, 2, 0, -2] as const;
   const hasFreshRemaining = isRemainingFresh(remainingUpdatedAt, now);
   const canEstimateProgress = hasFreshRemaining && displayRemaining !== null && displayRemaining >= 0;
   const baseProgressValue = estimateProgress(displayRemaining);
-  const progressValue = Math.max(0, Math.min(100, baseProgressValue + pulsePattern[activityTick]));
+  const progressValue = canEstimateProgress ? displayProgress : baseProgressValue;
   const etaLabel = offline
     ? "연결 확인 중"
     : canEstimateProgress
@@ -170,6 +157,29 @@ export function WaitingRoomPanel({
   const adImageUrl = ad ? buildVersionedImageUrl(ad.imageUrl, ad.updatedAt) : WAITING_AD_PLACEHOLDER;
   const adAlt = ad?.altText?.trim() || "단짠 대기열 광고";
   const adLink = ad?.linkUrl?.trim() || null;
+
+  useEffect(() => {
+    if (!canEstimateProgress) {
+      return;
+    }
+
+    // 진행바는 사용자 신뢰를 위해 절대 뒤로 가지 않게 단조 증가로 유지합니다.
+    const nextProgress = Math.max(displayProgressRef.current, baseProgressValue);
+    if (nextProgress === displayProgressRef.current) {
+      return;
+    }
+
+    displayProgressRef.current = nextProgress;
+    setDisplayProgress(nextProgress);
+  }, [baseProgressValue, canEstimateProgress]);
+
+  useEffect(() => {
+    if (remaining === null) {
+      const resetProgress = estimateProgress(null);
+      displayProgressRef.current = resetProgress;
+      setDisplayProgress(resetProgress);
+    }
+  }, [remaining]);
 
   return (
     <div className={`${TICKETING_NARROW_PANEL_CLASS} space-y-4`}>
@@ -209,7 +219,7 @@ export function WaitingRoomPanel({
           ) : (
             <div className="relative mt-2 h-4 overflow-hidden rounded-full bg-[var(--surface-tint-subtle)]">
               <div
-                className={`h-full w-[38%] rounded-full bg-[var(--accent)] ${offline ? "opacity-40" : "animate-pulse opacity-70"}`}
+                className={`h-full w-[38%] rounded-full bg-[var(--accent)] ${offline || !polling ? "opacity-40" : "animate-pulse opacity-70"}`}
               />
             </div>
           )}
