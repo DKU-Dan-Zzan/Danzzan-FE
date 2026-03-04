@@ -1,4 +1,4 @@
-﻿import type { LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { ArrowRight, ClipboardList, Ticket, TicketCheck } from "lucide-react";
 import { Card } from "@/ticketing/components/common/ui/card";
 import { TICKETING_CLASSES, TICKETING_MIDDLE_PANEL_CLASS } from "@/ticketing/components/ticketing/ticketingShared";
@@ -11,37 +11,37 @@ interface TicketingHomePanelProps {
 const guideItems = [
   {
     step: 1,
-    title: "?곗폆???ㅽ뵂 ?쒓컙 ?뺤씤",
-    description: "?곗폆 紐⑸줉?먯꽌 媛?怨듭뿰???ㅽ뵂 ?쒓컙???뺤씤?섏꽭?? ?ㅽ뵂 10遺??꾨???移댁슫?몃떎?댁씠 ?쒖옉?⑸땲??",
+    title: "티켓팅 오픈 시간 확인",
+    description: "티켓 목록에서 각 공연의 오픈 시간을 확인하세요. 오픈 10분 전부터 카운트다운이 시작됩니다.",
   },
   {
     step: 2,
-    title: "?湲?諛??덈ℓ",
-    description: "?ㅽ뵂 ?쒓컖???섎㈃ ?덈ℓ 踰꾪듉???쒖꽦?붾맗?덈떎.",
+    title: "대기 및 예매",
+    description: "오픈 시각이 되면 예매 버튼이 활성화됩니다.",
   },
   {
     step: 3,
-    title: "???곗폆 ?뺤씤",
-    description: "?덈ℓ媛 ?꾨즺?섎㈃ '???곗폆 ?뺤씤?섍린'?먯꽌 ?덈ℓ???곗폆???뺤씤?섏꽭??",
+    title: "내 티켓 확인",
+    description: "예매가 완료되면 '내 티켓 확인하기'에서 예매한 티켓을 확인하세요.",
   },
   {
     step: 4,
-    title: "?붿컡 ?섎졊",
+    title: "팔찌 수령",
     description:
-      "怨듭뿰 ?뱀씪 吏?뺣맂 ?μ냼?먯꽌 ?ㅽ깭?꾩뿉寃??곗폆???쒖떆?섏꽭?? ?뺤씤 諛??붿컡 諛곕?媛 ?꾨즺?섎㈃ ???곗폆 ?곹깭媛 '?붿컡 ?섎졊 ?꾨즺'濡??낅뜲?댄듃?⑸땲?? (?붿컡 諛곕? ?꾩튂/?쒓컙? 異뷀썑 珥앺븰?앺쉶 ?몄뒪?洹몃옩 怨듭?)",
+      "공연 당일 지정된 장소에서 스태프에게 티켓을 제시하세요. 확인 및 팔찌 배부가 완료되면 내 티켓 상태가 '팔찌 수령 완료'로 업데이트됩니다. (팔찌 배부 위치/시간은 추후 총학생회 인스타그램 공지)",
   },
   {
     step: 5,
-    title: "怨듭뿰 ?낆옣",
-    description: "?붿컡瑜?李⑹슜?섍퀬 ?④뎅議댁뿉 ?낆옣?섏꽭??",
+    title: "공연 입장",
+    description: "팔찌를 착용하고 단국존에 입장하세요.",
   },
 ];
 
 const noticeItems = [
-  "?곗폆? ?덈ℓ ?쒓컙 ?쒖쑝濡??좎갑??諛곗젙?⑸땲??,",
-  "1?몃떦 怨듭뿰蹂?理쒕? 1留ㅺ퉴吏 ?덈ℓ 媛?ν빀?덈떎",
-  "?덈ℓ???곗폆? 痍⑥냼媛 遺덇??ν빀?덈떎.",
-  "?붿컡 誘몄닔?????④뎅議??낆옣??遺덇??섏삤?? ?섎졊 ?쒓컙??留욎텛???낆옣 ?붿컡瑜??섎졊?닿??쒓만 諛붾엻?덈떎.",
+  "티켓은 예매 시간 순으로 선착순 배정됩니다",
+  "1인당 공연별 최대 1매까지 예매 가능합니다",
+  "예매한 티켓은 취소가 불가능합니다.",
+  "팔찌 미수령 시 단국존 입장이 불가하오니, 수령 시간에 맞추어 입장 팔찌를 수령해가시길 바랍니다.",
 ];
 
 interface HomeQuickAction {
@@ -61,8 +61,8 @@ export function TicketingHomePanel({
   const quickActions: HomeQuickAction[] = [
     {
       key: "ticketing-list",
-      title: "怨듭뿰 ?곗폆???섎윭媛湲?,",
-      description: "?덈줈??怨듭뿰 ?곗폆???덈ℓ?섏꽭??,",
+      title: "공연 티켓팅 하러가기",
+      description: "새로운 공연 티켓을 예매하세요",
       cardClassName:
         "relative isolate min-h-[116px] overflow-hidden rounded-[20px] p-4 shadow-[0_8px_20px_var(--shadow-color)] transition-all duration-200 group-hover:-translate-y-[1px] group-hover:shadow-[0_10px_24px_var(--shadow-color)] group-active:translate-y-[1px] group-active:shadow-[0_6px_16px_var(--shadow-color)]",
       icon: Ticket,
@@ -71,8 +71,8 @@ export function TicketingHomePanel({
     },
     {
       key: "my-ticket",
-      title: "???곗폆 ?뺤씤?섍린",
-      description: "?덈ℓ???곗폆???뺤씤?섏꽭??,",
+      title: "내 티켓 확인하기",
+      description: "예매한 티켓을 확인하세요",
       cardClassName:
         "relative isolate min-h-[116px] overflow-hidden rounded-[20px] p-4 shadow-[0_8px_20px_var(--shadow-color)] transition-all duration-200 group-hover:-translate-y-[1px] group-hover:shadow-[0_10px_24px_var(--shadow-color)] group-active:translate-y-[1px] group-active:shadow-[0_6px_16px_var(--shadow-color)]",
       icon: TicketCheck,
@@ -126,7 +126,7 @@ export function TicketingHomePanel({
       <Card className="rounded-[24px] border border-[var(--border-base)] bg-[var(--surface-base)] p-5 shadow-[0_10px_20px_-16px_var(--shadow-color)]">
         <h3 className={`flex items-center gap-2 ${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--text)]`}>
           <ClipboardList className="h-[17px] w-[17px] text-[var(--text-muted)]" strokeWidth={2.1} />
-          ?곗폆???댁슜 媛?대뱶
+          티켓팅 이용 가이드
         </h3>
         <div className="mt-0 px-2">
           {guideItems.map((item, index) => (
@@ -158,7 +158,7 @@ export function TicketingHomePanel({
         </div>
         <section className="mt-4 border-t border-[var(--border-subtle)] pt-4">
           <h4 className={`${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--accent)]`}>
-            ?뮕 ?좎쓽?ы빆
+            💡 유의사항
           </h4>
           <ul className={`mt-3 list-disc space-y-2 pl-5 ${TICKETING_CLASSES.typography.sectionBody} text-[var(--accent)]`}>
             {noticeItems.map((notice) => (

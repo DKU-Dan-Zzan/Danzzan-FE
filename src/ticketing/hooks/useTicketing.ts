@@ -1,4 +1,4 @@
-﻿import { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { ticketApi } from "@/ticketing/api/ticketApi";
 import type {
   Ticket,
@@ -15,7 +15,7 @@ export const useTicketing = () => {
     if (err instanceof Error) {
       return err;
     }
-    return new Error("?????녿뒗 ?ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.");
+    return new Error("알 수 없는 오류가 발생했습니다.");
   };
 
   const getTicketingEvents = useCallback(async (): Promise<TicketingEvent[]> => {

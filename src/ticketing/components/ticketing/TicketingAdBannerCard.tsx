@@ -1,11 +1,11 @@
-﻿import { Megaphone } from "lucide-react";
+import { Megaphone } from "lucide-react";
 import { Card } from "@/ticketing/components/common/ui/card";
 import { TICKETING_CLASSES } from "@/ticketing/components/ticketing/ticketingShared";
 import type { PlacementAd } from "@/ticketing/types/model/ad.model";
 
 const AD_PLACEHOLDER_IMAGE = "/ads/waiting-room-sample-banner.svg";
 
-// 愿묎퀬 ?щ’ ?ш린瑜?蹂寃쏀븯?ㅻ㈃ ?꾨옒 ?곸닔留??섏젙?섏꽭??
+// 광고 슬롯 크기를 변경하려면 아래 상수만 수정하세요.
 const AD_SLOT_MAX_WIDTH_CLASS = "max-w-[18rem]";
 const AD_SLOT_ASPECT_RATIO_CLASS = "aspect-[16/4.7]";
 
@@ -27,7 +27,7 @@ interface TicketingAdBannerCardProps {
 
 export function TicketingAdBannerCard({ ad }: TicketingAdBannerCardProps) {
   const adImageUrl = ad ? buildVersionedImageUrl(ad.imageUrl, ad.updatedAt) : AD_PLACEHOLDER_IMAGE;
-  const adAlt = ad?.altText?.trim() || "?⑥쭬 ?湲곗뿴 愿묎퀬";
+  const adAlt = ad?.altText?.trim() || "단짠 대기열 광고";
   const adLink = ad?.linkUrl?.trim() || null;
 
   return (
@@ -35,7 +35,7 @@ export function TicketingAdBannerCard({ ad }: TicketingAdBannerCardProps) {
       <div className="flex items-center justify-between">
         <p className={`flex items-center gap-1.5 ${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>
           <Megaphone className="h-3.5 w-3.5" />
-          愿묎퀬
+          광고
         </p>
         <span className="rounded-full border border-[var(--border-strong)] bg-[var(--surface-tint-subtle)] px-2 py-0.5 text-[0.68rem] font-semibold text-[var(--accent)]">
           AD

@@ -1,4 +1,4 @@
-﻿import { LoaderCircle, RotateCcw } from "lucide-react";
+import { LoaderCircle, RotateCcw } from "lucide-react";
 import { Button } from "@/ticketing/components/common/ui/button";
 import { Card } from "@/ticketing/components/common/ui/card";
 import { TICKETING_CLASSES, TICKETING_NARROW_PANEL_CLASS } from "@/ticketing/components/ticketing/ticketingShared";
@@ -27,7 +27,8 @@ export function ReservationProcessingPanel({
 
         <div>
           <h2 className={`text-center ${TICKETING_CLASSES.typography.stateTitle} text-[var(--text)]`}>
-            ?덈ℓ ?붿껌 泥섎━ 以?          </h2>
+            예매 요청 처리 중
+          </h2>
           <p className={`mt-2 text-center ${TICKETING_CLASSES.typography.stateBody} text-[var(--text-muted)]`}>
             {message}
           </p>
@@ -44,7 +45,7 @@ export function ReservationProcessingPanel({
         <div className="flex flex-col gap-2">
           {!processing && (
             <Button onClick={onRetry} className={TICKETING_CLASSES.button.primaryFull}>
-              ?ㅼ떆 ?쒕룄
+              다시 시도
               <RotateCcw className="h-4 w-4" />
             </Button>
           )}
@@ -53,7 +54,7 @@ export function ReservationProcessingPanel({
             onClick={onBackToList}
             className="h-12 rounded-[20px] border-[var(--border-base)] bg-[var(--surface-base)] text-[length:var(--ticketing-text-button)] font-semibold text-[var(--text)] hover:bg-[var(--surface-subtle)]"
           >
-            ?곗폆 紐⑸줉?쇰줈 ?대룞
+            티켓 목록으로 이동
           </Button>
         </div>
       </Card>

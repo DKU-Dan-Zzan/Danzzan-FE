@@ -1,4 +1,4 @@
-﻿import { Button } from "@/ticketing/components/common/ui/button";
+import { Button } from "@/ticketing/components/common/ui/button";
 import { Card } from "@/ticketing/components/common/ui/card";
 import { TicketCheck } from "lucide-react";
 import { PaperTicketCard } from "@/ticketing/components/ticketing/PaperTicketCard";
@@ -45,10 +45,10 @@ export function MyTicketListPanel({
           </span>
           <div className="min-w-0 flex-1">
             <h2 className={`${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--text)]`}>
-              ?④뎅議??좎삁留??곗폆
+              단국존 선예매 티켓
             </h2>
             <p className={`mt-1 ${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>
-              ?덈ℓ ?댁뿭怨??붿컡 ?곹깭
+              예매 내역과 팔찌 상태
             </p>
           </div>
           <TicketingRefreshButton
@@ -67,17 +67,17 @@ export function MyTicketListPanel({
             <p className="text-[length:var(--ticketing-text-holder-overline)] font-bold tracking-[0.1em] text-[var(--text-muted)]">
               TICKET HOLDER
             </p>
-            <p className={`${TICKETING_CLASSES.typography.sectionBodySm} font-semibold text-[var(--text-muted)]`}>?곗폆 ?뚯????뺣낫</p>
+            <p className={`${TICKETING_CLASSES.typography.sectionBodySm} font-semibold text-[var(--text-muted)]`}>티켓 소지자 정보</p>
           </div>
 
           <div className="relative z-10 mt-1.5 border-t border-[var(--border-subtle)]" />
 
           <dl className={`relative z-10 mt-1.5 grid grid-cols-[2.1rem_1fr] items-start gap-x-2 gap-y-1.5 ${TICKETING_CLASSES.typography.sectionBodySm}`}>
-            <dt className="font-semibold text-[var(--text-muted)]">?숇쾲</dt>
+            <dt className="font-semibold text-[var(--text-muted)]">학번</dt>
             <dd className="font-extrabold tracking-tight text-[var(--accent)] [overflow-wrap:anywhere]">
               {student.studentId}
             </dd>
-            <dt className="font-semibold text-[var(--text-muted)]">?대쫫</dt>
+            <dt className="font-semibold text-[var(--text-muted)]">이름</dt>
             <dd className="font-extrabold tracking-tight text-[var(--text)] [overflow-wrap:anywhere]">
               {student.name}
             </dd>
@@ -97,23 +97,24 @@ export function MyTicketListPanel({
 
       {loading && tickets.length === 0 && (
         <Card className={`${TICKETING_CLASSES.card.emptyState} p-6`}>
-          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>?곗폆??遺덈윭?ㅻ뒗 以묒엯?덈떎...</p>
+          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>티켓을 불러오는 중입니다...</p>
         </Card>
       )}
 
       {!loading && tickets.length === 0 && (
         <Card className={`${TICKETING_CLASSES.card.emptyState} p-8 text-center`}>
           <p className={`${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--text)]`}>
-            ?꾩쭅 ?덈ℓ???곗폆???놁뒿?덈떎.
+            아직 예매한 티켓이 없습니다.
           </p>
           <p className={`mt-1 ${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>
-            ?곗폆???섏씠吏?먯꽌 吏꾪뻾 以묒씤 怨듭뿰???뺤씤?섏꽭??
+            티켓팅 페이지에서 진행 중인 공연을 확인하세요.
           </p>
           <Button
             className={`mt-4 ${TICKETING_CLASSES.button.primaryFull}`}
             onClick={onGoTicketing}
           >
-            ?곗폆???섎윭媛湲?          </Button>
+            티켓팅 하러가기
+          </Button>
         </Card>
       )}
 

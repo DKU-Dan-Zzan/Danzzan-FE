@@ -1,4 +1,4 @@
-﻿import { Card } from "@/ticketing/components/common/ui/card";
+import { Card } from "@/ticketing/components/common/ui/card";
 import { cn } from "@/ticketing/components/common/ui/utils";
 import { TICKETING_CLASSES } from "@/ticketing/components/ticketing/ticketingShared";
 import type { Ticket } from "@/ticketing/types/model/ticket.model";
@@ -12,25 +12,25 @@ const statusDisplayMap: Record<
   { label: string; badgeClassName: string; stripColor: string }
 > = {
   issued: {
-    label: "?붿컡 誘몄닔???곹깭",
+    label: "팔찌 미수령 상태",
     badgeClassName:
       "border-[var(--status-pending-border)] bg-[var(--status-pending-bg)] text-[var(--status-pending-text)]",
     stripColor: "var(--status-pending)",
   },
   used: {
-    label: "?붿컡 ?섎졊 ?꾨즺",
+    label: "팔찌 수령 완료",
     badgeClassName:
       "border-[var(--status-success-border)] bg-[var(--status-success-bg)] text-[var(--status-success-text)]",
     stripColor: "var(--status-success)",
   },
   cancelled: {
-    label: "?덈ℓ 痍⑥냼",
+    label: "예매 취소",
     badgeClassName:
       "border-[var(--border-base)] bg-[linear-gradient(180deg,var(--surface-base)_0%,var(--ticket-paper-top)_100%)] text-[var(--text-muted)]",
     stripColor: "var(--text-muted)",
   },
   unknown: {
-    label: "?곹깭 ?뺤씤 ?꾩슂",
+    label: "상태 확인 필요",
     badgeClassName:
       "border-[var(--border-strong)] bg-[linear-gradient(180deg,var(--surface-tint-strong)_0%,var(--ticket-paper-top)_100%)] text-[var(--accent)]",
     stripColor: "var(--accent)",
@@ -57,7 +57,7 @@ const toCompactEventDate = (value: string): string => {
 };
 
 const getDayNumberFromEventName = (value: string): string | null => {
-  const matched = value.match(/(\d+)\s*?쇱감/);
+  const matched = value.match(/(\d+)\s*일차/);
   if (!matched) {
     return null;
   }
@@ -76,10 +76,10 @@ const getGuideLines = (
   entryLabel: string;
   entryValue: string;
 } => {
-  const dateLabel = ticket.eventDate ? toCompactEventDate(ticket.eventDate) : "誘몄젙";
+  const dateLabel = ticket.eventDate ? toCompactEventDate(ticket.eventDate) : "미정";
   const dayNumber = ticket.eventName ? getDayNumberFromEventName(ticket.eventName) : null;
-  const venueLabel = ticket.venue || "Main Stage";
-  const dayLabel = dayNumber ? `DAY ${dayNumber}` : "DAY 誘몄젙";
+  const venueLabel = ticket.venue || "단국존";
+  const dayLabel = dayNumber ? `DAY ${dayNumber}` : "DAY 미정";
   const queueLabel = ticket.queueNumber != null
     ? String(ticket.queueNumber)
     : ticket.id.slice(-4).toUpperCase();
@@ -89,9 +89,9 @@ const getGuideLines = (
     dateLabel,
     venueLabel,
     queueLabel,
-    wristbandValue: "異뷀썑 怨듭?",
-    entryLabel: `${venueLabel} ?낆옣 ?쒓컖`,
-    entryValue: "異뷀썑 怨듭?",
+    wristbandValue: "추후 공지",
+    entryLabel: `${venueLabel} 입장 시각`,
+    entryValue: "추후 공지",
   };
 };
 
@@ -183,7 +183,7 @@ export function PaperTicketCard({ ticket }: PaperTicketCardProps) {
         <div className="mt-2.5 grid grid-cols-[0.9fr_auto_1.35fr_auto_0.85fr] items-start gap-x-3">
           <div>
             <p className="text-[length:var(--ticketing-text-paper-label)] font-semibold leading-none tracking-[0.03em] text-[var(--text-muted)]">
-              ?쇱감
+              일차
             </p>
             <p className="mt-1 text-[length:var(--ticketing-text-paper-value)] leading-none font-bold text-[var(--text)]">
               {dayLabel}
@@ -197,7 +197,7 @@ export function PaperTicketCard({ ticket }: PaperTicketCardProps) {
 
           <div>
             <p className="text-[length:var(--ticketing-text-paper-label)] font-semibold leading-none tracking-[0.03em] text-[var(--text-muted)]">
-              怨듭뿰 ?쇱옄
+              공연 일자
             </p>
             <p className="mt-1 text-[length:var(--ticketing-text-paper-value)] leading-none font-bold text-[var(--text)] [font-variant-numeric:tabular-nums]">
               {dateLabel}
@@ -211,7 +211,7 @@ export function PaperTicketCard({ ticket }: PaperTicketCardProps) {
 
           <div>
             <p className="text-[length:var(--ticketing-text-paper-label)] font-semibold leading-none tracking-[0.03em] text-[var(--text-muted)]">
-              ?덈ℓ ?쒕쾲
+              예매 순번
             </p>
             <p className="mt-1 font-mono text-[length:var(--ticketing-text-paper-queue)] leading-none font-extrabold tracking-[0.02em] text-[var(--accent)] [font-variant-numeric:tabular-nums]">
               NO.{queueLabel}
@@ -224,7 +224,7 @@ export function PaperTicketCard({ ticket }: PaperTicketCardProps) {
         <div className="mt-2.5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-x-4">
           <div>
             <p className="text-[length:var(--ticketing-text-paper-label)] font-semibold leading-none tracking-[0.03em] text-[var(--text-muted)]">
-              ?붿컡 諛곕? ?쒓컖
+              팔찌 배부 시각
             </p>
             <p className="mt-1 text-[length:var(--ticketing-text-paper-time)] leading-none font-bold text-[var(--text)]">
               {wristbandValue}

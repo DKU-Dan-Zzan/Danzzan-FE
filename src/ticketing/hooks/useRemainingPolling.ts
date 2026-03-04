@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ticketApi } from "@/ticketing/api/ticketApi";
 
 interface UseRemainingPollingOptions {
@@ -27,7 +27,7 @@ export const useRemainingPolling = ({
         onSoldOutRef.current?.();
       }
     } catch {
-      // ?대쭅 ?ㅽ뙣??臾댁떆 (?ㅼ쓬 二쇨린???ъ떆??
+      // 폴링 실패는 무시 (다음 주기에 재시도)
     }
   }, [eventId]);
 
@@ -36,7 +36,7 @@ export const useRemainingPolling = ({
       return;
     }
 
-    // 利됱떆 ??踰?議고쉶
+    // 즉시 한 번 조회
     void fetchRemaining();
 
     const intervalId = window.setInterval(() => {

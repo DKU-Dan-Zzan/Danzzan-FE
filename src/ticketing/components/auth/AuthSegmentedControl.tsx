@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/ticketing/components/common/ui/utils";
 
@@ -46,7 +46,8 @@ export function AuthSegmentedControl({ activeTab }: AuthSegmentedControlProps) {
           activeTab === "login" ? "text-[var(--accent)]" : "text-[var(--text-muted)] hover:text-[var(--text)]",
         )}
       >
-        濡쒓렇??      </Link>
+        로그인
+      </Link>
       <Link
         to="/ticket/signup"
         state={{ authTabFrom: activeTab }}
@@ -55,7 +56,8 @@ export function AuthSegmentedControl({ activeTab }: AuthSegmentedControlProps) {
           activeTab === "signup" ? "text-[var(--accent)]" : "text-[var(--text-muted)] hover:text-[var(--text)]",
         )}
       >
-        ?뚯썝媛??      </Link>
+        회원가입
+      </Link>
     </div>
   );
 }

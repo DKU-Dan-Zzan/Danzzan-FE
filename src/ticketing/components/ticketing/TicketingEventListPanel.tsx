@@ -1,4 +1,4 @@
-﻿import { useMemo } from "react";
+import { useMemo } from "react";
 import { CalendarClock, Clock3 } from "lucide-react";
 import { Badge } from "@/ticketing/components/common/ui/badge";
 import { Button } from "@/ticketing/components/common/ui/button";
@@ -30,16 +30,16 @@ const statusMeta: Record<
   }
 > = {
   upcoming: {
-    label: "?ㅽ뵂 ?덉젙",
+    label: "오픈 예정",
     badgeClassName: "border-[var(--border-subtle)] bg-[var(--surface-subtle)] text-[var(--text-muted)]",
   },
   open: {
-    label: "?ㅼ떆媛??덈ℓ 以?",
+    label: "실시간 예매 중",
     badgeClassName:
       "border-[var(--status-success-border)] bg-[var(--status-success)] text-white shadow-[0_8px_14px_-10px_var(--shadow-color)]",
   },
   soldout: {
-    label: "?덈ℓ 留덇컧",
+    label: "예매 마감",
     badgeClassName: "border-[var(--status-neutral-border)] bg-[var(--status-neutral)] text-white",
   },
 };
@@ -55,7 +55,11 @@ const parseTimestamp = (value: string): number | null => {
   return parsed;
 };
 
-const normalizeKoreanMonthDay = (value: string): string => value;
+const normalizeKoreanMonthDay = (value: string): string => {
+  return value
+    .replace(/(^|[^0-9])0([1-9])(?=\s*월)/g, "$1$2")
+    .replace(/월(\s*)0([1-9])(?=\s*일)/g, "월$1$2");
+};
 
 const formatCountdown = (seconds: number): string => {
   const clamped = Math.max(0, seconds);
@@ -97,7 +101,7 @@ const formatEventDateTime = (event: TicketingEvent, openAtMs: number | null): st
   }
 
   if (openAtMs === null) {
-    return "?ㅽ뵂 ?쇱젙 異뷀썑 怨듭?";
+    return "오픈 일정 추후 공지";
   }
 
   const date = new Date(openAtMs);
@@ -109,7 +113,7 @@ const formatEventDateTime = (event: TicketingEvent, openAtMs: number | null): st
     minute: "2-digit",
     hour12: false,
   });
-  return `${month}??${day}??(${weekday}) ${time}`;
+  return `${month}월 ${day}일 (${weekday}) ${time}`;
 };
 
 export function TicketingEventListPanel({
@@ -145,7 +149,7 @@ export function TicketingEventListPanel({
   return (
     <div className={TICKETING_WIDE_PANEL_CLASS}>
       <div>
-        <h2 className="sr-only">?곗폆??</h2>
+        <h2 className="sr-only">티켓팅</h2>
         <Card className={`${TICKETING_CLASSES.card.infoBanner} p-4`}>
           <div className="flex items-start justify-between gap-3">
             <div className="flex min-w-0 items-start gap-3">
@@ -154,10 +158,10 @@ export function TicketingEventListPanel({
               </div>
               <div className="min-w-0">
                 <p className={`${TICKETING_CLASSES.typography.infoBannerTitle} text-[var(--text)]`}>
-                  怨듭뿰蹂??덈ℓ ?ㅽ뵂 ?쒓컖???뺤씤?섏뿬 ?④뎅議??곗폆?낆뿉 李몄뿬?섏꽭??
+                  공연별 예매 오픈 시각을 확인하여 단국존 티켓팅에 참여하세요.
                 </p>
                 <p className={`mt-1 ${TICKETING_CLASSES.typography.infoBannerBody} text-[var(--text-muted)]`}>
-                  ?ㅽ뵂 10遺??꾨???移댁슫?몃떎?댁씠 ?쒖옉?섎ŉ, 0珥??댄썑 ?덈ℓ 踰꾪듉???쒖꽦?붾맗?덈떎.
+                  오픈 10분 전부터 카운트다운이 시작되며, 0초 이후 예매 버튼이 활성화됩니다.
                 </p>
               </div>
             </div>
@@ -177,13 +181,13 @@ export function TicketingEventListPanel({
 
       {loading && events.length === 0 && (
         <Card className={`${TICKETING_CLASSES.card.emptyState} p-6`}>
-          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>?곗폆 ?뺣낫瑜?遺덈윭?ㅻ뒗 以묒엯?덈떎...</p>
+          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>티켓 정보를 불러오는 중입니다...</p>
         </Card>
       )}
 
       {!loading && events.length === 0 && (
         <Card className={`${TICKETING_CLASSES.card.emptyState} p-6`}>
-          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>吏꾪뻾 以묒씤 ?곗폆???쇱젙???놁뒿?덈떎.</p>
+          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>진행 중인 티켓팅 일정이 없습니다.</p>
         </Card>
       )}
 
@@ -196,7 +200,7 @@ export function TicketingEventListPanel({
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <h3 className={`truncate ${TICKETING_CLASSES.typography.cardTitle} text-[var(--text)]`}>
-                  {normalizeKoreanMonthDay(event.title || "怨듭뿰 ?곗폆")}
+                  {normalizeKoreanMonthDay(event.title || "공연 티켓팅")}
                 </h3>
                 <p className={`mt-1 ${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--accent)]`}>
                   {formatEventDateTime(event, openAtMs)}
@@ -220,7 +224,7 @@ export function TicketingEventListPanel({
                   disabled
                 >
                   <Clock3 className="h-[0.8rem] w-[0.8rem]" />
-                  ?ㅽ뵂源뚯? ?⑥? ?쒓컙 {formatCountdown(countdown)}
+                  오픈까지 남은 시간 {formatCountdown(countdown)}
                 </Button>
               )}
 
@@ -230,7 +234,7 @@ export function TicketingEventListPanel({
                   variant="outline"
                   disabled
                 >
-                  ?ㅽ뵂 ?덉젙
+                  오픈 예정
                 </Button>
               )}
 
@@ -239,7 +243,7 @@ export function TicketingEventListPanel({
                   className={`${TICKETING_CLASSES.button.primaryFull} h-12`}
                   onClick={() => onSelectEvent(event)}
                 >
-                  ?④뎅議??좎갑???덈ℓ
+                  단국존 선착순 예매
                 </Button>
               )}
 
@@ -249,7 +253,7 @@ export function TicketingEventListPanel({
                   variant="outline"
                   disabled
                 >
-                  ?뺤썝 珥덇낵濡??좎껌 留덇컧
+                  정원 초과로 신청 마감
                 </Button>
               )}
             </div>

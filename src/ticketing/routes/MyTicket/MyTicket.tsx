@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { adApi } from "@/ticketing/api/adApi";
 import { MyTicketListPanel } from "@/ticketing/components/ticketing/MyTicketListPanel";
@@ -39,7 +39,7 @@ export default function MyTicket() {
       tickets={tickets}
       student={{
         studentId: session.user?.studentId || "-",
-        name: session.user?.name || "?숈깮",
+        name: session.user?.name || "학생",
       }}
       loading={loading}
       errorMessage={error?.message ?? null}

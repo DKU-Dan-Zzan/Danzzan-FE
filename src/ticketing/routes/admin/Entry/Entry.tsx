@@ -1,12 +1,12 @@
-﻿import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/ticketing/components/common/ui/card";
 import { Button } from "@/ticketing/components/common/ui/button";
 
 const systems = [
   {
     id: "wristband",
-    title: "?붿컡 諛곕? ?댁쁺",
-    description: "?곗폆 ?뺤씤 諛??붿컡 吏湲??꾪솴??愿由ы빀?덈떎.",
+    title: "팔찌 배부 운영",
+    description: "티켓 확인 및 팔찌 지급 현황을 관리합니다.",
   },
 ];
 
@@ -18,8 +18,8 @@ export default function AdminEntry() {
       <Card className="w-full max-w-3xl p-10">
         <div className="space-y-2">
           <p className="text-sm text-primary font-semibold">DAN-ZZAN Operations</p>
-          <h1 className="text-2xl font-semibold text-foreground">愿由??쒖뒪???좏깮</h1>
-          <p className="text-sm text-muted-foreground">?묒냽???댁쁺 ?쒖뒪?쒖쓣 ?좏깮?섏꽭??</p>
+          <h1 className="text-2xl font-semibold text-foreground">관리 시스템 선택</h1>
+          <p className="text-sm text-muted-foreground">접속할 운영 시스템을 선택하세요.</p>
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -32,7 +32,7 @@ export default function AdminEntry() {
                   className="w-full"
                   onClick={() => navigate("/ticket/admin/login")}
                 >
-                  濡쒓렇?몄쑝濡??대룞
+                  로그인으로 이동
                 </Button>
               </div>
             </Card>

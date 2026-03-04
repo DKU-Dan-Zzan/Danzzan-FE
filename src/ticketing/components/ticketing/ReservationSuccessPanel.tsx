@@ -1,4 +1,4 @@
-﻿import { ArrowRight, CheckCircle2, ShieldCheck, Ticket } from "lucide-react";
+import { ArrowRight, CheckCircle2, ShieldCheck, Ticket } from "lucide-react";
 import { Button } from "@/ticketing/components/common/ui/button";
 import { Card } from "@/ticketing/components/common/ui/card";
 import { TICKETING_CLASSES, TICKETING_NARROW_PANEL_CLASS } from "@/ticketing/components/ticketing/ticketingShared";
@@ -16,7 +16,7 @@ export function ReservationSuccessPanel({
         <div className="relative">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-strong)_100%)] px-3 py-1 text-[length:var(--ticketing-text-badge)] font-semibold tracking-[0.01em] text-[var(--accent)]">
             <CheckCircle2 className="h-3.5 w-3.5" />
-            ?덉빟 ?꾨즺
+            예약 완료
           </span>
         </div>
 
@@ -26,10 +26,10 @@ export function ReservationSuccessPanel({
           </div>
           <div>
             <h2 className={`${TICKETING_CLASSES.typography.stateTitle} text-[var(--text)]`}>
-              ?곗폆???깃났
+              티켓팅 성공
             </h2>
             <p className={`mt-1 ${TICKETING_CLASSES.typography.stateBody} text-[var(--text-muted)]`}>
-              ?덈ℓ媛 ?꾨즺?섏뿀?듬땲?? ?꾨옒?먯꽌 ?ㅼ쓬 ?④퀎瑜?吏꾪뻾?섏꽭??
+              예매가 완료되었습니다. 아래에서 다음 단계를 진행하세요.
             </p>
           </div>
         </div>
@@ -39,11 +39,11 @@ export function ReservationSuccessPanel({
           <ul className={`mt-2 space-y-2.5 ${TICKETING_CLASSES.typography.sectionBody} text-[var(--text-muted)]`}>
             <li className="flex items-start gap-2.5">
               <Ticket className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
-              <span>???곗폆?먯꽌 諛쒓툒 ?곹깭? ?곸꽭 ?뺣낫瑜??뺤씤?섏꽭??</span>
+              <span>내 티켓에서 발급 상태와 상세 정보를 확인하세요.</span>
             </li>
             <li className="flex items-start gap-2.5">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
-              <span>怨듭뿰 ?뱀씪 ?좊텇利?誘몄?李????낆옣???쒗븳?????덉뒿?덈떎.</span>
+              <span>공연 당일 신분증 미지참 시 입장이 제한될 수 있습니다.</span>
             </li>
           </ul>
         </div>
@@ -53,7 +53,7 @@ export function ReservationSuccessPanel({
             onClick={onGoMyTickets}
             className={TICKETING_CLASSES.button.primaryWide}
           >
-            ???곗폆 ?뺤씤?섍린
+            내 티켓 확인하기
             <ArrowRight className="h-4 w-4" />
           </Button>
         </div>

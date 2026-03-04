@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { adApi } from "@/ticketing/api/adApi";
 import { HttpError } from "@/ticketing/api/httpClient";
@@ -32,7 +32,7 @@ interface ParsedApiError {
   code: string | null;
 }
 
-const OFFLINE_WAITING_MESSAGE = "?명꽣???곌껐???딄꼈?듬땲?? ?곌껐??蹂듦뎄?섎㈃ ?먮룞?쇰줈 ?ㅼ떆 ?뺤씤?⑸땲??";
+const OFFLINE_WAITING_MESSAGE = "인터넷 연결이 끊겼습니다. 연결이 복구되면 자동으로 다시 확인합니다.";
 
 const RESERVE_ERROR_CODE_SET = new Set<ReserveErrorCode>([
   "RESERVE_ALREADY_RESERVED",
@@ -110,7 +110,7 @@ export default function Ticketing() {
 
   const [reserveProcessing, setReserveProcessing] = useState(false);
   const [reserveErrorMessage, setReserveErrorMessage] = useState<string | null>(null);
-  const [reserveMessage, setReserveMessage] = useState("?낆옣 ?곹깭媛 ?뺤씤?섏뼱 ?덈ℓ瑜?吏꾪뻾?섍퀬 ?덉뒿?덈떎.");
+  const [reserveMessage, setReserveMessage] = useState("입장 상태가 확인되어 예매를 진행하고 있습니다.");
   const [agreementChecked, setAgreementChecked] = useState(false);
   const [reservationError, setReservationError] = useState<string | null>(null);
 
@@ -184,7 +184,7 @@ export default function Ticketing() {
     setWaitingPolling(false);
     setReserveProcessing(false);
     setReserveErrorMessage(null);
-    setReserveMessage("?낆옣 ?곹깭媛 ?뺤씤?섏뼱 ?덈ℓ瑜?吏꾪뻾?섍퀬 ?덉뒿?덈떎.");
+    setReserveMessage("입장 상태가 확인되어 예매를 진행하고 있습니다.");
     setAgreementChecked(false);
     setReservationError(null);
   }, []);
@@ -227,13 +227,13 @@ export default function Ticketing() {
       case "RESERVE_NOT_OPEN":
         setStep("in-progress");
         setReserveProcessing(false);
-        setReserveMessage("?덈ℓ ?ㅽ뵂 ?쒓컙???꾩쭅 ?섏? ?딆븯?듬땲?? ?좎떆 ???ㅼ떆 ?쒕룄?댁＜?몄슂.");
-        setReserveErrorMessage("?ㅽ뵂 ???곹깭?낅땲?? ?곗폆 ?ㅽ뵂 ?쒓컖 ?댄썑 ?ㅼ떆 ?쒕룄?댁＜?몄슂.");
-        setReservationError("?ㅽ뵂 ???곹깭?낅땲?? ?곗폆 ?ㅽ뵂 ?쒓컖 ?댄썑 ?ㅼ떆 ?쒕룄?댁＜?몄슂.");
+        setReserveMessage("예매 오픈 시간이 아직 되지 않았습니다. 잠시 후 다시 시도해주세요.");
+        setReserveErrorMessage("오픈 전 상태입니다. 티켓 오픈 시각 이후 다시 시도해주세요.");
+        setReservationError("오픈 전 상태입니다. 티켓 오픈 시각 이후 다시 시도해주세요.");
         break;
       case "EVENT_NOT_FOUND":
         setActiveEventId(null);
-        setListNotice("?대떦 ?곗폆 ?뺣낫瑜?李얠쓣 ???놁뼱 紐⑸줉?쇰줈 ?대룞?⑸땲??");
+        setListNotice("해당 티켓 정보를 찾을 수 없어 목록으로 이동합니다.");
         setReservationError(null);
         await moveToList({ preserveNotice: true });
         break;
@@ -241,14 +241,14 @@ export default function Ticketing() {
       default:
         setStep("in-progress");
         setReserveProcessing(false);
-        setReserveMessage("?쇱떆?곸씤 ?ㅻ쪟媛 諛쒖깮?덉뒿?덈떎. ?ㅽ듃?뚰겕 ?곹깭瑜??뺤씤?????ㅼ떆 ?쒕룄?댁＜?몄슂.");
-        setReserveErrorMessage("?붿껌 泥섎━???ㅽ뙣?덉뒿?덈떎. ?좎떆 ???ㅼ떆 ?쒕룄?댁＜?몄슂.");
-        setReservationError("?붿껌 泥섎━???ㅽ뙣?덉뒿?덈떎. ?좎떆 ???ㅼ떆 ?쒕룄?댁＜?몄슂.");
+        setReserveMessage("일시적인 오류가 발생했습니다. 네트워크 상태를 확인한 뒤 다시 시도해주세요.");
+        setReserveErrorMessage("요청 처리에 실패했습니다. 잠시 후 다시 시도해주세요.");
+        setReservationError("요청 처리에 실패했습니다. 잠시 후 다시 시도해주세요.");
         break;
     }
 
     if (reserveCode === "RESERVE_ALREADY_RESERVED") {
-      // ?곹깭 ?뺤씤 ?숆린?붾? ?꾪빐 ???곗폆 ?붾㈃?먯꽌 理쒖떊 ?뺣낫瑜??뺤씤?섎룄濡??좊룄?⑸땲??
+      // 상태 확인 동기화를 위해 내 티켓 화면에서 최신 정보를 확인하도록 유도합니다.
       void ticketApi.getMyTickets().catch(() => null);
     }
 
@@ -266,7 +266,7 @@ export default function Ticketing() {
     setStep("reserving");
     setReserveProcessing(true);
     setReserveErrorMessage(null);
-    setReserveMessage("?낆옣 ?곹깭媛 ?뺤씤?섏뼱 ?덈ℓ瑜?吏꾪뻾?섍퀬 ?덉뒿?덈떎.");
+    setReserveMessage("입장 상태가 확인되어 예매를 진행하고 있습니다.");
     setReservationError(null);
 
     try {
@@ -333,7 +333,7 @@ export default function Ticketing() {
         return;
       default:
         setActiveEventId(null);
-        setListNotice("?꾩옱 ?湲??곹깭瑜??뺤씤?????놁뼱 紐⑸줉?쇰줈 ?대룞?⑸땲??");
+        setListNotice("현재 대기 상태를 확인할 수 없어 목록으로 이동합니다.");
         applyQueueEventToUrl(null);
         await moveToList({ preserveNotice: true });
     }
@@ -366,7 +366,7 @@ export default function Ticketing() {
         return null;
       }
 
-      setWaitingError("?ㅽ듃?뚰겕 ?곹깭媛 遺덉븞?뺥빀?덈떎. ?좎떆 ???먮룞?쇰줈 ?ㅼ떆 ?뺤씤?⑸땲??");
+      setWaitingError("네트워크 상태가 불안정합니다. 잠시 후 자동으로 다시 확인합니다.");
       return null;
     }
   }, [handleQueueStatus, handleUnauthorized, isNetworkOnline]);
@@ -377,7 +377,7 @@ export default function Ticketing() {
     }
     if (!isNetworkOnline) {
       releaseSingleFlight(enterLockRef);
-      setListNotice("?명꽣???곌껐???뺤씤?????ㅼ떆 ?쒕룄?댁＜?몄슂.");
+      setListNotice("인터넷 연결을 확인한 뒤 다시 시도해주세요.");
       return;
     }
     setActiveEventId(event.id);
@@ -401,7 +401,7 @@ export default function Ticketing() {
         handleUnauthorized();
       } else {
         setActiveEventId(null);
-        setListNotice("?湲곗뿴 吏꾩엯???ㅽ뙣?덉뒿?덈떎. ?좎떆 ???ㅼ떆 ?쒕룄?댁＜?몄슂.");
+        setListNotice("대기열 진입에 실패했습니다. 잠시 후 다시 시도해주세요.");
         applyQueueEventToUrl(null);
         await moveToList({ preserveNotice: true });
       }
@@ -423,7 +423,7 @@ export default function Ticketing() {
     }
 
     if (!agreementChecked) {
-      setReservationError("???ы빆???숈??섏떊 ??泥댄겕?댁＜?몄슂.");
+      setReservationError("위 사항을 숙지하신 후 체크해주세요.");
       return;
     }
 
@@ -530,7 +530,7 @@ export default function Ticketing() {
           return;
         }
         setQueueStatus("WAITING");
-        setWaitingError("?湲??곹깭瑜??뺤씤?섏? 紐삵뻽?듬땲?? ?덈줈怨좎묠 ???ㅼ떆 ?쒕룄?댁＜?몄슂.");
+        setWaitingError("대기 상태를 확인하지 못했습니다. 새로고침 후 다시 시도해주세요.");
       } finally {
         setWaitingPolling(false);
       }

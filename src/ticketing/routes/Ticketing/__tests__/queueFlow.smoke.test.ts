@@ -1,4 +1,4 @@
-﻿import type { QueueRequestStatus } from "@/ticketing/types/model/ticket.model";
+import type { QueueRequestStatus } from "@/ticketing/types/model/ticket.model";
 import {
   BACKGROUND_POLL_INTERVAL,
   FOREGROUND_POLL_INTERVAL,
@@ -54,31 +54,31 @@ const runQueueFlowSmoke = (
 };
 
 describe("queueFlow smoke", () => {
-  it("WAITING -> ADMITTED -> ?낅젰/?뺤씤 ?붾㈃ 吏꾩엯", () => {
+  it("WAITING -> ADMITTED -> 입력/확인 화면 진입", () => {
     const result = runQueueFlowSmoke("WAITING", ["ADMITTED"]);
     expect(result.step).toBe("in-progress");
     expect(result.reserveCalls).toBe(0);
   });
 
-  it("WAITING -> SUCCESS -> ?낅젰/?뺤씤 ?붾㈃ 吏꾩엯", () => {
+  it("WAITING -> SUCCESS -> 입력/확인 화면 진입", () => {
     const result = runQueueFlowSmoke("WAITING", ["SUCCESS"]);
     expect(result.step).toBe("in-progress");
     expect(result.reserveCalls).toBe(0);
   });
 
-  it("WAITING -> SOLD_OUT 遺꾧린", () => {
+  it("WAITING -> SOLD_OUT 분기", () => {
     const result = runQueueFlowSmoke("WAITING", ["SOLD_OUT"]);
     expect(result.step).toBe("soldout");
     expect(result.reserveCalls).toBe(0);
   });
 
-  it("WAITING -> ALREADY 遺꾧린", () => {
+  it("WAITING -> ALREADY 분기", () => {
     const result = runQueueFlowSmoke("WAITING", ["ALREADY"]);
     expect(result.step).toBe("already");
     expect(result.reserveCalls).toBe(0);
   });
 
-  it("single-flight lock??以묐났 reserve 吏꾩엯??留됰뒗??, () => {
+  it("single-flight lock이 중복 reserve 진입을 막는다", () => {
     const lock = { current: false };
 
     expect(acquireSingleFlight(lock)).toBe(true);
@@ -87,13 +87,13 @@ describe("queueFlow smoke", () => {
     expect(acquireSingleFlight(lock)).toBe(true);
   });
 
-  it("?덈줈怨좎묠 蹂듭썝??eventId瑜?寃???뚮씪誘명꽣?먯꽌 ?쎈뒗??, () => {
+  it("새로고침 복원용 eventId를 검색 파라미터에서 읽는다", () => {
     expect(readQueueEventIdFromSearch("?eventId=42")).toBe("42");
     expect(readQueueEventIdFromSearch("?eventId=%20%20")).toBeNull();
     expect(readQueueEventIdFromSearch("")).toBeNull();
   });
 
-  it("polling 吏??怨꾩궛??諛깆삤??吏??踰붿쐞瑜?吏?⑤떎", () => {
+  it("polling 지연 계산이 백오프+지터 범위를 지킨다", () => {
     const minDelay = computePollingDelay(FOREGROUND_POLL_INTERVAL, 0, () => 0);
     const maxDelay = computePollingDelay(FOREGROUND_POLL_INTERVAL, 0, () => 1);
     expect(minDelay).toBe(FOREGROUND_POLL_INTERVAL - POLL_JITTER_MS);
@@ -103,7 +103,7 @@ describe("queueFlow smoke", () => {
     expect(clamped).toBeGreaterThanOrEqual(BACKGROUND_POLL_INTERVAL);
   });
 
-  it("remaining freshness ?먯젙?쇰줈 stale 媛믪쓣 援щ텇?쒕떎", () => {
+  it("remaining freshness 판정으로 stale 값을 구분한다", () => {
     const now = Date.now();
     expect(isRemainingFresh(now - (REMAINING_STALE_MS - 10), now)).toBe(true);
     expect(isRemainingFresh(now - (REMAINING_STALE_MS + 10), now)).toBe(false);

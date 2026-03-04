@@ -1,4 +1,4 @@
-﻿import { Ticket } from "lucide-react";
+import { Ticket } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Card } from "@/ticketing/components/common/ui/card";
 import { Progress } from "@/ticketing/components/common/ui/progress";
@@ -32,17 +32,17 @@ const estimateWaitSeconds = (remaining: number | null): number | null => {
 
 const formatEta = (seconds: number | null): string => {
   if (seconds === null) {
-    return "?뺤씤 以?;"
+    return "확인 중";
   }
   if (seconds < 60) {
-    return `??${seconds}珥?;`
+    return `약 ${seconds}초`;
   }
   const minutes = Math.floor(seconds / 60);
   const leftSec = seconds % 60;
   if (leftSec === 0) {
-    return `??${minutes}遺?;`
+    return `약 ${minutes}분`;
   }
-  return `??${minutes}遺?${leftSec}珥?;`
+  return `약 ${minutes}분 ${leftSec}초`;
 };
 
 const formatRemaining = (remaining: number | null): string => {
@@ -137,17 +137,17 @@ export function WaitingRoomPanel({
   const baseProgressValue = estimateProgress(displayRemaining);
   const progressValue = canEstimateProgress ? displayProgress : baseProgressValue;
   const etaLabel = offline
-    ? "?곌껐 ?뺤씤 以?"
+    ? "연결 확인 중"
     : canEstimateProgress
       ? formatEta(estimateWaitSeconds(displayRemaining))
-      : "?뺤씤 以?;"
+      : "확인 중";
 
   useEffect(() => {
     if (!canEstimateProgress) {
       return;
     }
 
-    // 吏꾪뻾諛붾뒗 ?ъ슜???좊ː瑜??꾪빐 ?덈? ?ㅻ줈 媛吏 ?딄쾶 ?⑥“ 利앷?濡??좎??⑸땲??
+    // 진행바는 사용자 신뢰를 위해 절대 뒤로 가지 않게 단조 증가로 유지합니다.
     const nextProgress = Math.max(displayProgressRef.current, baseProgressValue);
     if (nextProgress === displayProgressRef.current) {
       return;
@@ -169,22 +169,23 @@ export function WaitingRoomPanel({
     <div className={`${TICKETING_NARROW_PANEL_CLASS} space-y-4`}>
       <section className="px-1">
         <h2 className="text-[1.72rem] leading-[1.2] font-black tracking-[-0.02em] text-[var(--text)]">
-          ?묒냽 ?몄썝??留롮븘
+          접속 인원이 많아
           <br />
-          ?湲?以묒엯?덈떎.
+          대기 중입니다.
         </h2>
         <p className="mt-1 text-[1.55rem] leading-[1.18] font-black tracking-[-0.02em] text-[var(--accent)]">
-          議곌툑留?湲곕떎?ㅼ＜?몄슂.
+          조금만 기다려주세요.
         </p>
         <p className="mt-3 text-[length:var(--ticketing-text-card-subtitle)] font-bold text-[var(--text-muted)]">
-          {eventTitle || "?④뎅議??좎삁留?"}
+          {eventTitle || "단국존 선예매"}
         </p>
       </section>
 
       <Card className="rounded-[26px] border-[var(--border-base)] bg-[var(--surface-base)] px-5 py-5 shadow-[0_16px_28px_-22px_var(--shadow-color)]">
         <div className="text-center">
           <p className="text-[length:var(--ticketing-text-card-title)] font-black text-[var(--text)]">
-            ?섏쓽 ?湲곗닚??          </p>
+            나의 대기순서
+          </p>
           <p className="mt-1 font-mono text-[3.2rem] leading-none font-black tracking-[0.02em] text-[var(--text)] [font-variant-numeric:tabular-nums]">
             {formatQueueOrder(displayRemaining)}
           </p>
@@ -192,7 +193,7 @@ export function WaitingRoomPanel({
 
         <div className="mt-4">
           <p className="text-right text-[length:var(--ticketing-text-card-subtitle)] font-bold text-[var(--accent)]">
-            ?덉긽 ?湲??쒓컙: {etaLabel}
+            예상 대기 시간: {etaLabel}
           </p>
           <div className="relative mt-2">
             {canEstimateProgress ? (
@@ -217,15 +218,17 @@ export function WaitingRoomPanel({
         <div className="mt-4 border-t border-[var(--border-subtle)] pt-3">
           <div className="flex items-center justify-between gap-3">
             <p className="text-[length:var(--ticketing-text-helper)] font-semibold text-[var(--text-muted)]">
-              ?꾩옱 ?湲곗씤??            </p>
+              현재 대기인원
+            </p>
             <p className="font-mono text-[1.2rem] leading-none font-extrabold tracking-[0.01em] text-[var(--text)] [font-variant-numeric:tabular-nums]">
-              {formatRemaining(displayRemaining)}紐?            </p>
+              {formatRemaining(displayRemaining)}명
+            </p>
           </div>
         </div>
 
         <div className="mt-4 rounded-xl border border-[var(--status-warning-border)] bg-[var(--status-warning-bg)] px-3 py-2.5 text-center">
           <p className="text-[length:var(--ticketing-text-section-body-sm)] font-semibold text-[var(--status-warning-text)]">
-            ???덈줈怨좎묠?대굹 ?ъ젒?????湲??쒓컙????湲몄뼱吏????덉뒿?덈떎.
+            ※ 새로고침이나 재접속 시 대기 시간이 더 길어질 수 있습니다.
           </p>
         </div>
       </Card>

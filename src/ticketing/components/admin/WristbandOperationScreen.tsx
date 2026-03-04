@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/ticketing/components/common/ui/card";
 import { Button } from "@/ticketing/components/common/ui/button";
 import { Input } from "@/ticketing/components/common/ui/input";
@@ -76,9 +76,9 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
   }, [stats]);
 
   const normalizedDayLabel = dayLabel?.replace(/\s+/g, "").trim();
-  const headerMeta = [date, normalizedDayLabel ? `異뺤젣 ${normalizedDayLabel}` : null]
+  const headerMeta = [date, normalizedDayLabel ? `축제 ${normalizedDayLabel}` : null]
     .filter(Boolean)
-    .join(" 쨌 ");
+    .join(" · ");
   const contentMaxWidthClass = "mx-auto w-full max-w-[1200px]";
 
   const handleSearch = async () => {
@@ -134,7 +134,7 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
                 ...item,
                 hasWristband: !isCancelAction,
                 issuedAt: isCancelAction ? null : new Date().toISOString(),
-                issuerAdminName: isCancelAction ? null : "愿由ъ옄",
+                issuerAdminName: isCancelAction ? null : "관리자",
             }
             : item,
         ),
@@ -182,16 +182,18 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
             {headerMeta || date}
           </h2>
           <p className="text-sm text-muted-foreground">
-            ?붿컡 吏湲? 痍⑥냼 愿由??쒖뒪??          </p>
+            팔찌 지급, 취소 관리 시스템
+          </p>
         </div>
         <Button variant="outline" onClick={onBack} className="h-10 px-4">
           <ArrowLeft className="size-4 mr-2" />
-          ?좎쭨 ?좏깮?쇰줈 ?뚯븘媛湲?        </Button>
+          날짜 선택으로 돌아가기
+        </Button>
       </div>
 
       {error && (
         <div className="rounded-lg border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
-          {error.message || "?붿껌???ㅽ뙣?덉뒿?덈떎. ?쒕쾭 ?곹깭 ?먮뒗 ?좏겙 ?ㅼ젙???뺤씤?댁＜?몄슂."}
+          {error.message || "요청에 실패했습니다. 서버 상태 또는 토큰 설정을 확인해주세요."}
         </div>
       )}
 
@@ -200,19 +202,19 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
           <Card className="p-3 bg-primary-soft border border-primary/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-primary font-semibold mb-0.5">?꾩껜 ?곗폆</p>
+                <p className="text-xs text-primary font-semibold mb-0.5">전체 티켓</p>
                 <p className="text-2xl font-bold text-foreground">
                   {statsLoading ? "-" : resolvedStats.totalTickets}
                 </p>
               </div>
-              <span className="text-xl">?렖</span>
+              <span className="text-xl">🎫</span>
             </div>
           </Card>
 
           <Card className="border border-[#f5cfe1] bg-[#fff2f8] p-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="mb-0.5 text-xs font-semibold text-[#c84f8c]">吏湲??꾨즺</p>
+                <p className="mb-0.5 text-xs font-semibold text-[#c84f8c]">지급 완료</p>
                 <p className="text-2xl font-bold text-foreground">
                   {statsLoading ? "-" : resolvedStats.issuedCount}
                   {!statsLoading && resolvedStats.totalTickets > 0 && (
@@ -222,14 +224,14 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
                   )}
                 </p>
               </div>
-              <span className="text-xl">??</span>
+              <span className="text-xl">✅</span>
             </div>
           </Card>
 
           <Card className="p-3 bg-success/10 border border-success/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-success font-semibold mb-0.5">誘몄?湲?</p>
+                <p className="text-xs text-success font-semibold mb-0.5">미지급</p>
                 <p className="text-2xl font-bold text-foreground">
                   {statsLoading ? "-" : resolvedStats.pendingCount}
                   {!statsLoading && resolvedStats.totalTickets > 0 && (
@@ -239,17 +241,17 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
                   )}
                 </p>
               </div>
-              <span className="text-xl">??</span>
+              <span className="text-xl">⏳</span>
             </div>
           </Card>
         </div>
 
         <Card className="p-6">
           <div className={`${contentMaxWidthClass} space-y-4`}>
-            <Label className="text-base font-medium text-foreground">?숇쾲?쇰줈 ?곗폆 議고쉶</Label>
+            <Label className="text-base font-medium text-foreground">학번으로 티켓 조회</Label>
             <div className="flex gap-4">
               <Input
-                placeholder="?숇쾲 ?낅젰"
+                placeholder="학번 입력"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -260,29 +262,29 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
                 onClick={handleSearch}
                 disabled={searching}
               >
-                {searching ? "議고쉶 以?.." : "議고쉶"}
+                {searching ? "조회 중..." : "조회"}
               </Button>
             </div>
           </div>
         </Card>
 
         {hasSearched && searchResults.length === 0 && (
-          <Card className="p-6 text-sm text-muted-foreground">議고쉶 寃곌낵媛 ?놁뒿?덈떎.</Card>
+          <Card className="p-6 text-sm text-muted-foreground">조회 결과가 없습니다.</Card>
         )}
 
         {searchResults.length > 0 && (
           <Card className="p-4">
             <div className={contentMaxWidthClass}>
-              <h3 className="mb-3 text-base font-semibold">議고쉶 寃곌낵</h3>
+              <h3 className="mb-3 text-base font-semibold">조회 결과</h3>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-sm">?숇쾲</TableHead>
-                    <TableHead className="text-sm">?대쫫</TableHead>
-                    <TableHead className="text-sm">?④낵???</TableHead>
-                    <TableHead className="text-sm">?숆낵</TableHead>
-                    <TableHead className="text-sm">?붿컡 吏湲??щ?</TableHead>
-                    <TableHead className="text-sm">泥섎━ 踰꾪듉</TableHead>
+                    <TableHead className="text-sm">학번</TableHead>
+                    <TableHead className="text-sm">이름</TableHead>
+                    <TableHead className="text-sm">단과대학</TableHead>
+                    <TableHead className="text-sm">학과</TableHead>
+                    <TableHead className="text-sm">팔찌 지급 여부</TableHead>
+                    <TableHead className="text-sm">처리 버튼</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -295,10 +297,12 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
                       <TableCell>
                         {student.hasWristband ? (
                           <span className="inline-flex items-center rounded-full bg-[#ff4fa3]/20 px-3 py-1 text-sm font-medium text-[#e6007a]">
-                            吏湲됱셿猷?                          </span>
+                            지급완료
+                          </span>
                         ) : (
                           <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-success/15 text-success">
-                            誘몄?湲?                          </span>
+                            미지급
+                          </span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -310,7 +314,7 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
                             onClick={() => handleCancelWristband(student)}
                             disabled={issuing}
                           >
-                            吏湲?痍⑥냼
+                            지급 취소
                           </Button>
                         ) : (
                           <Button
@@ -319,7 +323,7 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
                             onClick={() => handleIssueWristband(student)}
                             disabled={issuing}
                           >
-                            ?붿컡 二쇨린
+                            팔찌 주기
                           </Button>
                         )}
                       </TableCell>
@@ -340,78 +344,81 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-bold text-foreground mb-2.5">
-                ?붿컡 吏湲??덉감 ?덈궡
+                팔찌 지급 절차 안내
               </h3>
               <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs text-slate-700">
                 <div className="flex gap-1.5 leading-snug">
                   <span className="flex-shrink-0 font-semibold text-primary">1.</span>
-                  <span>?뱀젙蹂?湲곕낯?뺣낫 ?붾㈃?먯꽌 ?쇨뎬 蹂몄씤 ?뺤씤</span>
+                  <span>웹정보-기본정보 화면에서 얼굴 본인 확인</span>
                 </div>
                 <div className="flex gap-1.5 leading-snug">
                   <span className="flex-shrink-0 font-semibold text-primary">2.</span>
-                  <span>?뱀젙蹂?湲곕낯?뺣낫 ?붾㈃?먯꽌 ?숇쾲 ?뺤씤</span>
+                  <span>웹정보-기본정보 화면에서 학번 확인</span>
                 </div>
                 <div className="flex gap-1.5 leading-snug">
                   <span className="flex-shrink-0 font-semibold text-primary">3.</span>
                   <span>
-                    학번 조회 후
+                    학번 조회 후{" "}
                     <span className="rounded bg-success/15 px-1 py-0.5 text-[11px] font-semibold text-success">
-                      誘몄?湲?                    </span>
-                    {" "}?щ? ?뺤씤
+                      미지급
+                    </span>
+                    {" "}여부 확인
                   </span>
                 </div>
                 <div className="flex gap-1.5 leading-snug">
                   <span className="flex-shrink-0 font-semibold text-primary">4.</span>
                   <span>
                     <span className="rounded bg-primary-soft px-1 py-0.5 text-[11px] font-semibold text-primary">
-                      [?붿컡 二쇨린]
+                      [팔찌 주기]
                     </span>
-                    {" "}踰꾪듉 ?대┃
+                    {" "}버튼 클릭
                   </span>
                 </div>
                 <div className="flex gap-1.5 leading-snug">
                   <span className="flex-shrink-0 font-semibold text-primary">5.</span>
                   <span>
-                    ?뺤씤 ?앹뾽?먯꽌{" "}
+                    확인 팝업에서{" "}
                     <span className="rounded bg-primary-soft px-1 py-0.5 text-[11px] font-semibold text-primary">
-                      [吏湲??뺤젙]
+                      [지급 확정]
                     </span>
-                    {" "}?대┃
+                    {" "}클릭
                   </span>
                 </div>
                 <div className="flex gap-1.5 leading-snug">
                   <span className="flex-shrink-0 font-semibold text-primary">6.</span>
                   <span>
                     <span className="rounded bg-[#ff4fa3]/20 px-1 py-0.5 text-[11px] font-semibold text-[#e6007a]">
-                      吏湲됱셿猷?                    </span>
-                    {" "}?뺤씤 ???붿컡 ?꾨떖
+                      지급완료
+                    </span>
+                    {" "}확인 후 팔찌 전달
                   </span>
                 </div>
                 <div className="flex gap-1.5 leading-snug">
                   <span className="flex-shrink-0 font-semibold text-primary">7.</span>
                   <span>
-                    발급 취소 시
+                    오처리 시{" "}
                     <span className="rounded bg-danger/10 px-1 py-0.5 text-[11px] font-semibold text-danger">
-                      [吏湲?痍⑥냼]
+                      [지급 취소]
                     </span>
-                    {" "}踰꾪듉 ?대┃
+                    {" "}버튼 클릭
                   </span>
                 </div>
                 <div className="flex gap-1.5 leading-snug">
                   <span className="flex-shrink-0 font-semibold text-primary">8.</span>
                   <span>
-                    ?뺤씤 ?앹뾽?먯꽌{" "}
+                    확인 팝업에서{" "}
                     <span className="rounded bg-danger/10 px-1 py-0.5 text-[11px] font-semibold text-danger">
-                      [吏湲?痍⑥냼 ?뺤젙]
+                      [지급 취소 확정]
                     </span>
-                    {" "}?대┃ ???곹깭 ?ы솗??                  </span>
+                    {" "}클릭 후 상태 재확인
+                  </span>
                 </div>
               </div>
               <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
                 <p className="flex items-start gap-1 text-[11px] leading-snug text-red-700">
-                  <span className="font-semibold">??</span>
+                  <span className="font-semibold">⚠</span>
                   <span>
-                    <span className="font-semibold">以묒슂:</span> 吏湲?痍⑥냼 泥섎━ ?댁뿭? 紐⑤몢 湲곕줉?⑸땲?? 諛섎뱶???숈깮 蹂몄씤 ?뺤씤 ??泥섎━?섏꽭??
+                    <span className="font-semibold">중요:</span> 지급/취소 처리 내역은 모두 기록됩니다. 반드시 학생 본인 확인 후 처리하세요.
                   </span>
                 </p>
               </div>
@@ -432,12 +439,12 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {confirmAction === "cancel" ? "?붿컡 吏湲?痍⑥냼 ?뺤씤" : "?붿컡 吏湲??뺤씤"}
+              {confirmAction === "cancel" ? "팔찌 지급 취소 확인" : "팔찌 지급 확인"}
             </DialogTitle>
             <DialogDescription>
               {confirmAction === "cancel"
-                ? "?대떦 ?숈깮??吏湲??꾨즺 ?곹깭瑜?痍⑥냼?섏떆寃좎뒿?덇퉴? 痍⑥냼 ?대젰? 濡쒓렇???⑥뒿?덈떎."
-                : "?대떦 ?숈깮?먭쾶 ?붿컡瑜?吏湲?泥섎━?섏떆寃좎뒿?덇퉴?"}
+                ? "해당 학생의 지급 완료 상태를 취소하시겠습니까? 취소 이력은 로그에 남습니다."
+                : "해당 학생에게 팔찌를 지급 처리하시겠습니까?"}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -448,7 +455,7 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
                 setSelectedAttendee(null);
               }}
             >
-              痍⑥냼
+              취소
             </Button>
             <Button
               variant={confirmAction === "cancel" ? "destructive" : "default"}
@@ -457,11 +464,11 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
             >
               {issuing
                 ? confirmAction === "cancel"
-                  ? "痍⑥냼 泥섎━ 以?.."
-                  : "吏湲?泥섎━ 以?.."
+                  ? "취소 처리 중..."
+                  : "지급 처리 중..."
                 : confirmAction === "cancel"
-                  ? "吏湲?痍⑥냼 ?뺤젙"
-                  : "吏湲??뺤젙"}
+                  ? "지급 취소 확정"
+                  : "지급 확정"}
             </Button>
           </DialogFooter>
         </DialogContent>

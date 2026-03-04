@@ -1,4 +1,4 @@
-﻿import { RotateCcw, TicketX } from "lucide-react";
+import { RotateCcw, TicketX } from "lucide-react";
 import { Button } from "@/ticketing/components/common/ui/button";
 import { Card } from "@/ticketing/components/common/ui/card";
 import { TICKETING_CLASSES, TICKETING_NARROW_PANEL_CLASS } from "@/ticketing/components/ticketing/ticketingShared";
@@ -24,10 +24,10 @@ export function ReservationSoldOutPanel({ onBackToList }: ReservationSoldOutPane
           </div>
           <div>
             <h2 className={`${TICKETING_CLASSES.typography.stateTitle} text-[var(--text)]`}>
-              ?곗폆 留ㅼ쭊
+              티켓 매진
             </h2>
             <p className={`mt-1 ${TICKETING_CLASSES.typography.stateBody} text-[var(--text-muted)]`}>
-              ?ㅻⅨ ?곗폆???쇱젙? ?곗폆??紐⑸줉?먯꽌 ?뺤씤?섏떎 ???덉뼱??
+              다른 티켓팅 일정은 티켓팅 목록에서 확인하실 수 있어요.
             </p>
           </div>
         </div>
@@ -37,7 +37,8 @@ export function ReservationSoldOutPanel({ onBackToList }: ReservationSoldOutPane
             onClick={onBackToList}
             className={TICKETING_CLASSES.button.primaryWide}
           >
-            ?곗폆??紐⑸줉?쇰줈 ?뚯븘媛湲?            <RotateCcw className="h-4 w-4" />
+            티켓팅 목록으로 돌아가기
+            <RotateCcw className="h-4 w-4" />
           </Button>
         </div>
       </Card>

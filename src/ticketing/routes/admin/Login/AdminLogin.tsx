@@ -30,7 +30,7 @@ export default function AdminLogin() {
       }
       navigate("/ticket/admin/wristband");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to login.");
+      setError(err instanceof Error ? err.message : "로그인에 실패했습니다.");
     } finally {
       setSubmitting(false);
     }
@@ -49,34 +49,34 @@ export default function AdminLogin() {
             <div className="space-y-2">
               <p className="inline-flex w-fit items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold text-primary">
                 <Ticket className="h-3.5 w-3.5" />
-                Wristband Operations
+                팔찌 배부 운영 시스템
               </p>
-              <h1 className="text-xl font-semibold text-foreground">Admin Login</h1>
+              <h1 className="text-xl font-semibold text-foreground">팔찌 배부 운영 시스템 로그인</h1>
               <p className="text-sm text-muted-foreground">
-                Sign in with an admin account to manage on-site operations.
+                운영자 계정으로 로그인하여 현장 배부를 관리하세요.
               </p>
             </div>
 
             <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
               <div className="space-y-2">
-                <Label htmlFor="studentId">Admin ID</Label>
+                <Label htmlFor="studentId">관리자 학번</Label>
                 <Input
                   id="studentId"
                   value={studentId}
                   onChange={(event) => setStudentId(event.target.value)}
-                  placeholder="Enter your admin ID"
+                  placeholder="학번을 입력하세요"
                   className="bg-card"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Admin Password</Label>
+                <Label htmlFor="password">관리자 비밀번호</Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Enter your password"
+                  placeholder="비밀번호를 입력하세요"
                   className="bg-card"
                   required
                 />
@@ -89,14 +89,14 @@ export default function AdminLogin() {
                 className="w-full"
                 disabled={submitting}
               >
-                {submitting ? "Signing in..." : "Sign in to admin"}
+                {submitting ? "로그인 중..." : "팔찌 배부 시스템 로그인"}
               </Button>
             </form>
           </div>
         </Card>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          This page is only for authorized operations staff.
+          본 시스템은 총학생회 및 운영진 전용 내부 관리 도구입니다.
         </p>
       </div>
     </div>

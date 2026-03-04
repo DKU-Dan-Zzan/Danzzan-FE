@@ -1,4 +1,4 @@
-﻿import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, House, LogOut } from "lucide-react";
 import { Button } from "@/ticketing/components/common/ui/button";
 import { useAuth } from "@/ticketing/hooks/useAuth";
@@ -11,7 +11,7 @@ export function UserLayout() {
   const isTicketingPage = location.pathname.startsWith("/ticket/ticketing");
   const isMyTicketPage = location.pathname.startsWith("/ticket/myticket");
   const showHeader = isAuthenticated && role === "student" && !isAuthPage;
-  const pageTitle = "?곗폆???ы꽭";
+  const pageTitle = "티켓팅 포털";
 
   const handleLogout = () => {
     logout();
@@ -61,8 +61,8 @@ export function UserLayout() {
                 variant="ghost"
                 onClick={handleBack}
                 className="h-10 w-10 rounded-lg border border-[var(--header-border)] bg-[var(--header-button-bg)] p-0 text-[var(--header-text)] hover:bg-[var(--header-button-hover)]"
-                aria-label="?ㅻ줈媛湲?"
-                title="?ㅻ줈媛湲?"
+                aria-label="뒤로가기"
+                title="뒤로가기"
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
@@ -81,8 +81,8 @@ export function UserLayout() {
                   variant="ghost"
                   onClick={handleGoHome}
                   className="h-10 w-10 rounded-lg border border-[var(--header-border)] bg-[var(--header-button-bg)] p-0 text-[var(--header-text)] hover:bg-[var(--header-button-hover)]"
-                  aria-label="?곗폆???ы꽭 ?덉쑝濡??대룞"
-                  title="?곗폆???ы꽭 ?덉쑝濡??대룞"
+                  aria-label="티켓팅 포털 홈으로 이동"
+                  title="티켓팅 포털 홈으로 이동"
                 >
                   <House className="h-4 w-4" />
                 </Button>
@@ -90,11 +90,11 @@ export function UserLayout() {
                   variant="ghost"
                   onClick={handleLogout}
                   className="h-10 rounded-lg border border-[var(--header-border)] bg-[var(--header-button-bg)] px-2.5 text-[length:var(--ticketing-text-section-body-sm)] font-semibold text-[var(--header-text)] hover:bg-[var(--header-button-hover)]"
-                  aria-label="濡쒓렇?꾩썐"
-                  title="濡쒓렇?꾩썐"
+                  aria-label="로그아웃"
+                  title="로그아웃"
                 >
                   <LogOut className="h-4 w-4" />
-                  濡쒓렇?꾩썐
+                  로그아웃
                 </Button>
               </div>
             </div>

@@ -1,4 +1,4 @@
-﻿import { useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   CircleAlert,
@@ -33,40 +33,40 @@ export default function Signup() {
     setError(null);
 
     if (!dkuStudentId.trim() || !dkuPassword.trim()) {
-      setError("?숇쾲怨??ы꽭 鍮꾨?踰덊샇瑜??낅젰??二쇱꽭??");
+      setError("학번과 포털 비밀번호를 입력해 주세요.");
       return;
     }
 
     if (!password || !passwordConfirm) {
-      setError("?쒕퉬??鍮꾨?踰덊샇瑜??낅젰??二쇱꽭??");
+      setError("서비스 비밀번호를 입력해 주세요.");
       return;
     }
 
     if (password.length < 4) {
-      setError("鍮꾨?踰덊샇??4???댁긽?댁뼱???⑸땲??");
+      setError("비밀번호는 4자 이상이어야 합니다.");
       return;
     }
 
     if (password !== passwordConfirm) {
-      setError("?쒕퉬??鍮꾨?踰덊샇媛 ?쇱튂?섏? ?딆뒿?덈떎.");
+      setError("서비스 비밀번호가 일치하지 않습니다.");
       return;
     }
 
     if (!privacyConsent) {
-      setError("媛쒖씤?뺣낫 ?댁슜 ?숈쓽(?꾩닔)??泥댄겕?댁＜?몄슂.");
+      setError("개인정보 이용 동의(필수)에 체크해주세요.");
       return;
     }
 
     setSubmitting(true);
 
     try {
-      setLoadingMessage("?④뎅? ?ы꽭 ?몄쬆 以?..");
+      setLoadingMessage("단국대 포털 인증 중...");
       const { signupToken } = await signupApi.verifyStudent(
         dkuStudentId,
         dkuPassword,
       );
 
-      setLoadingMessage("怨꾩젙 ?앹꽦 以?..");
+      setLoadingMessage("계정 생성 중...");
       await signupApi.completeSignup(signupToken, password);
 
       navigate("/ticket/login");
@@ -76,16 +76,16 @@ export default function Signup() {
         const message = payload?.error;
 
         if (err.status === 401) {
-          setError(message || "?ы꽭 ?꾩씠???먮뒗 鍮꾨?踰덊샇媛 ?щ컮瑜댁? ?딆뒿?덈떎.");
+          setError(message || "포털 아이디 또는 비밀번호가 올바르지 않습니다.");
         } else if (err.status === 409) {
-          setError(message || "?대? 媛?낅맂 ?숇쾲?낅땲??");
+          setError(message || "이미 가입된 학번입니다.");
         } else if (err.status === 403) {
-          setError(message || "?ы븰?앸쭔 ?뚯썝媛?낆씠 媛?ν빀?덈떎.");
+          setError(message || "재학생만 회원가입이 가능합니다.");
         } else {
-          setError(message || "?뚯썝媛?낆뿉 ?ㅽ뙣?덉뒿?덈떎.");
+          setError(message || "회원가입에 실패했습니다.");
         }
       } else {
-        setError("?뚯썝媛?낆뿉 ?ㅽ뙣?덉뒿?덈떎.");
+        setError("회원가입에 실패했습니다.");
       }
     } finally {
       setSubmitting(false);
@@ -107,13 +107,16 @@ export default function Signup() {
           className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-55"
         >
           <House className="h-4 w-4" strokeWidth={2.3} />
-          異뺤젣 ?덉쑝濡?        </button>
+          축제 홈으로
+        </button>
 
         <div className="mt-9">
           <p className="text-[length:var(--ticketing-text-helper)] font-semibold text-[var(--text-muted)]">
-            ?ы븰???꾩슜 ?쒕퉬??          </p>
+            재학생 전용 서비스
+          </p>
           <h1 className="mt-1 leading-[1.12] font-black tracking-tight text-[var(--text)]">
-            ?곗폆???ы꽭 ?뚯썝媛??          </h1>
+            티켓팅 포털 회원가입
+          </h1>
         </div>
 
         <main className="mt-6">
@@ -121,13 +124,13 @@ export default function Signup() {
             <section className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="dkuStudentId" className="text-sm font-semibold text-[var(--text)]">
-                  ?숇쾲
+                  학번
                 </Label>
                 <Input
                   id="dkuStudentId"
                   value={dkuStudentId}
                   onChange={(event) => setDkuStudentId(event.target.value)}
-                  placeholder="?숇쾲 8?먮━瑜??낅젰??二쇱꽭??"
+                  placeholder="학번 8자리를 입력해 주세요"
                   className={inputClassName}
                   required
                   disabled={submitting}
@@ -136,14 +139,14 @@ export default function Signup() {
 
               <div className="space-y-2">
                 <Label htmlFor="dkuPassword" className="text-sm font-semibold text-[var(--text)]">
-                  ?ы꽭 鍮꾨?踰덊샇
+                  포털 비밀번호
                 </Label>
                 <Input
                   id="dkuPassword"
                   type="password"
                   value={dkuPassword}
                   onChange={(event) => setDkuPassword(event.target.value)}
-                  placeholder="?ы꽭 鍮꾨?踰덊샇瑜??낅젰??二쇱꽭??"
+                  placeholder="포털 비밀번호를 입력해 주세요"
                   className={inputClassName}
                   required
                   disabled={submitting}
@@ -152,7 +155,7 @@ export default function Signup() {
 
               <p className="flex items-start gap-1.5 text-[11px] font-medium leading-5 text-[var(--text-muted)]">
                 <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={2.3} />
-                ?ы븰???몄쬆???꾪빐 1?뚯꽦?쇰줈留??ъ슜?섎ŉ ??λ릺吏 ?딆뒿?덈떎.
+                재학생 인증을 위해 1회성으로만 사용되며 저장되지 않습니다.
               </p>
             </section>
 
@@ -161,14 +164,14 @@ export default function Signup() {
             <section className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-semibold text-[var(--text)]">
-                  ?쒕퉬?ㅼ슜 鍮꾨?踰덊샇
+                  서비스용 비밀번호
                 </Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  placeholder="?덈줈??鍮꾨?踰덊샇瑜??낅젰??二쇱꽭??"
+                  placeholder="새로운 비밀번호를 입력해 주세요"
                   className={inputClassName}
                   required
                   disabled={submitting}
@@ -177,14 +180,14 @@ export default function Signup() {
 
               <div className="space-y-2">
                 <Label htmlFor="passwordConfirm" className="text-sm font-semibold text-[var(--text)]">
-                  ?쒕퉬?ㅼ슜 鍮꾨?踰덊샇 ?뺤씤
+                  서비스용 비밀번호 확인
                 </Label>
                 <Input
                   id="passwordConfirm"
                   type="password"
                   value={passwordConfirm}
                   onChange={(event) => setPasswordConfirm(event.target.value)}
-                  placeholder="?덈줈??鍮꾨?踰덊샇瑜??ㅼ떆 ?낅젰??二쇱꽭??"
+                  placeholder="새로운 비밀번호를 다시 입력해 주세요"
                   className={inputClassName}
                   required
                   disabled={submitting}
@@ -212,10 +215,10 @@ export default function Signup() {
                     htmlFor="privacyConsent"
                     className="cursor-pointer text-base font-semibold text-[var(--text)]"
                   >
-                    媛쒖씤?뺣낫 ?댁슜 ?숈쓽 (?꾩닔)
+                    개인정보 이용 동의 (필수)
                   </Label>
                   <p className="mt-1 text-sm leading-6 text-[var(--text-muted)]">
-                    ?곗폆???쒕퉬???댁슜???꾪빐 ?숇쾲, ?곕씫泥? ?ы븰?뺣낫, ?뚯냽 ??? ?숆낵 ?뺣낫???섏쭛 諛??댁슜???숈쓽?⑸땲??
+                    티켓팅 서비스 이용을 위해 학번, 연락처, 재학정보, 소속 대학, 학과 정보의 수집 및 이용에 동의합니다.
                   </p>
                 </div>
               </div>
@@ -227,18 +230,19 @@ export default function Signup() {
               disabled={submitting}
             >
               <KeyRound className="h-4 w-4" strokeWidth={2.3} />
-              {submitting ? loadingMessage || "泥섎━ 以?.." : "?ы븰???몄쬆 諛??곗폆???쒖옉"}
+              {submitting ? loadingMessage || "처리 중..." : "재학생 인증 및 티켓팅 시작"}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-[var(--text-muted)]">?대? 怨꾩젙???덉쑝?좉???</p>
+            <p className="text-sm text-[var(--text-muted)]">이미 계정이 있으신가요?</p>
             <Link
               to="/ticket/login"
               state={{ authTabFrom: "signup" }}
               className="mt-2 inline-block text-sm font-semibold text-[var(--accent)]"
             >
-              濡쒓렇?명븯??媛湲?            </Link>
+              로그인하러 가기
+            </Link>
           </div>
         </main>
       </div>

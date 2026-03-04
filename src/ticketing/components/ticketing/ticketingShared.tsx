@@ -1,4 +1,4 @@
-﻿import { RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { Button } from "@/ticketing/components/common/ui/button";
 import { cn } from "@/ticketing/components/common/ui/utils";
 
@@ -109,8 +109,8 @@ export function TicketingRefreshButton({
   size = "sm",
   className,
   iconClassName,
-  ariaLabel = "?덈줈怨좎묠",
-  title = "?덈줈怨좎묠",
+  ariaLabel = "새로고침",
+  title = "새로고침",
 }: TicketingRefreshButtonProps) {
   const resolvedClassName =
     className ?? (size === "lg" ? TICKETING_CLASSES.button.refreshLg : TICKETING_CLASSES.button.refreshSm);

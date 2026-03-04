@@ -1,4 +1,4 @@
-﻿import { ArrowRight, CheckCircle2, ListChecks } from "lucide-react";
+import { ArrowRight, CheckCircle2, ListChecks } from "lucide-react";
 import { Button } from "@/ticketing/components/common/ui/button";
 import { Card } from "@/ticketing/components/common/ui/card";
 import { TICKETING_CLASSES, TICKETING_NARROW_PANEL_CLASS } from "@/ticketing/components/ticketing/ticketingShared";
@@ -21,17 +21,18 @@ export function ReservationAlreadyPanel({
 
         <div>
           <h2 className={`text-center ${TICKETING_CLASSES.typography.stateTitle} text-[var(--text)]`}>
-            ?대? 泥섎━???덈ℓ?낅땲??          </h2>
+            이미 처리된 예매입니다
+          </h2>
           <p className={`mt-2 text-center ${TICKETING_CLASSES.typography.stateBody} text-[var(--text-muted)]`}>
-            ?대떦 怨듭뿰 ?곗폆? ?대? ?덈ℓ媛 吏꾪뻾???곹깭?낅땲??
+            해당 공연 티켓은 이미 예매가 진행된 상태입니다.
             <br />
-            ???곗폆 ?붾㈃?먯꽌 ?곹깭瑜??뺤씤?댁＜?몄슂.
+            내 티켓 화면에서 상태를 확인해주세요.
           </p>
         </div>
 
         <div className="flex flex-col gap-2">
           <Button onClick={onGoMyTickets} className={TICKETING_CLASSES.button.primaryFull}>
-            ???곗폆 ?뺤씤?섍린
+            내 티켓 확인하기
             <ArrowRight className="h-4 w-4" />
           </Button>
           <Button
@@ -39,7 +40,8 @@ export function ReservationAlreadyPanel({
             onClick={onBackToList}
             className="h-12 rounded-[20px] border-[var(--border-base)] bg-[var(--surface-base)] text-[length:var(--ticketing-text-button)] font-semibold text-[var(--text)] hover:bg-[var(--surface-subtle)]"
           >
-            ?곗폆 紐⑸줉?쇰줈 ?뚯븘媛湲?            <ListChecks className="h-4 w-4" />
+            티켓 목록으로 돌아가기
+            <ListChecks className="h-4 w-4" />
           </Button>
         </div>
       </Card>

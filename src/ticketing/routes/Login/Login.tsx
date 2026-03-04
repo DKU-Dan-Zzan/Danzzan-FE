@@ -1,4 +1,4 @@
-﻿import { useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { CircleAlert, GraduationCap, House } from "lucide-react";
 import { Button } from "@/ticketing/components/common/ui/button";
@@ -31,7 +31,7 @@ export default function Login() {
       await login({ studentId, password }, "student");
       navigate(redirect || "/ticket/ticketing");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "濡쒓렇?몄뿉 ?ㅽ뙣?덉뒿?덈떎.");
+      setError(err instanceof Error ? err.message : "로그인에 실패했습니다.");
     } finally {
       setSubmitting(false);
     }
@@ -51,13 +51,16 @@ export default function Login() {
           className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-55"
         >
           <House className="h-4 w-4" strokeWidth={2.3} />
-          異뺤젣 ?덉쑝濡?        </button>
+          축제 홈으로
+        </button>
 
         <div className="mt-9">
           <p className="text-[length:var(--ticketing-text-helper)] font-semibold text-[var(--text-muted)]">
-            ?ы븰???꾩슜 ?쒕퉬??          </p>
+            재학생 전용 서비스
+          </p>
           <h1 className="mt-1 leading-[1.12] font-black tracking-tight text-[var(--text)]">
-            ?곗폆???ы꽭 濡쒓렇??          </h1>
+            티켓팅 포털 로그인
+          </h1>
         </div>
 
         <main className="mt-6">
@@ -65,13 +68,13 @@ export default function Login() {
             <section className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="studentId" className="text-sm font-semibold text-[var(--text)]">
-                  ?숇쾲
+                  학번
                 </Label>
                 <Input
                   id="studentId"
                   value={studentId}
                   onChange={(event) => setStudentId(event.target.value)}
-                  placeholder="?숇쾲 8?먮━瑜??낅젰??二쇱꽭??"
+                  placeholder="학번 8자리를 입력해 주세요"
                   className={inputClassName}
                   required
                 />
@@ -79,14 +82,14 @@ export default function Login() {
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-semibold text-[var(--text)]">
-                  鍮꾨?踰덊샇
+                  비밀번호
                 </Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  placeholder="?쒕퉬?ㅼ슜 鍮꾨?踰덊샇瑜??낅젰??二쇱꽭??"
+                  placeholder="서비스용 비밀번호를 입력해 주세요"
                   className={inputClassName}
                   required
                 />
@@ -94,7 +97,7 @@ export default function Login() {
 
               <p className="flex items-start gap-1.5 text-[11px] font-medium leading-5 text-[var(--text-muted)]">
                 <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={2.3} />
-                媛?낇븳 ?곗폆??怨꾩젙 鍮꾨?踰덊샇瑜??낅젰??二쇱꽭??
+                가입한 티켓팅 계정 비밀번호를 입력해 주세요.
               </p>
             </section>
 
@@ -110,18 +113,19 @@ export default function Login() {
               disabled={submitting || !canSubmit}
             >
               <GraduationCap className="h-4 w-4" strokeWidth={2.3} />
-              {submitting ? "濡쒓렇??以?.." : "?곗폆??怨꾩젙?쇰줈 濡쒓렇??"}
+              {submitting ? "로그인 중..." : "티켓팅 계정으로 로그인"}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-[var(--text-muted)]">?곗폆???쒕퉬?ㅻ? 泥섏쓬 ?댁슜?섏떆?섏슂?</p>
+            <p className="text-sm text-[var(--text-muted)]">티켓팅 서비스를 처음 이용하시나요?</p>
             <Link
               to="/ticket/signup"
               state={{ authTabFrom: "login" }}
               className="mt-2 inline-block text-sm font-semibold text-[var(--accent)]"
             >
-              ?뚯썝媛?낇븯??媛湲?            </Link>
+              회원가입하러 가기
+            </Link>
           </div>
         </main>
       </div>
