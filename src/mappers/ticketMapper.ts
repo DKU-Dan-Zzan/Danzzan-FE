@@ -3,9 +3,14 @@ import type {
   TicketEventDto,
   TicketEventListResponseDto,
   TicketListResponseDto,
+  TicketQueueEnterResponseDto,
+  TicketQueueStatusResponseDto,
   TicketReservationResponseDto,
 } from "@/types/dto/ticket.dto";
 import type {
+  QueueEnterResult,
+  QueueRequestStatus,
+  QueueStatusResult,
   Ticket,
   TicketingEvent,
   TicketingEventStatus,
@@ -14,24 +19,41 @@ import type {
 } from "@/types/model/ticket.model";
 
 const mapTicketStatus = (status?: string): TicketStatus => {
-  switch (status) {
+  const normalized = status?.trim().toLowerCase();
+  switch (normalized) {
     case "issued":
     case "used":
     case "cancelled":
-      return status;
+      return normalized;
     default:
       return "unknown";
   }
 };
 
 const mapTicketingEventStatus = (status?: string): TicketingEventStatus => {
-  switch (status) {
+  const normalized = status?.trim().toLowerCase();
+  switch (normalized) {
     case "upcoming":
     case "open":
     case "soldout":
-      return status;
+      return normalized;
     default:
       return "unknown";
+  }
+};
+
+const mapQueueRequestStatus = (status?: string): QueueRequestStatus => {
+  const normalized = status?.trim().toUpperCase();
+  switch (normalized) {
+    case "NONE":
+    case "WAITING":
+    case "ADMITTED":
+    case "SUCCESS":
+    case "SOLD_OUT":
+    case "ALREADY":
+      return normalized;
+    default:
+      return "NONE";
   }
 };
 
@@ -114,5 +136,22 @@ export const mapTicketReservationDtoToModel = (
       queueNumber,
     },
     queueNumber,
+  };
+};
+
+export const mapQueueEnterDtoToModel = (
+  dto: TicketQueueEnterResponseDto,
+): QueueEnterResult => {
+  return {
+    status: mapQueueRequestStatus(dto.status),
+    remaining: toNullableNumber(dto.remaining),
+  };
+};
+
+export const mapQueueStatusDtoToModel = (
+  dto: TicketQueueStatusResponseDto,
+): QueueStatusResult => {
+  return {
+    status: mapQueueRequestStatus(dto.status),
   };
 };

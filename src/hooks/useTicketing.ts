@@ -32,14 +32,11 @@ export const useTicketing = () => {
   }, []);
 
   const reserveTicket = useCallback(
-    async (
-      eventId: string,
-      acknowledgementText: string,
-    ): Promise<TicketReservationResult | null> => {
+    async (eventId: string): Promise<TicketReservationResult | null> => {
       setReservationLoading(true);
       setError(null);
       try {
-        return await ticketApi.reserveTicket(eventId, { captcha: acknowledgementText });
+        return await ticketApi.reserveTicket(eventId);
       } catch (err) {
         setError(normalizeError(err));
         return null;

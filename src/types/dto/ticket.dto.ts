@@ -34,8 +34,13 @@ export interface TicketEventListResponseDto {
   items?: TicketEventDto[];
 }
 
-export interface ReserveTicketRequestDto {
-  captcha: string;
+export interface TicketQueueEnterResponseDto {
+  status?: string;
+  remaining?: string | number;
+}
+
+export interface TicketQueueStatusResponseDto {
+  status?: string;
 }
 
 export type TicketReservationResponseDto = TicketDto & {
