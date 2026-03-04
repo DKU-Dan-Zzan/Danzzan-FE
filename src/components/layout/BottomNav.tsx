@@ -1,13 +1,14 @@
-import { NavLink } from "react-router-dom"
-import { Home, Megaphone, Clock, Map, Package } from "lucide-react"
+import { NavLink } from "react-router-dom";
+import { Clock, Home, Map, Megaphone, Ticket, User } from "lucide-react";
 
 const navItems = [
   { to: "/", icon: Home, label: "홈" },
   { to: "/timetable", icon: Clock, label: "타임테이블" },
   { to: "/map", icon: Map, label: "부스맵" },
   { to: "/notice", icon: Megaphone, label: "공지" },
-  { to: "/lost-item", icon: Package, label: "분실물" },
-]
+  { to: "/ticket/ticketing", icon: Ticket, label: "티켓팅" },
+  { to: "/mypage", icon: User, label: "내정보" },
+];
 
 const BottomNav = () => {
   return (
@@ -20,7 +21,6 @@ const BottomNav = () => {
         z-50
       "
     >
-      {/* 네비게이션 배경 레이어 */}
       <div
         className="
           absolute inset-0
@@ -30,12 +30,12 @@ const BottomNav = () => {
         "
       />
 
-      {/* 실제 아이템 배치 */}
-      <div className="relative h-full flex items-center">
+      <div className="relative flex h-full items-center">
         {navItems.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}
+            end={to === "/"}
             className={({ isActive }) =>
               `
               flex-1
@@ -47,10 +47,10 @@ const BottomNav = () => {
           >
             {({ isActive }) => (
               <>
-                <Icon size={22} strokeWidth={2} />
+                <Icon size={20} strokeWidth={2} />
 
                 {isActive && (
-                  <div className="absolute -bottom-3 w-5 h-1 rounded-full bg-blue-600" />
+                  <div className="absolute -bottom-3 h-1 w-5 rounded-full bg-blue-600" />
                 )}
 
                 <span className="mt-2 text-center leading-none">{label}</span>
@@ -60,7 +60,7 @@ const BottomNav = () => {
         ))}
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default BottomNav
+export default BottomNav;

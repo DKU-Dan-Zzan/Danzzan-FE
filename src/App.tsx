@@ -7,6 +7,7 @@ import Notice from './routes/notice/Notice'
 import Timetable from './routes/timetable/Timetable'
 import BoothMap from "./routes/boothmap/BoothMap";
 import LostItem from "./routes/lostitem/LostItem";
+import MyPage from "./routes/mypage/MyPage";
 
 import Admin from "./routes/admin/Admin";
 import AdminLogin from "./routes/admin/AdminLogin";
@@ -46,6 +47,7 @@ function App() {
         <Route path="/timetable" element={<Timetable />} />
         <Route path="/map" element={<BoothMap />} />
         <Route path="/lost-item" element={<LostItem />} />
+        <Route path="/mypage" element={<MyPage />} />
       </Route>
 
       {/* admin: 헤더/바텀네비 미적용, 로그인 필요 */}
