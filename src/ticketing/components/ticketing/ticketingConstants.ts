@@ -1,0 +1,1 @@
+﻿export const REQUIRED_ACKNOWLEDGEMENT_CODE = "danfesta0513";

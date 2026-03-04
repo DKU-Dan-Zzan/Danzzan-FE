@@ -1,0 +1,345 @@
+﻿
+@custom-variant dark (&:is(.dark *));
+
+.ticketing-root {
+  --font-size: 16px;
+
+  /* Ticketing typography scale tokens */
+  --ticketing-text-button: 0.82rem;
+  --ticketing-text-button-compact: 0.79rem;
+  --ticketing-text-badge: 0.82rem;
+  --ticketing-text-hero-title: 1.2rem;
+  --ticketing-text-hero-description: 0.88rem;
+  --ticketing-text-card-title: 1.12rem;
+  --ticketing-text-card-subtitle: 0.9rem;
+  --ticketing-text-section-title: 0.8rem;
+  --ticketing-text-section-body: 0.82rem;
+  --ticketing-text-section-body-sm: 0.74rem;
+  --ticketing-text-helper: 0.84rem;
+  --ticketing-text-step-title: 0.78rem;
+  --ticketing-text-info-banner-title: 0.85rem;
+  --ticketing-text-info-banner-body: 0.88rem;
+  --ticketing-text-paper-title: 0.87rem;
+  --ticketing-text-queue-label: 0.78rem;
+  --ticketing-text-queue-value: 1.25rem;
+  --ticketing-text-ticket-meta: 0.86rem;
+  --ticketing-text-ticket-footer: 0.7rem;
+  --ticketing-text-watermark: 0.58rem;
+  --ticketing-text-state-title: 1.3rem;
+  --ticketing-text-state-body: 0.82rem;
+  --ticketing-text-overline: 0.7rem;
+  --ticketing-text-header-overline: 0.62rem;
+  --ticketing-text-step-index: 0.7125rem;
+  --ticketing-text-holder-overline: 0.82rem;
+  --ticketing-text-paper-status: 0.82rem;
+  --ticketing-text-paper-label: 0.78rem;
+  --ticketing-text-paper-value: 0.96rem;
+  --ticketing-text-paper-queue: 1.02rem;
+  --ticketing-text-paper-time: 0.86rem;
+  --ticketing-text-reservation-countdown: 1.02rem;
+
+  /*
+   * Design token policy
+   * - No raw colors in components. Always use semantic tokens/CSS vars.
+   * - For stronger emphasis, use surface strong/tint strong variants (no new hex blues).
+   *
+   * Examples:
+   * - Card: bg-[var(--surface)] border-[var(--border)]
+   * - Primary panel: bg-[var(--surface-tint)] border-[var(--border-strong)]
+   * - Badge/chip: bg-[var(--surface-tint-subtle)] text-[var(--accent)] border-[var(--border-strong)]
+   * - Alert(success): bg-[var(--status-success-bg)] text-[var(--status-success-text)] border-[var(--status-success-border)]
+   * - Alert(warning): bg-[var(--status-warning-bg)] text-[var(--status-warning-text)] border-[var(--status-warning-border)]
+   * - Neutral state: bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)] border-[var(--status-neutral-border)]
+   */
+
+  /* App-wide blue foundation tokens (fixed base blue) */
+  --bg-base: #eaf2ff;
+  --surface-subtle: rgba(255, 255, 255, 0.9);
+  --surface-base: rgba(255, 255, 255, 0.84);
+  --surface-strong: rgba(255, 255, 255, 0.78);
+  --surface-tint-subtle: rgba(59, 130, 246, 0.1);
+  --surface-tint-base: rgba(59, 130, 246, 0.14);
+  --surface-tint-strong: rgba(59, 130, 246, 0.18);
+  --surface-tint-emphasis: rgba(59, 130, 246, 0.29);
+  --border-subtle: rgba(147, 197, 253, 0.46);
+  --border-base: rgba(147, 197, 253, 0.56);
+  --border-strong: rgba(147, 197, 253, 0.66);
+  --border-emphasis: rgba(147, 197, 253, 0.82);
+  --shadow-color: rgba(15, 23, 42, 0.12);
+
+  /* Ticket paper tokens */
+  --ticket-paper-base: rgba(255, 252, 243, 0.96);
+  --ticket-paper-top: rgba(255, 255, 255, 0.98);
+  --ticket-paper-border: rgba(160, 193, 236, 0.76);
+  --ticket-fiber: rgba(15, 23, 42, 0.055);
+  --ticket-fiber-soft: rgba(15, 23, 42, 0.03);
+  --ticket-notch-border: rgba(160, 193, 236, 0.84);
+  --ticket-notch-shadow: rgba(213, 228, 248, 0.9);
+  --ticket-perf: rgba(147, 197, 253, 0.62);
+
+  /* Stable aliases used by existing components */
+  --surface: var(--surface-base);
+  --surface-tint: var(--surface-tint-base);
+  --border: var(--border-base);
+  --accent: #2563eb;
+  --text: #0f172a;
+  --text-muted: #475569;
+  --header-bg: var(--accent);
+  --header-border: rgba(255, 255, 255, 0.3);
+  --header-text: var(--primary-foreground);
+  --header-text-muted: rgba(255, 255, 255, 0.82);
+  --header-button-bg: rgba(255, 255, 255, 0.14);
+  --header-button-hover: rgba(255, 255, 255, 0.22);
+
+  /* Status semantic tokens */
+  --status-success: #2e7d32;
+  --status-success-bg: rgba(46, 125, 50, 0.12);
+  --status-success-border: rgba(46, 125, 50, 0.28);
+  --status-success-text: #1b5e20;
+
+  --status-warning: #b26a00;
+  --status-warning-bg: rgba(178, 106, 0, 0.12);
+  --status-warning-border: rgba(178, 106, 0, 0.28);
+  --status-warning-text: #7c4a00;
+
+  --status-pending: #e3776a;
+  --status-pending-bg: rgba(227, 119, 106, 0.16);
+  --status-pending-border: rgba(227, 119, 106, 0.38);
+  --status-pending-text: #a9473d;
+
+  --status-danger: #b3261e;
+  --status-danger-bg: rgba(179, 38, 30, 0.1);
+  --status-danger-border: rgba(179, 38, 30, 0.26);
+  --status-danger-text: #8a1c16;
+
+  --status-info: var(--accent);
+  --status-info-bg: var(--surface-tint-subtle);
+  --status-info-border: var(--border-strong);
+  --status-info-text: var(--accent);
+
+  --status-neutral: var(--text-muted);
+  --status-neutral-bg: var(--surface-subtle);
+  --status-neutral-border: var(--border-subtle);
+  --status-neutral-text: var(--text-muted);
+
+  --background: var(--bg-base);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: #ffffff;
+  --popover-foreground: var(--text);
+  --primary: var(--accent);
+  --primary-foreground: #ffffff;
+  --primary-soft: rgba(59, 130, 246, 0.12);
+  --secondary: rgba(255, 255, 255, 0.8);
+  --secondary-foreground: var(--text);
+  --muted: rgba(255, 255, 255, 0.72);
+  --muted-foreground: var(--text-muted);
+  --accent-soft: rgba(59, 130, 246, 0.16);
+  --accent-foreground: var(--accent);
+  --destructive: #b3261e;
+  --destructive-foreground: #ffffff;
+  --input: var(--border);
+  --input-background: #ffffff;
+  --switch-background: rgba(148, 163, 184, 0.5);
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: rgba(37, 99, 235, 0.45);
+  --success: var(--status-success);
+  --warning: var(--status-warning);
+  --danger: var(--status-danger);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.5rem;
+  --sidebar: rgba(255, 255, 255, 0.8);
+  --sidebar-foreground: var(--text);
+  --sidebar-primary: var(--accent);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(59, 130, 246, 0.12);
+  --sidebar-accent-foreground: var(--accent);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+}
+
+.ticketing-root.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+@theme inline {
+  --color-bg-base: var(--bg-base);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-surface-tint-subtle: var(--surface-tint-subtle);
+  --color-surface-tint: var(--surface-tint);
+  --color-surface-tint-strong: var(--surface-tint-strong);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-base: var(--border-base);
+  --color-border-strong: var(--border-strong);
+  --color-shadow: var(--shadow-color);
+
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-accent-solid: var(--accent);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent-soft);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--status-success);
+  --color-warning: var(--status-warning);
+  --color-danger: var(--status-danger);
+  --color-info: var(--status-info);
+  --color-neutral: var(--status-neutral);
+  --color-status-success: var(--status-success);
+  --color-status-success-bg: var(--status-success-bg);
+  --color-status-success-border: var(--status-success-border);
+  --color-status-success-text: var(--status-success-text);
+  --color-status-warning: var(--status-warning);
+  --color-status-warning-bg: var(--status-warning-bg);
+  --color-status-warning-border: var(--status-warning-border);
+  --color-status-warning-text: var(--status-warning-text);
+  --color-status-danger: var(--status-danger);
+  --color-status-danger-bg: var(--status-danger-bg);
+  --color-status-danger-border: var(--status-danger-border);
+  --color-status-danger-text: var(--status-danger-text);
+  --color-status-info: var(--status-info);
+  --color-status-info-bg: var(--status-info-bg);
+  --color-status-info-border: var(--status-info-border);
+  --color-status-info-text: var(--status-info-text);
+  --color-status-neutral: var(--status-neutral);
+  --color-status-neutral-bg: var(--status-neutral-bg);
+  --color-status-neutral-border: var(--status-neutral-border);
+  --color-status-neutral-text: var(--status-neutral-text);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  .ticketing-root * {
+    @apply border-border outline-ring/50;
+  }
+
+  .ticketing-root {
+    @apply bg-background text-foreground;
+    background-color: var(--bg-base);
+    font-family: "Pretendard Variable", "Pretendard", "SUIT", "Noto Sans KR",
+      system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  .ticketing-root {
+    background-color: var(--bg-base);
+    font-size: var(--font-size);
+  }
+
+  .ticketing-root h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  .ticketing-root h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  .ticketing-root h3 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  .ticketing-root h4 {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  .ticketing-root label {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  .ticketing-root button {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  .ticketing-root input {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
+  }
+}

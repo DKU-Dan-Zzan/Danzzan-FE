@@ -12,6 +12,7 @@ import Admin from "./routes/admin/Admin";
 import AdminLogin from "./routes/admin/AdminLogin";
 import { useAdminAuth } from "./hooks/useAdminAuth";
 import { useEffect, useState } from "react";
+import TicketingApp from "./ticketing/TicketingApp";
 
 function ProtectedAdmin() {
   const { isAuthenticated, tryRestoreSession } = useAdminAuth();
@@ -52,6 +53,13 @@ function App() {
         <Route index element={<ProtectedAdmin />} />
         <Route path="login" element={<AdminLogin />} />
       </Route>
+
+      <Route path="/ticket/*" element={<TicketingApp />} />
+
+      <Route path="/login" element={<Navigate to="/ticket/login" replace />} />
+      <Route path="/signup" element={<Navigate to="/ticket/signup" replace />} />
+      <Route path="/ticketing" element={<Navigate to="/ticket/ticketing" replace />} />
+      <Route path="/myticket" element={<Navigate to="/ticket/myticket" replace />} />
     </Routes>
   )
 }
