@@ -21,7 +21,7 @@ import {
   readQueueEventIdFromSearch,
   releaseSingleFlight,
   resolveQueueStatusAction,
-} from "@/ticketing/routes/Ticketing/queueFlowUtils";
+} from "@/routes/ticketing/Ticketing/queueFlowUtils";
 import type { PlacementAd } from "@/types/ticketing/model/ad.model";
 import type { QueueRequestStatus, ReserveErrorCode, TicketingEvent } from "@/types/ticketing/model/ticket.model";
 

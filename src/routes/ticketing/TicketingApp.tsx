@@ -2,16 +2,16 @@
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { AdminLayout } from "@/components/ticketing/layout/AdminLayout";
 import { UserLayout } from "@/components/ticketing/layout/UserLayout";
-import Login from "@/ticketing/routes/Login/Login";
-import Signup from "@/ticketing/routes/Signup/Signup";
-import Ticketing from "@/ticketing/routes/Ticketing/Ticketing";
-import MyTicket from "@/ticketing/routes/MyTicket/MyTicket";
-import AdminLogin from "@/ticketing/routes/admin/Login/AdminLogin";
-import WristbandPage from "@/ticketing/routes/admin/Wristband/WristbandPage";
-import TokenRequired from "@/ticketing/routes/admin/TokenRequired/TokenRequired";
-import NotFoundPage from "@/ticketing/routes/NotFound/NotFoundPage";
+import Login from "@/routes/ticketing/Login/Login";
+import Signup from "@/routes/ticketing/Signup/Signup";
+import Ticketing from "@/routes/ticketing/Ticketing/Ticketing";
+import MyTicket from "@/routes/ticketing/MyTicket/MyTicket";
+import AdminLogin from "@/routes/ticketing/admin/Login/AdminLogin";
+import WristbandPage from "@/routes/ticketing/admin/Wristband/WristbandPage";
+import TokenRequired from "@/routes/ticketing/admin/TokenRequired/TokenRequired";
+import NotFoundPage from "@/routes/ticketing/NotFound/NotFoundPage";
 import { env } from "@/utils/ticketing/env";
-import "@/ticketing/index.css";
+import "@/routes/ticketing/index.css";
 
 function RequireStudentAuth() {
   const { isAuthenticated, role } = useAuth();

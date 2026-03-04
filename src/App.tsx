@@ -12,7 +12,7 @@ import Admin from "./routes/admin/Admin";
 import AdminLogin from "./routes/admin/AdminLogin";
 import { useAdminAuth } from "./hooks/useAdminAuth";
 import { useEffect, useState } from "react";
-import TicketingApp from "./ticketing/TicketingApp";
+import TicketingApp from "./routes/ticketing/TicketingApp";
 
 function ProtectedAdmin() {
   const { isAuthenticated, tryRestoreSession } = useAdminAuth();

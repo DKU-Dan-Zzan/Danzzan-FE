@@ -11,7 +11,7 @@ import {
   readQueueEventIdFromSearch,
   releaseSingleFlight,
   resolveQueueStatusAction,
-} from "@/ticketing/routes/Ticketing/queueFlowUtils";
+} from "@/routes/ticketing/Ticketing/queueFlowUtils";
 
 type SmokeStep = "waiting" | "in-progress" | "reserving" | "soldout" | "already" | "success" | "list";
 
