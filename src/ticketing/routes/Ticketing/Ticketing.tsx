@@ -3,14 +3,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { adApi } from "@/api/ticketing/adApi";
 import { HttpError } from "@/api/ticketing/httpClient";
 import { ticketApi } from "@/api/ticketing/ticketApi";
-import { ReservationAlreadyPanel } from "@/ticketing/components/ticketing/ReservationAlreadyPanel";
-import { ReservationProcessingPanel } from "@/ticketing/components/ticketing/ReservationProcessingPanel";
-import { ReservationSoldOutPanel } from "@/ticketing/components/ticketing/ReservationSoldOutPanel";
-import { ReservationSuccessPanel } from "@/ticketing/components/ticketing/ReservationSuccessPanel";
-import { TicketingEventListPanel } from "@/ticketing/components/ticketing/TicketingEventListPanel";
-import { TicketingHomePanel } from "@/ticketing/components/ticketing/TicketingHomePanel";
-import { TicketingReservationPanel } from "@/ticketing/components/ticketing/TicketingReservationPanel";
-import { WaitingRoomPanel } from "@/ticketing/components/ticketing/WaitingRoomPanel";
+import { ReservationAlreadyPanel } from "@/components/ticketing/ticketing/ReservationAlreadyPanel";
+import { ReservationProcessingPanel } from "@/components/ticketing/ticketing/ReservationProcessingPanel";
+import { ReservationSoldOutPanel } from "@/components/ticketing/ticketing/ReservationSoldOutPanel";
+import { ReservationSuccessPanel } from "@/components/ticketing/ticketing/ReservationSuccessPanel";
+import { TicketingEventListPanel } from "@/components/ticketing/ticketing/TicketingEventListPanel";
+import { TicketingHomePanel } from "@/components/ticketing/ticketing/TicketingHomePanel";
+import { TicketingReservationPanel } from "@/components/ticketing/ticketing/TicketingReservationPanel";
+import { WaitingRoomPanel } from "@/components/ticketing/ticketing/WaitingRoomPanel";
 import { useTicketing } from "@/hooks/ticketing/useTicketing";
 import {
   BACKGROUND_POLL_INTERVAL,

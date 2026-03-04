@@ -1,7 +1,7 @@
 import { LoaderCircle, RotateCcw } from "lucide-react";
-import { Button } from "@/ticketing/components/common/ui/button";
-import { Card } from "@/ticketing/components/common/ui/card";
-import { TICKETING_CLASSES, TICKETING_NARROW_PANEL_CLASS } from "@/ticketing/components/ticketing/ticketingShared";
+import { Button } from "@/components/ticketing/common/ui/button";
+import { Card } from "@/components/ticketing/common/ui/card";
+import { TICKETING_CLASSES, TICKETING_NARROW_PANEL_CLASS } from "@/components/ticketing/ticketing/ticketingShared";
 
 interface ReservationProcessingPanelProps {
   processing: boolean;

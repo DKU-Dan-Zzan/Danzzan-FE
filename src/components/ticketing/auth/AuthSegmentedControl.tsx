@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { cn } from "@/ticketing/components/common/ui/utils";
+import { cn } from "@/components/ticketing/common/ui/utils";
 
 type AuthTab = "login" | "signup";
 

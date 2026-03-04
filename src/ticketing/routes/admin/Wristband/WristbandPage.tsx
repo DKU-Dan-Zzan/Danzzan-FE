@@ -1,6 +1,6 @@
 ﻿import { useState } from "react";
-import { WristbandDashboard } from "@/ticketing/components/admin/WristbandDashboard";
-import { WristbandOperationScreen } from "@/ticketing/components/admin/WristbandOperationScreen";
+import { WristbandDashboard } from "@/components/ticketing/admin/WristbandDashboard";
+import { WristbandOperationScreen } from "@/components/ticketing/admin/WristbandOperationScreen";
 import type { WristbandSession } from "@/types/ticketing/model/wristband.model";
 
 export default function WristbandPage() {

@@ -1,12 +1,12 @@
 import { Ticket } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Card } from "@/ticketing/components/common/ui/card";
-import { Progress } from "@/ticketing/components/common/ui/progress";
-import { TicketingAdBannerCard } from "@/ticketing/components/ticketing/TicketingAdBannerCard";
+import { Card } from "@/components/ticketing/common/ui/card";
+import { Progress } from "@/components/ticketing/common/ui/progress";
+import { TicketingAdBannerCard } from "@/components/ticketing/ticketing/TicketingAdBannerCard";
 import {
   TICKETING_CLASSES,
   TICKETING_NARROW_PANEL_CLASS,
-} from "@/ticketing/components/ticketing/ticketingShared";
+} from "@/components/ticketing/ticketing/ticketingShared";
 import { isRemainingFresh } from "@/ticketing/routes/Ticketing/queueFlowUtils";
 import type { PlacementAd } from "@/types/ticketing/model/ad.model";
 

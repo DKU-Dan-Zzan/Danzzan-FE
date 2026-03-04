@@ -1,6 +1,6 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, House, LogOut } from "lucide-react";
-import { Button } from "@/ticketing/components/common/ui/button";
+import { Button } from "@/components/ticketing/common/ui/button";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 
 export function UserLayout() {

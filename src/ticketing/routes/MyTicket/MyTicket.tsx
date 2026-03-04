@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { adApi } from "@/api/ticketing/adApi";
-import { MyTicketListPanel } from "@/ticketing/components/ticketing/MyTicketListPanel";
+import { MyTicketListPanel } from "@/components/ticketing/ticketing/MyTicketListPanel";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { useTicketing } from "@/hooks/ticketing/useTicketing";
 import type { PlacementAd } from "@/types/ticketing/model/ad.model";

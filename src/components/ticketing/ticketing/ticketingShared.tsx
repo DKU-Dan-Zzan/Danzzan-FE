@@ -1,6 +1,6 @@
 import { RefreshCw } from "lucide-react";
-import { Button } from "@/ticketing/components/common/ui/button";
-import { cn } from "@/ticketing/components/common/ui/utils";
+import { Button } from "@/components/ticketing/common/ui/button";
+import { cn } from "@/components/ticketing/common/ui/utils";
 
 export const TICKETING_WIDE_PANEL_CLASS = "mx-auto w-full max-w-3xl space-y-4 pb-6";
 export const TICKETING_NARROW_PANEL_CLASS = "mx-auto w-full max-w-xl pb-7";

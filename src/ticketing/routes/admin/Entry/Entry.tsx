@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { Card } from "@/ticketing/components/common/ui/card";
-import { Button } from "@/ticketing/components/common/ui/button";
+import { Card } from "@/components/ticketing/common/ui/card";
+import { Button } from "@/components/ticketing/common/ui/button";
 
 const systems = [
   {

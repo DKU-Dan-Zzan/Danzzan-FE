@@ -1,7 +1,7 @@
 ﻿import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/ticketing/useAuth";
-import { AdminLayout } from "@/ticketing/components/layout/AdminLayout";
-import { UserLayout } from "@/ticketing/components/layout/UserLayout";
+import { AdminLayout } from "@/components/ticketing/layout/AdminLayout";
+import { UserLayout } from "@/components/ticketing/layout/UserLayout";
 import Login from "@/ticketing/routes/Login/Login";
 import Signup from "@/ticketing/routes/Signup/Signup";
 import Ticketing from "@/ticketing/routes/Ticketing/Ticketing";

@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Ticket } from "lucide-react";
-import { Button } from "@/ticketing/components/common/ui/button";
-import { Card } from "@/ticketing/components/common/ui/card";
-import { Input } from "@/ticketing/components/common/ui/input";
-import { Label } from "@/ticketing/components/common/ui/label";
+import { Button } from "@/components/ticketing/common/ui/button";
+import { Card } from "@/components/ticketing/common/ui/card";
+import { Input } from "@/components/ticketing/common/ui/input";
+import { Label } from "@/components/ticketing/common/ui/label";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 
 export default function AdminLogin() {
