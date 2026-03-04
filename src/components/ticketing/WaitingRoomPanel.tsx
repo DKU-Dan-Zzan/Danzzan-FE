@@ -6,12 +6,15 @@ import {
   TICKETING_CLASSES,
   TICKETING_NARROW_PANEL_CLASS,
 } from "@/components/ticketing/ticketingShared";
+import { isRemainingFresh } from "@/routes/Ticketing/queueFlowUtils";
 import type { PlacementAd } from "@/types/model/ad.model";
 
 interface WaitingRoomPanelProps {
   eventTitle: string;
   remaining: number | null;
+  remainingUpdatedAt: number | null;
   polling: boolean;
+  offline: boolean;
   errorMessage: string | null;
   ad: PlacementAd | null;
 }
@@ -84,13 +87,16 @@ const estimateProgress = (remaining: number | null): number => {
 export function WaitingRoomPanel({
   eventTitle,
   remaining,
+  remainingUpdatedAt,
   polling,
+  offline,
   errorMessage,
   ad,
 }: WaitingRoomPanelProps) {
   const [displayRemaining, setDisplayRemaining] = useState<number | null>(remaining);
   const displayRemainingRef = useRef<number | null>(remaining);
   const [activityTick, setActivityTick] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
     if (remaining === null) {
@@ -143,10 +149,24 @@ export function WaitingRoomPanel({
     return () => window.clearInterval(intervalId);
   }, [polling]);
 
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
   const pulsePattern = [0, 2, 0, -2] as const;
+  const hasFreshRemaining = isRemainingFresh(remainingUpdatedAt, now);
+  const canEstimateProgress = hasFreshRemaining && displayRemaining !== null && displayRemaining >= 0;
   const baseProgressValue = estimateProgress(displayRemaining);
   const progressValue = Math.max(0, Math.min(100, baseProgressValue + pulsePattern[activityTick]));
-  const etaLabel = formatEta(estimateWaitSeconds(displayRemaining));
+  const etaLabel = offline
+    ? "연결 확인 중"
+    : canEstimateProgress
+      ? formatEta(estimateWaitSeconds(displayRemaining))
+      : "확인 중";
   const adImageUrl = ad ? buildVersionedImageUrl(ad.imageUrl, ad.updatedAt) : WAITING_AD_PLACEHOLDER;
   const adAlt = ad?.altText?.trim() || "단짠 대기열 광고";
   const adLink = ad?.linkUrl?.trim() || null;
@@ -181,10 +201,18 @@ export function WaitingRoomPanel({
           <p className="text-right text-[length:var(--ticketing-text-card-subtitle)] font-bold text-[var(--accent)]">
             예상 대기 시간: {etaLabel}
           </p>
-          <Progress
-            value={progressValue}
-            className="mt-2 h-4 rounded-full bg-[var(--surface-tint-subtle)] [&_[data-slot=progress-indicator]]:rounded-full [&_[data-slot=progress-indicator]]:bg-[var(--accent)]"
-          />
+          {canEstimateProgress ? (
+            <Progress
+              value={progressValue}
+              className="mt-2 h-4 rounded-full bg-[var(--surface-tint-subtle)] [&_[data-slot=progress-indicator]]:rounded-full [&_[data-slot=progress-indicator]]:bg-[var(--accent)]"
+            />
+          ) : (
+            <div className="relative mt-2 h-4 overflow-hidden rounded-full bg-[var(--surface-tint-subtle)]">
+              <div
+                className={`h-full w-[38%] rounded-full bg-[var(--accent)] ${offline ? "opacity-40" : "animate-pulse opacity-70"}`}
+              />
+            </div>
+          )}
         </div>
 
         <div className="mt-4 border-t border-[var(--border-subtle)] pt-3">

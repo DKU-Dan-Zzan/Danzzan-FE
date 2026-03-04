@@ -11,6 +11,16 @@ import { TicketingEventListPanel } from "@/components/ticketing/TicketingEventLi
 import { TicketingHomePanel } from "@/components/ticketing/TicketingHomePanel";
 import { WaitingRoomPanel } from "@/components/ticketing/WaitingRoomPanel";
 import { useTicketing } from "@/hooks/useTicketing";
+import {
+  BACKGROUND_POLL_INTERVAL,
+  FOREGROUND_POLL_INTERVAL,
+  MAX_BACKOFF_EXPONENT,
+  acquireSingleFlight,
+  computePollingDelay,
+  readQueueEventIdFromSearch,
+  releaseSingleFlight,
+  resolveQueueStatusAction,
+} from "@/routes/Ticketing/queueFlowUtils";
 import type { PlacementAd } from "@/types/model/ad.model";
 import type { QueueRequestStatus, ReserveErrorCode, TicketingEvent } from "@/types/model/ticket.model";
 
@@ -21,9 +31,7 @@ interface ParsedApiError {
   code: string | null;
 }
 
-const FOREGROUND_POLL_INTERVAL = 2000;
-const BACKGROUND_POLL_INTERVAL = 8000;
-const MAX_BACKOFF_EXPONENT = 4;
+const OFFLINE_WAITING_MESSAGE = "인터넷 연결이 끊겼습니다. 연결이 복구되면 자동으로 다시 확인합니다.";
 
 const RESERVE_ERROR_CODE_SET = new Set<ReserveErrorCode>([
   "RESERVE_ALREADY_RESERVED",
@@ -75,12 +83,6 @@ const asReserveErrorCode = (value: string | null): ReserveErrorCode | null => {
   return value as ReserveErrorCode;
 };
 
-const readEventIdFromSearch = (search: string): string | null => {
-  const params = new URLSearchParams(search);
-  const eventId = params.get("eventId");
-  return eventId?.trim() || null;
-};
-
 export default function Ticketing() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -94,14 +96,16 @@ export default function Ticketing() {
   const [step, setStep] = useState<TicketingStep>("home");
   const [events, setEvents] = useState<TicketingEvent[]>([]);
   const [now, setNow] = useState(() => Date.now());
-  const [activeEventId, setActiveEventId] = useState<string | null>(() => readEventIdFromSearch(window.location.search));
+  const [activeEventId, setActiveEventId] = useState<string | null>(() => readQueueEventIdFromSearch(window.location.search));
   const [activeEventTitle, setActiveEventTitle] = useState("");
 
   const [queueStatus, setQueueStatus] = useState<QueueRequestStatus>("NONE");
   const [waitingRemaining, setWaitingRemaining] = useState<number | null>(null);
+  const [waitingRemainingUpdatedAt, setWaitingRemainingUpdatedAt] = useState<number | null>(null);
   const [waitingPolling, setWaitingPolling] = useState(false);
   const [waitingError, setWaitingError] = useState<string | null>(null);
   const [listNotice, setListNotice] = useState<string | null>(null);
+  const [isNetworkOnline, setIsNetworkOnline] = useState(() => window.navigator.onLine);
 
   const [reserveProcessing, setReserveProcessing] = useState(false);
   const [reserveErrorMessage, setReserveErrorMessage] = useState<string | null>(null);
@@ -114,6 +118,7 @@ export default function Ticketing() {
   const pollBackoffRef = useRef(0);
   const restoreAttemptedRef = useRef(false);
   const adLoadedRef = useRef(false);
+  const wasOnlineRef = useRef(isNetworkOnline);
 
   const listErrorMessage = useMemo(() => {
     if (listNotice) {
@@ -123,7 +128,7 @@ export default function Ticketing() {
   }, [listNotice, listError?.message]);
 
   const queueEventFromSearch = useMemo(
-    () => readEventIdFromSearch(location.search),
+    () => readQueueEventIdFromSearch(location.search),
     [location.search],
   );
 
@@ -171,11 +176,17 @@ export default function Ticketing() {
   const resetQueueFlowState = useCallback(() => {
     setQueueStatus("NONE");
     setWaitingRemaining(null);
+    setWaitingRemainingUpdatedAt(null);
     setWaitingError(null);
     setWaitingPolling(false);
     setReserveProcessing(false);
     setReserveErrorMessage(null);
     setReserveMessage("입장 상태가 확인되어 예매를 진행하고 있습니다.");
+  }, []);
+
+  const updateWaitingRemaining = useCallback((remaining: number | null) => {
+    setWaitingRemaining(remaining);
+    setWaitingRemainingUpdatedAt(Date.now());
   }, []);
 
   const moveToList = useCallback(async (options?: { preserveNotice?: boolean }) => {
@@ -239,11 +250,9 @@ export default function Ticketing() {
   }, [applyQueueEventToUrl, handleUnauthorized, moveToList]);
 
   const executeReserve = useCallback(async (eventId: string) => {
-    if (reserveLockRef.current) {
+    if (!acquireSingleFlight(reserveLockRef)) {
       return;
     }
-
-    reserveLockRef.current = true;
     setStep("reserving");
     setReserveProcessing(true);
     setReserveErrorMessage(null);
@@ -266,7 +275,7 @@ export default function Ticketing() {
         }),
       );
       if (reservation.queueNumber !== null) {
-        setWaitingRemaining(reservation.queueNumber);
+        updateWaitingRemaining(reservation.queueNumber);
       }
       setStep("success");
       setActiveEventId(null);
@@ -276,9 +285,9 @@ export default function Ticketing() {
       await applyReserveError(eventId, parsedError);
     } finally {
       setReserveProcessing(false);
-      reserveLockRef.current = false;
+      releaseSingleFlight(reserveLockRef);
     }
-  }, [applyQueueEventToUrl, applyReserveError]);
+  }, [applyQueueEventToUrl, applyReserveError, updateWaitingRemaining]);
 
   const handleQueueStatus = useCallback(async (
     status: QueueRequestStatus,
@@ -287,41 +296,46 @@ export default function Ticketing() {
   ) => {
     setQueueStatus(status);
     if (typeof remaining === "number" || remaining === null) {
-      setWaitingRemaining(remaining);
+      updateWaitingRemaining(remaining);
     }
 
-    switch (status) {
-      case "WAITING":
+    const action = resolveQueueStatusAction(status);
+    switch (action) {
+      case "waiting":
         setStep("waiting");
         return;
-      case "ADMITTED":
-      case "SUCCESS":
+      case "reserve":
         setWaitingError(null);
         await executeReserve(eventId);
         return;
-      case "SOLD_OUT":
+      case "soldout":
         setStep("soldout");
         setActiveEventId(null);
         applyQueueEventToUrl(null);
         return;
-      case "ALREADY":
+      case "already":
         setStep("already");
         setActiveEventId(null);
         applyQueueEventToUrl(null);
         return;
-      case "NONE":
       default:
         setActiveEventId(null);
         setListNotice("현재 대기 상태를 확인할 수 없어 목록으로 이동합니다.");
         applyQueueEventToUrl(null);
         await moveToList({ preserveNotice: true });
     }
-  }, [applyQueueEventToUrl, executeReserve, moveToList]);
+  }, [applyQueueEventToUrl, executeReserve, moveToList, updateWaitingRemaining]);
 
   const checkQueueStatus = useCallback(async (
     eventId: string,
     signal?: AbortSignal,
   ): Promise<QueueRequestStatus | null> => {
+    if (!isNetworkOnline) {
+      setWaitingPolling(false);
+      setWaitingError(OFFLINE_WAITING_MESSAGE);
+      return null;
+    }
+
     try {
       const statusResponse = await ticketApi.getTicketQueueStatus(eventId, signal);
       setWaitingError(null);
@@ -342,18 +356,23 @@ export default function Ticketing() {
       setWaitingError("네트워크 상태가 불안정합니다. 잠시 후 자동으로 다시 확인합니다.");
       return null;
     }
-  }, [handleQueueStatus, handleUnauthorized]);
+  }, [handleQueueStatus, handleUnauthorized, isNetworkOnline]);
 
   const handleEnterQueue = useCallback(async (event: TicketingEvent) => {
-    if (enterLockRef.current) {
+    if (!acquireSingleFlight(enterLockRef)) {
       return;
     }
-
-    enterLockRef.current = true;
+    if (!isNetworkOnline) {
+      releaseSingleFlight(enterLockRef);
+      setListNotice("인터넷 연결을 확인한 뒤 다시 시도해주세요.");
+      return;
+    }
     setActiveEventId(event.id);
     setActiveEventTitle(event.title);
     setListNotice(null);
     setWaitingError(null);
+    setWaitingRemaining(null);
+    setWaitingRemainingUpdatedAt(null);
     setQueueStatus("WAITING");
     setStep("waiting");
     applyQueueEventToUrl(event.id);
@@ -372,9 +391,9 @@ export default function Ticketing() {
         await moveToList({ preserveNotice: true });
       }
     } finally {
-      enterLockRef.current = false;
+      releaseSingleFlight(enterLockRef);
     }
-  }, [applyQueueEventToUrl, handleQueueStatus, handleUnauthorized, moveToList]);
+  }, [applyQueueEventToUrl, handleQueueStatus, handleUnauthorized, isNetworkOnline, moveToList]);
 
   useEffect(() => {
     if (step !== "list") {
@@ -387,6 +406,39 @@ export default function Ticketing() {
 
     return () => window.clearInterval(intervalId);
   }, [step]);
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsNetworkOnline(true);
+    };
+    const handleOffline = () => {
+      setIsNetworkOnline(false);
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (step !== "waiting") {
+      return;
+    }
+
+    if (!isNetworkOnline) {
+      setWaitingPolling(false);
+      setWaitingError(OFFLINE_WAITING_MESSAGE);
+      return;
+    }
+
+    if (waitingError === OFFLINE_WAITING_MESSAGE) {
+      setWaitingError(null);
+    }
+  }, [isNetworkOnline, step, waitingError]);
 
   useEffect(() => {
     if (activeEventId === queueEventFromSearch) {
@@ -420,6 +472,13 @@ export default function Ticketing() {
       return;
     }
 
+    if (!isNetworkOnline) {
+      setQueueStatus("WAITING");
+      setWaitingError(OFFLINE_WAITING_MESSAGE);
+      setWaitingPolling(false);
+      return;
+    }
+
     setStep("waiting");
     const controller = new AbortController();
     setWaitingPolling(true);
@@ -444,10 +503,25 @@ export default function Ticketing() {
     return () => {
       controller.abort();
     };
-  }, [activeEventId, handleQueueStatus, handleUnauthorized]);
+  }, [activeEventId, handleQueueStatus, handleUnauthorized, isNetworkOnline]);
 
   useEffect(() => {
-    if (step !== "waiting" || !activeEventId) {
+    const wasOnline = wasOnlineRef.current;
+    wasOnlineRef.current = isNetworkOnline;
+
+    if (wasOnline || !isNetworkOnline || step !== "waiting" || !activeEventId) {
+      return;
+    }
+
+    setWaitingError(null);
+    setWaitingPolling(true);
+    void checkQueueStatus(activeEventId).finally(() => {
+      setWaitingPolling(false);
+    });
+  }, [activeEventId, checkQueueStatus, isNetworkOnline, step]);
+
+  useEffect(() => {
+    if (step !== "waiting" || !activeEventId || !isNetworkOnline) {
       return;
     }
 
@@ -486,12 +560,12 @@ export default function Ticketing() {
         } else {
           pollBackoffRef.current = 0;
         }
-        const delay = baseDelay * 2 ** pollBackoffRef.current;
+        const delay = computePollingDelay(baseDelay, pollBackoffRef.current);
         scheduleNextPoll(delay);
       }
     };
 
-    scheduleNextPoll(FOREGROUND_POLL_INTERVAL);
+    scheduleNextPoll(computePollingDelay(FOREGROUND_POLL_INTERVAL, 0));
 
     return () => {
       cancelled = true;
@@ -502,7 +576,7 @@ export default function Ticketing() {
       setWaitingPolling(false);
       pollBackoffRef.current = 0;
     };
-  }, [activeEventId, checkQueueStatus, step]);
+  }, [activeEventId, checkQueueStatus, isNetworkOnline, step]);
 
   useEffect(() => {
     if (step !== "waiting" || adLoadedRef.current) {
@@ -566,7 +640,9 @@ export default function Ticketing() {
       <WaitingRoomPanel
         eventTitle={activeEventTitle}
         remaining={waitingRemaining}
+        remainingUpdatedAt={waitingRemainingUpdatedAt}
         polling={waitingPolling}
+        offline={!isNetworkOnline}
         errorMessage={waitingError}
         ad={waitingAd}
       />

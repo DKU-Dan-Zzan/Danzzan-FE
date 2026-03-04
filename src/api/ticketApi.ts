@@ -1,5 +1,11 @@
 import { createHttpClient } from "@/api/httpClient";
 import {
+  normalizeQueueEnterContract,
+  normalizeQueueStatusContract,
+  normalizeReserveContract,
+  unwrapApiObjectEnvelope,
+} from "@/api/ticketContract";
+import {
   mapQueueEnterDtoToModel,
   mapQueueStatusDtoToModel,
   mapTicketEventListDtoToModel,
@@ -35,22 +41,6 @@ const getTicketingClient = () =>
 type ApiEnvelope<T> = {
   data?: T | null;
 } & Record<string, unknown>;
-
-const unwrapApiData = <T extends Record<string, unknown>>(
-  payload: T | ApiEnvelope<T> | null | undefined,
-): T => {
-  if (!payload || typeof payload !== "object") {
-    return {} as T;
-  }
-
-  const record = payload as Record<string, unknown>;
-  const maybeData = record.data;
-  if (maybeData && typeof maybeData === "object") {
-    return maybeData as T;
-  }
-
-  return payload as T;
-};
 
 const addMinutesToIso = (minutes: number) => {
   return new Date(Date.now() + minutes * 60_000).toISOString();
@@ -166,8 +156,9 @@ export const ticketApi = {
 
     const client = getTicketingClient();
     // TODO(ticketing-api): Confirm endpoint path and response spec for student ticketing event list.
-    const dto = await client.get<TicketEventListResponseDto | ApiEnvelope<TicketEventListResponseDto>>("/tickets/events");
-    return mapTicketEventListDtoToModel(unwrapApiData(dto));
+    const raw = await client.get<TicketEventListResponseDto | ApiEnvelope<TicketEventListResponseDto>>("/tickets/events");
+    const dto = unwrapApiObjectEnvelope<TicketEventListResponseDto>(raw, "/tickets/events");
+    return mapTicketEventListDtoToModel(dto);
   },
 
   enterTicketQueue: async (
@@ -197,12 +188,17 @@ export const ticketApi = {
     }
 
     const client = getTicketingClient();
-    const dto = await client.post<TicketQueueEnterResponseDto | ApiEnvelope<TicketQueueEnterResponseDto>>(
+    const raw = await client.post<TicketQueueEnterResponseDto | ApiEnvelope<TicketQueueEnterResponseDto>>(
       `/tickets/${eventId}/queue/enter`,
       undefined,
       { signal },
     );
-    return mapQueueEnterDtoToModel(unwrapApiData(dto));
+    const dto = unwrapApiObjectEnvelope<TicketQueueEnterResponseDto>(
+      raw,
+      `/tickets/${eventId}/queue/enter`,
+    );
+    const normalizedDto = normalizeQueueEnterContract(dto, `/tickets/${eventId}/queue/enter`);
+    return mapQueueEnterDtoToModel(normalizedDto);
   },
 
   getTicketQueueStatus: async (
@@ -227,11 +223,16 @@ export const ticketApi = {
     }
 
     const client = getTicketingClient();
-    const dto = await client.get<TicketQueueStatusResponseDto | ApiEnvelope<TicketQueueStatusResponseDto>>(
+    const raw = await client.get<TicketQueueStatusResponseDto | ApiEnvelope<TicketQueueStatusResponseDto>>(
       `/tickets/${eventId}/queue/status`,
       { signal },
     );
-    return mapQueueStatusDtoToModel(unwrapApiData(dto));
+    const dto = unwrapApiObjectEnvelope<TicketQueueStatusResponseDto>(
+      raw,
+      `/tickets/${eventId}/queue/status`,
+    );
+    const normalizedDto = normalizeQueueStatusContract(dto, `/tickets/${eventId}/queue/status`);
+    return mapQueueStatusDtoToModel(normalizedDto);
   },
 
   reserveTicket: async (
@@ -243,12 +244,17 @@ export const ticketApi = {
     }
 
     const client = getTicketingClient();
-    const dto = await client.post<TicketReservationResponseDto | ApiEnvelope<TicketReservationResponseDto>>(
+    const raw = await client.post<TicketReservationResponseDto | ApiEnvelope<TicketReservationResponseDto>>(
       `/tickets/${eventId}/reserve`,
       undefined,
       { signal },
     );
-    return mapTicketReservationDtoToModel(unwrapApiData(dto));
+    const dto = unwrapApiObjectEnvelope<TicketReservationResponseDto>(
+      raw,
+      `/tickets/${eventId}/reserve`,
+    );
+    const normalizedDto = normalizeReserveContract(dto, `/tickets/${eventId}/reserve`);
+    return mapTicketReservationDtoToModel(normalizedDto);
   },
 
   getMyTickets: async (): Promise<Ticket[]> => {
@@ -258,7 +264,8 @@ export const ticketApi = {
 
     const client = getTicketingClient();
     // TODO(ticketing-api): Confirm endpoint path for student my-ticket list.
-    const dto = await client.get<TicketListResponseDto | ApiEnvelope<TicketListResponseDto>>("/tickets/me");
-    return mapTicketListDtoToModel(unwrapApiData(dto));
+    const raw = await client.get<TicketListResponseDto | ApiEnvelope<TicketListResponseDto>>("/tickets/me");
+    const dto = unwrapApiObjectEnvelope<TicketListResponseDto>(raw, "/tickets/me");
+    return mapTicketListDtoToModel(dto);
   },
 };
