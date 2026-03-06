@@ -19,6 +19,7 @@ const mapAuthUser = (dto?: AuthLoginResponseDto["user"]): AuthUser | null => {
     role: mapUserRole(dto.role),
     department: dto.department ?? "",
     studentId: dto.studentId ?? "",
+    college: dto.college ?? "",
   };
 };
 
