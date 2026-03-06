@@ -15,6 +15,7 @@ export interface AuthUserDto {
   role?: string;
   department?: string;
   studentId?: string;
+  college?: string;
 }
 
 export interface AuthLoginResponseDto {

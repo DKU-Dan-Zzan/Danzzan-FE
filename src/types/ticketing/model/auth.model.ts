@@ -17,6 +17,7 @@ export interface AuthUser {
   role: UserRole | "unknown";
   department: string;
   studentId: string;
+  college: string;
 }
 
 export interface AuthSession {
