@@ -8,6 +8,7 @@ import {
 import DayTabs from "./components/DayTabs"
 import Timeline from "./components/Timeline"
 import ContentImageSection from "./components/ContentImage"
+import AdBanner from "./components/AdBanner"
 import type { FestivalDay, Performance } from "./timetable.types"
 
 const FESTIVAL_DAYS: FestivalDay[] = [
@@ -227,6 +228,7 @@ export default function Timetable() {
       </div>
 
       <div className="flex-1 overflow-y-auto scrollbar-hide px-5 pt-4 pb-[calc(84px+env(safe-area-inset-bottom))]">
+        <AdBanner />
         <div className="min-h-full flex flex-col">
           <div className="mt-4 flex-1">
             {isDay1 ? (
