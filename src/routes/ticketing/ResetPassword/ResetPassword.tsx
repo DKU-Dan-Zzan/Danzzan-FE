@@ -461,6 +461,15 @@ export default function ResetPassword() {
               </Button>
             </section>
           )}
+
+          {!completed && (
+            <div className="mt-6 text-center">
+              <p className="text-sm text-[var(--text-muted)]">로그인 화면으로 돌아가시겠어요?</p>
+              <Link to="/ticket/login" className="mt-2 inline-block text-sm font-semibold text-[var(--accent)]">
+                로그인하러 가기
+              </Link>
+            </div>
+          )}
         </main>
       </div>
     </div>
