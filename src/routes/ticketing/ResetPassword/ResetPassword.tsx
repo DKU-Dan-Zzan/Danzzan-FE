@@ -18,6 +18,16 @@ const STUDENT_ID_REGEX = /^\d{8}$/;
 const VERIFICATION_CODE_REGEX = /^\d{6}$/;
 const PASSWORD_MIN_LENGTH = 8;
 const SPECIAL_CHAR_REGEX = /[^A-Za-z0-9]/;
+const ACCOUNT_EXISTENCE_ERROR_PATTERNS = [
+  /미가입/,
+  /가입되지/,
+  /존재하지 않/,
+  /계정.*없/,
+  /회원.*없/,
+  /not found/i,
+  /user not found/i,
+  /unknown user/i,
+];
 const RESET_STEPS: ResetStepItem[] = [
   { key: "request", label: "학번 입력" },
   { key: "verify", label: "인증번호 확인" },
@@ -48,6 +58,10 @@ const resolveErrorMessage = (error: unknown, fallback: string) => {
   return fallback;
 };
 
+const isAccountExistenceError = (message: string) => {
+  return ACCOUNT_EXISTENCE_ERROR_PATTERNS.some((pattern) => pattern.test(message));
+};
+
 export default function ResetPassword() {
   const [step, setStep] = useState<ResetStep>("request");
   const [studentId, setStudentId] = useState("");
@@ -74,7 +88,6 @@ export default function ResetPassword() {
   const isPasswordFormValid = hasPasswordMinLength && hasPasswordSpecialChar && isPasswordMatched;
   const isCodeExpired = timerSecondsLeft <= 0;
   const isTimerRunning = step === "verify" && timerSecondsLeft > 0;
-  const targetEmail = isStudentIdValid ? `${studentId}@dankook.ac.kr` : "학번 8자리 입력 후 확인";
   const stepIndex = RESET_STEPS.findIndex(({ key }) => key === step) + 1;
   const currentStepLabel = RESET_STEPS[stepIndex - 1]?.label ?? RESET_STEPS[0].label;
 
@@ -92,6 +105,14 @@ export default function ResetPassword() {
     return () => window.clearInterval(timer);
   }, [isTimerRunning]);
 
+  const moveToVerifyStep = (expiresInSec?: number, nextRequestId?: string) => {
+    setRequestId(nextRequestId);
+    setVerificationCode("");
+    setVerificationToken(undefined);
+    setTimerSecondsLeft(expiresInSec && expiresInSec > 0 ? expiresInSec : DEFAULT_TIMER_SECONDS);
+    setStep("verify");
+  };
+
   const handleRequestCode = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -105,13 +126,14 @@ export default function ResetPassword() {
 
     try {
       const response = await passwordResetApi.requestCode(studentId);
-      setRequestId(response.requestId);
-      setVerificationCode("");
-      setVerificationToken(undefined);
-      setTimerSecondsLeft(response.expiresInSec && response.expiresInSec > 0 ? response.expiresInSec : DEFAULT_TIMER_SECONDS);
-      setStep("verify");
+      moveToVerifyStep(response.expiresInSec, response.requestId);
     } catch (requestError) {
-      setError(resolveErrorMessage(requestError, "인증번호 요청에 실패했습니다. 잠시 후 다시 시도해 주세요."));
+      const message = resolveErrorMessage(requestError, "인증번호 요청에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+      if (isAccountExistenceError(message)) {
+        moveToVerifyStep();
+      } else {
+        setError(message);
+      }
     } finally {
       setRequestingCode(false);
     }
@@ -128,11 +150,14 @@ export default function ResetPassword() {
 
     try {
       const response = await passwordResetApi.requestCode(studentId);
-      setRequestId(response.requestId);
-      setVerificationCode("");
-      setTimerSecondsLeft(response.expiresInSec && response.expiresInSec > 0 ? response.expiresInSec : DEFAULT_TIMER_SECONDS);
+      moveToVerifyStep(response.expiresInSec, response.requestId);
     } catch (requestError) {
-      setError(resolveErrorMessage(requestError, "인증번호 재전송에 실패했습니다. 잠시 후 다시 시도해 주세요."));
+      const message = resolveErrorMessage(requestError, "인증번호 재전송에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+      if (isAccountExistenceError(message)) {
+        moveToVerifyStep();
+      } else {
+        setError(message);
+      }
     } finally {
       setResendingCode(false);
     }
@@ -304,9 +329,7 @@ export default function ResetPassword() {
               </div>
 
               <p className="rounded-2xl border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] px-4 py-3 text-sm leading-6 text-[var(--text)]">
-                입력한 학번의 학교 이메일로 인증번호가 발송됩니다.
-                <br />
-                <span className="font-semibold text-[var(--accent)]">{targetEmail}</span>
+                인증코드를 요청하면 가입된 계정에 한해 학교 메일로 전송됩니다.
               </p>
 
               {error && (
@@ -345,18 +368,28 @@ export default function ResetPassword() {
                 />
               </div>
 
-              <div className="flex items-center justify-between rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-3">
-                <p className="text-sm font-medium text-[var(--text-muted)]">
-                  {studentId}@dankook.ac.kr로 인증번호를 발송했습니다.
-                </p>
-                <p
-                  className={`inline-flex items-center gap-1 text-sm font-semibold ${
-                    isCodeExpired ? "text-[var(--status-danger-text)]" : "text-[var(--accent)]"
-                  }`}
-                >
-                  <Clock3 className="h-4 w-4" />
-                  {formatTimer(timerSecondsLeft)}
-                </p>
+              <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-[var(--text)]">
+                      가입된 계정이라면 학교 메일로 인증코드가 전송됩니다.
+                    </p>
+                    <p className="text-xs leading-5 text-[var(--text-muted)]">
+                      메일이 보이지 않으면 스팸함을 확인해 주세요.
+                    </p>
+                    <p className="text-xs leading-5 text-[var(--text-muted)]">
+                      계정이 없다면 회원가입 후 이용해 주세요.
+                    </p>
+                  </div>
+                  <p
+                    className={`inline-flex items-center gap-1 text-sm font-semibold ${
+                      isCodeExpired ? "text-[var(--status-danger-text)]" : "text-[var(--accent)]"
+                    }`}
+                  >
+                    <Clock3 className="h-4 w-4" />
+                    {formatTimer(timerSecondsLeft)}
+                  </p>
+                </div>
               </div>
 
               {isCodeExpired && (
