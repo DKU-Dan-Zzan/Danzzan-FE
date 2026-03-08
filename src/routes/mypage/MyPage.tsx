@@ -20,8 +20,8 @@ function MyPage() {
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
             <User size={40} className="text-blue-400" />
           </div>
-          <h2 className="text-xl font-bold text-gray-800">로그인이 안되어 있습니다</h2>
-          <p className="text-sm text-gray-500">티켓팅 서비스 이용을 위해<br />로그인이 필요합니다.</p>
+          <h2 className="text-xl font-bold text-gray-800">내정보를 보려면 로그인해 주세요</h2>
+          <p className="text-sm text-gray-500">로그인 후 예매 내역과 계정 정보를 확인할 수 있어요.</p>
         </div>
         <button
           onClick={() => navigate("/ticket/login")}
