@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { CheckCircle2, Circle, CircleAlert, Clock3, House, KeyRound, MailCheck, RotateCcw } from "lucide-react";
 import { HttpError } from "@/api/ticketing/httpClient";
@@ -8,12 +8,21 @@ import { Input } from "@/components/ticketing/common/ui/input";
 import { Label } from "@/components/ticketing/common/ui/label";
 
 type ResetStep = "request" | "verify" | "password";
+type ResetStepItem = {
+  key: ResetStep;
+  label: string;
+};
 
 const DEFAULT_TIMER_SECONDS = 180;
 const STUDENT_ID_REGEX = /^\d{8}$/;
 const VERIFICATION_CODE_REGEX = /^\d{6}$/;
 const PASSWORD_MIN_LENGTH = 8;
 const SPECIAL_CHAR_REGEX = /[^A-Za-z0-9]/;
+const RESET_STEPS: ResetStepItem[] = [
+  { key: "request", label: "학번 입력" },
+  { key: "verify", label: "인증번호 확인" },
+  { key: "password", label: "새 비밀번호" },
+];
 
 const sanitizeDigitInput = (value: string, maxLength: number) => value.replace(/\D/g, "").slice(0, maxLength);
 
@@ -68,15 +77,8 @@ export default function ResetPassword() {
   const isCodeExpired = timerSecondsLeft <= 0;
   const isTimerRunning = step === "verify" && timerSecondsLeft > 0;
   const targetEmail = isStudentIdValid ? `${studentId}@dankook.ac.kr` : "학번 8자리 입력 후 확인";
-  const stepIndex = useMemo(() => {
-    if (step === "request") {
-      return 1;
-    }
-    if (step === "verify") {
-      return 2;
-    }
-    return 3;
-  }, [step]);
+  const stepIndex = RESET_STEPS.findIndex(({ key }) => key === step) + 1;
+  const currentStepLabel = RESET_STEPS[stepIndex - 1]?.label ?? RESET_STEPS[0].label;
 
   useEffect(() => {
     if (!isTimerRunning) {
@@ -229,26 +231,55 @@ export default function ResetPassword() {
 
         <main className="mt-6">
           {!completed && (
-            <div className="mb-5 grid grid-cols-3 gap-2">
-              {["학번 입력", "인증번호 확인", "새 비밀번호"].map((label, index) => {
-                const current = index + 1;
-                const isActive = current === stepIndex;
-                const isDone = current < stepIndex;
-                return (
-                  <div
-                    key={label}
-                    className={`rounded-xl border px-2 py-2 text-center text-[11px] font-semibold ${
-                      isActive
-                        ? "border-[var(--border-strong)] bg-[var(--surface-tint-subtle)] text-[var(--accent)]"
-                        : isDone
-                          ? "border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text)]"
-                          : "border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text-muted)]"
-                    }`}
-                  >
-                    {label}
-                  </div>
-                );
-              })}
+            <div className="mb-6 rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 py-3">
+              <p className="text-xs font-semibold text-[var(--text-muted)]">
+                <span className="text-[var(--accent)]">{stepIndex}/3 단계</span> · {currentStepLabel}
+              </p>
+
+              <ol className="mt-3 flex items-start" aria-label="비밀번호 재설정 단계">
+                {RESET_STEPS.map(({ key, label }, index) => {
+                  const current = index + 1;
+                  const isActive = current === stepIndex;
+                  const isDone = current < stepIndex;
+                  const isLast = index === RESET_STEPS.length - 1;
+                  return (
+                    <li key={key} className="flex min-w-0 flex-1 items-start">
+                      <div className="flex min-w-0 flex-col items-center text-center">
+                        <span
+                          className={`inline-flex h-8 w-8 items-center justify-center rounded-full border text-[11px] font-bold ${
+                            isActive
+                              ? "border-[var(--accent)] bg-[var(--accent)] text-white"
+                              : isDone
+                                ? "border-[var(--border-strong)] bg-[var(--surface-tint-subtle)] text-[var(--accent)]"
+                                : "border-[var(--border-base)] bg-[var(--surface-base)] text-[var(--text-muted)]"
+                          }`}
+                        >
+                          {isDone ? "✓" : String(current).padStart(2, "0")}
+                        </span>
+                        <span
+                          className={`mt-1 text-[11px] font-semibold ${
+                            isActive
+                              ? "text-[var(--accent)]"
+                              : isDone
+                                ? "text-[var(--text)]"
+                                : "text-[var(--text-muted)]"
+                          }`}
+                        >
+                          {label}
+                        </span>
+                      </div>
+
+                      {!isLast && (
+                        <span
+                          className={`mx-2 mt-4 h-px flex-1 ${
+                            isDone ? "bg-[var(--border-emphasis)]" : "bg-[var(--border-base)]"
+                          }`}
+                        />
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
             </div>
           )}
 
