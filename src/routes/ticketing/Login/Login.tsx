@@ -103,20 +103,20 @@ export default function Login() {
 
           <div className="mt-6 space-y-3 text-center">
             <Link
-              to="/ticket/reset-password"
-              className="inline-flex items-center gap-1 text-sm font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--accent)]"
-            >
-              <span>비밀번호를 잊으셨나요?</span>
-              <span className="font-semibold text-[var(--accent)]">비밀번호 재설정</span>
-            </Link>
-
-            <Link
               to="/ticket/signup"
               state={{ authTabFrom: "login" }}
               className="inline-flex items-center gap-1 text-sm font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--accent)]"
             >
               <span>티켓팅 서비스를 처음 이용하시나요?</span>
               <span className="font-semibold text-[var(--accent)]">회원가입</span>
+            </Link>
+
+            <Link
+              to="/ticket/reset-password"
+              className="inline-flex items-center gap-1 text-sm font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--accent)]"
+            >
+              <span>비밀번호를 잊으셨나요?</span>
+              <span className="font-semibold text-[var(--accent)]">비밀번호 재설정</span>
             </Link>
           </div>
         </main>
