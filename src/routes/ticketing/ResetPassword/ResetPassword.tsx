@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { CheckCircle2, Circle, CircleAlert, Clock3, House, KeyRound, MailCheck, RotateCcw } from "lucide-react";
+import { CheckCircle2, Circle, CircleAlert, Clock3, KeyRound, MailCheck, RotateCcw } from "lucide-react";
 import { HttpError } from "@/api/ticketing/httpClient";
 import { passwordResetApi } from "@/api/ticketing/passwordResetApi";
 import { Button } from "@/components/ticketing/common/ui/button";
@@ -63,8 +63,6 @@ export default function ResetPassword() {
   const [resettingPassword, setResettingPassword] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const festivalHomeUrl = (import.meta.env.VITE_FESTIVAL_HOME_URL as string | undefined)?.trim() ?? "";
-  const hasFestivalHomeUrl = Boolean(festivalHomeUrl);
   const inputClassName =
     "h-11 rounded-2xl border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20";
 
@@ -206,20 +204,6 @@ export default function ResetPassword() {
   return (
     <div className="min-h-screen bg-[var(--bg-base)]">
       <div className="mx-auto w-full max-w-[420px] px-5 py-6">
-        <button
-          type="button"
-          onClick={() => {
-            if (hasFestivalHomeUrl) {
-              window.location.href = festivalHomeUrl;
-            }
-          }}
-          disabled={!hasFestivalHomeUrl}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-55"
-        >
-          <House className="h-4 w-4" strokeWidth={2.3} />
-          축제 홈으로
-        </button>
-
         <div className="mt-9">
           <p className="text-[length:var(--ticketing-text-helper)] font-semibold text-[var(--text-muted)]">
             재학생 전용 서비스

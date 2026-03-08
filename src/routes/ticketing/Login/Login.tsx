@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { CircleAlert, GraduationCap, House } from "lucide-react";
+import { CircleAlert, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ticketing/common/ui/button";
 import { Input } from "@/components/ticketing/common/ui/input";
 import { Label } from "@/components/ticketing/common/ui/label";
@@ -14,8 +14,6 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const festivalHomeUrl = (import.meta.env.VITE_FESTIVAL_HOME_URL as string | undefined)?.trim() ?? "";
-  const hasFestivalHomeUrl = Boolean(festivalHomeUrl);
   const canSubmit = studentId.trim().length > 0 && password.trim().length > 0;
   const inputClassName =
     "h-11 rounded-2xl border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20";
@@ -40,20 +38,6 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-[var(--bg-base)]">
       <div className="mx-auto w-full max-w-[420px] px-5 py-6">
-        <button
-          type="button"
-          onClick={() => {
-            if (hasFestivalHomeUrl) {
-              window.location.href = festivalHomeUrl;
-            }
-          }}
-          disabled={!hasFestivalHomeUrl}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-55"
-        >
-          <House className="h-4 w-4" strokeWidth={2.3} />
-          축제 홈으로
-        </button>
-
         <div className="mt-9">
           <p className="text-[length:var(--ticketing-text-helper)] font-semibold text-[var(--text-muted)]">
             재학생 전용 서비스
