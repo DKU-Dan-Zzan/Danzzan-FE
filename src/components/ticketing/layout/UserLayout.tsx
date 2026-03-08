@@ -1,5 +1,5 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, House, LogOut } from "lucide-react";
+import { ArrowLeft, LogOut } from "lucide-react";
 import { Button } from "@/components/ticketing/common/ui/button";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import BottomNav from "@/components/layout/BottomNav";
@@ -41,12 +41,6 @@ export function UserLayout() {
     navigate("/ticket/login", { replace: true });
   };
 
-  const handleGoHome = () => {
-    navigate("/ticket/ticketing", {
-      replace: isTicketingPage,
-      state: { resetToHome: Date.now() },
-    });
-  };
   const bottomNavPaddingClass = "pb-[calc(84px+env(safe-area-inset-bottom)+0.75rem)]";
 
   return (
@@ -78,16 +72,7 @@ export function UserLayout() {
                 </h1>
               </div>
 
-              <div className="flex items-center gap-1.5">
-                <Button
-                  variant="ghost"
-                  onClick={handleGoHome}
-                  className="h-10 w-10 rounded-lg border border-[var(--header-border)] bg-[var(--header-button-bg)] p-0 text-[var(--header-text)] hover:bg-[var(--header-button-hover)]"
-                  aria-label="티켓팅 포털 홈으로 이동"
-                  title="티켓팅 포털 홈으로 이동"
-                >
-                  <House className="h-4 w-4" />
-                </Button>
+              <div className="flex items-center">
                 <Button
                   variant="ghost"
                   onClick={handleLogout}
