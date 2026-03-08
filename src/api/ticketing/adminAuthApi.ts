@@ -33,6 +33,7 @@ export const adminAuthApi = {
           role: "admin",
           department: "",
           studentId: payload.studentId,
+          college: "",
         },
       });
     }
@@ -61,6 +62,7 @@ export const adminAuthApi = {
           role: decoded.role === "ROLE_ADMIN" ? "admin" as const : "unknown" as const,
           department: "",
           studentId: decoded.studentId ?? "",
+          college: decoded.college ?? "",
         };
 
         if (decoded.role !== "ROLE_ADMIN") {

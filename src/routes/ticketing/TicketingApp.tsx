@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/ticketing/useAuth";
 import { AdminLayout } from "@/components/ticketing/layout/AdminLayout";
 import { UserLayout } from "@/components/ticketing/layout/UserLayout";
 import Login from "@/routes/ticketing/Login/Login";
+import ResetPassword from "@/routes/ticketing/ResetPassword/ResetPassword";
 import Signup from "@/routes/ticketing/Signup/Signup";
 import Ticketing from "@/routes/ticketing/Ticketing/Ticketing";
 import MyTicket from "@/routes/ticketing/MyTicket/MyTicket";
@@ -47,6 +48,7 @@ export default function TicketingApp() {
 
         <Route element={<UserLayout />}>
           <Route path="login" element={<Login />} />
+          <Route path="reset-password" element={<ResetPassword />} />
           <Route path="signup" element={<Signup />} />
           <Route element={<RequireStudentAuth />}>
             <Route path="ticketing" element={<Ticketing />} />
