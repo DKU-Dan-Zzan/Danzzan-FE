@@ -30,6 +30,7 @@ export const authApi = {
           role: "student",
           department: "소프트웨어학과",
           studentId: payload.studentId,
+          college: "",
         },
       });
     }
