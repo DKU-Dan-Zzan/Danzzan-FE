@@ -236,15 +236,17 @@ export default function ResetPassword() {
                 <span className="text-[var(--accent)]">{stepIndex}/3 단계</span> · {currentStepLabel}
               </p>
 
-              <ol className="mt-3 flex items-start" aria-label="비밀번호 재설정 단계">
-                {RESET_STEPS.map(({ key, label }, index) => {
-                  const current = index + 1;
-                  const isActive = current === stepIndex;
-                  const isDone = current < stepIndex;
-                  const isLast = index === RESET_STEPS.length - 1;
-                  return (
-                    <li key={key} className="flex min-w-0 flex-1 items-start">
-                      <div className="flex min-w-0 flex-col items-center text-center">
+              <div className="mt-3" aria-label="비밀번호 재설정 단계">
+                <div className="grid grid-cols-[2rem_1fr_2rem_1fr_2rem] items-center">
+                  {RESET_STEPS.map(({ key }, index) => {
+                    const current = index + 1;
+                    const isActive = current === stepIndex;
+                    const isDone = current < stepIndex;
+                    const showConnector = index < RESET_STEPS.length - 1;
+                    const connectorDone = stepIndex > current;
+
+                    return (
+                      <div key={key} className="contents">
                         <span
                           className={`inline-flex h-8 w-8 items-center justify-center rounded-full border text-[11px] font-bold ${
                             isActive
@@ -256,8 +258,30 @@ export default function ResetPassword() {
                         >
                           {isDone ? "✓" : String(current).padStart(2, "0")}
                         </span>
-                        <span
-                          className={`mt-1 text-[11px] font-semibold ${
+
+                        {showConnector && (
+                          <span
+                            className={`mx-3 h-px w-full ${
+                              connectorDone ? "bg-[var(--border-emphasis)]" : "bg-[var(--border-base)]"
+                            }`}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-1.5 grid grid-cols-[2rem_1fr_2rem_1fr_2rem] items-start">
+                  {RESET_STEPS.map(({ key, label }, index) => {
+                    const current = index + 1;
+                    const isActive = current === stepIndex;
+                    const isDone = current < stepIndex;
+                    const showSpacer = index < RESET_STEPS.length - 1;
+
+                    return (
+                      <div key={`${key}-label`} className="contents">
+                        <p
+                          className={`justify-self-center text-center text-[11px] leading-4 font-semibold whitespace-nowrap ${
                             isActive
                               ? "text-[var(--accent)]"
                               : isDone
@@ -266,20 +290,13 @@ export default function ResetPassword() {
                           }`}
                         >
                           {label}
-                        </span>
+                        </p>
+                        {showSpacer && <span aria-hidden="true" />}
                       </div>
-
-                      {!isLast && (
-                        <span
-                          className={`mx-2 mt-4 h-px flex-1 ${
-                            isDone ? "bg-[var(--border-emphasis)]" : "bg-[var(--border-base)]"
-                          }`}
-                        />
-                      )}
-                    </li>
-                  );
-                })}
-              </ol>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           )}
 
