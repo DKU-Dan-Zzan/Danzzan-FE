@@ -329,7 +329,7 @@ export default function ResetPassword() {
               </div>
 
               <p className="rounded-2xl border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] px-4 py-3 text-sm leading-6 text-[var(--text)]">
-                인증코드를 요청하면 가입된 계정에 한해 학교 메일로 전송됩니다.
+                티켓팅 서비스에 기존에 가입된 학생에게, 입력한 학번의 학교 이메일(학번@dankook.ac.kr)로 인증번호가 발송됩니다.
               </p>
 
               {error && (
@@ -372,7 +372,7 @@ export default function ResetPassword() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-[var(--text)]">
-                      가입된 계정이라면 학교 메일로 인증코드가 전송됩니다.
+                      학교 이메일(학번@dankook.ac.kr)로 인증번호가 전송됩니다.
                     </p>
                     <p className="text-xs leading-5 text-[var(--text-muted)]">
                       메일이 보이지 않으면 스팸함을 확인해 주세요.
