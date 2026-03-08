@@ -6,6 +6,13 @@ export type TimetableResponseDto = {
   performances: Performance[]
 }
 
+export type ContentImageDto = {
+  id: number
+  name: string
+  previewImageUrl: string
+  detailImageUrl: string
+}
+
 export async function getPerformances(date: string) {
   const res = await http.get<TimetableResponseDto>(
     "/timetable/performances",
@@ -13,5 +20,10 @@ export async function getPerformances(date: string) {
       params: { date }
     }
   )
+  return res.data
+}
+
+export async function getContentImages() {
+  const res = await http.get<ContentImageDto[]>("timetable/content-images")
   return res.data
 }

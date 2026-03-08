@@ -2,9 +2,9 @@ import { Megaphone } from "lucide-react"
 
 export interface EmergencyNoticeData {
   id: number
-  title: string
+  title:string
   content: string
-  createdAt?: string
+  updatedAt?: string
 }
 
 interface Props {
@@ -14,25 +14,19 @@ interface Props {
 const EmergencyNotice = ({ notice }: Props) => {
   if (!notice) return null
 
-  const isNew = notice.createdAt === "방금 전"
+  const isNew = notice.updatedAt === "방금 전"
 
   return (
-    <section className="px-4 mt-6">
+    <section className="px-4 mt-3 mb-1">
       <div
         className="
-          relative
-          rounded-2xl
-          bg-white
-          border border-gray-200
-          shadow-[0_12px_30px_rgba(10,85,156,0.12)]
-          overflow-hidden
+          rounded-[20px]
+          bg-[#FCFCFD]
+          border border-[#E8EDF3]
+          shadow-[0_4px_12px_rgba(15,23,42,0.06)]
         "
       >
-        {/* 얇은 상단 액센트 바 */}
-        <div className="absolute top-0 left-0 right-0 h-[5px] bg-primary" />
-
-        <div className="px-4 py-4 flex items-start gap-3">
-          {/* 아이콘 */}
+        <div className="px-4 py-3 flex items-start gap-3">
           <div
             className="
               flex items-center justify-center
@@ -44,10 +38,9 @@ const EmergencyNotice = ({ notice }: Props) => {
             <Megaphone size={18} strokeWidth={2.2} />
           </div>
 
-          {/* 텍스트 영역 */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 min-w-0">
                 <span className="font-semibold text-[14px] text-gray-900">
                   {notice.title}
                 </span>
@@ -58,7 +51,8 @@ const EmergencyNotice = ({ notice }: Props) => {
                       px-2 py-[2px]
                       text-[10px] font-semibold
                       rounded-full
-                      bg-primary text-white
+                      bg-primary/90 text-white
+                      flex-shrink-0
                     "
                   >
                     NEW
@@ -66,14 +60,14 @@ const EmergencyNotice = ({ notice }: Props) => {
                 )}
               </div>
 
-              {notice.createdAt && (
-                <span className="text-[11px] text-gray-500 whitespace-nowrap">
-                  {notice.createdAt}
+              {notice.updatedAt && (
+                <span className="text-[11px] text-gray-400 whitespace-nowrap flex-shrink-0">
+                  {notice.updatedAt}
                 </span>
               )}
             </div>
 
-            <p className="mt-2 text-[13px] leading-relaxed text-gray-700">
+            <p className="mt-1.5 text-[13px] leading-[1.5] text-gray-700 break-words">
               {notice.content}
             </p>
           </div>
