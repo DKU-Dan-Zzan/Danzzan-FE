@@ -33,6 +33,16 @@ const RESET_STEPS: ResetStepItem[] = [
   { key: "verify", label: "인증번호 확인" },
   { key: "password", label: "새 비밀번호" },
 ];
+const RESET_PASSWORD_STORAGE_KEY = "ticketing-reset-password-state-v1";
+
+type ResetPasswordPersistedState = {
+  step?: ResetStep;
+  studentId?: string;
+  requestId?: string;
+  verificationCode?: string;
+  verificationToken?: string;
+  timerExpiresAt?: number;
+};
 
 const sanitizeDigitInput = (value: string, maxLength: number) => value.replace(/\D/g, "").slice(0, maxLength);
 
@@ -62,6 +72,25 @@ const isAccountExistenceError = (message: string) => {
   return ACCOUNT_EXISTENCE_ERROR_PATTERNS.some((pattern) => pattern.test(message));
 };
 
+const safeParsePersistedState = (raw: string | null): ResetPasswordPersistedState | null => {
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(raw) as ResetPasswordPersistedState;
+  } catch {
+    return null;
+  }
+};
+
+const sanitizePersistedStep = (value?: string): ResetStep => {
+  if (value === "verify" || value === "password") {
+    return value;
+  }
+  return "request";
+};
+
 export default function ResetPassword() {
   const [step, setStep] = useState<ResetStep>("request");
   const [studentId, setStudentId] = useState("");
@@ -71,6 +100,7 @@ export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [timerSecondsLeft, setTimerSecondsLeft] = useState(DEFAULT_TIMER_SECONDS);
+  const [timerExpiresAt, setTimerExpiresAt] = useState<number | null>(null);
   const [requestingCode, setRequestingCode] = useState(false);
   const [resendingCode, setResendingCode] = useState(false);
   const [verifyingCode, setVerifyingCode] = useState(false);
@@ -87,9 +117,57 @@ export default function ResetPassword() {
   const isPasswordMatched = passwordConfirm.length > 0 && password === passwordConfirm;
   const isPasswordFormValid = hasPasswordMinLength && hasPasswordSpecialChar && isPasswordMatched;
   const isCodeExpired = timerSecondsLeft <= 0;
-  const isTimerRunning = step === "verify" && timerSecondsLeft > 0;
+  const isTimerRunning = step === "verify" && timerExpiresAt !== null && timerSecondsLeft > 0;
   const stepIndex = RESET_STEPS.findIndex(({ key }) => key === step) + 1;
   const currentStepLabel = RESET_STEPS[stepIndex - 1]?.label ?? RESET_STEPS[0].label;
+
+  useEffect(() => {
+    const persisted = safeParsePersistedState(sessionStorage.getItem(RESET_PASSWORD_STORAGE_KEY));
+    if (!persisted) {
+      return;
+    }
+
+    const nextStep = sanitizePersistedStep(persisted.step);
+    const nextStudentId = sanitizeDigitInput(persisted.studentId ?? "", 8);
+    const nextVerificationCode = sanitizeDigitInput(persisted.verificationCode ?? "", 6);
+    const nextExpiresAt = typeof persisted.timerExpiresAt === "number" ? persisted.timerExpiresAt : null;
+
+    if (nextStudentId) {
+      setStudentId(nextStudentId);
+    }
+
+    if (persisted.requestId) {
+      setRequestId(persisted.requestId);
+    }
+
+    if (nextVerificationCode) {
+      setVerificationCode(nextVerificationCode);
+    }
+
+    if (persisted.verificationToken) {
+      setVerificationToken(persisted.verificationToken);
+    }
+
+    if (nextStep === "verify") {
+      setStep("verify");
+      if (nextExpiresAt !== null) {
+        const left = Math.max(0, Math.ceil((nextExpiresAt - Date.now()) / 1000));
+        setTimerExpiresAt(nextExpiresAt);
+        setTimerSecondsLeft(left);
+      } else {
+        const fallbackExpiresAt = Date.now() + DEFAULT_TIMER_SECONDS * 1000;
+        setTimerExpiresAt(fallbackExpiresAt);
+        setTimerSecondsLeft(DEFAULT_TIMER_SECONDS);
+      }
+      return;
+    }
+
+    if (nextStep === "password") {
+      setStep("password");
+      setTimerExpiresAt(null);
+      setTimerSecondsLeft(0);
+    }
+  }, []);
 
   useEffect(() => {
     if (!isTimerRunning) {
@@ -97,19 +175,55 @@ export default function ResetPassword() {
     }
 
     const timer = window.setInterval(() => {
-      setTimerSecondsLeft((prev) => {
-        return prev <= 1 ? 0 : prev - 1;
-      });
+      if (timerExpiresAt === null) {
+        setTimerSecondsLeft(0);
+        return;
+      }
+      const left = Math.max(0, Math.ceil((timerExpiresAt - Date.now()) / 1000));
+      setTimerSecondsLeft(left);
     }, 1000);
 
     return () => window.clearInterval(timer);
-  }, [isTimerRunning]);
+  }, [isTimerRunning, timerExpiresAt]);
+
+  useEffect(() => {
+    if (completed) {
+      sessionStorage.removeItem(RESET_PASSWORD_STORAGE_KEY);
+      return;
+    }
+
+    const payload: ResetPasswordPersistedState = {
+      step,
+      studentId,
+      requestId,
+      verificationCode,
+      verificationToken,
+      timerExpiresAt: step === "verify" ? timerExpiresAt ?? undefined : undefined,
+    };
+
+    const hasMeaningfulState = Boolean(
+      payload.studentId ||
+        payload.requestId ||
+        payload.verificationCode ||
+        payload.verificationToken ||
+        payload.step !== "request",
+    );
+
+    if (!hasMeaningfulState) {
+      sessionStorage.removeItem(RESET_PASSWORD_STORAGE_KEY);
+      return;
+    }
+
+    sessionStorage.setItem(RESET_PASSWORD_STORAGE_KEY, JSON.stringify(payload));
+  }, [completed, requestId, step, studentId, timerExpiresAt, verificationCode, verificationToken]);
 
   const moveToVerifyStep = (expiresInSec?: number, nextRequestId?: string) => {
+    const expiresAt = Date.now() + (expiresInSec && expiresInSec > 0 ? expiresInSec : DEFAULT_TIMER_SECONDS) * 1000;
     setRequestId(nextRequestId);
     setVerificationCode("");
     setVerificationToken(undefined);
-    setTimerSecondsLeft(expiresInSec && expiresInSec > 0 ? expiresInSec : DEFAULT_TIMER_SECONDS);
+    setTimerExpiresAt(expiresAt);
+    setTimerSecondsLeft(Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000)));
     setStep("verify");
   };
 
@@ -186,6 +300,7 @@ export default function ResetPassword() {
         requestId,
       });
       setVerificationToken(response.verificationToken);
+      setTimerExpiresAt(null);
       setStep("password");
     } catch (verifyError) {
       setError(resolveErrorMessage(verifyError, "인증번호 확인에 실패했습니다. 번호를 다시 확인해 주세요."));
