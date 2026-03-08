@@ -21,16 +21,17 @@ export default function PrimaryFilterChips({
     <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {chips.map((c) => {
         const active = value === c.value;
+
         return (
           <button
             key={c.value}
             type="button"
             onClick={() => onChange(c.value)}
             className={[
-              "shrink-0 rounded-full px-4 py-2 text-sm font-extrabold border transition",
+              "shrink-0 rounded-full border px-4 py-2 text-sm font-extrabold transition",
               active
-                ? "bg-gray-900 text-white border-gray-900"
-                : "bg-white text-gray-900 border-gray-200",
+                ? "border-[#0a559c] bg-[#0a559c] text-white shadow-sm"
+                : "border-gray-200 bg-white text-gray-500",
             ].join(" ")}
           >
             {c.label}

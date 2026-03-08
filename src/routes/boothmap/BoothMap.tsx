@@ -11,15 +11,14 @@ import type {
 } from "./types/boothmap.types";
 import { mockBooths, mockColleges, mockPubs } from "./data/mockBoothMapData";
 
-import MapModeToggle from "./components/MapModeToggle";
 import PrimaryFilterChips from "./components/PrimaryFilterChips";
 import SecondaryCollegeChips from "./components/SecondaryCollegeChips";
-import KakaoMapPlaceholder from "./components/KaKaoMapPlaceholder";
-import MapMarkersOverlay from "./components/MapMarkersOverlay";
+import KakaoMapView from "./components/KakaoMapView";
 import BottomSheet from "./components/BottomSheet";
 import BoothList from "./components/BoothList";
 import PubList from "./components/PubList";
 import DetailSheet from "./components/DetailSheet";
+import MapFloatingToggle from "./components/MapFloatingToggle";
 
 export default function BoothMap() {
   const [mode, setMode] = useState<MapMode>("2D");
@@ -29,19 +28,22 @@ export default function BoothMap() {
   const [sheetMode, setSheetMode] = useState<SheetMode>("LIST");
   const [sheetSnap, setSheetSnap] = useState<SheetSnap>("PEEK");
 
-  // ✅ 프레임 폭(노트북에서 폰 UI로 가운데 정렬용) — Layout을 이미 프레임으로 묶어놨으면 그대로 둬도 됨
-  const frameWidth = 430;
-
   const colleges: College[] = mockColleges;
   const booths: Booth[] = mockBooths;
   const pubs: Pub[] = mockPubs;
+
+  const frameWidth = 430;
+  const bottomNavHeight = 84;
 
   const handlePrimaryChange = (next: PrimaryFilter) => {
     setPrimaryFilter(next);
     setSelectedItem(null);
     setSheetMode("LIST");
     setSheetSnap("PEEK");
-    if (next !== "PUB") setSelectedCollegeId(null);
+
+    if (next !== "PUB") {
+      setSelectedCollegeId(null);
+    }
   };
 
   const visibleBooths = useMemo(() => {
@@ -87,38 +89,11 @@ export default function BoothMap() {
     setSheetSnap("HALF");
   };
 
-  const bottomNavHeight = 80;
-
   return (
-    <div className="relative h-full min-h-screen w-full">
-      {/* 상단 컨트롤 */}
-      <div className="mx-auto w-full max-w-[480px] px-4 pt-3">
-        <div className="flex flex-col gap-3">
-          <div className="flex justify-center">
-            <MapModeToggle mode={mode} onChange={setMode} />
-          </div>
-
-          <PrimaryFilterChips value={primaryFilter} onChange={handlePrimaryChange} />
-
-          <SecondaryCollegeChips
-            visible={primaryFilter === "PUB"}
-            colleges={colleges}
-            selectedCollegeId={selectedCollegeId}
-            onSelect={(idOrNull) => {
-              setSelectedCollegeId(idOrNull);
-              setSelectedItem(null);
-              setSheetMode("LIST");
-              setSheetSnap(idOrNull ? "HALF" : "PEEK");
-            }}
-          />
-        </div>
-      </div>
-
-      {/* 지도 영역 */}
-      <div className="mx-auto mt-3 w-full max-w-[480px] px-4 pb-[96px]">
-        <div className="relative h-[58vh] w-full overflow-hidden rounded-2xl border border-gray-200 bg-white">
-          <KakaoMapPlaceholder mode={mode} />
-          <MapMarkersOverlay
+    <div className="relative h-screen w-full overflow-hidden bg-white">
+      {/* 전체 지도 영역 */}
+      <div className="absolute inset-0">
+          <KakaoMapView
             booths={visibleBooths}
             colleges={visibleColleges}
             primaryFilter={primaryFilter}
@@ -126,7 +101,53 @@ export default function BoothMap() {
             onClickBooth={onClickMarkerBooth}
             onClickCollege={onClickMarkerCollege}
           />
+
+          {mode === "3D" && (
+            <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/20">
+              <div className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-gray-600 shadow-lg">
+                3D 지도는 준비 중입니다
+              </div>
+            </div>  
+        )}
+      </div>
+
+      {/* 상단 로고 + 칩 오버레이 */}
+      <div className="absolute left-1/2 top-3 z-30 w-[calc(100%-24px)] max-w-[430px] -translate-x-1/2">
+        <div className="rounded-[28px] border border-white/70 bg-white/92 px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.08)] backdrop-blur-md">
+          <div className="mb-3 flex justify-center">
+            <img
+              src="/logo.png"
+              alt="단짠 로고"
+              className="h-10 w-auto object-contain"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = "none";
+              }}
+            />
+          </div>
+
+          <PrimaryFilterChips value={primaryFilter} onChange={handlePrimaryChange} />
+
+          {primaryFilter === "PUB" && (
+            <div className="mt-2">
+              <SecondaryCollegeChips
+                visible={true}
+                colleges={colleges}
+                selectedCollegeId={selectedCollegeId}
+                onSelect={(idOrNull) => {
+                  setSelectedCollegeId(idOrNull);
+                  setSelectedItem(null);
+                  setSheetMode("LIST");
+                  setSheetSnap(idOrNull ? "HALF" : "PEEK");
+                }}
+              />
+            </div>
+          )}
         </div>
+      </div>
+
+      {/* 2D / 3D 플로팅 토글 */}
+      <div className="absolute bottom-[124px] right-4 z-30">
+        <MapFloatingToggle mode={mode} onChange={setMode} />
       </div>
 
       {/* 바텀시트 */}
@@ -148,7 +169,11 @@ export default function BoothMap() {
           </div>
         ) : sheetMode === "LIST" ? (
           primaryFilter === "PUB" ? (
-            <PubList pubs={visiblePubs} selectedCollegeId={selectedCollegeId} onSelectPub={onSelectPubFromList} />
+            <PubList
+              pubs={visiblePubs}
+              selectedCollegeId={selectedCollegeId}
+              onSelectPub={onSelectPubFromList}
+            />
           ) : (
             <BoothList booths={visibleBooths} onSelectBooth={onSelectBoothFromList} />
           )
@@ -166,8 +191,6 @@ export default function BoothMap() {
           />
         )}
       </BottomSheet>
-
-      {/* (참고) BottomNav은 기존 layout/BottomNav.tsx에서 처리한다고 가정 */}
     </div>
   );
 }

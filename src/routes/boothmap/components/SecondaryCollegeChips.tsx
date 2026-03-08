@@ -1,4 +1,4 @@
-// 주점(PUB) 모드에서 단과대(secondary filter)를 선택하는 칩 컴포넌트
+// 주점 선택 시 단과대 secondary filter를 보여주는 칩 컴포넌트
 
 import type { College } from "../types/boothmap.types";
 
@@ -21,10 +21,10 @@ export default function SecondaryCollegeChips({
         type="button"
         onClick={() => onSelect(null)}
         className={[
-          "shrink-0 rounded-full px-4 py-2 text-sm font-extrabold border transition",
+          "shrink-0 rounded-full border px-4 py-2 text-sm font-extrabold transition",
           selectedCollegeId === null
-            ? "bg-blue-600 text-white border-blue-600"
-            : "bg-white text-gray-900 border-gray-200",
+            ? "border-[#0a559c] bg-[#0a559c] text-white shadow-sm"
+            : "border-gray-200 bg-white text-gray-500",
         ].join(" ")}
       >
         전체
@@ -32,16 +32,17 @@ export default function SecondaryCollegeChips({
 
       {colleges.map((c) => {
         const active = selectedCollegeId === c.id;
+
         return (
           <button
             key={c.id}
             type="button"
             onClick={() => onSelect(c.id)}
             className={[
-              "shrink-0 rounded-full px-4 py-2 text-sm font-extrabold border transition",
+              "shrink-0 rounded-full border px-4 py-2 text-sm font-extrabold transition",
               active
-                ? "bg-blue-600 text-white border-blue-600"
-                : "bg-white text-gray-900 border-gray-200",
+                ? "border-[#0a559c] bg-[#0a559c] text-white shadow-sm"
+                : "border-gray-200 bg-white text-gray-500",
             ].join(" ")}
           >
             {c.name}
