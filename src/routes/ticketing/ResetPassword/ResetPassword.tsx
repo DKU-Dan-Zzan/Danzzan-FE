@@ -18,16 +18,12 @@ const STUDENT_ID_REGEX = /^\d{8}$/;
 const VERIFICATION_CODE_REGEX = /^\d{6}$/;
 const PASSWORD_MIN_LENGTH = 8;
 const SPECIAL_CHAR_REGEX = /[^A-Za-z0-9]/;
-const ACCOUNT_EXISTENCE_ERROR_PATTERNS = [
-  /미가입/,
-  /가입되지/,
-  /존재하지 않/,
-  /계정.*없/,
-  /회원.*없/,
-  /not found/i,
-  /user not found/i,
-  /unknown user/i,
-];
+const ERROR_CODE_MESSAGES: Record<string, string> = {
+  PASSWORD_RESET_USER_NOT_FOUND: "등록되지 않은 학번입니다. 티켓팅 서비스에 가입된 학번을 입력해 주세요.",
+  PASSWORD_RESET_RESEND_COOLDOWN: "잠시 후 인증번호를 다시 요청해 주세요.",
+  PASSWORD_RESET_RATE_LIMITED: "요청 횟수 제한을 초과했습니다. 잠시 후 다시 시도해 주세요.",
+  PASSWORD_RESET_TOO_MANY_ATTEMPTS: "인증 시도 횟수를 초과했습니다. 잠시 후 다시 시도해 주세요.",
+};
 const RESET_STEPS: ResetStepItem[] = [
   { key: "request", label: "학번 입력" },
   { key: "verify", label: "인증번호 확인" },
@@ -54,7 +50,10 @@ const formatTimer = (seconds: number) => {
 
 const resolveErrorMessage = (error: unknown, fallback: string) => {
   if (error instanceof HttpError) {
-    const payload = error.payload as { error?: string; message?: string } | undefined;
+    const payload = error.payload as { error?: string; errorCode?: string; message?: string } | undefined;
+    if (payload?.errorCode && ERROR_CODE_MESSAGES[payload.errorCode]) {
+      return ERROR_CODE_MESSAGES[payload.errorCode];
+    }
     if (payload?.error) {
       return payload.error;
     }
@@ -66,10 +65,6 @@ const resolveErrorMessage = (error: unknown, fallback: string) => {
     }
   }
   return fallback;
-};
-
-const isAccountExistenceError = (message: string) => {
-  return ACCOUNT_EXISTENCE_ERROR_PATTERNS.some((pattern) => pattern.test(message));
 };
 
 const safeParsePersistedState = (raw: string | null): ResetPasswordPersistedState | null => {
@@ -242,12 +237,7 @@ export default function ResetPassword() {
       const response = await passwordResetApi.requestCode(studentId);
       moveToVerifyStep(response.expiresInSec, response.requestId);
     } catch (requestError) {
-      const message = resolveErrorMessage(requestError, "인증번호 요청에 실패했습니다. 잠시 후 다시 시도해 주세요.");
-      if (isAccountExistenceError(message)) {
-        moveToVerifyStep();
-      } else {
-        setError(message);
-      }
+      setError(resolveErrorMessage(requestError, "인증번호 요청에 실패했습니다. 잠시 후 다시 시도해 주세요."));
     } finally {
       setRequestingCode(false);
     }
@@ -266,12 +256,7 @@ export default function ResetPassword() {
       const response = await passwordResetApi.requestCode(studentId);
       moveToVerifyStep(response.expiresInSec, response.requestId);
     } catch (requestError) {
-      const message = resolveErrorMessage(requestError, "인증번호 재전송에 실패했습니다. 잠시 후 다시 시도해 주세요.");
-      if (isAccountExistenceError(message)) {
-        moveToVerifyStep();
-      } else {
-        setError(message);
-      }
+      setError(resolveErrorMessage(requestError, "인증번호 재전송에 실패했습니다. 잠시 후 다시 시도해 주세요."));
     } finally {
       setResendingCode(false);
     }
