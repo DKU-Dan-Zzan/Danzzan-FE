@@ -1,3 +1,5 @@
+// 부스맵 페이지(전체화면 지도 + 상단 필터 카드 + 우측 상단 지도 토글 + 바텀시트) 최상위 컴포넌트입니다.
+
 import { useMemo, useState } from "react";
 import type {
   Booth,
@@ -53,23 +55,31 @@ export default function BoothMap() {
   }, [primaryFilter, booths]);
 
   const visibleColleges = useMemo(() => {
+    if (primaryFilter === "ALL") return colleges;
     if (primaryFilter !== "PUB") return [];
     if (!selectedCollegeId) return colleges;
     return colleges.filter((c) => c.id === selectedCollegeId);
   }, [primaryFilter, colleges, selectedCollegeId]);
 
   const visiblePubs = useMemo(() => {
-    if (primaryFilter !== "PUB") return [];
     if (!selectedCollegeId) return [];
     return pubs.filter((p) => p.college_id === selectedCollegeId);
-  }, [primaryFilter, pubs, selectedCollegeId]);
+  }, [pubs, selectedCollegeId]);
 
+  // ✅ 바텀시트에서 PubList를 보여줄 조건
+  const shouldShowPubList =
+    primaryFilter === "PUB" || selectedItem?.kind === "college";
+
+  // 일반 부스 마커 클릭
+  // - 자동으로 시트를 올리지 않음
   const onClickMarkerBooth = (id: number) => {
     setSelectedItem({ kind: "booth", id });
     setSheetMode("DETAIL");
-    setSheetSnap("HALF");
+    setSheetSnap("PEEK");
   };
 
+  // 단과대(주점) 마커 클릭
+  // - 주점 리스트를 보여줘야 하므로 HALF
   const onClickMarkerCollege = (id: number) => {
     setSelectedCollegeId(id);
     setSelectedItem({ kind: "college", id });
@@ -77,12 +87,14 @@ export default function BoothMap() {
     setSheetSnap("HALF");
   };
 
+  // 일반 부스 리스트에서 선택
   const onSelectBoothFromList = (id: number) => {
     setSelectedItem({ kind: "booth", id });
     setSheetMode("DETAIL");
     setSheetSnap("HALF");
   };
 
+  // 주점 리스트에서 선택
   const onSelectPubFromList = (id: number) => {
     setSelectedItem({ kind: "pub", id });
     setSheetMode("DETAIL");
@@ -93,38 +105,28 @@ export default function BoothMap() {
     <div className="relative h-screen w-full overflow-hidden bg-white">
       {/* 전체 지도 영역 */}
       <div className="absolute inset-0">
-          <KakaoMapView
-            booths={visibleBooths}
-            colleges={visibleColleges}
-            primaryFilter={primaryFilter}
-            selectedItem={selectedItem}
-            onClickBooth={onClickMarkerBooth}
-            onClickCollege={onClickMarkerCollege}
-          />
+        <KakaoMapView
+          booths={visibleBooths}
+          colleges={visibleColleges}
+          primaryFilter={primaryFilter}
+          selectedItem={selectedItem}
+          sheetSnap={sheetSnap}
+          onClickBooth={onClickMarkerBooth}
+          onClickCollege={onClickMarkerCollege}
+        />
 
-          {mode === "3D" && (
-            <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/20">
-              <div className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-gray-600 shadow-lg">
-                3D 지도는 준비 중입니다
-              </div>
-            </div>  
+        {mode === "3D" && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/20">
+            <div className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-gray-600 shadow-lg">
+              3D 지도는 준비 중입니다
+            </div>
+          </div>
         )}
       </div>
 
       {/* 상단 로고 + 칩 오버레이 */}
       <div className="absolute left-1/2 top-3 z-30 w-[calc(100%-24px)] max-w-[430px] -translate-x-1/2">
         <div className="rounded-[28px] border border-white/70 bg-white/92 px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.08)] backdrop-blur-md">
-          <div className="mb-3 flex justify-center">
-            <img
-              src="/logo.png"
-              alt="단짠 로고"
-              className="h-10 w-auto object-contain"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).style.display = "none";
-              }}
-            />
-          </div>
-
           <PrimaryFilterChips value={primaryFilter} onChange={handlePrimaryChange} />
 
           {primaryFilter === "PUB" && (
@@ -135,7 +137,7 @@ export default function BoothMap() {
                 selectedCollegeId={selectedCollegeId}
                 onSelect={(idOrNull) => {
                   setSelectedCollegeId(idOrNull);
-                  setSelectedItem(null);
+                  setSelectedItem(idOrNull ? { kind: "college", id: idOrNull } : null);
                   setSheetMode("LIST");
                   setSheetSnap(idOrNull ? "HALF" : "PEEK");
                 }}
@@ -143,11 +145,10 @@ export default function BoothMap() {
             </div>
           )}
         </div>
-      </div>
 
-      {/* 2D / 3D 플로팅 토글 */}
-      <div className="absolute bottom-[124px] right-4 z-30">
-        <MapFloatingToggle mode={mode} onChange={setMode} />
+        <div className="mt-3 flex justify-end pr-1">
+          <MapFloatingToggle mode={mode} onChange={setMode} />
+        </div>
       </div>
 
       {/* 바텀시트 */}
@@ -156,9 +157,14 @@ export default function BoothMap() {
         snap={sheetSnap}
         onSnapChange={setSheetSnap}
         onBackToList={() => {
+          const nextSnap =
+            selectedItem?.kind === "pub" || selectedItem?.kind === "college"
+              ? "HALF"
+              : "PEEK";
+
           setSelectedItem(null);
           setSheetMode("LIST");
-          setSheetSnap("HALF");
+          setSheetSnap(nextSnap);
         }}
         bottomOffset={bottomNavHeight}
         frameWidth={frameWidth}
@@ -168,7 +174,7 @@ export default function BoothMap() {
             위로 올려서 목록 보기
           </div>
         ) : sheetMode === "LIST" ? (
-          primaryFilter === "PUB" ? (
+          shouldShowPubList ? (
             <PubList
               pubs={visiblePubs}
               selectedCollegeId={selectedCollegeId}

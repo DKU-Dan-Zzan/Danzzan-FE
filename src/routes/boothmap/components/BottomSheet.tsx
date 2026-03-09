@@ -119,11 +119,6 @@ export default function BottomSheet({
     setHeight(snaps[target]);
   };
 
-  useEffect(() => {
-    if (mode === "DETAIL" && snap === "PEEK") onSnapChange("HALF");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode]);
-
   const contentScrollable = snap !== "PEEK";
 
   return (
