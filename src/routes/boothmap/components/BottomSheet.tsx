@@ -39,7 +39,7 @@ export default function BottomSheet({
   const buildSnaps = () => {
     const usable = window.innerHeight - bottomOffset;
     return {
-      PEEK: 84,
+      PEEK: 40,
       HALF: Math.round(usable * 0.48),
       FULL: Math.round(usable * 0.82),
     } satisfies SnapPx;
@@ -154,7 +154,7 @@ export default function BottomSheet({
           <button
             type="button"
             onClick={onBackToList}
-            className="text-sm font-extrabold text-blue-600"
+            className="text-m font-extrabold text-blue-600"
           >
             ← 목록으로
           </button>

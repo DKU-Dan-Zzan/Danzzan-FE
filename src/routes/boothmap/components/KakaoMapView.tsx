@@ -1,12 +1,17 @@
 // 카카오맵 2D 지도를 렌더링하고, 커스텀 오버레이 핀 마커와 이름 말풍선을 표시하는 컴포넌트입니다.
+// 성능 개선:
+// 1) 마커 전체 생성/제거와 선택 상태 변경 로직 분리
+// 2) selectedItem 변경 시 전체 오버레이 재생성 방지
+// 3) 핀 SVG data url 캐싱
+// 4) overlay를 id 기반으로 관리하여 필요한 것만 업데이트
 
-import { useEffect, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import useKakaoMapLoader from "../../../hooks/useKakaoMapLoader"
 import type {
   Booth,
   College,
   PrimaryFilter,
-  SelectedItem,
+  SelectedMapItem,
   SheetSnap,
 } from "../types/boothmap.types"
 
@@ -17,21 +22,33 @@ declare global {
 }
 
 type Props = {
-  booths: Booth[]
-  colleges: College[]
-  primaryFilter: PrimaryFilter
-  selectedItem: SelectedItem
-  sheetSnap: SheetSnap
-  onClickBooth: (id: number) => void
-  onClickCollege: (id: number) => void
-}
+  booths: Booth[];
+  colleges: College[];
+  primaryFilter: PrimaryFilter;
+  selectedMapItem: SelectedMapItem;
+  sheetSnap: SheetSnap;
+  onClickBooth: (id: number) => void;
+  onClickCollege: (id: number) => void;
+};
 
 const DEFAULT_CENTER = {
-  lat: 37.3226,
-  lng: 127.1265,
+  lat: 37.3201,
+  lng: 127.1276,
 }
 
-function getMarkerConfig(type: "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "FACILITY") {
+type MarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "FACILITY"
+
+type OverlayRecord = {
+  overlay: any
+  kind: "booth" | "college"
+  id: number
+  lat: number
+  lng: number
+  name: string
+  type: MarkerType
+}
+
+function getMarkerConfig(type: MarkerType) {
   switch (type) {
     case "PUB":
       return {
@@ -71,21 +88,54 @@ function createPinDataUrl(color: string) {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`
 }
 
+// type별 pin url 캐싱
+const PIN_URL_MAP: Record<MarkerType, string> = {
+  PUB: createPinDataUrl("#0a559c"),
+  FOOD_TRUCK: createPinDataUrl("#ef4444"),
+  EXPERIENCE: createPinDataUrl("#10b981"),
+  FACILITY: createPinDataUrl("#3b82f6"),
+}
+
+function getOverlayKey(kind: "booth" | "college", id: number) {
+  return `${kind}:${id}`
+}
+
 export default function KakaoMapView({
   booths,
   colleges,
   primaryFilter,
-  selectedItem,
+  selectedMapItem,
   sheetSnap,
   onClickBooth,
   onClickCollege,
 }: Props) {
   const mapRef = useRef<HTMLDivElement | null>(null)
   const mapInstanceRef = useRef<any>(null)
-  const overlaysRef = useRef<any[]>([])
+  const isInitialBoundsAppliedRef = useRef(false)
+
+  // 전체 오버레이를 배열 대신 Map으로 관리
+  const overlayMapRef = useRef<Map<string, OverlayRecord>>(new Map())
+
+  // 이름 말풍선
   const labelOverlayRef = useRef<any>(null)
 
+  // 이전 선택 항목 추적
+  const prevSelectedKeyRef = useRef<string | null>(null)
+
   const { isLoaded, isError } = useKakaoMapLoader()
+
+  // 선택된 booth/college 빠르게 찾기 위한 맵
+  const boothMap = useMemo(() => {
+    const map = new Map<number, Booth>()
+    booths.forEach((booth) => map.set(booth.id, booth))
+    return map
+  }, [booths])
+
+  const collegeMap = useMemo(() => {
+    const map = new Map<number, College>()
+    colleges.forEach((college) => map.set(college.id, college))
+    return map
+  }, [colleges])
 
   // 지도 최초 생성
   useEffect(() => {
@@ -96,8 +146,11 @@ export default function KakaoMapView({
 
     const map = new kakao.maps.Map(mapRef.current, {
       center,
-      level: 4,
+      level: 3,
     })
+
+    // 줌 제한
+    map.setMaxLevel(4) // 최대 축소
 
     // 지도 빈 곳 클릭 시 말풍선 닫기
     kakao.maps.event.addListener(map, "click", () => {
@@ -107,18 +160,18 @@ export default function KakaoMapView({
     mapInstanceRef.current = map
   }, [isLoaded])
 
-  // 기존 일반 오버레이 제거
-  const clearOverlays = () => {
-    overlaysRef.current.forEach((overlay) => overlay.setMap(null))
-    overlaysRef.current = []
-  }
-
-  // 기존 이름 말풍선 제거
   const clearLabelOverlay = () => {
     if (labelOverlayRef.current) {
       labelOverlayRef.current.setMap(null)
       labelOverlayRef.current = null
     }
+  }
+
+  const clearAllOverlays = () => {
+    overlayMapRef.current.forEach(({ overlay }) => {
+      overlay.setMap(null)
+    })
+    overlayMapRef.current.clear()
   }
 
   // offset 이동 함수
@@ -194,7 +247,7 @@ export default function KakaoMapView({
     const overlay = new kakao.maps.CustomOverlay({
       position,
       content: bubble,
-      yAnchor: 2.2, // 마커 위쪽에 뜨게
+      yAnchor: 2.2,
       zIndex: 20,
     })
 
@@ -202,20 +255,20 @@ export default function KakaoMapView({
     labelOverlayRef.current = overlay
   }
 
-  // 커스텀 핀 DOM 생성
+  // 마커 DOM 생성
   const createMarkerElement = ({
     type,
     isSelected,
     title,
     onClick,
   }: {
-    type: "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "FACILITY"
+    type: MarkerType
     isSelected: boolean
     title: string
     onClick: () => void
   }) => {
-    const { color, iconPath } = getMarkerConfig(type)
-    const pinUrl = createPinDataUrl(color)
+    const { iconPath } = getMarkerConfig(type)
+    const pinUrl = PIN_URL_MAP[type]
 
     const wrapper = document.createElement("div")
     wrapper.title = title
@@ -251,8 +304,11 @@ export default function KakaoMapView({
     icon.style.transform = "translate(-50%, -50%)"
     icon.style.objectFit = "contain"
     icon.style.pointerEvents = "none"
-    icon.style.filter = "brightness(0) invert(1)" // 검은 svg -> 흰색
+    icon.style.filter = "brightness(0) invert(1)"
     icon.draggable = false
+
+    wrapper.appendChild(pin)
+    wrapper.appendChild(icon)
 
     if (isSelected) {
       const ring = document.createElement("div")
@@ -268,9 +324,6 @@ export default function KakaoMapView({
       wrapper.appendChild(ring)
     }
 
-    wrapper.appendChild(pin)
-    wrapper.appendChild(icon)
-
     wrapper.onclick = (e) => {
       e.stopPropagation()
       onClick()
@@ -279,162 +332,324 @@ export default function KakaoMapView({
     return wrapper
   }
 
-  // 오버레이 렌더링
+  // 개별 overlay 생성
+  const createOverlayRecord = ({
+    kind,
+    id,
+    lat,
+    lng,
+    name,
+    type,
+    isSelected,
+    onClick,
+  }: {
+    kind: "booth" | "college"
+    id: number
+    lat: number
+    lng: number
+    name: string
+    type: MarkerType
+    isSelected: boolean
+    onClick: () => void
+  }): OverlayRecord => {
+    const { kakao } = window
+    const map = mapInstanceRef.current
+
+    const position = new kakao.maps.LatLng(lat, lng)
+    const content = createMarkerElement({
+      type,
+      isSelected,
+      title: name,
+      onClick,
+    })
+
+    const overlay = new kakao.maps.CustomOverlay({
+      position,
+      content,
+      yAnchor: 1,
+      zIndex: isSelected ? 10 : 1,
+    })
+
+    overlay.setMap(map)
+
+    return {
+      overlay,
+      kind,
+      id,
+      lat,
+      lng,
+      name,
+      type,
+    }
+  }
+
+  // 특정 overlay만 선택/비선택 스타일로 교체
+  const replaceOverlaySelection = (
+    key: string,
+    isSelected: boolean
+  ) => {
+    const record = overlayMapRef.current.get(key)
+    const map = mapInstanceRef.current
+    if (!record || !map) return
+
+    record.overlay.setMap(null)
+
+    const newRecord = createOverlayRecord({
+      kind: record.kind,
+      id: record.id,
+      lat: record.lat,
+      lng: record.lng,
+      name: record.name,
+      type: record.type,
+      isSelected,
+      onClick:
+        record.kind === "booth"
+          ? () => onClickBooth(record.id)
+          : () => onClickCollege(record.id),
+    })
+
+    overlayMapRef.current.set(key, newRecord)
+  }
+
+  // 현재 필터 기준으로 보여줄 데이터 계산
+  const visibleItems = useMemo(() => {
+    const items: Array<{
+      key: string
+      kind: "booth" | "college"
+      id: number
+      lat: number
+      lng: number
+      name: string
+      type: MarkerType
+      onClick: () => void
+    }> = []
+
+    const addBooth = (booth: Booth) => {
+      items.push({
+        key: getOverlayKey("booth", booth.id),
+        kind: "booth",
+        id: booth.id,
+        lat: booth.location_y,
+        lng: booth.location_x,
+        name: booth.name,
+        type: booth.type,
+        onClick: () => onClickBooth(booth.id),
+      })
+    }
+
+    const addCollege = (college: College) => {
+      items.push({
+        key: getOverlayKey("college", college.id),
+        kind: "college",
+        id: college.id,
+        lat: college.location_y,
+        lng: college.location_x,
+        name: `${college.name} 주점`,
+        type: "PUB",
+        onClick: () => onClickCollege(college.id),
+      })
+    }
+
+    if (primaryFilter === "PUB") {
+      colleges.forEach(addCollege)
+    } else if (primaryFilter === "ALL") {
+      booths.forEach(addBooth)
+      colleges.forEach(addCollege)
+    } else {
+      booths.forEach(addBooth)
+    }
+
+    return items
+  }, [booths, colleges, primaryFilter, onClickBooth, onClickCollege])
+
+  // 1) 마커 목록이 바뀔 때만 전체 오버레이 재구성
   useEffect(() => {
     if (!isLoaded || !mapInstanceRef.current) return
 
     const { kakao } = window
     const map = mapInstanceRef.current
 
-    clearOverlays()
+    clearAllOverlays()
     clearLabelOverlay()
+    prevSelectedKeyRef.current = null
 
     const bounds = new kakao.maps.LatLngBounds()
     let hasMarker = false
 
-    const addOverlay = ({
-      lat,
-      lng,
-      type,
-      isSelected,
-      title,
-      onClick,
-    }: {
-      lat: number
-      lng: number
-      type: "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "FACILITY"
-      isSelected: boolean
-      title: string
-      onClick: () => void
-    }) => {
-      const position = new kakao.maps.LatLng(lat, lng)
+    visibleItems.forEach((item) => {
+      const isSelected =
+        selectedMapItem?.kind === item.kind && selectedMapItem.id === item.id
 
-      const content = createMarkerElement({
-        type,
+      const record = createOverlayRecord({
+        kind: item.kind,
+        id: item.id,
+        lat: item.lat,
+        lng: item.lng,
+        name: item.name,
+        type: item.type,
         isSelected,
-        title,
-        onClick: () => {
-          onClick()
-        },
+        onClick: item.onClick,
       })
 
-      const overlay = new kakao.maps.CustomOverlay({
-        position,
-        content,
-        yAnchor: 1,
-        zIndex: isSelected ? 10 : 1,
-      })
-
-      overlay.setMap(map)
-      overlaysRef.current.push(overlay)
-      bounds.extend(position)
+      overlayMapRef.current.set(item.key, record)
+      bounds.extend(new kakao.maps.LatLng(item.lat, item.lng))
       hasMarker = true
+    })
+
+    if (selectedMapItem) {
+      prevSelectedKeyRef.current = getOverlayKey(selectedMapItem.kind, selectedMapItem.id)
     }
 
-    const addBoothMarker = (booth: Booth) => {
-      const isSelected =
-        selectedItem?.kind === "booth" && selectedItem.id === booth.id
-
-      addOverlay({
-        lat: booth.location_y,
-        lng: booth.location_x,
-        type: booth.type,
-        isSelected,
-        title: booth.name,
-        onClick: () => onClickBooth(booth.id),
-      })
-    }
-
-    const addCollegeMarker = (college: College) => {
-      const isSelected =
-        selectedItem?.kind === "college" && selectedItem.id === college.id
-
-      addOverlay({
-        lat: college.location_y,
-        lng: college.location_x,
-        type: "PUB",
-        isSelected,
-        title: `${college.name} 주점`,
-        onClick: () => onClickCollege(college.id),
-      })
-    }
-
-    // 표시 규칙
-    if (primaryFilter === "PUB") {
-      colleges.forEach(addCollegeMarker)
-    } else if (primaryFilter === "ALL") {
-      booths.forEach(addBoothMarker)
-      colleges.forEach(addCollegeMarker)
-    } else {
-      booths.forEach(addBoothMarker)
-    }
-
+    // 초기 지도 범위 설정
     let shouldSkipBounds = false
 
-    // 선택된 항목이 있으면 이름 말풍선 표시
-    if (selectedItem?.kind === "booth") {
-      const selectedBooth = booths.find((booth) => booth.id === selectedItem.id)
-
+    if (selectedMapItem?.kind === "booth") {
+      const selectedBooth = boothMap.get(selectedMapItem.id)
       if (selectedBooth) {
+        const target = new kakao.maps.LatLng(
+          selectedBooth.location_y,
+          selectedBooth.location_x
+        )
+
         showLabelOverlay({
           lat: selectedBooth.location_y,
           lng: selectedBooth.location_x,
           name: selectedBooth.name,
         })
 
-        // 일반 부스는 바텀시트가 PEEK라서 기본 중앙 이동
-        map.panTo(new kakao.maps.LatLng(selectedBooth.location_y, selectedBooth.location_x))
+        map.setLevel(2, { anchor: target })
+        map.panTo(target)
+
         shouldSkipBounds = true
       }
     }
 
-    if (selectedItem?.kind === "college") {
-      const selectedCollege = colleges.find((college) => college.id === selectedItem.id)
-
+    if (selectedMapItem?.kind === "college") {
+      const selectedCollege = collegeMap.get(selectedMapItem.id)
       if (selectedCollege) {
+        const target = new kakao.maps.LatLng(
+          selectedCollege.location_y,
+          selectedCollege.location_x
+        )
+
         showLabelOverlay({
           lat: selectedCollege.location_y,
           lng: selectedCollege.location_x,
           name: selectedCollege.name,
         })
 
-        // 단과대 마커는 HALF 시트를 고려해서 보이는 영역 중심으로 이동
+        map.setLevel(2, { anchor: target })
         panToWithSheetOffset({
           lat: selectedCollege.location_y,
           lng: selectedCollege.location_x,
           targetSnap: "HALF",
         })
+
         shouldSkipBounds = true
       }
     }
 
-    if (!shouldSkipBounds) {
+    if (!shouldSkipBounds && !isInitialBoundsAppliedRef.current) {
       if (hasMarker) {
-        if (overlaysRef.current.length === 1) {
-          map.setCenter(bounds.getSouthWest())
+        if (visibleItems.length === 1) {
+          const only = visibleItems[0]
+          map.setCenter(new kakao.maps.LatLng(only.lat, only.lng))
           map.setLevel(3)
-        } else {
-          map.setBounds(bounds, 60, 60, 140, 60)
-        }
+        } 
       } else {
         map.setCenter(new kakao.maps.LatLng(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng))
         map.setLevel(4)
       }
+
+      isInitialBoundsAppliedRef.current = true
     }
 
     return () => {
-      clearOverlays()
+      clearAllOverlays()
       clearLabelOverlay()
+      prevSelectedKeyRef.current = null
     }
   }, [
     isLoaded,
-    booths,
-    colleges,
-    primaryFilter,
-    selectedItem,
-    onClickBooth,
-    onClickCollege,
+    visibleItems,
+    selectedMapItem,
+    boothMap,
+    collegeMap,
   ])
+
+  // 2) 선택 상태만 바뀔 때는 필요한 overlay만 교체
+  useEffect(() => {
+    if (!isLoaded || !mapInstanceRef.current) return
+
+    const { kakao } = window
+    const map = mapInstanceRef.current
+
+    const prevKey = prevSelectedKeyRef.current
+    const nextKey = selectedMapItem
+      ? getOverlayKey(selectedMapItem.kind, selectedMapItem.id)
+      : null
+
+    // 이전 선택 해제
+    if (prevKey && prevKey !== nextKey && overlayMapRef.current.has(prevKey)) {
+      replaceOverlaySelection(prevKey, false)
+    }
+
+    // 새 선택 강조
+    if (nextKey && overlayMapRef.current.has(nextKey)) {
+      if (prevKey !== nextKey) {
+        replaceOverlaySelection(nextKey, true)
+      }
+
+      if (selectedMapItem?.kind === "booth") {
+        const selectedBooth = boothMap.get(selectedMapItem.id)
+        if (selectedBooth) {
+          const target = new kakao.maps.LatLng(
+            selectedBooth.location_y,
+            selectedBooth.location_x
+          )
+
+          showLabelOverlay({
+            lat: selectedBooth.location_y,
+            lng: selectedBooth.location_x,
+            name: selectedBooth.name,
+          })
+
+          map.setLevel(2, { anchor: target }) // 클릭한 마커 기준 확대
+          map.panTo(target)
+        }
+      }
+
+      if (selectedMapItem?.kind === "college") {
+        const selectedCollege = collegeMap.get(selectedMapItem.id)
+        if (selectedCollege) {
+          const target = new kakao.maps.LatLng(
+            selectedCollege.location_y,
+            selectedCollege.location_x
+          )
+
+          showLabelOverlay({
+            lat: selectedCollege.location_y,
+            lng: selectedCollege.location_x,
+            name: selectedCollege.name,
+          })
+
+          map.setLevel(2, { anchor: target }) // 클릭한 마커 기준 확대
+
+          panToWithSheetOffset({
+            lat: selectedCollege.location_y,
+            lng: selectedCollege.location_x,
+            targetSnap: "HALF",
+          })
+        }
+      }
+    }
+
+    if (!selectedMapItem) {
+      clearLabelOverlay()
+    }
+
+    prevSelectedKeyRef.current = nextKey
+  }, [isLoaded, selectedMapItem, boothMap, collegeMap, sheetSnap, onClickBooth, onClickCollege])
 
   if (isError) {
     return (

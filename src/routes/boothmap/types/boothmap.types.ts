@@ -33,10 +33,16 @@ export type Pub = {
   intro?: string;
   description?: string;
   instagram?: string;
+  images?: string[];
+  mainImageUrl?: string;
 };
 
-export type SelectedItem =
+export type SelectedMapItem =
+  | { kind: "booth"; id: number }
+  | { kind: "college"; id: number }
+  | null;
+
+export type SelectedDetailItem =
   | { kind: "booth"; id: number }
   | { kind: "pub"; id: number }
-  | { kind: "college"; id: number }
   | null;

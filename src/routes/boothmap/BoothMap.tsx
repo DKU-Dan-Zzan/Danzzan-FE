@@ -1,13 +1,14 @@
 // 부스맵 페이지(전체화면 지도 + 상단 필터 카드 + 우측 상단 지도 토글 + 바텀시트) 최상위 컴포넌트입니다.
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import type {
   Booth,
   College,
   MapMode,
   PrimaryFilter,
   Pub,
-  SelectedItem,
+  SelectedMapItem,
+  SelectedDetailItem,
   SheetMode,
   SheetSnap,
 } from "./types/boothmap.types";
@@ -25,8 +26,9 @@ import MapFloatingToggle from "./components/MapFloatingToggle";
 export default function BoothMap() {
   const [mode, setMode] = useState<MapMode>("2D");
   const [primaryFilter, setPrimaryFilter] = useState<PrimaryFilter>("ALL");
+  const [selectedMapItem, setSelectedMapItem] = useState<SelectedMapItem>(null);
+  const [selectedDetailItem, setSelectedDetailItem] = useState<SelectedDetailItem>(null);
   const [selectedCollegeId, setSelectedCollegeId] = useState<number | null>(null);
-  const [selectedItem, setSelectedItem] = useState<SelectedItem>(null);
   const [sheetMode, setSheetMode] = useState<SheetMode>("LIST");
   const [sheetSnap, setSheetSnap] = useState<SheetSnap>("PEEK");
 
@@ -39,7 +41,8 @@ export default function BoothMap() {
 
   const handlePrimaryChange = (next: PrimaryFilter) => {
     setPrimaryFilter(next);
-    setSelectedItem(null);
+    setSelectedMapItem(null);
+    setSelectedDetailItem(null);
     setSheetMode("LIST");
     setSheetSnap("PEEK");
 
@@ -68,38 +71,43 @@ export default function BoothMap() {
 
   // ✅ 바텀시트에서 PubList를 보여줄 조건
   const shouldShowPubList =
-    primaryFilter === "PUB" || selectedItem?.kind === "college";
+    primaryFilter === "PUB" || selectedMapItem?.kind === "college";
 
   // 일반 부스 마커 클릭
   // - 자동으로 시트를 올리지 않음
-  const onClickMarkerBooth = (id: number) => {
-    setSelectedItem({ kind: "booth", id });
+  const onClickMarkerBooth = useCallback((id: number) => {
+    setSelectedMapItem({ kind: "booth", id });
+    setSelectedDetailItem({ kind: "booth", id });
+    setSelectedCollegeId(null);
     setSheetMode("DETAIL");
     setSheetSnap("PEEK");
-  };
+  }, []);
 
   // 단과대(주점) 마커 클릭
   // - 주점 리스트를 보여줘야 하므로 HALF
-  const onClickMarkerCollege = (id: number) => {
+  const onClickMarkerCollege = useCallback((id: number) => {
     setSelectedCollegeId(id);
-    setSelectedItem({ kind: "college", id });
+    setSelectedMapItem({ kind: "college", id });
+    setSelectedDetailItem(null);
     setSheetMode("LIST");
     setSheetSnap("HALF");
-  };
+  }, []);
 
   // 일반 부스 리스트에서 선택
-  const onSelectBoothFromList = (id: number) => {
-    setSelectedItem({ kind: "booth", id });
+  const onSelectBoothFromList = useCallback((id: number) => {
+    setSelectedMapItem({ kind: "booth", id });
+    setSelectedDetailItem({ kind: "booth", id });
+    setSelectedCollegeId(null);
     setSheetMode("DETAIL");
     setSheetSnap("HALF");
-  };
+  }, []);
 
   // 주점 리스트에서 선택
-  const onSelectPubFromList = (id: number) => {
-    setSelectedItem({ kind: "pub", id });
+  const onSelectPubFromList = useCallback((id: number) => {
+    setSelectedDetailItem({ kind: "pub", id });
     setSheetMode("DETAIL");
-    setSheetSnap("HALF");
-  };
+    setSheetSnap("FULL");
+  }, []);
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-white">
@@ -109,7 +117,7 @@ export default function BoothMap() {
           booths={visibleBooths}
           colleges={visibleColleges}
           primaryFilter={primaryFilter}
-          selectedItem={selectedItem}
+          selectedMapItem={selectedMapItem}
           sheetSnap={sheetSnap}
           onClickBooth={onClickMarkerBooth}
           onClickCollege={onClickMarkerCollege}
@@ -137,7 +145,8 @@ export default function BoothMap() {
                 selectedCollegeId={selectedCollegeId}
                 onSelect={(idOrNull) => {
                   setSelectedCollegeId(idOrNull);
-                  setSelectedItem(idOrNull ? { kind: "college", id: idOrNull } : null);
+                  setSelectedMapItem(idOrNull ? { kind: "college", id: idOrNull } : null);
+                  setSelectedDetailItem(null);
                   setSheetMode("LIST");
                   setSheetSnap(idOrNull ? "HALF" : "PEEK");
                 }}
@@ -157,22 +166,21 @@ export default function BoothMap() {
         snap={sheetSnap}
         onSnapChange={setSheetSnap}
         onBackToList={() => {
-          const nextSnap =
-            selectedItem?.kind === "pub" || selectedItem?.kind === "college"
-              ? "HALF"
-              : "PEEK";
+          const isPubFlow = selectedDetailItem?.kind === "pub" || selectedMapItem?.kind === "college";
 
-          setSelectedItem(null);
+          setSelectedDetailItem(null);
           setSheetMode("LIST");
-          setSheetSnap(nextSnap);
+          setSheetSnap(isPubFlow ? "HALF" : "PEEK");
+
+          if (!isPubFlow) {
+            setSelectedMapItem(null);
+          }
         }}
         bottomOffset={bottomNavHeight}
         frameWidth={frameWidth}
       >
         {sheetSnap === "PEEK" ? (
-          <div className="px-1 py-2 text-sm font-semibold text-gray-400">
-            위로 올려서 목록 보기
-          </div>
+          <div className="py-2" />
         ) : sheetMode === "LIST" ? (
           shouldShowPubList ? (
             <PubList
@@ -185,14 +193,20 @@ export default function BoothMap() {
           )
         ) : (
           <DetailSheet
-            selectedItem={selectedItem}
+            selectedItem={selectedDetailItem}
             booths={booths}
             pubs={pubs}
             colleges={colleges}
             onClose={() => {
-              setSelectedItem(null);
+              const isPubDetail = selectedDetailItem?.kind === "pub";
+
+              setSelectedDetailItem(null);
               setSheetMode("LIST");
-              setSheetSnap("HALF");
+              setSheetSnap(isPubDetail ? "HALF" : "PEEK");
+
+              if (!isPubDetail) {
+                setSelectedMapItem(null);
+              }
             }}
           />
         )}
