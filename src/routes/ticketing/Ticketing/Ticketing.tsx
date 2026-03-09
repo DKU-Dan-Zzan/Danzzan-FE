@@ -101,8 +101,8 @@ export default function Ticketing() {
   const [activeEventTitle, setActiveEventTitle] = useState("");
 
   const [queueStatus, setQueueStatus] = useState<QueueRequestStatus>("NONE");
-  const [waitingRemaining, setWaitingRemaining] = useState<number | null>(null);
-  const [waitingRemainingUpdatedAt, setWaitingRemainingUpdatedAt] = useState<number | null>(null);
+  const [waitingQueuePosition, setWaitingQueuePosition] = useState<number | null>(null);
+  const [waitingQueuePositionUpdatedAt, setWaitingQueuePositionUpdatedAt] = useState<number | null>(null);
   const [waitingPolling, setWaitingPolling] = useState(false);
   const [waitingError, setWaitingError] = useState<string | null>(null);
   const [listNotice, setListNotice] = useState<string | null>(null);
@@ -178,8 +178,8 @@ export default function Ticketing() {
 
   const resetQueueFlowState = useCallback(() => {
     setQueueStatus("NONE");
-    setWaitingRemaining(null);
-    setWaitingRemainingUpdatedAt(null);
+    setWaitingQueuePosition(null);
+    setWaitingQueuePositionUpdatedAt(null);
     setWaitingError(null);
     setWaitingPolling(false);
     setReserveProcessing(false);
@@ -189,9 +189,9 @@ export default function Ticketing() {
     setReservationError(null);
   }, []);
 
-  const updateWaitingRemaining = useCallback((remaining: number | null) => {
-    setWaitingRemaining(remaining);
-    setWaitingRemainingUpdatedAt(Date.now());
+  const updateWaitingQueuePosition = useCallback((queuePosition: number | null) => {
+    setWaitingQueuePosition(queuePosition);
+    setWaitingQueuePositionUpdatedAt(Date.now());
   }, []);
 
   const moveToList = useCallback(async (options?: { preserveNotice?: boolean }) => {
@@ -285,9 +285,6 @@ export default function Ticketing() {
           };
         }),
       );
-      if (reservation.queueNumber !== null) {
-        updateWaitingRemaining(reservation.queueNumber);
-      }
       setStep("success");
       setActiveEventId(null);
       applyQueueEventToUrl(null);
@@ -298,16 +295,16 @@ export default function Ticketing() {
       setReserveProcessing(false);
       releaseSingleFlight(reserveLockRef);
     }
-  }, [applyQueueEventToUrl, applyReserveError, updateWaitingRemaining]);
+  }, [applyQueueEventToUrl, applyReserveError, updateWaitingQueuePosition]);
 
   const handleQueueStatus = useCallback(async (
     status: QueueRequestStatus,
     eventId: string,
-    remaining?: number | null,
+    queuePosition?: number | null,
   ) => {
     setQueueStatus(status);
-    if (typeof remaining === "number" || remaining === null) {
-      updateWaitingRemaining(remaining);
+    if (typeof queuePosition === "number" || queuePosition === null) {
+      updateWaitingQueuePosition(queuePosition);
     }
 
     const action = resolveQueueStatusAction(status);
@@ -337,7 +334,7 @@ export default function Ticketing() {
         applyQueueEventToUrl(null);
         await moveToList({ preserveNotice: true });
     }
-  }, [applyQueueEventToUrl, moveToList, updateWaitingRemaining]);
+  }, [applyQueueEventToUrl, moveToList, updateWaitingQueuePosition]);
 
   const checkQueueStatus = useCallback(async (
     eventId: string,
@@ -353,7 +350,7 @@ export default function Ticketing() {
       const statusResponse = await ticketApi.getTicketQueueStatus(eventId, signal);
       setWaitingError(null);
       pollBackoffRef.current = 0;
-      await handleQueueStatus(statusResponse.status, eventId);
+      await handleQueueStatus(statusResponse.status, eventId, statusResponse.queuePosition);
       return statusResponse.status;
     } catch (error) {
       if (signal?.aborted) {
@@ -384,8 +381,8 @@ export default function Ticketing() {
     setActiveEventTitle(event.title);
     setListNotice(null);
     setWaitingError(null);
-    setWaitingRemaining(null);
-    setWaitingRemainingUpdatedAt(null);
+    setWaitingQueuePosition(null);
+    setWaitingQueuePositionUpdatedAt(null);
     setAgreementChecked(false);
     setReservationError(null);
     setQueueStatus("WAITING");
@@ -394,7 +391,7 @@ export default function Ticketing() {
 
     try {
       const enterResponse = await ticketApi.enterTicketQueue(event.id);
-      await handleQueueStatus(enterResponse.status, event.id, enterResponse.remaining);
+      await handleQueueStatus(enterResponse.status, event.id, enterResponse.queuePosition);
     } catch (error) {
       const parsed = parseApiError(error);
       if (parsed.status === 401 || parsed.code === "UNAUTHORIZED") {
@@ -675,8 +672,8 @@ export default function Ticketing() {
     return (
       <WaitingRoomPanel
         eventTitle={activeEventTitle}
-        remaining={waitingRemaining}
-        remainingUpdatedAt={waitingRemainingUpdatedAt}
+        queuePosition={waitingQueuePosition}
+        queuePositionUpdatedAt={waitingQueuePositionUpdatedAt}
         polling={waitingPolling}
         offline={!isNetworkOnline}
         errorMessage={waitingError}
