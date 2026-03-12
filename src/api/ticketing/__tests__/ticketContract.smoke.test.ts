@@ -7,22 +7,39 @@ import {
 } from "@/api/ticketing/ticketContract";
 
 describe("ticketContract smoke", () => {
-  it("queue enter 응답을 정규화한다", () => {
+  it("queue enter SUCCESS 응답을 정규화한다", () => {
     const dto = normalizeQueueEnterContract(
       {
-        status: " waiting ",
+        status: " success ",
         remaining: "17",
       },
       "/tickets/2/queue/enter",
     );
 
     expect(dto).toEqual({
-      status: "WAITING",
+      status: "SUCCESS",
       remaining: 17,
+      queuePosition: null,
     });
   });
 
-  it("queue enter remaining 누락 시 에러를 던진다", () => {
+  it("queue enter WAITING 응답에서 queuePosition을 파싱한다", () => {
+    const dto = normalizeQueueEnterContract(
+      {
+        status: "WAITING",
+        queuePosition: 142,
+      },
+      "/tickets/2/queue/enter",
+    );
+
+    expect(dto).toEqual({
+      status: "WAITING",
+      remaining: undefined,
+      queuePosition: 142,
+    });
+  });
+
+  it("queue enter remaining 없이도 에러 없이 동작한다", () => {
     expect(() =>
       normalizeQueueEnterContract(
         {
@@ -30,7 +47,7 @@ describe("ticketContract smoke", () => {
         },
         "/tickets/2/queue/enter",
       ),
-    ).toThrow(TicketContractError);
+    ).not.toThrow();
   });
 
   it("queue status 응답의 status를 검증한다", () => {

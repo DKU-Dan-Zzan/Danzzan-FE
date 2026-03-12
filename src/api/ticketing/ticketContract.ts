@@ -84,26 +84,22 @@ export const normalizeQueueEnterContract = (
 ): TicketQueueEnterResponseDto => {
   const status = assertQueueStatus(rawDto.status, endpoint);
 
-  if (!Object.prototype.hasOwnProperty.call(rawDto, "remaining")) {
-    throw new TicketContractError(endpoint, "remaining 필드가 누락되었습니다.");
-  }
-
-  const remainingRaw = rawDto.remaining;
-  if (remainingRaw === null) {
-    return {
-      status,
-      remaining: undefined,
-    };
-  }
-
-  const remaining = toFiniteNumber(remainingRaw);
-  if (remaining === null) {
+  const remainingRaw = rawDto.remaining ?? null;
+  const remaining = remainingRaw !== null ? toFiniteNumber(remainingRaw) : null;
+  if (remainingRaw !== null && remaining === null) {
     throw new TicketContractError(endpoint, "remaining 값이 숫자 형식이 아닙니다.");
+  }
+
+  const queuePositionRaw = rawDto.queuePosition ?? null;
+  const queuePosition = queuePositionRaw !== null ? toFiniteNumber(queuePositionRaw) : null;
+  if (queuePositionRaw !== null && queuePosition === null) {
+    throw new TicketContractError(endpoint, "queuePosition 값이 숫자 형식이 아닙니다.");
   }
 
   return {
     status,
-    remaining,
+    remaining: remaining ?? undefined,
+    queuePosition,
   };
 };
 
@@ -111,8 +107,12 @@ export const normalizeQueueStatusContract = (
   rawDto: TicketQueueStatusResponseDto,
   endpoint: string,
 ): TicketQueueStatusResponseDto => {
+  const queuePositionRaw = rawDto.queuePosition ?? null;
+  const queuePosition = queuePositionRaw !== null ? toFiniteNumber(queuePositionRaw) : null;
+
   return {
     status: assertQueueStatus(rawDto.status, endpoint),
+    queuePosition,
   };
 };
 

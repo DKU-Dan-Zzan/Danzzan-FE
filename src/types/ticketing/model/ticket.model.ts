@@ -45,10 +45,12 @@ export type QueueRequestStatus =
 export interface QueueEnterResult {
   status: QueueRequestStatus;
   remaining: number | null;
+  queuePosition: number | null;
 }
 
 export interface QueueStatusResult {
   status: QueueRequestStatus;
+  queuePosition: number | null;
 }
 
 export type ReserveErrorCode =

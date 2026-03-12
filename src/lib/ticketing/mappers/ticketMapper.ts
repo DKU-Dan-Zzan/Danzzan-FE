@@ -144,7 +144,8 @@ export const mapQueueEnterDtoToModel = (
 ): QueueEnterResult => {
   return {
     status: mapQueueRequestStatus(dto.status),
-    remaining: toNullableNumber(dto.remaining),
+    remaining: toNullableNumber(dto.remaining ?? undefined),
+    queuePosition: dto.queuePosition ?? null,
   };
 };
 
@@ -153,5 +154,6 @@ export const mapQueueStatusDtoToModel = (
 ): QueueStatusResult => {
   return {
     status: mapQueueRequestStatus(dto.status),
+    queuePosition: dto.queuePosition ?? null,
   };
 };
