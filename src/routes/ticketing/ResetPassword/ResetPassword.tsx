@@ -34,6 +34,8 @@ const RESET_STEPS: ResetStepItem[] = [
   { key: "password", label: "새 비밀번호" },
 ];
 const RESET_PASSWORD_STORAGE_KEY = "ticketing-reset-password-state-v1";
+const RESET_PASSWORD_SESSION_ERROR_MESSAGE =
+  "비밀번호 재설정 정보를 확인할 수 없습니다. 인증번호를 다시 요청해 주세요.";
 
 type ResetPasswordPersistedState = {
   step?: ResetStep;
@@ -90,6 +92,9 @@ const sanitizePersistedStep = (value?: string): ResetStep => {
   return "request";
 };
 
+const hasResetSession = (requestId?: string, verificationToken?: string) =>
+  Boolean(requestId?.trim() && verificationToken?.trim());
+
 export default function ResetPassword() {
   const [step, setStep] = useState<ResetStep>("request");
   const [studentId, setStudentId] = useState("");
@@ -117,6 +122,21 @@ export default function ResetPassword() {
   const isTimerRunning = step === "verify" && timerExpiresAt !== null && timerSecondsLeft > 0;
   const stepIndex = RESET_STEPS.findIndex(({ key }) => key === step) + 1;
   const currentStepLabel = RESET_STEPS[stepIndex - 1]?.label ?? RESET_STEPS[0].label;
+
+  const resetToRequestStep = (nextError?: string) => {
+    sessionStorage.removeItem(RESET_PASSWORD_STORAGE_KEY);
+    setStep("request");
+    setRequestId(undefined);
+    setVerificationCode("");
+    setVerificationToken(undefined);
+    setPassword("");
+    setPasswordConfirm("");
+    setTimerExpiresAt(null);
+    setTimerSecondsLeft(DEFAULT_TIMER_SECONDS);
+    if (nextError) {
+      setError(nextError);
+    }
+  };
 
   useEffect(() => {
     const persisted = safeParsePersistedState(sessionStorage.getItem(RESET_PASSWORD_STORAGE_KEY));
@@ -160,6 +180,11 @@ export default function ResetPassword() {
     }
 
     if (nextStep === "password") {
+      if (!hasResetSession(persisted.requestId, persisted.verificationToken)) {
+        resetToRequestStep(RESET_PASSWORD_SESSION_ERROR_MESSAGE);
+        return;
+      }
+
       setStep("password");
       setTimerExpiresAt(null);
       setTimerSecondsLeft(0);
@@ -298,6 +323,11 @@ export default function ResetPassword() {
 
   const handleResetPassword = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!hasResetSession(requestId, verificationToken)) {
+      resetToRequestStep(RESET_PASSWORD_SESSION_ERROR_MESSAGE);
+      return;
+    }
 
     if (!isPasswordFormValid) {
       if (!passwordPolicy.hasMinLength || !passwordPolicy.hasSpecialChar) {
