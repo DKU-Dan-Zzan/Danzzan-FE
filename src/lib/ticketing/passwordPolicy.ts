@@ -28,3 +28,20 @@ export const getPasswordPolicyState = (
     isValid: hasMinLength && hasSpecialChar && isConfirmMatched,
   };
 };
+
+export const getPasswordPolicyErrorMessage = (
+  state: Pick<PasswordPolicyState, "hasMinLength" | "hasSpecialChar" | "isConfirmMatched">,
+): string | null => {
+  if (!state.hasMinLength || !state.hasSpecialChar) {
+    return PASSWORD_POLICY_ERROR_MESSAGE;
+  }
+
+  if (!state.isConfirmMatched) {
+    return PASSWORD_CONFIRM_MISMATCH_ERROR_MESSAGE;
+  }
+
+  return null;
+};
+
+export const isPasswordPolicyErrorMessage = (value: string | null) =>
+  value === PASSWORD_POLICY_ERROR_MESSAGE || value === PASSWORD_CONFIRM_MISMATCH_ERROR_MESSAGE;

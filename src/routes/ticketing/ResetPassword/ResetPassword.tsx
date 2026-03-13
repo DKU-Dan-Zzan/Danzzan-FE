@@ -8,9 +8,9 @@ import { Button } from "@/components/ticketing/common/ui/button";
 import { Input } from "@/components/ticketing/common/ui/input";
 import { Label } from "@/components/ticketing/common/ui/label";
 import {
+  getPasswordPolicyErrorMessage,
   getPasswordPolicyState,
-  PASSWORD_CONFIRM_MISMATCH_ERROR_MESSAGE,
-  PASSWORD_POLICY_ERROR_MESSAGE,
+  isPasswordPolicyErrorMessage,
 } from "@/lib/ticketing/passwordPolicy";
 
 type ResetStep = "request" | "verify" | "password";
@@ -122,6 +122,11 @@ export default function ResetPassword() {
   const isTimerRunning = step === "verify" && timerExpiresAt !== null && timerSecondsLeft > 0;
   const stepIndex = RESET_STEPS.findIndex(({ key }) => key === step) + 1;
   const currentStepLabel = RESET_STEPS[stepIndex - 1]?.label ?? RESET_STEPS[0].label;
+  const clearPasswordPolicyError = () => {
+    if (isPasswordPolicyErrorMessage(error)) {
+      setError(null);
+    }
+  };
 
   const resetToRequestStep = (nextError?: string) => {
     sessionStorage.removeItem(RESET_PASSWORD_STORAGE_KEY);
@@ -329,13 +334,9 @@ export default function ResetPassword() {
       return;
     }
 
-    if (!isPasswordFormValid) {
-      if (!passwordPolicy.hasMinLength || !passwordPolicy.hasSpecialChar) {
-        setError(PASSWORD_POLICY_ERROR_MESSAGE);
-        return;
-      }
-
-      setError(PASSWORD_CONFIRM_MISMATCH_ERROR_MESSAGE);
+    const passwordPolicyError = getPasswordPolicyErrorMessage(passwordPolicy);
+    if (passwordPolicyError) {
+      setError(passwordPolicyError);
       return;
     }
 
@@ -569,7 +570,10 @@ export default function ResetPassword() {
                   id="password"
                   type="password"
                   value={password}
-                  onChange={(event) => setPassword(event.target.value)}
+                  onChange={(event) => {
+                    clearPasswordPolicyError();
+                    setPassword(event.target.value);
+                  }}
                   placeholder="새 비밀번호를 입력해 주세요"
                   className={inputClassName}
                   autoComplete="new-password"
@@ -586,7 +590,10 @@ export default function ResetPassword() {
                   id="passwordConfirm"
                   type="password"
                   value={passwordConfirm}
-                  onChange={(event) => setPasswordConfirm(event.target.value)}
+                  onChange={(event) => {
+                    clearPasswordPolicyError();
+                    setPasswordConfirm(event.target.value);
+                  }}
                   placeholder="새 비밀번호를 다시 입력해 주세요"
                   className={inputClassName}
                   autoComplete="new-password"
