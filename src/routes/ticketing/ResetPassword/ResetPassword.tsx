@@ -1,11 +1,17 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { CheckCircle2, Circle, CircleAlert, Clock3, KeyRound, MailCheck, RotateCcw } from "lucide-react";
+import { CircleAlert, Clock3, KeyRound, MailCheck, RotateCcw } from "lucide-react";
 import { HttpError } from "@/api/ticketing/httpClient";
 import { passwordResetApi } from "@/api/ticketing/passwordResetApi";
+import { PasswordPolicyChecklist } from "@/components/ticketing/auth/PasswordPolicyChecklist";
 import { Button } from "@/components/ticketing/common/ui/button";
 import { Input } from "@/components/ticketing/common/ui/input";
 import { Label } from "@/components/ticketing/common/ui/label";
+import {
+  getPasswordPolicyState,
+  PASSWORD_CONFIRM_MISMATCH_ERROR_MESSAGE,
+  PASSWORD_POLICY_ERROR_MESSAGE,
+} from "@/lib/ticketing/passwordPolicy";
 
 type ResetStep = "request" | "verify" | "password";
 type ResetStepItem = {
@@ -16,8 +22,6 @@ type ResetStepItem = {
 const DEFAULT_TIMER_SECONDS = 180;
 const STUDENT_ID_REGEX = /^\d{8}$/;
 const VERIFICATION_CODE_REGEX = /^\d{6}$/;
-const PASSWORD_MIN_LENGTH = 8;
-const SPECIAL_CHAR_REGEX = /[^A-Za-z0-9]/;
 const ERROR_CODE_MESSAGES: Record<string, string> = {
   PASSWORD_RESET_USER_NOT_FOUND: "등록되지 않은 학번입니다. 티켓팅 서비스에 가입된 학번을 입력해 주세요.",
   PASSWORD_RESET_RESEND_COOLDOWN: "잠시 후 인증번호를 다시 요청해 주세요.",
@@ -107,10 +111,8 @@ export default function ResetPassword() {
 
   const isStudentIdValid = STUDENT_ID_REGEX.test(studentId);
   const isVerificationCodeValid = VERIFICATION_CODE_REGEX.test(verificationCode);
-  const hasPasswordMinLength = password.length >= PASSWORD_MIN_LENGTH;
-  const hasPasswordSpecialChar = SPECIAL_CHAR_REGEX.test(password);
-  const isPasswordMatched = passwordConfirm.length > 0 && password === passwordConfirm;
-  const isPasswordFormValid = hasPasswordMinLength && hasPasswordSpecialChar && isPasswordMatched;
+  const passwordPolicy = getPasswordPolicyState(password, passwordConfirm);
+  const isPasswordFormValid = passwordPolicy.isValid;
   const isCodeExpired = timerSecondsLeft <= 0;
   const isTimerRunning = step === "verify" && timerExpiresAt !== null && timerSecondsLeft > 0;
   const stepIndex = RESET_STEPS.findIndex(({ key }) => key === step) + 1;
@@ -298,12 +300,12 @@ export default function ResetPassword() {
     event.preventDefault();
 
     if (!isPasswordFormValid) {
-      if (!hasPasswordMinLength || !hasPasswordSpecialChar) {
-        setError("비밀번호는 8자 이상이며 특수문자를 최소 1개 포함해야 합니다.");
+      if (!passwordPolicy.hasMinLength || !passwordPolicy.hasSpecialChar) {
+        setError(PASSWORD_POLICY_ERROR_MESSAGE);
         return;
       }
 
-      setError("비밀번호 확인이 일치하지 않습니다.");
+      setError(PASSWORD_CONFIRM_MISMATCH_ERROR_MESSAGE);
       return;
     }
 
@@ -312,11 +314,10 @@ export default function ResetPassword() {
 
     try {
       await passwordResetApi.resetPassword({
-        studentId,
-        code: verificationCode,
-        newPassword: password,
         requestId,
         verificationToken,
+        newPassword: password,
+        confirmPassword: passwordConfirm,
       });
       setCompleted(true);
     } catch (resetError) {
@@ -564,33 +565,7 @@ export default function ResetPassword() {
                 />
               </div>
 
-              <div className="space-y-2 rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-3">
-                <p className="text-sm font-semibold text-[var(--text)]">비밀번호 조건</p>
-                <p
-                  className={`inline-flex items-center gap-1.5 text-sm ${
-                    hasPasswordMinLength ? "text-[var(--status-success-text)]" : "text-[var(--text-muted)]"
-                  }`}
-                >
-                  {hasPasswordMinLength ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
-                  8자 이상
-                </p>
-                <p
-                  className={`inline-flex items-center gap-1.5 text-sm ${
-                    hasPasswordSpecialChar ? "text-[var(--status-success-text)]" : "text-[var(--text-muted)]"
-                  }`}
-                >
-                  {hasPasswordSpecialChar ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
-                  특수문자 최소 1개 포함
-                </p>
-                <p
-                  className={`inline-flex items-center gap-1.5 text-sm ${
-                    isPasswordMatched ? "text-[var(--status-success-text)]" : "text-[var(--text-muted)]"
-                  }`}
-                >
-                  {isPasswordMatched ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
-                  비밀번호 확인 일치
-                </p>
-              </div>
+              <PasswordPolicyChecklist state={passwordPolicy} />
 
               {error && (
                 <p className="rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-sm text-[var(--status-danger-text)]">
