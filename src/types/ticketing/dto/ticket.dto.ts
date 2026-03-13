@@ -36,11 +36,13 @@ export interface TicketEventListResponseDto {
 
 export interface TicketQueueEnterResponseDto {
   status?: string;
-  remaining?: string | number;
+  remaining?: string | number | null;
+  queuePosition?: number | null;
 }
 
 export interface TicketQueueStatusResponseDto {
   status?: string;
+  queuePosition?: number | null;
 }
 
 export type TicketReservationResponseDto = TicketDto & {

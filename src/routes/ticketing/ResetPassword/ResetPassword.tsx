@@ -1,11 +1,17 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { CheckCircle2, Circle, CircleAlert, Clock3, KeyRound, MailCheck, RotateCcw } from "lucide-react";
+import { CircleAlert, Clock3, KeyRound, MailCheck, RotateCcw } from "lucide-react";
 import { HttpError } from "@/api/ticketing/httpClient";
 import { passwordResetApi } from "@/api/ticketing/passwordResetApi";
+import { PasswordPolicyChecklist } from "@/components/ticketing/auth/PasswordPolicyChecklist";
 import { Button } from "@/components/ticketing/common/ui/button";
 import { Input } from "@/components/ticketing/common/ui/input";
 import { Label } from "@/components/ticketing/common/ui/label";
+import {
+  getPasswordPolicyErrorMessage,
+  getPasswordPolicyState,
+  isPasswordPolicyErrorMessage,
+} from "@/lib/ticketing/passwordPolicy";
 
 type ResetStep = "request" | "verify" | "password";
 type ResetStepItem = {
@@ -16,24 +22,20 @@ type ResetStepItem = {
 const DEFAULT_TIMER_SECONDS = 180;
 const STUDENT_ID_REGEX = /^\d{8}$/;
 const VERIFICATION_CODE_REGEX = /^\d{6}$/;
-const PASSWORD_MIN_LENGTH = 8;
-const SPECIAL_CHAR_REGEX = /[^A-Za-z0-9]/;
-const ACCOUNT_EXISTENCE_ERROR_PATTERNS = [
-  /미가입/,
-  /가입되지/,
-  /존재하지 않/,
-  /계정.*없/,
-  /회원.*없/,
-  /not found/i,
-  /user not found/i,
-  /unknown user/i,
-];
+const ERROR_CODE_MESSAGES: Record<string, string> = {
+  PASSWORD_RESET_USER_NOT_FOUND: "등록되지 않은 학번입니다. 티켓팅 서비스에 가입된 학번을 입력해 주세요.",
+  PASSWORD_RESET_RESEND_COOLDOWN: "잠시 후 인증번호를 다시 요청해 주세요.",
+  PASSWORD_RESET_RATE_LIMITED: "요청 횟수 제한을 초과했습니다. 잠시 후 다시 시도해 주세요.",
+  PASSWORD_RESET_TOO_MANY_ATTEMPTS: "인증 시도 횟수를 초과했습니다. 잠시 후 다시 시도해 주세요.",
+};
 const RESET_STEPS: ResetStepItem[] = [
   { key: "request", label: "학번 입력" },
   { key: "verify", label: "인증번호 확인" },
   { key: "password", label: "새 비밀번호" },
 ];
 const RESET_PASSWORD_STORAGE_KEY = "ticketing-reset-password-state-v1";
+const RESET_PASSWORD_SESSION_ERROR_MESSAGE =
+  "비밀번호 재설정 정보를 확인할 수 없습니다. 인증번호를 다시 요청해 주세요.";
 
 type ResetPasswordPersistedState = {
   step?: ResetStep;
@@ -54,7 +56,10 @@ const formatTimer = (seconds: number) => {
 
 const resolveErrorMessage = (error: unknown, fallback: string) => {
   if (error instanceof HttpError) {
-    const payload = error.payload as { error?: string; message?: string } | undefined;
+    const payload = error.payload as { error?: string; errorCode?: string; message?: string } | undefined;
+    if (payload?.errorCode && ERROR_CODE_MESSAGES[payload.errorCode]) {
+      return ERROR_CODE_MESSAGES[payload.errorCode];
+    }
     if (payload?.error) {
       return payload.error;
     }
@@ -66,10 +71,6 @@ const resolveErrorMessage = (error: unknown, fallback: string) => {
     }
   }
   return fallback;
-};
-
-const isAccountExistenceError = (message: string) => {
-  return ACCOUNT_EXISTENCE_ERROR_PATTERNS.some((pattern) => pattern.test(message));
 };
 
 const safeParsePersistedState = (raw: string | null): ResetPasswordPersistedState | null => {
@@ -90,6 +91,9 @@ const sanitizePersistedStep = (value?: string): ResetStep => {
   }
   return "request";
 };
+
+const hasResetSession = (requestId?: string, verificationToken?: string) =>
+  Boolean(requestId?.trim() && verificationToken?.trim());
 
 export default function ResetPassword() {
   const [step, setStep] = useState<ResetStep>("request");
@@ -112,14 +116,32 @@ export default function ResetPassword() {
 
   const isStudentIdValid = STUDENT_ID_REGEX.test(studentId);
   const isVerificationCodeValid = VERIFICATION_CODE_REGEX.test(verificationCode);
-  const hasPasswordMinLength = password.length >= PASSWORD_MIN_LENGTH;
-  const hasPasswordSpecialChar = SPECIAL_CHAR_REGEX.test(password);
-  const isPasswordMatched = passwordConfirm.length > 0 && password === passwordConfirm;
-  const isPasswordFormValid = hasPasswordMinLength && hasPasswordSpecialChar && isPasswordMatched;
+  const passwordPolicy = getPasswordPolicyState(password, passwordConfirm);
+  const isPasswordFormValid = passwordPolicy.isValid;
   const isCodeExpired = timerSecondsLeft <= 0;
   const isTimerRunning = step === "verify" && timerExpiresAt !== null && timerSecondsLeft > 0;
   const stepIndex = RESET_STEPS.findIndex(({ key }) => key === step) + 1;
   const currentStepLabel = RESET_STEPS[stepIndex - 1]?.label ?? RESET_STEPS[0].label;
+  const clearPasswordPolicyError = () => {
+    if (isPasswordPolicyErrorMessage(error)) {
+      setError(null);
+    }
+  };
+
+  const resetToRequestStep = (nextError?: string) => {
+    sessionStorage.removeItem(RESET_PASSWORD_STORAGE_KEY);
+    setStep("request");
+    setRequestId(undefined);
+    setVerificationCode("");
+    setVerificationToken(undefined);
+    setPassword("");
+    setPasswordConfirm("");
+    setTimerExpiresAt(null);
+    setTimerSecondsLeft(DEFAULT_TIMER_SECONDS);
+    if (nextError) {
+      setError(nextError);
+    }
+  };
 
   useEffect(() => {
     const persisted = safeParsePersistedState(sessionStorage.getItem(RESET_PASSWORD_STORAGE_KEY));
@@ -163,6 +185,11 @@ export default function ResetPassword() {
     }
 
     if (nextStep === "password") {
+      if (!hasResetSession(persisted.requestId, persisted.verificationToken)) {
+        resetToRequestStep(RESET_PASSWORD_SESSION_ERROR_MESSAGE);
+        return;
+      }
+
       setStep("password");
       setTimerExpiresAt(null);
       setTimerSecondsLeft(0);
@@ -242,12 +269,7 @@ export default function ResetPassword() {
       const response = await passwordResetApi.requestCode(studentId);
       moveToVerifyStep(response.expiresInSec, response.requestId);
     } catch (requestError) {
-      const message = resolveErrorMessage(requestError, "인증번호 요청에 실패했습니다. 잠시 후 다시 시도해 주세요.");
-      if (isAccountExistenceError(message)) {
-        moveToVerifyStep();
-      } else {
-        setError(message);
-      }
+      setError(resolveErrorMessage(requestError, "인증번호 요청에 실패했습니다. 잠시 후 다시 시도해 주세요."));
     } finally {
       setRequestingCode(false);
     }
@@ -266,12 +288,7 @@ export default function ResetPassword() {
       const response = await passwordResetApi.requestCode(studentId);
       moveToVerifyStep(response.expiresInSec, response.requestId);
     } catch (requestError) {
-      const message = resolveErrorMessage(requestError, "인증번호 재전송에 실패했습니다. 잠시 후 다시 시도해 주세요.");
-      if (isAccountExistenceError(message)) {
-        moveToVerifyStep();
-      } else {
-        setError(message);
-      }
+      setError(resolveErrorMessage(requestError, "인증번호 재전송에 실패했습니다. 잠시 후 다시 시도해 주세요."));
     } finally {
       setResendingCode(false);
     }
@@ -312,13 +329,14 @@ export default function ResetPassword() {
   const handleResetPassword = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!isPasswordFormValid) {
-      if (!hasPasswordMinLength || !hasPasswordSpecialChar) {
-        setError("비밀번호는 8자 이상이며 특수문자를 최소 1개 포함해야 합니다.");
-        return;
-      }
+    if (!hasResetSession(requestId, verificationToken)) {
+      resetToRequestStep(RESET_PASSWORD_SESSION_ERROR_MESSAGE);
+      return;
+    }
 
-      setError("비밀번호 확인이 일치하지 않습니다.");
+    const passwordPolicyError = getPasswordPolicyErrorMessage(passwordPolicy);
+    if (passwordPolicyError) {
+      setError(passwordPolicyError);
       return;
     }
 
@@ -327,11 +345,10 @@ export default function ResetPassword() {
 
     try {
       await passwordResetApi.resetPassword({
-        studentId,
-        code: verificationCode,
-        newPassword: password,
         requestId,
         verificationToken,
+        newPassword: password,
+        confirmPassword: passwordConfirm,
       });
       setCompleted(true);
     } catch (resetError) {
@@ -553,7 +570,10 @@ export default function ResetPassword() {
                   id="password"
                   type="password"
                   value={password}
-                  onChange={(event) => setPassword(event.target.value)}
+                  onChange={(event) => {
+                    clearPasswordPolicyError();
+                    setPassword(event.target.value);
+                  }}
                   placeholder="새 비밀번호를 입력해 주세요"
                   className={inputClassName}
                   autoComplete="new-password"
@@ -570,7 +590,10 @@ export default function ResetPassword() {
                   id="passwordConfirm"
                   type="password"
                   value={passwordConfirm}
-                  onChange={(event) => setPasswordConfirm(event.target.value)}
+                  onChange={(event) => {
+                    clearPasswordPolicyError();
+                    setPasswordConfirm(event.target.value);
+                  }}
                   placeholder="새 비밀번호를 다시 입력해 주세요"
                   className={inputClassName}
                   autoComplete="new-password"
@@ -579,33 +602,7 @@ export default function ResetPassword() {
                 />
               </div>
 
-              <div className="space-y-2 rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-3">
-                <p className="text-sm font-semibold text-[var(--text)]">비밀번호 조건</p>
-                <p
-                  className={`inline-flex items-center gap-1.5 text-sm ${
-                    hasPasswordMinLength ? "text-[var(--status-success-text)]" : "text-[var(--text-muted)]"
-                  }`}
-                >
-                  {hasPasswordMinLength ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
-                  8자 이상
-                </p>
-                <p
-                  className={`inline-flex items-center gap-1.5 text-sm ${
-                    hasPasswordSpecialChar ? "text-[var(--status-success-text)]" : "text-[var(--text-muted)]"
-                  }`}
-                >
-                  {hasPasswordSpecialChar ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
-                  특수문자 최소 1개 포함
-                </p>
-                <p
-                  className={`inline-flex items-center gap-1.5 text-sm ${
-                    isPasswordMatched ? "text-[var(--status-success-text)]" : "text-[var(--text-muted)]"
-                  }`}
-                >
-                  {isPasswordMatched ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
-                  비밀번호 확인 일치
-                </p>
-              </div>
+              <PasswordPolicyChecklist state={passwordPolicy} />
 
               {error && (
                 <p className="rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-sm text-[var(--status-danger-text)]">

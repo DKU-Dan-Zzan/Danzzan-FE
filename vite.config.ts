@@ -15,6 +15,7 @@ export default defineConfig({
         name: "DAN-ZZAN",
         short_name: "DAN-ZZAN",
         description: "DAN-ZZAN festival service",
+        lang: "ko",
         theme_color: "#0a559c",
         background_color: "#ffffff",
         display: "standalone",

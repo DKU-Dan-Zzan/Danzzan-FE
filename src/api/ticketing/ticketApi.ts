@@ -171,10 +171,10 @@ export const ticketApi = {
     if (env.apiMode === "mock") {
       const event = createMockTicketingEventsDto().items?.find((item) => `${item.id}` === eventId);
       if (!event) {
-        return { status: "NONE", remaining: null };
+        return { status: "NONE", remaining: null, queuePosition: null };
       }
       if (event.status === "soldout" || event.remainingCount === 0) {
-        return { status: "SOLD_OUT", remaining: 0 };
+        return { status: "SOLD_OUT", remaining: 0, queuePosition: null };
       }
 
       mockJoinSequence += 1;
@@ -186,7 +186,8 @@ export const ticketApi = {
       mockQueueByEvent.set(eventId, session);
       return {
         status: "WAITING",
-        remaining: session.remaining,
+        remaining: null,
+        queuePosition: mockJoinSequence,
       };
     }
 
@@ -211,7 +212,7 @@ export const ticketApi = {
     if (env.apiMode === "mock") {
       const session = mockQueueByEvent.get(eventId);
       if (!session) {
-        return { status: "NONE" };
+        return { status: "NONE", queuePosition: null };
       }
 
       session.pollCount += 1;
@@ -219,10 +220,10 @@ export const ticketApi = {
 
       if (session.pollCount >= MOCK_QUEUE_TERMINAL_POLL_COUNT) {
         mockQueueByEvent.delete(eventId);
-        return { status: session.terminalStatus };
+        return { status: session.terminalStatus, queuePosition: null };
       }
 
-      return { status: "WAITING" };
+      return { status: "WAITING", queuePosition: mockJoinSequence };
     }
 
     const client = getTicketingClient();
