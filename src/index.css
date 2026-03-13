@@ -3,17 +3,18 @@
 /* 경고는 뜨나 기능상 문제는 없음 
 혹시 거슬릴 경우 setting에 관련 경고 ignore 추가하면 됨*/
 @theme {
-  --color-primary: #0a559c;
+  --color-primary: #2563eb;
+  --color-primary-foreground: #ffffff;
 }
 
 :root {
   --bg-base: #f8fafc;
   --text: #1e293b;
   --text-muted: #64748b;
-  --accent: #0a559c;
+  --accent: #2563eb;
   --border-base: #e2e8f0;
   --surface-subtle: #f1f5f9;
-  --shadow-color: rgba(10, 85, 156, 0.15);
+  --shadow-color: rgba(37, 99, 235, 0.15);
   --status-danger-bg: #fef2f2;
   --status-danger-border: #fecaca;
   --status-danger-text: #b91c1c;
