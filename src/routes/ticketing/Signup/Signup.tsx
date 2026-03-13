@@ -8,8 +8,14 @@ import { Button } from "@/components/ticketing/common/ui/button";
 import { Checkbox } from "@/components/ticketing/common/ui/checkbox";
 import { Input } from "@/components/ticketing/common/ui/input";
 import { Label } from "@/components/ticketing/common/ui/label";
+import { PasswordPolicyChecklist } from "@/components/ticketing/auth/PasswordPolicyChecklist";
 import { signupApi } from "@/api/ticketing/signupApi";
 import { HttpError } from "@/api/ticketing/httpClient";
+import {
+  getPasswordPolicyState,
+  PASSWORD_CONFIRM_MISMATCH_ERROR_MESSAGE,
+  PASSWORD_POLICY_ERROR_MESSAGE,
+} from "@/lib/ticketing/passwordPolicy";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -23,6 +29,7 @@ export default function Signup() {
   const [loadingMessage, setLoadingMessage] = useState("");
   const inputClassName =
     "h-11 rounded-2xl border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20";
+  const passwordPolicy = getPasswordPolicyState(password, passwordConfirm);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -38,13 +45,13 @@ export default function Signup() {
       return;
     }
 
-    if (password.length < 4) {
-      setError("비밀번호는 4자 이상이어야 합니다.");
+    if (!passwordPolicy.hasMinLength || !passwordPolicy.hasSpecialChar) {
+      setError(PASSWORD_POLICY_ERROR_MESSAGE);
       return;
     }
 
-    if (password !== passwordConfirm) {
-      setError("서비스 비밀번호가 일치하지 않습니다.");
+    if (!passwordPolicy.isConfirmMatched) {
+      setError(PASSWORD_CONFIRM_MISMATCH_ERROR_MESSAGE);
       return;
     }
 
@@ -63,7 +70,7 @@ export default function Signup() {
       );
 
       setLoadingMessage("계정 생성 중...");
-      await signupApi.completeSignup(signupToken, password);
+      await signupApi.completeSignup(signupToken, password, passwordConfirm);
 
       navigate("/ticket/login");
     } catch (err) {
@@ -155,6 +162,7 @@ export default function Signup() {
                   onChange={(event) => setPassword(event.target.value)}
                   placeholder="새로운 비밀번호를 입력해 주세요"
                   className={inputClassName}
+                  autoComplete="new-password"
                   required
                   disabled={submitting}
                 />
@@ -171,10 +179,13 @@ export default function Signup() {
                   onChange={(event) => setPasswordConfirm(event.target.value)}
                   placeholder="새로운 비밀번호를 다시 입력해 주세요"
                   className={inputClassName}
+                  autoComplete="new-password"
                   required
                   disabled={submitting}
                 />
               </div>
+
+              <PasswordPolicyChecklist state={passwordPolicy} />
             </section>
 
             {error && (
