@@ -5,7 +5,7 @@ const navItems = [
   { to: "/", icon: Home, label: "홈" },
   { to: "/timetable", icon: Clock, label: "타임테이블" },
   { to: "/map", icon: Map, label: "부스맵" },
-  { to: "/notice", icon: Megaphone, label: "공지" },
+  { to: "/notice", icon: Megaphone, label: "공지사항" },
   { to: "/ticket/ticketing", icon: Ticket, label: "티켓팅" },
   { to: "/mypage", icon: User, label: "내정보" },
 ];
