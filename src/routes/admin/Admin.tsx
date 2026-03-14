@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   AlertCircle,
   Bell,
+  LogOut,
   Megaphone,
   Pencil,
   Plus,
@@ -360,8 +361,9 @@ function Admin() {
             <button
               type="button"
               onClick={handleLogout}
-              className="inline-flex h-8 items-center justify-center rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
+              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
             >
+              <LogOut className="h-4 w-4" strokeWidth={2.3} />
               로그아웃
             </button>
           </div>
