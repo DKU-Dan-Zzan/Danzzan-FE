@@ -100,7 +100,7 @@ const PIN_URL_MAP: Record<MarkerType, string> = {
 }
 
 function kakaoLevelToMapboxZoom(level: number) {
-  return 20 - level
+  return 20.4 - level * 1.5
 }
 
 function getOverlayKey(kind: "booth" | "college", id: number) {
