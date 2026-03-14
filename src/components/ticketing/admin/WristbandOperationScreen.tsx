@@ -349,20 +349,16 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
               <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs text-slate-700">
                 <div className="flex gap-1.5 leading-snug">
                   <span className="flex-shrink-0 font-semibold text-primary">1.</span>
-                  <span>웹정보-기본정보 화면에서 얼굴 본인 확인</span>
+                  <span>웹정보 및 티켓 예매 내역 확인</span>
                 </div>
                 <div className="flex gap-1.5 leading-snug">
                   <span className="flex-shrink-0 font-semibold text-primary">2.</span>
-                  <span>웹정보-기본정보 화면에서 학번 확인</span>
+                  <span>웹정보 화면에서 학번 확인</span>
                 </div>
                 <div className="flex gap-1.5 leading-snug">
                   <span className="flex-shrink-0 font-semibold text-primary">3.</span>
                   <span>
-                    학번 조회 후{" "}
-                    <span className="rounded bg-success/15 px-1 py-0.5 text-[11px] font-semibold text-success">
-                      미지급
-                    </span>
-                    {" "}여부 확인
+                    학번 조회 후 미지급 여부 확인.
                   </span>
                 </div>
                 <div className="flex gap-1.5 leading-snug">
@@ -381,7 +377,7 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
                     <span className="rounded bg-primary-soft px-1 py-0.5 text-[11px] font-semibold text-primary">
                       [지급 확정]
                     </span>
-                    {" "}클릭
+                    {" "}클릭.
                   </span>
                 </div>
                 <div className="flex gap-1.5 leading-snug">
@@ -390,27 +386,7 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
                     <span className="rounded bg-[#ff4fa3]/20 px-1 py-0.5 text-[11px] font-semibold text-[#e6007a]">
                       지급완료
                     </span>
-                    {" "}확인 후 팔찌 전달
-                  </span>
-                </div>
-                <div className="flex gap-1.5 leading-snug">
-                  <span className="flex-shrink-0 font-semibold text-primary">7.</span>
-                  <span>
-                    오처리 시{" "}
-                    <span className="rounded bg-danger/10 px-1 py-0.5 text-[11px] font-semibold text-danger">
-                      [지급 취소]
-                    </span>
-                    {" "}버튼 클릭
-                  </span>
-                </div>
-                <div className="flex gap-1.5 leading-snug">
-                  <span className="flex-shrink-0 font-semibold text-primary">8.</span>
-                  <span>
-                    확인 팝업에서{" "}
-                    <span className="rounded bg-danger/10 px-1 py-0.5 text-[11px] font-semibold text-danger">
-                      [지급 취소 확정]
-                    </span>
-                    {" "}클릭 후 상태 재확인
+                    {" "}확인 후 팔찌 배부
                   </span>
                 </div>
               </div>
