@@ -7,11 +7,13 @@ import App from './App.tsx'
 import "mapbox-gl/dist/mapbox-gl.css";
 
 // PWA 서비스워커 등록
-// import { registerSW } from "virtual:pwa-register"
-// registerSW({ immediate: true })
+import { registerSW } from "virtual:pwa-register"
+registerSW({ immediate: true })
 
 createRoot(document.getElementById('root')!).render(
+  <StrictMode>
     <BrowserRouter>
       <App />
     </BrowserRouter>
+  </StrictMode>
 )

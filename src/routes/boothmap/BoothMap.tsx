@@ -1,4 +1,4 @@
-// 부스맵 페이지(전체화면 지도 + 상단 필터 카드 + 우측 상단 지도 토글 + 바텀시트) 최상위 컴포넌트입니다.
+// 부스맵 페이지(전체화면 지도 + 상단 필터 카드 + 우측 상단 지도 토글 + 바텀시트) 최상위 컴포넌트
 
 import { useMemo, useState, useCallback } from "react";
 import type {

@@ -1,9 +1,4 @@
-// 카카오맵 2D 지도를 렌더링하고, 커스텀 오버레이 핀 마커와 이름 말풍선을 표시하는 컴포넌트입니다.
-// 성능 개선:
-// 1) 마커 전체 생성/제거와 선택 상태 변경 로직 분리
-// 2) selectedItem 변경 시 전체 오버레이 재생성 방지
-// 3) 핀 SVG data url 캐싱
-// 4) overlay를 id 기반으로 관리하여 필요한 것만 업데이트
+// 카카오맵 2D 지도를 렌더링하고, 커스텀 오버레이 핀 마커와 이름 말풍선을 표시하는 컴포넌트
 
 import { useEffect, useMemo, useRef } from "react"
 import useKakaoMapLoader from "../../../hooks/useKakaoMapLoader"
