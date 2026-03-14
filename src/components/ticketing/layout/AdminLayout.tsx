@@ -13,8 +13,8 @@ export function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="border-b border-[var(--border-base)] bg-[var(--bg-base)]">
+    <div className="min-h-screen bg-[var(--admin-page-bg)]">
+      <header className="border-b border-[var(--border-base)] bg-[var(--admin-header-bg)]">
         <div className="mx-auto flex w-full max-w-[1360px] items-center justify-between px-8 py-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
@@ -24,11 +24,11 @@ export function AdminLayout() {
           </div>
           <div className="flex items-center gap-3">
             {env.apiMode === "mock" && (
-              <span className="rounded-full bg-warning/15 px-3 py-1 text-sm font-semibold text-warning">
+              <span className="rounded-full bg-[var(--admin-chip-warning-bg)] px-3 py-1 text-sm font-semibold text-[var(--admin-chip-warning-text)]">
                 MOCK MODE
               </span>
             )}
-            <span className="rounded-full border border-[var(--border-base)] bg-[var(--surface-base)] px-3 py-1 text-sm font-semibold text-muted-foreground">
+            <span className="rounded-full border border-[var(--admin-operator-badge-border)] bg-[var(--admin-operator-badge-bg)] px-3 py-1 text-sm font-semibold text-[var(--admin-operator-badge-text)]">
               운영자: 관리자
             </span>
             <Button variant="outline" onClick={handleLogout} className="h-9">

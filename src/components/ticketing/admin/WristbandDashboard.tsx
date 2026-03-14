@@ -47,23 +47,23 @@ export function WristbandDashboard({ onSelectSession }: WristbandDashboardProps)
       </div>
 
       {error && (
-        <div className="rounded-lg border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
+        <div className="rounded-lg border border-[var(--admin-alert-error-border)] bg-[var(--admin-alert-error-bg)] px-4 py-3 text-sm text-[var(--admin-alert-error-text)]">
           세션 정보를 불러오지 못했습니다. 서버 상태를 확인해주세요.
         </div>
       )}
 
       {loading && sessions.length === 0 ? (
-        <div className="rounded-lg border border-border bg-card px-4 py-6 text-sm text-muted-foreground">
+        <div className="rounded-lg border border-[var(--admin-panel-border)] bg-[var(--admin-panel-bg)] px-4 py-6 text-sm text-muted-foreground">
           세션 목록을 불러오는 중입니다...
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {sortedSessions.map((session) => (
             <Card key={session.id} className="p-8 hover:shadow-md transition-shadow">
-                <div className="space-y-6">
+              <div className="space-y-6">
                 <div className="space-y-2">
                   <div>
-                    <span className="text-sm font-semibold text-primary">{session.dayLabel}</span>
+                    <span className="text-sm font-semibold text-[var(--admin-accent-text)]">{session.dayLabel}</span>
                   </div>
                   <h3 className="text-2xl font-bold text-foreground">
                     {session.title || `${formatDate(session.date)} 공연 팔찌 배부`}

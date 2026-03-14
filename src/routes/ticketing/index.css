@@ -121,6 +121,83 @@
   --status-neutral-border: var(--border-subtle);
   --status-neutral-text: var(--text-muted);
 
+  /* Admin semantic tokens */
+  --admin-page-bg: #ffffff;
+  --admin-header-bg: var(--bg-base);
+
+  --admin-panel-bg: var(--surface);
+  --admin-panel-border: var(--border);
+
+  --admin-accent-text: var(--accent);
+  --admin-accent-soft-bg: var(--primary-soft);
+
+  --admin-chip-warning-bg: var(--status-warning-bg);
+  --admin-chip-warning-text: var(--status-warning-text);
+
+  --admin-operator-badge-bg: var(--surface-base);
+  --admin-operator-badge-border: var(--border-base);
+  --admin-operator-badge-text: var(--text-muted);
+
+  --admin-alert-error-bg: var(--status-danger-bg);
+  --admin-alert-error-border: var(--status-danger-border);
+  --admin-alert-error-text: var(--status-danger);
+
+  --admin-metric-total-bg: var(--surface-tint-base);
+  --admin-metric-total-border: var(--border-base);
+  --admin-metric-total-text: var(--accent);
+
+  --admin-metric-issued-bg: #fff2f8;
+  --admin-metric-issued-border: #f5cfe1;
+  --admin-metric-issued-text: #c84f8c;
+
+  --admin-metric-pending-bg: var(--status-success-bg);
+  --admin-metric-pending-border: var(--status-success-border);
+  --admin-metric-pending-text: var(--status-success);
+
+  --admin-table-bg: #ffffff;
+  --admin-table-header-bg: var(--surface-tint-base);
+  --admin-table-header-border: var(--border-base);
+  --admin-table-cell-border: var(--border-subtle);
+  --admin-table-row-bg: #ffffff;
+  --admin-table-row-alt-bg: var(--surface-subtle);
+
+  --admin-badge-issued-bg: #ffe6f3;
+  --admin-badge-issued-border: #f5a6cf;
+  --admin-badge-issued-text: #e6007a;
+
+  --admin-badge-pending-bg: #dcfce7;
+  --admin-badge-pending-border: #86efac;
+  --admin-badge-pending-text: #15803d;
+
+  --admin-guide-bg: #f8fafc;
+  --admin-guide-border: #e2e8f0;
+  --admin-guide-icon-bg: #e2e8f0;
+  --admin-guide-icon-text: #475569;
+  --admin-guide-text: #334155;
+  --admin-guide-step-text: var(--admin-accent-text);
+  --admin-guide-chip-bg: var(--admin-accent-soft-bg);
+  --admin-guide-chip-text: var(--admin-accent-text);
+
+  --admin-danger-note-bg: #fef2f2;
+  --admin-danger-note-border: #fecaca;
+  --admin-danger-note-icon-bg: #fee2e2;
+  --admin-danger-note-icon-text: #b91c1c;
+  --admin-danger-note-text: #b91c1c;
+  --admin-danger-chip-bg: var(--status-danger-bg);
+  --admin-danger-chip-text: #b91c1c;
+  --admin-danger-outline-border: var(--admin-danger-note-border);
+  --admin-danger-outline-text: var(--admin-danger-note-text);
+  --admin-danger-outline-hover-bg: var(--admin-danger-note-bg);
+
+  --admin-dialog-bg: #ffffff;
+  --admin-dialog-border: #cbd5e1;
+  --admin-dialog-shadow: rgba(15, 23, 42, 0.35);
+
+  --admin-danger-action-bg: #c62828;
+  --admin-danger-action-hover-bg: #b71c1c;
+  --admin-danger-action-border: #c62828;
+  --admin-danger-action-text: #ffffff;
+
   --background: var(--bg-base);
   --foreground: var(--text);
   --card: var(--surface);
