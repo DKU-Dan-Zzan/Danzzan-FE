@@ -13,27 +13,6 @@ function MyPage() {
   );
 
   const isLoggedIn = !!session.tokens?.accessToken && session.role === "student";
-
-  if (!isLoggedIn) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-gray-50 px-6 pb-[100px]">
-        <div className="flex flex-col items-center gap-3 text-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
-            <User size={40} className="text-blue-400" />
-          </div>
-          <h2 className="text-xl font-bold text-gray-800">내정보를 보려면 로그인해 주세요</h2>
-          <p className="text-sm text-gray-500">로그인 후 예매 내역과 계정 정보를 확인할 수 있어요.</p>
-        </div>
-        <button
-          onClick={() => navigate("/ticket/login")}
-          className="w-full max-w-xs rounded-2xl bg-blue-600 py-4 text-sm font-bold text-white shadow-sm"
-        >
-          로그인 / 회원가입하러 가기
-        </button>
-      </div>
-    );
-  }
-
   const user = session.user;
 
   useEffect(() => {
@@ -59,7 +38,7 @@ function MyPage() {
             tokens,
             user: freshUser,
           },
-          "student",
+          session.role ?? undefined,
         );
       } catch {
         // Fallback: keep login payload profile when /user/me request fails.
@@ -69,7 +48,27 @@ function MyPage() {
     return () => {
       cancelled = true;
     };
-  }, [isLoggedIn, session.tokens, user?.college, user?.name]);
+  }, [isLoggedIn, session.role, session.tokens, user?.college, user?.name]);
+
+  if (!isLoggedIn) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-gray-50 px-6 pb-[100px]">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
+            <User size={40} className="text-blue-400" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-800">내정보를 보려면 로그인해 주세요</h2>
+          <p className="text-sm text-gray-500">로그인 후 예매 내역과 계정 정보를 확인할 수 있어요.</p>
+        </div>
+        <button
+          onClick={() => navigate("/ticket/login")}
+          className="w-full max-w-xs rounded-2xl bg-blue-600 py-4 text-sm font-bold text-white shadow-sm"
+        >
+          로그인 / 회원가입하러 가기
+        </button>
+      </div>
+    );
+  }
 
   const handleLogout = () => {
     authStore.clear();

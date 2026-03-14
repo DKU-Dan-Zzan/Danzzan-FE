@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { Ticket } from "lucide-react"
 import { useSyncExternalStore } from "react"
 import { authStore } from "@/store/ticketing/authStore"
+import { getMyTicketNavigationTarget } from "@/routes/ticketing/authNavigation"
 
 const Header = () => {
   const navigate = useNavigate()
@@ -13,9 +14,7 @@ const Header = () => {
   const isLoggedIn = !!session.tokens?.accessToken && session.role === "student"
 
   const handleTicketClick = () => {
-    if (isLoggedIn) {
-      navigate("/ticket/myticket")
-    }
+    navigate(getMyTicketNavigationTarget(isLoggedIn))
   }
 
   return (
@@ -39,15 +38,9 @@ const Header = () => {
 
         <button
           onClick={handleTicketClick}
-          disabled={!isLoggedIn}
-          title={isLoggedIn ? "내 티켓 보기" : "로그인 후 이용 가능"}
-          className={`
-            flex h-10 w-10 items-center justify-center rounded-full transition-all
-            ${isLoggedIn
-              ? "bg-blue-600 text-white shadow-md active:scale-95"
-              : "bg-gray-100 text-gray-300 cursor-not-allowed"
-            }
-          `}
+          aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
+          title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white shadow-md transition-all active:scale-95"
         >
           <Ticket size={20} />
         </button>

@@ -9,7 +9,6 @@ import { getEmergencyNotice, getHomeImages, getLineupImages } from "../../api/ho
 const dummyPosters: Poster[] = [
   { id: "p1", imageUrl: "/posters/dummy.jpg", alt: "2026 단국축제 포스터" },
 ]
-const HOME_BOTTOM_SCROLL_BUFFER_PX = 280
 
 function Home() {
   const [posters, setPosters] = useState<Poster[]>(dummyPosters)
@@ -87,10 +86,7 @@ function Home() {
   }, [])
 
   return (
-    <div
-      className="pb-24"
-      style={{ scrollPaddingBottom: `${HOME_BOTTOM_SCROLL_BUFFER_PX}px` }}
-    >
+    <div className="pb-24">
       {error && (
         <div className="px-4 mt-3 text-xs text-red-600">
           {error}
