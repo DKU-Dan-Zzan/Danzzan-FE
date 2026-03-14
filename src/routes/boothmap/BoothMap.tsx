@@ -153,7 +153,11 @@ export default function BoothMap() {
       </div>
 
       {/* 상단 로고 + 칩 오버레이 */}
-      <div className="absolute left-1/2 top-3 z-[70] w-[calc(100%-24px)] max-w-[430px] -translate-x-1/2">
+      <div
+        className={`absolute left-1/2 top-3 w-[calc(100%-24px)] max-w-[430px] -translate-x-1/2 ${
+          sheetSnap === "FULL" ? "z-[40]" : "z-[70]"
+        }`}
+      >
         <div className="rounded-[28px] border border-white/70 bg-white/92 px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.08)] backdrop-blur-md">
           <PrimaryFilterChips value={primaryFilter} onChange={handlePrimaryChange} />
 
