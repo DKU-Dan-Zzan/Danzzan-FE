@@ -7,10 +7,19 @@ export const getMyTicketNavigationTarget = (isStudentLoggedIn: boolean) =>
     : `/ticket/login?redirect=${encodeURIComponent(MY_TICKET_PATH)}`;
 
 const isTicketRouteSegment = (path: string) => /^\/ticket(?:\/|$|[?#])/.test(path);
+const DUMMY_ORIGIN = "http://dummy";
 
 const isSafeTicketRedirect = (rawPath: string): boolean => {
+  if (!rawPath.startsWith("/") || rawPath.startsWith("//")) {
+    return false;
+  }
+
   try {
-    const url = new URL(rawPath, "http://dummy");
+    const url = new URL(rawPath, DUMMY_ORIGIN);
+    if (url.origin !== DUMMY_ORIGIN) {
+      return false;
+    }
+
     const pathname = url.pathname;
 
     if (!isTicketRouteSegment(pathname)) {

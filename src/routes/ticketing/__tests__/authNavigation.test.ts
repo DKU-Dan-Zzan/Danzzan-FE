@@ -25,6 +25,8 @@ describe("authNavigation", () => {
   it("외부/비정상 redirect는 기본 경로로 대체한다", () => {
     expect(resolveTicketingLoginRedirect(null)).toBe(TICKETING_DEFAULT_PATH);
     expect(resolveTicketingLoginRedirect("https://evil.example.com")).toBe(TICKETING_DEFAULT_PATH);
+    expect(resolveTicketingLoginRedirect("https://evil.example.com/ticket/myticket")).toBe(TICKETING_DEFAULT_PATH);
+    expect(resolveTicketingLoginRedirect("//evil.example.com/ticket/myticket")).toBe(TICKETING_DEFAULT_PATH);
     expect(resolveTicketingLoginRedirect("/mypage")).toBe(TICKETING_DEFAULT_PATH);
   });
 
