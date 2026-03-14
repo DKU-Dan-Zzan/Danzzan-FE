@@ -33,6 +33,8 @@ interface ParsedApiError {
 }
 
 const OFFLINE_WAITING_MESSAGE = "인터넷 연결이 끊겼습니다. 연결이 복구되면 자동으로 다시 확인합니다.";
+const DEFAULT_SOLD_OUT_DESCRIPTION = "다른 티켓팅 일정은 티켓팅 목록에서 확인하실 수 있어요.";
+const QUEUE_WAITING_SOLD_OUT_DESCRIPTION = "현재 순서 이전에 티켓이 모두 소진되었습니다.";
 
 const RESERVE_ERROR_CODE_SET = new Set<ReserveErrorCode>([
   "RESERVE_ALREADY_RESERVED",
@@ -66,6 +68,7 @@ const parseApiError = (error: unknown): ParsedApiError => {
     payloadRecord?.code ??
     payloadError?.errorCode ??
     payloadError?.code ??
+    payloadError?.error ??
     payloadData?.errorCode ??
     payloadData?.code ??
     null;
@@ -100,9 +103,10 @@ export default function Ticketing() {
   const [activeEventId, setActiveEventId] = useState<string | null>(() => readQueueEventIdFromSearch(window.location.search));
   const [activeEventTitle, setActiveEventTitle] = useState("");
 
-  const [queueStatus, setQueueStatus] = useState<QueueRequestStatus>("NONE");
+  const [, setQueueStatus] = useState<QueueRequestStatus>("NONE");
   const [waitingQueuePosition, setWaitingQueuePosition] = useState<number | null>(null);
   const [waitingQueuePositionUpdatedAt, setWaitingQueuePositionUpdatedAt] = useState<number | null>(null);
+  const [waitingEstimatedWaitSeconds, setWaitingEstimatedWaitSeconds] = useState<number | null>(null);
   const [waitingPolling, setWaitingPolling] = useState(false);
   const [waitingError, setWaitingError] = useState<string | null>(null);
   const [listNotice, setListNotice] = useState<string | null>(null);
@@ -115,6 +119,7 @@ export default function Ticketing() {
   const [reservationError, setReservationError] = useState<string | null>(null);
 
   const [waitingAd, setWaitingAd] = useState<PlacementAd | null>(null);
+  const [soldOutDescription, setSoldOutDescription] = useState(DEFAULT_SOLD_OUT_DESCRIPTION);
 
   const enterLockRef = useRef(false);
   const reserveLockRef = useRef(false);
@@ -180,8 +185,10 @@ export default function Ticketing() {
     setQueueStatus("NONE");
     setWaitingQueuePosition(null);
     setWaitingQueuePositionUpdatedAt(null);
+    setWaitingEstimatedWaitSeconds(null);
     setWaitingError(null);
     setWaitingPolling(false);
+    setSoldOutDescription(DEFAULT_SOLD_OUT_DESCRIPTION);
     setReserveProcessing(false);
     setReserveErrorMessage(null);
     setReserveMessage("입장 상태가 확인되어 예매를 진행하고 있습니다.");
@@ -192,6 +199,10 @@ export default function Ticketing() {
   const updateWaitingQueuePosition = useCallback((queuePosition: number | null) => {
     setWaitingQueuePosition(queuePosition);
     setWaitingQueuePositionUpdatedAt(Date.now());
+  }, []);
+
+  const updateEstimatedWaitSeconds = useCallback((estimatedWaitSeconds: number | null) => {
+    setWaitingEstimatedWaitSeconds(estimatedWaitSeconds);
   }, []);
 
   const moveToList = useCallback(async (options?: { preserveNotice?: boolean }) => {
@@ -220,6 +231,7 @@ export default function Ticketing() {
         setReservationError(null);
         break;
       case "RESERVE_SOLD_OUT":
+        setSoldOutDescription(DEFAULT_SOLD_OUT_DESCRIPTION);
         setStep("soldout");
         setActiveEventId(null);
         setReservationError(null);
@@ -270,7 +282,8 @@ export default function Ticketing() {
     setReservationError(null);
 
     try {
-      const reservation = await ticketApi.reserveTicket(eventId);
+      await ticketApi.activateTicket(eventId);
+      await ticketApi.reserveTicket(eventId);
       setEvents((prev) =>
         prev.map((event) => {
           if (event.id !== eventId) {
@@ -295,16 +308,21 @@ export default function Ticketing() {
       setReserveProcessing(false);
       releaseSingleFlight(reserveLockRef);
     }
-  }, [applyQueueEventToUrl, applyReserveError, updateWaitingQueuePosition]);
+  }, [applyQueueEventToUrl, applyReserveError]);
 
   const handleQueueStatus = useCallback(async (
     status: QueueRequestStatus,
     eventId: string,
     queuePosition?: number | null,
+    estimatedWaitSeconds?: number | null,
+    source: "enter" | "poll" = "enter",
   ) => {
     setQueueStatus(status);
     if (typeof queuePosition === "number" || queuePosition === null) {
       updateWaitingQueuePosition(queuePosition);
+    }
+    if (typeof estimatedWaitSeconds === "number" || estimatedWaitSeconds === null) {
+      updateEstimatedWaitSeconds(estimatedWaitSeconds);
     }
 
     const action = resolveQueueStatusAction(status);
@@ -319,22 +337,28 @@ export default function Ticketing() {
         setStep("in-progress");
         return;
       case "soldout":
+        setSoldOutDescription(
+          source === "poll" ? QUEUE_WAITING_SOLD_OUT_DESCRIPTION : DEFAULT_SOLD_OUT_DESCRIPTION,
+        );
         setStep("soldout");
         setActiveEventId(null);
+        updateEstimatedWaitSeconds(null);
         applyQueueEventToUrl(null);
         return;
       case "already":
         setStep("already");
         setActiveEventId(null);
+        updateEstimatedWaitSeconds(null);
         applyQueueEventToUrl(null);
         return;
       default:
         setActiveEventId(null);
+        updateEstimatedWaitSeconds(null);
         setListNotice("현재 대기 상태를 확인할 수 없어 목록으로 이동합니다.");
         applyQueueEventToUrl(null);
         await moveToList({ preserveNotice: true });
     }
-  }, [applyQueueEventToUrl, moveToList, updateWaitingQueuePosition]);
+  }, [applyQueueEventToUrl, moveToList, updateEstimatedWaitSeconds, updateWaitingQueuePosition]);
 
   const checkQueueStatus = useCallback(async (
     eventId: string,
@@ -350,7 +374,13 @@ export default function Ticketing() {
       const statusResponse = await ticketApi.getTicketQueueStatus(eventId, signal);
       setWaitingError(null);
       pollBackoffRef.current = 0;
-      await handleQueueStatus(statusResponse.status, eventId, statusResponse.queuePosition);
+      await handleQueueStatus(
+        statusResponse.status,
+        eventId,
+        statusResponse.queuePosition,
+        statusResponse.estimatedWaitSeconds,
+        "poll",
+      );
       return statusResponse.status;
     } catch (error) {
       if (signal?.aborted) {
@@ -383,6 +413,7 @@ export default function Ticketing() {
     setWaitingError(null);
     setWaitingQueuePosition(null);
     setWaitingQueuePositionUpdatedAt(null);
+    setWaitingEstimatedWaitSeconds(null);
     setAgreementChecked(false);
     setReservationError(null);
     setQueueStatus("WAITING");
@@ -391,7 +422,13 @@ export default function Ticketing() {
 
     try {
       const enterResponse = await ticketApi.enterTicketQueue(event.id);
-      await handleQueueStatus(enterResponse.status, event.id, enterResponse.queuePosition);
+      await handleQueueStatus(
+        enterResponse.status,
+        event.id,
+        enterResponse.queuePosition,
+        enterResponse.estimatedWaitSeconds,
+        "enter",
+      );
     } catch (error) {
       const parsed = parseApiError(error);
       if (parsed.status === 401 || parsed.code === "UNAUTHORIZED") {
@@ -674,6 +711,7 @@ export default function Ticketing() {
         eventTitle={activeEventTitle}
         queuePosition={waitingQueuePosition}
         queuePositionUpdatedAt={waitingQueuePositionUpdatedAt}
+        estimatedWaitSeconds={waitingEstimatedWaitSeconds}
         polling={waitingPolling}
         offline={!isNetworkOnline}
         errorMessage={waitingError}
@@ -721,6 +759,7 @@ export default function Ticketing() {
   if (step === "soldout") {
     return (
       <ReservationSoldOutPanel
+        description={soldOutDescription}
         onBackToList={() => {
           setActiveEventId(null);
           setActiveEventTitle("");

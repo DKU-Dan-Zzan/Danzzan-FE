@@ -38,11 +38,21 @@ export interface TicketQueueEnterResponseDto {
   status?: string;
   remaining?: string | number | null;
   queuePosition?: number | null;
+  mySequence?: string | number | null;
+  aheadCount?: string | number | null;
+  estimatedWaitSeconds?: string | number | null;
+  readyUntil?: string | number | null;
+  admissionState?: string | null;
 }
 
 export interface TicketQueueStatusResponseDto {
   status?: string;
   queuePosition?: number | null;
+  mySequence?: string | number | null;
+  aheadCount?: string | number | null;
+  estimatedWaitSeconds?: string | number | null;
+  readyUntil?: string | number | null;
+  admissionState?: string | null;
 }
 
 export type TicketReservationResponseDto = TicketDto & {

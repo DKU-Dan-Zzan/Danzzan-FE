@@ -13,6 +13,7 @@ interface WaitingRoomPanelProps {
   eventTitle: string;
   queuePosition: number | null;
   queuePositionUpdatedAt: number | null;
+  estimatedWaitSeconds: number | null;
   polling: boolean;
   offline: boolean;
   errorMessage: string | null;
@@ -26,10 +27,30 @@ const formatQueuePosition = (queuePosition: number | null): string => {
   return queuePosition.toLocaleString("ko-KR");
 };
 
+const formatEstimatedWaitLabel = (estimatedWaitSeconds: number | null, offline: boolean): string => {
+  if (offline) {
+    return "연결 확인 중";
+  }
+  if (estimatedWaitSeconds === null || estimatedWaitSeconds < 0) {
+    return "확인 중";
+  }
+  if (estimatedWaitSeconds < 60) {
+    return `${estimatedWaitSeconds}초`;
+  }
+
+  const minutes = Math.floor(estimatedWaitSeconds / 60);
+  const seconds = estimatedWaitSeconds % 60;
+  if (seconds === 0) {
+    return `${minutes}분`;
+  }
+  return `${minutes}분 ${seconds}초`;
+};
+
 export function WaitingRoomPanel({
   eventTitle,
   queuePosition,
   queuePositionUpdatedAt,
+  estimatedWaitSeconds,
   polling,
   offline,
   errorMessage,
@@ -46,7 +67,7 @@ export function WaitingRoomPanel({
   }, []);
 
   const hasFreshPosition = isRemainingFresh(queuePositionUpdatedAt, now);
-  const etaLabel = offline ? "연결 확인 중" : "확인 중";
+  const etaLabel = formatEstimatedWaitLabel(estimatedWaitSeconds, offline);
 
   return (
     <div className={`${TICKETING_NARROW_PANEL_CLASS} space-y-4`}>

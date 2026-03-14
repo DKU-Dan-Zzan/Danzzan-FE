@@ -42,15 +42,27 @@ export type QueueRequestStatus =
   | "SOLD_OUT"
   | "ALREADY";
 
+export type AdmissionState = "READY" | "ACTIVE";
+
 export interface QueueEnterResult {
   status: QueueRequestStatus;
   remaining: number | null;
   queuePosition: number | null;
+  mySequence: number | null;
+  aheadCount: number | null;
+  estimatedWaitSeconds: number | null;
+  readyUntil: number | null;
+  admissionState: AdmissionState | null;
 }
 
 export interface QueueStatusResult {
   status: QueueRequestStatus;
   queuePosition: number | null;
+  mySequence: number | null;
+  aheadCount: number | null;
+  estimatedWaitSeconds: number | null;
+  readyUntil: number | null;
+  admissionState: AdmissionState | null;
 }
 
 export type ReserveErrorCode =

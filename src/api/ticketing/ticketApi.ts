@@ -171,10 +171,28 @@ export const ticketApi = {
     if (env.apiMode === "mock") {
       const event = createMockTicketingEventsDto().items?.find((item) => `${item.id}` === eventId);
       if (!event) {
-        return { status: "NONE", remaining: null, queuePosition: null };
+        return {
+          status: "NONE",
+          remaining: null,
+          queuePosition: null,
+          mySequence: null,
+          aheadCount: null,
+          estimatedWaitSeconds: null,
+          readyUntil: null,
+          admissionState: null,
+        };
       }
       if (event.status === "soldout" || event.remainingCount === 0) {
-        return { status: "SOLD_OUT", remaining: 0, queuePosition: null };
+        return {
+          status: "SOLD_OUT",
+          remaining: 0,
+          queuePosition: null,
+          mySequence: null,
+          aheadCount: null,
+          estimatedWaitSeconds: null,
+          readyUntil: null,
+          admissionState: null,
+        };
       }
 
       mockJoinSequence += 1;
@@ -188,6 +206,11 @@ export const ticketApi = {
         status: "WAITING",
         remaining: null,
         queuePosition: mockJoinSequence,
+        mySequence: mockJoinSequence,
+        aheadCount: Math.max(mockJoinSequence - 1, 0),
+        estimatedWaitSeconds: Math.max(mockJoinSequence - 1, 0) * 15,
+        readyUntil: null,
+        admissionState: null,
       };
     }
 
@@ -212,7 +235,15 @@ export const ticketApi = {
     if (env.apiMode === "mock") {
       const session = mockQueueByEvent.get(eventId);
       if (!session) {
-        return { status: "NONE", queuePosition: null };
+        return {
+          status: "NONE",
+          queuePosition: null,
+          mySequence: null,
+          aheadCount: null,
+          estimatedWaitSeconds: null,
+          readyUntil: null,
+          admissionState: null,
+        };
       }
 
       session.pollCount += 1;
@@ -220,10 +251,26 @@ export const ticketApi = {
 
       if (session.pollCount >= MOCK_QUEUE_TERMINAL_POLL_COUNT) {
         mockQueueByEvent.delete(eventId);
-        return { status: session.terminalStatus, queuePosition: null };
+        return {
+          status: session.terminalStatus,
+          queuePosition: null,
+          mySequence: null,
+          aheadCount: 0,
+          estimatedWaitSeconds: 0,
+          readyUntil: Date.now() + 180_000,
+          admissionState: "READY",
+        };
       }
 
-      return { status: "WAITING", queuePosition: mockJoinSequence };
+      return {
+        status: "WAITING",
+        queuePosition: mockJoinSequence,
+        mySequence: mockJoinSequence,
+        aheadCount: Math.max(mockJoinSequence - 1, 0),
+        estimatedWaitSeconds: Math.max(session.remaining, 0),
+        readyUntil: null,
+        admissionState: null,
+      };
     }
 
     const client = getTicketingClient();
@@ -237,6 +284,37 @@ export const ticketApi = {
     );
     const normalizedDto = normalizeQueueStatusContract(dto, `/tickets/${eventId}/queue/status`);
     return mapQueueStatusDtoToModel(normalizedDto);
+  },
+
+  activateTicket: async (
+    eventId: string,
+    signal?: AbortSignal,
+  ): Promise<QueueEnterResult> => {
+    if (env.apiMode === "mock") {
+      return {
+        status: "ADMITTED",
+        remaining: null,
+        queuePosition: null,
+        mySequence: null,
+        aheadCount: 0,
+        estimatedWaitSeconds: 0,
+        readyUntil: null,
+        admissionState: "ACTIVE",
+      };
+    }
+
+    const client = getTicketingClient();
+    const raw = await client.post<TicketQueueEnterResponseDto | ApiEnvelope<TicketQueueEnterResponseDto>>(
+      `/tickets/${eventId}/activate`,
+      undefined,
+      { signal },
+    );
+    const dto = unwrapApiObjectEnvelope<TicketQueueEnterResponseDto>(
+      raw,
+      `/tickets/${eventId}/activate`,
+    );
+    const normalizedDto = normalizeQueueEnterContract(dto, `/tickets/${eventId}/activate`);
+    return mapQueueEnterDtoToModel(normalizedDto);
   },
 
   reserveTicket: async (
