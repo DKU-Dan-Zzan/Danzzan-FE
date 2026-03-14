@@ -208,7 +208,7 @@ export default function Timetable() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[var(--bg-page-soft)]">
+    <div className="min-h-full bg-[var(--bg-page-soft)]">
       <div className="sticky top-0 z-20 bg-[var(--bg-page-soft)]">
         <div className="px-5 pt-5">
           <div className="text-[38px] font-extrabold text-[var(--accent)] font-cute">
@@ -226,47 +226,45 @@ export default function Timetable() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide px-5 pt-4 pb-[calc(84px+env(safe-area-inset-bottom))]">
-        <div className="min-h-full flex flex-col">
-          <div className="mt-4 flex-1">
-            {isDay1 ? (
-              <ContentImageSection
-                images={contentImages}
-                isLoading={isImageLoading}
-                error={imageLoadError}
-                selectedImage={selectedImage}
-                onSelectImage={setSelectedImage}
-                onCloseImage={() => setSelectedImage(null)}
+      <div className="px-5 pt-4 pb-6">
+        <div className="mt-4">
+          {isDay1 ? (
+            <ContentImageSection
+              images={contentImages}
+              isLoading={isImageLoading}
+              error={imageLoadError}
+              selectedImage={selectedImage}
+              onSelectImage={setSelectedImage}
+              onCloseImage={() => setSelectedImage(null)}
+            />
+          ) : isLoading ? (
+            <div className="py-12 text-center text-[var(--timetable-empty-text)]">
+              공연 정보를 불러오는 중입니다...
+            </div>
+          ) : loadError ? (
+            <div className="py-12 text-center text-[var(--timetable-empty-text)]">
+              공연 정보를 불러오지 못했습니다.
+            </div>
+          ) : items.length === 0 ? (
+            <div className="py-12 text-center text-[var(--timetable-empty-text)]">
+              등록된 공연이 없습니다.
+            </div>
+          ) : (
+            <>
+              <Timeline
+                items={items}
+                scrollTargetId={scrollTargetId}
+                nowTargetId={nowTargetId}
               />
-            ) : isLoading ? (
-              <div className="py-12 text-center text-[var(--timetable-empty-text)]">
-                공연 정보를 불러오는 중입니다...
-              </div>
-            ) : loadError ? (
-              <div className="py-12 text-center text-[var(--timetable-empty-text)]">
-                공연 정보를 불러오지 못했습니다.
-              </div>
-            ) : items.length === 0 ? (
-              <div className="py-12 text-center text-[var(--timetable-empty-text)]">
-                등록된 공연이 없습니다.
-              </div>
-            ) : (
-              <>
-                <Timeline
-                  items={items}
-                  scrollTargetId={scrollTargetId}
-                  nowTargetId={nowTargetId}
-                />
 
-                <div className="mt-5 flex items-start gap-2 rounded-2xl border border-[var(--timetable-info-border)] bg-[var(--timetable-info-bg)] px-4 py-3">
-                  <InformationCircleIcon className="mt-0.5 h-5 w-5 text-[var(--accent)]" />
-                  <p className="text-sm font-medium text-[var(--timetable-info-text)]">
-                    일정은 현장 상황에 따라 변경될 수 있습니다.
-                  </p>
-                </div>
-              </>
-            )}
-          </div>
+              <div className="mt-5 flex items-start gap-2 rounded-2xl border border-[var(--timetable-info-border)] bg-[var(--timetable-info-bg)] px-4 py-3">
+                <InformationCircleIcon className="mt-0.5 h-5 w-5 text-[var(--accent)]" />
+                <p className="text-sm font-medium text-[var(--timetable-info-text)]">
+                  일정은 현장 상황에 따라 변경될 수 있습니다.
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
