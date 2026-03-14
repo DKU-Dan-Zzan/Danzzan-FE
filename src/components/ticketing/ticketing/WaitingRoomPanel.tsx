@@ -13,7 +13,6 @@ interface WaitingRoomPanelProps {
   eventTitle: string;
   queuePosition: number | null;
   queuePositionUpdatedAt: number | null;
-  estimatedWaitSeconds: number | null;
   polling: boolean;
   offline: boolean;
   errorMessage: string | null;
@@ -27,30 +26,10 @@ const formatQueuePosition = (queuePosition: number | null): string => {
   return queuePosition.toLocaleString("ko-KR");
 };
 
-const formatEstimatedWaitLabel = (estimatedWaitSeconds: number | null, offline: boolean): string => {
-  if (offline) {
-    return "연결 확인 중";
-  }
-  if (estimatedWaitSeconds === null || estimatedWaitSeconds < 0) {
-    return "확인 중";
-  }
-  if (estimatedWaitSeconds < 60) {
-    return `${estimatedWaitSeconds}초`;
-  }
-
-  const minutes = Math.floor(estimatedWaitSeconds / 60);
-  const seconds = estimatedWaitSeconds % 60;
-  if (seconds === 0) {
-    return `${minutes}분`;
-  }
-  return `${minutes}분 ${seconds}초`;
-};
-
 export function WaitingRoomPanel({
   eventTitle,
   queuePosition,
   queuePositionUpdatedAt,
-  estimatedWaitSeconds,
   polling,
   offline,
   errorMessage,
@@ -67,8 +46,6 @@ export function WaitingRoomPanel({
   }, []);
 
   const hasFreshPosition = isRemainingFresh(queuePositionUpdatedAt, now);
-  const etaLabel = formatEstimatedWaitLabel(estimatedWaitSeconds, offline);
-
   return (
     <div className={`${TICKETING_NARROW_PANEL_CLASS} space-y-4`}>
       <section className="px-1">
@@ -96,10 +73,7 @@ export function WaitingRoomPanel({
         </div>
 
         <div className="mt-4">
-          <p className="text-right text-[length:var(--ticketing-text-card-subtitle)] font-bold text-[var(--accent)]">
-            예상 대기 시간: {etaLabel}
-          </p>
-          <div className="relative mt-2">
+          <div className="relative">
             <div className="relative h-5 overflow-hidden rounded-full bg-[var(--surface-tint-subtle)]">
               <div
                 className={`h-full w-[38%] rounded-full bg-[var(--accent)] ${offline || !polling || !hasFreshPosition ? "opacity-40" : "animate-pulse opacity-70"}`}

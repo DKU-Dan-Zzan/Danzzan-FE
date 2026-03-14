@@ -106,7 +106,6 @@ export default function Ticketing() {
   const [, setQueueStatus] = useState<QueueRequestStatus>("NONE");
   const [waitingQueuePosition, setWaitingQueuePosition] = useState<number | null>(null);
   const [waitingQueuePositionUpdatedAt, setWaitingQueuePositionUpdatedAt] = useState<number | null>(null);
-  const [waitingEstimatedWaitSeconds, setWaitingEstimatedWaitSeconds] = useState<number | null>(null);
   const [waitingPolling, setWaitingPolling] = useState(false);
   const [waitingError, setWaitingError] = useState<string | null>(null);
   const [listNotice, setListNotice] = useState<string | null>(null);
@@ -185,7 +184,6 @@ export default function Ticketing() {
     setQueueStatus("NONE");
     setWaitingQueuePosition(null);
     setWaitingQueuePositionUpdatedAt(null);
-    setWaitingEstimatedWaitSeconds(null);
     setWaitingError(null);
     setWaitingPolling(false);
     setSoldOutDescription(DEFAULT_SOLD_OUT_DESCRIPTION);
@@ -199,10 +197,6 @@ export default function Ticketing() {
   const updateWaitingQueuePosition = useCallback((queuePosition: number | null) => {
     setWaitingQueuePosition(queuePosition);
     setWaitingQueuePositionUpdatedAt(Date.now());
-  }, []);
-
-  const updateEstimatedWaitSeconds = useCallback((estimatedWaitSeconds: number | null) => {
-    setWaitingEstimatedWaitSeconds(estimatedWaitSeconds);
   }, []);
 
   const moveToList = useCallback(async (options?: { preserveNotice?: boolean }) => {
@@ -314,15 +308,11 @@ export default function Ticketing() {
     status: QueueRequestStatus,
     eventId: string,
     queuePosition?: number | null,
-    estimatedWaitSeconds?: number | null,
     source: "enter" | "poll" = "enter",
   ) => {
     setQueueStatus(status);
     if (typeof queuePosition === "number" || queuePosition === null) {
       updateWaitingQueuePosition(queuePosition);
-    }
-    if (typeof estimatedWaitSeconds === "number" || estimatedWaitSeconds === null) {
-      updateEstimatedWaitSeconds(estimatedWaitSeconds);
     }
 
     const action = resolveQueueStatusAction(status);
@@ -342,23 +332,20 @@ export default function Ticketing() {
         );
         setStep("soldout");
         setActiveEventId(null);
-        updateEstimatedWaitSeconds(null);
         applyQueueEventToUrl(null);
         return;
       case "already":
         setStep("already");
         setActiveEventId(null);
-        updateEstimatedWaitSeconds(null);
         applyQueueEventToUrl(null);
         return;
       default:
         setActiveEventId(null);
-        updateEstimatedWaitSeconds(null);
         setListNotice("현재 대기 상태를 확인할 수 없어 목록으로 이동합니다.");
         applyQueueEventToUrl(null);
         await moveToList({ preserveNotice: true });
     }
-  }, [applyQueueEventToUrl, moveToList, updateEstimatedWaitSeconds, updateWaitingQueuePosition]);
+  }, [applyQueueEventToUrl, moveToList, updateWaitingQueuePosition]);
 
   const checkQueueStatus = useCallback(async (
     eventId: string,
@@ -378,7 +365,6 @@ export default function Ticketing() {
         statusResponse.status,
         eventId,
         statusResponse.queuePosition,
-        statusResponse.estimatedWaitSeconds,
         "poll",
       );
       return statusResponse.status;
@@ -413,7 +399,6 @@ export default function Ticketing() {
     setWaitingError(null);
     setWaitingQueuePosition(null);
     setWaitingQueuePositionUpdatedAt(null);
-    setWaitingEstimatedWaitSeconds(null);
     setAgreementChecked(false);
     setReservationError(null);
     setQueueStatus("WAITING");
@@ -426,7 +411,6 @@ export default function Ticketing() {
         enterResponse.status,
         event.id,
         enterResponse.queuePosition,
-        enterResponse.estimatedWaitSeconds,
         "enter",
       );
     } catch (error) {
@@ -711,7 +695,6 @@ export default function Ticketing() {
         eventTitle={activeEventTitle}
         queuePosition={waitingQueuePosition}
         queuePositionUpdatedAt={waitingQueuePositionUpdatedAt}
-        estimatedWaitSeconds={waitingEstimatedWaitSeconds}
         polling={waitingPolling}
         offline={!isNetworkOnline}
         errorMessage={waitingError}
