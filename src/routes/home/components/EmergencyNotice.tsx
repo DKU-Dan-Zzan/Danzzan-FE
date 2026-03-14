@@ -19,24 +19,26 @@ const EmergencyNotice = ({ notice }: Props) => {
       <div
         className="
           rounded-[16px]
-          bg-[#FCFCFD]
-          border border-[#E8EDF3]
-          shadow-[0_3px_10px_rgba(15,23,42,0.06)]
+          border border-[var(--border-base)]
+          bg-[var(--surface-subtle)]
+          shadow-[0_10px_22px_-16px_var(--shadow-color)]
         "
       >
-        <div className="flex h-[35px] items-center gap-2.5 px-3">
+        <div className="flex h-[38px] items-center gap-2.5 px-3">
           <div
             className="
               flex items-center justify-center
               w-6 h-6 rounded-full
-              bg-primary/10 text-primary
+              border border-[var(--border-base)]
+              bg-[var(--surface-tint-subtle)]
+              text-[var(--accent)]
               flex-shrink-0
             "
           >
             <Megaphone size={14} strokeWidth={2.2} />
           </div>
 
-          <p className="min-w-0 truncate text-[13px] leading-none text-gray-700">
+          <p className="min-w-0 truncate text-[13px] leading-none text-[var(--text)]">
             {notice.content}
           </p>
         </div>

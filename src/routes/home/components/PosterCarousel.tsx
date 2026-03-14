@@ -22,12 +22,6 @@ export default function PosterCarousel({
   const count = posters.length
   const [index, setIndex] = useState(0)
 
-  // posters 개수가 줄어들거나 바뀌었을 때 index 안전 처리
-  useEffect(() => {
-    if (count === 0) return
-    if (index > count - 1) setIndex(0)
-  }, [count, index])
-
   // 자동 슬라이드
   useEffect(() => {
     if (count <= 1) return
@@ -37,7 +31,11 @@ export default function PosterCarousel({
     return () => clearInterval(t)
   }, [count, intervalMs])
 
-  const translateX = useMemo(() => `-${index * 100}%`, [index])
+  const safeIndex = useMemo(() => {
+    if (count === 0) return 0
+    return index % count
+  }, [count, index])
+  const translateX = useMemo(() => `-${safeIndex * 100}%`, [safeIndex])
 
   // 데이터 없을 때 placeholder UI (디자인 유지)
   if (count === 0) {
@@ -47,17 +45,17 @@ export default function PosterCarousel({
           className="
             relative overflow-hidden
             rounded-[16px]
-            shadow-[0_18px_40px_rgba(0,0,0,0.10)]
-            bg-gradient-to-br from-blue-50 to-violet-50
-            border border-gray-100
+            border border-[var(--border-base)]
+            bg-[linear-gradient(145deg,var(--surface-tint-subtle)_0%,var(--surface-subtle)_100%)]
+            shadow-[0_18px_40px_-26px_var(--shadow-color)]
           "
         >
           <div className="flex items-center justify-center" style={{ aspectRatio: aspect }}>
             <div className="text-center">
-              <div className="text-[15px] font-semibold text-gray-800">
+              <div className="text-[15px] font-semibold text-[var(--text)]">
                 2026 단국축제
               </div>
-              <div className="mt-1 text-[12px] text-gray-500">
+              <div className="mt-1 text-[12px] text-[var(--text-muted)]">
                 축제 포스터 영역
               </div>
             </div>
@@ -74,9 +72,9 @@ export default function PosterCarousel({
         className="
           relative overflow-hidden
           rounded-[16px]
-          shadow-[0_24px_70px_rgba(0,0,0,0.14)]
-          bg-white
-          ring-1 ring-black/5
+          border border-[var(--border-base)]
+          bg-[var(--surface-subtle)]
+          shadow-[0_24px_70px_-34px_var(--shadow-color)]
         "
       >
         {/* 비율 고정 */}
@@ -106,7 +104,7 @@ export default function PosterCarousel({
       {count > 1 && (
         <div className="mt-3 flex justify-center gap-2">
           {posters.map((p, i) => {
-            const active = i === index
+            const active = i === safeIndex
             return (
               <button
                 key={p.id}
@@ -115,7 +113,7 @@ export default function PosterCarousel({
                 aria-label={`포스터 ${i + 1}로 이동`}
                 className={`
                   h-1.5 rounded-full transition-all duration-300
-                  ${active ? "w-8 bg-blue-600" : "w-2 bg-gray-300"}
+                  ${active ? "w-8 bg-[var(--accent)]" : "w-2 bg-[var(--border-base)]"}
                 `}
               />
             )

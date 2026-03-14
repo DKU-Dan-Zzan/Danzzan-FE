@@ -10,12 +10,18 @@
 :root {
   --bg-base: #f8fafc;
   --bg-page-soft: #edf3ff;
+  --home-bg-start: #f3f7ff;
+  --home-bg-mid: #edf3ff;
+  --home-bg-end: #f8fbff;
+  --home-glow-strong: rgba(37, 99, 235, 0.22);
+  --home-glow-soft: rgba(59, 130, 246, 0.18);
   --text: #1e293b;
   --text-muted: #64748b;
   --text-on-accent: #ffffff;
   --accent: #2563eb;
   --border-base: #e2e8f0;
   --surface-subtle: #f1f5f9;
+  --surface-tint-subtle: rgba(59, 130, 246, 0.1);
   --shadow-color: rgba(37, 99, 235, 0.15);
   --status-danger-bg: #fef2f2;
   --status-danger-border: #fecaca;

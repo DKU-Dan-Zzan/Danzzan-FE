@@ -86,9 +86,9 @@ function Home() {
   }, [])
 
   return (
-    <div className="pb-24">
+    <div className="min-h-full flow-root bg-[var(--bg-page-soft)] pb-24">
       {error && (
-        <div className="px-4 mt-3 text-xs text-red-600">
+        <div className="mx-auto mt-3 w-full max-w-[314.4px] rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-xs text-[var(--status-danger-text)]">
           {error}
         </div>
       )}
@@ -100,10 +100,7 @@ function Home() {
         </div>
         {lineups.length > 0 && (
           <>
-            <p className="mx-auto mt-[31px] w-full max-w-[314.4px] text-[15px] font-semibold text-[#C0C8D3]">
-              올해 축제를 빛낼 아티스트들을 지금 확인하세요
-            </p>
-            <div className="mt-4">
+            <div className="mt-[31px]">
               <LineupCarousel banners={lineups} />
             </div>
           </>
@@ -111,7 +108,7 @@ function Home() {
       </div>
 
       {loading && (
-        <div className="px-4 mt-3 text-xs text-gray-400">
+        <div className="mx-auto mt-3 w-full max-w-[314.4px] rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 py-2 text-xs text-[var(--text-muted)]">
           로딩 중...
         </div>
       )}

@@ -23,11 +23,6 @@ export default function LineupCarousel({
   const touchStartYRef = useRef<number | null>(null)
 
   useEffect(() => {
-    if (count === 0) return
-    if (index > count - 1) setIndex(0)
-  }, [count, index])
-
-  useEffect(() => {
     if (count <= 1) return
     const t = setInterval(() => {
       setIndex((prev) => (prev + 1) % count)
@@ -35,7 +30,11 @@ export default function LineupCarousel({
     return () => clearInterval(t)
   }, [count, intervalMs])
 
-  const translateX = useMemo(() => `-${index * 100}%`, [index])
+  const safeIndex = useMemo(() => {
+    if (count === 0) return 0
+    return index % count
+  }, [count, index])
+  const translateX = useMemo(() => `-${safeIndex * 100}%`, [safeIndex])
 
   const handleTouchStart = (e: TouchEvent<HTMLDivElement>) => {
     const touch = e.touches[0]
@@ -75,9 +74,9 @@ export default function LineupCarousel({
         className="
           relative overflow-hidden
           rounded-[16px]
-          bg-white
-          ring-1 ring-black/5
-          shadow-[0_14px_35px_rgba(0,0,0,0.12)]
+          border border-[var(--border-base)]
+          bg-[var(--surface-subtle)]
+          shadow-[0_14px_35px_-20px_var(--shadow-color)]
           touch-pan-y
         "
         onTouchStart={handleTouchStart}
@@ -105,14 +104,14 @@ export default function LineupCarousel({
       {count > 1 && (
         <div className="mt-3 flex justify-center gap-2">
           {banners.map((banner, i) => {
-            const active = i === index
+            const active = i === safeIndex
             return (
               <button
                 key={banner.id}
                 type="button"
                 onClick={() => setIndex(i)}
                 aria-label={`라인업 ${i + 1}로 이동`}
-                className={`h-1.5 rounded-full transition-all duration-300 ${active ? "w-8 bg-slate-400" : "w-2 bg-slate-300"}`}
+                className={`h-1.5 rounded-full transition-all duration-300 ${active ? "w-8 bg-[var(--accent)]" : "w-2 bg-[var(--border-base)]"}`}
               />
             )
           })}
