@@ -5,6 +5,7 @@ import { Button } from "@/components/ticketing/common/ui/button";
 import { Input } from "@/components/ticketing/common/ui/input";
 import { Label } from "@/components/ticketing/common/ui/label";
 import { useAuth } from "@/hooks/ticketing/useAuth";
+import { resolveTicketingLoginRedirect } from "@/routes/ticketing/authNavigation";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -18,8 +19,7 @@ export default function Login() {
   const inputClassName =
     "h-11 rounded-2xl border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20";
 
-  const redirectParam = searchParams.get("redirect");
-  const redirect = redirectParam?.startsWith("/ticket") ? redirectParam : null;
+  const redirect = resolveTicketingLoginRedirect(searchParams.get("redirect"));
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -28,7 +28,7 @@ export default function Login() {
 
     try {
       await login({ studentId, password }, "student");
-      navigate(redirect || "/ticket/ticketing");
+      navigate(redirect);
     } catch (err) {
       setError(err instanceof Error ? err.message : "로그인에 실패했습니다.");
     } finally {

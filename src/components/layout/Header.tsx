@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { Ticket } from "lucide-react"
 import { useSyncExternalStore } from "react"
 import { authStore } from "@/store/ticketing/authStore"
+import { getMyTicketNavigationTarget } from "@/routes/ticketing/authNavigation"
 
 const Header = () => {
   const navigate = useNavigate()
@@ -11,11 +12,9 @@ const Header = () => {
     authStore.getSnapshot,
   )
   const isLoggedIn = !!session.tokens?.accessToken && session.role === "student"
-  const myTicketPath = "/ticket/myticket"
-  const loginWithRedirectPath = `/ticket/login?redirect=${encodeURIComponent(myTicketPath)}`
 
   const handleTicketClick = () => {
-    navigate(isLoggedIn ? myTicketPath : loginWithRedirectPath)
+    navigate(getMyTicketNavigationTarget(isLoggedIn))
   }
 
   return (
