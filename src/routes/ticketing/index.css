@@ -138,6 +138,19 @@
   --admin-operator-badge-border: var(--border-base);
   --admin-operator-badge-text: var(--text-muted);
 
+  --admin-auth-page-bg: var(--admin-page-bg);
+  --admin-auth-card-bg: var(--admin-panel-bg);
+  --admin-auth-card-border: var(--admin-panel-border);
+  --admin-auth-card-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+  --admin-auth-brand-text: var(--admin-accent-text);
+  --admin-auth-subtext: var(--text-muted);
+  --admin-auth-pill-bg: var(--admin-accent-soft-bg);
+  --admin-auth-pill-text: var(--admin-accent-text);
+  --admin-auth-input-bg: #ffffff;
+  --admin-auth-help-bg: var(--surface-subtle);
+  --admin-auth-help-border: var(--border-subtle);
+  --admin-auth-help-text: var(--text-muted);
+
   --admin-alert-error-bg: var(--status-danger-bg);
   --admin-alert-error-border: var(--status-danger-border);
   --admin-alert-error-text: var(--status-danger);
@@ -192,6 +205,19 @@
   --admin-dialog-bg: #ffffff;
   --admin-dialog-border: #cbd5e1;
   --admin-dialog-shadow: rgba(15, 23, 42, 0.35);
+  --admin-dialog-description-text: #334155;
+  --admin-dialog-issue-bg: #f2f7ff;
+  --admin-dialog-issue-border: #bfdbfe;
+  --admin-dialog-issue-title: #1d4ed8;
+  --admin-dialog-cancel-bg: #fff5f5;
+  --admin-dialog-cancel-border: #fecaca;
+  --admin-dialog-cancel-title: #b91c1c;
+  --admin-dialog-overlay-bg: rgba(15, 23, 42, 0.52);
+
+  --admin-issue-action-bg: var(--accent);
+  --admin-issue-action-hover-bg: #1d4ed8;
+  --admin-issue-action-border: var(--accent);
+  --admin-issue-action-text: #ffffff;
 
   --admin-danger-action-bg: #c62828;
   --admin-danger-action-hover-bg: #b71c1c;
@@ -417,5 +443,59 @@
     font-size: var(--text-base);
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
+  }
+}
+
+@layer components {
+  .ticketing-dialog-overlay {
+    background-color: var(--admin-dialog-overlay-bg, rgba(15, 23, 42, 0.52));
+  }
+
+  [data-slot="dialog-content"].admin-confirm-dialog {
+    background-color: var(--admin-dialog-bg);
+    border-color: var(--admin-dialog-border);
+    box-shadow: 0 24px 56px var(--admin-dialog-shadow);
+  }
+
+  [data-slot="dialog-content"].admin-confirm-dialog--issue {
+    background-color: var(--admin-dialog-issue-bg);
+    border-color: var(--admin-dialog-issue-border);
+  }
+
+  [data-slot="dialog-content"].admin-confirm-dialog--cancel {
+    background-color: var(--admin-dialog-cancel-bg);
+    border-color: var(--admin-dialog-cancel-border);
+  }
+
+  [data-slot="dialog-title"].admin-confirm-dialog__title--issue {
+    color: var(--admin-dialog-issue-title);
+  }
+
+  [data-slot="dialog-title"].admin-confirm-dialog__title--cancel {
+    color: var(--admin-dialog-cancel-title);
+  }
+
+  [data-slot="dialog-description"].admin-confirm-dialog__description {
+    color: var(--admin-dialog-description-text);
+  }
+
+  [data-slot="button"].admin-confirm-dialog__confirm--issue {
+    border: 1px solid var(--admin-issue-action-border);
+    background-color: var(--admin-issue-action-bg);
+    color: var(--admin-issue-action-text);
+  }
+
+  [data-slot="button"].admin-confirm-dialog__confirm--issue:hover {
+    background-color: var(--admin-issue-action-hover-bg);
+  }
+
+  [data-slot="button"].admin-confirm-dialog__confirm--cancel {
+    border: 1px solid var(--admin-danger-action-border);
+    background-color: var(--admin-danger-action-bg);
+    color: var(--admin-danger-action-text);
+  }
+
+  [data-slot="button"].admin-confirm-dialog__confirm--cancel:hover {
+    background-color: var(--admin-danger-action-hover-bg);
   }
 }

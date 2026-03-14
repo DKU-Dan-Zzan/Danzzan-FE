@@ -174,6 +174,8 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
     }
   };
 
+  const isCancelConfirm = confirmAction === "cancel";
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -442,13 +444,17 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
           }
         }}
       >
-        <DialogContent className="!bg-[var(--admin-dialog-bg)] border-[var(--admin-dialog-border)] shadow-[0_24px_56px_var(--admin-dialog-shadow)]">
+        <DialogContent
+          className={`admin-confirm-dialog ${isCancelConfirm ? "admin-confirm-dialog--cancel" : "admin-confirm-dialog--issue"}`}
+        >
           <DialogHeader>
-            <DialogTitle>
-              {confirmAction === "cancel" ? "팔찌 지급 취소 확인" : "팔찌 지급 확인"}
+            <DialogTitle
+              className={isCancelConfirm ? "admin-confirm-dialog__title--cancel" : "admin-confirm-dialog__title--issue"}
+            >
+              {isCancelConfirm ? "팔찌 지급 취소 확인" : "팔찌 지급 확인"}
             </DialogTitle>
-            <DialogDescription>
-              {confirmAction === "cancel"
+            <DialogDescription className="admin-confirm-dialog__description">
+              {isCancelConfirm
                 ? "해당 학생의 지급 완료 상태를 취소하시겠습니까? 취소 이력은 로그에 남습니다."
                 : "해당 학생에게 팔찌를 지급 처리하시겠습니까?"}
             </DialogDescription>
@@ -464,20 +470,20 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
               취소
             </Button>
             <Button
-              variant={confirmAction === "cancel" ? "destructive" : "default"}
+              variant="default"
               className={
-                confirmAction === "cancel"
-                  ? "border border-[var(--admin-danger-action-border)] bg-[var(--admin-danger-action-bg)] text-[var(--admin-danger-action-text)] hover:bg-[var(--admin-danger-action-hover-bg)]"
-                  : ""
+                isCancelConfirm
+                  ? "admin-confirm-dialog__confirm--cancel"
+                  : "admin-confirm-dialog__confirm--issue"
               }
               onClick={handleConfirmAction}
               disabled={issuing}
             >
               {issuing
-                ? confirmAction === "cancel"
+                ? isCancelConfirm
                   ? "취소 처리 중..."
                   : "지급 처리 중..."
-                : confirmAction === "cancel"
+                : isCancelConfirm
                   ? "지급 취소 확정"
                   : "지급 확정"}
             </Button>
