@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import AppLayout from './components/layout/AppLayout'
 import AdminLayout from './components/layout/AdminLayout'
-import "mapbox-gl/dist/mapbox-gl.css";
 
 import Home from './routes/home/Home'
 import Notice from './routes/notice/Notice'
