@@ -208,13 +208,13 @@ export default function Timetable() {
   }
 
   return (
-    <div className="h-screen bg-white flex flex-col">
-      <div className="sticky top-0 z-20 bg-white">
+    <div className="h-screen flex flex-col bg-[var(--bg-page-soft)]">
+      <div className="sticky top-0 z-20 bg-[var(--bg-page-soft)]">
         <div className="px-5 pt-5">
-          <div className="text-[38px] font-extrabold text-blue-600 font-cute">
+          <div className="text-[38px] font-extrabold text-[var(--accent)] font-cute">
             {title}
           </div>
-          <div className="mt-1 text-sm text-gray-500">{subtitle}</div>
+          <div className="mt-1 text-sm text-[var(--text-muted)]">{subtitle}</div>
 
           <div className="mt-4">
             <DayTabs
@@ -239,15 +239,15 @@ export default function Timetable() {
                 onCloseImage={() => setSelectedImage(null)}
               />
             ) : isLoading ? (
-              <div className="py-12 text-center text-gray-400">
+              <div className="py-12 text-center text-[var(--timetable-empty-text)]">
                 공연 정보를 불러오는 중입니다...
               </div>
             ) : loadError ? (
-              <div className="py-12 text-center text-gray-400">
+              <div className="py-12 text-center text-[var(--timetable-empty-text)]">
                 공연 정보를 불러오지 못했습니다.
               </div>
             ) : items.length === 0 ? (
-              <div className="py-12 text-center text-gray-400">
+              <div className="py-12 text-center text-[var(--timetable-empty-text)]">
                 등록된 공연이 없습니다.
               </div>
             ) : (
@@ -258,9 +258,9 @@ export default function Timetable() {
                   nowTargetId={nowTargetId}
                 />
 
-                <div className="mt-5 rounded-2xl bg-blue-50 border border-blue-100 px-4 py-3 flex items-start gap-2">
-                  <InformationCircleIcon className="w-5 h-5 text-blue-600 mt-0.5" />
-                  <p className="text-sm text-blue-700 font-medium">
+                <div className="mt-5 flex items-start gap-2 rounded-2xl border border-[var(--timetable-info-border)] bg-[var(--timetable-info-bg)] px-4 py-3">
+                  <InformationCircleIcon className="mt-0.5 h-5 w-5 text-[var(--accent)]" />
+                  <p className="text-sm font-medium text-[var(--timetable-info-text)]">
                     일정은 현장 상황에 따라 변경될 수 있습니다.
                   </p>
                 </div>
