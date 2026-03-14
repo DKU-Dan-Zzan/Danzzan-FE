@@ -21,12 +21,12 @@ const Header = () => {
     <header
       className="
         sticky top-0 z-50
-        bg-blue-600
-        border-b border-blue-700/40
+        bg-[#2563eb]
+        border-b border-[#1d4ed866]
         pt-[env(safe-area-inset-top)]
       "
     >
-      <div className="relative mx-auto h-[72px] max-w-[430px] px-4">
+      <div className="relative mx-auto h-16 max-w-[430px] px-4">
         <img
           src="/DAN-ZZAN.png"
           alt="DAN-ZZAN"

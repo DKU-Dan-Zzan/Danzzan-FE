@@ -9,8 +9,10 @@
 
 :root {
   --bg-base: #f8fafc;
+  --bg-page-soft: #edf3ff;
   --text: #1e293b;
   --text-muted: #64748b;
+  --text-on-accent: #ffffff;
   --accent: #2563eb;
   --border-base: #e2e8f0;
   --surface-subtle: #f1f5f9;
@@ -18,6 +20,24 @@
   --status-danger-bg: #fef2f2;
   --status-danger-border: #fecaca;
   --status-danger-text: #b91c1c;
+
+  /* Timetable semantic tokens */
+  --timetable-tab-inactive: #94a3b8;
+  --timetable-empty-text: #94a3b8;
+  --timetable-card-bg: #ffffff;
+  --timetable-card-border: var(--border-base);
+  --timetable-line: rgba(59, 130, 246, 0.55);
+  --timetable-info-bg: rgba(37, 99, 235, 0.1);
+  --timetable-info-border: rgba(37, 99, 235, 0.2);
+  --timetable-info-text: #1d4ed8;
+  --timetable-overlay-bg: rgba(15, 23, 42, 0.8);
+  --timetable-close-bg: rgba(255, 255, 255, 0.9);
+}
+
+html,
+body,
+#root {
+  background-color: var(--accent);
 }
 
 .font-cute {

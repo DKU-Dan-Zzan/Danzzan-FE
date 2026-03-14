@@ -83,7 +83,7 @@
   --accent: #2563eb;
   --text: #0f172a;
   --text-muted: #475569;
-  --header-bg: var(--accent);
+  --header-bg: #2563eb;
   --header-border: rgba(255, 255, 255, 0.3);
   --header-text: var(--primary-foreground);
   --header-text-muted: rgba(255, 255, 255, 0.82);
