@@ -32,7 +32,7 @@ const Header = () => {
         <img
           src="/DAN-ZZAN.png"
           alt="DAN-ZZAN"
-          className="h-[38px] w-[170px] object-cover object-center select-none"
+          className="h-[48px] w-[210px] object-cover object-center select-none"
           draggable={false}
         />
 
