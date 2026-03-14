@@ -470,10 +470,10 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
               취소
             </Button>
             <Button
-              variant="default"
+              variant={isCancelConfirm ? "destructive" : "default"}
               className={
                 isCancelConfirm
-                  ? "admin-confirm-dialog__confirm--cancel"
+                  ? "admin-confirm-dialog__confirm--cancel !border-[var(--admin-danger-action-border)] !bg-[var(--admin-danger-action-bg)] !text-[var(--admin-danger-action-text)] hover:!bg-[var(--admin-danger-action-hover-bg)]"
                   : "admin-confirm-dialog__confirm--issue"
               }
               onClick={handleConfirmAction}
