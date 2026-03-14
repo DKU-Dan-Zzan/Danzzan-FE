@@ -100,7 +100,7 @@ function Home() {
         </div>
         {lineups.length > 0 && (
           <>
-            <p className="mx-auto mt-[31px] w-full max-w-[314.4px] text-[16px] font-semibold text-[#C0C8D3]">
+            <p className="mx-auto mt-[31px] w-full max-w-[314.4px] text-[15px] font-semibold text-[#C0C8D3]">
               올해 축제를 빛낼 아티스트들을 지금 확인하세요
             </p>
             <div className="mt-4">
