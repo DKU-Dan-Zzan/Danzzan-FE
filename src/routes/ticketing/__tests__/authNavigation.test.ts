@@ -27,4 +27,9 @@ describe("authNavigation", () => {
     expect(resolveTicketingLoginRedirect("https://evil.example.com")).toBe(TICKETING_DEFAULT_PATH);
     expect(resolveTicketingLoginRedirect("/mypage")).toBe(TICKETING_DEFAULT_PATH);
   });
+
+  it("혼동 가능한 ticket prefix redirect는 기본 경로로 대체한다", () => {
+    expect(resolveTicketingLoginRedirect("/ticketing")).toBe(TICKETING_DEFAULT_PATH);
+    expect(resolveTicketingLoginRedirect("/ticket-admin")).toBe(TICKETING_DEFAULT_PATH);
+  });
 });

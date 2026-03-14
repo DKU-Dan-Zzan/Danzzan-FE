@@ -6,5 +6,11 @@ export const getMyTicketNavigationTarget = (isStudentLoggedIn: boolean) =>
     ? MY_TICKET_PATH
     : `/ticket/login?redirect=${encodeURIComponent(MY_TICKET_PATH)}`;
 
-export const resolveTicketingLoginRedirect = (redirectParam: string | null) =>
-  redirectParam?.startsWith("/ticket") ? redirectParam : TICKETING_DEFAULT_PATH;
+const isTicketRouteSegment = (path: string) => /^\/ticket(?:\/|$|[?#])/.test(path);
+
+export const resolveTicketingLoginRedirect = (redirectParam: string | null) => {
+  const trimmed = redirectParam?.trim() ?? null;
+  return trimmed && isTicketRouteSegment(trimmed)
+    ? trimmed
+    : TICKETING_DEFAULT_PATH;
+};
