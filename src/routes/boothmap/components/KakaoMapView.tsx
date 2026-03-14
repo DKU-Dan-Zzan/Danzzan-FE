@@ -39,6 +39,13 @@ const DEFAULT_CENTER = {
   lng: 127.1276,
 }
 
+const DANKOOK_BOUNDS = {
+  south: 37.315,
+  north: 37.3295,
+  west: 127.116,
+  east: 127.137,
+}
+
 type MarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "FACILITY"
 
 type OverlayRecord = {
@@ -49,6 +56,7 @@ type OverlayRecord = {
   lng: number
   name: string
   type: MarkerType
+  onClick: () => void
 }
 
 function getMarkerConfig(type: MarkerType) {
@@ -122,12 +130,14 @@ export default function KakaoMapView({
   const mapInstanceRef = useRef<any>(null)
   const isInitialBoundsAppliedRef = useRef(false)
   const lastViewportRef = useRef<MapViewport>(viewport)
+  const isClampingBoundsRef = useRef(false)
 
   // 전체 오버레이를 배열 대신 Map으로 관리
   const overlayMapRef = useRef<Map<string, OverlayRecord>>(new Map())
 
   // 이름 말풍선
   const labelOverlayRef = useRef<any>(null)
+  const labelContentRef = useRef<HTMLDivElement | null>(null)
 
   // 이전 선택 항목 추적
   const prevSelectedKeyRef = useRef<string | null>(null)
@@ -152,6 +162,7 @@ export default function KakaoMapView({
       labelOverlayRef.current.setMap(null)
       labelOverlayRef.current = null
     }
+    labelContentRef.current = null
   }
 
   // 지도 최초 생성
@@ -175,6 +186,10 @@ export default function KakaoMapView({
     })
 
     kakao.maps.event.addListener(map, "idle", () => {
+      if (clampMapCenter()) {
+        return
+      }
+
       const center = map.getCenter()
       const nextViewport: MapViewport = {
         lat: center.getLat(),
@@ -183,6 +198,16 @@ export default function KakaoMapView({
         mapboxZoom: kakaoLevelToMapboxZoom(map.getLevel()),
         mapboxPitch: lastViewportRef.current.mapboxPitch,
         mapboxBearing: lastViewportRef.current.mapboxBearing,
+      }
+
+      const prevViewport = lastViewportRef.current
+      const isSameViewport =
+        Math.abs(prevViewport.lat - nextViewport.lat) < 0.00001 &&
+        Math.abs(prevViewport.lng - nextViewport.lng) < 0.00001 &&
+        prevViewport.kakaoLevel === nextViewport.kakaoLevel
+
+      if (isSameViewport) {
+        return
       }
 
       lastViewportRef.current = nextViewport
@@ -225,6 +250,30 @@ export default function KakaoMapView({
       overlay.setMap(null)
     })
     overlayMapRef.current.clear()
+  }
+
+  const clampLatLng = (lat: number, lng: number) => ({
+    lat: Math.min(DANKOOK_BOUNDS.north, Math.max(DANKOOK_BOUNDS.south, lat)),
+    lng: Math.min(DANKOOK_BOUNDS.east, Math.max(DANKOOK_BOUNDS.west, lng)),
+  })
+
+  const clampMapCenter = () => {
+    const { kakao } = window
+    const map = mapInstanceRef.current
+    if (!map || !kakao || isClampingBoundsRef.current) return false
+
+    const center = map.getCenter()
+    const clamped = clampLatLng(center.getLat(), center.getLng())
+    const isOutOfBounds =
+      Math.abs(clamped.lat - center.getLat()) > 0.000001 ||
+      Math.abs(clamped.lng - center.getLng()) > 0.000001
+
+    if (!isOutOfBounds) return false
+
+    isClampingBoundsRef.current = true
+    map.setCenter(new kakao.maps.LatLng(clamped.lat, clamped.lng))
+    isClampingBoundsRef.current = false
+    return true
   }
 
   // offset 이동 함수
@@ -288,24 +337,31 @@ export default function KakaoMapView({
     const map = mapInstanceRef.current
     if (!map) return
 
-    clearLabelOverlay()
-
     const position = new kakao.maps.LatLng(lat, lng)
 
-    const bubble = document.createElement("div")
-    bubble.className =
-      "rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs font-bold text-gray-800 shadow-[0_6px_18px_rgba(0,0,0,0.16)] whitespace-nowrap backdrop-blur-sm"
-    bubble.innerText = name
+    if (!labelOverlayRef.current) {
+      const bubble = document.createElement("div")
+      bubble.className =
+        "rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs font-bold text-gray-800 shadow-[0_6px_18px_rgba(0,0,0,0.16)] whitespace-nowrap backdrop-blur-sm"
 
-    const overlay = new kakao.maps.CustomOverlay({
-      position,
-      content: bubble,
-      yAnchor: 2.2,
-      zIndex: 20,
-    })
+      const overlay = new kakao.maps.CustomOverlay({
+        position,
+        content: bubble,
+        yAnchor: 2.2,
+        zIndex: 20,
+      })
 
-    overlay.setMap(map)
-    labelOverlayRef.current = overlay
+      overlay.setMap(map)
+      labelOverlayRef.current = overlay
+      labelContentRef.current = bubble
+    } else {
+      labelOverlayRef.current.setPosition(position)
+      labelOverlayRef.current.setMap(map)
+    }
+
+    if (labelContentRef.current) {
+      labelContentRef.current.innerText = name
+    }
   }
 
   // 마커 DOM 생성
@@ -433,6 +489,7 @@ export default function KakaoMapView({
       lng,
       name,
       type,
+      onClick,
     }
   }
 
@@ -442,26 +499,17 @@ export default function KakaoMapView({
     isSelected: boolean
   ) => {
     const record = overlayMapRef.current.get(key)
-    const map = mapInstanceRef.current
-    if (!record || !map) return
+    if (!record) return
 
-    record.overlay.setMap(null)
-
-    const newRecord = createOverlayRecord({
-      kind: record.kind,
-      id: record.id,
-      lat: record.lat,
-      lng: record.lng,
-      name: record.name,
+    const content = createMarkerElement({
       type: record.type,
       isSelected,
-      onClick:
-        record.kind === "booth"
-          ? () => onClickBooth(record.id)
-          : () => onClickCollege(record.id),
+      title: record.name,
+      onClick: record.onClick,
     })
 
-    overlayMapRef.current.set(key, newRecord)
+    record.overlay.setContent(content)
+    record.overlay.setZIndex(isSelected ? 10 : 1)
   }
 
   // 현재 필터 기준으로 보여줄 데이터 계산
@@ -521,94 +569,67 @@ export default function KakaoMapView({
 
     const { kakao } = window
     const map = mapInstanceRef.current
-
-    clearAllOverlays()
-    clearLabelOverlay()
-    prevSelectedKeyRef.current = null
-
     const bounds = new kakao.maps.LatLngBounds()
+    const nextKeys = new Set(visibleItems.map((item) => item.key))
     let hasMarker = false
 
+    overlayMapRef.current.forEach((record, key) => {
+      if (nextKeys.has(key)) return
+      record.overlay.setMap(null)
+      overlayMapRef.current.delete(key)
+    })
+
     visibleItems.forEach((item) => {
+      const existing = overlayMapRef.current.get(item.key)
       const isSelected =
         selectedMapItem?.kind === item.kind && selectedMapItem.id === item.id
 
-      const record = createOverlayRecord({
-        kind: item.kind,
-        id: item.id,
-        lat: item.lat,
-        lng: item.lng,
-        name: item.name,
-        type: item.type,
-        isSelected,
-        onClick: item.onClick,
-      })
+      if (!existing) {
+        const record = createOverlayRecord({
+          kind: item.kind,
+          id: item.id,
+          lat: item.lat,
+          lng: item.lng,
+          name: item.name,
+          type: item.type,
+          isSelected,
+          onClick: item.onClick,
+        })
+        overlayMapRef.current.set(item.key, record)
+      } else {
+        const hasChanged =
+          existing.lat !== item.lat ||
+          existing.lng !== item.lng ||
+          existing.name !== item.name ||
+          existing.type !== item.type
 
-      overlayMapRef.current.set(item.key, record)
+        if (hasChanged) {
+          existing.overlay.setMap(null)
+          const record = createOverlayRecord({
+            kind: item.kind,
+            id: item.id,
+            lat: item.lat,
+            lng: item.lng,
+            name: item.name,
+            type: item.type,
+            isSelected,
+            onClick: item.onClick,
+          })
+          overlayMapRef.current.set(item.key, record)
+        }
+      }
+
       bounds.extend(new kakao.maps.LatLng(item.lat, item.lng))
       hasMarker = true
     })
 
-    if (selectedMapItem) {
-      prevSelectedKeyRef.current = getOverlayKey(selectedMapItem.kind, selectedMapItem.id)
-    }
-
-    // 초기 지도 범위 설정
-    let shouldSkipBounds = false
-
-    if (selectedMapItem?.kind === "booth") {
-      const selectedBooth = boothMap.get(selectedMapItem.id)
-      if (selectedBooth) {
-        const target = new kakao.maps.LatLng(
-          selectedBooth.location_y,
-          selectedBooth.location_x
-        )
-
-        showLabelOverlay({
-          lat: selectedBooth.location_y,
-          lng: selectedBooth.location_x,
-          name: selectedBooth.name,
-        })
-
-        map.setLevel(2, { anchor: target })
-        map.panTo(target)
-
-        shouldSkipBounds = true
-      }
-    }
-
-    if (selectedMapItem?.kind === "college") {
-      const selectedCollege = collegeMap.get(selectedMapItem.id)
-      if (selectedCollege) {
-        const target = new kakao.maps.LatLng(
-          selectedCollege.location_y,
-          selectedCollege.location_x
-        )
-
-        showLabelOverlay({
-          lat: selectedCollege.location_y,
-          lng: selectedCollege.location_x,
-          name: selectedCollege.name,
-        })
-
-        map.setLevel(2, { anchor: target })
-        panToWithSheetOffset({
-          lat: selectedCollege.location_y,
-          lng: selectedCollege.location_x,
-          targetSnap: "HALF",
-        })
-
-        shouldSkipBounds = true
-      }
-    }
-
-    if (!shouldSkipBounds && !isInitialBoundsAppliedRef.current) {
+    if (!isInitialBoundsAppliedRef.current) {
       if (hasMarker) {
         if (visibleItems.length === 1) {
           const only = visibleItems[0]
           map.setCenter(new kakao.maps.LatLng(only.lat, only.lng))
           map.setLevel(3)
-        } 
+        }
       } else {
         map.setCenter(new kakao.maps.LatLng(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng))
         map.setLevel(4)
@@ -616,18 +637,10 @@ export default function KakaoMapView({
 
       isInitialBoundsAppliedRef.current = true
     }
-
-    return () => {
-      clearAllOverlays()
-      clearLabelOverlay()
-      prevSelectedKeyRef.current = null
-    }
   }, [
     isLoaded,
     visibleItems,
     selectedMapItem,
-    boothMap,
-    collegeMap,
   ])
 
   // 2) 선택 상태만 바뀔 때는 필요한 overlay만 교체
@@ -702,7 +715,7 @@ export default function KakaoMapView({
     }
 
     prevSelectedKeyRef.current = nextKey
-  }, [isLoaded, selectedMapItem, boothMap, collegeMap, sheetSnap, onClickBooth, onClickCollege])
+  }, [isLoaded, selectedMapItem, boothMap, collegeMap, sheetSnap, onClickBooth, onClickCollege, visibleItems])
 
   if (isError) {
     return (
