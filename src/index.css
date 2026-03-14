@@ -31,3 +31,19 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;             /* Chrome/Safari */
 }
+
+/* 부스맵 Mapbox 기본 팝업 껍데기 제거 */
+.boothmap-name-popup .mapboxgl-popup-content {
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+.boothmap-name-popup .mapboxgl-popup-tip {
+  border-top-color: rgba(255, 255, 255, 0.96);
+}
+
+.boothmap-name-popup.mapboxgl-popup {
+  z-index: 30;
+}

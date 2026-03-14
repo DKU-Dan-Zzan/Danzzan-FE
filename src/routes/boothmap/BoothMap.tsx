@@ -22,6 +22,7 @@ import BoothList from "./components/BoothList";
 import PubList from "./components/PubList";
 import DetailSheet from "./components/DetailSheet";
 import MapFloatingToggle from "./components/MapFloatingToggle";
+import Mapbox3DView from "./components/Mapbox3DView";
 
 export default function BoothMap() {
   const [mode, setMode] = useState<MapMode>("2D");
@@ -113,27 +114,31 @@ export default function BoothMap() {
     <div className="relative h-screen w-full overflow-hidden bg-white">
       {/* 전체 지도 영역 */}
       <div className="absolute inset-0">
-        <KakaoMapView
-          booths={visibleBooths}
-          colleges={visibleColleges}
-          primaryFilter={primaryFilter}
-          selectedMapItem={selectedMapItem}
-          sheetSnap={sheetSnap}
-          onClickBooth={onClickMarkerBooth}
-          onClickCollege={onClickMarkerCollege}
-        />
-
-        {mode === "3D" && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/20">
-            <div className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-gray-600 shadow-lg">
-              3D 지도는 준비 중입니다
-            </div>
-          </div>
+        {mode === "2D" ? (
+          <KakaoMapView
+            booths={visibleBooths}
+            colleges={visibleColleges}
+            primaryFilter={primaryFilter}
+            selectedMapItem={selectedMapItem}
+            sheetSnap={sheetSnap}
+            onClickBooth={onClickMarkerBooth}
+            onClickCollege={onClickMarkerCollege}
+          />
+        ) : (
+          <Mapbox3DView
+            booths={visibleBooths}
+            colleges={visibleColleges}
+            primaryFilter={primaryFilter}
+            selectedMapItem={selectedMapItem}
+            sheetSnap={sheetSnap}
+            onClickBooth={onClickMarkerBooth}
+            onClickCollege={onClickMarkerCollege}
+          />
         )}
       </div>
 
       {/* 상단 로고 + 칩 오버레이 */}
-      <div className="absolute left-1/2 top-3 z-30 w-[calc(100%-24px)] max-w-[430px] -translate-x-1/2">
+      <div className="absolute left-1/2 top-3 z-[70] w-[calc(100%-24px)] max-w-[430px] -translate-x-1/2">
         <div className="rounded-[28px] border border-white/70 bg-white/92 px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.08)] backdrop-blur-md">
           <PrimaryFilterChips value={primaryFilter} onChange={handlePrimaryChange} />
 
