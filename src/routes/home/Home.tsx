@@ -66,7 +66,7 @@ function Home() {
       if (noticeResult.status === "fulfilled" && noticeResult.value) {
         setNotice({
           id: noticeResult.value.id,
-          title: "긴급 공지",
+          title: "긴급공지 및 내용",
           content: noticeResult.value.content,
           updatedAt: noticeResult.value.updatedAt,
         })
