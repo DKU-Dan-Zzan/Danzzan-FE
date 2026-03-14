@@ -8,6 +8,15 @@ export type PrimaryFilter = "ALL" | "PUB" | BoothType;
 export type SheetMode = "LIST" | "DETAIL";
 export type SheetSnap = "PEEK" | "HALF" | "FULL";
 
+export type MapViewport = {
+  lat: number;
+  lng: number;
+  kakaoLevel: number;
+  mapboxZoom: number;
+  mapboxPitch: number;
+  mapboxBearing: number;
+};
+
 export type College = {
   id: number;
   name: string;

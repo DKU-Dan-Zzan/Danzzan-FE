@@ -10,6 +10,7 @@ import useKakaoMapLoader from "../../../hooks/useKakaoMapLoader"
 import type {
   Booth,
   College,
+  MapViewport,
   PrimaryFilter,
   SelectedMapItem,
   SheetSnap,
@@ -27,6 +28,8 @@ type Props = {
   primaryFilter: PrimaryFilter;
   selectedMapItem: SelectedMapItem;
   sheetSnap: SheetSnap;
+  viewport: MapViewport;
+  onViewportChange: (next: MapViewport) => void;
   onClickBooth: (id: number) => void;
   onClickCollege: (id: number) => void;
 };
@@ -96,6 +99,10 @@ const PIN_URL_MAP: Record<MarkerType, string> = {
   FACILITY: createPinDataUrl("#3b82f6"),
 }
 
+function kakaoLevelToMapboxZoom(level: number) {
+  return 20 - level
+}
+
 function getOverlayKey(kind: "booth" | "college", id: number) {
   return `${kind}:${id}`
 }
@@ -106,12 +113,15 @@ export default function KakaoMapView({
   primaryFilter,
   selectedMapItem,
   sheetSnap,
+  viewport,
+  onViewportChange,
   onClickBooth,
   onClickCollege,
 }: Props) {
   const mapRef = useRef<HTMLDivElement | null>(null)
   const mapInstanceRef = useRef<any>(null)
   const isInitialBoundsAppliedRef = useRef(false)
+  const lastViewportRef = useRef<MapViewport>(viewport)
 
   // 전체 오버레이를 배열 대신 Map으로 관리
   const overlayMapRef = useRef<Map<string, OverlayRecord>>(new Map())
@@ -137,16 +147,23 @@ export default function KakaoMapView({
     return map
   }, [colleges])
 
+  function clearLabelOverlay() {
+    if (labelOverlayRef.current) {
+      labelOverlayRef.current.setMap(null)
+      labelOverlayRef.current = null
+    }
+  }
+
   // 지도 최초 생성
   useEffect(() => {
     if (!isLoaded || !mapRef.current || mapInstanceRef.current) return
 
     const { kakao } = window
-    const center = new kakao.maps.LatLng(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng)
+    const center = new kakao.maps.LatLng(viewport.lat, viewport.lng)
 
     const map = new kakao.maps.Map(mapRef.current, {
       center,
-      level: 3,
+      level: viewport.kakaoLevel,
     })
 
     // 줌 제한
@@ -157,15 +174,51 @@ export default function KakaoMapView({
       clearLabelOverlay()
     })
 
-    mapInstanceRef.current = map
-  }, [isLoaded])
+    kakao.maps.event.addListener(map, "idle", () => {
+      const center = map.getCenter()
+      const nextViewport: MapViewport = {
+        lat: center.getLat(),
+        lng: center.getLng(),
+        kakaoLevel: map.getLevel(),
+        mapboxZoom: kakaoLevelToMapboxZoom(map.getLevel()),
+        mapboxPitch: lastViewportRef.current.mapboxPitch,
+        mapboxBearing: lastViewportRef.current.mapboxBearing,
+      }
 
-  const clearLabelOverlay = () => {
-    if (labelOverlayRef.current) {
-      labelOverlayRef.current.setMap(null)
-      labelOverlayRef.current = null
+      lastViewportRef.current = nextViewport
+      onViewportChange(nextViewport)
+    })
+
+    mapInstanceRef.current = map
+    isInitialBoundsAppliedRef.current = true
+  }, [isLoaded, onViewportChange, viewport])
+
+  useEffect(() => {
+    const { kakao } = window
+    const map = mapInstanceRef.current
+    if (!map || !kakao) return
+
+    const currentCenter = map.getCenter()
+    const hasCenterChanged =
+      Math.abs(currentCenter.getLat() - viewport.lat) > 0.00001 ||
+      Math.abs(currentCenter.getLng() - viewport.lng) > 0.00001
+    const hasLevelChanged = map.getLevel() !== viewport.kakaoLevel
+
+    if (!hasCenterChanged && !hasLevelChanged) {
+      lastViewportRef.current = viewport
+      return
     }
-  }
+
+    if (hasLevelChanged) {
+      map.setLevel(viewport.kakaoLevel, { animate: false })
+    }
+
+    if (hasCenterChanged) {
+      map.setCenter(new kakao.maps.LatLng(viewport.lat, viewport.lng))
+    }
+
+    lastViewportRef.current = viewport
+  }, [viewport])
 
   const clearAllOverlays = () => {
     overlayMapRef.current.forEach(({ overlay }) => {

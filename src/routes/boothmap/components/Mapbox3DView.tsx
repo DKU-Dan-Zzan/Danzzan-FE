@@ -3,6 +3,7 @@ import mapboxgl from "mapbox-gl";
 import type {
   Booth,
   College,
+  MapViewport,
   PrimaryFilter,
   SelectedMapItem,
   SheetSnap,
@@ -16,17 +17,31 @@ type Props = {
   primaryFilter: PrimaryFilter;
   selectedMapItem: SelectedMapItem;
   sheetSnap: SheetSnap;
+  viewport: MapViewport;
+  onViewportChange: (next: MapViewport) => void;
   onClickBooth: (id: number) => void;
   onClickCollege: (id: number) => void;
 };
 
-const DEFAULT_CENTER: [number, number] = [127.1265, 37.3226];
+const DEFAULT_ZOOM = 17;
+const DEFAULT_PITCH = 55;
+const DEFAULT_BEARING = -20;
 const DANKOOK_BOUNDS: [[number, number], [number, number]] = [
   [127.1225, 37.3196],
   [127.1305, 37.3256],
 ];
 
 type MarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "FACILITY";
+type VisibleItem = {
+  key: string;
+  kind: "booth" | "college";
+  id: number;
+  lng: number;
+  lat: number;
+  name: string;
+  type: MarkerType;
+  onClick: () => void;
+};
 
 function getMarkerConfig(type: MarkerType) {
   switch (type) {
@@ -62,6 +77,13 @@ function createPinDataUrl(color: string) {
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="60" viewBox="0 0 48 60" fill="none">
       <path d="M24 59C24 59 45 38.5 45 24C45 12.402 35.598 3 24 3C12.402 3 3 12.402 3 24C3 38.5 24 59 24 59Z" fill="${color}"/>
+      <path d="M24 8C14.6112 8 7 15.6112 7 25C7 35.5591 16.3091 46.7859 24 54.3936C31.6909 46.7859 41 35.5591 41 25C41 15.6112 33.3888 8 24 8Z" fill="url(#pin-shine)" fill-opacity="0.22"/>
+      <defs>
+        <linearGradient id="pin-shine" x1="8" y1="8" x2="40" y2="52" gradientUnits="userSpaceOnUse">
+          <stop stop-color="white"/>
+          <stop offset="1" stop-color="white" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
     </svg>
   `;
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
@@ -73,62 +95,64 @@ function getOffsetYBySnap(sheetSnap: SheetSnap) {
   return 80;
 }
 
-async function loadSvgAsImageBitmap(
-  src: string,
-  {
-    size = 32,
-    padding = 4,
-  }: { size?: number; padding?: number } = {}
-): Promise<ImageBitmap> {
-  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-    const image = new Image();
-    image.crossOrigin = "anonymous";
-    image.onload = () => resolve(image);
-    image.onerror = reject;
-    image.src = src;
-  });
-
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-
-  const ctx = canvas.getContext("2d");
-  if (!ctx) {
-    throw new Error("canvas context 생성 실패");
-  }
-
-  ctx.clearRect(0, 0, size, size);
-
-  const drawSize = size - padding * 2;
-  ctx.drawImage(img, padding, padding, drawSize, drawSize);
-
-  return await createImageBitmap(canvas);
+function getItemKey(kind: "booth" | "college", id: number) {
+  return `${kind}:${id}`;
 }
 
-function sourceExists(map: mapboxgl.Map, id: string) {
-  return !!map.getSource(id);
+function mapboxZoomToKakaoLevel(zoom: number) {
+  return Math.min(4, Math.max(1, Math.round(20 - zoom)));
 }
 
-function layerExists(map: mapboxgl.Map, id: string) {
-  return !!map.getLayer(id);
-}
-
-function buildSelectedMarkerElement(type: MarkerType, title: string) {
+function buildMarkerElement({
+  type,
+  title,
+  isSelected,
+  onClick,
+}: {
+  type: MarkerType;
+  title: string;
+  isSelected: boolean;
+  onClick: () => void;
+}) {
   const { iconPath, color } = getMarkerConfig(type);
   const pinUrl = createPinDataUrl(color);
 
-  const wrapper = document.createElement("div");
+  const wrapper = document.createElement("button");
+  wrapper.type = "button";
   wrapper.title = title;
+  wrapper.setAttribute("aria-label", title);
   wrapper.style.position = "relative";
-  wrapper.style.width = "56px";
-  wrapper.style.height = "68px";
+  wrapper.style.width = isSelected ? "56px" : "48px";
+  wrapper.style.height = isSelected ? "70px" : "62px";
+  wrapper.style.padding = "0";
+  wrapper.style.border = "0";
+  wrapper.style.background = "transparent";
   wrapper.style.cursor = "pointer";
   wrapper.style.userSelect = "none";
-  wrapper.style.filter = "drop-shadow(0 10px 22px rgba(10,85,156,0.25))";
+  wrapper.style.transform = isSelected
+    ? "translate(-50%, -100%) scale(1.03)"
+    : "translate(-50%, -100%)";
+  wrapper.style.transition =
+    "transform 0.18s ease, filter 0.18s ease, opacity 0.18s ease";
+  wrapper.style.filter = isSelected
+    ? "drop-shadow(0 14px 24px rgba(10,85,156,0.28))"
+    : "drop-shadow(0 10px 18px rgba(15,23,42,0.22))";
+
+  const shadow = document.createElement("div");
+  shadow.style.position = "absolute";
+  shadow.style.left = "50%";
+  shadow.style.bottom = "3px";
+  shadow.style.width = isSelected ? "28px" : "24px";
+  shadow.style.height = isSelected ? "8px" : "7px";
+  shadow.style.transform = "translateX(-50%)";
+  shadow.style.borderRadius = "9999px";
+  shadow.style.background = "rgba(15,23,42,0.18)";
+  shadow.style.filter = "blur(3px)";
+  shadow.style.pointerEvents = "none";
 
   const pin = document.createElement("img");
   pin.src = pinUrl;
-  pin.alt = `${title} 핀`;
+  pin.alt = `${title} marker`;
   pin.style.position = "absolute";
   pin.style.inset = "0";
   pin.style.width = "100%";
@@ -138,32 +162,41 @@ function buildSelectedMarkerElement(type: MarkerType, title: string) {
 
   const icon = document.createElement("img");
   icon.src = iconPath;
-  icon.alt = `${title} 아이콘`;
+  icon.alt = "";
   icon.style.position = "absolute";
   icon.style.left = "50%";
   icon.style.top = "36%";
-  icon.style.width = "22px";
-  icon.style.height = "22px";
+  icon.style.width = isSelected ? "22px" : "20px";
+  icon.style.height = isSelected ? "22px" : "20px";
   icon.style.transform = "translate(-50%, -50%)";
   icon.style.objectFit = "contain";
   icon.style.pointerEvents = "none";
   icon.style.filter = "brightness(0) invert(1)";
   icon.draggable = false;
 
-  const ring = document.createElement("div");
-  ring.style.position = "absolute";
-  ring.style.left = "50%";
-  ring.style.top = "36%";
-  ring.style.width = "28px";
-  ring.style.height = "28px";
-  ring.style.transform = "translate(-50%, -50%)";
-  ring.style.borderRadius = "9999px";
-  ring.style.boxShadow = "0 0 0 5px rgba(10,85,156,0.18)";
-  ring.style.pointerEvents = "none";
+  wrapper.onclick = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onClick();
+  };
 
+  wrapper.appendChild(shadow);
   wrapper.appendChild(pin);
   wrapper.appendChild(icon);
-  wrapper.appendChild(ring);
+
+  if (isSelected) {
+    const ring = document.createElement("div");
+    ring.style.position = "absolute";
+    ring.style.left = "50%";
+    ring.style.top = "36%";
+    ring.style.width = "28px";
+    ring.style.height = "28px";
+    ring.style.transform = "translate(-50%, -50%)";
+    ring.style.borderRadius = "9999px";
+    ring.style.boxShadow = "0 0 0 5px rgba(10,85,156,0.18)";
+    ring.style.pointerEvents = "none";
+    wrapper.appendChild(ring);
+  }
 
   return wrapper;
 }
@@ -171,7 +204,7 @@ function buildSelectedMarkerElement(type: MarkerType, title: string) {
 function buildLabelElement(name: string) {
   const bubble = document.createElement("div");
   bubble.className =
-    "rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-extrabold text-gray-800 shadow-[0_8px_24px_rgba(0,0,0,0.12)] whitespace-nowrap";
+    "rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs font-bold text-gray-800 shadow-[0_6px_18px_rgba(0,0,0,0.16)] whitespace-nowrap backdrop-blur-sm";
   bubble.innerText = name;
   return bubble;
 }
@@ -182,15 +215,17 @@ export default function Mapbox3DView({
   primaryFilter,
   selectedMapItem,
   sheetSnap,
+  viewport,
+  onViewportChange,
   onClickBooth,
   onClickCollege,
 }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
-  const selectedMarkerRef = useRef<mapboxgl.Marker | null>(null);
+  const markerMapRef = useRef<Map<string, mapboxgl.Marker>>(new Map());
   const labelMarkerRef = useRef<mapboxgl.Marker | null>(null);
-  const imagesLoadedRef = useRef(false);
+  const lastViewportRef = useRef<MapViewport>(viewport);
 
   const boothMap = useMemo(() => {
     const map = new Map<number, Booth>();
@@ -204,87 +239,46 @@ export default function Mapbox3DView({
     return map;
   }, [colleges]);
 
-  const layerGeoJson = useMemo<GeoJSON.FeatureCollection>(() => {
-    const features: GeoJSON.Feature[] = [];
+  const visibleItems = useMemo<VisibleItem[]>(() => {
+    const items: VisibleItem[] = [];
+
+    const addBooth = (booth: Booth) => {
+      items.push({
+        key: getItemKey("booth", booth.id),
+        kind: "booth",
+        id: booth.id,
+        lng: booth.location_x,
+        lat: booth.location_y,
+        name: booth.name,
+        type: booth.type,
+        onClick: () => onClickBooth(booth.id),
+      });
+    };
+
+    const addCollege = (college: College) => {
+      items.push({
+        key: getItemKey("college", college.id),
+        kind: "college",
+        id: college.id,
+        lng: college.location_x,
+        lat: college.location_y,
+        name: `${college.name} 주점`,
+        type: "PUB",
+        onClick: () => onClickCollege(college.id),
+      });
+    };
 
     if (primaryFilter === "PUB") {
-      colleges.forEach((college) => {
-        features.push({
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [college.location_x, college.location_y],
-          },
-          properties: {
-            id: college.id,
-            kind: "college",
-            name: `${college.name} 주점`,
-            markerType: "PUB",
-          },
-        });
-      });
+      colleges.forEach(addCollege);
     } else if (primaryFilter === "ALL") {
-      booths.forEach((booth) => {
-        features.push({
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [booth.location_x, booth.location_y],
-          },
-          properties: {
-            id: booth.id,
-            kind: "booth",
-            name: booth.name,
-            markerType: booth.type,
-          },
-        });
-      });
-
-      colleges.forEach((college) => {
-        features.push({
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [college.location_x, college.location_y],
-          },
-          properties: {
-            id: college.id,
-            kind: "college",
-            name: `${college.name} 주점`,
-            markerType: "PUB",
-          },
-        });
-      });
+      booths.forEach(addBooth);
+      colleges.forEach(addCollege);
     } else {
-      booths.forEach((booth) => {
-        features.push({
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [booth.location_x, booth.location_y],
-          },
-          properties: {
-            id: booth.id,
-            kind: "booth",
-            name: booth.name,
-            markerType: booth.type,
-          },
-        });
-      });
+      booths.forEach(addBooth);
     }
 
-    return {
-      type: "FeatureCollection",
-      features,
-    };
-  }, [booths, colleges, primaryFilter]);
-
-  const clearSelectedMarker = () => {
-    if (selectedMarkerRef.current) {
-      selectedMarkerRef.current.remove();
-      selectedMarkerRef.current = null;
-    }
-  };
+    return items;
+  }, [booths, colleges, primaryFilter, onClickBooth, onClickCollege]);
 
   const clearLabelMarker = () => {
     if (labelMarkerRef.current) {
@@ -293,9 +287,60 @@ export default function Mapbox3DView({
     }
   };
 
-  const clearSelectionOverlays = () => {
-    clearSelectedMarker();
+  const clearAllMarkers = () => {
+    markerMapRef.current.forEach((marker) => marker.remove());
+    markerMapRef.current.clear();
+  };
+
+  const syncMarkers = () => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    clearAllMarkers();
+
+    visibleItems.forEach((item) => {
+      const isSelected =
+        selectedMapItem?.kind === item.kind && selectedMapItem.id === item.id;
+      const element = buildMarkerElement({
+        type: item.type,
+        title: item.name,
+        isSelected,
+        onClick: item.onClick,
+      });
+
+      const marker = new mapboxgl.Marker({
+        element,
+        anchor: "bottom",
+      })
+        .setLngLat([item.lng, item.lat])
+        .addTo(map);
+
+      markerMapRef.current.set(item.key, marker);
+    });
+  };
+
+  const showLabelMarker = ({
+    lng,
+    lat,
+    name,
+  }: {
+    lng: number;
+    lat: number;
+    name: string;
+  }) => {
+    const map = mapRef.current;
+    if (!map) return;
+
     clearLabelMarker();
+
+    const labelEl = buildLabelElement(name);
+    labelMarkerRef.current = new mapboxgl.Marker({
+      element: labelEl,
+      anchor: "bottom",
+      offset: [0, -74],
+    })
+      .setLngLat([lng, lat])
+      .addTo(map);
   };
 
   const moveCameraWithOffset = ({
@@ -311,203 +356,25 @@ export default function Mapbox3DView({
     if (!map) return;
 
     const point = map.project([lng, lat]);
-    const adjusted = new mapboxgl.Point(
+    const adjustedPoint = new mapboxgl.Point(
       point.x,
       point.y + getOffsetYBySnap(targetSnap)
     );
-    const nextCenter = map.unproject(adjusted);
+    const nextCenter = map.unproject(adjustedPoint);
 
     map.easeTo({
       center: [nextCenter.lng, nextCenter.lat],
-      zoom: 17.2,
-      pitch: 55,
-      bearing: -20,
+      zoom: Math.max(map.getZoom(), 17.2),
+      pitch: Math.max(map.getPitch(), DEFAULT_PITCH),
+      bearing: map.getBearing() || DEFAULT_BEARING,
       duration: 700,
       essential: true,
     });
   };
 
-  const showSelectedOverlays = ({
-    lng,
-    lat,
-    name,
-    type,
-  }: {
-    lng: number;
-    lat: number;
-    name: string;
-    type: MarkerType;
-  }) => {
-    const map = mapRef.current;
-    if (!map) return;
-
-    clearSelectionOverlays();
-
-    const selectedEl = buildSelectedMarkerElement(type, name);
-    selectedMarkerRef.current = new mapboxgl.Marker({
-      element: selectedEl,
-      anchor: "bottom",
-      offset: [0, -12],
-    })
-      .setLngLat([lng, lat])
-      .addTo(map);
-
-    const labelEl = buildLabelElement(name);
-    labelMarkerRef.current = new mapboxgl.Marker({
-      element: labelEl,
-      anchor: "bottom",
-      offset: [0, -84],
-    })
-      .setLngLat([lng, lat])
-      .addTo(map);
-  };
-
-  const ensureImages = async (map: mapboxgl.Map) => {
-		if (imagesLoadedRef.current) return;
-
-		const imageDefs: Array<{ id: string; src: string }> = [
-			{ id: "marker-pub", src: "/markers/booth-pub.svg" },
-			{ id: "marker-foodtruck", src: "/markers/booth-foodtruck.svg" },
-			{ id: "marker-experience", src: "/markers/booth-experience.svg" },
-			{ id: "marker-facility", src: "/markers/facility-restroom.svg" },
-		];
-
-		for (const imageDef of imageDefs) {
-			if (map.hasImage(imageDef.id)) continue;
-
-			const bitmap = await loadSvgAsImageBitmap(imageDef.src, {
-				size: 32,
-				padding: 5,
-			});
-
-			map.addImage(imageDef.id, bitmap, { pixelRatio: 2 });
-		}
-
-		imagesLoadedRef.current = true;
-	};
-
-  const createLayers = async (map: mapboxgl.Map) => {
-    await ensureImages(map);
-
-    if (!sourceExists(map, "booth-points")) {
-      map.addSource("booth-points", {
-        type: "geojson",
-        data: layerGeoJson,
-      });
-    }
-
-    if (!layerExists(map, "booth-pin-bg")) {
-      map.addLayer({
-        id: "booth-pin-bg",
-        type: "circle",
-        source: "booth-points",
-        paint: {
-          "circle-radius": 18,
-          "circle-color": [
-            "match",
-            ["get", "markerType"],
-            "PUB",
-            "#0a559c",
-            "FOOD_TRUCK",
-            "#ef4444",
-            "EXPERIENCE",
-            "#10b981",
-            "FACILITY",
-            "#3b82f6",
-            "#0a559c",
-          ],
-          "circle-opacity": 1,
-          "circle-stroke-color": "#ffffff",
-          "circle-stroke-width": 2.5,
-          "circle-translate": [0, -20],
-          "circle-pitch-alignment": "map",
-        },
-      });
-    }
-
-    if (!layerExists(map, "booth-pin-icon")) {
-      map.addLayer({
-        id: "booth-pin-icon",
-        type: "symbol",
-        source: "booth-points",
-        layout: {
-          "icon-image": [
-            "match",
-            ["get", "markerType"],
-            "PUB",
-            "marker-pub",
-            "FOOD_TRUCK",
-            "marker-foodtruck",
-            "EXPERIENCE",
-            "marker-experience",
-            "FACILITY",
-            "marker-facility",
-            "marker-experience",
-          ],
-          "icon-size": 0.7,
-          "icon-anchor": "center",
-          "icon-allow-overlap": true,
-          "icon-ignore-placement": true,
-          "icon-offset": [0, -14],
-        },
-        paint: {
-          "icon-opacity": 1,
-        },
-      });
-    }
-
-    if (!layerExists(map, "booth-hit-area")) {
-      map.addLayer({
-        id: "booth-hit-area",
-        type: "circle",
-        source: "booth-points",
-        paint: {
-          "circle-radius": 26,
-          "circle-color": "#000000",
-          "circle-opacity": 0,
-        },
-      });
-
-      map.on("click", "booth-hit-area", (e) => {
-        const feature = e.features?.[0];
-        if (!feature) return;
-
-        const id = Number(feature.properties?.id);
-        const kind = String(feature.properties?.kind);
-
-        if (kind === "booth") {
-          onClickBooth(id);
-        }
-
-        if (kind === "college") {
-          onClickCollege(id);
-        }
-      });
-
-      map.on("mouseenter", "booth-hit-area", () => {
-        map.getCanvas().style.cursor = "pointer";
-      });
-
-      map.on("mouseleave", "booth-hit-area", () => {
-        map.getCanvas().style.cursor = "";
-      });
-
-      map.on("click", (e) => {
-        const hitFeatures = map.queryRenderedFeatures(e.point, {
-          layers: ["booth-hit-area"],
-        });
-
-        if (hitFeatures.length === 0) {
-          clearSelectionOverlays();
-        }
-      });
-    }
-  };
-
   useLayoutEffect(() => {
     const container = containerRef.current;
-    if (!container || mapRef.current) return;
-    if (!mapboxgl.accessToken) return;
+    if (!container || mapRef.current || !mapboxgl.accessToken) return;
 
     const initMap = () => {
       if (!containerRef.current || mapRef.current) return;
@@ -518,29 +385,48 @@ export default function Mapbox3DView({
       const map = new mapboxgl.Map({
         container: containerRef.current,
         style: "mapbox://styles/mapbox/standard",
-        center: DEFAULT_CENTER,
-        zoom: 17,
-        pitch: 55,
-        bearing: -20,
+        center: [viewport.lng, viewport.lat],
+        zoom: viewport.mapboxZoom || DEFAULT_ZOOM,
+        pitch: viewport.mapboxPitch || DEFAULT_PITCH,
+        bearing: viewport.mapboxBearing || DEFAULT_BEARING,
         maxBounds: DANKOOK_BOUNDS,
         antialias: true,
       });
 
       map.setMinZoom(15);
-      map.setMaxZoom(18);
+      map.setMaxZoom(18.5);
 
       mapRef.current = map;
 
-      map.on("load", async () => {
-        await createLayers(map);
+      map.on("load", () => {
+        syncMarkers();
         map.resize();
 
         requestAnimationFrame(() => map.resize());
         setTimeout(() => map.resize(), 200);
       });
 
-      map.on("error", (e) => {
-        console.error("[Mapbox] error:", e);
+      map.on("click", () => {
+        clearLabelMarker();
+      });
+
+      map.on("moveend", () => {
+        const center = map.getCenter();
+        const nextViewport: MapViewport = {
+          lat: center.lat,
+          lng: center.lng,
+          kakaoLevel: mapboxZoomToKakaoLevel(map.getZoom()),
+          mapboxZoom: map.getZoom(),
+          mapboxPitch: map.getPitch(),
+          mapboxBearing: map.getBearing(),
+        };
+
+        lastViewportRef.current = nextViewport;
+        onViewportChange(nextViewport);
+      });
+
+      map.on("error", (event) => {
+        console.error("[Mapbox] error:", event);
       });
     };
 
@@ -566,7 +452,8 @@ export default function Mapbox3DView({
     return () => {
       resizeObserverRef.current?.disconnect();
       resizeObserverRef.current = null;
-      clearSelectionOverlays();
+      clearLabelMarker();
+      clearAllMarkers();
 
       if (mapRef.current) {
         mapRef.current.remove();
@@ -579,19 +466,47 @@ export default function Mapbox3DView({
     const map = mapRef.current;
     if (!map) return;
 
-    const source = map.getSource("booth-points") as mapboxgl.GeoJSONSource | undefined;
-    if (!source) return;
+    const center = map.getCenter();
+    const hasCenterChanged =
+      Math.abs(center.lat - viewport.lat) > 0.00001 ||
+      Math.abs(center.lng - viewport.lng) > 0.00001;
+    const hasZoomChanged = Math.abs(map.getZoom() - viewport.mapboxZoom) > 0.01;
+    const hasPitchChanged =
+      Math.abs(map.getPitch() - viewport.mapboxPitch) > 0.1;
+    const hasBearingChanged =
+      Math.abs(map.getBearing() - viewport.mapboxBearing) > 0.1;
 
-    source.setData(layerGeoJson);
-    clearSelectionOverlays();
-  }, [layerGeoJson]);
+    if (
+      !hasCenterChanged &&
+      !hasZoomChanged &&
+      !hasPitchChanged &&
+      !hasBearingChanged
+    ) {
+      lastViewportRef.current = viewport;
+      return;
+    }
+
+    map.jumpTo({
+      center: [viewport.lng, viewport.lat],
+      zoom: viewport.mapboxZoom,
+      pitch: viewport.mapboxPitch,
+      bearing: viewport.mapboxBearing,
+    });
+
+    lastViewportRef.current = viewport;
+  }, [viewport]);
 
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
+    syncMarkers();
 
     if (!selectedMapItem) {
-      clearSelectionOverlays();
+      clearLabelMarker();
+    }
+  }, [visibleItems, selectedMapItem]);
+
+  useEffect(() => {
+    if (!selectedMapItem) {
+      clearLabelMarker();
       return;
     }
 
@@ -599,11 +514,10 @@ export default function Mapbox3DView({
       const booth = boothMap.get(selectedMapItem.id);
       if (!booth) return;
 
-      showSelectedOverlays({
+      showLabelMarker({
         lng: booth.location_x,
         lat: booth.location_y,
         name: booth.name,
-        type: booth.type,
       });
 
       moveCameraWithOffset({
@@ -611,32 +525,30 @@ export default function Mapbox3DView({
         lat: booth.location_y,
         targetSnap: sheetSnap,
       });
+      return;
     }
 
-    if (selectedMapItem.kind === "college") {
-      const college = collegeMap.get(selectedMapItem.id);
-      if (!college) return;
+    const college = collegeMap.get(selectedMapItem.id);
+    if (!college) return;
 
-      showSelectedOverlays({
-        lng: college.location_x,
-        lat: college.location_y,
-        name: `${college.name} 주점`,
-        type: "PUB",
-      });
+    showLabelMarker({
+      lng: college.location_x,
+      lat: college.location_y,
+      name: `${college.name} 주점`,
+    });
 
-      moveCameraWithOffset({
-        lng: college.location_x,
-        lat: college.location_y,
-        targetSnap: "HALF",
-      });
-    }
+    moveCameraWithOffset({
+      lng: college.location_x,
+      lat: college.location_y,
+      targetSnap: "HALF",
+    });
   }, [selectedMapItem, sheetSnap, boothMap, collegeMap]);
 
   if (!mapboxgl.accessToken) {
     return (
       <div className="flex h-full w-full items-center justify-center bg-gray-50">
         <div className="rounded-2xl border border-red-200 bg-white px-4 py-3 text-sm font-semibold text-red-500 shadow-sm">
-          Mapbox 토큰이 설정되지 않았어요.
+          Mapbox access token is missing.
         </div>
       </div>
     );

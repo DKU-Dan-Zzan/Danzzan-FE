@@ -5,6 +5,7 @@ import type {
   Booth,
   College,
   MapMode,
+  MapViewport,
   PrimaryFilter,
   Pub,
   SelectedMapItem,
@@ -24,6 +25,15 @@ import DetailSheet from "./components/DetailSheet";
 import MapFloatingToggle from "./components/MapFloatingToggle";
 import Mapbox3DView from "./components/Mapbox3DView";
 
+const DEFAULT_MAP_VIEWPORT: MapViewport = {
+  lat: 37.3201,
+  lng: 127.1276,
+  kakaoLevel: 3,
+  mapboxZoom: 17,
+  mapboxPitch: 55,
+  mapboxBearing: -20,
+};
+
 export default function BoothMap() {
   const [mode, setMode] = useState<MapMode>("2D");
   const [primaryFilter, setPrimaryFilter] = useState<PrimaryFilter>("ALL");
@@ -32,6 +42,7 @@ export default function BoothMap() {
   const [selectedCollegeId, setSelectedCollegeId] = useState<number | null>(null);
   const [sheetMode, setSheetMode] = useState<SheetMode>("LIST");
   const [sheetSnap, setSheetSnap] = useState<SheetSnap>("PEEK");
+  const [mapViewport, setMapViewport] = useState<MapViewport>(DEFAULT_MAP_VIEWPORT);
 
   const colleges: College[] = mockColleges;
   const booths: Booth[] = mockBooths;
@@ -121,6 +132,8 @@ export default function BoothMap() {
             primaryFilter={primaryFilter}
             selectedMapItem={selectedMapItem}
             sheetSnap={sheetSnap}
+            viewport={mapViewport}
+            onViewportChange={setMapViewport}
             onClickBooth={onClickMarkerBooth}
             onClickCollege={onClickMarkerCollege}
           />
@@ -131,6 +144,8 @@ export default function BoothMap() {
             primaryFilter={primaryFilter}
             selectedMapItem={selectedMapItem}
             sheetSnap={sheetSnap}
+            viewport={mapViewport}
+            onViewportChange={setMapViewport}
             onClickBooth={onClickMarkerBooth}
             onClickCollege={onClickMarkerCollege}
           />
