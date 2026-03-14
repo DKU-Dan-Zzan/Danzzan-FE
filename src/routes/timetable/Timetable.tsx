@@ -82,7 +82,7 @@ export default function Timetable() {
   const isDay1 = activeDay.key === "DAY-1"
 
   const title = useMemo(() => "타임테이블", [])
-  const subtitle = useMemo(() => "공연 일정을 확인하세요", [])
+  const subtitle = useMemo(() => "공연 타임테이블을 확인하세요", [])
 
   useEffect(() => {
     if (isDay1) {
