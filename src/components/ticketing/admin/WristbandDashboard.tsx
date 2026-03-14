@@ -42,8 +42,8 @@ export function WristbandDashboard({ onSelectSession }: WristbandDashboardProps)
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-semibold text-foreground mb-2">운영 날짜 선택</h2>
-        <p className="text-sm text-muted-foreground">배부 운영일을 선택해 상세 화면으로 이동합니다.</p>
+        <h2 className="text-2xl font-semibold text-foreground mb-2">배부 날짜 선택</h2>
+        <p className="text-sm text-muted-foreground">배부 날짜를 선택하여 상세 페이지로 이동합니다.</p>
       </div>
 
       {error && (
