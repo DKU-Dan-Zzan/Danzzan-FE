@@ -17,7 +17,7 @@ const EmergencyNotice = ({ notice }: Props) => {
   const isNew = notice.updatedAt === "방금 전"
 
   return (
-    <section className="px-4 mt-3 mb-1">
+    <section className="mx-auto mt-[21px] w-full max-w-[314.4px]">
       <div
         className="
           rounded-[20px]

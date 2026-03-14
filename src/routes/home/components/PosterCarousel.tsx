@@ -17,7 +17,7 @@ type Props = {
 export default function PosterCarousel({
   posters,
   intervalMs = 3500,
-  aspect = "4/3",
+  aspect = "314.4/310",
 }: Props) {
   const count = posters.length
   const [index, setIndex] = useState(0)
@@ -42,7 +42,7 @@ export default function PosterCarousel({
   // 데이터 없을 때 placeholder UI (디자인 유지)
   if (count === 0) {
     return (
-      <section className="max-w-[430px] mx-auto px-4 pt-4">
+      <section className="mx-auto w-full max-w-[314.4px]">
         <div
           className="
             relative overflow-hidden
@@ -52,7 +52,7 @@ export default function PosterCarousel({
             border border-gray-100
           "
         >
-          <div className={`aspect-[${aspect}] flex items-center justify-center`}>
+          <div className="flex items-center justify-center" style={{ aspectRatio: aspect }}>
             <div className="text-center">
               <div className="text-[15px] font-semibold text-gray-800">
                 2026 단국축제
@@ -68,7 +68,7 @@ export default function PosterCarousel({
   }
 
   return (
-    <section className="max-w-[430px] mx-auto px-4 pt-4">
+    <section className="mx-auto w-full max-w-[314.4px]">
       {/* 포스터 카드 */}
       <div
         className="
@@ -80,7 +80,7 @@ export default function PosterCarousel({
         "
       >
         {/* 비율 고정 */}
-        <div className={`aspect-[${aspect}]`}>
+        <div style={{ aspectRatio: aspect }}>
           {/* 슬라이드 트랙 */}
           <div
             className="h-full w-full flex transition-transform duration-500 ease-out"

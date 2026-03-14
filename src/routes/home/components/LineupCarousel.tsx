@@ -15,7 +15,7 @@ type Props = {
 export default function LineupCarousel({
   banners,
   intervalMs = 4500,
-  aspect = "16/4",
+  aspect = "314.4/138",
 }: Props) {
   const count = banners.length
   const [index, setIndex] = useState(0)
@@ -38,7 +38,7 @@ export default function LineupCarousel({
   if (count === 0) return null
 
   return (
-    <section className="max-w-[430px] mx-auto px-4">
+    <section className="mx-auto w-full max-w-[314.4px]">
       <div
         className="
           relative overflow-hidden
