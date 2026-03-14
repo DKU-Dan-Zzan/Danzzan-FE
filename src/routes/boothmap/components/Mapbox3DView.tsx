@@ -189,7 +189,8 @@ async function loadSvgAsImageBitmap(
   {
     size = 32,
     padding = 4,
-  }: { size?: number; padding?: number } = {}
+    tintColor = "#ffffff",
+  }: { size?: number; padding?: number; tintColor?: string } = {}
 ): Promise<ImageBitmap> {
   const img = await new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
@@ -212,6 +213,10 @@ async function loadSvgAsImageBitmap(
 
   const drawSize = size - padding * 2;
   ctx.drawImage(img, padding, padding, drawSize, drawSize);
+  ctx.globalCompositeOperation = "source-in";
+  ctx.fillStyle = tintColor;
+  ctx.fillRect(0, 0, size, size);
+  ctx.globalCompositeOperation = "source-over";
 
   return createImageBitmap(canvas);
 }
@@ -366,8 +371,8 @@ export default function Mapbox3DView({
       if (map.hasImage(imageDef.id)) continue;
 
       const bitmap = await loadSvgAsImageBitmap(imageDef.src, {
-        size: 28,
-        padding: 4,
+        size: 40,
+        padding: 3,
       });
 
       map.addImage(imageDef.id, bitmap, { pixelRatio: 2 });
@@ -452,13 +457,13 @@ export default function Mapbox3DView({
             ["linear"],
             ["zoom"],
             8,
-            0.4,
+            0.58,
             12,
-            0.45,
+            0.66,
             16,
-            0.52,
+            0.74,
             18,
-            0.56,
+            0.8,
           ],
           "icon-anchor": "center",
           "icon-allow-overlap": true,

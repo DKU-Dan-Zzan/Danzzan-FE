@@ -115,6 +115,19 @@ function getOverlayKey(kind: "booth" | "college", id: number) {
   return `${kind}:${id}`
 }
 
+function getMarkerScaleByLevel(level: number, isSelected: boolean) {
+  const baseScale =
+    level <= 2 ? 1 :
+    level === 3 ? 0.88 :
+    0.74
+
+  if (isSelected) {
+    return Math.max(0.92, baseScale)
+  }
+
+  return baseScale
+}
+
 export default function KakaoMapView({
   booths,
   colleges,
@@ -369,21 +382,28 @@ export default function KakaoMapView({
     type,
     isSelected,
     title,
+    level,
     onClick,
   }: {
     type: MarkerType
     isSelected: boolean
     title: string
+    level: number
     onClick: () => void
   }) => {
     const { iconPath } = getMarkerConfig(type)
     const pinUrl = PIN_URL_MAP[type]
+    const scale = getMarkerScaleByLevel(level, isSelected)
+    const width = Math.round((isSelected ? 56 : 48) * scale)
+    const height = Math.round((isSelected ? 68 : 60) * scale)
+    const iconSize = Math.round((isSelected ? 22 : 20) * scale)
+    const ringSize = Math.round(28 * scale)
 
     const wrapper = document.createElement("div")
     wrapper.title = title
     wrapper.style.position = "relative"
-    wrapper.style.width = isSelected ? "56px" : "48px"
-    wrapper.style.height = isSelected ? "68px" : "60px"
+    wrapper.style.width = `${width}px`
+    wrapper.style.height = `${height}px`
     wrapper.style.transform = "translate(-50%, -100%)"
     wrapper.style.cursor = "pointer"
     wrapper.style.userSelect = "none"
@@ -408,8 +428,8 @@ export default function KakaoMapView({
     icon.style.position = "absolute"
     icon.style.left = "50%"
     icon.style.top = "36%"
-    icon.style.width = isSelected ? "22px" : "20px"
-    icon.style.height = isSelected ? "22px" : "20px"
+    icon.style.width = `${iconSize}px`
+    icon.style.height = `${iconSize}px`
     icon.style.transform = "translate(-50%, -50%)"
     icon.style.objectFit = "contain"
     icon.style.pointerEvents = "none"
@@ -424,8 +444,8 @@ export default function KakaoMapView({
       ring.style.position = "absolute"
       ring.style.left = "50%"
       ring.style.top = "36%"
-      ring.style.width = "28px"
-      ring.style.height = "28px"
+      ring.style.width = `${ringSize}px`
+      ring.style.height = `${ringSize}px`
       ring.style.transform = "translate(-50%, -50%)"
       ring.style.borderRadius = "9999px"
       ring.style.boxShadow = "0 0 0 5px rgba(10,85,156,0.18)"
@@ -465,10 +485,12 @@ export default function KakaoMapView({
     const map = mapInstanceRef.current
 
     const position = new kakao.maps.LatLng(lat, lng)
+    const level = map?.getLevel?.() ?? 3
     const content = createMarkerElement({
       type,
       isSelected,
       title: name,
+      level,
       onClick,
     })
 
@@ -499,12 +521,14 @@ export default function KakaoMapView({
     isSelected: boolean
   ) => {
     const record = overlayMapRef.current.get(key)
+    const map = mapInstanceRef.current
     if (!record) return
 
     const content = createMarkerElement({
       type: record.type,
       isSelected,
       title: record.name,
+      level: map?.getLevel?.() ?? 3,
       onClick: record.onClick,
     })
 
