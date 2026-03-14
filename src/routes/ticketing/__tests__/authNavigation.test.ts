@@ -32,4 +32,9 @@ describe("authNavigation", () => {
     expect(resolveTicketingLoginRedirect("/ticketing")).toBe(TICKETING_DEFAULT_PATH);
     expect(resolveTicketingLoginRedirect("/ticket-admin")).toBe(TICKETING_DEFAULT_PATH);
   });
+
+  it("ticket 경로 내부 dot-segment 우회는 기본 경로로 대체한다", () => {
+    expect(resolveTicketingLoginRedirect("/ticket/../mypage")).toBe(TICKETING_DEFAULT_PATH);
+    expect(resolveTicketingLoginRedirect("/ticket/%2e%2e/mypage")).toBe(TICKETING_DEFAULT_PATH);
+  });
 });
