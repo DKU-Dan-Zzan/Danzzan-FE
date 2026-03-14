@@ -13,8 +13,8 @@ export function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-[var(--border-base)] bg-[var(--surface-subtle)]">
+    <div className="min-h-screen bg-white">
+      <header className="border-b border-[var(--border-base)] bg-[var(--bg-base)]">
         <div className="mx-auto flex w-full max-w-[1360px] items-center justify-between px-8 py-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
