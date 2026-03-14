@@ -42,7 +42,7 @@ export default function LineupCarousel({
       <div
         className="
           relative overflow-hidden
-          rounded-[22px]
+          rounded-[16px]
           bg-white
           ring-1 ring-black/5
           shadow-[0_14px_35px_rgba(0,0,0,0.12)]

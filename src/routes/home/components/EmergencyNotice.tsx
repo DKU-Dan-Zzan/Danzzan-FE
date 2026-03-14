@@ -18,7 +18,7 @@ const EmergencyNotice = ({ notice }: Props) => {
     <section className="mx-auto mt-[21px] w-full max-w-[314.4px]">
       <div
         className="
-          rounded-[18px]
+          rounded-full
           bg-[#FCFCFD]
           border border-[#E8EDF3]
           shadow-[0_3px_10px_rgba(15,23,42,0.06)]

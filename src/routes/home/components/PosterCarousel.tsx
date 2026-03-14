@@ -46,7 +46,7 @@ export default function PosterCarousel({
         <div
           className="
             relative overflow-hidden
-            rounded-[26px]
+            rounded-[16px]
             shadow-[0_18px_40px_rgba(0,0,0,0.10)]
             bg-gradient-to-br from-blue-50 to-violet-50
             border border-gray-100
@@ -73,7 +73,7 @@ export default function PosterCarousel({
       <div
         className="
           relative overflow-hidden
-          rounded-[28px]
+          rounded-[16px]
           shadow-[0_24px_70px_rgba(0,0,0,0.14)]
           bg-white
           ring-1 ring-black/5
