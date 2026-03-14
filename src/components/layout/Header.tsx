@@ -26,13 +26,11 @@ const Header = () => {
         pt-[env(safe-area-inset-top)]
       "
     >
-      <div className="mx-auto flex h-16 max-w-[430px] items-center justify-between px-4">
-        <div className="w-11" />
-
+      <div className="relative mx-auto h-[72px] max-w-[430px] px-4">
         <img
           src="/DAN-ZZAN.png"
           alt="DAN-ZZAN"
-          className="h-[48px] w-[210px] object-cover object-center select-none"
+          className="pointer-events-none absolute top-[75%] left-1/2 h-[68px] w-[300px] -translate-x-1/2 -translate-y-1/2 object-cover object-[50%_58%] select-none brightness-0 invert"
           draggable={false}
         />
 
@@ -40,7 +38,7 @@ const Header = () => {
           onClick={handleTicketClick}
           aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
           title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
-          className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-blue-600 shadow-md transition-all active:scale-95"
+          className="absolute top-1/2 right-4 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white text-blue-600 shadow-md transition-all active:scale-95"
         >
           <Ticket size={20} />
         </button>
