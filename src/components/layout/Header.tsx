@@ -39,6 +39,7 @@ const Header = () => {
 
         <button
           onClick={handleTicketClick}
+          aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
           title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
           className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white shadow-md transition-all active:scale-95"
         >

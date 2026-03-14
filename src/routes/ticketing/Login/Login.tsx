@@ -18,7 +18,8 @@ export default function Login() {
   const inputClassName =
     "h-11 rounded-2xl border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20";
 
-  const redirect = searchParams.get("redirect");
+  const redirectParam = searchParams.get("redirect");
+  const redirect = redirectParam?.startsWith("/ticket") ? redirectParam : null;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
