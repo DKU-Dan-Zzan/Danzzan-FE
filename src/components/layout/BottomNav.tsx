@@ -16,7 +16,7 @@ const BottomNav = () => {
       className="
         fixed bottom-0 left-0 right-0
         max-w-[430px] mx-auto
-        h-[var(--app-bottom-nav-height,84px)]
+        h-[calc(var(--app-bottom-nav-height,84px)+env(safe-area-inset-bottom))]
         pb-[env(safe-area-inset-bottom)]
         z-50
       "
