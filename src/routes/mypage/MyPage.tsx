@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { authStore } from "@/store/ticketing/authStore";
+import { authApi } from "@/api/ticketing/authApi";
 import { GraduationCap, IdCard, LogOut, User } from "lucide-react";
 
 function MyPage() {
@@ -34,6 +35,41 @@ function MyPage() {
   }
 
   const user = session.user;
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      return;
+    }
+
+    const hasProfileGap = !user?.name?.trim() || !user?.college?.trim();
+    const tokens = session.tokens;
+    if (!hasProfileGap || !tokens) {
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const freshUser = await authApi.me();
+        if (!freshUser || cancelled) {
+          return;
+        }
+        authStore.setSession(
+          {
+            tokens,
+            user: freshUser,
+          },
+          "student",
+        );
+      } catch {
+        // Fallback: keep login payload profile when /user/me request fails.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoggedIn, session.tokens, user?.college, user?.name]);
 
   const handleLogout = () => {
     authStore.clear();

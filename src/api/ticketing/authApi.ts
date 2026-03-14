@@ -1,7 +1,7 @@
 import { createHttpClient } from "@/api/ticketing/httpClient";
-import { mapAuthLoginResponse } from "@/lib/ticketing/mappers/authMapper";
+import { mapAuthLoginResponse, mapAuthUserDto } from "@/lib/ticketing/mappers/authMapper";
 import { authStore } from "@/store/ticketing/authStore";
-import type { AuthLoginResponseDto } from "@/types/ticketing/dto/auth.dto";
+import type { AuthLoginResponseDto, AuthUserDto } from "@/types/ticketing/dto/auth.dto";
 import type { AuthCredentials, AuthSession } from "@/types/ticketing/model/auth.model";
 import { env, requireEnv } from "@/utils/ticketing/env";
 
@@ -40,7 +40,32 @@ export const authApi = {
       studentId: payload.studentId,
       password: payload.password,
     });
-    return mapAuthLoginResponse(dto ?? {});
+
+    const session = mapAuthLoginResponse(dto ?? {});
+    const hasProfileGap = !session.user?.name?.trim() || !session.user?.college?.trim();
+    if (!session.tokens.accessToken || !hasProfileGap) {
+      return session;
+    }
+
+    try {
+      const meDto = await client.get<AuthUserDto>("/user/me", {
+        headers: {
+          Authorization: `Bearer ${session.tokens.accessToken}`,
+        },
+      });
+      const resolvedUser = mapAuthUserDto(meDto ?? undefined);
+      return {
+        ...session,
+        user: resolvedUser ?? session.user,
+      };
+    } catch {
+      return session;
+    }
+  },
+  me: async () => {
+    const client = getAuthClient();
+    const dto = await client.get<AuthUserDto>("/user/me");
+    return mapAuthUserDto(dto ?? undefined);
   },
   refresh: async (): Promise<AuthSession> => {
     const client = getAuthClient();

@@ -8,7 +8,7 @@ const mapUserRole = (role?: string): AuthUser["role"] => {
   return "unknown";
 };
 
-const mapAuthUser = (dto?: AuthLoginResponseDto["user"]): AuthUser | null => {
+export const mapAuthUserDto = (dto?: AuthLoginResponseDto["user"]): AuthUser | null => {
   if (!dto) {
     return null;
   }
@@ -34,6 +34,6 @@ const mapAuthTokens = (dto: AuthLoginResponseDto): AuthTokens => {
 export const mapAuthLoginResponse = (dto: AuthLoginResponseDto): AuthSession => {
   return {
     tokens: mapAuthTokens(dto),
-    user: mapAuthUser(dto.user),
+    user: mapAuthUserDto(dto.user),
   };
 };
