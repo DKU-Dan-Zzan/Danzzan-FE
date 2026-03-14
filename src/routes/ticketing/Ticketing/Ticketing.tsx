@@ -33,6 +33,8 @@ interface ParsedApiError {
 }
 
 const OFFLINE_WAITING_MESSAGE = "인터넷 연결이 끊겼습니다. 연결이 복구되면 자동으로 다시 확인합니다.";
+const DEFAULT_SOLD_OUT_DESCRIPTION = "다른 티켓팅 일정은 티켓팅 목록에서 확인하실 수 있어요.";
+const QUEUE_WAITING_SOLD_OUT_DESCRIPTION = "현재 순서 이전에 티켓이 모두 소진되었습니다.";
 
 const RESERVE_ERROR_CODE_SET = new Set<ReserveErrorCode>([
   "RESERVE_ALREADY_RESERVED",
@@ -66,6 +68,7 @@ const parseApiError = (error: unknown): ParsedApiError => {
     payloadRecord?.code ??
     payloadError?.errorCode ??
     payloadError?.code ??
+    payloadError?.error ??
     payloadData?.errorCode ??
     payloadData?.code ??
     null;
@@ -100,7 +103,7 @@ export default function Ticketing() {
   const [activeEventId, setActiveEventId] = useState<string | null>(() => readQueueEventIdFromSearch(window.location.search));
   const [activeEventTitle, setActiveEventTitle] = useState("");
 
-  const [queueStatus, setQueueStatus] = useState<QueueRequestStatus>("NONE");
+  const [, setQueueStatus] = useState<QueueRequestStatus>("NONE");
   const [waitingQueuePosition, setWaitingQueuePosition] = useState<number | null>(null);
   const [waitingQueuePositionUpdatedAt, setWaitingQueuePositionUpdatedAt] = useState<number | null>(null);
   const [waitingPolling, setWaitingPolling] = useState(false);
@@ -115,6 +118,7 @@ export default function Ticketing() {
   const [reservationError, setReservationError] = useState<string | null>(null);
 
   const [waitingAd, setWaitingAd] = useState<PlacementAd | null>(null);
+  const [soldOutDescription, setSoldOutDescription] = useState(DEFAULT_SOLD_OUT_DESCRIPTION);
 
   const enterLockRef = useRef(false);
   const reserveLockRef = useRef(false);
@@ -182,6 +186,7 @@ export default function Ticketing() {
     setWaitingQueuePositionUpdatedAt(null);
     setWaitingError(null);
     setWaitingPolling(false);
+    setSoldOutDescription(DEFAULT_SOLD_OUT_DESCRIPTION);
     setReserveProcessing(false);
     setReserveErrorMessage(null);
     setReserveMessage("입장 상태가 확인되어 예매를 진행하고 있습니다.");
@@ -220,6 +225,7 @@ export default function Ticketing() {
         setReservationError(null);
         break;
       case "RESERVE_SOLD_OUT":
+        setSoldOutDescription(DEFAULT_SOLD_OUT_DESCRIPTION);
         setStep("soldout");
         setActiveEventId(null);
         setReservationError(null);
@@ -270,7 +276,8 @@ export default function Ticketing() {
     setReservationError(null);
 
     try {
-      const reservation = await ticketApi.reserveTicket(eventId);
+      await ticketApi.activateTicket(eventId);
+      await ticketApi.reserveTicket(eventId);
       setEvents((prev) =>
         prev.map((event) => {
           if (event.id !== eventId) {
@@ -295,12 +302,13 @@ export default function Ticketing() {
       setReserveProcessing(false);
       releaseSingleFlight(reserveLockRef);
     }
-  }, [applyQueueEventToUrl, applyReserveError, updateWaitingQueuePosition]);
+  }, [applyQueueEventToUrl, applyReserveError]);
 
   const handleQueueStatus = useCallback(async (
     status: QueueRequestStatus,
     eventId: string,
     queuePosition?: number | null,
+    source: "enter" | "poll" = "enter",
   ) => {
     setQueueStatus(status);
     if (typeof queuePosition === "number" || queuePosition === null) {
@@ -319,6 +327,9 @@ export default function Ticketing() {
         setStep("in-progress");
         return;
       case "soldout":
+        setSoldOutDescription(
+          source === "poll" ? QUEUE_WAITING_SOLD_OUT_DESCRIPTION : DEFAULT_SOLD_OUT_DESCRIPTION,
+        );
         setStep("soldout");
         setActiveEventId(null);
         applyQueueEventToUrl(null);
@@ -350,7 +361,12 @@ export default function Ticketing() {
       const statusResponse = await ticketApi.getTicketQueueStatus(eventId, signal);
       setWaitingError(null);
       pollBackoffRef.current = 0;
-      await handleQueueStatus(statusResponse.status, eventId, statusResponse.queuePosition);
+      await handleQueueStatus(
+        statusResponse.status,
+        eventId,
+        statusResponse.queuePosition,
+        "poll",
+      );
       return statusResponse.status;
     } catch (error) {
       if (signal?.aborted) {
@@ -391,7 +407,12 @@ export default function Ticketing() {
 
     try {
       const enterResponse = await ticketApi.enterTicketQueue(event.id);
-      await handleQueueStatus(enterResponse.status, event.id, enterResponse.queuePosition);
+      await handleQueueStatus(
+        enterResponse.status,
+        event.id,
+        enterResponse.queuePosition,
+        "enter",
+      );
     } catch (error) {
       const parsed = parseApiError(error);
       if (parsed.status === 401 || parsed.code === "UNAUTHORIZED") {
@@ -721,6 +742,7 @@ export default function Ticketing() {
   if (step === "soldout") {
     return (
       <ReservationSoldOutPanel
+        description={soldOutDescription}
         onBackToList={() => {
           setActiveEventId(null);
           setActiveEventTitle("");

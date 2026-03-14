@@ -46,8 +46,6 @@ export function WaitingRoomPanel({
   }, []);
 
   const hasFreshPosition = isRemainingFresh(queuePositionUpdatedAt, now);
-  const etaLabel = offline ? "연결 확인 중" : "확인 중";
-
   return (
     <div className={`${TICKETING_NARROW_PANEL_CLASS} space-y-4`}>
       <section className="px-1">
@@ -75,10 +73,7 @@ export function WaitingRoomPanel({
         </div>
 
         <div className="mt-4">
-          <p className="text-right text-[length:var(--ticketing-text-card-subtitle)] font-bold text-[var(--accent)]">
-            예상 대기 시간: {etaLabel}
-          </p>
-          <div className="relative mt-2">
+          <div className="relative">
             <div className="relative h-5 overflow-hidden rounded-full bg-[var(--surface-tint-subtle)]">
               <div
                 className={`h-full w-[38%] rounded-full bg-[var(--accent)] ${offline || !polling || !hasFreshPosition ? "opacity-40" : "animate-pulse opacity-70"}`}
