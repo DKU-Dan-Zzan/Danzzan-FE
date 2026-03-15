@@ -5,6 +5,7 @@ import { Button } from "@/components/ticketing/common/ui/button";
 import { Input } from "@/components/ticketing/common/ui/input";
 import { Label } from "@/components/ticketing/common/ui/label";
 import { useAuth } from "@/hooks/ticketing/useAuth";
+import { TICKETING_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
 import { resolveTicketingLoginRedirect } from "@/routes/ticketing/authNavigation";
 
 export default function Login() {
@@ -16,8 +17,6 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const canSubmit = studentId.trim().length > 0 && password.trim().length > 0;
-  const inputClassName =
-    "h-11 rounded-2xl border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20";
 
   const redirect = resolveTicketingLoginRedirect(searchParams.get("redirect"));
 
@@ -60,7 +59,7 @@ export default function Login() {
                   value={studentId}
                   onChange={(event) => setStudentId(event.target.value)}
                   placeholder="학번 8자리를 입력해 주세요"
-                  className={inputClassName}
+                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
                   required
                 />
               </div>
@@ -75,7 +74,7 @@ export default function Login() {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   placeholder="축제 포털용 비밀번호를 입력해 주세요"
-                  className={inputClassName}
+                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
                   required
                 />
               </div>

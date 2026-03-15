@@ -16,6 +16,7 @@ import {
   getPasswordPolicyErrorMessage,
   isPasswordPolicyErrorMessage,
 } from "@/lib/ticketing/passwordPolicy";
+import { TICKETING_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -27,8 +28,6 @@ export default function Signup() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
-  const inputClassName =
-    "h-11 rounded-2xl border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20";
   const passwordPolicy = getPasswordPolicyState(password, passwordConfirm);
   const clearPasswordPolicyError = () => {
     if (isPasswordPolicyErrorMessage(error)) {
@@ -121,7 +120,7 @@ export default function Signup() {
                   value={dkuStudentId}
                   onChange={(event) => setDkuStudentId(event.target.value)}
                   placeholder="학번 8자리를 입력해 주세요"
-                  className={inputClassName}
+                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
                   required
                   disabled={submitting}
                 />
@@ -137,7 +136,7 @@ export default function Signup() {
                   value={dkuPassword}
                   onChange={(event) => setDkuPassword(event.target.value)}
                   placeholder="단국대 포털 비밀번호를 입력해 주세요"
-                  className={inputClassName}
+                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
                   required
                   disabled={submitting}
                 />
@@ -165,7 +164,7 @@ export default function Signup() {
                     setPassword(event.target.value);
                   }}
                   placeholder="새로운 비밀번호를 입력해 주세요"
-                  className={inputClassName}
+                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
                   autoComplete="new-password"
                   required
                   disabled={submitting}
@@ -185,7 +184,7 @@ export default function Signup() {
                     setPasswordConfirm(event.target.value);
                   }}
                   placeholder="새로운 비밀번호를 다시 입력해 주세요"
-                  className={inputClassName}
+                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
                   autoComplete="new-password"
                   required
                   disabled={submitting}

@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { CircleAlert, Eye, EyeOff, House, ShieldCheck } from "lucide-react";
+import { ADMIN_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
 import { getAdminSession, useAdminAuth } from "../../hooks/useAdminAuth";
 
 export default function AdminLogin() {
@@ -20,8 +21,6 @@ export default function AdminLogin() {
   }
 
   const canSubmit = studentNumber.trim().length > 0 && password.trim().length > 0;
-  const inputClassName =
-    "h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus:outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20";
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -75,7 +74,7 @@ export default function AdminLogin() {
                   value={studentNumber}
                   onChange={(e) => setStudentNumber(e.target.value)}
                   placeholder="관리자 ID를 입력해 주세요"
-                  className={inputClassName}
+                  className={ADMIN_AUTH_INPUT_CLASS_NAME}
                   required
                   autoComplete="username"
                 />
@@ -95,7 +94,7 @@ export default function AdminLogin() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="비밀번호를 입력해 주세요"
-                    className={`${inputClassName} pr-12`}
+                    className={`${ADMIN_AUTH_INPUT_CLASS_NAME} pr-12`}
                     required
                     autoComplete="current-password"
                   />

@@ -12,6 +12,7 @@ import {
   getPasswordPolicyState,
   isPasswordPolicyErrorMessage,
 } from "@/lib/ticketing/passwordPolicy";
+import { TICKETING_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
 
 type ResetStep = "request" | "verify" | "password";
 type ResetStepItem = {
@@ -111,8 +112,6 @@ export default function ResetPassword() {
   const [resettingPassword, setResettingPassword] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const inputClassName =
-    "h-11 rounded-2xl border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20";
 
   const isStudentIdValid = STUDENT_ID_REGEX.test(studentId);
   const isVerificationCodeValid = VERIFICATION_CODE_REGEX.test(verificationCode);
@@ -454,7 +453,7 @@ export default function ResetPassword() {
                   inputMode="numeric"
                   maxLength={8}
                   placeholder="학번 8자리를 입력해 주세요"
-                  className={inputClassName}
+                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
                   disabled={requestingCode}
                   required
                 />
@@ -494,7 +493,7 @@ export default function ResetPassword() {
                   inputMode="numeric"
                   maxLength={6}
                   placeholder="인증번호 6자리를 입력해 주세요"
-                  className={inputClassName}
+                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
                   disabled={verifyingCode}
                   required
                 />
@@ -575,7 +574,7 @@ export default function ResetPassword() {
                     setPassword(event.target.value);
                   }}
                   placeholder="새 비밀번호를 입력해 주세요"
-                  className={inputClassName}
+                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
                   autoComplete="new-password"
                   disabled={resettingPassword}
                   required
@@ -595,7 +594,7 @@ export default function ResetPassword() {
                     setPasswordConfirm(event.target.value);
                   }}
                   placeholder="새 비밀번호를 다시 입력해 주세요"
-                  className={inputClassName}
+                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
                   autoComplete="new-password"
                   disabled={resettingPassword}
                   required
