@@ -2,11 +2,14 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AlertCircle,
+  ArrowDown,
+  ArrowUp,
   Bell,
   LogOut,
   Megaphone,
   Pencil,
   Plus,
+  RotateCcw,
   Trash2,
   UploadCloud,
 } from "lucide-react";
@@ -21,9 +24,12 @@ import {
   getEmergencyAdminNotice,
   type LostItemResponse,
   type LostItemStatusFilter,
+  type NoticeStatusFilter,
   type NoticeResponse,
+  restoreAdminNotice,
   updateAdminLostItem,
   updateAdminNotice,
+  updateNoticeDisplayOrder,
   updateEmergencyAdminNotice,
 } from "../../api/admin";
 
@@ -34,8 +40,8 @@ type NoticeFormState = {
   title: string;
   content: string;
   author: NoticeAuthor;
-  isEmergency: boolean;
-  imageUrls: string[];
+  isPinned: boolean;
+  thumbnailImageUrl: string;
 };
 
 type LostItemFormState = {
@@ -77,7 +83,10 @@ function Admin() {
   const [notices, setNotices] = useState<NoticeResponse[]>([]);
   const [noticeLoading, setNoticeLoading] = useState(false);
   const [editingNotice, setEditingNotice] = useState<NoticeFormState | null>(null);
-  const [noticeImageInput, setNoticeImageInput] = useState("");
+  const [noticeStatus, setNoticeStatus] = useState<NoticeStatusFilter>("ACTIVE");
+  const [pinReorderMode, setPinReorderMode] = useState(false);
+  const [pinReorderList, setPinReorderList] = useState<NoticeResponse[]>([]);
+  const [pinSaving, setPinSaving] = useState(false);
 
   // 분실물
   const [lostStatus, setLostStatus] = useState<LostItemStatusFilter>("ALL");
@@ -105,7 +114,7 @@ function Admin() {
 
         const [emergencyRes, noticePageRes, lostPageRes] = await Promise.all([
           getEmergencyAdminNotice(),
-          getAdminNotices({ page: 0, size: 10 }),
+          getAdminNotices({ page: 0, size: 10, status: "ACTIVE" }),
           getAdminLostItems({ status: "ALL", page: 0, size: 10 }),
         ]);
 
@@ -135,11 +144,20 @@ function Admin() {
   }, [initialLoaded]);
 
   // 공지 재조회
-  const reloadNotices = async (page = 0, keyword = noticeKeyword) => {
+  const reloadNotices = async (
+    page = 0,
+    keyword = noticeKeyword,
+    status: NoticeStatusFilter = noticeStatus,
+  ) => {
     try {
       setGlobalError(null);
       setNoticeLoading(true);
-      const res = await getAdminNotices({ page, size: 10, keyword: keyword.trim() || undefined });
+      const res = await getAdminNotices({
+        page,
+        size: 10,
+        keyword: keyword.trim() || undefined,
+        status,
+      });
       setNotices(res.content);
       setNoticePage(res.number);
       setNoticeTotalPages(res.totalPages);
@@ -184,21 +202,29 @@ function Admin() {
   };
 
   const noticePinned = useMemo(
-    () => notices.filter((n) => n.isEmergency),
-    [notices],
+    () =>
+      noticeStatus === "DELETED"
+        ? []
+        : notices.filter((n) => (n.isPinned ?? n.isEmergency) === true),
+    [notices, noticeStatus],
   );
   const noticeOthers = useMemo(
-    () => notices.filter((n) => !n.isEmergency),
-    [notices],
+    () =>
+      noticeStatus === "DELETED"
+        ? notices
+        : notices.filter((n) => !(n.isPinned ?? n.isEmergency)),
+    [notices, noticeStatus],
   );
+
+  const effectivePinned = pinReorderMode ? pinReorderList : noticePinned;
 
   const openNewNotice = () => {
     setEditingNotice({
       title: "",
       content: "",
       author: "개발팀",
-      isEmergency: false,
-      imageUrls: [],
+      isPinned: false,
+      thumbnailImageUrl: "",
     });
   };
 
@@ -208,8 +234,8 @@ function Admin() {
       title: notice.title,
       content: notice.content,
       author: (notice.author as NoticeAuthor) || "개발팀",
-      isEmergency: notice.isEmergency,
-      imageUrls: notice.imageUrls ?? [],
+      isPinned: Boolean(notice.isPinned ?? notice.isEmergency),
+      thumbnailImageUrl: notice.thumbnailImageUrl ?? "",
     });
   };
 
@@ -221,8 +247,8 @@ function Admin() {
       title: editingNotice.title.trim(),
       content: editingNotice.content.trim(),
       author: editingNotice.author,
-      isEmergency: editingNotice.isEmergency,
-      imageUrls: editingNotice.imageUrls,
+      isPinned: editingNotice.isPinned,
+      thumbnailImageUrl: editingNotice.thumbnailImageUrl.trim() || null,
     };
 
     if (!payload.title || !payload.content) {
@@ -244,8 +270,8 @@ function Admin() {
     }
   };
 
-  const handleDeleteNotice = async (id: number) => {
-    const confirmed = window.confirm("이 공지를 삭제하시겠습니까?");
+  const handleArchiveNotice = async (id: number) => {
+    const confirmed = window.confirm("이 공지를 보관 처리하시겠습니까?");
     if (!confirmed) return;
 
     try {
@@ -253,7 +279,71 @@ function Admin() {
       await deleteAdminNotice(id);
       await reloadNotices(noticePage);
     } catch (error) {
-      setGlobalError(error instanceof Error ? error.message : "공지를 삭제하지 못했습니다.");
+      setGlobalError(error instanceof Error ? error.message : "공지를 보관하지 못했습니다.");
+    }
+  };
+
+  const handleRestoreNotice = async (id: number) => {
+    const confirmed = window.confirm("이 공지를 다시 게시중 상태로 복원할까요?");
+    if (!confirmed) return;
+
+    try {
+      setGlobalError(null);
+      await restoreAdminNotice(id);
+      await reloadNotices(noticePage);
+    } catch (error) {
+      setGlobalError(error instanceof Error ? error.message : "공지를 복원하지 못했습니다.");
+    }
+  };
+
+  const startPinReorder = () => {
+    if (noticePinned.length === 0) {
+      window.alert("핀 공지가 없습니다.");
+      return;
+    }
+    setPinReorderList(noticePinned);
+    setPinReorderMode(true);
+  };
+
+  const cancelPinReorder = () => {
+    setPinReorderMode(false);
+    setPinReorderList([]);
+  };
+
+  const movePinnedItem = (index: number, direction: "up" | "down") => {
+    setPinReorderList((prev) => {
+      const next = [...prev];
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= next.length) return prev;
+      [next[index], next[targetIndex]] = [next[targetIndex], next[index]];
+      return next;
+    });
+  };
+
+  const handleSavePinOrder = async () => {
+    if (pinReorderList.length === 0) {
+      setPinReorderMode(false);
+      return;
+    }
+
+    try {
+      setPinSaving(true);
+      await updateNoticeDisplayOrder({
+        orders: pinReorderList.map((notice, index) => ({
+          id: notice.id,
+          displayOrder: index + 1,
+        })),
+      });
+      setPinReorderMode(false);
+      setPinReorderList([]);
+      await reloadNotices(noticePage);
+      window.alert("핀 공지 순서를 저장했습니다.");
+    } catch (error) {
+      setGlobalError(
+        error instanceof Error ? error.message : "핀 공지 순서를 저장하지 못했습니다.",
+      );
+    } finally {
+      setPinSaving(false);
     }
   };
 
@@ -417,8 +507,31 @@ function Admin() {
             <div>
               <h2 className="text-sm font-bold text-[var(--text)]">일반 공지 목록</h2>
               <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-                맨 위 고정 공지 1개까지 설정할 수 있습니다.
+                핀 공지 순서와 삭제된 공지를 함께 관리할 수 있습니다.
               </p>
+              <div className="mt-2 flex flex-wrap gap-1 text-[11px] font-semibold">
+                {([
+                  { key: "ACTIVE", label: "게시중" },
+                  { key: "DELETED", label: "보관됨" },
+                  { key: "ALL", label: "전체보기" },
+                ] satisfies { key: NoticeStatusFilter; label: string }[]).map((item) => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() => {
+                      setNoticeStatus(item.key);
+                      void reloadNotices(0, noticeKeyword, item.key);
+                    }}
+                    className={`rounded-full px-3 py-1 ${
+                      noticeStatus === item.key
+                        ? "bg-[var(--accent)] text-white"
+                        : "bg-[var(--surface-subtle)] text-[var(--text-muted)]"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <input
@@ -442,6 +555,20 @@ function Admin() {
               </button>
               <button
                 type="button"
+                disabled={noticeStatus !== "ACTIVE"}
+                onClick={pinReorderMode ? cancelPinReorder : startPinReorder}
+                className={`flex h-9 items-center gap-1 rounded-2xl border px-3 text-xs font-semibold ${
+                  noticeStatus !== "ACTIVE"
+                    ? "cursor-not-allowed border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text-muted)] opacity-60"
+                    : pinReorderMode
+                      ? "border-orange-400 bg-orange-50 text-orange-700"
+                      : "border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text)] hover:bg-[var(--border-base)]"
+                }`}
+              >
+                {pinReorderMode ? "핀 순서 변경 취소" : "핀 공지 순서변경"}
+              </button>
+              <button
+                type="button"
                 onClick={openNewNotice}
                 className="flex h-9 items-center gap-1 rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-xs font-semibold text-[var(--text)] hover:bg-[var(--border-base)]"
               >
@@ -458,8 +585,12 @@ function Admin() {
                   <th className="px-4 py-2 font-semibold">제목</th>
                   <th className="px-4 py-2 font-semibold">작성자</th>
                   <th className="px-4 py-2 font-semibold">날짜</th>
-                  <th className="px-3 py-2 text-center font-semibold">수정</th>
-                  <th className="px-3 py-2 text-center font-semibold">삭제</th>
+                  <th className="px-3 py-2 text-center font-semibold">
+                    {pinReorderMode ? "순서" : "수정"}
+                  </th>
+                  <th className="px-3 py-2 text-center font-semibold">
+                    {noticeStatus === "DELETED" ? "복원" : "보관"}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border-base)] bg-white">
@@ -477,12 +608,13 @@ function Admin() {
                     </td>
                   </tr>
                 )}
-                {noticePinned.map((notice) => (
+                {effectivePinned.map((notice, index) => (
                   <tr key={notice.id} className="bg-orange-50/60">
                     <td className="px-4 py-2 align-middle">
                       <div className="flex items-center gap-1.5">
-                        <span className="inline-flex rounded-full bg-orange-500 px-2 py-0.5 text-[10px] font-semibold text-white">
-                          맨 위 고정
+                        <span className="inline-flex items-center gap-1 rounded-full bg-orange-500 px-2 py-0.5 text-[10px] font-semibold text-white">
+                          <span>📌</span>
+                          <span>상단 고정</span>
                         </span>
                         <span className="truncate text-sm font-semibold text-[var(--text)]">
                           {notice.title}
@@ -494,22 +626,53 @@ function Admin() {
                       {formatDate(notice.createdAt)}
                     </td>
                     <td className="px-3 py-2 text-center">
-                      <button
-                        type="button"
-                        onClick={() => openEditNotice(notice)}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--surface-subtle)] text-[var(--text-muted)] hover:bg-[var(--border-base)]"
-                      >
-                        <Pencil className="h-3.5 w-3.5" strokeWidth={2.3} />
-                      </button>
+                      {pinReorderMode ? (
+                        <div className="flex items-center justify-center gap-1">
+                          <button
+                            type="button"
+                            disabled={index === 0}
+                            onClick={() => movePinnedItem(index, "up")}
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--surface-subtle)] text-[var(--text-muted)] disabled:opacity-40"
+                          >
+                            <ArrowUp className="h-3.5 w-3.5" strokeWidth={2.3} />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={index === effectivePinned.length - 1}
+                            onClick={() => movePinnedItem(index, "down")}
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--surface-subtle)] text-[var(--text-muted)] disabled:opacity-40"
+                          >
+                            <ArrowDown className="h-3.5 w-3.5" strokeWidth={2.3} />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => openEditNotice(notice)}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--surface-subtle)] text-[var(--text-muted)] hover:bg-[var(--border-base)]"
+                        >
+                          <Pencil className="h-3.5 w-3.5" strokeWidth={2.3} />
+                        </button>
+                      )}
                     </td>
                     <td className="px-3 py-2 text-center">
-                      <button
-                        type="button"
-                        onClick={() => void handleDeleteNotice(notice.id)}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
-                      </button>
+                      {noticeStatus === "DELETED" ? (
+                        <button
+                          type="button"
+                          onClick={() => void handleRestoreNotice(notice.id)}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+                        >
+                          <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.3} />
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => void handleArchiveNotice(notice.id)}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -523,22 +686,36 @@ function Admin() {
                       {formatDate(notice.createdAt)}
                     </td>
                     <td className="px-3 py-2 text-center">
-                      <button
-                        type="button"
-                        onClick={() => openEditNotice(notice)}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--surface-subtle)] text-[var(--text-muted)] hover:bg-[var(--border-base)]"
-                      >
-                        <Pencil className="h-3.5 w-3.5" strokeWidth={2.3} />
-                      </button>
+                      {pinReorderMode ? (
+                        <span className="text-[11px] text-[var(--text-muted)]">-</span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => openEditNotice(notice)}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--surface-subtle)] text-[var(--text-muted)] hover:bg-[var(--border-base)]"
+                        >
+                          <Pencil className="h-3.5 w-3.5" strokeWidth={2.3} />
+                        </button>
+                      )}
                     </td>
                     <td className="px-3 py-2 text-center">
-                      <button
-                        type="button"
-                        onClick={() => void handleDeleteNotice(notice.id)}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
-                      </button>
+                      {noticeStatus === "DELETED" ? (
+                        <button
+                          type="button"
+                          onClick={() => void handleRestoreNotice(notice.id)}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+                        >
+                          <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.3} />
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => void handleArchiveNotice(notice.id)}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -566,6 +743,18 @@ function Admin() {
                 className="rounded-full border border-[var(--border-base)] bg-[var(--surface-subtle)] px-2 py-1 disabled:opacity-50"
               >
                 다음
+              </button>
+            </div>
+          )}
+          {pinReorderMode && (
+            <div className="mt-3 flex justify-end">
+              <button
+                type="button"
+                disabled={pinSaving}
+                onClick={() => void handleSavePinOrder()}
+                className="inline-flex items-center gap-1 rounded-full bg-orange-500 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
+              >
+                {pinSaving ? "저장 중..." : "핀 공지 순서 저장"}
               </button>
             </div>
           )}
@@ -784,70 +973,49 @@ function Admin() {
 
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-[var(--text)]">
-                  이미지 업로드 영역
+                  썸네일 이미지 URL
                 </label>
                 <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-6 text-center">
                   <UploadCloud className="h-8 w-8 text-[var(--text-muted)]" strokeWidth={2.3} />
                   <p className="mt-2 text-sm font-semibold text-[var(--text-muted)]">
-                    이미지를 업로드하세요
+                    공지에 함께 노출할 썸네일 이미지를 설정할 수 있습니다.
                   </p>
                   <p className="text-[11px] text-[var(--text-muted)]">
-                    (PNG, JPG / S3 연동 예정)
+                    (PNG, JPG 등 이미지 주소를 직접 입력해 주세요)
                   </p>
                   <div className="mt-3 flex w-full max-w-sm gap-2">
                     <input
                       type="url"
-                      value={noticeImageInput}
-                      onChange={(e) => setNoticeImageInput(e.target.value)}
-                      placeholder="이미지 URL을 입력해 주세요"
+                      value={editingNotice.thumbnailImageUrl}
+                      onChange={(e) =>
+                        setEditingNotice((prev) =>
+                          prev ? { ...prev, thumbnailImageUrl: e.target.value } : prev,
+                        )
+                      }
+                      placeholder="https:// 예시..."
                       className="h-9 flex-1 rounded-2xl border border-[var(--border-base)] bg-white px-3 text-xs focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/15"
                     />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const url = noticeImageInput.trim();
-                        if (!url) return;
-                        setEditingNotice((prev) =>
-                          prev ? { ...prev, imageUrls: [...prev.imageUrls, url] } : prev,
-                        );
-                        setNoticeImageInput("");
-                      }}
-                      className="h-9 rounded-2xl bg-[var(--accent)] px-3 text-xs font-semibold text-white shadow-sm hover:brightness-95"
-                    >
-                      추가
-                    </button>
                   </div>
-
-                  {editingNotice.imageUrls.length > 0 && (
+                  {editingNotice.thumbnailImageUrl && (
                     <div className="mt-4 flex w-full max-w-sm flex-wrap gap-2">
-                      {editingNotice.imageUrls.map((url, index) => (
-                        <div
-                          key={`${url}-${index}`}
-                          className="group relative h-16 w-16 overflow-hidden rounded-xl border border-[var(--border-base)] bg-white"
+                      <div className="group relative h-16 w-28 overflow-hidden rounded-xl border border-[var(--border-base)] bg-white">
+                        <img
+                          src={editingNotice.thumbnailImageUrl}
+                          alt="공지 썸네일 미리보기"
+                          className="h-full w-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditingNotice((prev) =>
+                              prev ? { ...prev, thumbnailImageUrl: "" } : prev,
+                            )
+                          }
+                          className="absolute right-1 top-1 hidden rounded-full bg-black/60 px-1.5 text-[10px] font-semibold text-white group-hover:inline"
                         >
-                          <img
-                            src={url}
-                            alt={`공지 이미지 ${index + 1}`}
-                            className="h-full w-full object-cover"
-                          />
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setEditingNotice((prev) =>
-                                prev
-                                  ? {
-                                      ...prev,
-                                      imageUrls: prev.imageUrls.filter((_, i) => i !== index),
-                                    }
-                                  : prev,
-                              )
-                            }
-                            className="absolute right-1 top-1 hidden rounded-full bg-black/60 px-1.5 text-[10px] font-semibold text-white group-hover:inline"
-                          >
-                            삭제
-                          </button>
-                        </div>
-                      ))}
+                          삭제
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -873,10 +1041,10 @@ function Admin() {
                 <label className="flex items-center gap-2 text-xs font-semibold text-[var(--text)]">
                   <input
                     type="checkbox"
-                    checked={editingNotice.isEmergency}
+                    checked={editingNotice.isPinned}
                     onChange={(e) =>
                       setEditingNotice((prev) =>
-                        prev ? { ...prev, isEmergency: e.target.checked } : prev,
+                        prev ? { ...prev, isPinned: e.target.checked } : prev,
                       )
                     }
                     className="h-4 w-4 rounded border-[var(--border-base)] text-[var(--accent)] focus:ring-[var(--accent)]"

@@ -105,14 +105,20 @@ export async function updateEmergencyAdminNotice(
 
 // 2-3. 일반 공지
 
+export type NoticeStatusFilter = "ACTIVE" | "DELETED" | "ALL";
+
 export type NoticeResponse = {
   id: number;
   title: string;
   content: string;
   author: string;
+  category?: string | null;
+  isPinned?: boolean;
+  thumbnailImageUrl?: string | null;
+  displayOrder?: number | null;
   imageUrls?: string[];
-  isEmergency: boolean;
-  isActive: boolean;
+  isEmergency?: boolean;
+  isActive?: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -121,20 +127,17 @@ export type CreateNoticeRequest = {
   title: string;
   content: string;
   author: string;
-  isEmergency?: boolean;
-  imageUrls?: string[];
+  category?: string | null;
+  isPinned?: boolean;
+  thumbnailImageUrl?: string | null;
 };
 
-export type UpdateNoticeRequest = {
-  title: string;
-  content: string;
-  author: string;
-  isEmergency?: boolean;
-  imageUrls?: string[];
-};
+export type UpdateNoticeRequest = CreateNoticeRequest;
 
 type NoticeListParams = {
   keyword?: string;
+  category?: string;
+  status?: NoticeStatusFilter;
   page?: number;
   size?: number;
 };
@@ -155,6 +158,8 @@ export async function getAdminNotices(
 ): Promise<PageResponse<NoticeResponse>> {
   const query = buildQuery({
     keyword: params.keyword,
+    category: params.category,
+    status: params.status,
     page: params.page ?? 0,
     size: params.size ?? 10,
   });
@@ -185,6 +190,30 @@ export async function updateAdminNotice(
 export async function deleteAdminNotice(id: number): Promise<void> {
   await fetchWithAuth<void>(`/api/admin/notices/${id}`, {
     method: "DELETE",
+  });
+}
+
+export async function restoreAdminNotice(id: number): Promise<NoticeResponse> {
+  return fetchWithAuth<NoticeResponse>(`/api/admin/notices/${id}/restore`, {
+    method: "PATCH",
+  });
+}
+
+type NoticeDisplayOrderItem = {
+  id: number;
+  displayOrder: number;
+};
+
+export type UpdateNoticeDisplayOrderRequest = {
+  orders: NoticeDisplayOrderItem[];
+};
+
+export async function updateNoticeDisplayOrder(
+  body: UpdateNoticeDisplayOrderRequest,
+): Promise<void> {
+  await fetchWithAuth<void>("/api/admin/notices/display-order", {
+    method: "PUT",
+    body: JSON.stringify(body),
   });
 }
 
@@ -271,4 +300,3 @@ export async function deleteAdminLostItem(id: number): Promise<void> {
     method: "DELETE",
   });
 }
-
