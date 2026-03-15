@@ -215,26 +215,24 @@ export default function Timetable() {
   }
 
   return (
-    <div className="min-h-full bg-[var(--bg-page-soft)]">
-      <div className="sticky top-0 z-20 bg-[var(--bg-page-soft)]">
+    <div className="flex h-screen min-h-0 flex-col bg-[var(--bg-page-soft)]">
+      <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
         <div className="px-5 pt-5">
           <div className="text-[38px] font-extrabold text-[var(--accent)] font-cute">
             {title}
           </div>
           <div className="mt-1 text-sm text-[var(--text-muted)]">{subtitle}</div>
-
-          <div className="mt-4">
-            <DayTabs
-              days={FESTIVAL_DAYS}
-              activeIndex={activeIdx}
-              onChange={handleChangeDay}
-            />
-          </div>
         </div>
-      </div>
 
-      <div className="px-5 pt-4 pb-6">
-        <div className="mt-4">
+        <div className="sticky top-0 z-20 bg-[var(--bg-page-soft)] px-5 py-1">
+          <DayTabs
+            days={FESTIVAL_DAYS}
+            activeIndex={activeIdx}
+            onChange={handleChangeDay}
+          />
+        </div>
+
+        <div className="px-5 pt-4 pb-6">
           {isDay1 ? (
             <ContentImageSection
               images={contentImages}
