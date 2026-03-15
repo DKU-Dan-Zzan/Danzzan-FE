@@ -393,6 +393,10 @@ body,
   background-color: var(--accent);
 }
 
+.home-carousel-dots.is-lineup .home-carousel-dot.is-active {
+  background-color: var(--home-card-border);
+}
+
 .mypage-info-icon-glass {
   display: flex;
   height: var(--mypage-info-icon-size);
