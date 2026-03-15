@@ -186,12 +186,12 @@ export default function DetailSheet({
           </div>
 
           {boothDetail.imageUrl && (
-            <div className="mt-3">
+            <div className="mt-3 rounded-xl bg-gray-100 p-2">
               <img
                 src={boothDetail.imageUrl}
                 loading="lazy"
                 onClick={() => setViewerImage(boothDetail.imageUrl)}
-                className="h-44 w-full rounded-xl object-cover cursor-pointer"
+                className="mx-auto max-h-[320px] w-auto max-w-full rounded-xl object-contain cursor-pointer"
               />
             </div>
           )}
@@ -253,7 +253,7 @@ export default function DetailSheet({
           {imageUrls.length > 0 && (
             <div className="mt-3">
               <div
-                className="flex gap-3 overflow-x-auto snap-x snap-mandatory"
+                className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide"
                 onScroll={(e) => {
                   const el = e.currentTarget
                   const itemWidth = el.clientWidth * 0.85 + 12
@@ -262,13 +262,17 @@ export default function DetailSheet({
                 }}
               >
                 {imageUrls.map((img, i) => (
-                  <img
+                  <div
                     key={i}
-                    src={img}
-                    loading="lazy"
-                    onClick={() => setViewerImage(img)}
-                    className="h-44 w-[85%] flex-shrink-0 snap-start rounded-xl object-cover cursor-pointer"
-                  />
+                    className="w-[85%] flex-shrink-0 snap-start"
+                  >
+                    <img
+                      src={img}
+                      loading="lazy"
+                      onClick={() => setViewerImage(img)}
+                      className="w-full rounded-xl object-contain cursor-pointer"
+                    />
+                  </div>
                 ))}
               </div>
 
