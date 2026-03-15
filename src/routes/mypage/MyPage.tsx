@@ -52,7 +52,7 @@ function MyPage() {
 
   if (!isLoggedIn) {
     return (
-      <div className="relative flex min-h-full flex-col items-center justify-center overflow-hidden bg-[linear-gradient(180deg,#f3f7ff_0%,#ecf2ff_44%,#f8fbff_100%)] px-6 pb-[100px]">
+      <div className="relative flex min-h-full flex-col items-center justify-center overflow-hidden bg-[linear-gradient(180deg,#f3f7ff_0%,#ecf2ff_44%,#f8fbff_100%)] px-6 py-[100px]">
         <div className="pointer-events-none absolute -top-20 -right-14 h-52 w-52 rounded-full bg-blue-300/20 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-20 -left-14 h-52 w-52 rounded-full bg-blue-200/20 blur-3xl" />
 
@@ -64,11 +64,6 @@ function MyPage() {
             <p className="text-[11px] font-semibold tracking-[0.18em] text-blue-500/80">STUDENT PROFILE</p>
             <h2 className="text-xl font-extrabold tracking-tight text-slate-900">내정보를 보려면 로그인해 주세요</h2>
             <p className="text-sm leading-relaxed text-slate-500">로그인 후 예매 내역과 계정 정보를 확인할 수 있어요.</p>
-          </div>
-
-          <div className="w-full rounded-2xl border border-blue-100 bg-blue-50/70 px-4 py-3 text-left">
-            <p className="text-[11px] font-semibold tracking-[0.12em] text-blue-600">NOTICE</p>
-            <p className="mt-1 text-xs leading-relaxed text-slate-600">예매 인증 및 내 티켓 확인을 위해 학생 계정으로 로그인해 주세요.</p>
           </div>
 
           <button
@@ -136,8 +131,8 @@ function MyPage() {
           <div className="divide-y divide-blue-100/80">
             {infoItems.map(({ label, value, icon: Icon }) => (
               <div key={label} className="flex items-center gap-4 px-5 py-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-blue-100 bg-[linear-gradient(145deg,#eff6ff_0%,#dbeafe_100%)]">
-                  <Icon size={18} aria-hidden className="text-blue-700" />
+                <div className="mypage-info-icon-glass">
+                  <Icon size={18} aria-hidden className="mypage-info-icon-symbol" />
                 </div>
                 <div className="min-w-0">
                   <p className="text-[11px] font-medium tracking-[0.08em] text-slate-400">{label}</p>
