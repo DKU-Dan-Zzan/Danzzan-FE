@@ -1,7 +1,6 @@
 import { Ticket } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ticketing/common/ui/card";
-import { Progress } from "@/components/ticketing/common/ui/progress";
 import { TicketingAdBannerCard } from "@/components/ticketing/ticketing/TicketingAdBannerCard";
 import {
   TICKETING_CLASSES,
@@ -12,117 +11,31 @@ import type { PlacementAd } from "@/types/ticketing/model/ad.model";
 
 interface WaitingRoomPanelProps {
   eventTitle: string;
-  remaining: number | null;
-  remainingUpdatedAt: number | null;
+  queuePosition: number | null;
+  queuePositionUpdatedAt: number | null;
   polling: boolean;
   offline: boolean;
   errorMessage: string | null;
   ad: PlacementAd | null;
 }
 
-const estimateWaitSeconds = (remaining: number | null): number | null => {
-  if (remaining === null || remaining < 0) {
-    return null;
-  }
-  if (remaining <= 0) {
-    return 0;
-  }
-  return Math.max(1, Math.round(remaining / 7));
-};
-
-const formatEta = (seconds: number | null): string => {
-  if (seconds === null) {
-    return "확인 중";
-  }
-  if (seconds < 60) {
-    return `약 ${seconds}초`;
-  }
-  const minutes = Math.floor(seconds / 60);
-  const leftSec = seconds % 60;
-  if (leftSec === 0) {
-    return `약 ${minutes}분`;
-  }
-  return `약 ${minutes}분 ${leftSec}초`;
-};
-
-const formatRemaining = (remaining: number | null): string => {
-  if (remaining === null || remaining < 0) {
+const formatQueuePosition = (queuePosition: number | null): string => {
+  if (queuePosition === null || queuePosition < 1) {
     return "--";
   }
-  return remaining.toLocaleString("ko-KR");
-};
-
-const formatQueueOrder = (remaining: number | null): string => {
-  if (remaining === null || remaining < 0) {
-    return "--";
-  }
-  return (remaining + 1).toLocaleString("ko-KR");
-};
-
-const estimateProgress = (remaining: number | null): number => {
-  if (remaining === null) {
-    return 25;
-  }
-  if (remaining <= 0) {
-    return 95;
-  }
-  const max = 300;
-  const normalized = Math.min(remaining, max);
-  return Math.max(8, Math.round((1 - normalized / max) * 95));
+  return queuePosition.toLocaleString("ko-KR");
 };
 
 export function WaitingRoomPanel({
   eventTitle,
-  remaining,
-  remainingUpdatedAt,
+  queuePosition,
+  queuePositionUpdatedAt,
   polling,
   offline,
   errorMessage,
   ad,
 }: WaitingRoomPanelProps) {
-  const [displayRemaining, setDisplayRemaining] = useState<number | null>(remaining);
-  const displayRemainingRef = useRef<number | null>(remaining);
   const [now, setNow] = useState(() => Date.now());
-  const [displayProgress, setDisplayProgress] = useState(() => estimateProgress(remaining));
-  const displayProgressRef = useRef<number>(estimateProgress(remaining));
-
-  useEffect(() => {
-    if (remaining === null) {
-      displayRemainingRef.current = null;
-      setDisplayRemaining(null);
-      return;
-    }
-
-    const from = displayRemainingRef.current ?? remaining;
-    if (from === remaining) {
-      displayRemainingRef.current = remaining;
-      setDisplayRemaining(remaining);
-      return;
-    }
-
-    const duration = 420;
-    const startedAt = performance.now();
-    let rafId = 0;
-
-    const tick = (now: number) => {
-      const progress = Math.min((now - startedAt) / duration, 1);
-      const eased = 1 - (1 - progress) ** 3;
-      const next = Math.round(from + (remaining - from) * eased);
-      displayRemainingRef.current = next;
-      setDisplayRemaining(next);
-
-      if (progress < 1) {
-        rafId = requestAnimationFrame(tick);
-        return;
-      }
-
-      displayRemainingRef.current = remaining;
-      setDisplayRemaining(remaining);
-    };
-
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  }, [remaining]);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -132,39 +45,7 @@ export function WaitingRoomPanel({
     return () => window.clearInterval(intervalId);
   }, []);
 
-  const hasFreshRemaining = isRemainingFresh(remainingUpdatedAt, now);
-  const canEstimateProgress = hasFreshRemaining && displayRemaining !== null && displayRemaining >= 0;
-  const baseProgressValue = estimateProgress(displayRemaining);
-  const progressValue = canEstimateProgress ? displayProgress : baseProgressValue;
-  const etaLabel = offline
-    ? "연결 확인 중"
-    : canEstimateProgress
-      ? formatEta(estimateWaitSeconds(displayRemaining))
-      : "확인 중";
-
-  useEffect(() => {
-    if (!canEstimateProgress) {
-      return;
-    }
-
-    // 진행바는 사용자 신뢰를 위해 절대 뒤로 가지 않게 단조 증가로 유지합니다.
-    const nextProgress = Math.max(displayProgressRef.current, baseProgressValue);
-    if (nextProgress === displayProgressRef.current) {
-      return;
-    }
-
-    displayProgressRef.current = nextProgress;
-    setDisplayProgress(nextProgress);
-  }, [baseProgressValue, canEstimateProgress]);
-
-  useEffect(() => {
-    if (remaining === null) {
-      const resetProgress = estimateProgress(null);
-      displayProgressRef.current = resetProgress;
-      setDisplayProgress(resetProgress);
-    }
-  }, [remaining]);
-
+  const hasFreshPosition = isRemainingFresh(queuePositionUpdatedAt, now);
   return (
     <div className={`${TICKETING_NARROW_PANEL_CLASS} space-y-4`}>
       <section className="px-1">
@@ -187,42 +68,21 @@ export function WaitingRoomPanel({
             나의 대기순서
           </p>
           <p className="mt-1 font-mono text-[3.2rem] leading-none font-black tracking-[0.02em] text-[var(--text)] [font-variant-numeric:tabular-nums]">
-            {formatQueueOrder(displayRemaining)}
+            {formatQueuePosition(queuePosition)}
           </p>
         </div>
 
         <div className="mt-4">
-          <p className="text-right text-[length:var(--ticketing-text-card-subtitle)] font-bold text-[var(--accent)]">
-            예상 대기 시간: {etaLabel}
-          </p>
-          <div className="relative mt-2">
-            {canEstimateProgress ? (
-              <Progress
-                value={progressValue}
-                className="h-5 rounded-full bg-[var(--surface-tint-subtle)] [&_[data-slot=progress-indicator]]:rounded-full [&_[data-slot=progress-indicator]]:bg-[var(--accent)]"
+          <div className="relative">
+            <div className="relative h-5 overflow-hidden rounded-full bg-[var(--surface-tint-subtle)]">
+              <div
+                className={`h-full w-[38%] rounded-full bg-[var(--accent)] ${offline || !polling || !hasFreshPosition ? "opacity-40" : "animate-pulse opacity-70"}`}
               />
-            ) : (
-              <div className="relative h-5 overflow-hidden rounded-full bg-[var(--surface-tint-subtle)]">
-                <div
-                  className={`h-full w-[38%] rounded-full bg-[var(--accent)] ${offline || !polling ? "opacity-40" : "animate-pulse opacity-70"}`}
-                />
-              </div>
-            )}
+            </div>
             <Ticket
               className="pointer-events-none absolute top-1/2 right-3 h-4.5 w-4.5 -translate-y-1/2 text-[var(--text-muted)] opacity-50"
               aria-hidden="true"
             />
-          </div>
-        </div>
-
-        <div className="mt-4 border-t border-[var(--border-subtle)] pt-3">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-[length:var(--ticketing-text-helper)] font-semibold text-[var(--text-muted)]">
-              현재 대기인원
-            </p>
-            <p className="font-mono text-[1.2rem] leading-none font-extrabold tracking-[0.01em] text-[var(--text)] [font-variant-numeric:tabular-nums]">
-              {formatRemaining(displayRemaining)}명
-            </p>
           </div>
         </div>
 

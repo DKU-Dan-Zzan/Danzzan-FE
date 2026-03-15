@@ -174,6 +174,8 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
     }
   };
 
+  const isCancelConfirm = confirmAction === "cancel";
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -192,17 +194,17 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
       </div>
 
       {error && (
-        <div className="rounded-lg border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
+        <div className="rounded-lg border border-[var(--admin-alert-error-border)] bg-[var(--admin-alert-error-bg)] px-4 py-3 text-sm text-[var(--admin-alert-error-text)]">
           {error.message || "요청에 실패했습니다. 서버 상태 또는 토큰 설정을 확인해주세요."}
         </div>
       )}
 
       <div className="space-y-6">
         <div className="grid grid-cols-3 gap-3">
-          <Card className="p-3 bg-primary-soft border border-primary/20">
+          <Card className="border border-[var(--admin-metric-total-border)] bg-[var(--admin-metric-total-bg)] p-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-primary font-semibold mb-0.5">전체 티켓</p>
+                <p className="mb-0.5 text-xs font-semibold text-[var(--admin-metric-total-text)]">전체 티켓</p>
                 <p className="text-2xl font-bold text-foreground">
                   {statsLoading ? "-" : resolvedStats.totalTickets}
                 </p>
@@ -211,14 +213,14 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
             </div>
           </Card>
 
-          <Card className="border border-[#f5cfe1] bg-[#fff2f8] p-3">
+          <Card className="border border-[var(--admin-metric-issued-border)] bg-[var(--admin-metric-issued-bg)] p-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="mb-0.5 text-xs font-semibold text-[#c84f8c]">지급 완료</p>
+                <p className="mb-0.5 text-xs font-semibold text-[var(--admin-metric-issued-text)]">지급 완료</p>
                 <p className="text-2xl font-bold text-foreground">
                   {statsLoading ? "-" : resolvedStats.issuedCount}
                   {!statsLoading && resolvedStats.totalTickets > 0 && (
-                    <span className="ml-1.5 text-sm text-[#c84f8c]">
+                    <span className="ml-1.5 text-sm text-[var(--admin-metric-issued-text)]">
                       ({((resolvedStats.issuedCount / resolvedStats.totalTickets) * 100).toFixed(1)}%)
                     </span>
                   )}
@@ -228,14 +230,14 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
             </div>
           </Card>
 
-          <Card className="p-3 bg-success/10 border border-success/20">
+          <Card className="border border-[var(--admin-metric-pending-border)] bg-[var(--admin-metric-pending-bg)] p-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-success font-semibold mb-0.5">미지급</p>
+                <p className="mb-0.5 text-xs font-semibold text-[var(--admin-metric-pending-text)]">미지급</p>
                 <p className="text-2xl font-bold text-foreground">
                   {statsLoading ? "-" : resolvedStats.pendingCount}
                   {!statsLoading && resolvedStats.totalTickets > 0 && (
-                    <span className="text-sm text-success ml-1.5">
+                    <span className="ml-1.5 text-sm text-[var(--admin-metric-pending-text)]">
                       ({((resolvedStats.pendingCount / resolvedStats.totalTickets) * 100).toFixed(1)}%)
                     </span>
                   )}
@@ -248,7 +250,7 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
 
         <Card className="p-6">
           <div className={`${contentMaxWidthClass} space-y-4`}>
-            <Label className="text-base font-medium text-foreground">학번으로 티켓 조회</Label>
+            <Label className="text-base font-bold text-foreground">학번으로 티켓 조회</Label>
             <div className="flex gap-4">
               <Input
                 placeholder="학번 입력"
@@ -276,151 +278,157 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
           <Card className="p-4">
             <div className={contentMaxWidthClass}>
               <h3 className="mb-3 text-base font-semibold">조회 결과</h3>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-sm">학번</TableHead>
-                    <TableHead className="text-sm">이름</TableHead>
-                    <TableHead className="text-sm">단과대학</TableHead>
-                    <TableHead className="text-sm">학과</TableHead>
-                    <TableHead className="text-sm">팔찌 지급 여부</TableHead>
-                    <TableHead className="text-sm">처리 버튼</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {searchResults.map((student) => (
-                    <TableRow key={student.ticketId}>
-                      <TableCell className="font-medium text-sm py-2">{student.studentId}</TableCell>
-                      <TableCell className="text-base">{student.name}</TableCell>
-                      <TableCell className="text-base">{student.college}</TableCell>
-                      <TableCell className="text-base">{student.department}</TableCell>
-                      <TableCell>
-                        {student.hasWristband ? (
-                          <span className="inline-flex items-center rounded-full bg-[#ff4fa3]/20 px-3 py-1 text-sm font-medium text-[#e6007a]">
-                            지급완료
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-success/15 text-success">
-                            미지급
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {student.hasWristband ? (
-                          <Button
-                            size="default"
-                            variant="outline"
-                            className="h-10 border-danger/30 px-6 text-danger hover:bg-danger/10"
-                            onClick={() => handleCancelWristband(student)}
-                            disabled={issuing}
-                          >
-                            지급 취소
-                          </Button>
-                        ) : (
-                          <Button
-                            size="default"
-                            className="h-10 px-6"
-                            onClick={() => handleIssueWristband(student)}
-                            disabled={issuing}
-                          >
-                            팔찌 주기
-                          </Button>
-                        )}
-                      </TableCell>
+              <div className="overflow-hidden rounded-xl border border-[var(--admin-table-header-border)] bg-[var(--admin-table-bg)]">
+                <Table className="border-separate border-spacing-0">
+                  <TableHeader className="bg-transparent">
+                    <TableRow className="border-b-2 border-[var(--admin-table-header-border)] hover:bg-transparent">
+                      <TableHead className="h-12 border-r border-[var(--admin-table-header-border)] bg-[var(--admin-table-header-bg)] px-5 text-sm font-semibold last:border-r-0">
+                        학번
+                      </TableHead>
+                      <TableHead className="h-12 border-r border-[var(--admin-table-header-border)] bg-[var(--admin-table-header-bg)] px-5 text-sm font-semibold last:border-r-0">
+                        이름
+                      </TableHead>
+                      <TableHead className="h-12 border-r border-[var(--admin-table-header-border)] bg-[var(--admin-table-header-bg)] px-5 text-sm font-semibold last:border-r-0">
+                        단과대학
+                      </TableHead>
+                      <TableHead className="h-12 border-r border-[var(--admin-table-header-border)] bg-[var(--admin-table-header-bg)] px-5 text-sm font-semibold last:border-r-0">
+                        학과
+                      </TableHead>
+                      <TableHead className="h-12 border-r border-[var(--admin-table-header-border)] bg-[var(--admin-table-header-bg)] px-5 text-sm font-semibold last:border-r-0">
+                        팔찌 지급 여부
+                      </TableHead>
+                      <TableHead className="h-12 border-r border-[var(--admin-table-header-border)] bg-[var(--admin-table-header-bg)] px-5 text-sm font-semibold last:border-r-0">
+                        처리 버튼
+                      </TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {searchResults.map((student) => (
+                      <TableRow
+                        key={student.ticketId}
+                        className="bg-[var(--admin-table-row-bg)] hover:!bg-[var(--admin-table-row-alt-bg)] even:bg-[var(--admin-table-row-alt-bg)] [&>td]:border-r [&>td]:border-[var(--admin-table-cell-border)] [&>td:last-child]:border-r-0"
+                      >
+                        <TableCell className="px-5 py-4 text-sm font-semibold">{student.studentId}</TableCell>
+                        <TableCell className="px-5 py-4 text-base">{student.name}</TableCell>
+                        <TableCell className="px-5 py-4 text-base">{student.college}</TableCell>
+                        <TableCell className="px-5 py-4 text-base">{student.department}</TableCell>
+                        <TableCell className="px-5 py-4">
+                          {student.hasWristband ? (
+                            <span className="inline-flex items-center rounded-full border border-[var(--admin-badge-issued-border)] bg-[var(--admin-badge-issued-bg)] px-3 py-1 text-sm font-semibold text-[var(--admin-badge-issued-text)]">
+                              지급완료
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center rounded-full border border-[var(--admin-badge-pending-border)] bg-[var(--admin-badge-pending-bg)] px-3 py-1 text-sm font-semibold text-[var(--admin-badge-pending-text)]">
+                              미지급
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell className="px-5 py-4">
+                          {student.hasWristband ? (
+                            <Button
+                              size="default"
+                              variant="outline"
+                              className="h-10 border-[var(--admin-danger-outline-border)] px-6 text-[var(--admin-danger-outline-text)] hover:bg-[var(--admin-danger-outline-hover-bg)]"
+                              onClick={() => handleCancelWristband(student)}
+                              disabled={issuing}
+                            >
+                              지급 취소
+                            </Button>
+                          ) : (
+                            <Button
+                              size="default"
+                              className="h-10 px-6"
+                              onClick={() => handleIssueWristband(student)}
+                              disabled={issuing}
+                            >
+                              팔찌 주기
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           </Card>
         )}
 
-        <Card className="rounded-xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
+        <Card className="rounded-xl border border-[var(--admin-guide-border)] bg-[var(--admin-guide-bg)] p-5 shadow-sm">
           <div className="flex gap-2.5">
             <div className="flex-shrink-0">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-200">
-                <Info className="size-4 text-slate-600" />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--admin-guide-icon-bg)]">
+                <Info className="size-4 text-[var(--admin-guide-icon-text)]" />
               </div>
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-bold text-foreground mb-2.5">
                 팔찌 지급 절차 안내
               </h3>
-              <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs text-slate-700">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs text-[var(--admin-guide-text)]">
                 <div className="flex gap-1.5 leading-snug">
-                  <span className="flex-shrink-0 font-semibold text-primary">1.</span>
-                  <span>웹정보-기본정보 화면에서 얼굴 본인 확인</span>
+                  <span className="flex-shrink-0 font-semibold text-[var(--admin-guide-step-text)]">1.</span>
+                  <span>웹정보 및 티켓 예매 내역 확인</span>
                 </div>
                 <div className="flex gap-1.5 leading-snug">
-                  <span className="flex-shrink-0 font-semibold text-primary">2.</span>
-                  <span>웹정보-기본정보 화면에서 학번 확인</span>
+                  <span className="flex-shrink-0 font-semibold text-[var(--admin-guide-step-text)]">2.</span>
+                  <span>웹정보 화면에서 학번 확인</span>
                 </div>
                 <div className="flex gap-1.5 leading-snug">
-                  <span className="flex-shrink-0 font-semibold text-primary">3.</span>
+                  <span className="flex-shrink-0 font-semibold text-[var(--admin-guide-step-text)]">3.</span>
                   <span>
                     학번 조회 후{" "}
-                    <span className="rounded bg-success/15 px-1 py-0.5 text-[11px] font-semibold text-success">
+                    <span className="inline-flex items-center rounded-full border border-[var(--admin-badge-pending-border)] bg-[var(--admin-badge-pending-bg)] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--admin-badge-pending-text)]">
                       미지급
                     </span>
                     {" "}여부 확인
                   </span>
                 </div>
                 <div className="flex gap-1.5 leading-snug">
-                  <span className="flex-shrink-0 font-semibold text-primary">4.</span>
+                  <span className="flex-shrink-0 font-semibold text-[var(--admin-guide-step-text)]">4.</span>
                   <span>
-                    <span className="rounded bg-primary-soft px-1 py-0.5 text-[11px] font-semibold text-primary">
+                    <span className="rounded bg-[var(--admin-guide-chip-bg)] px-1 py-0.5 text-[11px] font-semibold text-[var(--admin-guide-chip-text)]">
                       [팔찌 주기]
                     </span>
                     {" "}버튼 클릭
                   </span>
                 </div>
                 <div className="flex gap-1.5 leading-snug">
-                  <span className="flex-shrink-0 font-semibold text-primary">5.</span>
+                  <span className="flex-shrink-0 font-semibold text-[var(--admin-guide-step-text)]">5.</span>
                   <span>
                     확인 팝업에서{" "}
-                    <span className="rounded bg-primary-soft px-1 py-0.5 text-[11px] font-semibold text-primary">
+                    <span className="rounded bg-[var(--admin-guide-chip-bg)] px-1 py-0.5 text-[11px] font-semibold text-[var(--admin-guide-chip-text)]">
                       [지급 확정]
                     </span>
                     {" "}클릭
                   </span>
                 </div>
                 <div className="flex gap-1.5 leading-snug">
-                  <span className="flex-shrink-0 font-semibold text-primary">6.</span>
+                  <span className="flex-shrink-0 font-semibold text-[var(--admin-guide-step-text)]">6.</span>
                   <span>
-                    <span className="rounded bg-[#ff4fa3]/20 px-1 py-0.5 text-[11px] font-semibold text-[#e6007a]">
+                    <span className="inline-flex items-center rounded-full border border-[var(--admin-badge-issued-border)] bg-[var(--admin-badge-issued-bg)] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--admin-badge-issued-text)]">
                       지급완료
                     </span>
-                    {" "}확인 후 팔찌 전달
-                  </span>
-                </div>
-                <div className="flex gap-1.5 leading-snug">
-                  <span className="flex-shrink-0 font-semibold text-primary">7.</span>
-                  <span>
-                    오처리 시{" "}
-                    <span className="rounded bg-danger/10 px-1 py-0.5 text-[11px] font-semibold text-danger">
-                      [지급 취소]
-                    </span>
-                    {" "}버튼 클릭
-                  </span>
-                </div>
-                <div className="flex gap-1.5 leading-snug">
-                  <span className="flex-shrink-0 font-semibold text-primary">8.</span>
-                  <span>
-                    확인 팝업에서{" "}
-                    <span className="rounded bg-danger/10 px-1 py-0.5 text-[11px] font-semibold text-danger">
-                      [지급 취소 확정]
-                    </span>
-                    {" "}클릭 후 상태 재확인
+                    {" "}확인 후 팔찌 배부
                   </span>
                 </div>
               </div>
-              <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
-                <p className="flex items-start gap-1 text-[11px] leading-snug text-red-700">
-                  <span className="font-semibold">⚠</span>
-                  <span>
-                    <span className="font-semibold">중요:</span> 지급/취소 처리 내역은 모두 기록됩니다. 반드시 학생 본인 확인 후 처리하세요.
+              <div className="mt-3 rounded-xl border border-[var(--admin-danger-note-border)] bg-[var(--admin-danger-note-bg)] px-3.5 py-3">
+                <div className="flex items-start gap-2.5">
+                  <span className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[var(--admin-danger-note-icon-bg)] text-[11px] font-bold text-[var(--admin-danger-note-icon-text)]">
+                    !
                   </span>
-                </p>
+                  <div className="space-y-1">
+                    <p className="text-[11px] leading-relaxed text-[var(--admin-danger-note-text)]">
+                      오지급 시{" "}
+                      <span className="rounded bg-[var(--admin-danger-chip-bg)] px-1 py-0.5 font-semibold text-[var(--admin-danger-chip-text)]">[지급 취소]</span>
+                      {" "}버튼 클릭 후, 확인 팝업에서{" "}
+                      <span className="rounded bg-[var(--admin-danger-chip-bg)] px-1 py-0.5 font-semibold text-[var(--admin-danger-chip-text)]">[지급 취소 확정]</span>
+                      {" "}클릭
+                    </p>
+                    <p className="text-[11px] font-semibold leading-relaxed text-[var(--admin-danger-note-text)]">팔찌 배부 상태 재확인 필수!</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -436,13 +444,17 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
           }
         }}
       >
-        <DialogContent>
+        <DialogContent
+          className={`admin-confirm-dialog ${isCancelConfirm ? "admin-confirm-dialog--cancel" : "admin-confirm-dialog--issue"}`}
+        >
           <DialogHeader>
-            <DialogTitle>
-              {confirmAction === "cancel" ? "팔찌 지급 취소 확인" : "팔찌 지급 확인"}
+            <DialogTitle
+              className={isCancelConfirm ? "admin-confirm-dialog__title--cancel" : "admin-confirm-dialog__title--issue"}
+            >
+              {isCancelConfirm ? "팔찌 지급 취소 확인" : "팔찌 지급 확인"}
             </DialogTitle>
-            <DialogDescription>
-              {confirmAction === "cancel"
+            <DialogDescription className="admin-confirm-dialog__description">
+              {isCancelConfirm
                 ? "해당 학생의 지급 완료 상태를 취소하시겠습니까? 취소 이력은 로그에 남습니다."
                 : "해당 학생에게 팔찌를 지급 처리하시겠습니까?"}
             </DialogDescription>
@@ -458,15 +470,20 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
               취소
             </Button>
             <Button
-              variant={confirmAction === "cancel" ? "destructive" : "default"}
+              variant={isCancelConfirm ? "destructive" : "default"}
+              className={
+                isCancelConfirm
+                  ? "admin-confirm-dialog__confirm--cancel !border-[var(--admin-danger-action-border)] !bg-[var(--admin-danger-action-bg)] !text-[var(--admin-danger-action-text)] hover:!bg-[var(--admin-danger-action-hover-bg)]"
+                  : "admin-confirm-dialog__confirm--issue"
+              }
               onClick={handleConfirmAction}
               disabled={issuing}
             >
               {issuing
-                ? confirmAction === "cancel"
+                ? isCancelConfirm
                   ? "취소 처리 중..."
                   : "지급 처리 중..."
-                : confirmAction === "cancel"
+                : isCancelConfirm
                   ? "지급 취소 확정"
                   : "지급 확정"}
             </Button>

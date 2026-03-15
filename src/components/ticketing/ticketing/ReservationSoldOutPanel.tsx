@@ -4,10 +4,16 @@ import { Card } from "@/components/ticketing/common/ui/card";
 import { TICKETING_CLASSES, TICKETING_NARROW_PANEL_CLASS } from "@/components/ticketing/ticketing/ticketingShared";
 
 interface ReservationSoldOutPanelProps {
+  description?: string;
   onBackToList: () => void;
 }
 
-export function ReservationSoldOutPanel({ onBackToList }: ReservationSoldOutPanelProps) {
+const DEFAULT_DESCRIPTION = "다른 티켓팅 일정은 티켓팅 목록에서 확인하실 수 있어요.";
+
+export function ReservationSoldOutPanel({
+  description = DEFAULT_DESCRIPTION,
+  onBackToList,
+}: ReservationSoldOutPanelProps) {
   return (
     <div className={`${TICKETING_NARROW_PANEL_CLASS} flex min-h-[calc(100dvh-10rem)] items-center`}>
       <Card className={`${TICKETING_CLASSES.card.success} border-[var(--status-pending-border)] px-5 py-6`}>
@@ -27,7 +33,7 @@ export function ReservationSoldOutPanel({ onBackToList }: ReservationSoldOutPane
               티켓 매진
             </h2>
             <p className={`mt-1 ${TICKETING_CLASSES.typography.stateBody} text-[var(--text-muted)]`}>
-              다른 티켓팅 일정은 티켓팅 목록에서 확인하실 수 있어요.
+              {description}
             </p>
           </div>
         </div>

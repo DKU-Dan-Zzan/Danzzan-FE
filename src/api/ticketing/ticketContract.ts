@@ -15,6 +15,7 @@ const QUEUE_STATUS_VALUES: QueueRequestStatus[] = [
 ];
 
 const queueStatusSet = new Set<QueueRequestStatus>(QUEUE_STATUS_VALUES);
+const admissionStateSet = new Set(["READY", "ACTIVE"]);
 
 const isRecord = (value: unknown): value is Record<string, unknown> => {
   return Boolean(value) && typeof value === "object";
@@ -84,26 +85,60 @@ export const normalizeQueueEnterContract = (
 ): TicketQueueEnterResponseDto => {
   const status = assertQueueStatus(rawDto.status, endpoint);
 
-  if (!Object.prototype.hasOwnProperty.call(rawDto, "remaining")) {
-    throw new TicketContractError(endpoint, "remaining 필드가 누락되었습니다.");
-  }
-
-  const remainingRaw = rawDto.remaining;
-  if (remainingRaw === null) {
-    return {
-      status,
-      remaining: undefined,
-    };
-  }
-
-  const remaining = toFiniteNumber(remainingRaw);
-  if (remaining === null) {
+  const remainingRaw = rawDto.remaining ?? null;
+  const remaining = remainingRaw !== null ? toFiniteNumber(remainingRaw) : null;
+  if (remainingRaw !== null && remaining === null) {
     throw new TicketContractError(endpoint, "remaining 값이 숫자 형식이 아닙니다.");
+  }
+
+  const queuePositionRaw = rawDto.queuePosition ?? null;
+  const queuePosition = queuePositionRaw !== null ? toFiniteNumber(queuePositionRaw) : null;
+  if (queuePositionRaw !== null && queuePosition === null) {
+    throw new TicketContractError(endpoint, "queuePosition 값이 숫자 형식이 아닙니다.");
+  }
+
+  const mySequenceRaw = rawDto.mySequence ?? null;
+  const mySequence = mySequenceRaw !== null ? toFiniteNumber(mySequenceRaw) : null;
+  if (mySequenceRaw !== null && mySequence === null) {
+    throw new TicketContractError(endpoint, "mySequence 값이 숫자 형식이 아닙니다.");
+  }
+
+  const aheadCountRaw = rawDto.aheadCount ?? null;
+  const aheadCount = aheadCountRaw !== null ? toFiniteNumber(aheadCountRaw) : null;
+  if (aheadCountRaw !== null && aheadCount === null) {
+    throw new TicketContractError(endpoint, "aheadCount 값이 숫자 형식이 아닙니다.");
+  }
+
+  const estimatedWaitSecondsRaw = rawDto.estimatedWaitSeconds ?? null;
+  const estimatedWaitSeconds = estimatedWaitSecondsRaw !== null
+    ? toFiniteNumber(estimatedWaitSecondsRaw)
+    : null;
+  if (estimatedWaitSecondsRaw !== null && estimatedWaitSeconds === null) {
+    throw new TicketContractError(endpoint, "estimatedWaitSeconds 값이 숫자 형식이 아닙니다.");
+  }
+
+  const readyUntilRaw = rawDto.readyUntil ?? null;
+  const readyUntil = readyUntilRaw !== null ? toFiniteNumber(readyUntilRaw) : null;
+  if (readyUntilRaw !== null && readyUntil === null) {
+    throw new TicketContractError(endpoint, "readyUntil 값이 숫자 형식이 아닙니다.");
+  }
+
+  const admissionStateRaw = typeof rawDto.admissionState === "string"
+    ? rawDto.admissionState.trim().toUpperCase()
+    : null;
+  if (admissionStateRaw !== null && !admissionStateSet.has(admissionStateRaw)) {
+    throw new TicketContractError(endpoint, `admissionState 값이 유효하지 않습니다. (${rawDto.admissionState})`);
   }
 
   return {
     status,
-    remaining,
+    remaining: remaining ?? undefined,
+    queuePosition,
+    mySequence,
+    aheadCount,
+    estimatedWaitSeconds,
+    readyUntil,
+    admissionState: admissionStateRaw ?? undefined,
   };
 };
 
@@ -111,8 +146,50 @@ export const normalizeQueueStatusContract = (
   rawDto: TicketQueueStatusResponseDto,
   endpoint: string,
 ): TicketQueueStatusResponseDto => {
+  const queuePositionRaw = rawDto.queuePosition ?? null;
+  const queuePosition = queuePositionRaw !== null ? toFiniteNumber(queuePositionRaw) : null;
+
+  const mySequenceRaw = rawDto.mySequence ?? null;
+  const mySequence = mySequenceRaw !== null ? toFiniteNumber(mySequenceRaw) : null;
+  if (mySequenceRaw !== null && mySequence === null) {
+    throw new TicketContractError(endpoint, "mySequence 값이 숫자 형식이 아닙니다.");
+  }
+
+  const aheadCountRaw = rawDto.aheadCount ?? null;
+  const aheadCount = aheadCountRaw !== null ? toFiniteNumber(aheadCountRaw) : null;
+  if (aheadCountRaw !== null && aheadCount === null) {
+    throw new TicketContractError(endpoint, "aheadCount 값이 숫자 형식이 아닙니다.");
+  }
+
+  const estimatedWaitSecondsRaw = rawDto.estimatedWaitSeconds ?? null;
+  const estimatedWaitSeconds = estimatedWaitSecondsRaw !== null
+    ? toFiniteNumber(estimatedWaitSecondsRaw)
+    : null;
+  if (estimatedWaitSecondsRaw !== null && estimatedWaitSeconds === null) {
+    throw new TicketContractError(endpoint, "estimatedWaitSeconds 값이 숫자 형식이 아닙니다.");
+  }
+
+  const readyUntilRaw = rawDto.readyUntil ?? null;
+  const readyUntil = readyUntilRaw !== null ? toFiniteNumber(readyUntilRaw) : null;
+  if (readyUntilRaw !== null && readyUntil === null) {
+    throw new TicketContractError(endpoint, "readyUntil 값이 숫자 형식이 아닙니다.");
+  }
+
+  const admissionStateRaw = typeof rawDto.admissionState === "string"
+    ? rawDto.admissionState.trim().toUpperCase()
+    : null;
+  if (admissionStateRaw !== null && !admissionStateSet.has(admissionStateRaw)) {
+    throw new TicketContractError(endpoint, `admissionState 값이 유효하지 않습니다. (${rawDto.admissionState})`);
+  }
+
   return {
     status: assertQueueStatus(rawDto.status, endpoint),
+    queuePosition,
+    mySequence,
+    aheadCount,
+    estimatedWaitSeconds,
+    readyUntil,
+    admissionState: admissionStateRaw ?? undefined,
   };
 };
 

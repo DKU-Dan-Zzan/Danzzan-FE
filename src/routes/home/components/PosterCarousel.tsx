@@ -17,16 +17,10 @@ type Props = {
 export default function PosterCarousel({
   posters,
   intervalMs = 3500,
-  aspect = "4/3",
+  aspect = "314.4/310",
 }: Props) {
   const count = posters.length
   const [index, setIndex] = useState(0)
-
-  // posters 개수가 줄어들거나 바뀌었을 때 index 안전 처리
-  useEffect(() => {
-    if (count === 0) return
-    if (index > count - 1) setIndex(0)
-  }, [count, index])
 
   // 자동 슬라이드
   useEffect(() => {
@@ -37,27 +31,23 @@ export default function PosterCarousel({
     return () => clearInterval(t)
   }, [count, intervalMs])
 
-  const translateX = useMemo(() => `-${index * 100}%`, [index])
+  const safeIndex = useMemo(() => {
+    if (count === 0) return 0
+    return index % count
+  }, [count, index])
+  const translateX = useMemo(() => `-${safeIndex * 100}%`, [safeIndex])
 
   // 데이터 없을 때 placeholder UI (디자인 유지)
   if (count === 0) {
     return (
-      <section className="max-w-[430px] mx-auto px-4 pt-4">
-        <div
-          className="
-            relative overflow-hidden
-            rounded-[26px]
-            shadow-[0_18px_40px_rgba(0,0,0,0.10)]
-            bg-gradient-to-br from-blue-50 to-violet-50
-            border border-gray-100
-          "
-        >
-          <div className={`aspect-[${aspect}] flex items-center justify-center`}>
-            <div className="text-center">
-              <div className="text-[15px] font-semibold text-gray-800">
+      <section className="home-content-block">
+        <div className="home-poster-placeholder-card">
+          <div className="home-poster-placeholder-center" style={{ aspectRatio: aspect }}>
+            <div className="home-poster-placeholder-content">
+              <div className="home-poster-placeholder-title">
                 2026 단국축제
               </div>
-              <div className="mt-1 text-[12px] text-gray-500">
+              <div className="home-poster-placeholder-subtitle">
                 축제 포스터 영역
               </div>
             </div>
@@ -68,34 +58,26 @@ export default function PosterCarousel({
   }
 
   return (
-    <section className="max-w-[430px] mx-auto px-4 pt-4">
+    <section className="home-content-block">
       {/* 포스터 카드 */}
-      <div
-        className="
-          relative overflow-hidden
-          rounded-[28px]
-          shadow-[0_24px_70px_rgba(0,0,0,0.14)]
-          bg-white
-          ring-1 ring-black/5
-        "
-      >
+      <div className="home-poster-card">
         {/* 비율 고정 */}
-        <div className={`aspect-[${aspect}]`}>
+        <div style={{ aspectRatio: aspect }}>
           {/* 슬라이드 트랙 */}
           <div
-            className="h-full w-full flex transition-transform duration-500 ease-out"
+            className="home-carousel-track"
             style={{ transform: `translateX(${translateX})` }}
           >
             {posters.map((p) => (
-              <div key={p.id} className="min-w-full h-full relative">
+              <div key={p.id} className="home-carousel-slide">
                 <img
                   src={p.imageUrl}
                   alt={p.alt ?? "축제 포스터"}
-                  className="h-full w-full object-cover"
+                  className="home-carousel-image"
                   draggable={false}
                 />
                 {/* 텍스트 올릴 때 가독성용(선택) */}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-black/0 to-black/10" />
+                <div className="home-poster-overlay" />
               </div>
             ))}
           </div>
@@ -104,19 +86,16 @@ export default function PosterCarousel({
 
       {/* 도트 인디케이터 */}
       {count > 1 && (
-        <div className="mt-3 flex justify-center gap-2">
+        <div className="home-carousel-dots">
           {posters.map((p, i) => {
-            const active = i === index
+            const active = i === safeIndex
             return (
               <button
                 key={p.id}
                 type="button"
                 onClick={() => setIndex(i)}
                 aria-label={`포스터 ${i + 1}로 이동`}
-                className={`
-                  h-1.5 rounded-full transition-all duration-300
-                  ${active ? "w-8 bg-blue-600" : "w-2 bg-gray-300"}
-                `}
+                className={`home-carousel-dot ${active ? "is-active" : ""}`}
               />
             )
           })}

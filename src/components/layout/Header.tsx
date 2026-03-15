@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { Ticket } from "lucide-react"
 import { useSyncExternalStore } from "react"
 import { authStore } from "@/store/ticketing/authStore"
+import { getMyTicketNavigationTarget } from "@/routes/ticketing/authNavigation"
 
 const Header = () => {
   const navigate = useNavigate()
@@ -13,42 +14,33 @@ const Header = () => {
   const isLoggedIn = !!session.tokens?.accessToken && session.role === "student"
 
   const handleTicketClick = () => {
-    if (isLoggedIn) {
-      navigate("/ticket/myticket")
-    }
+    navigate(getMyTicketNavigationTarget(isLoggedIn))
   }
 
   return (
     <header
       className="
         sticky top-0 z-50
-        bg-white/85 backdrop-blur-xl
-        border-b border-slate-200/70
+        bg-[var(--app-header-bg)]
+        border-b border-[var(--app-header-border)]
+        pt-[env(safe-area-inset-top)]
       "
     >
-      <div className="max-w-[430px] mx-auto h-14 flex items-center justify-between px-4">
-        <div className="w-10" />
-
+      <div className="relative mx-auto h-16 max-w-[430px] px-4">
         <img
           src="/DAN-ZZAN.png"
           alt="DAN-ZZAN"
-          className="h-11 object-contain select-none"
+          className="pointer-events-none absolute top-[75%] left-1/2 h-[68px] w-[300px] -translate-x-1/2 -translate-y-1/2 object-cover object-[50%_58%] select-none brightness-0 invert"
           draggable={false}
         />
 
         <button
           onClick={handleTicketClick}
-          disabled={!isLoggedIn}
-          title={isLoggedIn ? "내 티켓 보기" : "로그인 후 이용 가능"}
-          className={`
-            flex h-10 w-10 items-center justify-center rounded-full transition-all
-            ${isLoggedIn
-              ? "bg-blue-600 text-white shadow-md active:scale-95"
-              : "bg-gray-100 text-gray-300 cursor-not-allowed"
-            }
-          `}
+          aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
+          title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
+          className="app-header-ticket-button absolute top-1/2 right-4 -translate-y-1/2"
         >
-          <Ticket size={20} />
+          <Ticket size={20} className="app-header-ticket-icon" />
         </button>
       </div>
     </header>

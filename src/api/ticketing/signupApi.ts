@@ -35,8 +35,9 @@ export const signupApi = {
   completeSignup: async (
     signupToken: string,
     password: string,
+    confirmPassword: string,
   ): Promise<void> => {
     const client = getClient();
-    await client.post(`/user/${signupToken}`, { password });
+    await client.post(`/user/${signupToken}`, { password, confirmPassword });
   },
 };

@@ -8,6 +8,7 @@
   TicketReservationResponseDto,
 } from "@/types/ticketing/dto/ticket.dto";
 import type {
+  AdmissionState,
   QueueEnterResult,
   QueueRequestStatus,
   QueueStatusResult,
@@ -27,6 +28,17 @@ const mapTicketStatus = (status?: string): TicketStatus => {
       return normalized;
     default:
       return "unknown";
+  }
+};
+
+const mapAdmissionState = (admissionState?: string | null): AdmissionState | null => {
+  const normalized = admissionState?.trim().toUpperCase();
+  switch (normalized) {
+    case "READY":
+    case "ACTIVE":
+      return normalized;
+    default:
+      return null;
   }
 };
 
@@ -144,7 +156,13 @@ export const mapQueueEnterDtoToModel = (
 ): QueueEnterResult => {
   return {
     status: mapQueueRequestStatus(dto.status),
-    remaining: toNullableNumber(dto.remaining),
+    remaining: toNullableNumber(dto.remaining ?? undefined),
+    queuePosition: dto.queuePosition ?? null,
+    mySequence: toNullableNumber(dto.mySequence ?? undefined),
+    aheadCount: toNullableNumber(dto.aheadCount ?? undefined),
+    estimatedWaitSeconds: toNullableNumber(dto.estimatedWaitSeconds ?? undefined),
+    readyUntil: toNullableNumber(dto.readyUntil ?? undefined),
+    admissionState: mapAdmissionState(dto.admissionState),
   };
 };
 
@@ -153,5 +171,11 @@ export const mapQueueStatusDtoToModel = (
 ): QueueStatusResult => {
   return {
     status: mapQueueRequestStatus(dto.status),
+    queuePosition: dto.queuePosition ?? null,
+    mySequence: toNullableNumber(dto.mySequence ?? undefined),
+    aheadCount: toNullableNumber(dto.aheadCount ?? undefined),
+    estimatedWaitSeconds: toNullableNumber(dto.estimatedWaitSeconds ?? undefined),
+    readyUntil: toNullableNumber(dto.readyUntil ?? undefined),
+    admissionState: mapAdmissionState(dto.admissionState),
   };
 };
