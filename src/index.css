@@ -36,22 +36,26 @@
   --status-danger-border: #fecaca;
   --status-danger-text: #b91c1c;
   --home-notice-bg-start: #f7faff;
-  --home-notice-bg-end: #eef4ff;
-  --home-notice-border: #cfdcf6;
-  --home-notice-shadow: rgba(37, 99, 235, 0.42);
-  --home-notice-depth-shadow: rgba(30, 41, 59, 0.24);
+  --home-notice-bg-end: #edf3ff;
+  --home-notice-border: #c8d7f3;
+  --home-notice-shadow: rgba(37, 99, 235, 0.28);
+  --home-notice-depth-shadow: rgba(30, 41, 59, 0.14);
   --home-notice-icon-border: rgba(147, 197, 253, 0.66);
   --home-notice-icon-bg-start: rgba(219, 234, 254, 0.86);
   --home-notice-icon-bg-end: rgba(191, 219, 254, 0.72);
+  --home-notice-card-radius: 22px;
   --home-notice-card-shadow:
-    0 24px 46px -14px var(--home-notice-shadow),
-    0 12px 22px -18px var(--home-notice-depth-shadow);
-  --home-notice-ring: rgba(255, 255, 255, 0.78);
+    0 16px 30px -24px var(--home-notice-shadow),
+    0 8px 16px -14px var(--home-notice-depth-shadow);
+  --home-notice-ring: rgba(255, 255, 255, 0.9);
   --home-notice-icon-inner-shadow: inset 0 1px 0 rgba(248, 250, 252, 0.9);
   --home-content-max-width: 314.4px;
   --home-section-notice-margin-top: 21px;
   --home-section-poster-margin-top: 26.5px;
-  --home-section-lineup-margin-top: 31px;
+  --home-lineup-caption-margin-top: 31px;
+  --home-section-lineup-margin-top: 16px;
+  --home-lineup-caption-font-size: 15px;
+  --home-lineup-caption-color: #b2bcc8;
   --home-bottom-spacer-height: 8rem;
   --home-card-radius: 16px;
   --home-card-border: var(--border-base);
@@ -139,12 +143,21 @@ body,
 }
 
 .home-emergency-notice-card {
+  position: relative;
   overflow: hidden;
-  border-radius: var(--home-card-radius);
+  border-radius: var(--home-notice-card-radius);
   border: 1px solid var(--home-notice-border);
   background-image: linear-gradient(145deg, var(--home-notice-bg-start) 0%, var(--home-notice-bg-end) 100%);
   box-shadow: var(--home-notice-card-shadow);
-  outline: 1px solid var(--home-notice-ring);
+}
+
+.home-emergency-notice-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid var(--home-notice-ring);
+  pointer-events: none;
 }
 
 .home-emergency-notice-wrapper {
@@ -279,6 +292,15 @@ body,
 
 .home-section-lineup {
   margin-top: var(--home-section-lineup-margin-top);
+}
+
+.home-lineup-caption {
+  margin-top: var(--home-lineup-caption-margin-top);
+  margin-bottom: 0;
+  font-size: var(--home-lineup-caption-font-size);
+  line-height: 1.4;
+  color: var(--home-lineup-caption-color);
+  font-weight: 600;
 }
 
 .home-bottom-spacer {
