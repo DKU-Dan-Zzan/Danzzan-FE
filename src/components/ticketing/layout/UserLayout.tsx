@@ -2,6 +2,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import BottomNav from "@/components/layout/BottomNav";
+import { AppHeaderLogo } from "@/components/layout/AppHeaderLogo";
 
 export function UserLayout() {
   const location = useLocation();
@@ -47,12 +48,7 @@ export function UserLayout() {
           />
           <header className="app-main-header sticky top-0 z-40 border-b border-[var(--app-header-border)] pt-[env(safe-area-inset-top)]">
             <div className="relative mx-auto h-16 w-full max-w-md px-4">
-              <img
-                src="/DAN-ZZAN.png"
-                alt="DAN-ZZAN"
-                className="pointer-events-none absolute top-[75%] left-1/2 h-[61px] w-[270px] -translate-x-1/2 -translate-y-1/2 object-cover object-[50%_58%] select-none"
-                draggable={false}
-              />
+              <AppHeaderLogo />
 
               <button
                 onClick={handleBack}
