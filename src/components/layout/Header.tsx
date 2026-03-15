@@ -38,9 +38,9 @@ const Header = () => {
           onClick={handleTicketClick}
           aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
           title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
-          className="absolute top-1/2 right-4 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white text-blue-600 shadow-md transition-all active:scale-95"
+          className="app-header-ticket-button absolute top-1/2 right-4 -translate-y-1/2"
         >
-          <Ticket size={20} />
+          <Ticket size={20} className="app-header-ticket-icon" />
         </button>
       </div>
     </header>
