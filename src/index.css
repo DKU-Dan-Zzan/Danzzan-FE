@@ -37,12 +37,12 @@
   --app-header-bg-gradient:
     linear-gradient(
       180deg,
-      #edf3fb 0%,
+      #f1f6fd 0%,
       #f7faff 100%
     );
   --app-header-border: rgba(143, 165, 210, 0.34);
-  --app-overscroll-bg: #edf3fb;
-  --app-overscroll-bg-gradient: var(--app-header-bg-gradient);
+  --app-overscroll-bg: #f1f6fd;
+  --app-overscroll-bg-gradient: none;
   --app-nav-bg: rgba(251, 253, 255, 0.96);
   --app-nav-border: rgba(138, 157, 198, 0.26);
   --app-nav-shadow: 0 -8px 24px rgba(16, 32, 74, 0.1);
