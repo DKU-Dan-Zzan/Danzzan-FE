@@ -65,7 +65,7 @@ export function UserLayout() {
 
               <div className="min-w-0 flex-1 px-1">
                 <p className="text-[length:var(--ticketing-text-header-overline)] font-semibold uppercase tracking-[0.16em] text-[var(--header-text-muted)]">
-                  Student Portal
+                  DANFESTA
                 </p>
                 <h1 className="truncate text-[length:var(--ticketing-text-card-title)] font-semibold tracking-[-0.01em] text-[var(--header-text)]">
                   {pageTitle}

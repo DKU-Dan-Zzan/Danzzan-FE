@@ -4,6 +4,8 @@ import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
 
+import "mapbox-gl/dist/mapbox-gl.css";
+
 // PWA 서비스워커 등록
 import { registerSW } from "virtual:pwa-register"
 registerSW({ immediate: true })
@@ -13,5 +15,5 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <App />
     </BrowserRouter>
-  </StrictMode>,
+  </StrictMode>
 )

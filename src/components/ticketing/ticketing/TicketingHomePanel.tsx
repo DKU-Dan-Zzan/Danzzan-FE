@@ -12,7 +12,7 @@ const guideItems = [
   {
     step: 1,
     title: "티켓팅 오픈 시간 확인",
-    description: "티켓 목록에서 각 공연의 오픈 시간을 확인하세요. 오픈 10분 전부터 카운트다운이 시작됩니다.",
+    description: "티켓 목록에서 각 공연의 예매 오픈 시간을 확인하세요. 오픈 10분 전부터 카운트다운이 시작됩니다.",
   },
   {
     step: 2,
@@ -22,18 +22,18 @@ const guideItems = [
   {
     step: 3,
     title: "내 티켓 확인",
-    description: "예매가 완료되면 '내 티켓 확인하기'에서 예매한 티켓을 확인하세요.",
+    description: "예매 완료 후 '티켓팅' 페이지에서 예매한 티켓을 확인하세요.",
   },
   {
     step: 4,
     title: "팔찌 수령",
     description:
-      "공연 당일 지정된 장소에서 스태프에게 티켓을 제시하세요. 확인 및 팔찌 배부가 완료되면 내 티켓 상태가 '팔찌 수령 완료'로 업데이트됩니다. (팔찌 배부 위치/시간은 추후 총학생회 인스타그램 공지)",
+      "공연 당일 지정된 장소에서 스태프에게 티켓과 웹정보를 제시하세요. 팔찌 수령이 완료되면 내 티켓 상태가 '팔찌 수령 완료'로 변경됩니다. (팔찌 배부 위치 및 시간은 추후 총학생회 인스타그램을 통해 공지됩니다.)",
   },
   {
     step: 5,
     title: "공연 입장",
-    description: "팔찌를 착용하고 단국존에 입장하세요.",
+    description: "팔찌 착용 후 단국존에 입장 가능합니다.",
   },
 ];
 
@@ -126,7 +126,7 @@ export function TicketingHomePanel({
       <Card className="rounded-[24px] border border-[var(--border-base)] bg-[var(--surface-base)] p-5 shadow-[0_10px_20px_-16px_var(--shadow-color)]">
         <h3 className={`flex items-center gap-2 ${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--text)]`}>
           <ClipboardList className="h-[17px] w-[17px] text-[var(--text-muted)]" strokeWidth={2.1} />
-          티켓팅 이용 가이드
+          티켓 예매 이용 가이드
         </h3>
         <div className="mt-0 px-2">
           {guideItems.map((item, index) => (

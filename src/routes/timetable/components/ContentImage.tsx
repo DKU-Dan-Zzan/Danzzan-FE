@@ -20,7 +20,7 @@ export default function ContentImageSection({
 }: ContentImageSectionProps) {
   if (isLoading) {
     return (
-      <div className="py-12 text-center text-gray-400">
+      <div className="py-12 text-center text-[var(--timetable-empty-text)]">
         콘텐츠 이미지를 불러오는 중입니다...
       </div>
     )
@@ -28,7 +28,7 @@ export default function ContentImageSection({
 
   if (error) {
     return (
-      <div className="py-12 text-center text-gray-400">
+      <div className="py-12 text-center text-[var(--timetable-empty-text)]">
         콘텐츠 이미지를 불러오지 못했습니다.
       </div>
     )
@@ -36,7 +36,7 @@ export default function ContentImageSection({
 
   if (images.length === 0) {
     return (
-      <div className="py-12 text-center text-gray-400">
+      <div className="py-12 text-center text-[var(--timetable-empty-text)]">
         등록된 콘텐츠 이미지가 없습니다.
       </div>
     )
@@ -49,7 +49,7 @@ export default function ContentImageSection({
           <button
             key={image.id}
             type="button"
-            className="block w-full overflow-hidden rounded-2xl border border-gray-200 bg-white"
+            className="block w-full overflow-hidden rounded-2xl border border-[var(--timetable-card-border)] bg-[var(--timetable-card-bg)]"
             onClick={() => onSelectImage(image)}
           >
             <img
@@ -66,15 +66,15 @@ export default function ContentImageSection({
 
       {selectedImage && (
         <div
-          className="fixed inset-0 z-[100] bg-black/80"
+          className="fixed inset-0 z-[100] bg-[var(--timetable-overlay-bg)]"
           onClick={onCloseImage}
         >
           <button
             type="button"
-            className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-md"
+            className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--timetable-close-bg)] shadow-md"
             onClick={onCloseImage}
           >
-            <XMarkIcon className="h-5 w-5 text-gray-900" />
+            <XMarkIcon className="h-5 w-5 text-[var(--text)]" />
           </button>
 
           <div
