@@ -240,7 +240,7 @@ body,
   min-height: 100%;
   display: flow-root;
   background-color: var(--bg-page-soft);
-  padding-bottom: 6rem;
+  padding-bottom: 1rem;
 }
 
 .home-content-block {
