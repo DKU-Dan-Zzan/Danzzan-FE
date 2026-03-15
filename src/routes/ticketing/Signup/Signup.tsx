@@ -41,12 +41,12 @@ export default function Signup() {
     setError(null);
 
     if (!dkuStudentId.trim() || !dkuPassword.trim()) {
-      setError("학번과 포털 비밀번호를 입력해 주세요.");
+      setError("학번과 단국대학교 포털 비밀번호를 입력해 주세요.");
       return;
     }
 
     if (!password || !passwordConfirm) {
-      setError("서비스 비밀번호를 입력해 주세요.");
+      setError("축제 포털 전용 비밀번호를 입력해 주세요.");
       return;
     }
 
@@ -80,7 +80,7 @@ export default function Signup() {
         const message = payload?.error;
 
         if (err.status === 401) {
-          setError(message || "포털 아이디 또는 비밀번호가 올바르지 않습니다.");
+          setError(message || "단국대 포털 학번 또는 비밀번호가 올바르지 않습니다.");
         } else if (err.status === 409) {
           setError(message || "이미 가입된 학번입니다.");
         } else if (err.status === 403) {
@@ -102,7 +102,7 @@ export default function Signup() {
       <div className="mx-auto w-full max-w-[420px] px-5 py-6">
         <div className="mt-9">
           <p className="text-[length:var(--ticketing-text-helper)] font-semibold text-[var(--text-muted)]">
-            재학생 전용 서비스
+            재학생 전용 티켓팅 서비스
           </p>
           <h1 className="mt-1 leading-[1.12] font-black tracking-tight text-[var(--text)]">
             티켓팅 포털 회원가입
@@ -136,7 +136,7 @@ export default function Signup() {
                   type="password"
                   value={dkuPassword}
                   onChange={(event) => setDkuPassword(event.target.value)}
-                  placeholder="포털 비밀번호를 입력해 주세요"
+                  placeholder="단국대 포털 비밀번호를 입력해 주세요"
                   className={inputClassName}
                   required
                   disabled={submitting}
@@ -154,7 +154,7 @@ export default function Signup() {
             <section className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-semibold text-[var(--text)]">
-                  서비스용 비밀번호
+                  축제 포털 비밀번호
                 </Label>
                 <Input
                   id="password"
@@ -174,7 +174,7 @@ export default function Signup() {
 
               <div className="space-y-2">
                 <Label htmlFor="passwordConfirm" className="text-sm font-semibold text-[var(--text)]">
-                  서비스용 비밀번호 확인
+                  축제 포털 비밀번호 확인
                 </Label>
                 <Input
                   id="passwordConfirm"
@@ -218,7 +218,7 @@ export default function Signup() {
                     개인정보 이용 동의 (필수)
                   </Label>
                   <p className="mt-1 text-sm leading-6 text-[var(--text-muted)]">
-                    티켓팅 서비스 이용을 위해 학번, 연락처, 재학정보, 소속 대학, 학과 정보의 수집 및 이용에 동의합니다.
+                    축제 포털 및 티켓팅 서비스 이용을 위해 학번, 연락처, 재학정보, 소속 대학, 학과 정보의 수집 및 이용에 동의합니다.
                   </p>
                 </div>
               </div>
