@@ -69,30 +69,19 @@ export default function LineupCarousel({
   if (count === 0) return null
 
   return (
-    <section className="mx-auto w-full max-w-[314.4px]">
-      <div
-        className="
-          relative overflow-hidden
-          rounded-[16px]
-          border border-[var(--border-base)]
-          bg-[var(--surface-subtle)]
-          shadow-[0_14px_35px_-20px_var(--shadow-color)]
-          touch-pan-y
-        "
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
+    <section className="home-content-block">
+      <div className="home-lineup-card" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
         <div style={{ aspectRatio: aspect }}>
           <div
-            className="h-full w-full flex transition-transform duration-500 ease-out"
+            className="home-carousel-track"
             style={{ transform: `translateX(${translateX})` }}
           >
             {banners.map((banner) => (
-              <div key={banner.id} className="min-w-full h-full">
+              <div key={banner.id} className="home-carousel-slide">
                 <img
                   src={banner.imageUrl}
                   alt={banner.alt ?? "라인업 이미지"}
-                  className="h-full w-full object-cover"
+                  className="home-carousel-image"
                   draggable={false}
                 />
               </div>
@@ -102,7 +91,7 @@ export default function LineupCarousel({
       </div>
 
       {count > 1 && (
-        <div className="mt-3 flex justify-center gap-2">
+        <div className="home-carousel-dots">
           {banners.map((banner, i) => {
             const active = i === safeIndex
             return (
@@ -111,7 +100,7 @@ export default function LineupCarousel({
                 type="button"
                 onClick={() => setIndex(i)}
                 aria-label={`라인업 ${i + 1}로 이동`}
-                className={`h-1.5 rounded-full transition-all duration-300 ${active ? "w-8 bg-[var(--accent)]" : "w-2 bg-[var(--border-base)]"}`}
+                className={`home-carousel-dot ${active ? "is-active" : ""}`}
               />
             )
           })}

@@ -1,8 +1,9 @@
-import { Megaphone } from "lucide-react"
+import { useState } from "react"
+import { ChevronDown, Megaphone } from "lucide-react"
 
 export interface EmergencyNoticeData {
   id: number
-  title:string
+  title: string
   content: string
   updatedAt?: string
 }
@@ -12,36 +13,60 @@ interface Props {
 }
 
 const EmergencyNotice = ({ notice }: Props) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const contentId = `emergency-notice-content-${notice?.id ?? "empty"}`
+  const updatedAtLabel = (() => {
+    if (!notice?.updatedAt) return null
+
+    const parsed = new Date(notice.updatedAt)
+    if (Number.isNaN(parsed.getTime())) return null
+
+    return parsed.toLocaleString("ko-KR", {
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    })
+  })()
+
   if (!notice) return null
 
   return (
-    <section className="mx-auto mt-[21px] w-full max-w-[314.4px]">
-      <div
-        className="
-          rounded-[16px]
-          border border-[var(--border-base)]
-          bg-[var(--surface-subtle)]
-          shadow-[0_10px_22px_-16px_var(--shadow-color)]
-        "
-      >
-        <div className="flex h-[38px] items-center gap-2.5 px-3">
-          <div
-            className="
-              flex items-center justify-center
-              w-6 h-6 rounded-full
-              border border-[var(--border-base)]
-              bg-[var(--surface-tint-subtle)]
-              text-[var(--accent)]
-              flex-shrink-0
-            "
-          >
+    <section className="home-emergency-notice-wrapper">
+      <div className="home-emergency-notice-card">
+        <button
+          type="button"
+          onClick={() => setIsExpanded((prev) => !prev)}
+          className={`home-emergency-notice-trigger ${isExpanded ? "is-expanded" : ""}`}
+          aria-expanded={isExpanded}
+          aria-controls={contentId}
+          aria-label={isExpanded ? "긴급 공지 접기" : "긴급 공지 전문 펼치기"}
+        >
+          <div className="home-emergency-notice-icon">
             <Megaphone size={14} strokeWidth={2.2} />
           </div>
 
-          <p className="min-w-0 truncate text-[13px] leading-none text-[var(--text)]">
-            {notice.content}
-          </p>
-        </div>
+          <div className="home-emergency-notice-content">
+            {isExpanded && updatedAtLabel && (
+              <p className="home-emergency-notice-updated-inline">
+                업데이트 {updatedAtLabel}
+              </p>
+            )}
+            <p
+              id={contentId}
+              className={`home-emergency-notice-body ${isExpanded ? "is-expanded" : "is-collapsed"}`}
+            >
+              {notice.content}
+            </p>
+          </div>
+
+          <ChevronDown
+            size={16}
+            className={`home-emergency-notice-chevron ${isExpanded ? "is-expanded" : ""}`}
+            aria-hidden="true"
+          />
+        </button>
       </div>
     </section>
   )

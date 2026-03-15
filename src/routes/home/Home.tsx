@@ -86,21 +86,21 @@ function Home() {
   }, [])
 
   return (
-    <div className="min-h-full flow-root bg-[var(--bg-page-soft)] pb-24">
+    <div className="home-page-root">
       {error && (
-        <div className="mx-auto mt-3 w-full max-w-[314.4px] rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-xs text-[var(--status-danger-text)]">
+        <div className="home-status-banner is-error">
           {error}
         </div>
       )}
 
       <div>
         <EmergencyNotice notice={notice} />
-        <div className="mt-[26.5px]">
+        <div className="home-section-poster">
           <PosterCarousel posters={posters} />
         </div>
         {lineups.length > 0 && (
           <>
-            <div className="mt-[31px]">
+            <div className="home-section-lineup">
               <LineupCarousel banners={lineups} />
             </div>
           </>
@@ -108,12 +108,12 @@ function Home() {
       </div>
 
       {loading && (
-        <div className="mx-auto mt-3 w-full max-w-[314.4px] rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 py-2 text-xs text-[var(--text-muted)]">
+        <div className="home-status-banner is-loading">
           로딩 중...
         </div>
       )}
 
-      <div className="h-32" aria-hidden="true" />
+      <div className="home-bottom-spacer" aria-hidden="true" />
     </div>
   )
 }
