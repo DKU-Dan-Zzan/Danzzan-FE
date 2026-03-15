@@ -124,8 +124,6 @@ function Home() {
           로딩 중...
         </div>
       )}
-
-      {/* <div className="home-bottom-spacer" aria-hidden="true" /> */}
     </div>
   )
 }
