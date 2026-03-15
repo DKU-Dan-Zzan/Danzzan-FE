@@ -1,5 +1,6 @@
 import { InformationCircleIcon } from "@heroicons/react/24/outline"
 import { useEffect, useMemo, useRef, useState } from "react"
+import { useSearchParams } from "react-router-dom"
 import {
   getContentImages,
   getPerformances,
@@ -52,6 +53,8 @@ function findNowOrNextTarget(items: Performance[], nowMinutes: number) {
 }
 
 export default function Timetable() {
+  const [searchParams] = useSearchParams()
+
   const [activeIdx, setActiveIdx] = useState(1)
   const [scrollTargetId, setScrollTargetId] = useState<number | null>(null)
   const [nowTargetId, setNowTargetId] = useState<number | null>(null)
@@ -72,10 +75,14 @@ export default function Timetable() {
     if (didAutoInitRef.current) return
     didAutoInitRef.current = true
 
-    const today = todayISODateLocal()
-    const todayIdx = FESTIVAL_DAYS.findIndex((d) => d.date === today)
-    if (todayIdx !== -1) setActiveIdx(todayIdx)
-  }, [])
+    const queryDate = searchParams.get("date")
+    const baseDate = queryDate || todayISODateLocal()
+
+    const targetIdx = FESTIVAL_DAYS.findIndex((d) => d.date === baseDate)
+    if (targetIdx !== -1) {
+      setActiveIdx(targetIdx)
+    }
+  }, [searchParams])
 
   const activeDay = FESTIVAL_DAYS[activeIdx]
   const activeDate = activeDay.date
