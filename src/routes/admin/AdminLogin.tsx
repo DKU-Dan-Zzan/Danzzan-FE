@@ -7,10 +7,6 @@ export default function AdminLogin() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { login } = useAdminAuth();
-
-  if (getAdminSession()) {
-    return <Navigate to={searchParams.get("redirect") || "/admin"} replace />;
-  }
   const [studentNumber, setStudentNumber] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -18,6 +14,11 @@ export default function AdminLogin() {
   const [submitting, setSubmitting] = useState(false);
 
   const redirect = searchParams.get("redirect") || "/admin";
+
+  if (getAdminSession()) {
+    return <Navigate to={redirect} replace />;
+  }
+
   const canSubmit = studentNumber.trim().length > 0 && password.trim().length > 0;
   const inputClassName =
     "h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus:outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20";
