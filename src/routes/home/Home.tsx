@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import PosterCarousel, { type Poster } from "./components/PosterCarousel"
 import LineupCarousel, { type LineupBanner } from "./components/LineupCarousel"
 import EmergencyNotice, { type EmergencyNoticeData } from "./components/EmergencyNotice"
+import CurrentPerformanceSection from "./components/CurrentPerformanceSection";
 
 import { getEmergencyNotice, getHomeImages, getLineupImages } from "../../api/homeApi"
 
@@ -105,6 +106,9 @@ function Home() {
             </div>
           </>
         )}
+        <div className="home-section-performance">
+          <CurrentPerformanceSection />
+        </div>
       </div>
 
       {loading && (
@@ -113,7 +117,7 @@ function Home() {
         </div>
       )}
 
-      <div className="home-bottom-spacer" aria-hidden="true" />
+      {/* <div className="home-bottom-spacer" aria-hidden="true" /> */}
     </div>
   )
 }
