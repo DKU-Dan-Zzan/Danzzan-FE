@@ -344,18 +344,30 @@ function Admin() {
 
   return (
     <div className="min-h-dvh bg-[var(--bg-base)]">
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-3">
-        <h1 className="text-lg font-bold text-[var(--text)]">
-          공지사항 및 분실물 관리자 페이지
-        </h1>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-[var(--text-muted)] transition-colors hover:bg-[var(--border-base)] hover:text-[var(--text)]"
-        >
-          <LogOut className="h-4 w-4" strokeWidth={2.3} />
-          로그아웃
-        </button>
+      <header className="sticky top-0 z-20 border-b border-[var(--border-base)] bg-[var(--bg-base)]">
+        <div className="mx-auto flex w-full max-w-[1360px] items-center justify-between px-8 py-3">
+          <div>
+            <p className="text-[8px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">
+              ADMIN PORTAL
+            </p>
+            <h1 className="text-2xl font-semibold text-[var(--text)]">
+              공지사항 및 분실물 관리자 페이지
+            </h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="rounded-full border border-[var(--border-base)] bg-[var(--surface-subtle)] px-2.5 py-0.5 text-xs font-semibold text-[var(--text-muted)]">
+              운영자: 관리자
+            </span>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
+            >
+              <LogOut className="h-4 w-4" strokeWidth={2.3} />
+              로그아웃
+            </button>
+          </div>
+        </div>
       </header>
 
       <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-5">

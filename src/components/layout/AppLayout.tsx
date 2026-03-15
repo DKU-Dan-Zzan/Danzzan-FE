@@ -1,12 +1,7 @@
-import type { CSSProperties } from "react"
 import { Outlet, useLocation } from "react-router-dom"
 import Header from "./Header"
 import BottomNav from "./BottomNav"
 import Footer from "./Footer"
-
-const layoutStyle = {
-  "--app-bottom-nav-height": "84px",
-} as CSSProperties;
 
 const Layout = () => {
   const location = useLocation()
@@ -16,7 +11,6 @@ const Layout = () => {
   return (
     <div
       className={isBoothMapPage ? "h-dvh overflow-hidden bg-white" : "min-h-dvh bg-white"}
-      style={layoutStyle}
     >
       <div
         className={

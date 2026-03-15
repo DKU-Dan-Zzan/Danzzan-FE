@@ -1,8 +1,9 @@
-import { Megaphone } from "lucide-react"
+import { useState } from "react"
+import { ChevronDown, Megaphone } from "lucide-react"
 
 export interface EmergencyNoticeData {
   id: number
-  title:string
+  title: string
   content: string
   updatedAt?: string
 }
@@ -12,66 +13,60 @@ interface Props {
 }
 
 const EmergencyNotice = ({ notice }: Props) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const contentId = `emergency-notice-content-${notice?.id ?? "empty"}`
+  const updatedAtLabel = (() => {
+    if (!notice?.updatedAt) return null
+
+    const parsed = new Date(notice.updatedAt)
+    if (Number.isNaN(parsed.getTime())) return null
+
+    return parsed.toLocaleString("ko-KR", {
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    })
+  })()
+
   if (!notice) return null
 
-  const isNew = notice.updatedAt === "방금 전"
-
   return (
-    <section className="px-4 mt-3 mb-1">
-      <div
-        className="
-          rounded-[20px]
-          bg-[#FCFCFD]
-          border border-[#E8EDF3]
-          shadow-[0_4px_12px_rgba(15,23,42,0.06)]
-        "
-      >
-        <div className="px-4 py-3 flex items-start gap-3">
-          <div
-            className="
-              flex items-center justify-center
-              w-9 h-9 rounded-full
-              bg-primary/10 text-primary
-              flex-shrink-0
-            "
-          >
-            <Megaphone size={18} strokeWidth={2.2} />
+    <section className="home-emergency-notice-wrapper">
+      <div className="home-emergency-notice-card">
+        <button
+          type="button"
+          onClick={() => setIsExpanded((prev) => !prev)}
+          className={`home-emergency-notice-trigger ${isExpanded ? "is-expanded" : ""}`}
+          aria-expanded={isExpanded}
+          aria-controls={contentId}
+          aria-label={isExpanded ? "긴급 공지 접기" : "긴급 공지 전문 펼치기"}
+        >
+          <div className="home-emergency-notice-icon">
+            <Megaphone size={14} strokeWidth={2.2} />
           </div>
 
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="font-semibold text-[14px] text-gray-900">
-                  {notice.title}
-                </span>
-
-                {isNew && (
-                  <span
-                    className="
-                      px-2 py-[2px]
-                      text-[10px] font-semibold
-                      rounded-full
-                      bg-primary/90 text-white
-                      flex-shrink-0
-                    "
-                  >
-                    NEW
-                  </span>
-                )}
-              </div>
-
-              {notice.updatedAt && (
-                <span className="text-[11px] text-gray-400 whitespace-nowrap flex-shrink-0">
-                  {notice.updatedAt}
-                </span>
-              )}
-            </div>
-
-            <p className="mt-1.5 text-[13px] leading-[1.5] text-gray-700 break-words">
+          <div className="home-emergency-notice-content">
+            {isExpanded && updatedAtLabel && (
+              <p className="home-emergency-notice-updated-inline">
+                업데이트 {updatedAtLabel}
+              </p>
+            )}
+            <p
+              id={contentId}
+              className={`home-emergency-notice-body ${isExpanded ? "is-expanded" : "is-collapsed"}`}
+            >
               {notice.content}
             </p>
           </div>
-        </div>
+
+          <ChevronDown
+            size={16}
+            className={`home-emergency-notice-chevron ${isExpanded ? "is-expanded" : ""}`}
+            aria-hidden="true"
+          />
+        </button>
       </div>
     </section>
   )

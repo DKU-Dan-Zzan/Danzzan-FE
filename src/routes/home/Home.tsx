@@ -66,7 +66,7 @@ function Home() {
       if (noticeResult.status === "fulfilled" && noticeResult.value) {
         setNotice({
           id: noticeResult.value.id,
-          title: "긴급 공지",
+          title: "긴급공지 및 내용",
           content: noticeResult.value.content,
           updatedAt: noticeResult.value.updatedAt,
         })
@@ -86,26 +86,34 @@ function Home() {
   }, [])
 
   return (
-    <div className="pb-24">
+    <div className="home-page-root">
       {error && (
-        <div className="px-4 mt-3 text-xs text-red-600">
+        <div className="home-status-banner is-error">
           {error}
         </div>
       )}
 
-      <div className="space-y-4">
+      <div>
         <EmergencyNotice notice={notice} />
-        <PosterCarousel posters={posters} />
-        <LineupCarousel banners={lineups} />
+        <div className="home-section-poster">
+          <PosterCarousel posters={posters} />
+        </div>
+        {lineups.length > 0 && (
+          <>
+            <div className="home-section-lineup">
+              <LineupCarousel banners={lineups} />
+            </div>
+          </>
+        )}
       </div>
 
       {loading && (
-        <div className="px-4 mt-3 text-xs text-gray-400">
+        <div className="home-status-banner is-loading">
           로딩 중...
         </div>
       )}
 
-      <div className="h-32" aria-hidden="true" />
+      <div className="home-bottom-spacer" aria-hidden="true" />
     </div>
   )
 }

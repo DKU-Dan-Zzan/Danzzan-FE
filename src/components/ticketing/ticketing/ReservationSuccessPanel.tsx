@@ -43,7 +43,7 @@ export function ReservationSuccessPanel({
             </li>
             <li className="flex items-start gap-2.5">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
-              <span>공연 당일 신분증 미지참 시 입장이 제한될 수 있습니다.</span>
+              <span>공연 당일 단국대학교 어플의 웹정보 확인이 필요합니다.</span>
             </li>
           </ul>
         </div>
