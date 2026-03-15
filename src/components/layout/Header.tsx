@@ -20,8 +20,8 @@ const Header = () => {
   return (
     <header
       className="
+        app-main-header
         sticky top-0 z-50
-        bg-[var(--app-header-bg)]
         border-b border-[var(--app-header-border)]
         pt-[env(safe-area-inset-top)]
       "
@@ -30,7 +30,7 @@ const Header = () => {
         <img
           src="/DAN-ZZAN.png"
           alt="DAN-ZZAN"
-          className="pointer-events-none absolute top-[75%] left-1/2 h-[68px] w-[300px] -translate-x-1/2 -translate-y-1/2 object-cover object-[50%_58%] select-none brightness-0 invert"
+          className="pointer-events-none absolute top-[75%] left-1/2 h-[68px] w-[300px] -translate-x-1/2 -translate-y-1/2 object-cover object-[50%_58%] select-none"
           draggable={false}
         />
 
