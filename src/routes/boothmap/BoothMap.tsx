@@ -1,6 +1,4 @@
-// 부스맵 페이지(전체화면 지도 + 상단 필터 카드 + 우측 상단 지도 토글 + 바텀시트) 최상위 컴포넌트
-
-import { useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import type {
   Booth,
   College,
@@ -13,7 +11,6 @@ import type {
   SheetMode,
   SheetSnap,
 } from "./types/boothmap.types";
-import { mockBooths, mockColleges, mockPubs } from "./data/mockBoothMapData";
 
 import PrimaryFilterChips from "./components/PrimaryFilterChips";
 import SecondaryCollegeChips from "./components/SecondaryCollegeChips";
@@ -25,6 +22,14 @@ import DetailSheet from "./components/DetailSheet";
 import MapFloatingToggle from "./components/MapFloatingToggle";
 import Mapbox3DView from "./components/Mapbox3DView";
 
+import {
+  getBoothMap,
+  getPubs,
+  type BoothDto,
+  type CollegeDto,
+  type PubSummaryResponse,
+} from "../../api/boothmapApi";
+
 const DEFAULT_MAP_VIEWPORT: MapViewport = {
   lat: 37.3201,
   lng: 127.1276,
@@ -33,6 +38,39 @@ const DEFAULT_MAP_VIEWPORT: MapViewport = {
   mapboxPitch: 55,
   mapboxBearing: -20,
 };
+
+function mapCollegeDtoToCollege(dto: CollegeDto): College {
+  return {
+    id: dto.collegeId,
+    name: dto.name,
+    location_x: dto.locationX,
+    location_y: dto.locationY,
+  };
+}
+
+function mapBoothDtoToBooth(dto: BoothDto): Booth {
+  return {
+    id: dto.boothId,
+    name: dto.name,
+    type: dto.type as Booth["type"],
+    location_x: dto.locationX,
+    location_y: dto.locationY,
+  };
+}
+
+function mapPubSummaryToPub(dto: PubSummaryResponse): Pub {
+  return {
+    id: dto.pubId,
+    college_id: dto.collegeId,
+    department_id: -1,
+    name: dto.name,
+    intro: dto.intro,
+    description: undefined,
+    instagram: undefined,
+    images: dto.mainImageUrl ? [dto.mainImageUrl] : [],
+    mainImageUrl: dto.mainImageUrl ?? undefined,
+  };
+}
 
 export default function BoothMap() {
   const [mode, setMode] = useState<MapMode>("2D");
@@ -44,12 +82,53 @@ export default function BoothMap() {
   const [sheetSnap, setSheetSnap] = useState<SheetSnap>("PEEK");
   const [mapViewport, setMapViewport] = useState<MapViewport>(DEFAULT_MAP_VIEWPORT);
 
-  const colleges: College[] = mockColleges;
-  const booths: Booth[] = mockBooths;
-  const pubs: Pub[] = mockPubs;
+  const [colleges, setColleges] = useState<College[]>([]);
+  const [booths, setBooths] = useState<Booth[]>([]);
+  const [pubs, setPubs] = useState<Pub[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
   const frameWidth = 430;
   const bottomNavHeight = 84;
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchMapData() {
+      try {
+        setIsLoading(true);
+        setIsError(false);
+
+        const [boothMapData, pubsData] = await Promise.all([
+          getBoothMap(),
+          getPubs(),
+        ]);
+
+        if (!isMounted) return;
+
+        const mappedColleges = boothMapData.colleges.map(mapCollegeDtoToCollege);
+        const mappedBooths = boothMapData.booths.map(mapBoothDtoToBooth);
+        const mappedPubs = pubsData.map(mapPubSummaryToPub)
+
+        setColleges(mappedColleges);
+        setBooths(mappedBooths);
+        setPubs(mappedPubs);
+      } catch (error) {
+        console.error("부스맵 데이터 조회 실패", error);
+        if (!isMounted) return;
+        setIsError(true);
+      } finally {
+        if (!isMounted) return;
+        setIsLoading(false);
+      }
+    }
+
+    fetchMapData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handlePrimaryChange = (next: PrimaryFilter) => {
     setPrimaryFilter(next);
@@ -77,16 +156,13 @@ export default function BoothMap() {
   }, [primaryFilter, colleges, selectedCollegeId]);
 
   const visiblePubs = useMemo(() => {
-    if (!selectedCollegeId) return [];
+    if (!selectedCollegeId) return pubs;
     return pubs.filter((p) => p.college_id === selectedCollegeId);
   }, [pubs, selectedCollegeId]);
 
-  // ✅ 바텀시트에서 PubList를 보여줄 조건
   const shouldShowPubList =
     primaryFilter === "PUB" || selectedMapItem?.kind === "college";
 
-  // 일반 부스 마커 클릭
-  // - 자동으로 시트를 올리지 않음
   const onClickMarkerBooth = useCallback((id: number) => {
     setSelectedMapItem({ kind: "booth", id });
     setSelectedDetailItem({ kind: "booth", id });
@@ -95,8 +171,6 @@ export default function BoothMap() {
     setSheetSnap("PEEK");
   }, []);
 
-  // 단과대(주점) 마커 클릭
-  // - 주점 리스트를 보여줘야 하므로 HALF
   const onClickMarkerCollege = useCallback((id: number) => {
     setSelectedCollegeId(id);
     setSelectedMapItem({ kind: "college", id });
@@ -105,7 +179,6 @@ export default function BoothMap() {
     setSheetSnap("HALF");
   }, []);
 
-  // 일반 부스 리스트에서 선택
   const onSelectBoothFromList = useCallback((id: number) => {
     setSelectedMapItem({ kind: "booth", id });
     setSelectedDetailItem({ kind: "booth", id });
@@ -114,16 +187,34 @@ export default function BoothMap() {
     setSheetSnap("HALF");
   }, []);
 
-  // 주점 리스트에서 선택
   const onSelectPubFromList = useCallback((id: number) => {
     setSelectedDetailItem({ kind: "pub", id });
     setSheetMode("DETAIL");
     setSheetSnap("FULL");
   }, []);
 
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-white">
+        <div className="text-sm font-semibold text-gray-500">
+          부스맵을 불러오는 중...
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-white">
+        <div className="text-sm font-semibold text-red-500">
+          부스맵 정보를 불러오지 못했어요.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative h-screen w-full overflow-hidden bg-white">
-      {/* 전체 지도 영역 */}
       <div className="absolute inset-0">
         {mode === "2D" ? (
           <KakaoMapView
@@ -152,7 +243,6 @@ export default function BoothMap() {
         )}
       </div>
 
-      {/* 상단 로고 + 칩 오버레이 */}
       <div
         className={`absolute left-1/2 top-3 w-[calc(100%-24px)] max-w-[430px] -translate-x-1/2 ${
           sheetSnap === "FULL" ? "z-[40]" : "z-[70]"
@@ -184,13 +274,13 @@ export default function BoothMap() {
         </div>
       </div>
 
-      {/* 바텀시트 */}
       <BottomSheet
         mode={sheetMode}
         snap={sheetSnap}
         onSnapChange={setSheetSnap}
         onBackToList={() => {
-          const isPubFlow = selectedDetailItem?.kind === "pub" || selectedMapItem?.kind === "college";
+          const isPubFlow =
+            selectedDetailItem?.kind === "pub" || selectedMapItem?.kind === "college";
 
           setSelectedDetailItem(null);
           setSheetMode("LIST");
