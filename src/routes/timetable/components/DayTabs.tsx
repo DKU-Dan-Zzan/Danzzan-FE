@@ -23,7 +23,9 @@ export default function DayTabs({
                 "relative justify-self-center",
                 "px-3 py-2",
                 "text-xl tracking-wide transition-colors",
-                active ? "text-blue-700 font-extrabold" : "text-gray-400 hover:text-gray-600",
+                active
+                  ? "text-[var(--accent)] font-extrabold"
+                  : "text-[var(--timetable-tab-inactive)] hover:text-[var(--text-muted)]",
               ].join(" ")}
             >
 
@@ -43,11 +45,11 @@ export default function DayTabs({
       </div>
 
       {/* 베이스 라인 */}
-      <div className="absolute inset-x-0 bottom-0 h-px bg-gray-200" />
+      <div className="absolute inset-x-0 bottom-0 h-px bg-[var(--timetable-card-border)]" />
 
       {/* 밑줄 */}
       <div
-        className="absolute bottom-0 h-[4px] rounded-full bg-blue-700 transition-[left] duration-200"
+        className="absolute bottom-0 h-[4px] rounded-full bg-[var(--accent)] transition-[left] duration-200"
         style={{
           left: `${(100 / days.length) * activeIndex}%`,
           width: `${100 / days.length}%`,

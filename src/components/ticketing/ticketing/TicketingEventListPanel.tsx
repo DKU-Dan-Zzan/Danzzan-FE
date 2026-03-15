@@ -158,7 +158,7 @@ export function TicketingEventListPanel({
               </div>
               <div className="min-w-0">
                 <p className={`${TICKETING_CLASSES.typography.infoBannerTitle} text-[var(--text)]`}>
-                  공연별 예매 오픈 시각을 확인하여 단국존 티켓팅에 참여하세요.
+                  요일별 예매 오픈시간을 확인하여 티켓팅에 참여하세요.
                 </p>
                 <p className={`mt-1 ${TICKETING_CLASSES.typography.infoBannerBody} text-[var(--text-muted)]`}>
                   오픈 10분 전부터 카운트다운이 시작되며, 0초 이후 예매 버튼이 활성화됩니다.

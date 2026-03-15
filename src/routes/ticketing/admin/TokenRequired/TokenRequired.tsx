@@ -7,18 +7,18 @@ export default function TokenRequired() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 bg-background">
-      <Card className="w-full max-w-lg p-8 space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--admin-auth-page-bg)] px-6">
+      <Card className="w-full max-w-lg space-y-4 border-[var(--admin-auth-card-border)] bg-[var(--admin-auth-card-bg)] p-8 shadow-[var(--admin-auth-card-shadow)]">
         <div className="space-y-2">
-          <p className="text-sm text-primary font-semibold">DAN-ZZAN Operations</p>
+          <p className="text-sm font-semibold text-[var(--admin-auth-brand-text)]">DAN-ZZAN Operations</p>
           <h1 className="text-2xl font-semibold text-foreground">접근 토큰이 필요합니다</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-[var(--admin-auth-subtext)]">
             현재 모드는 <span className="font-semibold">{env.apiMode.toUpperCase()}</span>입니다.
             라이브 모드에서는 관리자 토큰이 있어야 팔찌 배부 화면에 접근할 수 있습니다.
           </p>
         </div>
 
-        <div className="rounded-lg border border-border bg-muted/60 p-4 text-sm text-muted-foreground space-y-2">
+        <div className="space-y-2 rounded-lg border border-[var(--admin-auth-help-border)] bg-[var(--admin-auth-help-bg)] p-4 text-sm text-[var(--admin-auth-help-text)]">
           <p>개발 중이라면 아래 중 하나를 선택하세요.</p>
           <ul className="list-disc pl-5 space-y-1">
             <li>.env.development에서 VITE_API_MODE=mock 설정</li>

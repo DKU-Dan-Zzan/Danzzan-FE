@@ -5,7 +5,7 @@ const navItems = [
   { to: "/", icon: Home, label: "홈" },
   { to: "/timetable", icon: Clock, label: "타임테이블" },
   { to: "/map", icon: Map, label: "부스맵" },
-  { to: "/notice", icon: Megaphone, label: "공지" },
+  { to: "/notice", icon: Megaphone, label: "공지사항" },
   { to: "/ticket/ticketing", icon: Ticket, label: "티켓팅" },
   { to: "/mypage", icon: User, label: "내정보" },
 ];
@@ -16,7 +16,7 @@ const BottomNav = () => {
       className="
         fixed bottom-0 left-0 right-0
         max-w-[430px] mx-auto
-        h-[84px]
+        h-[calc(var(--app-bottom-nav-height,56px)_+_env(safe-area-inset-bottom))]
         pb-[env(safe-area-inset-bottom)]
         z-50
       "
@@ -30,7 +30,7 @@ const BottomNav = () => {
         "
       />
 
-      <div className="relative flex h-full items-center">
+      <div className="app-bottom-nav-inner relative flex items-center">
         {navItems.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
@@ -39,21 +39,21 @@ const BottomNav = () => {
             className={({ isActive }) =>
               `
               flex-1
-              relative flex flex-col items-center justify-center
-              text-xs transition-all duration-200
+              relative flex h-full flex-col items-center justify-center
+              app-bottom-nav-link transition-all duration-200
               ${isActive ? "text-blue-600" : "text-gray-400"}
               `
             }
           >
             {({ isActive }) => (
               <>
-                <Icon size={20} strokeWidth={2} />
+                <Icon strokeWidth={2} className="app-bottom-nav-icon" />
 
                 {isActive && (
-                  <div className="absolute -bottom-3 h-1 w-5 rounded-full bg-blue-600" />
+                  <div className="app-bottom-nav-indicator" />
                 )}
 
-                <span className="mt-2 text-center leading-none">{label}</span>
+                <span className="mt-1 text-center leading-none">{label}</span>
               </>
             )}
           </NavLink>

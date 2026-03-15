@@ -54,11 +54,10 @@ export const passwordResetApi = {
   },
 
   resetPassword: async (payload: {
-    studentId: string;
-    code: string;
-    newPassword: string;
     requestId?: string;
     verificationToken?: string;
+    newPassword: string;
+    confirmPassword: string;
   }): Promise<void> => {
     if (env.apiMode === "mock") {
       await wait(500);
