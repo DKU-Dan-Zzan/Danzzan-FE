@@ -108,6 +108,9 @@ function Home() {
             <div className="home-section-lineup">
               <LineupCarousel banners={lineups} />
             </div>
+            <p className="home-content-block home-current-show-caption">
+              현재 진행중인 공연을 지금 확인하세요
+            </p>
           </>
         )}
         <div className="home-section-performance">

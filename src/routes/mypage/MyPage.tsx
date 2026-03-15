@@ -127,9 +127,9 @@ function MyPage() {
             <h2 className="mypage-info-title mt-1 text-[18px] font-bold tracking-tight">학적 정보</h2>
           </div>
 
-          <div className="mypage-info-list divide-y">
+          <div className="mypage-info-list">
             {infoItems.map(({ label, value, icon: Icon }) => (
-              <div key={label} className="flex items-center gap-4 px-5 py-4">
+              <div key={label} className="mypage-info-row flex items-center gap-4 px-5 py-4">
                 <div className="mypage-info-icon-glass">
                   <Icon size={18} aria-hidden className="mypage-info-icon-symbol" />
                 </div>

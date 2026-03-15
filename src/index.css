@@ -3,20 +3,20 @@
 /* 경고는 뜨나 기능상 문제는 없음 
 혹시 거슬릴 경우 setting에 관련 경고 ignore 추가하면 됨*/
 @theme {
-  --color-primary: #2f56c7;
+  --color-primary: #0a559c;
   --color-primary-foreground: #ffffff;
 }
 
 :root {
   --brand-strong: #2142ab;
-  --brand-main: #2f56c7;
+  --brand-main: #0a559c;
   --brand-soft: #4f79df;
   --brand-ghost: #dfe8ff;
-  --bg-base: #f3f7ff;
-  --bg-page-soft: #eaf0ff;
-  --home-bg-start: #f2f6ff;
-  --home-bg-mid: #e9f0ff;
-  --home-bg-end: #edf3ff;
+  --bg-base: #ffffff;
+  --bg-page-soft: #f8fbff;
+  --home-bg-start: #ffffff;
+  --home-bg-mid: #fbfdff;
+  --home-bg-end: #f8fbff;
   --home-glow-strong: rgba(33, 66, 171, 0.24);
   --home-glow-soft: rgba(47, 86, 199, 0.18);
   --text: #13203d;
@@ -33,22 +33,22 @@
   --app-bottom-nav-indicator-width: 16px;
   --app-bottom-nav-indicator-height: 3px;
   --app-bottom-nav-indicator-bottom: 2px;
-  --app-header-bg: #edf2ff;
+  --app-header-bg: #f1f6fd;
   --app-header-bg-gradient:
     linear-gradient(
       180deg,
-      #edf2ff 0%,
-      #f4f6fd 62%,
-      #f4efe4 100%
+      #edf3fb 0%,
+      #f7faff 100%
     );
-  --app-header-border: rgba(138, 157, 198, 0.38);
-  --app-overscroll-bg: #edf2ff;
-  --app-nav-bg: rgba(245, 248, 255, 0.96);
-  --app-nav-border: rgba(125, 145, 188, 0.34);
+  --app-header-border: rgba(143, 165, 210, 0.34);
+  --app-overscroll-bg: #edf3fb;
+  --app-overscroll-bg-gradient: var(--app-header-bg-gradient);
+  --app-nav-bg: rgba(251, 253, 255, 0.96);
+  --app-nav-border: rgba(138, 157, 198, 0.26);
   --app-nav-shadow: 0 -8px 24px rgba(16, 32, 74, 0.1);
   --app-nav-text: #8b97ad;
   --app-nav-text-active: var(--brand-main);
-  --footer-bg: #edf2fb;
+  --footer-bg: #f8fbff;
   --footer-text-primary: #32405f;
   --footer-text-secondary: #61708f;
   --footer-divider: rgba(126, 145, 185, 0.44);
@@ -57,9 +57,9 @@
   --status-danger-bg: #fef2f2;
   --status-danger-border: #fecaca;
   --status-danger-text: #b91c1c;
-  --home-notice-bg-start: rgba(47, 86, 199, 0.1);
-  --home-notice-bg-end: rgba(47, 86, 199, 0.06);
-  --home-notice-border: transparent;
+  --home-notice-bg-start: rgba(143, 153, 170, 0.13);
+  --home-notice-bg-end: rgba(143, 153, 170, 0.08);
+  --home-notice-border: rgba(163, 173, 191, 0.2);
   --home-notice-shadow: rgba(33, 66, 171, 0.28);
   --home-notice-depth-shadow: rgba(30, 41, 59, 0.14);
   --home-notice-icon-border: rgba(162, 186, 236, 0.66);
@@ -97,15 +97,15 @@
   --mypage-info-icon-border: rgba(162, 186, 236, 0.68);
   --mypage-info-icon-bg-start: rgba(79, 121, 223, 0.2);
   --mypage-info-icon-bg-end: rgba(255, 255, 255, 0.8);
-  --mypage-info-icon-symbol: #2f56c7;
+  --mypage-info-icon-symbol: var(--brand-main);
   --mypage-info-icon-shadow:
     inset 0 1px 0 rgba(248, 250, 252, 0.92),
     0 10px 18px -14px rgba(33, 66, 171, 0.48);
-  --mypage-portal-card-border: rgba(162, 186, 236, 0.76);
-  --mypage-portal-card-bg-start: rgba(209, 223, 250, 0.68);
-  --mypage-portal-card-bg-mid: rgba(171, 195, 243, 0.32);
-  --mypage-portal-card-bg-end: rgba(255, 255, 255, 0.9);
-  --mypage-portal-card-shadow: rgba(33, 66, 171, 0.28);
+  --mypage-portal-card-border: rgba(168, 190, 236, 0.72);
+  --mypage-portal-card-bg-start: rgba(214, 226, 250, 0.82);
+  --mypage-portal-card-bg-mid: rgba(190, 209, 246, 0.48);
+  --mypage-portal-card-bg-end: rgba(255, 255, 255, 0.96);
+  --mypage-portal-card-shadow: rgba(33, 66, 171, 0.34);
   --mypage-portal-card-inner-border: rgba(255, 255, 255, 0.52);
   --mypage-portal-overline: var(--brand-main);
   --mypage-portal-name: #0f172a;
@@ -118,17 +118,31 @@
   --mypage-portal-icon-shadow:
     inset 0 1px 0 rgba(248, 250, 252, 0.94),
     0 12px 20px -16px rgba(33, 66, 171, 0.5);
-  --mypage-bg-start: #f2f6ff;
-  --mypage-bg-mid: #e6eeff;
-  --mypage-bg-low: #e1e9fa;
-  --mypage-bg-end: #edf2fb;
+  --mypage-bg-start: #f5f9ff;
+  --mypage-bg-mid: #e9f0ff;
+  --mypage-bg-low: #e2eafb;
+  --mypage-bg-end: #eef3fc;
   --mypage-page-gradient:
     linear-gradient(
       180deg,
       var(--mypage-bg-start) 0%,
-      var(--mypage-bg-mid) 52%,
-      var(--mypage-bg-low) 78%,
+      var(--mypage-bg-mid) 48%,
+      var(--mypage-bg-low) 76%,
       var(--mypage-bg-end) 100%
+    );
+  --mypage-page-gradient-guest:
+    radial-gradient(
+      120% 64% at 50% 36%,
+      rgba(255, 255, 255, 0.44) 0%,
+      rgba(255, 255, 255, 0) 74%
+    ),
+    linear-gradient(
+      180deg,
+      var(--mypage-bg-start) 0%,
+      var(--mypage-bg-mid) 50%,
+      #e6eefc 76%,
+      #eaf1fb 88%,
+      var(--footer-bg) 100%
     );
   --mypage-glow-top: rgba(79, 121, 223, 0.22);
   --mypage-glow-bottom: rgba(47, 86, 199, 0.18);
@@ -145,19 +159,19 @@
   --mypage-guest-cta-bg-start: #4674dd;
   --mypage-guest-cta-bg-end: var(--brand-main);
   --mypage-guest-cta-shadow: 0 14px 24px -16px rgba(33, 66, 171, 0.68);
-  --mypage-info-card-border: rgba(189, 208, 247, 0.9);
-  --mypage-info-card-bg: rgba(255, 255, 255, 0.86);
-  --mypage-info-card-shadow: 0 18px 38px -24px rgba(15, 23, 42, 0.3);
+  --mypage-info-card-border: rgba(184, 205, 245, 0.82);
+  --mypage-info-card-bg: rgba(255, 255, 255, 0.92);
+  --mypage-info-card-shadow: 0 20px 40px -24px rgba(30, 58, 138, 0.28);
   --mypage-info-header-border: rgba(189, 208, 247, 0.82);
   --mypage-info-header-bg-start: rgba(238, 245, 255, 0.94);
   --mypage-info-header-bg-end: rgba(255, 255, 255, 0.78);
   --mypage-info-overline: rgba(47, 86, 199, 0.82);
   --mypage-info-title: #13203d;
-  --mypage-info-item-divider: rgba(189, 208, 247, 0.82);
+  --mypage-info-item-divider: rgba(181, 201, 241, 0.9);
   --mypage-info-item-label: #8a97af;
   --mypage-info-item-value: #14223e;
-  --mypage-logout-border: rgba(201, 210, 228, 0.9);
-  --mypage-logout-bg: rgba(255, 255, 255, 0.88);
+  --mypage-logout-border: rgba(184, 199, 226, 0.84);
+  --mypage-logout-bg: rgba(255, 255, 255, 0.92);
   --mypage-logout-text: #4e5f82;
   --mypage-logout-shadow: 0 12px 24px -18px rgba(15, 23, 42, 0.22);
   --mypage-logout-bg-hover: rgba(243, 247, 255, 0.92);
@@ -172,6 +186,15 @@
   --app-header-ticket-btn-shadow-hover:
     inset 0 1px 0 rgba(255, 255, 255, 0.98),
     0 16px 24px -16px rgba(33, 66, 171, 0.42);
+  --boothmap-chip-active-bg: var(--brand-main);
+  --boothmap-chip-active-border: var(--brand-main);
+  --boothmap-chip-active-text: var(--text-on-accent);
+  --boothmap-chip-inactive-bg: #ffffff;
+  --boothmap-chip-inactive-border: #e5e7eb;
+  --boothmap-chip-inactive-text: #6b7280;
+  --boothmap-toggle-active-bg: var(--brand-main);
+  --boothmap-toggle-active-text: var(--text-on-accent);
+  --boothmap-toggle-inactive-text: #6b7280;
 
   /* Timetable semantic tokens */
   --timetable-tab-inactive: #8f9bb4;
@@ -190,6 +213,9 @@ html,
 body,
 #root {
   background-color: var(--app-overscroll-bg);
+  background-image: var(--app-overscroll-bg-gradient);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
 
 .app-main-header {
@@ -355,6 +381,14 @@ body,
 
 .home-lineup-caption {
   margin-top: var(--home-lineup-caption-margin-top);
+}
+
+.home-current-show-caption {
+  margin-top: 14px;
+}
+
+.home-lineup-caption,
+.home-current-show-caption {
   margin-bottom: 0;
   font-size: var(--home-lineup-caption-font-size);
   line-height: 1.4;
@@ -465,15 +499,21 @@ body,
 }
 
 .mypage-page-root {
-  background-image: var(--mypage-page-gradient);
+  background-color: var(--bg-page-soft);
+  background-image: none;
+}
+
+.mypage-page-root.is-guest {
+  background-color: var(--bg-page-soft);
+  background-image: none;
 }
 
 .mypage-page-glow.is-top {
-  background-color: var(--mypage-glow-top);
+  display: none;
 }
 
 .mypage-page-glow.is-bottom {
-  background-color: var(--mypage-glow-bottom);
+  display: none;
 }
 
 .mypage-guest-card {
@@ -545,8 +585,8 @@ body,
   color: var(--mypage-info-title);
 }
 
-.mypage-info-list {
-  border-color: var(--mypage-info-item-divider);
+.mypage-info-row + .mypage-info-row {
+  border-top: 1px solid var(--mypage-info-item-divider);
 }
 
 .mypage-info-item-label {
@@ -770,6 +810,28 @@ body,
     var(--footer-divider-transparent) 100%
   );
   pointer-events: none;
+}
+
+.boothmap-chip {
+  border: 1px solid var(--boothmap-chip-inactive-border);
+  background-color: var(--boothmap-chip-inactive-bg);
+  color: var(--boothmap-chip-inactive-text);
+}
+
+.boothmap-chip.is-active {
+  border-color: var(--boothmap-chip-active-border);
+  background-color: var(--boothmap-chip-active-bg);
+  color: var(--boothmap-chip-active-text);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.12);
+}
+
+.boothmap-mode-toggle-button {
+  color: var(--boothmap-toggle-inactive-text);
+}
+
+.boothmap-mode-toggle-button.is-active {
+  background-color: var(--boothmap-toggle-active-bg);
+  color: var(--boothmap-toggle-active-text);
 }
 
 /* 부스맵 Mapbox 기본 팝업 껍데기 제거 */
