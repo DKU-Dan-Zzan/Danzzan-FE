@@ -33,6 +33,7 @@
   --app-bottom-nav-indicator-width: 16px;
   --app-bottom-nav-indicator-height: 3px;
   --app-bottom-nav-indicator-bottom: 2px;
+  --app-header-first-card-gap: 20px;
   --app-header-bg: #f1f6fd;
   --app-header-bg-gradient:
     linear-gradient(
@@ -170,11 +171,12 @@
   --mypage-info-item-divider: rgba(181, 201, 241, 0.9);
   --mypage-info-item-label: #8a97af;
   --mypage-info-item-value: #14223e;
-  --mypage-logout-border: rgba(184, 199, 226, 0.84);
-  --mypage-logout-bg: rgba(255, 255, 255, 0.92);
+  --mypage-logout-gap: 48px;
   --mypage-logout-text: #4e5f82;
-  --mypage-logout-shadow: 0 12px 24px -18px rgba(15, 23, 42, 0.22);
-  --mypage-logout-bg-hover: rgba(243, 247, 255, 0.92);
+  --mypage-logout-text-hover: #3f5172;
+  --mypage-logout-font-size: 12px;
+  --mypage-logout-underline-thickness: 1px;
+  --mypage-logout-underline-offset: 3px;
   --app-header-ticket-btn-size: 44px;
   --app-header-ticket-btn-border: rgba(160, 180, 220, 0.56);
   --app-header-ticket-btn-bg-start: rgba(252, 254, 255, 0.98);
@@ -383,12 +385,7 @@ body,
   margin-top: var(--home-lineup-caption-margin-top);
 }
 
-.home-current-show-caption {
-  margin-top: 14px;
-}
-
-.home-lineup-caption,
-.home-current-show-caption {
+.home-lineup-caption {
   margin-bottom: 0;
   font-size: var(--home-lineup-caption-font-size);
   line-height: 1.4;
@@ -598,16 +595,25 @@ body,
 }
 
 .mypage-logout-button {
-  border: 1px solid var(--mypage-logout-border);
-  background-color: var(--mypage-logout-bg);
+  margin-top: var(--mypage-logout-gap);
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 8px 2px;
   color: var(--mypage-logout-text);
-  box-shadow: var(--mypage-logout-shadow);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  font-size: var(--mypage-logout-font-size);
+  font-weight: 500;
+  line-height: 1.4;
+  text-decoration-line: underline;
+  text-decoration-thickness: var(--mypage-logout-underline-thickness);
+  text-underline-offset: var(--mypage-logout-underline-offset);
 }
 
 .mypage-logout-button:hover {
-  background-color: var(--mypage-logout-bg-hover);
+  color: var(--mypage-logout-text-hover);
 }
 
 .mypage-info-icon-glass {

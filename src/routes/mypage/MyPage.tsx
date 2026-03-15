@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useSyncExternalStore } from "react";
 import { authStore } from "@/store/ticketing/authStore";
 import { authApi } from "@/api/ticketing/authApi";
-import { GraduationCap, IdCard, LogOut, User } from "lucide-react";
+import { GraduationCap, IdCard, User } from "lucide-react";
 
 function MyPage() {
   const navigate = useNavigate();
@@ -105,7 +105,7 @@ function MyPage() {
       <div className="mypage-page-glow is-top pointer-events-none absolute -top-24 -right-16 h-60 w-60 rounded-full blur-3xl" />
       <div className="mypage-page-glow is-bottom pointer-events-none absolute -bottom-24 -left-16 h-60 w-60 rounded-full blur-3xl" />
 
-      <div className="relative px-4 pt-5">
+      <div className="relative px-4 pt-[var(--app-header-first-card-gap)]">
         <div className="mypage-portal-card">
           <div className="mypage-portal-content">
             <div>
@@ -144,9 +144,8 @@ function MyPage() {
 
         <button
           onClick={handleLogout}
-          className="mypage-logout-button mt-4 flex h-[52px] w-full items-center justify-center gap-2 rounded-2xl text-sm font-semibold transition"
+          className="mypage-logout-button transition"
         >
-          <LogOut size={18} />
           로그아웃
         </button>
       </div>
