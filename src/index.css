@@ -23,6 +23,12 @@
   --surface-subtle: #f1f5f9;
   --surface-tint-subtle: rgba(59, 130, 246, 0.1);
   --shadow-color: rgba(37, 99, 235, 0.15);
+  --app-bottom-nav-height: 56px;
+  --app-bottom-nav-icon-size: 20px;
+  --app-bottom-nav-label-size: 10px;
+  --app-bottom-nav-indicator-width: 16px;
+  --app-bottom-nav-indicator-height: 3px;
+  --app-bottom-nav-indicator-bottom: 2px;
   --status-danger-bg: #fef2f2;
   --status-danger-border: #fecaca;
   --status-danger-text: #b91c1c;
@@ -410,6 +416,28 @@ body,
 
 .app-header-ticket-icon {
   color: var(--app-header-ticket-btn-icon);
+}
+
+.app-bottom-nav-inner {
+  height: var(--app-bottom-nav-height);
+}
+
+.app-bottom-nav-link {
+  font-size: var(--app-bottom-nav-label-size);
+}
+
+.app-bottom-nav-icon {
+  width: var(--app-bottom-nav-icon-size);
+  height: var(--app-bottom-nav-icon-size);
+}
+
+.app-bottom-nav-indicator {
+  position: absolute;
+  bottom: var(--app-bottom-nav-indicator-bottom);
+  height: var(--app-bottom-nav-indicator-height);
+  width: var(--app-bottom-nav-indicator-width);
+  border-radius: 9999px;
+  background-color: var(--accent);
 }
 
 /* 부스맵 Mapbox 기본 팝업 껍데기 제거 */
