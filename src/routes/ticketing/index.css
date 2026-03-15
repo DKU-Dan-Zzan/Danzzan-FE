@@ -83,8 +83,8 @@
   --accent: #2563eb;
   --text: #0f172a;
   --text-muted: #475569;
-  --header-bg: #2563eb;
-  --header-border: rgba(255, 255, 255, 0.3);
+  --header-bg: var(--app-header-bg, #000080);
+  --header-border: var(--app-header-border, rgba(255, 255, 255, 0.24));
   --header-text: var(--primary-foreground);
   --header-text-muted: rgba(255, 255, 255, 0.82);
   --header-button-bg: rgba(255, 255, 255, 0.14);

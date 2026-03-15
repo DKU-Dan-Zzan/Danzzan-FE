@@ -106,18 +106,17 @@ function MyPage() {
       <div className="pointer-events-none absolute -bottom-24 -left-16 h-60 w-60 rounded-full bg-blue-200/20 blur-3xl" />
 
       <div className="relative px-4 pt-5">
-        <div className="overflow-hidden rounded-[30px] border border-blue-300/45 bg-[linear-gradient(145deg,#3b82f6_0%,#2563eb_70%,#1d4ed8_100%)] px-5 pt-6 pb-6 shadow-[0_24px_42px_-24px_rgba(37,99,235,0.72)]">
-          <div className="flex items-start justify-between gap-4">
+        <div className="mypage-portal-card">
+          <div className="mypage-portal-content">
             <div>
-              <p className="text-[11px] font-semibold tracking-[0.18em] text-blue-100/90">DANFESTA PORTAL</p>
-              <h1 className="mt-1 text-[26px] leading-[1.1] font-extrabold tracking-tight text-white">{user?.name ?? "-"}</h1>
-              <p className="mt-2 text-sm text-blue-100">단국대학교 재학생</p>
+              <p className="mypage-portal-overline">DANFESTA PORTAL</p>
+              <h1 className="mypage-portal-name">{user?.name ?? "-"}</h1>
+              <p className="mypage-portal-subtitle">단국대학교 재학생</p>
             </div>
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/30 bg-white/18 backdrop-blur-sm">
-              <User size={28} className="text-white" />
+            <div className="mypage-portal-avatar">
+              <User size={28} className="mypage-portal-avatar-icon" />
             </div>
           </div>
-
         </div>
       </div>
 

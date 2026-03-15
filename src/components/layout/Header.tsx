@@ -21,8 +21,8 @@ const Header = () => {
     <header
       className="
         sticky top-0 z-50
-        bg-[#2563eb]
-        border-b border-[#1d4ed866]
+        bg-[var(--app-header-bg)]
+        border-b border-[var(--app-header-border)]
         pt-[env(safe-area-inset-top)]
       "
     >
