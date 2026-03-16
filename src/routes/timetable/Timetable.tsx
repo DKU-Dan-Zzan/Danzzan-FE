@@ -1,5 +1,6 @@
 import { InformationCircleIcon } from "@heroicons/react/24/outline"
 import { useEffect, useMemo, useRef, useState } from "react"
+import { useSearchParams } from "react-router-dom"
 import {
   getContentImages,
   getPerformances,
@@ -52,6 +53,8 @@ function findNowOrNextTarget(items: Performance[], nowMinutes: number) {
 }
 
 export default function Timetable() {
+  const [searchParams] = useSearchParams()
+
   const [activeIdx, setActiveIdx] = useState(1)
   const [scrollTargetId, setScrollTargetId] = useState<number | null>(null)
   const [nowTargetId, setNowTargetId] = useState<number | null>(null)
@@ -72,10 +75,14 @@ export default function Timetable() {
     if (didAutoInitRef.current) return
     didAutoInitRef.current = true
 
-    const today = todayISODateLocal()
-    const todayIdx = FESTIVAL_DAYS.findIndex((d) => d.date === today)
-    if (todayIdx !== -1) setActiveIdx(todayIdx)
-  }, [])
+    const queryDate = searchParams.get("date")
+    const baseDate = queryDate || todayISODateLocal()
+
+    const targetIdx = FESTIVAL_DAYS.findIndex((d) => d.date === baseDate)
+    if (targetIdx !== -1) {
+      setActiveIdx(targetIdx)
+    }
+  }, [searchParams])
 
   const activeDay = FESTIVAL_DAYS[activeIdx]
   const activeDate = activeDay.date
@@ -208,26 +215,24 @@ export default function Timetable() {
   }
 
   return (
-    <div className="min-h-full bg-[var(--bg-page-soft)]">
-      <div className="sticky top-0 z-20 bg-[var(--bg-page-soft)]">
+    <div className="flex h-screen min-h-0 flex-col bg-[var(--bg-page-soft)]">
+      <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
         <div className="px-5 pt-5">
           <div className="text-[38px] font-extrabold text-[var(--accent)] font-cute">
             {title}
           </div>
           <div className="mt-1 text-sm text-[var(--text-muted)]">{subtitle}</div>
-
-          <div className="mt-4">
-            <DayTabs
-              days={FESTIVAL_DAYS}
-              activeIndex={activeIdx}
-              onChange={handleChangeDay}
-            />
-          </div>
         </div>
-      </div>
 
-      <div className="px-5 pt-4 pb-6">
-        <div className="mt-4">
+        <div className="sticky top-0 z-20 bg-[var(--bg-page-soft)] px-5 py-1">
+          <DayTabs
+            days={FESTIVAL_DAYS}
+            activeIndex={activeIdx}
+            onChange={handleChangeDay}
+          />
+        </div>
+
+        <div className="px-5 pt-4 pb-6">
           {isDay1 ? (
             <ContentImageSection
               images={contentImages}
