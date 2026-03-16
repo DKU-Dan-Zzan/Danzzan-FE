@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 
 import PosterCarousel, { type Poster } from "./components/PosterCarousel"
-import LineupCarousel, { type LineupBanner } from "./components/LineupCarousel"
 import EmergencyNotice, { type EmergencyNoticeData } from "./components/EmergencyNotice"
+import LineupSection, { type LineupBanner } from "./components/LineupSection"
 import CurrentPerformanceSection from "./components/CurrentPerformanceSection";
 import AdBanner from "./components/AdBanner";
 
@@ -100,16 +100,7 @@ function Home() {
         <div className="home-section-poster">
           <PosterCarousel posters={posters} />
         </div>
-        {lineups.length > 0 && (
-          <>
-            <p className="home-content-block home-lineup-caption">
-              올해 축제를 빛낼 아티스트들을 지금 확인하세요
-            </p>
-            <div className="home-section-lineup">
-              <LineupCarousel banners={lineups} />
-            </div>
-          </>
-        )}
+        <LineupSection banners={lineups} />
         <div className="home-section-performance">
           <CurrentPerformanceSection />
         </div>

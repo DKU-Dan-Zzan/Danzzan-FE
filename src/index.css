@@ -381,16 +381,20 @@ body,
   margin-top: var(--home-section-lineup-margin-top);
 }
 
-.home-lineup-caption {
-  margin-top: var(--home-lineup-caption-margin-top);
-}
-
-.home-lineup-caption {
+.home-caption-text {
   margin-bottom: 0;
   font-size: var(--home-lineup-caption-font-size);
   line-height: 1.4;
   color: var(--home-lineup-caption-color);
   font-weight: 600;
+}
+
+.home-lineup-caption {
+  margin-top: var(--home-lineup-caption-margin-top);
+}
+
+.home-current-performance-caption {
+  margin-bottom: 12px;
 }
 
 .home-poster-placeholder-card {
