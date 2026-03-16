@@ -63,6 +63,7 @@ function mapPubSummaryToPub(dto: PubSummaryResponse): Pub {
     id: dto.pubId,
     college_id: dto.collegeId,
     department_id: -1,
+    department: dto.department,
     name: dto.name,
     intro: dto.intro,
     description: undefined,
