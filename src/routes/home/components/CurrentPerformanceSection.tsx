@@ -72,7 +72,7 @@ export default function CurrentPerformanceSection() {
           : null;
 
   return (
-    <section className="mt-10 px-5">
+    <section className="px-5">
       <div className="mx-auto w-full max-w-[314px]">
         <p className="home-caption-text home-current-performance-caption">
           현재 진행 중인 공연을 지금 확인하세요
@@ -82,7 +82,7 @@ export default function CurrentPerformanceSection() {
           type="button"
           onClick={() => navigate(`/timetable?date=${today}`)}
           style={{ aspectRatio: CARD_ASPECT_RATIO }}
-          className="w-full rounded-[22px] border border-gray-100 bg-white px-5 py-4 shadow-[0_8px_24px_rgba(15,23,42,0.08)] transition active:scale-[0.99]"
+          className="home-current-performance-card w-full rounded-[22px] border border-gray-100 bg-white px-5 py-4 transition active:scale-[0.99]"
         >
           {status === "active" && currentPerformance ? (
             <div className="flex h-full items-center gap-4">
