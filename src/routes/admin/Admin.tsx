@@ -9,6 +9,7 @@ import {
   Plus,
   Trash2,
   UploadCloud,
+  Map,
 } from "lucide-react";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
 import {
@@ -358,6 +359,16 @@ function Admin() {
             <span className="rounded-full border border-[var(--border-base)] bg-[var(--surface-subtle)] px-2.5 py-0.5 text-xs font-semibold text-[var(--text-muted)]">
               운영자: 관리자
             </span>
+
+            <button
+              type="button"
+              onClick={() => navigate("/admin/map")}
+              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
+            >
+              <Map className="h-4 w-4" strokeWidth={2.3} />
+              지도 편집
+            </button>
+
             <button
               type="button"
               onClick={handleLogout}

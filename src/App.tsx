@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import AppLayout from './components/layout/AppLayout'
 import AdminLayout from './components/layout/AdminLayout'
 
@@ -11,11 +11,12 @@ import MyPage from "./routes/mypage/MyPage";
 
 import Admin from "./routes/admin/Admin";
 import AdminLogin from "./routes/admin/AdminLogin";
+import AdminMap from "./routes/admin/AdminMap";
 import { useAdminAuth } from "./hooks/useAdminAuth";
 import { useEffect, useState } from "react";
 import TicketingApp from "./routes/ticketing/TicketingApp";
 
-function ProtectedAdmin() {
+function ProtectedAdminRoute() {
   const { isAuthenticated, tryRestoreSession } = useAdminAuth();
   const [restoreDone, setRestoreDone] = useState(false);
 
@@ -34,7 +35,7 @@ function ProtectedAdmin() {
   if (!isAuthenticated) {
     return <Navigate to="/admin/login" replace />;
   }
-  return <Admin />;
+  return <Outlet />;
 }
 
 function App() {
@@ -50,10 +51,16 @@ function App() {
         <Route path="/mypage" element={<MyPage />} />
       </Route>
 
-      {/* admin: 헤더/바텀네비 미적용, 로그인 필요 */}
+      {/* admin: 헤더/바텀네비 미적용 */}
       <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<ProtectedAdmin />} />
+        {/* 로그인은 공개 */}
         <Route path="login" element={<AdminLogin />} />
+
+        {/* 로그인 필요한 관리자 페이지들 */}
+        <Route element={<ProtectedAdminRoute />}>
+          <Route index element={<Admin />} />
+          <Route path="map" element={<AdminMap />} />
+        </Route>
       </Route>
 
       <Route path="/ticket/*" element={<TicketingApp />} />
