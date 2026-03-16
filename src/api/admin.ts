@@ -187,7 +187,6 @@ export async function deleteAdminNotice(id: number): Promise<void> {
     method: "DELETE",
   });
 }
-
 // 3. 분실물
 
 export type LostItemStatusFilter = "ALL" | "UNCLAIMED" | "CLAIMED";
@@ -272,3 +271,114 @@ export async function deleteAdminLostItem(id: number): Promise<void> {
   });
 }
 
+// 4. 광고 관리자
+
+export type AdvertisementPlacement = "HOME" | "BOOTH_LIST" | "MAP" | "TICKET" | "GLOBAL";
+
+export type AdvertisementResponse = {
+  id: number;
+  title: string;
+  imageUrl: string;
+  linkUrl?: string | null;
+  placement: AdvertisementPlacement | string;
+  startDate: string; // yyyy-MM-dd
+  endDate: string; // yyyy-MM-dd
+  isActive: boolean;
+  priority?: number | null;
+  createdAt: string;
+};
+
+export type CreateAdvertisementRequest = {
+  title: string;
+  imageUrl: string;
+  linkUrl?: string | null;
+  placement: AdvertisementPlacement;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  priority?: number | null;
+};
+
+export type UpdateAdvertisementRequest = CreateAdvertisementRequest;
+
+export type AdUploadUrlRequest = {
+  fileName: string;
+  contentType: string;
+  fileSize?: number;
+};
+
+export type AdUploadUrlResponse = {
+  presignedUrl: string;
+  imageUrl: string;
+  key: string;
+  expiresAt: string;
+  method: "PUT";
+};
+
+type AdminAdListParams = {
+  page?: number;
+  size?: number;
+};
+
+export async function getAdminAdUploadUrl(
+  body: AdUploadUrlRequest,
+): Promise<AdUploadUrlResponse> {
+  return fetchWithAuth<AdUploadUrlResponse>("/api/admin/ads/upload-url", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function getAdminAds(
+  params: AdminAdListParams,
+): Promise<PageResponse<AdvertisementResponse>> {
+  const query = buildQuery({
+    page: params.page ?? 0,
+    size: params.size ?? 20,
+  });
+
+  return fetchWithAuth<PageResponse<AdvertisementResponse>>(`/api/admin/ads${query}`, {
+    method: "GET",
+  });
+}
+
+export async function getAdminAd(id: number): Promise<AdvertisementResponse> {
+  return fetchWithAuth<AdvertisementResponse>(`/api/admin/ads/${id}`, {
+    method: "GET",
+  });
+}
+
+export async function createAdminAd(
+  body: CreateAdvertisementRequest,
+): Promise<AdvertisementResponse> {
+  return fetchWithAuth<AdvertisementResponse>("/api/admin/ads", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function updateAdminAd(
+  id: number,
+  body: UpdateAdvertisementRequest,
+): Promise<AdvertisementResponse> {
+  return fetchWithAuth<AdvertisementResponse>(`/api/admin/ads/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function deleteAdminAd(id: number): Promise<void> {
+  await fetchWithAuth<void>(`/api/admin/ads/${id}`, {
+    method: "DELETE",
+  });
+}
+
+export async function toggleAdminAdActive(
+  id: number,
+  isActive: boolean,
+): Promise<AdvertisementResponse> {
+  return fetchWithAuth<AdvertisementResponse>(`/api/admin/ads/${id}/active`, {
+    method: "PATCH",
+    body: JSON.stringify({ isActive }),
+  });
+}

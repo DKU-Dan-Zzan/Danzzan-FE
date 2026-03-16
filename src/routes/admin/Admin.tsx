@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   AlertCircle,
   Bell,
+  ImageIcon,
   LogOut,
   Megaphone,
   Pencil,
@@ -12,17 +13,19 @@ import {
 } from "lucide-react";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
 import {
-  createAdminLostItem,
   createAdminNotice,
-  deleteAdminLostItem,
   deleteAdminNotice,
-  getAdminLostItems,
+  getAdminAdUploadUrl,
+  getAdminAds,
   getAdminNotices,
   getEmergencyAdminNotice,
-  type LostItemResponse,
-  type LostItemStatusFilter,
+  type AdvertisementPlacement,
+  type AdvertisementResponse,
   type NoticeResponse,
-  updateAdminLostItem,
+  toggleAdminAdActive,
+  createAdminAd,
+  updateAdminAd,
+  deleteAdminAd,
   updateAdminNotice,
   updateEmergencyAdminNotice,
 } from "../../api/admin";
@@ -38,15 +41,16 @@ type NoticeFormState = {
   imageUrls: string[];
 };
 
-type LostItemFormState = {
+type AdFormState = {
   id?: number;
-  itemName: string;
+  title: string;
   imageUrl: string;
-  foundLocation: string;
-  foundDate: string;
-  isClaimed: boolean;
-  receiverName: string;
-  receiverNote: string;
+  linkUrl: string;
+  placement: AdvertisementPlacement;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  priority: string;
 };
 
 function formatDate(dateString: string) {
@@ -78,14 +82,13 @@ function Admin() {
   const [noticeLoading, setNoticeLoading] = useState(false);
   const [editingNotice, setEditingNotice] = useState<NoticeFormState | null>(null);
   const [noticeImageInput, setNoticeImageInput] = useState("");
-
-  // 분실물
-  const [lostStatus, setLostStatus] = useState<LostItemStatusFilter>("ALL");
-  const [lostPage, setLostPage] = useState(0);
-  const [lostTotalPages, setLostTotalPages] = useState(0);
-  const [lostItems, setLostItems] = useState<LostItemResponse[]>([]);
-  const [lostLoading, setLostLoading] = useState(false);
-  const [editingLostItem, setEditingLostItem] = useState<LostItemFormState | null>(null);
+  // 광고
+  const [ads, setAds] = useState<AdvertisementResponse[]>([]);
+  const [adPage, setAdPage] = useState(0);
+  const [adTotalPages, setAdTotalPages] = useState(0);
+  const [adLoading, setAdLoading] = useState(false);
+  const [editingAd, setEditingAd] = useState<AdFormState | null>(null);
+  const [uploadingAdImage, setUploadingAdImage] = useState(false);
 
   const [initialLoaded, setInitialLoaded] = useState(false);
 
@@ -101,12 +104,12 @@ function Admin() {
         setGlobalError(null);
         setEmergencyLoading(true);
         setNoticeLoading(true);
-        setLostLoading(true);
+        setAdLoading(true);
 
-        const [emergencyRes, noticePageRes, lostPageRes] = await Promise.all([
+        const [emergencyRes, noticePageRes, adPageRes] = await Promise.all([
           getEmergencyAdminNotice(),
           getAdminNotices({ page: 0, size: 10 }),
-          getAdminLostItems({ status: "ALL", page: 0, size: 10 }),
+          getAdminAds({ page: 0, size: 10 }),
         ]);
 
         setEmergencyMessage(emergencyRes.message ?? "");
@@ -115,16 +118,15 @@ function Admin() {
         setNotices(noticePageRes.content);
         setNoticePage(noticePageRes.number);
         setNoticeTotalPages(noticePageRes.totalPages);
-
-        setLostItems(lostPageRes.content);
-        setLostPage(lostPageRes.number);
-        setLostTotalPages(lostPageRes.totalPages);
+        setAds(adPageRes.content);
+        setAdPage(adPageRes.number);
+        setAdTotalPages(adPageRes.totalPages);
       } catch (error) {
         setGlobalError(error instanceof Error ? error.message : "데이터를 불러오지 못했습니다.");
       } finally {
         setEmergencyLoading(false);
         setNoticeLoading(false);
-        setLostLoading(false);
+        setAdLoading(false);
         setInitialLoaded(true);
       }
     };
@@ -139,7 +141,11 @@ function Admin() {
     try {
       setGlobalError(null);
       setNoticeLoading(true);
-      const res = await getAdminNotices({ page, size: 10, keyword: keyword.trim() || undefined });
+      const res = await getAdminNotices({
+        page,
+        size: 10,
+        keyword: keyword.trim() || undefined,
+      });
       setNotices(res.content);
       setNoticePage(res.number);
       setNoticeTotalPages(res.totalPages);
@@ -150,19 +156,19 @@ function Admin() {
     }
   };
 
-  // 분실물 재조회
-  const reloadLostItems = async (page = 0, status = lostStatus) => {
+  // 광고 재조회
+  const reloadAds = async (page = 0) => {
     try {
       setGlobalError(null);
-      setLostLoading(true);
-      const res = await getAdminLostItems({ status, page, size: 10 });
-      setLostItems(res.content);
-      setLostPage(res.number);
-      setLostTotalPages(res.totalPages);
+      setAdLoading(true);
+      const res = await getAdminAds({ page, size: 10 });
+      setAds(res.content);
+      setAdPage(res.number);
+      setAdTotalPages(res.totalPages);
     } catch (error) {
-      setGlobalError(error instanceof Error ? error.message : "분실물 목록을 불러오지 못했습니다.");
+      setGlobalError(error instanceof Error ? error.message : "광고 목록을 불러오지 못했습니다.");
     } finally {
-      setLostLoading(false);
+      setAdLoading(false);
     }
   };
 
@@ -257,88 +263,134 @@ function Admin() {
     }
   };
 
-  const openNewLostItem = () => {
-    setEditingLostItem({
-      itemName: "",
+  const openNewAd = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = `${today.getMonth() + 1}`.padStart(2, "0");
+    const dd = `${today.getDate()}`.padStart(2, "0");
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+
+    setEditingAd({
+      title: "",
       imageUrl: "",
-      foundLocation: "",
-      foundDate: "",
-      isClaimed: false,
-      receiverName: "",
-      receiverNote: "",
+      linkUrl: "",
+      placement: "HOME",
+      startDate: todayStr,
+      endDate: todayStr,
+      isActive: true,
+      priority: "",
     });
   };
 
-  const openEditLostItem = (item: LostItemResponse) => {
-    setEditingLostItem({
-      id: item.id,
-      itemName: item.itemName,
-      imageUrl: item.imageUrl ?? "",
-      foundLocation: item.foundLocation,
-      foundDate: item.foundDate,
-      isClaimed: item.isClaimed,
-      receiverName: item.receiverName ?? "",
-      receiverNote: item.receiverNote ?? "",
+  const openEditAd = (ad: AdvertisementResponse) => {
+    setEditingAd({
+      id: ad.id,
+      title: ad.title,
+      imageUrl: ad.imageUrl,
+      linkUrl: ad.linkUrl ?? "",
+      placement: (ad.placement as AdvertisementPlacement) || "HOME",
+      startDate: ad.startDate,
+      endDate: ad.endDate,
+      isActive: ad.isActive,
+      priority: ad.priority != null ? String(ad.priority) : "",
     });
   };
 
-  const handleSubmitLostItem = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmitAd = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!editingLostItem) return;
+    if (!editingAd) return;
 
-    const payloadBase = {
-      itemName: editingLostItem.itemName.trim(),
-      imageUrl: editingLostItem.imageUrl.trim() || null,
-      foundLocation: editingLostItem.foundLocation.trim(),
-      foundDate: editingLostItem.foundDate,
+    const payload = {
+      title: editingAd.title.trim(),
+      imageUrl: editingAd.imageUrl.trim(),
+      linkUrl: editingAd.linkUrl.trim() || null,
+      placement: editingAd.placement,
+      startDate: editingAd.startDate,
+      endDate: editingAd.endDate,
+      isActive: editingAd.isActive,
+      priority:
+        editingAd.priority.trim() === "" ? null : Number.parseInt(editingAd.priority.trim(), 10),
     };
 
-    if (!payloadBase.itemName || !payloadBase.foundLocation || !payloadBase.foundDate) {
-      setGlobalError("물건 이름, 습득 장소, 습득 날짜를 모두 입력해 주세요.");
+    if (!payload.title || !payload.imageUrl || !payload.startDate || !payload.endDate) {
+      setGlobalError("제목, 이미지, 시작일, 종료일을 모두 입력해 주세요.");
+      return;
+    }
+
+    if (Number.isNaN(payload.priority as number | null | undefined)) {
+      setGlobalError("우선순위는 숫자로 입력해 주세요.");
       return;
     }
 
     try {
       setGlobalError(null);
-      if (editingLostItem.id) {
-        await updateAdminLostItem(editingLostItem.id, {
-          ...payloadBase,
-          isClaimed: editingLostItem.isClaimed,
-          receiverName: editingLostItem.isClaimed
-            ? editingLostItem.receiverName.trim() || null
-            : null,
-          receiverNote: editingLostItem.isClaimed
-            ? editingLostItem.receiverNote.trim() || null
-            : null,
-        });
+      if (editingAd.id) {
+        await updateAdminAd(editingAd.id, payload);
       } else {
-        await createAdminLostItem({
-          ...payloadBase,
-          isClaimed: editingLostItem.isClaimed,
-          receiverName: editingLostItem.isClaimed
-            ? editingLostItem.receiverName.trim() || null
-            : null,
-          receiverNote: editingLostItem.isClaimed
-            ? editingLostItem.receiverNote.trim() || null
-            : null,
-        });
+        await createAdminAd(payload);
       }
-      setEditingLostItem(null);
-      await reloadLostItems(lostPage, lostStatus);
+      setEditingAd(null);
+      await reloadAds(adPage);
     } catch (error) {
-      setGlobalError(error instanceof Error ? error.message : "분실물을 저장하지 못했습니다.");
+      setGlobalError(error instanceof Error ? error.message : "광고를 저장하지 못했습니다.");
     }
   };
 
-  const handleDeleteLostItem = async (id: number) => {
-    const confirmed = window.confirm("이 분실물 기록을 삭제하시겠습니까?");
+  const handleDeleteAd = async (id: number) => {
+    const confirmed = window.confirm("이 광고를 삭제하시겠습니까?");
     if (!confirmed) return;
     try {
       setGlobalError(null);
-      await deleteAdminLostItem(id);
-      await reloadLostItems(lostPage, lostStatus);
+      await deleteAdminAd(id);
+      await reloadAds(adPage);
     } catch (error) {
-      setGlobalError(error instanceof Error ? error.message : "분실물을 삭제하지 못했습니다.");
+      setGlobalError(error instanceof Error ? error.message : "광고를 삭제하지 못했습니다.");
+    }
+  };
+
+  const handleToggleAdActive = async (ad: AdvertisementResponse) => {
+    try {
+      setGlobalError(null);
+      await toggleAdminAdActive(ad.id, !ad.isActive);
+      await reloadAds(adPage);
+    } catch (error) {
+      setGlobalError(error instanceof Error ? error.message : "광고 상태를 변경하지 못했습니다.");
+    }
+  };
+
+  const handleUploadAdImage = async (file: File) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      window.alert("이미지는 JPG, PNG, WEBP 형식만 업로드할 수 있습니다.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      window.alert("이미지 크기는 최대 5MB까지 업로드할 수 있습니다.");
+      return;
+    }
+
+    try {
+      setUploadingAdImage(true);
+      const uploadMeta = await getAdminAdUploadUrl({
+        fileName: file.name,
+        contentType: file.type,
+        fileSize: file.size,
+      });
+
+      await fetch(uploadMeta.presignedUrl, {
+        method: uploadMeta.method,
+        headers: {
+          "Content-Type": file.type,
+        },
+        body: file,
+      });
+
+      setEditingAd((prev) => (prev ? { ...prev, imageUrl: uploadMeta.imageUrl } : prev));
+      window.alert("이미지 업로드가 완료되었습니다.");
+    } catch (error) {
+      setGlobalError(error instanceof Error ? error.message : "이미지 업로드에 실패했습니다.");
+    } finally {
+      setUploadingAdImage(false);
     }
   };
 
@@ -351,7 +403,7 @@ function Admin() {
               ADMIN PORTAL
             </p>
             <h1 className="text-2xl font-semibold text-[var(--text)]">
-              공지사항 및 분실물 관리자 페이지
+              공지 및 광고 관리자 페이지
             </h1>
           </div>
           <div className="flex items-center gap-2">
@@ -583,44 +635,23 @@ function Admin() {
           )}
         </section>
 
-        {/* 분실물 목록 */}
+        {/* 광고 목록 */}
         <section className="mb-6 rounded-2xl border border-[var(--border-base)] bg-white p-4 shadow-sm">
           <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-sm font-bold text-[var(--text)]">분실물 목록</h2>
+              <h2 className="text-sm font-bold text-[var(--text)]">광고 배너 관리</h2>
               <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-                인수 여부에 따라 필터링하고 인수자 정보를 기록할 수 있습니다.
+                각 화면별 노출될 배너를 관리합니다. 기간/활성 여부를 설정해 주세요.
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex rounded-full bg-[var(--surface-subtle)] p-0.5 text-xs font-semibold">
-                {(["ALL", "UNCLAIMED", "CLAIMED"] as LostItemStatusFilter[]).map((status) => (
-                  <button
-                    key={status}
-                    type="button"
-                    onClick={() => {
-                      setLostStatus(status);
-                      void reloadLostItems(0, status);
-                    }}
-                    className={`rounded-full px-3 py-1 ${
-                      lostStatus === status
-                        ? "bg-[var(--accent)] text-white"
-                        : "text-[var(--text-muted)]"
-                    }`}
-                  >
-                    {status === "ALL" && "전체"}
-                    {status === "UNCLAIMED" && "미인수"}
-                    {status === "CLAIMED" && "인수완료"}
-                  </button>
-                ))}
-              </div>
               <button
                 type="button"
-                onClick={openNewLostItem}
+                onClick={openNewAd}
                 className="flex h-9 items-center gap-1 rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-xs font-semibold text-[var(--text)] hover:bg-[var(--border-base)]"
               >
                 <Plus className="h-3.5 w-3.5" strokeWidth={2.3} />
-                새 분실물
+                새 광고
               </button>
             </div>
           </header>
@@ -630,36 +661,36 @@ function Admin() {
               <thead className="bg-[var(--surface-subtle)] text-[var(--text-muted)]">
                 <tr>
                   <th className="px-4 py-2 font-semibold">이미지</th>
-                  <th className="px-4 py-2 font-semibold">물건 이름</th>
-                  <th className="px-4 py-2 font-semibold">습득 장소</th>
-                  <th className="px-4 py-2 font-semibold">습득 날짜</th>
-                  <th className="px-4 py-2 font-semibold">인수 여부</th>
+                  <th className="px-4 py-2 font-semibold">제목 / 링크</th>
+                  <th className="px-4 py-2 font-semibold">위치</th>
+                  <th className="px-4 py-2 font-semibold">기간</th>
+                  <th className="px-4 py-2 font-semibold">활성</th>
                   <th className="px-3 py-2 text-center font-semibold">수정</th>
                   <th className="px-3 py-2 text-center font-semibold">삭제</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border-base)] bg-white">
-                {lostLoading && (
+                {adLoading && (
                   <tr>
                     <td colSpan={7} className="px-4 py-6 text-center text-[var(--text-muted)]">
-                      분실물 목록을 불러오는 중입니다...
+                      광고 목록을 불러오는 중입니다...
                     </td>
                   </tr>
                 )}
-                {!lostLoading && lostItems.length === 0 && (
+                {!adLoading && ads.length === 0 && (
                   <tr>
                     <td colSpan={7} className="px-4 py-6 text-center text-[var(--text-muted)]">
-                      등록된 분실물이 없습니다.
+                      등록된 광고가 없습니다.
                     </td>
                   </tr>
                 )}
-                {lostItems.map((item) => (
-                  <tr key={item.id}>
+                {ads.map((ad) => (
+                  <tr key={ad.id}>
                     <td className="px-4 py-2">
-                      {item.imageUrl ? (
+                      {ad.imageUrl ? (
                         <img
-                          src={item.imageUrl}
-                          alt={item.itemName}
+                          src={ad.imageUrl}
+                          alt={ad.title}
                           className="h-9 w-9 rounded-xl object-cover"
                         />
                       ) : (
@@ -670,35 +701,44 @@ function Admin() {
                     </td>
                     <td className="px-4 py-2 align-middle">
                       <div className="flex flex-col">
-                        <span className="text-sm text-[var(--text)]">{item.itemName}</span>
-                        {item.receiverName && (
+                        <span className="text-sm text-[var(--text)]">{ad.title}</span>
+                        {ad.linkUrl && (
                           <span className="mt-0.5 text-[11px] text-[var(--text-muted)]">
-                            인수자: {item.receiverName}
+                            {ad.linkUrl}
                           </span>
                         )}
                       </div>
                     </td>
                     <td className="px-4 py-2 text-[var(--text-muted)]">
-                      {item.foundLocation}
+                      {ad.placement}
                     </td>
                     <td className="px-4 py-2 text-[var(--text-muted)]">
-                      {formatDate(item.foundDate)}
+                      {formatDate(ad.startDate)} ~ {formatDate(ad.endDate)}
                     </td>
                     <td className="px-4 py-2">
                       <span
                         className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                          item.isClaimed
+                          ad.isActive
                             ? "bg-emerald-50 text-emerald-600"
                             : "bg-slate-100 text-slate-600"
                         }`}
                       >
-                        {item.isClaimed ? "인수완료" : "미인수"}
+                        {ad.isActive ? "활성" : "비활성"}
                       </span>
                     </td>
                     <td className="px-3 py-2 text-center">
                       <button
                         type="button"
-                        onClick={() => openEditLostItem(item)}
+                        onClick={() => handleToggleAdActive(ad)}
+                        className="inline-flex h-7 items-center justify-center rounded-full border px-3 text-[10px] font-semibold text-[var(--text-muted)] hover:bg-[var(--surface-subtle)]"
+                      >
+                        {ad.isActive ? "비활성" : "활성"}
+                      </button>
+                    </td>
+                    <td className="px-3 py-2 text-center">
+                      <button
+                        type="button"
+                        onClick={() => openEditAd(ad)}
                         className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--surface-subtle)] text-[var(--text-muted)] hover:bg-[var(--border-base)]"
                       >
                         <Pencil className="h-3.5 w-3.5" strokeWidth={2.3} />
@@ -707,7 +747,7 @@ function Admin() {
                     <td className="px-3 py-2 text-center">
                       <button
                         type="button"
-                        onClick={() => void handleDeleteLostItem(item.id)}
+                        onClick={() => void handleDeleteAd(ad.id)}
                         className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100"
                       >
                         <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
@@ -719,23 +759,23 @@ function Admin() {
             </table>
           </div>
 
-          {lostTotalPages > 1 && (
+          {adTotalPages > 1 && (
             <div className="mt-3 flex items-center justify-end gap-2 text-[11px] text-[var(--text-muted)]">
               <button
                 type="button"
-                disabled={lostPage === 0}
-                onClick={() => void reloadLostItems(lostPage - 1)}
+                disabled={adPage === 0}
+                onClick={() => void reloadAds(adPage - 1)}
                 className="rounded-full border border-[var(--border-base)] bg-[var(--surface-subtle)] px-2 py-1 disabled:opacity-50"
               >
                 이전
               </button>
               <span>
-                {lostPage + 1} / {lostTotalPages}
+                {adPage + 1} / {adTotalPages}
               </span>
               <button
                 type="button"
-                disabled={lostPage + 1 >= lostTotalPages}
-                onClick={() => void reloadLostItems(lostPage + 1)}
+                disabled={adPage + 1 >= adTotalPages}
+                onClick={() => void reloadAds(adPage + 1)}
                 className="rounded-full border border-[var(--border-base)] bg-[var(--surface-subtle)] px-2 py-1 disabled:opacity-50"
               >
                 다음
@@ -829,7 +869,6 @@ function Admin() {
                       추가
                     </button>
                   </div>
-
                   {editingNotice.imageUrls.length > 0 && (
                     <div className="mt-4 flex w-full max-w-sm flex-wrap gap-2">
                       {editingNotice.imageUrls.map((url, index) => (
@@ -917,138 +956,184 @@ function Admin() {
         </div>
       )}
 
-      {/* 분실물 작성/수정 모달 */}
-      {editingLostItem && (
+      {/* 광고 작성/수정 모달 */}
+      {editingAd && (
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-4 shadow-xl">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl">
             <h3 className="text-sm font-bold text-[var(--text)]">
-              {editingLostItem.id ? "분실물 수정" : "새 분실물 등록"}
+              {editingAd.id ? "광고 수정" : "새 광고 등록"}
             </h3>
-            <form className="mt-3 space-y-3" onSubmit={handleSubmitLostItem}>
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-[var(--text)]">물건 이름</label>
+            <form className="mt-4 space-y-4" onSubmit={handleSubmitAd}>
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-[var(--text)]">광고 제목</label>
                 <input
                   type="text"
-                  value={editingLostItem.itemName}
+                  value={editingAd.title}
                   onChange={(e) =>
-                    setEditingLostItem((prev) =>
-                      prev ? { ...prev, itemName: e.target.value } : prev,
-                    )
+                    setEditingAd((prev) => (prev ? { ...prev, title: e.target.value } : prev))
                   }
                   className="h-9 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-xs focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/15"
+                  placeholder="메인 배너 광고 제목"
                   required
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-[var(--text)]">
-                  이미지 URL (선택)
-                </label>
-                <input
-                  type="url"
-                  value={editingLostItem.imageUrl}
-                  onChange={(e) =>
-                    setEditingLostItem((prev) =>
-                      prev ? { ...prev, imageUrl: e.target.value } : prev,
-                    )
-                  }
-                  className="h-9 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-xs focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/15"
-                  placeholder="https:// 예시..."
-                />
-              </div>
-              <div className="flex gap-3">
-                <div className="flex-1 space-y-1">
-                  <label className="text-xs font-semibold text-[var(--text)]">습득 장소</label>
-                  <input
-                    type="text"
-                    value={editingLostItem.foundLocation}
-                    onChange={(e) =>
-                      setEditingLostItem((prev) =>
-                        prev ? { ...prev, foundLocation: e.target.value } : prev,
-                      )
-                    }
-                    className="h-9 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-xs focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/15"
-                    required
-                  />
-                </div>
-                <div className="w-32 space-y-1">
-                  <label className="text-xs font-semibold text-[var(--text)]">습득 날짜</label>
-                  <input
-                    type="date"
-                    value={editingLostItem.foundDate}
-                    onChange={(e) =>
-                      setEditingLostItem((prev) =>
-                        prev ? { ...prev, foundDate: e.target.value } : prev,
-                      )
-                    }
-                    className="h-9 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-xs focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/15"
-                    required
-                  />
-                </div>
-              </div>
 
-              <div className="space-y-1">
-                <label className="flex items-center gap-2 text-xs font-semibold text-[var(--text)]">
-                  <input
-                    type="checkbox"
-                    checked={editingLostItem.isClaimed}
-                    onChange={(e) =>
-                      setEditingLostItem((prev) =>
-                        prev ? { ...prev, isClaimed: e.target.checked } : prev,
-                      )
-                    }
-                    className="h-4 w-4 rounded border-[var(--border-base)] text-[var(--accent)] focus:ring-[var(--accent)]"
-                  />
-                  인수 완료 처리
-                </label>
-                {editingLostItem.isClaimed && (
-                  <div className="mt-1 space-y-2 rounded-2xl bg-[var(--surface-subtle)] p-2">
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-semibold text-[var(--text)]">
-                        인수자 이름
-                      </label>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1.4fr_minmax(0,1fr)]">
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-[var(--text)]">
+                    이미지 업로드 (최대 5MB)
+                  </label>
+                  <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-4 text-center">
+                    <ImageIcon className="h-7 w-7 text-[var(--text-muted)]" strokeWidth={2.3} />
+                    <p className="mt-1.5 text-[11px] font-semibold text-[var(--text-muted)]">
+                      JPG, PNG, WEBP 이미지를 업로드하세요
+                    </p>
+                    <p className="text-[10px] text-[var(--text-muted)]">
+                      업로드 후 자동으로 S3 URL이 입력됩니다.
+                    </p>
+                    <label className="mt-3 inline-flex cursor-pointer items-center justify-center rounded-2xl bg-[var(--accent)] px-3 py-1.5 text-[11px] font-semibold text-white shadow-sm hover:brightness-95">
+                      <UploadCloud className="mr-1 h-3.5 w-3.5" strokeWidth={2.3} />
+                      {uploadingAdImage ? "업로드 중..." : "파일 선택"}
                       <input
-                        type="text"
-                        value={editingLostItem.receiverName}
-                        onChange={(e) =>
-                          setEditingLostItem((prev) =>
-                            prev ? { ...prev, receiverName: e.target.value } : prev,
-                          )
-                        }
-                        className="h-8 w-full rounded-2xl border border-[var(--border-base)] bg-white px-3 text-[11px] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/15"
-                        placeholder="인수자 이름 (선택)"
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        className="hidden"
+                        disabled={uploadingAdImage}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            void handleUploadAdImage(file);
+                            e.target.value = "";
+                          }
+                        }}
                       />
+                    </label>
+                    {editingAd.imageUrl && (
+                      <p className="mt-2 truncate text-[10px] text-[var(--text-muted)]">
+                        {editingAd.imageUrl}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-[var(--text)]">링크 URL (선택)</label>
+                  <input
+                    type="url"
+                    value={editingAd.linkUrl}
+                    onChange={(e) =>
+                      setEditingAd((prev) => (prev ? { ...prev, linkUrl: e.target.value } : prev))
+                    }
+                    className="h-9 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-xs focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/15"
+                    placeholder="https://example.com"
+                  />
+
+                  <div className="space-y-1">
+                    <span className="text-xs font-semibold text-[var(--text)]">노출 위치</span>
+                    <div className="flex flex-wrap gap-1.5 text-[11px]">
+                      {(["HOME", "BOOTH_LIST", "MAP", "TICKET", "GLOBAL"] as AdvertisementPlacement[]).map(
+                        (placement) => (
+                          <button
+                            key={placement}
+                            type="button"
+                            onClick={() =>
+                              setEditingAd((prev) =>
+                                prev ? { ...prev, placement } : prev,
+                              )
+                            }
+                            className={`rounded-full px-3 py-1 font-semibold ${
+                              editingAd.placement === placement
+                                ? "bg-[var(--accent)] text-white"
+                                : "bg-[var(--surface-subtle)] text-[var(--text-muted)]"
+                            }`}
+                          >
+                            {placement === "HOME" && "홈"}
+                            {placement === "BOOTH_LIST" && "부스 목록"}
+                            {placement === "MAP" && "지도"}
+                            {placement === "TICKET" && "티켓"}
+                            {placement === "GLOBAL" && "공통(GLOBAL)"}
+                          </button>
+                        ),
+                      )}
                     </div>
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-semibold text-[var(--text)]">
-                        인수 메모
-                      </label>
-                      <textarea
-                        rows={2}
-                        value={editingLostItem.receiverNote}
+                  </div>
+
+                  <div className="space-y-1">
+                    <span className="text-xs font-semibold text-[var(--text)]">노출 기간</span>
+                    <div className="flex gap-2">
+                      <input
+                        type="date"
+                        value={editingAd.startDate}
                         onChange={(e) =>
-                          setEditingLostItem((prev) =>
-                            prev ? { ...prev, receiverNote: e.target.value } : prev,
+                          setEditingAd((prev) =>
+                            prev ? { ...prev, startDate: e.target.value } : prev,
                           )
                         }
-                        className="w-full resize-none rounded-2xl border border-[var(--border-base)] bg-white px-3 py-1.5 text-[11px] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/15"
-                        placeholder="학생증 확인 후 인계 완료 등 메모"
+                        className="h-9 flex-1 rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-xs focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/15"
+                        required
+                      />
+                      <span className="self-center text-[11px] text-[var(--text-muted)]">~</span>
+                      <input
+                        type="date"
+                        value={editingAd.endDate}
+                        onChange={(e) =>
+                          setEditingAd((prev) =>
+                            prev ? { ...prev, endDate: e.target.value } : prev,
+                          )
+                        }
+                        className="h-9 flex-1 rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-xs focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/15"
+                        required
                       />
                     </div>
                   </div>
-                )}
+
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-[var(--text)]">
+                        우선순위 (선택)
+                      </label>
+                      <input
+                        type="number"
+                        min={0}
+                        value={editingAd.priority}
+                        onChange={(e) =>
+                          setEditingAd((prev) =>
+                            prev ? { ...prev, priority: e.target.value } : prev,
+                          )
+                        }
+                        className="h-9 w-24 rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-xs focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/15"
+                        placeholder="예: 10"
+                      />
+                    </div>
+
+                    <label className="flex items-center gap-2 text-xs font-semibold text-[var(--text)]">
+                      <input
+                        type="checkbox"
+                        checked={editingAd.isActive}
+                        onChange={(e) =>
+                          setEditingAd((prev) =>
+                            prev ? { ...prev, isActive: e.target.checked } : prev,
+                          )
+                        }
+                        className="h-4 w-4 rounded border-[var(--border-base)] text-[var(--accent)] focus:ring-[var(--accent)]"
+                      />
+                      현재 활성화
+                    </label>
+                  </div>
+                </div>
               </div>
 
-              <div className="mt-3 flex justify-end gap-2 text-xs">
+              <div className="mt-2 flex justify-end gap-2 text-xs">
                 <button
                   type="button"
-                  onClick={() => setEditingLostItem(null)}
-                  className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 py-1.5 text-[var(--text-muted)]"
+                  onClick={() => setEditingAd(null)}
+                  className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-2 text-[var(--text-muted)]"
                 >
                   취소
                 </button>
                 <button
                   type="submit"
-                  className="rounded-2xl bg-[var(--accent)] px-3 py-1.5 font-semibold text-white shadow-sm hover:brightness-95"
+                  className="rounded-2xl bg-[var(--accent)] px-4 py-2 font-semibold text-white shadow-sm hover:brightness-95"
                 >
                   저장
                 </button>
