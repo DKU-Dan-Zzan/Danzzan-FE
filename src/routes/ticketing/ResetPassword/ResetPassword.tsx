@@ -362,7 +362,7 @@ export default function ResetPassword() {
       <div className="mx-auto w-full max-w-[420px] px-5 py-6">
         <div className="mt-9">
           <p className="text-[length:var(--ticketing-text-helper)] font-semibold text-[var(--text-muted)]">
-            재학생 전용 티켓팅 서비스
+            재학생 전용 축제 포털 서비스
           </p>
           <h1 className="mt-1 leading-[1.12] font-black tracking-tight text-[var(--text)]">
             비밀번호 재설정

@@ -12,7 +12,7 @@ export function UserLayout() {
   const isTicketingPage = location.pathname.startsWith("/ticket/ticketing");
   const isMyTicketPage = location.pathname.startsWith("/ticket/myticket");
   const showHeader = isAuthenticated && role === "student" && !isAuthPage;
-  const pageTitle = "티켓팅 포털";
+  const pageTitle = "축제 포털";
 
   const handleBack = () => {
     if (isTicketingPage) {
