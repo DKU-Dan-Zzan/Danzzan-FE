@@ -13,6 +13,7 @@ const navItems = [
 const BottomNav = () => {
   return (
     <nav
+      data-app-bottom-nav
       className="
         fixed bottom-0 left-0 right-0
         max-w-[430px] mx-auto

@@ -87,9 +87,32 @@ export default function BoothMap() {
   const [pubs, setPubs] = useState<Pub[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [bottomNavHeight, setBottomNavHeight] = useState(56);
 
   const frameWidth = 430;
-  const bottomNavHeight = 84;
+
+  useEffect(() => {
+    const nav = document.querySelector<HTMLElement>("[data-app-bottom-nav]");
+    if (!nav) return;
+
+    const updateBottomNavHeight = () => {
+      setBottomNavHeight(nav.getBoundingClientRect().height);
+    };
+
+    updateBottomNavHeight();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateBottomNavHeight();
+    });
+
+    resizeObserver.observe(nav);
+    window.addEventListener("resize", updateBottomNavHeight);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateBottomNavHeight);
+    };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
