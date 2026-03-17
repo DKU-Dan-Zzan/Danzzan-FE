@@ -5,6 +5,7 @@ import { Button } from "@/components/ticketing/common/ui/button";
 import { Input } from "@/components/ticketing/common/ui/input";
 import { Label } from "@/components/ticketing/common/ui/label";
 import { useAuth } from "@/hooks/ticketing/useAuth";
+import { TICKETING_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
 import { resolveTicketingLoginRedirect } from "@/routes/ticketing/authNavigation";
 
 export default function Login() {
@@ -16,8 +17,6 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const canSubmit = studentId.trim().length > 0 && password.trim().length > 0;
-  const inputClassName =
-    "h-11 rounded-2xl border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20";
 
   const redirect = resolveTicketingLoginRedirect(searchParams.get("redirect"));
 
@@ -41,10 +40,10 @@ export default function Login() {
       <div className="mx-auto w-full max-w-[420px] px-5 py-6">
         <div className="mt-9">
           <p className="text-[length:var(--ticketing-text-helper)] font-semibold text-[var(--text-muted)]">
-            재학생 전용 서비스
+            재학생 전용 축제 포털 서비스
           </p>
           <h1 className="mt-1 leading-[1.12] font-black tracking-tight text-[var(--text)]">
-            티켓팅 포털 로그인
+            축제 포털 로그인
           </h1>
         </div>
 
@@ -60,29 +59,29 @@ export default function Login() {
                   value={studentId}
                   onChange={(event) => setStudentId(event.target.value)}
                   placeholder="학번 8자리를 입력해 주세요"
-                  className={inputClassName}
+                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
                   required
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-semibold text-[var(--text)]">
-                  비밀번호
+                  축제 포털 비밀번호
                 </Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  placeholder="서비스용 비밀번호를 입력해 주세요"
-                  className={inputClassName}
+                  placeholder="축제 포털용 비밀번호를 입력해 주세요"
+                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
                   required
                 />
               </div>
 
               <p className="flex items-start gap-1.5 text-[11px] font-medium leading-5 text-[var(--text-muted)]">
                 <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={2.3} />
-                가입한 티켓팅 계정 비밀번호를 입력해 주세요.
+                가입한 축제 포털 계정 비밀번호를 입력해 주세요.
               </p>
             </section>
 
@@ -98,7 +97,7 @@ export default function Login() {
               disabled={submitting || !canSubmit}
             >
               <GraduationCap className="h-4 w-4" strokeWidth={2.3} />
-              {submitting ? "로그인 중..." : "티켓팅 계정으로 로그인"}
+              {submitting ? "로그인 중..." : "축제 포털 계정으로 로그인"}
             </Button>
           </form>
 
@@ -108,7 +107,7 @@ export default function Login() {
               state={{ authTabFrom: "login" }}
               className="inline-flex items-center gap-1 text-sm font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--accent)]"
             >
-              <span>티켓팅 서비스를 처음 이용하시나요?</span>
+              <span>축제 포털을 처음 이용하시나요?</span>
               <span className="font-semibold text-[var(--accent)]">회원가입</span>
             </Link>
 

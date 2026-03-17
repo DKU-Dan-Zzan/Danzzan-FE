@@ -3,6 +3,7 @@ import { Ticket } from "lucide-react"
 import { useSyncExternalStore } from "react"
 import { authStore } from "@/store/ticketing/authStore"
 import { getMyTicketNavigationTarget } from "@/routes/ticketing/authNavigation"
+import { AppHeaderLogo } from "@/components/layout/AppHeaderLogo"
 
 const Header = () => {
   const navigate = useNavigate()
@@ -20,19 +21,14 @@ const Header = () => {
   return (
     <header
       className="
+        app-main-header
         sticky top-0 z-50
-        bg-[var(--app-header-bg)]
         border-b border-[var(--app-header-border)]
         pt-[env(safe-area-inset-top)]
       "
     >
       <div className="relative mx-auto h-16 max-w-[430px] px-4">
-        <img
-          src="/DAN-ZZAN.png"
-          alt="DAN-ZZAN"
-          className="pointer-events-none absolute top-[75%] left-1/2 h-[68px] w-[300px] -translate-x-1/2 -translate-y-1/2 object-cover object-[50%_58%] select-none brightness-0 invert"
-          draggable={false}
-        />
+        <AppHeaderLogo />
 
         <button
           onClick={handleTicketClick}
