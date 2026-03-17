@@ -91,7 +91,7 @@ export default function LineupCarousel({
       </div>
 
       {count > 1 && (
-        <div className="home-carousel-dots">
+        <div className="home-carousel-dots is-lineup">
           {banners.map((banner, i) => {
             const active = i === safeIndex
             return (

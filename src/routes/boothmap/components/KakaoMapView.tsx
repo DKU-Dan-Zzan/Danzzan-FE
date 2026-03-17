@@ -2,6 +2,12 @@
 
 import { useEffect, useMemo, useRef } from "react"
 import useKakaoMapLoader from "../../../hooks/useKakaoMapLoader"
+import {
+  BOOTHMAP_MARKER_THEME,
+  BOOTHMAP_SELECTED_RING,
+  BOOTHMAP_SELECTED_SHADOW_SOFT,
+  type BoothmapMarkerType,
+} from "../constants/boothmapTheme"
 import type {
   Booth,
   College,
@@ -41,7 +47,7 @@ const DANKOOK_BOUNDS = {
   east: 127.137,
 }
 
-type MarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "FACILITY"
+type MarkerType = BoothmapMarkerType
 
 type OverlayRecord = {
   overlay: any
@@ -55,33 +61,7 @@ type OverlayRecord = {
 }
 
 function getMarkerConfig(type: MarkerType) {
-  switch (type) {
-    case "PUB":
-      return {
-        color: "#0a559c",
-        iconPath: "/markers/booth-pub.svg",
-      }
-    case "FOOD_TRUCK":
-      return {
-        color: "#ef4444",
-        iconPath: "/markers/booth-foodtruck.svg",
-      }
-    case "EXPERIENCE":
-      return {
-        color: "#10b981",
-        iconPath: "/markers/booth-experience.svg",
-      }
-    case "FACILITY":
-      return {
-        color: "#3b82f6",
-        iconPath: "/markers/facility-restroom.svg",
-      }
-    default:
-      return {
-        color: "#0a559c",
-        iconPath: "/markers/booth-experience.svg",
-      }
-  }
+  return BOOTHMAP_MARKER_THEME[type] ?? BOOTHMAP_MARKER_THEME.PUB
 }
 
 // 물방울 핀 모양 SVG를 data url로 생성
@@ -96,10 +76,10 @@ function createPinDataUrl(color: string) {
 
 // type별 pin url 캐싱
 const PIN_URL_MAP: Record<MarkerType, string> = {
-  PUB: createPinDataUrl("#0a559c"),
-  FOOD_TRUCK: createPinDataUrl("#ef4444"),
-  EXPERIENCE: createPinDataUrl("#10b981"),
-  FACILITY: createPinDataUrl("#3b82f6"),
+  PUB: createPinDataUrl(BOOTHMAP_MARKER_THEME.PUB.color),
+  FOOD_TRUCK: createPinDataUrl(BOOTHMAP_MARKER_THEME.FOOD_TRUCK.color),
+  EXPERIENCE: createPinDataUrl(BOOTHMAP_MARKER_THEME.EXPERIENCE.color),
+  FACILITY: createPinDataUrl(BOOTHMAP_MARKER_THEME.FACILITY.color),
 }
 
 function kakaoLevelToMapboxZoom(level: number) {
@@ -112,12 +92,12 @@ function getOverlayKey(kind: "booth" | "college", id: number) {
 
 function getMarkerScaleByLevel(level: number, isSelected: boolean) {
   const baseScale =
-    level <= 2 ? 1 :
-    level === 3 ? 0.88 :
-    0.74
+    level <= 2 ? 0.9 :
+    level === 3 ? 0.8 :
+    0.68
 
   if (isSelected) {
-    return Math.max(0.92, baseScale)
+    return Math.max(0.84, baseScale)
   }
 
   return baseScale
@@ -144,8 +124,6 @@ export default function KakaoMapView({
   const overlayMapRef = useRef<Map<string, OverlayRecord>>(new Map())
 
   // 이름 말풍선
-  const labelOverlayRef = useRef<any>(null)
-  const labelContentRef = useRef<HTMLDivElement | null>(null)
 
   // 이전 선택 항목 추적
   const prevSelectedKeyRef = useRef<string | null>(null)
@@ -165,14 +143,6 @@ export default function KakaoMapView({
     return map
   }, [colleges])
 
-  function clearLabelOverlay() {
-    if (labelOverlayRef.current) {
-      labelOverlayRef.current.setMap(null)
-      labelOverlayRef.current = null
-    }
-    labelContentRef.current = null
-  }
-
   // 지도 최초 생성
   useEffect(() => {
     if (!isLoaded || !mapRef.current || mapInstanceRef.current) return
@@ -189,10 +159,6 @@ export default function KakaoMapView({
     map.setMaxLevel(4) // 최대 축소
 
     // 지도 빈 곳 클릭 시 말풍선 닫기
-    kakao.maps.event.addListener(map, "click", () => {
-      clearLabelOverlay()
-    })
-
     kakao.maps.event.addListener(map, "idle", () => {
       if (clampMapCenter()) {
         return
@@ -332,44 +298,16 @@ export default function KakaoMapView({
   }
 
   // 이름 말풍선 생성
-  const showLabelOverlay = ({
-    lat,
-    lng,
-    name,
-  }: {
-    lat: number
-    lng: number
-    name: string
-  }) => {
-    const { kakao } = window
-    const map = mapInstanceRef.current
-    if (!map) return
-
-    const position = new kakao.maps.LatLng(lat, lng)
-
-    if (!labelOverlayRef.current) {
-      const bubble = document.createElement("div")
-      bubble.className =
-        "rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs font-bold text-gray-800 shadow-[0_6px_18px_rgba(0,0,0,0.16)] whitespace-nowrap backdrop-blur-sm"
-
-      const overlay = new kakao.maps.CustomOverlay({
-        position,
-        content: bubble,
-        yAnchor: 2.2,
-        zIndex: 20,
-      })
-
-      overlay.setMap(map)
-      labelOverlayRef.current = overlay
-      labelContentRef.current = bubble
-    } else {
-      labelOverlayRef.current.setPosition(position)
-      labelOverlayRef.current.setMap(map)
-    }
-
-    if (labelContentRef.current) {
-      labelContentRef.current.innerText = name
-    }
+  const buildLabelBubble = (name: string) => {
+    const bubble = document.createElement("div")
+    bubble.className =
+      "rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs font-bold text-gray-800 shadow-[0_6px_18px_rgba(0,0,0,0.16)] whitespace-nowrap backdrop-blur-sm"
+    bubble.innerText = name
+    bubble.style.position = "absolute"
+    bubble.style.left = "50%"
+    bubble.style.transform = "translateX(-50%)"
+    bubble.style.pointerEvents = "none"
+    return bubble
   }
 
   // 마커 DOM 생성
@@ -377,22 +315,24 @@ export default function KakaoMapView({
     type,
     isSelected,
     title,
+    selectedLabel,
     level,
     onClick,
   }: {
     type: MarkerType
     isSelected: boolean
     title: string
+    selectedLabel?: string
     level: number
     onClick: () => void
   }) => {
     const { iconPath } = getMarkerConfig(type)
     const pinUrl = PIN_URL_MAP[type]
     const scale = getMarkerScaleByLevel(level, isSelected)
-    const width = Math.round((isSelected ? 56 : 48) * scale)
-    const height = Math.round((isSelected ? 68 : 60) * scale)
-    const iconSize = Math.round((isSelected ? 22 : 20) * scale)
-    const ringSize = Math.round(28 * scale)
+    const width = Math.round((isSelected ? 50 : 42) * scale)
+    const height = Math.round((isSelected ? 61 : 53) * scale)
+    const iconSize = Math.round((isSelected ? 20 : 18) * scale)
+    const ringSize = Math.round(24 * scale)
 
     const wrapper = document.createElement("div")
     wrapper.title = title
@@ -404,7 +344,7 @@ export default function KakaoMapView({
     wrapper.style.userSelect = "none"
     wrapper.style.transition = "transform 0.18s ease"
     wrapper.style.filter = isSelected
-      ? "drop-shadow(0 10px 22px rgba(10,85,156,0.25))"
+      ? `drop-shadow(0 10px 22px ${BOOTHMAP_SELECTED_SHADOW_SOFT})`
       : "drop-shadow(0 8px 18px rgba(0,0,0,0.18))"
 
     const pin = document.createElement("img")
@@ -435,6 +375,12 @@ export default function KakaoMapView({
     wrapper.appendChild(icon)
 
     if (isSelected) {
+      if (selectedLabel) {
+        const bubble = buildLabelBubble(selectedLabel)
+        bubble.style.bottom = `${height + 6}px`
+        wrapper.appendChild(bubble)
+      }
+
       const ring = document.createElement("div")
       ring.style.position = "absolute"
       ring.style.left = "50%"
@@ -443,7 +389,7 @@ export default function KakaoMapView({
       ring.style.height = `${ringSize}px`
       ring.style.transform = "translate(-50%, -50%)"
       ring.style.borderRadius = "9999px"
-      ring.style.boxShadow = "0 0 0 5px rgba(10,85,156,0.18)"
+      ring.style.boxShadow = `0 0 0 5px ${BOOTHMAP_SELECTED_RING}`
       ring.style.pointerEvents = "none"
       wrapper.appendChild(ring)
     }
@@ -485,6 +431,7 @@ export default function KakaoMapView({
       type,
       isSelected,
       title: name,
+      selectedLabel: isSelected ? name : undefined,
       level,
       onClick,
     })
@@ -523,6 +470,7 @@ export default function KakaoMapView({
       type: record.type,
       isSelected,
       title: record.name,
+      selectedLabel: isSelected ? record.name : undefined,
       level: map?.getLevel?.() ?? 3,
       onClick: record.onClick,
     })
@@ -693,11 +641,6 @@ export default function KakaoMapView({
             selectedBooth.location_x
           )
 
-          showLabelOverlay({
-            lat: selectedBooth.location_y,
-            lng: selectedBooth.location_x,
-            name: selectedBooth.name,
-          })
 
           map.setLevel(2, { anchor: target }) // 클릭한 마커 기준 확대
           map.panTo(target)
@@ -712,11 +655,6 @@ export default function KakaoMapView({
             selectedCollege.location_x
           )
 
-          showLabelOverlay({
-            lat: selectedCollege.location_y,
-            lng: selectedCollege.location_x,
-            name: selectedCollege.name,
-          })
 
           map.setLevel(2, { anchor: target }) // 클릭한 마커 기준 확대
 
@@ -727,10 +665,6 @@ export default function KakaoMapView({
           })
         }
       }
-    }
-
-    if (!selectedMapItem) {
-      clearLabelOverlay()
     }
 
     prevSelectedKeyRef.current = nextKey

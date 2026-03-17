@@ -105,14 +105,20 @@ export async function updateEmergencyAdminNotice(
 
 // 2-3. 일반 공지
 
+export type NoticeStatusFilter = "ACTIVE" | "DELETED" | "ALL";
+
 export type NoticeResponse = {
   id: number;
   title: string;
   content: string;
   author: string;
+  category?: string | null;
+  isPinned?: boolean;
+  thumbnailImageUrl?: string | null;
+  displayOrder?: number | null;
   imageUrls?: string[];
-  isEmergency: boolean;
-  isActive: boolean;
+  isEmergency?: boolean;
+  isActive?: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -121,20 +127,18 @@ export type CreateNoticeRequest = {
   title: string;
   content: string;
   author: string;
-  isEmergency?: boolean;
-  imageUrls?: string[];
+  category?: string | null;
+  isPinned?: boolean;
+  thumbnailImageUrl?: string | null;
+  images?: string[];
 };
 
-export type UpdateNoticeRequest = {
-  title: string;
-  content: string;
-  author: string;
-  isEmergency?: boolean;
-  imageUrls?: string[];
-};
+export type UpdateNoticeRequest = CreateNoticeRequest;
 
 type NoticeListParams = {
   keyword?: string;
+  category?: string;
+  status?: NoticeStatusFilter;
   page?: number;
   size?: number;
 };
@@ -155,6 +159,8 @@ export async function getAdminNotices(
 ): Promise<PageResponse<NoticeResponse>> {
   const query = buildQuery({
     keyword: params.keyword,
+    category: params.category,
+    status: params.status,
     page: params.page ?? 0,
     size: params.size ?? 10,
   });
@@ -188,87 +194,75 @@ export async function deleteAdminNotice(id: number): Promise<void> {
   });
 }
 
-// 3. 분실물
+export async function restoreAdminNotice(id: number): Promise<NoticeResponse> {
+  return fetchWithAuth<NoticeResponse>(`/api/admin/notices/${id}/restore`, {
+    method: "PATCH",
+  });
+}
 
-export type LostItemStatusFilter = "ALL" | "UNCLAIMED" | "CLAIMED";
-
-export type LostItemResponse = {
+type NoticeDisplayOrderItem = {
   id: number;
-  itemName: string;
-  imageUrl: string | null;
-  foundLocation: string;
-  foundDate: string; // yyyy-MM-dd
-  isClaimed: boolean;
-  receiverName: string | null;
-  receiverNote: string | null;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  displayOrder: number;
 };
 
-export type CreateLostItemRequest = {
-  itemName: string;
-  imageUrl?: string | null;
-  foundLocation: string;
-  foundDate: string;
-  isClaimed?: boolean;
-  receiverName?: string | null;
-  receiverNote?: string | null;
+export type UpdateNoticeDisplayOrderRequest = {
+  orders: NoticeDisplayOrderItem[];
 };
 
-export type UpdateLostItemRequest = {
-  itemName: string;
-  imageUrl?: string | null;
-  foundLocation: string;
-  foundDate: string;
-  isClaimed: boolean;
-  receiverName?: string | null;
-  receiverNote?: string | null;
+export type NoticeImagePresignRequest = {
+  fileName: string;
+  contentType: string;
+  fileSize?: number;
 };
 
-type LostItemListParams = {
-  status?: LostItemStatusFilter;
-  page?: number;
-  size?: number;
+export type NoticeImagePresignResponse = {
+  presignedUrl: string;
+  imageUrl: string;
+  expiresAt?: string;
+  method: "PUT";
 };
 
-export async function getAdminLostItems(
-  params: LostItemListParams,
-): Promise<PageResponse<LostItemResponse>> {
-  const query = buildQuery({
-    status: params.status,
-    page: params.page ?? 0,
-    size: params.size ?? 10,
-  });
-
-  return fetchWithAuth<PageResponse<LostItemResponse>>(
-    `/api/admin/lost-items${query}`,
-    { method: "GET" },
-  );
-}
-
-export async function createAdminLostItem(
-  body: CreateLostItemRequest,
-): Promise<LostItemResponse> {
-  return fetchWithAuth<LostItemResponse>("/api/admin/lost-items", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
-}
-
-export async function updateAdminLostItem(
-  id: number,
-  body: UpdateLostItemRequest,
-): Promise<LostItemResponse> {
-  return fetchWithAuth<LostItemResponse>(`/api/admin/lost-items/${id}`, {
+export async function updateNoticeDisplayOrder(
+  body: UpdateNoticeDisplayOrderRequest,
+): Promise<void> {
+  await fetchWithAuth<void>("/api/admin/notices/display-order", {
     method: "PUT",
     body: JSON.stringify(body),
   });
 }
 
-export async function deleteAdminLostItem(id: number): Promise<void> {
-  await fetchWithAuth<void>(`/api/admin/lost-items/${id}`, {
-    method: "DELETE",
+export async function getNoticeImagePresign(
+  body: NoticeImagePresignRequest,
+): Promise<NoticeImagePresignResponse> {
+  return fetchWithAuth<NoticeImagePresignResponse>("/api/admin/notices/images/presign", {
+    method: "POST",
+    body: JSON.stringify(body),
   });
 }
 
+export type AdvertisementPlacement = "HOME_BOTTOM" | "MY_TICKET";
+
+export type AdvertisementResponse = {
+  id: number;
+  title: string;
+  imageUrl: string;
+  placement: AdvertisementPlacement;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateAdvertisementRequest = {
+  title: string;
+  imageUrl: string;
+  placement: AdvertisementPlacement;
+};
+
+export async function createAdminAd(
+  body: CreateAdvertisementRequest,
+): Promise<AdvertisementResponse> {
+  return fetchWithAuth<AdvertisementResponse>("/api/admin/ads", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}

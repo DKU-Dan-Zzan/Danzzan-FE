@@ -39,3 +39,6 @@ dist-ssr
 .cache
 coverage
 *.tsbuildinfo
+
+# Local poster source asset (do not commit)
+/public/posters/LOUD-main-poster.jpg

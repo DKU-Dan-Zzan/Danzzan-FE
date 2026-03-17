@@ -52,7 +52,7 @@
    */
 
   /* App-wide blue foundation tokens (fixed base blue) */
-  --bg-base: #eaf2ff;
+  --bg-base: #f8fbff;
   --surface-subtle: rgba(255, 255, 255, 0.9);
   --surface-base: rgba(255, 255, 255, 0.84);
   --surface-strong: rgba(255, 255, 255, 0.78);
@@ -85,10 +85,10 @@
   --text-muted: #475569;
   --header-bg: var(--app-header-bg, #000080);
   --header-border: var(--app-header-border, rgba(255, 255, 255, 0.24));
-  --header-text: var(--primary-foreground);
-  --header-text-muted: rgba(255, 255, 255, 0.82);
-  --header-button-bg: rgba(255, 255, 255, 0.14);
-  --header-button-hover: rgba(255, 255, 255, 0.22);
+  --header-text: var(--text);
+  --header-text-muted: var(--text-muted);
+  --header-button-bg: rgba(255, 255, 255, 0.72);
+  --header-button-hover: rgba(255, 255, 255, 0.9);
 
   /* Status semantic tokens */
   --status-success: #2e7d32;

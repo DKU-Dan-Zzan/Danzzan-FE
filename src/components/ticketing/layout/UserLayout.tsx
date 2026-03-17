@@ -1,23 +1,18 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, LogOut } from "lucide-react";
-import { Button } from "@/components/ticketing/common/ui/button";
+import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import BottomNav from "@/components/layout/BottomNav";
+import { AppHeaderLogo } from "@/components/layout/AppHeaderLogo";
 
 export function UserLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, role, logout } = useAuth();
+  const { isAuthenticated, role } = useAuth();
   const isAuthPage = location.pathname === "/ticket/login" || location.pathname === "/ticket/signup";
   const isTicketingPage = location.pathname.startsWith("/ticket/ticketing");
   const isMyTicketPage = location.pathname.startsWith("/ticket/myticket");
   const showHeader = isAuthenticated && role === "student" && !isAuthPage;
-  const pageTitle = "티켓팅 포털";
-
-  const handleLogout = () => {
-    logout();
-    navigate("/ticket/login");
-  };
+  const pageTitle = "축제 포털";
 
   const handleBack = () => {
     if (isTicketingPage) {
@@ -44,46 +39,27 @@ export function UserLayout() {
   const bottomNavPaddingClass = "pb-[calc(84px+env(safe-area-inset-bottom)+0.75rem)]";
 
   return (
-      <div className="min-h-screen overflow-x-hidden bg-[var(--bg-base)]">
+    <div className="min-h-screen overflow-x-hidden bg-[var(--bg-base)]">
       {showHeader && (
         <>
           <div
             aria-hidden="true"
-            className="pointer-events-none fixed inset-x-0 top-0 z-30 h-[max(env(safe-area-inset-top),2.75rem)] bg-[var(--header-bg)] sm:hidden"
+            className="app-main-header pointer-events-none fixed inset-x-0 top-0 z-30 h-[max(env(safe-area-inset-top),2.75rem)] sm:hidden"
           />
-          <header className="sticky top-0 z-40 border-b border-[var(--header-border)] bg-[var(--header-bg)] pt-[env(safe-area-inset-top)] shadow-[0_1px_0_var(--header-border)] backdrop-blur supports-[backdrop-filter]:bg-[var(--header-bg)]">
-            <div className="mx-auto flex h-16 w-full max-w-md items-center gap-2 px-4">
-              <Button
-                variant="ghost"
+          <header className="app-main-header sticky top-0 z-40 border-b border-[var(--app-header-border)] pt-[env(safe-area-inset-top)]">
+            <div className="relative mx-auto h-16 w-full max-w-md px-4">
+              <AppHeaderLogo />
+
+              <button
                 onClick={handleBack}
-                className="h-10 w-10 rounded-lg border border-[var(--header-border)] bg-[var(--header-button-bg)] p-0 text-[var(--header-text)] hover:bg-[var(--header-button-hover)]"
+                className="app-header-ticket-button absolute top-1/2 left-4 -translate-y-1/2"
                 aria-label="뒤로가기"
                 title="뒤로가기"
               >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
+                <ArrowLeft size={18} className="app-header-ticket-icon" />
+              </button>
 
-              <div className="min-w-0 flex-1 px-1">
-                <p className="text-[length:var(--ticketing-text-header-overline)] font-semibold uppercase tracking-[0.16em] text-[var(--header-text-muted)]">
-                  DANFESTA
-                </p>
-                <h1 className="truncate text-[length:var(--ticketing-text-card-title)] font-semibold tracking-[-0.01em] text-[var(--header-text)]">
-                  {pageTitle}
-                </h1>
-              </div>
-
-              <div className="flex items-center">
-                <Button
-                  variant="ghost"
-                  onClick={handleLogout}
-                  className="h-10 rounded-lg border border-[var(--header-border)] bg-[var(--header-button-bg)] px-2.5 text-[length:var(--ticketing-text-section-body-sm)] font-semibold text-[var(--header-text)] hover:bg-[var(--header-button-hover)]"
-                  aria-label="로그아웃"
-                  title="로그아웃"
-                >
-                  <LogOut className="h-4 w-4" />
-                  로그아웃
-                </Button>
-              </div>
+              <h1 className="sr-only">{pageTitle}</h1>
             </div>
           </header>
         </>
@@ -92,7 +68,7 @@ export function UserLayout() {
       <main
         className={
           showHeader
-            ? `relative mx-auto w-full max-w-md px-4 ${isMyTicketPage ? "pt-3" : "pt-6"} ${bottomNavPaddingClass}`
+            ? `relative mx-auto w-full max-w-md px-4 ${isMyTicketPage ? "pt-3" : "pt-[var(--app-header-first-card-gap)]"} ${bottomNavPaddingClass}`
             : `relative mx-auto min-h-screen w-full max-w-md ${bottomNavPaddingClass}`
         }
       >

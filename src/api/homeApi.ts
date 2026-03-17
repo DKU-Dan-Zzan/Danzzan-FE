@@ -3,6 +3,7 @@ import { http } from "../lib/http"
 export type HomeImageDto = {
   id: number
   imageUrl: string
+  version?: string | null
 }
 
 export type EmergencyNoticeDto = {

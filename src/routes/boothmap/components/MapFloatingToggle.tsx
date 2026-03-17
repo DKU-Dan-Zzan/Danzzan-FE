@@ -15,10 +15,8 @@ export default function MapFloatingToggle({
         type="button"
         onClick={() => onChange("2D")}
         className={[
-          "rounded-full px-3 py-2 text-[11px] font-extrabold transition",
-          mode === "2D"
-            ? "bg-[#0a559c] text-white"
-            : "bg-transparent text-gray-500",
+          "boothmap-mode-toggle-button rounded-full px-3 py-2 text-[11px] font-extrabold transition",
+          mode === "2D" ? "is-active" : "bg-transparent",
         ].join(" ")}
       >
         2D
@@ -28,10 +26,8 @@ export default function MapFloatingToggle({
         type="button"
         onClick={() => onChange("3D")}
         className={[
-          "rounded-full px-2.5 py-1.5 text-[10px] font-extrabold",
-          mode === "3D"
-            ? "bg-[#0a559c] text-white"
-            : "bg-transparent text-gray-500",
+          "boothmap-mode-toggle-button rounded-full px-2.5 py-1.5 text-[10px] font-extrabold",
+          mode === "3D" ? "is-active" : "bg-transparent",
         ].join(" ")}
       >
         3D

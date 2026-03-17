@@ -38,6 +38,7 @@ export type Pub = {
   id: number;
   college_id: number;
   department_id: number;
+  department?: string;
   name: string;
   intro?: string;
   description?: string;
