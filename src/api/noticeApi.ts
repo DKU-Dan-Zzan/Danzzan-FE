@@ -50,24 +50,26 @@ export async function getNoticeDetail(id: number): Promise<NoticeDto> {
   return res.data;
 }
 
-export type PlacementKey = "HOME" | "BOOTH_LIST" | "MAP" | "TICKET";
+export type PlacementKey = "HOME_BOTTOM" | "MY_TICKET";
 
 export type ClientAdDto = {
   id: number;
   title: string;
   imageUrl: string;
-  linkUrl?: string | null;
-  placement: string;
-  startDate: string;
-  endDate: string;
+  placement: PlacementKey;
   isActive: boolean;
-  priority?: number | null;
   createdAt: string;
+  updatedAt: string;
 };
 
-export async function getPlacementAds(placement: PlacementKey): Promise<ClientAdDto[]> {
-  const res = await http.get<ClientAdDto[]>(`/api/ads`, {
+export async function getPlacementAd(placement: PlacementKey): Promise<ClientAdDto | null> {
+  const res = await http.get<ClientAdDto>(`/api/ads`, {
     params: { placement },
   });
+
+  if (res.status === 204 || !res.data) {
+    return null;
+  }
+
   return res.data;
 }

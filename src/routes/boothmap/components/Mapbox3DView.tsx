@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import mapboxgl from "mapbox-gl";
+import type { Feature, FeatureCollection, Point } from "geojson";
 import type {
   Booth,
   College,
@@ -92,6 +93,10 @@ function createPinDataUrl(color: string) {
   `;
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
+
+type MapClickEvent = {
+  point: mapboxgl.PointLike;
+};
 
 function getOffsetYBySnap(sheetSnap: SheetSnap) {
   if (sheetSnap === "FULL") return 220;
@@ -282,8 +287,8 @@ export default function Mapbox3DView({
     return map;
   }, [colleges]);
 
-  const layerGeoJson = useMemo<GeoJSON.FeatureCollection<GeoJSON.Point>>(() => {
-    const features: GeoJSON.Feature<GeoJSON.Point>[] = [];
+  const layerGeoJson = useMemo<FeatureCollection<Point>>(() => {
+    const features: Feature<Point>[] = [];
 
     const addBooth = (booth: Booth) => {
       const isSelected =
@@ -489,7 +494,14 @@ export default function Mapbox3DView({
         },
       });
 
-      map.on("click", HIT_AREA_LAYER_ID, (event) => {
+      map.on(
+        "click",
+        HIT_AREA_LAYER_ID,
+        (
+          event: mapboxgl.MapMouseEvent & {
+            features?: mapboxgl.MapboxGeoJSONFeature[];
+          }
+        ) => {
         const feature = event.features?.[0];
         if (!feature) return;
 
@@ -504,7 +516,8 @@ export default function Mapbox3DView({
         if (kind === "college") {
           onClickCollege(id);
         }
-      });
+        }
+      );
 
       map.on("mouseenter", HIT_AREA_LAYER_ID, () => {
         map.getCanvas().style.cursor = "pointer";
@@ -514,7 +527,7 @@ export default function Mapbox3DView({
         map.getCanvas().style.cursor = "";
       });
 
-      map.on("click", (event) => {
+      map.on("click", (event: MapClickEvent) => {
         const hitFeatures = map.queryRenderedFeatures(event.point, {
           layers: [HIT_AREA_LAYER_ID],
         });
