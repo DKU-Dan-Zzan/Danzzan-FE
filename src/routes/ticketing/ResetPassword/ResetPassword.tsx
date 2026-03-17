@@ -12,6 +12,7 @@ import {
   getPasswordPolicyState,
   isPasswordPolicyErrorMessage,
 } from "@/lib/ticketing/passwordPolicy";
+import { TICKETING_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
 
 type ResetStep = "request" | "verify" | "password";
 type ResetStepItem = {
@@ -23,7 +24,7 @@ const DEFAULT_TIMER_SECONDS = 180;
 const STUDENT_ID_REGEX = /^\d{8}$/;
 const VERIFICATION_CODE_REGEX = /^\d{6}$/;
 const ERROR_CODE_MESSAGES: Record<string, string> = {
-  PASSWORD_RESET_USER_NOT_FOUND: "등록되지 않은 학번입니다. 티켓팅 서비스에 가입된 학번을 입력해 주세요.",
+  PASSWORD_RESET_USER_NOT_FOUND: "등록되지 않은 학번입니다. 축제 포털에 가입된 학번을 입력해 주세요.",
   PASSWORD_RESET_RESEND_COOLDOWN: "잠시 후 인증번호를 다시 요청해 주세요.",
   PASSWORD_RESET_RATE_LIMITED: "요청 횟수 제한을 초과했습니다. 잠시 후 다시 시도해 주세요.",
   PASSWORD_RESET_TOO_MANY_ATTEMPTS: "인증 시도 횟수를 초과했습니다. 잠시 후 다시 시도해 주세요.",
@@ -111,8 +112,6 @@ export default function ResetPassword() {
   const [resettingPassword, setResettingPassword] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const inputClassName =
-    "h-11 rounded-2xl border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20";
 
   const isStudentIdValid = STUDENT_ID_REGEX.test(studentId);
   const isVerificationCodeValid = VERIFICATION_CODE_REGEX.test(verificationCode);
@@ -363,7 +362,7 @@ export default function ResetPassword() {
       <div className="mx-auto w-full max-w-[420px] px-5 py-6">
         <div className="mt-9">
           <p className="text-[length:var(--ticketing-text-helper)] font-semibold text-[var(--text-muted)]">
-            재학생 전용 서비스
+            재학생 전용 축제 포털 서비스
           </p>
           <h1 className="mt-1 leading-[1.12] font-black tracking-tight text-[var(--text)]">
             비밀번호 재설정
@@ -454,14 +453,14 @@ export default function ResetPassword() {
                   inputMode="numeric"
                   maxLength={8}
                   placeholder="학번 8자리를 입력해 주세요"
-                  className={inputClassName}
+                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
                   disabled={requestingCode}
                   required
                 />
               </div>
 
               <p className="rounded-2xl border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] px-4 py-3 text-sm leading-6 text-[var(--text)]">
-                티켓팅 서비스에 기존에 가입된 학생에게, 입력한 학번의 학교 이메일(학번@dankook.ac.kr)로 인증번호가 발송됩니다.
+                축제 포털에 기존에 가입된 학생에게, 입력한 학번의 학교 이메일(학번@dankook.ac.kr)로 인증번호가 발송됩니다.
               </p>
 
               {error && (
@@ -494,7 +493,7 @@ export default function ResetPassword() {
                   inputMode="numeric"
                   maxLength={6}
                   placeholder="인증번호 6자리를 입력해 주세요"
-                  className={inputClassName}
+                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
                   disabled={verifyingCode}
                   required
                 />
@@ -575,7 +574,7 @@ export default function ResetPassword() {
                     setPassword(event.target.value);
                   }}
                   placeholder="새 비밀번호를 입력해 주세요"
-                  className={inputClassName}
+                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
                   autoComplete="new-password"
                   disabled={resettingPassword}
                   required
@@ -595,7 +594,7 @@ export default function ResetPassword() {
                     setPasswordConfirm(event.target.value);
                   }}
                   placeholder="새 비밀번호를 다시 입력해 주세요"
-                  className={inputClassName}
+                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
                   autoComplete="new-password"
                   disabled={resettingPassword}
                   required

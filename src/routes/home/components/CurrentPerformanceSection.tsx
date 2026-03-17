@@ -54,53 +54,67 @@ export default function CurrentPerformanceSection() {
   const currentPerformance = useMemo(() => {
     return getCurrentPerformance(performances, now);
   }, [performances, now]);
+  const status = loading
+    ? "loading"
+    : error
+      ? "error"
+      : currentPerformance
+        ? "active"
+        : "empty";
 
-  if (loading || error || !currentPerformance) {
-    return null;
-  }
+  const helperText =
+    status === "loading"
+      ? "현재 진행 중인 공연을 확인하고 있어요."
+      : status === "error"
+        ? "공연 정보를 불러오지 못했어요. 잠시 후 다시 확인해 주세요."
+        : status === "empty"
+          ? "현재 진행 중인 공연이 없습니다."
+          : null;
 
   return (
-    <section className="mt-10 px-5">
+    <section className="px-5">
       <div className="mx-auto w-full max-w-[314px]">
-        <p className="mb-3 text-sm font-semibold text-gray-500">
-          현재 공연
+        <p className="home-caption-text home-current-performance-caption">
+          현재 진행 중인 공연을 지금 확인하세요
         </p>
 
         <button
           type="button"
           onClick={() => navigate(`/timetable?date=${today}`)}
           style={{ aspectRatio: CARD_ASPECT_RATIO }}
-          className="w-full rounded-[22px] border border-gray-100 bg-white px-5 py-4 shadow-[0_8px_24px_rgba(15,23,42,0.08)] transition active:scale-[0.99]"
+          className="home-current-performance-card w-full rounded-[22px] border border-gray-100 bg-white px-5 py-4 transition active:scale-[0.99]"
         >
-          <div className="flex h-full items-center gap-4">
-            <div className="h-[68px] w-[68px] shrink-0 overflow-hidden rounded-full border border-gray-200 bg-gray-100">
-              <img
-                src={
-                  currentPerformance.artistImageUrl || "/images/default-artist.png"
-                }
-                alt={currentPerformance.artistName}
-                className="h-full w-full object-cover"
-              />
+          {status === "active" && currentPerformance ? (
+            <div className="flex h-full items-center gap-4">
+              <div className="h-[68px] w-[68px] shrink-0 overflow-hidden rounded-full border border-gray-200 bg-gray-100">
+                <img
+                  src={currentPerformance.artistImageUrl || "/images/default-artist.png"}
+                  alt={currentPerformance.artistName}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+
+              <div className="min-w-0 flex-1 text-left">
+                <p className="truncate text-[18px] font-bold leading-tight text-gray-900">
+                  {currentPerformance.artistName}
+                </p>
+
+                <p className="mt-1 text-[14px] font-medium text-gray-500">
+                  {currentPerformance.startTime} - {currentPerformance.endTime}
+                </p>
+              </div>
             </div>
-
-            <div className="min-w-0 flex-1 text-left">
-              {/* LIVE 표시 */}
-              {/* <div className="mb-1.5 flex items-center gap-2">
-                <span className="inline-flex items-center rounded-full bg-[var(--bg-page-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--accent)]">
-                  <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
-                  LIVE
-                </span>
-              </div> */}
-
-              <p className="truncate text-[18px] font-bold leading-tight text-gray-900">
-                {currentPerformance.artistName}
-              </p>
-
-              <p className="mt-1 text-[14px] font-medium text-gray-500">
-                {currentPerformance.startTime} - {currentPerformance.endTime}
-              </p>
+          ) : (
+            <div className="flex h-full items-center gap-4">
+              <div className="flex h-[68px] w-[68px] shrink-0 items-center justify-center rounded-full border border-gray-200 bg-gray-100 text-xs font-semibold text-gray-500">
+                NOW
+              </div>
+              <div className="min-w-0 flex-1 text-left">
+                <p className="text-[16px] font-semibold leading-tight text-gray-800">{helperText}</p>
+                <p className="mt-1 text-[13px] font-medium text-gray-500">타임테이블에서 다음 공연을 확인해 보세요.</p>
+              </div>
             </div>
-          </div>
+          )}
         </button>
       </div>
     </section>

@@ -2,6 +2,12 @@
 
 import { useEffect, useMemo, useRef } from "react"
 import useKakaoMapLoader from "../../../hooks/useKakaoMapLoader"
+import {
+  BOOTHMAP_MARKER_THEME,
+  BOOTHMAP_SELECTED_RING,
+  BOOTHMAP_SELECTED_SHADOW_SOFT,
+  type BoothmapMarkerType,
+} from "../constants/boothmapTheme"
 import type {
   Booth,
   College,
@@ -41,7 +47,7 @@ const DANKOOK_BOUNDS = {
   east: 127.137,
 }
 
-type MarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "FACILITY"
+type MarkerType = BoothmapMarkerType
 
 type OverlayRecord = {
   overlay: any
@@ -55,33 +61,7 @@ type OverlayRecord = {
 }
 
 function getMarkerConfig(type: MarkerType) {
-  switch (type) {
-    case "PUB":
-      return {
-        color: "#0a559c",
-        iconPath: "/markers/booth-pub.svg",
-      }
-    case "FOOD_TRUCK":
-      return {
-        color: "#ef4444",
-        iconPath: "/markers/booth-foodtruck.svg",
-      }
-    case "EXPERIENCE":
-      return {
-        color: "#10b981",
-        iconPath: "/markers/booth-experience.svg",
-      }
-    case "FACILITY":
-      return {
-        color: "#3b82f6",
-        iconPath: "/markers/facility-restroom.svg",
-      }
-    default:
-      return {
-        color: "#0a559c",
-        iconPath: "/markers/booth-experience.svg",
-      }
-  }
+  return BOOTHMAP_MARKER_THEME[type] ?? BOOTHMAP_MARKER_THEME.PUB
 }
 
 // 물방울 핀 모양 SVG를 data url로 생성
@@ -96,10 +76,10 @@ function createPinDataUrl(color: string) {
 
 // type별 pin url 캐싱
 const PIN_URL_MAP: Record<MarkerType, string> = {
-  PUB: createPinDataUrl("#0a559c"),
-  FOOD_TRUCK: createPinDataUrl("#ef4444"),
-  EXPERIENCE: createPinDataUrl("#10b981"),
-  FACILITY: createPinDataUrl("#3b82f6"),
+  PUB: createPinDataUrl(BOOTHMAP_MARKER_THEME.PUB.color),
+  FOOD_TRUCK: createPinDataUrl(BOOTHMAP_MARKER_THEME.FOOD_TRUCK.color),
+  EXPERIENCE: createPinDataUrl(BOOTHMAP_MARKER_THEME.EXPERIENCE.color),
+  FACILITY: createPinDataUrl(BOOTHMAP_MARKER_THEME.FACILITY.color),
 }
 
 function kakaoLevelToMapboxZoom(level: number) {
@@ -404,7 +384,7 @@ export default function KakaoMapView({
     wrapper.style.userSelect = "none"
     wrapper.style.transition = "transform 0.18s ease"
     wrapper.style.filter = isSelected
-      ? "drop-shadow(0 10px 22px rgba(10,85,156,0.25))"
+      ? `drop-shadow(0 10px 22px ${BOOTHMAP_SELECTED_SHADOW_SOFT})`
       : "drop-shadow(0 8px 18px rgba(0,0,0,0.18))"
 
     const pin = document.createElement("img")
@@ -443,7 +423,7 @@ export default function KakaoMapView({
       ring.style.height = `${ringSize}px`
       ring.style.transform = "translate(-50%, -50%)"
       ring.style.borderRadius = "9999px"
-      ring.style.boxShadow = "0 0 0 5px rgba(10,85,156,0.18)"
+      ring.style.boxShadow = `0 0 0 5px ${BOOTHMAP_SELECTED_RING}`
       ring.style.pointerEvents = "none"
       wrapper.appendChild(ring)
     }

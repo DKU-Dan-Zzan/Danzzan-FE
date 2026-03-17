@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 
 import PosterCarousel, { type Poster } from "./components/PosterCarousel"
-import LineupCarousel, { type LineupBanner } from "./components/LineupCarousel"
 import EmergencyNotice, { type EmergencyNoticeData } from "./components/EmergencyNotice"
+import LineupSection, { type LineupBanner } from "./components/LineupSection"
 import CurrentPerformanceSection from "./components/CurrentPerformanceSection";
 import AdBanner from "./components/AdBanner";
 
@@ -12,6 +12,28 @@ import { getPlacementAd, type ClientAdDto } from "../../api/noticeApi"
 const dummyPosters: Poster[] = [
   { id: "p1", imageUrl: "/posters/dummy.jpg", alt: "2026 단국축제 포스터" },
 ]
+
+const getVersionFromImageUrl = (imageUrl: string) => {
+  const match = imageUrl.match(/[?&]v=([^&#]+)/)
+  if (!match?.[1]) return null
+
+  try {
+    return decodeURIComponent(match[1])
+  } catch {
+    return match[1]
+  }
+}
+
+const withImageVersion = (imageUrl: string, version?: string | null) => {
+  if (!version?.trim()) return imageUrl
+
+  const [urlWithoutHash, hash = ""] = imageUrl.split("#")
+  if (/[?&]v=/.test(urlWithoutHash)) return imageUrl
+
+  const separator = urlWithoutHash.includes("?") ? "&" : "?"
+  const nextUrl = `${urlWithoutHash}${separator}v=${encodeURIComponent(version.trim())}`
+  return hash ? `${nextUrl}#${hash}` : nextUrl
+}
 
 function Home() {
   const [posters, setPosters] = useState<Poster[]>(dummyPosters)
@@ -41,8 +63,8 @@ function Home() {
       if (imagesResult.status === "fulfilled" && imagesResult.value?.length > 0) {
         setPosters(
           imagesResult.value.map((img, idx) => ({
-            id: String(img.id),
-            imageUrl: img.imageUrl,
+            id: `${img.id}-${img.version?.trim() || getVersionFromImageUrl(img.imageUrl) || "noversion"}`,
+            imageUrl: withImageVersion(img.imageUrl, img.version),
             alt: `포스터 ${idx + 1}`,
           }))
         )
@@ -109,13 +131,7 @@ function Home() {
         <div className="home-section-poster">
           <PosterCarousel posters={posters} />
         </div>
-        {lineups.length > 0 && (
-          <>
-            <div className="home-section-lineup">
-              <LineupCarousel banners={lineups} />
-            </div>
-          </>
-        )}
+        <LineupSection banners={lineups} />
         <div className="home-section-performance">
           <CurrentPerformanceSection />
         </div>
@@ -130,8 +146,6 @@ function Home() {
           로딩 중...
         </div>
       )}
-
-      {/* <div className="home-bottom-spacer" aria-hidden="true" /> */}
     </div>
   )
 }

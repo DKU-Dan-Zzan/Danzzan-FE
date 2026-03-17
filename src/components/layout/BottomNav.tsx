@@ -13,22 +13,9 @@ const navItems = [
 const BottomNav = () => {
   return (
     <nav
-      className="
-        fixed bottom-0 left-0 right-0
-        max-w-[430px] mx-auto
-        h-[calc(var(--app-bottom-nav-height,56px)_+_env(safe-area-inset-bottom))]
-        pb-[env(safe-area-inset-bottom)]
-        z-50
-      "
+      className="fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-[430px] h-[calc(var(--app-bottom-nav-height,56px)_+_env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)]"
     >
-      <div
-        className="
-          absolute inset-0
-          bg-white/95 backdrop-blur-xl
-          border-t border-gray-200
-          shadow-[0_-8px_24px_rgba(0,0,0,0.06)]
-        "
-      />
+      <div className="app-bottom-nav-backdrop absolute inset-0" />
 
       <div className="app-bottom-nav-inner relative flex items-center">
         {navItems.map(({ to, icon: Icon, label }) => (
@@ -37,12 +24,7 @@ const BottomNav = () => {
             to={to}
             end={to === "/"}
             className={({ isActive }) =>
-              `
-              flex-1
-              relative flex h-full flex-col items-center justify-center
-              app-bottom-nav-link transition-all duration-200
-              ${isActive ? "text-blue-600" : "text-gray-400"}
-              `
+              `app-bottom-nav-link relative flex h-full flex-1 flex-col items-center justify-center transition-all duration-200 ${isActive ? "is-active" : ""}`
             }
           >
             {({ isActive }) => (

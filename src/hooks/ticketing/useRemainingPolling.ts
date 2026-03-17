@@ -16,7 +16,10 @@ export const useRemainingPolling = ({
 }: UseRemainingPollingOptions) => {
   const [remaining, setRemaining] = useState<number | null>(null);
   const onSoldOutRef = useRef(onSoldOut);
-  onSoldOutRef.current = onSoldOut;
+
+  useEffect(() => {
+    onSoldOutRef.current = onSoldOut;
+  }, [onSoldOut]);
 
   const fetchRemaining = useCallback(async () => {
     if (!eventId) return;
@@ -36,14 +39,21 @@ export const useRemainingPolling = ({
       return;
     }
 
-    // 즉시 한 번 조회
-    void fetchRemaining();
+    const runFetch = () => {
+      void fetchRemaining();
+    };
+
+    // 마운트 직후 1회 조회
+    const initialTimeoutId = window.setTimeout(runFetch, 0);
 
     const intervalId = window.setInterval(() => {
-      void fetchRemaining();
+      runFetch();
     }, intervalMs);
 
-    return () => window.clearInterval(intervalId);
+    return () => {
+      window.clearTimeout(initialTimeoutId);
+      window.clearInterval(intervalId);
+    };
   }, [enabled, eventId, intervalMs, fetchRemaining]);
 
   return { remaining };
