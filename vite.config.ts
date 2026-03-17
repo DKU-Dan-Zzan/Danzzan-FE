@@ -39,13 +39,16 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: "autoUpdate",
         includeAssets: ["favicon.ico", "apple-touch-icon.png"],
+        workbox: {
+          maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+        },
         manifest: {
           name: "DAN-ZZAN",
           short_name: "DAN-ZZAN",
           description: "DAN-ZZAN festival service",
           lang: "ko",
-          theme_color: "#0a559c",
-          background_color: "#ffffff",
+          theme_color: "#f1f6fd",
+          background_color: "#f1f6fd",
           display: "standalone",
           start_url: "/",
           scope: "/",

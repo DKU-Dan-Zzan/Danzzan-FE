@@ -1,5 +1,11 @@
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import mapboxgl from "mapbox-gl";
+import {
+  BOOTHMAP_MARKER_THEME,
+  BOOTHMAP_SELECTED_RING,
+  BOOTHMAP_SELECTED_SHADOW,
+  type BoothmapMarkerType,
+} from "../constants/boothmapTheme";
 import type {
   Booth,
   College,
@@ -37,7 +43,7 @@ const BASE_CIRCLE_LAYER_ID = "booth-base-circle";
 const BASE_ICON_LAYER_ID = "booth-base-icon";
 const HIT_AREA_LAYER_ID = "booth-hit-area";
 
-type MarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "FACILITY";
+type MarkerType = BoothmapMarkerType;
 
 type MapFeatureProperties = {
   id: number;
@@ -48,33 +54,7 @@ type MapFeatureProperties = {
 };
 
 function getMarkerConfig(type: MarkerType) {
-  switch (type) {
-    case "PUB":
-      return {
-        color: "#0a559c",
-        iconPath: "/markers/booth-pub.svg",
-      };
-    case "FOOD_TRUCK":
-      return {
-        color: "#ef4444",
-        iconPath: "/markers/booth-foodtruck.svg",
-      };
-    case "EXPERIENCE":
-      return {
-        color: "#10b981",
-        iconPath: "/markers/booth-experience.svg",
-      };
-    case "FACILITY":
-      return {
-        color: "#3b82f6",
-        iconPath: "/markers/facility-restroom.svg",
-      };
-    default:
-      return {
-        color: "#0a559c",
-        iconPath: "/markers/booth-experience.svg",
-      };
-  }
+  return BOOTHMAP_MARKER_THEME[type] ?? BOOTHMAP_MARKER_THEME.PUB;
 }
 
 function createPinDataUrl(color: string) {
@@ -92,6 +72,10 @@ function createPinDataUrl(color: string) {
   `;
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
+
+type MapClickEvent = {
+  point: mapboxgl.PointLike;
+};
 
 function getOffsetYBySnap(sheetSnap: SheetSnap) {
   if (sheetSnap === "FULL") return 220;
@@ -119,7 +103,7 @@ function buildSelectedMarkerElement(type: MarkerType, title: string) {
   wrapper.style.background = "transparent";
   wrapper.style.cursor = "pointer";
   wrapper.style.userSelect = "none";
-  wrapper.style.filter = "drop-shadow(0 14px 24px rgba(10,85,156,0.28))";
+  wrapper.style.filter = `drop-shadow(0 14px 24px ${BOOTHMAP_SELECTED_SHADOW})`;
 
   const shadow = document.createElement("div");
   shadow.style.position = "absolute";
@@ -165,7 +149,7 @@ function buildSelectedMarkerElement(type: MarkerType, title: string) {
   ring.style.height = "26px";
   ring.style.transform = "translate(-50%, -50%)";
   ring.style.borderRadius = "9999px";
-  ring.style.boxShadow = "0 0 0 5px rgba(10,85,156,0.18)";
+  ring.style.boxShadow = `0 0 0 5px ${BOOTHMAP_SELECTED_RING}`;
   ring.style.pointerEvents = "none";
 
   wrapper.appendChild(shadow);
@@ -282,8 +266,8 @@ export default function Mapbox3DView({
     return map;
   }, [colleges]);
 
-  const layerGeoJson = useMemo<GeoJSON.FeatureCollection<GeoJSON.Point>>(() => {
-    const features: GeoJSON.Feature<GeoJSON.Point>[] = [];
+  const layerGeoJson = useMemo<FeatureCollection<Point>>(() => {
+    const features: Feature<Point>[] = [];
 
     const addBooth = (booth: Booth) => {
       const isSelected =
@@ -415,14 +399,14 @@ export default function Mapbox3DView({
             "match",
             ["get", "markerType"],
             "PUB",
-            "#0a559c",
+            BOOTHMAP_MARKER_THEME.PUB.color,
             "FOOD_TRUCK",
-            "#ef4444",
+            BOOTHMAP_MARKER_THEME.FOOD_TRUCK.color,
             "EXPERIENCE",
-            "#10b981",
+            BOOTHMAP_MARKER_THEME.EXPERIENCE.color,
             "FACILITY",
-            "#3b82f6",
-            "#0a559c",
+            BOOTHMAP_MARKER_THEME.FACILITY.color,
+            BOOTHMAP_MARKER_THEME.PUB.color,
           ],
           "circle-stroke-color": "#ffffff",
           "circle-stroke-width": 2,
@@ -489,7 +473,14 @@ export default function Mapbox3DView({
         },
       });
 
-      map.on("click", HIT_AREA_LAYER_ID, (event) => {
+      map.on(
+        "click",
+        HIT_AREA_LAYER_ID,
+        (
+          event: mapboxgl.MapMouseEvent & {
+            features?: mapboxgl.MapboxGeoJSONFeature[];
+          }
+        ) => {
         const feature = event.features?.[0];
         if (!feature) return;
 
@@ -504,7 +495,8 @@ export default function Mapbox3DView({
         if (kind === "college") {
           onClickCollege(id);
         }
-      });
+        }
+      );
 
       map.on("mouseenter", HIT_AREA_LAYER_ID, () => {
         map.getCanvas().style.cursor = "pointer";
@@ -514,7 +506,7 @@ export default function Mapbox3DView({
         map.getCanvas().style.cursor = "";
       });
 
-      map.on("click", (event) => {
+      map.on("click", (event: MapClickEvent) => {
         const hitFeatures = map.queryRenderedFeatures(event.point, {
           layers: [HIT_AREA_LAYER_ID],
         });

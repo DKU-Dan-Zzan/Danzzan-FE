@@ -29,10 +29,8 @@ export default function PrimaryFilterChips({
               type="button"
               onClick={() => onChange(c.value)}
               className={[
-                "shrink-0 rounded-full border px-4 py-2 text-sm font-extrabold transition",
-                active
-                  ? "border-[#0a559c] bg-[#0a559c] text-white shadow-sm"
-                  : "border-gray-200 bg-white text-gray-500",
+                "boothmap-chip shrink-0 rounded-full px-4 py-2 text-sm font-extrabold transition",
+                active ? "is-active" : "",
               ].join(" ")}
             >
               {c.label}
