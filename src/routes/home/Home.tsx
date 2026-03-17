@@ -7,6 +7,7 @@ import CurrentPerformanceSection from "./components/CurrentPerformanceSection";
 import AdBanner from "./components/AdBanner";
 
 import { getEmergencyNotice, getHomeImages, getLineupImages } from "../../api/homeApi"
+import { getPlacementAd, type ClientAdDto } from "../../api/noticeApi"
 
 const dummyPosters: Poster[] = [
   { id: "p1", imageUrl: "/posters/dummy.jpg", alt: "2026 단국축제 포스터" },
@@ -38,6 +39,7 @@ function Home() {
   const [posters, setPosters] = useState<Poster[]>(dummyPosters)
   const [lineups, setLineups] = useState<LineupBanner[]>([])
   const [notice, setNotice] = useState<EmergencyNoticeData | null>(null)
+  const [homeBottomAd, setHomeBottomAd] = useState<ClientAdDto | null>(null)
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -49,10 +51,11 @@ function Home() {
       setLoading(true)
       setError(null)
 
-      const [imagesResult, lineupResult, noticeResult] = await Promise.allSettled([
+      const [imagesResult, lineupResult, noticeResult, homeBottomAdResult] = await Promise.allSettled([
         getHomeImages(),
         getLineupImages(),
         getEmergencyNotice(),
+        getPlacementAd("HOME_BOTTOM"),
       ])
 
       if (!alive) return
@@ -101,6 +104,12 @@ function Home() {
         }
       }
 
+      if (homeBottomAdResult.status === "fulfilled") {
+        setHomeBottomAd(homeBottomAdResult.value ?? null)
+      } else {
+        setHomeBottomAd(null)
+      }
+
       setLoading(false)
     })()
 
@@ -128,7 +137,7 @@ function Home() {
         </div>
 
         <div className="home-section-ad">
-          <AdBanner />
+          <AdBanner imageUrl={homeBottomAd?.imageUrl} alt={homeBottomAd?.title} />
         </div>
       </div>
 
