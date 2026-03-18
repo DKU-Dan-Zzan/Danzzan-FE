@@ -101,7 +101,7 @@ function createLabelContent(options: {
   return `
     <div style="
       pointer-events:none;
-      transform: translateY(-14px);
+      transform: translateY(-52px);
       opacity:${opacity};
     ">
       <div style="
@@ -125,6 +125,24 @@ function createLabelContent(options: {
   `;
 }
 
+function createAnchorDotContent(selected: boolean, kind: "booth" | "college") {
+  const color = kind === "college" ? "#2563eb" : "#10b981";
+  const size = selected ? 10 : 8;
+  const border = selected ? "#111827" : "#ffffff";
+
+  return `
+    <div style="
+      width:${size}px;
+      height:${size}px;
+      border-radius:999px;
+      background:${color};
+      border:2px solid ${border};
+      box-shadow:0 2px 6px rgba(15,23,42,0.18);
+      pointer-events:none;
+    "></div>
+  `;
+}
+
 type EditorMode = "idle" | "booth" | "college";
 type SelectedItem =
   | { kind: "booth"; id: number }
@@ -138,7 +156,7 @@ export default function AdminMap() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<any>(null);
   const mapClickHandlerRef = useRef<((mouseEvent: any) => void) | null>(null);
-  const markerRefs = useRef<Array<{ marker: any; overlay: any }>>([]);
+  const markerRefs = useRef<Array<{ marker: any; overlay: any; dotOverlay: any }>>([]);
 
   const [editorMode, setEditorMode] = useState<EditorMode>("idle");
   const [selectedItem, setSelectedItem] = useState<SelectedItem>(null);
@@ -322,9 +340,10 @@ export default function AdminMap() {
     const kakao = window.kakao;
     const map = mapRef.current;
 
-    markerRefs.current.forEach(({ marker, overlay }) => {
+    markerRefs.current.forEach(({ marker, overlay, dotOverlay }) => {
       marker.setMap(null);
       overlay.setMap(null);
+      dotOverlay.setMap(null);
     });
     markerRefs.current = [];
 
@@ -360,14 +379,22 @@ export default function AdminMap() {
       const overlay = new kakao.maps.CustomOverlay({
         map,
         position,
-        yAnchor: 2.1,
+        xAnchor: 0.5,
+        yAnchor: 1,
         zIndex: isSelected ? 21 : 6,
-        content: createLabelContent({
-          name: college.name,
+        image: createMarkerImage(kakao, {
           kind: "college",
           selected: isSelected,
-          dimmed: isDimmed,
         }),
+      });
+
+      const dotOverlay = new kakao.maps.CustomOverlay({
+        map,
+        position,
+        xAnchor: 0.5,
+        yAnchor: 0.5,
+        zIndex: isSelected ? 30 : 8,
+        content: createAnchorDotContent(isSelected, "college"),
       });
 
       kakao.maps.event.addListener(marker, "click", () => {
@@ -406,7 +433,7 @@ export default function AdminMap() {
         })();
       });
 
-      markerRefs.current.push({ marker, overlay });
+      markerRefs.current.push({ marker, overlay, dotOverlay });
       bounds.extend(position);
     });
 
@@ -439,14 +466,24 @@ export default function AdminMap() {
       const overlay = new kakao.maps.CustomOverlay({
         map,
         position,
-        yAnchor: 1.9,
+        xAnchor: 0.5,
+        yAnchor: 1,
         zIndex: isSelected ? 21 : 6,
         content: createLabelContent({
-          name: booth.name,
           kind: "booth",
+          name: booth.name,
           selected: isSelected,
           dimmed: isDimmed,
         }),
+      });
+
+      const dotOverlay = new kakao.maps.CustomOverlay({
+        map,
+        position,
+        xAnchor: 0.5,
+        yAnchor: 0.5,
+        zIndex: isSelected ? 30 : 8,
+        content: createAnchorDotContent(isSelected, "college"),
       });
 
       kakao.maps.event.addListener(marker, "click", () => {
@@ -485,7 +522,7 @@ export default function AdminMap() {
         })();
       });
 
-      markerRefs.current.push({ marker, overlay });
+      markerRefs.current.push({ marker, overlay, dotOverlay });
       bounds.extend(position);
     });
 
@@ -499,9 +536,10 @@ export default function AdminMap() {
     }
 
     return () => {
-      markerRefs.current.forEach(({ marker, overlay }) => {
+      markerRefs.current.forEach(({ marker, overlay, dotOverlay }) => {
         marker.setMap(null);
         overlay.setMap(null);
+        dotOverlay.setMap(null);
       });
       markerRefs.current = [];
     };

@@ -82,6 +82,13 @@ const PIN_URL_MAP: Record<MarkerType, string> = {
   FACILITY: createPinDataUrl(BOOTHMAP_MARKER_THEME.FACILITY.color),
 }
 
+const PIN_BOTTOM_OFFSET_MAP: Record<MarkerType, number> = {
+  PUB: 2,
+  FOOD_TRUCK: 1,
+  EXPERIENCE: 1,
+  FACILITY: 0,
+}
+
 function kakaoLevelToMapboxZoom(level: number) {
   return 20.4 - level * 1.5
 }
@@ -329,8 +336,8 @@ export default function KakaoMapView({
     const { iconPath } = getMarkerConfig(type)
     const pinUrl = PIN_URL_MAP[type]
     const scale = getMarkerScaleByLevel(level, isSelected)
-    const width = Math.round((isSelected ? 50 : 42) * scale)
-    const height = Math.round((isSelected ? 61 : 53) * scale)
+    const width = Math.round((isSelected ? 46 : 40) * scale)
+    const height = Math.round((isSelected ? 56 : 50) * scale)
     const iconSize = Math.round((isSelected ? 20 : 18) * scale)
     const ringSize = Math.round(24 * scale)
 
@@ -339,7 +346,6 @@ export default function KakaoMapView({
     wrapper.style.position = "relative"
     wrapper.style.width = `${width}px`
     wrapper.style.height = `${height}px`
-    wrapper.style.transform = "translate(-50%, -100%)"
     wrapper.style.cursor = "pointer"
     wrapper.style.userSelect = "none"
     wrapper.style.transition = "transform 0.18s ease"
@@ -347,15 +353,20 @@ export default function KakaoMapView({
       ? `drop-shadow(0 10px 22px ${BOOTHMAP_SELECTED_SHADOW_SOFT})`
       : "drop-shadow(0 8px 18px rgba(0,0,0,0.18))"
 
+    const pinBottomOffset = PIN_BOTTOM_OFFSET_MAP[type] ?? 0
+
     const pin = document.createElement("img")
     pin.src = pinUrl
     pin.alt = `${title} 핀`
     pin.style.position = "absolute"
-    pin.style.inset = "0"
-    pin.style.width = "100%"
-    pin.style.height = "100%"
+    pin.style.left = "50%"
+    pin.style.bottom = `${pinBottomOffset}px`
+    pin.style.width = `${width}px`
+    pin.style.height = `${height}px`
+    pin.style.transform = "translateX(-50%)"
     pin.style.objectFit = "contain"
     pin.draggable = false
+    pin.style.pointerEvents = "none"
 
     const icon = document.createElement("img")
     icon.src = iconPath
@@ -370,6 +381,21 @@ export default function KakaoMapView({
     icon.style.pointerEvents = "none"
     icon.style.filter = "brightness(0) invert(1)"
     icon.draggable = false
+
+    const debugDot = document.createElement("div")
+    debugDot.style.position = "absolute"
+    debugDot.style.left = "50%"
+    debugDot.style.bottom = "0"
+    debugDot.style.width = "8px"
+    debugDot.style.height = "8px"
+    debugDot.style.transform = "translate(-50%, 50%)"
+    debugDot.style.borderRadius = "9999px"
+    debugDot.style.background = "#111827"
+    debugDot.style.border = "2px solid white"
+    debugDot.style.boxShadow = "0 2px 6px rgba(0,0,0,0.15)"
+    debugDot.style.pointerEvents = "none"
+
+    wrapper.appendChild(debugDot)
 
     wrapper.appendChild(pin)
     wrapper.appendChild(icon)
@@ -439,6 +465,7 @@ export default function KakaoMapView({
     const overlay = new kakao.maps.CustomOverlay({
       position,
       content,
+      xAnchor: 0.5,
       yAnchor: 1,
       zIndex: isSelected ? 10 : 1,
     })
