@@ -313,7 +313,17 @@ function Admin() {
           fileSize: file.size,
         });
 
-        await fetch(presign.presignedUrl, {
+        if (import.meta.env.DEV) {
+          // presign 응답 구조 디버깅용
+          console.log("[notice presign]", presign);
+        }
+
+        if (!presign.presignedUrl) {
+          console.error("[notice presign] presignedUrl is undefined", presign);
+          throw new Error("presignedUrl이 비어 있습니다. presign API 응답을 확인해 주세요.");
+        }
+
+        const putRes = await fetch(presign.presignedUrl, {
           method: presign.method,
           headers: {
             "Content-Type": file.type,
@@ -321,12 +331,25 @@ function Admin() {
           body: file,
         });
 
-        setEditingNotice((prev) =>
-          prev ? { ...prev, images: [...prev.images, presign.imageUrl] } : prev,
-        );
+        if (!putRes.ok) {
+          const errorText = await putRes.text().catch(() => "");
+          const message = [
+            `S3 업로드 실패: ${putRes.status} ${putRes.statusText}`,
+            errorText ? `응답: ${errorText}` : "",
+          ]
+            .filter(Boolean)
+            .join("\n");
+          throw new Error(message);
+        }
+
+        const url = presign.imageUrl ?? presign.fileUrl;
+        setEditingNotice((prev) => (prev ? { ...prev, images: [...prev.images, url] } : prev));
       }
     } catch (error) {
-      setGlobalError(error instanceof Error ? error.message : "이미지 업로드에 실패했습니다.");
+      const message =
+        error instanceof Error ? error.message : "이미지 업로드에 실패했습니다.";
+      setGlobalError(message);
+      window.alert(message);
     } finally {
       setNoticeImageUploading(false);
     }
@@ -613,7 +636,7 @@ function Admin() {
             <table className="min-w-full text-left text-xs">
               <thead className="bg-[var(--surface-subtle)] text-[var(--text-muted)]">
                 <tr>
-                  <th className="px-4 py-2 font-semibold">제목</th>
+                  <th className="px-4 py-2 font-semibold">제목 / 썸네일</th>
                   <th className="px-4 py-2 font-semibold">작성자</th>
                   <th className="px-4 py-2 font-semibold">날짜</th>
                   <th className="px-3 py-2 text-center font-semibold">
@@ -642,11 +665,18 @@ function Admin() {
                 {effectivePinned.map((notice, index) => (
                   <tr key={notice.id} className="bg-orange-50/60">
                     <td className="px-4 py-2 align-middle">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-2">
                         <span className="inline-flex items-center gap-1 rounded-full bg-orange-500 px-2 py-0.5 text-[10px] font-semibold text-white">
                           <span>📌</span>
                           <span>상단 고정</span>
                         </span>
+                        {notice.thumbnailImageUrl && (
+                          <img
+                            src={notice.thumbnailImageUrl}
+                            alt={notice.title}
+                            className="h-8 w-8 flex-shrink-0 rounded-lg object-cover"
+                          />
+                        )}
                         <span className="truncate text-sm font-semibold text-[var(--text)]">
                           {notice.title}
                         </span>
@@ -720,7 +750,16 @@ function Admin() {
                 {noticeOthers.map((notice) => (
                   <tr key={notice.id}>
                     <td className="px-4 py-2 align-middle">
-                      <span className="truncate text-sm text-[var(--text)]">{notice.title}</span>
+                      <div className="flex items-center gap-2">
+                        {notice.thumbnailImageUrl && (
+                          <img
+                            src={notice.thumbnailImageUrl}
+                            alt={notice.title}
+                            className="h-8 w-8 flex-shrink-0 rounded-lg object-cover"
+                          />
+                        )}
+                        <span className="truncate text-sm text-[var(--text)]">{notice.title}</span>
+                      </div>
                     </td>
                     <td className="px-4 py-2 text-[var(--text-muted)]">{notice.author}</td>
                     <td className="px-4 py-2 text-[var(--text-muted)]">
@@ -898,8 +937,8 @@ function Admin() {
 
       {/* 공지 작성/수정 모달 */}
       {editingNotice && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-3xl rounded-2xl bg-white p-5 shadow-xl">
+        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 px-4 py-6">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-5 shadow-xl">
             <h3 className="text-base font-bold text-[var(--text)]">
               {editingNotice.id ? "공지 수정" : "새 공지 등록"}
             </h3>
@@ -990,11 +1029,18 @@ function Admin() {
                   </div>
                   {editingNotice.images.length > 0 && (
                     <div className="mt-4 grid w-full max-w-sm grid-cols-3 gap-2">
-                      {editingNotice.images.map((url) => {
-                        const isThumbnail = editingNotice.thumbnailImageUrl === url;
+                      {editingNotice.images.map((url, index) => {
+                        const isThumbnail =
+                          (editingNotice.thumbnailImageUrl || editingNotice.images[0]) === url;
                         return (
-                          <div
+                          <button
                             key={url}
+                            type="button"
+                            onClick={() =>
+                              setEditingNotice((prev) =>
+                                prev ? { ...prev, thumbnailImageUrl: url } : prev,
+                              )
+                            }
                             className={`group relative h-20 overflow-hidden rounded-xl border ${
                               isThumbnail
                                 ? "border-[var(--accent)] ring-2 ring-[var(--accent)]/40"
@@ -1002,44 +1048,35 @@ function Admin() {
                             } bg-white`}
                           >
                             <img src={url} alt="공지 이미지" className="h-full w-full object-cover" />
-                            <div className="absolute inset-x-1 bottom-1 flex justify-between gap-1 text-[9px]">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setEditingNotice((prev) =>
-                                    prev ? { ...prev, thumbnailImageUrl: url } : prev,
-                                  )
-                                }
-                                className={`flex-1 rounded-full px-1.5 py-0.5 font-semibold ${
-                                  isThumbnail
-                                    ? "bg-[var(--accent)] text-white"
-                                    : "bg-black/60 text-white"
-                                }`}
-                              >
-                                {isThumbnail ? "썸네일" : "썸네일로"}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setEditingNotice((prev) =>
-                                    prev
-                                      ? {
-                                          ...prev,
-                                          images: prev.images.filter((img) => img !== url),
-                                          thumbnailImageUrl:
-                                            prev.thumbnailImageUrl === url
-                                              ? ""
-                                              : prev.thumbnailImageUrl,
-                                        }
-                                      : prev,
-                                  )
-                                }
-                                className="rounded-full bg-black/60 px-1.5 py-0.5 font-semibold text-white"
-                              >
-                                삭제
-                              </button>
-                            </div>
-                          </div>
+                            {isThumbnail && (
+                              <div className="absolute inset-0 flex items-start justify-end p-1">
+                                <span className="rounded-full bg-black/55 px-2 py-0.5 text-[9px] font-semibold text-white">
+                                  대표 이미지
+                                </span>
+                              </div>
+                            )}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingNotice((prev) =>
+                                  prev
+                                    ? {
+                                        ...prev,
+                                        images: prev.images.filter((img) => img !== url),
+                                        thumbnailImageUrl:
+                                          prev.thumbnailImageUrl === url
+                                            ? prev.images.filter((img) => img !== url)[0] ?? ""
+                                            : prev.thumbnailImageUrl,
+                                      }
+                                    : prev,
+                                );
+                              }}
+                              className="absolute inset-x-1 bottom-1 rounded-full bg-black/60 px-1.5 py-0.5 text-[9px] font-semibold text-white"
+                            >
+                              삭제
+                            </button>
+                          </button>
                         );
                       })}
                     </div>
@@ -1095,7 +1132,7 @@ function Admin() {
                     type="submit"
                     className="rounded-2xl bg-[var(--accent)] px-4 py-2 font-semibold text-white shadow-sm hover:brightness-95"
                   >
-                    저장하기
+                    {editingNotice.id ? "수정하기" : "등록하기"}
                   </button>
                 </div>
               </div>

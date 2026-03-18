@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getNoticeDetail, getNotices, type NoticeDto } from "../../api/noticeApi";
 
 type CategoryKey = "ALL" | "GENERAL" | "EVENT";
@@ -43,6 +43,10 @@ function Notice() {
     loading: false,
     error: null,
   });
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [dragStartX, setDragStartX] = useState<number | null>(null);
+  const wheelAccumXRef = useRef(0);
+  const wheelCooldownRef = useRef(false);
 
   useEffect(() => {
     let alive = true;
@@ -99,6 +103,7 @@ function Notice() {
     try {
       const res = await getNoticeDetail(id);
       setDetailState({ notice: res, loading: false, error: null });
+      setActiveImageIndex(0);
     } catch (error) {
       setDetailState({
         notice: null,
@@ -110,6 +115,10 @@ function Notice() {
 
   const handleCloseDetail = () => {
     setDetailState({ notice: null, loading: false, error: null });
+    setActiveImageIndex(0);
+    setDragStartX(null);
+    wheelAccumXRef.current = 0;
+    wheelCooldownRef.current = false;
   };
 
   const handleChangePage = (nextPage: number) => {
@@ -195,9 +204,15 @@ function Notice() {
               className="group flex w-full items-center justify-between rounded-[18px] border border-[#E5E7EB] bg-white px-4 py-3 text-left shadow-[0_4px_12px_rgba(15,23,42,0.05)] transition-transform active:scale-[0.99]"
             >
               <div className="flex min-w-0 flex-1 items-center gap-2.5">
-                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#F3F4F6] text-[11px] font-semibold text-[#6B7280]">
-                  {notice.category === "EVENT" ? "이벤트" : "일반"}
-                </span>
+                {notice.thumbnailImageUrl && (
+                  <div className="flex h-9 w-9 flex-shrink-0 overflow-hidden rounded-xl border border-[#E5E7EB] bg-[#F9FAFB]">
+                    <img
+                      src={notice.thumbnailImageUrl}
+                      alt={notice.title}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                )}
                 <div className="min-w-0">
                   <p className="truncate text-[13px] font-semibold text-[#111827]">
                     {notice.title}
@@ -280,7 +295,109 @@ function Notice() {
                     </div>
                   </header>
 
-                  {detailState.notice.thumbnailImageUrl && (
+                  {(detailState.notice.imageUrls?.length ?? 0) > 0 ? (
+                    <div className="mt-3">
+                      <div
+                        className="relative overflow-hidden rounded-2xl border border-[#E5E7EB] bg-[#F9FAFB]"
+                        onTouchStart={(e) => {
+                          if (e.touches.length === 1) {
+                            setDragStartX(e.touches[0].clientX);
+                          }
+                        }}
+                        onTouchEnd={(e) => {
+                          if (dragStartX == null || !detailState.notice?.imageUrls) return;
+                          const endX = e.changedTouches[0]?.clientX ?? dragStartX;
+                          const delta = endX - dragStartX;
+                          const threshold = 40;
+                          const maxIndex = detailState.notice.imageUrls.length - 1;
+
+                          if (delta <= -threshold && activeImageIndex < maxIndex) {
+                            setActiveImageIndex((prev) => Math.min(prev + 1, maxIndex));
+                          } else if (delta >= threshold && activeImageIndex > 0) {
+                            setActiveImageIndex((prev) => Math.max(prev - 1, 0));
+                          }
+
+                          setDragStartX(null);
+                        }}
+                        onMouseDown={(e) => {
+                          if (e.button !== 0) return;
+                          setDragStartX(e.clientX);
+                        }}
+                        onMouseUp={(e) => {
+                          if (dragStartX == null || !detailState.notice?.imageUrls) return;
+                          const endX = e.clientX ?? dragStartX;
+                          const delta = endX - dragStartX;
+                          const threshold = 40;
+                          const maxIndex = detailState.notice.imageUrls.length - 1;
+
+                          if (delta <= -threshold && activeImageIndex < maxIndex) {
+                            setActiveImageIndex((prev) => Math.min(prev + 1, maxIndex));
+                          } else if (delta >= threshold && activeImageIndex > 0) {
+                            setActiveImageIndex((prev) => Math.max(prev - 1, 0));
+                          }
+
+                          setDragStartX(null);
+                        }}
+                        onWheel={(e) => {
+                          if (!detailState.notice?.imageUrls?.length) return;
+                          const dx = e.deltaX;
+                          const dy = e.deltaY;
+                          if (Math.abs(dx) <= Math.abs(dy)) return; // 세로 스크롤 우선
+
+                          // 트랙패드 좌우 스와이프: deltaX 누적이 일정 이상이면 페이지 이동
+                          const threshold = 80;
+                          const maxIndex = detailState.notice.imageUrls.length - 1;
+
+                          wheelAccumXRef.current += dx;
+
+                          if (wheelCooldownRef.current) return;
+
+                          if (wheelAccumXRef.current >= threshold && activeImageIndex > 0) {
+                            e.preventDefault();
+                            wheelCooldownRef.current = true;
+                            setActiveImageIndex((prev) => Math.max(prev - 1, 0));
+                            wheelAccumXRef.current = 0;
+                            window.setTimeout(() => {
+                              wheelCooldownRef.current = false;
+                            }, 220);
+                          } else if (wheelAccumXRef.current <= -threshold && activeImageIndex < maxIndex) {
+                            e.preventDefault();
+                            wheelCooldownRef.current = true;
+                            setActiveImageIndex((prev) => Math.min(prev + 1, maxIndex));
+                            wheelAccumXRef.current = 0;
+                            window.setTimeout(() => {
+                              wheelCooldownRef.current = false;
+                            }, 220);
+                          }
+                        }}
+                      >
+                        <img
+                          src={detailState.notice.imageUrls?.[activeImageIndex]}
+                          alt={detailState.notice.title}
+                          className="max-h-60 w-full object-cover"
+                        />
+                        <div className="pointer-events-none absolute right-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold text-white">
+                          {activeImageIndex + 1} / {detailState.notice.imageUrls?.length ?? 0}
+                        </div>
+                      </div>
+                      <div className="mt-2 flex justify-center">
+                        <div className="flex items-center gap-1">
+                          {detailState.notice.imageUrls?.map((_, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => setActiveImageIndex(idx)}
+                              className={`h-1.5 rounded-full transition-all ${
+                                activeImageIndex === idx
+                                  ? "w-4 bg-[#2563EB]"
+                                  : "w-1.5 bg-[#D1D5DB]"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ) : detailState.notice.thumbnailImageUrl ? (
                     <div className="mt-3 overflow-hidden rounded-2xl border border-[#E5E7EB]">
                       <img
                         src={detailState.notice.thumbnailImageUrl}
@@ -288,7 +405,7 @@ function Notice() {
                         className="max-h-60 w-full object-cover"
                       />
                     </div>
-                  )}
+                  ) : null}
 
                   <div className="mt-4 whitespace-pre-wrap text-[13px] leading-relaxed text-[#111827]">
                     {detailState.notice.content}
