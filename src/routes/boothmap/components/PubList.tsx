@@ -48,6 +48,12 @@ export default function PubList({
                 {p.name}
               </div>
 
+              {p.department && (
+                <div className="mt-1 truncate text-sm font-semibold text-gray-500">
+                  {p.department}
+                </div>
+              )}
+
               <div className="mt-1 line-clamp-2 text-sm font-medium text-gray-600">
                 {p.intro ?? "소개가 아직 없어요"}
               </div>

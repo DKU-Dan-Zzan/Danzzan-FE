@@ -17,7 +17,7 @@ type Props = {
 export default function PosterCarousel({
   posters,
   intervalMs = 3500,
-  aspect = "314.4/310",
+  aspect = "4962/7017",
 }: Props) {
   const count = posters.length
   const [index, setIndex] = useState(0)
