@@ -156,7 +156,7 @@ export default function AdminMap() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<any>(null);
   const mapClickHandlerRef = useRef<((mouseEvent: any) => void) | null>(null);
-  const markerRefs = useRef<Array<{ marker: any; overlay: any; dotOverlay: any }>>([]);
+  const markerRefs = useRef<Array<{ marker: any; overlay: any | null; dotOverlay: any }>>([]);
 
   const [editorMode, setEditorMode] = useState<EditorMode>("idle");
   const [selectedItem, setSelectedItem] = useState<SelectedItem>(null);
@@ -341,9 +341,9 @@ export default function AdminMap() {
     const map = mapRef.current;
 
     markerRefs.current.forEach(({ marker, overlay, dotOverlay }) => {
-      marker.setMap(null);
-      overlay.setMap(null);
-      dotOverlay.setMap(null);
+      marker?.setMap(null);
+      overlay?.setMap(null);
+      dotOverlay?.setMap(null);
     });
     markerRefs.current = [];
 
@@ -376,17 +376,23 @@ export default function AdminMap() {
         marker.setOpacity(isDimmed ? 0.55 : 1);
       }
 
-      const overlay = new kakao.maps.CustomOverlay({
-        map,
-        position,
-        xAnchor: 0.5,
-        yAnchor: 1,
-        zIndex: isSelected ? 21 : 6,
-        image: createMarkerImage(kakao, {
-          kind: "college",
-          selected: isSelected,
-        }),
-      });
+      const shouldShowCollegeLabel = editorMode === "college";
+
+      const overlay = shouldShowCollegeLabel
+        ? new kakao.maps.CustomOverlay({
+            map,
+            position,
+            xAnchor: 0.5,
+            yAnchor: 1,
+            zIndex: isSelected ? 21 : 6,
+            content: createLabelContent({
+              kind: "college",
+              name: college.name,
+              selected: isSelected,
+              dimmed: false,
+            }),
+          })
+        : null;
 
       const dotOverlay = new kakao.maps.CustomOverlay({
         map,
@@ -463,19 +469,23 @@ export default function AdminMap() {
         marker.setOpacity(isDimmed ? 0.55 : 1);
       }
 
-      const overlay = new kakao.maps.CustomOverlay({
-        map,
-        position,
-        xAnchor: 0.5,
-        yAnchor: 1,
-        zIndex: isSelected ? 21 : 6,
-        content: createLabelContent({
-          kind: "booth",
-          name: booth.name,
-          selected: isSelected,
-          dimmed: isDimmed,
-        }),
-      });
+      const shouldShowBoothLabel = editorMode === "booth";
+
+      const overlay = shouldShowBoothLabel
+        ? new kakao.maps.CustomOverlay({
+            map,
+            position,
+            xAnchor: 0.5,
+            yAnchor: 1,
+            zIndex: isSelected ? 21 : 6,
+            content: createLabelContent({
+              kind: "booth",
+              name: booth.name,
+              selected: isSelected,
+              dimmed: false,
+            }),
+          })
+        : null;
 
       const dotOverlay = new kakao.maps.CustomOverlay({
         map,
@@ -537,9 +547,9 @@ export default function AdminMap() {
 
     return () => {
       markerRefs.current.forEach(({ marker, overlay, dotOverlay }) => {
-        marker.setMap(null);
-        overlay.setMap(null);
-        dotOverlay.setMap(null);
+        marker?.setMap(null);
+        overlay?.setMap(null);
+        dotOverlay?.setMap(null);
       });
       markerRefs.current = [];
     };
