@@ -28,6 +28,103 @@ declare global {
   }
 }
 
+function createCollegeMarkerSvg(selected: boolean) {
+  const stroke = selected ? "#1d4ed8" : "#1e40af";
+  const fill = selected ? "#dbeafe" : "#eff6ff";
+
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+    <svg width="44" height="52" viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22 50C22 50 38 33.8 38 21C38 11.6112 30.3888 4 21 4C11.6112 4 4 11.6112 4 21C4 33.8 22 50 22 50Z"
+        fill="${fill}" stroke="${stroke}" stroke-width="3"/>
+      <path d="M14 20.5L22 15L30 20.5V29.5H14V20.5Z" fill="${stroke}"/>
+      <rect x="19.5" y="21.5" width="5" height="8" rx="1" fill="white"/>
+    </svg>
+  `)}`;
+}
+
+function getBoothColor(type?: string) {
+  if (type === "FOOD_TRUCK") return "#ef4444";
+  if (type === "EXPERIENCE") return "#10b981";
+  if (type === "FACILITY") return "#3b82f6";
+  return "#10b981";
+}
+
+function createBoothMarkerSvg(type: string | undefined, selected: boolean) {
+  const mainColor = getBoothColor(type);
+  const stroke = selected ? "#111827" : mainColor;
+  const fill = selected ? "#ffffff" : mainColor;
+  const inner = selected ? mainColor : "#ffffff";
+
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+    <svg width="44" height="52" viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22 50C22 50 38 33.8 38 21C38 11.6112 30.3888 4 21 4C11.6112 4 4 11.6112 4 21C4 33.8 22 50 22 50Z"
+        fill="${fill}" stroke="${stroke}" stroke-width="3"/>
+      <circle cx="21" cy="21" r="7" fill="${inner}" />
+    </svg>
+  `)}`;
+}
+
+function createMarkerImage(
+  kakao: any,
+  options: {
+    kind: "booth" | "college";
+    boothType?: string;
+    selected: boolean;
+  },
+) {
+  const width = options.selected ? 44 : 36;
+  const height = options.selected ? 52 : 44;
+
+  const size = new kakao.maps.Size(width, height);
+  const offset = new kakao.maps.Point(width / 2, height);
+
+  const src =
+    options.kind === "college"
+      ? createCollegeMarkerSvg(options.selected)
+      : createBoothMarkerSvg(options.boothType, options.selected);
+
+  return new kakao.maps.MarkerImage(src, size, { offset });
+}
+
+function createLabelContent(options: {
+  name: string;
+  kind: "booth" | "college";
+  selected: boolean;
+  dimmed: boolean;
+}) {
+  const accent = options.kind === "college" ? "#2563eb" : "#10b981";
+  const background = options.selected ? accent : "#ffffff";
+  const color = options.selected ? "#ffffff" : "#111827";
+  const border = options.selected ? accent : "#d1d5db";
+  const opacity = options.dimmed ? 0.55 : 1;
+
+  return `
+    <div style="
+      pointer-events:none;
+      transform: translateY(-14px);
+      opacity:${opacity};
+    ">
+      <div style="
+        display:inline-flex;
+        align-items:center;
+        max-width:180px;
+        padding:6px 10px;
+        border-radius:999px;
+        border:1px solid ${border};
+        background:${background};
+        color:${color};
+        font-size:12px;
+        font-weight:700;
+        line-height:1;
+        white-space:nowrap;
+        box-shadow:0 6px 14px rgba(15,23,42,0.12);
+      ">
+        ${options.name}
+      </div>
+    </div>
+  `;
+}
+
 type EditorMode = "idle" | "booth" | "college";
 type SelectedItem =
   | { kind: "booth"; id: number }
@@ -41,7 +138,7 @@ export default function AdminMap() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<any>(null);
   const mapClickHandlerRef = useRef<((mouseEvent: any) => void) | null>(null);
-  const markerRefs = useRef<any[]>([]);
+  const markerRefs = useRef<Array<{ marker: any; overlay: any }>>([]);
 
   const [editorMode, setEditorMode] = useState<EditorMode>("idle");
   const [selectedItem, setSelectedItem] = useState<SelectedItem>(null);
@@ -52,7 +149,9 @@ export default function AdminMap() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const [statusMessage, setStatusMessage] = useState<string>("");
+  const [statusMessage, setStatusMessage] = useState<string>(
+    "보기 모드입니다. 부스 편집 또는 단과대 편집 모드를 선택해 주세요."
+  );
 
   const placedBooths = useMemo(
     () => booths.filter((booth) => booth.placed && booth.locationX != null && booth.locationY != null),
@@ -135,6 +234,16 @@ export default function AdminMap() {
         return;
       }
 
+      if (selectedItem.kind === "booth" && editorMode !== "booth") {
+        setStatusMessage("부스 편집 모드에서만 부스 위치를 변경할 수 있습니다.");
+        return;
+      }
+
+      if (selectedItem.kind === "college" && editorMode !== "college") {
+        setStatusMessage("단과대 편집 모드에서만 단과대 위치를 변경할 수 있습니다.");
+        return;
+      }
+
       try {
         setGlobalError(null);
         setSaving(true);
@@ -156,7 +265,7 @@ export default function AdminMap() {
         setSaving(false);
       }
     },
-    [selectedItem, updateBoothState, updateCollegeState],
+    [selectedItem, editorMode, updateBoothState, updateCollegeState],
   );
 
   useEffect(() => {
@@ -213,7 +322,10 @@ export default function AdminMap() {
     const kakao = window.kakao;
     const map = mapRef.current;
 
-    markerRefs.current.forEach((marker) => marker.setMap(null));
+    markerRefs.current.forEach(({ marker, overlay }) => {
+      marker.setMap(null);
+      overlay.setMap(null);
+    });
     markerRefs.current = [];
 
     const bounds = new kakao.maps.LatLngBounds();
@@ -222,27 +334,61 @@ export default function AdminMap() {
       if (college.locationX == null || college.locationY == null) return;
 
       const position = new kakao.maps.LatLng(college.locationY, college.locationX);
+      const isSelected =
+        selectedItem?.kind === "college" && selectedItem.id === college.id;
+      const isEditable = editorMode === "college";
+      const isDimmed = editorMode === "booth";
 
       const marker = new kakao.maps.Marker({
         map,
         position,
-        draggable: true,
+        draggable: isEditable,
         title: college.name,
+        image: createMarkerImage(kakao, {
+          kind: "college",
+          selected: isSelected,
+        }),
+      });
+
+      if (typeof marker.setZIndex === "function") {
+        marker.setZIndex(isSelected ? 20 : 5);
+      }
+      if (typeof marker.setOpacity === "function") {
+        marker.setOpacity(isDimmed ? 0.55 : 1);
+      }
+
+      const overlay = new kakao.maps.CustomOverlay({
+        map,
+        position,
+        yAnchor: 2.1,
+        zIndex: isSelected ? 21 : 6,
+        content: createLabelContent({
+          name: college.name,
+          kind: "college",
+          selected: isSelected,
+          dimmed: isDimmed,
+        }),
       });
 
       kakao.maps.event.addListener(marker, "click", () => {
+        if (editorMode !== "college") {
+          setStatusMessage("단과대 편집 모드에서만 단과대를 선택하고 이동할 수 있습니다.");
+          return;
+        }
+
         setSelectedItem({ kind: "college", id: college.id });
-        setEditorMode("college");
         setStatusMessage(`선택됨: ${college.name}`);
       });
 
       kakao.maps.event.addListener(marker, "dragend", () => {
+        if (editorMode !== "college") return;
+
         const newPosition = marker.getPosition();
         const lat = newPosition.getLat();
         const lng = newPosition.getLng();
 
         setSelectedItem({ kind: "college", id: college.id });
-        setEditorMode("college");
+
         void (async () => {
           try {
             setSaving(true);
@@ -260,33 +406,68 @@ export default function AdminMap() {
         })();
       });
 
-      markerRefs.current.push(marker);
+      markerRefs.current.push({ marker, overlay });
       bounds.extend(position);
     });
 
     placedBooths.forEach((booth) => {
       const position = new kakao.maps.LatLng(booth.locationY!, booth.locationX!);
+      const isSelected =
+        selectedItem?.kind === "booth" && selectedItem.id === booth.id;
+      const isEditable = editorMode === "booth";
+      const isDimmed = editorMode === "college";
 
       const marker = new kakao.maps.Marker({
         map,
         position,
-        draggable: true,
+        draggable: isEditable,
         title: booth.name,
+        image: createMarkerImage(kakao, {
+          kind: "booth",
+          boothType: booth.type,
+          selected: isSelected,
+        }),
+      });
+
+      if (typeof marker.setZIndex === "function") {
+        marker.setZIndex(isSelected ? 20 : 5);
+      }
+      if (typeof marker.setOpacity === "function") {
+        marker.setOpacity(isDimmed ? 0.55 : 1);
+      }
+
+      const overlay = new kakao.maps.CustomOverlay({
+        map,
+        position,
+        yAnchor: 1.9,
+        zIndex: isSelected ? 21 : 6,
+        content: createLabelContent({
+          name: booth.name,
+          kind: "booth",
+          selected: isSelected,
+          dimmed: isDimmed,
+        }),
       });
 
       kakao.maps.event.addListener(marker, "click", () => {
+        if (editorMode !== "booth") {
+          setStatusMessage("부스 편집 모드에서만 부스를 선택하고 이동할 수 있습니다.");
+          return;
+        }
+
         setSelectedItem({ kind: "booth", id: booth.id });
-        setEditorMode("booth");
         setStatusMessage(`선택됨: ${booth.name}`);
       });
 
       kakao.maps.event.addListener(marker, "dragend", () => {
+        if (editorMode !== "booth") return;
+
         const newPosition = marker.getPosition();
         const lat = newPosition.getLat();
         const lng = newPosition.getLng();
 
         setSelectedItem({ kind: "booth", id: booth.id });
-        setEditorMode("booth");
+
         void (async () => {
           try {
             setSaving(true);
@@ -304,36 +485,68 @@ export default function AdminMap() {
         })();
       });
 
-      markerRefs.current.push(marker);
+      markerRefs.current.push({ marker, overlay });
       bounds.extend(position);
     });
 
-    if (!bounds.isEmpty()) {
+    let hasPosition = false;
+
+    // college/booth loop 안에서 bounds.extend(position) 할 때
+    hasPosition = true;
+
+    if (hasPosition) {
       map.setBounds(bounds);
     }
 
     return () => {
-      markerRefs.current.forEach((marker) => marker.setMap(null));
+      markerRefs.current.forEach(({ marker, overlay }) => {
+        marker.setMap(null);
+        overlay.setMap(null);
+      });
       markerRefs.current = [];
     };
-  }, [isKakaoLoaded, colleges, placedBooths, updateBoothState, updateCollegeState]);
+  }, [
+    isKakaoLoaded,
+    colleges,
+    placedBooths,
+    selectedItem,
+    editorMode,
+    updateBoothState,
+    updateCollegeState,
+  ]);
+
+  const activateBoothMode = () => {
+    setEditorMode("booth");
+    if (selectedItem?.kind === "college") {
+      setSelectedItem(null);
+    }
+    setStatusMessage("부스 편집 모드입니다. 부스만 선택/드래그할 수 있습니다.");
+  };
+
+  const activateCollegeMode = () => {
+    setEditorMode("college");
+    if (selectedItem?.kind === "booth") {
+      setSelectedItem(null);
+    }
+    setStatusMessage("단과대 편집 모드입니다. 단과대만 선택/드래그할 수 있습니다.");
+  };
 
   const handleSelectBooth = (boothId: number) => {
-    setSelectedItem({ kind: "booth", id: boothId });
     setEditorMode("booth");
-    setStatusMessage("지도를 클릭하거나 마커를 드래그해서 부스 위치를 지정해 주세요.");
+    setSelectedItem({ kind: "booth", id: boothId });
+    setStatusMessage("부스가 선택되었습니다. 지도를 클릭하거나 해당 마커를 드래그해 위치를 지정해 주세요.");
   };
 
   const handleSelectCollege = (collegeId: number) => {
-    setSelectedItem({ kind: "college", id: collegeId });
     setEditorMode("college");
-    setStatusMessage("지도를 클릭하거나 마커를 드래그해서 단과대 위치를 지정해 주세요.");
+    setSelectedItem({ kind: "college", id: collegeId });
+    setStatusMessage("단과대가 선택되었습니다. 지도를 클릭하거나 해당 마커를 드래그해 위치를 지정해 주세요.");
   };
 
   const handleClearSelection = () => {
     setSelectedItem(null);
     setEditorMode("idle");
-    setStatusMessage("선택이 해제되었습니다.");
+    setStatusMessage("보기 모드입니다. 편집하려면 부스 또는 단과대 편집 모드를 선택해 주세요.");
   };
 
   const handleClearBoothLocation = async () => {
@@ -419,13 +632,13 @@ export default function AdminMap() {
             </div>
 
             <p className="mt-1 text-xs text-[var(--text-muted)]">
-              목록에서 항목을 선택한 뒤 지도를 클릭하거나 마커를 드래그하면 좌표가 즉시 저장됩니다.
+              부스 편집 모드에서는 부스만, 단과대 편집 모드에서는 단과대만 이동할 수 있습니다.
             </p>
 
             <div className="mt-4 flex flex-col gap-2">
               <button
                 type="button"
-                onClick={() => setEditorMode("booth")}
+                onClick={activateBoothMode}
                 className={`flex items-center gap-2 rounded-2xl border px-3 py-3 text-sm font-semibold transition-colors ${
                   editorMode === "booth"
                     ? "border-[var(--accent)] bg-[var(--accent)]/5 text-[var(--accent)]"
@@ -438,7 +651,7 @@ export default function AdminMap() {
 
               <button
                 type="button"
-                onClick={() => setEditorMode("college")}
+                onClick={activateCollegeMode}
                 className={`flex items-center gap-2 rounded-2xl border px-3 py-3 text-sm font-semibold transition-colors ${
                   editorMode === "college"
                     ? "border-[var(--accent)] bg-[var(--accent)]/5 text-[var(--accent)]"
@@ -488,7 +701,7 @@ export default function AdminMap() {
                     onClick={() => handleSelectBooth(booth.id)}
                     className={`w-full rounded-2xl border px-3 py-3 text-left transition-colors ${
                       isSelected
-                        ? "border-[var(--accent)] bg-[var(--accent)]/5"
+                        ? "border-[var(--accent)] bg-[var(--accent)]/10 ring-2 ring-[var(--accent)]/20"
                         : "border-[var(--border-base)] bg-[var(--surface-subtle)] hover:bg-[var(--border-base)]"
                     }`}
                   >
@@ -521,7 +734,7 @@ export default function AdminMap() {
                     onClick={() => handleSelectCollege(college.id)}
                     className={`w-full rounded-2xl border px-3 py-3 text-left transition-colors ${
                       isSelected
-                        ? "border-[var(--accent)] bg-[var(--accent)]/5"
+                        ? "border-[var(--accent)] bg-[var(--accent)]/10 ring-2 ring-[var(--accent)]/20"
                         : "border-[var(--border-base)] bg-[var(--surface-subtle)] hover:bg-[var(--border-base)]"
                     }`}
                   >
