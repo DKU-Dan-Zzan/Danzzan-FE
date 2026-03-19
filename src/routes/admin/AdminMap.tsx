@@ -46,7 +46,7 @@ function createCollegeMarkerSvg(selected: boolean) {
 function getBoothColor(type?: string) {
   if (type === "FOOD_TRUCK") return "#ef4444";
   if (type === "EXPERIENCE") return "#10b981";
-  if (type === "EVENT") return "#f6e33b";
+  if (type === "EVENT") return "#f6da3b";
   if (type === "FACILITY") return "#3b82f6";
   return "#10b981";
 }
@@ -206,7 +206,7 @@ export default function AdminMap() {
       const data = await getAdminMap(date);
       setColleges(data.colleges ?? []);
       setBooths(data.booths ?? []);
-      setSelectedDate(data.activeOperationDate ?? date ?? "2026-05-12");
+      // setSelectedDate(data.activeOperationDate ?? date ?? "2026-05-12");
     } catch (error) {
       setGlobalError(
         error instanceof Error
@@ -608,11 +608,11 @@ export default function AdminMap() {
       setSaving(true);
       setGlobalError(null);
 
-      await updateActiveOperationDate(date);
+      // await updateActiveOperationDate(date);
       setSelectedDate(date);
       setSelectedItem(null);
       setEditorMode("idle");
-      setStatusMessage(`운영 일차가 변경되었습니다. 현재 선택 날짜: ${date}`);
+      setStatusMessage(`관리자 편집 날짜가 변경되었습니다. 현재 선택 날짜: ${date}`);
       await loadMapData(date);
     } catch (error) {
       setGlobalError(
@@ -702,7 +702,7 @@ export default function AdminMap() {
           <section className="rounded-2xl border border-[var(--border-base)] bg-white p-4 shadow-sm">
             <h2 className="text-sm font-bold text-[var(--text)]">현재 운영 일차</h2>
             <p className="mt-1 text-xs text-[var(--text-muted)]">
-              여기서 선택한 날짜는 관리자 지도 편집 기준이며, 사용자 지도 기본 날짜에도 반영됩니다.
+              여기서 선택한 날짜는 관리자 지도 편집 기준입니다.
             </p>
 
             <div className="mt-3 flex gap-2">

@@ -21,6 +21,7 @@ import PubList from "./components/PubList";
 import DetailSheet from "./components/DetailSheet";
 import MapFloatingToggle from "./components/MapFloatingToggle";
 import Mapbox3DView from "./components/Mapbox3DView";
+import FestivalDateTabs from "./components/FestivalDateTabs";
 
 import {
   getBoothMap,
@@ -38,6 +39,12 @@ const DEFAULT_MAP_VIEWPORT: MapViewport = {
   mapboxPitch: 55,
   mapboxBearing: -20,
 };
+
+const FESTIVAL_DATES = [
+  { label: "1일차", value: "2026-05-12" },
+  { label: "2일차", value: "2026-05-13" },
+  { label: "3일차", value: "2026-05-14" },
+]
 
 function mapCollegeDtoToCollege(dto: CollegeDto): College {
   return {
@@ -81,6 +88,7 @@ export default function BoothMap() {
   const [selectedCollegeId, setSelectedCollegeId] = useState<number | null>(null);
   const [sheetMode, setSheetMode] = useState<SheetMode>("LIST");
   const [sheetSnap, setSheetSnap] = useState<SheetSnap>("PEEK");
+  const [selectedDate, setSelectedDate] = useState("2026-05-12");
   const [mapViewport, setMapViewport] = useState<MapViewport>(DEFAULT_MAP_VIEWPORT);
 
   const [colleges, setColleges] = useState<College[]>([]);
@@ -124,8 +132,8 @@ export default function BoothMap() {
         setIsError(false);
 
         const [boothMapData, pubsData] = await Promise.all([
-          getBoothMap(),
-          getPubs(),
+          getBoothMap(selectedDate),
+          getPubs(selectedDate),
         ]);
 
         if (!isMounted) return;
@@ -152,7 +160,7 @@ export default function BoothMap() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [selectedDate]);
 
   const handlePrimaryChange = (next: PrimaryFilter) => {
     setPrimaryFilter(next);
@@ -273,7 +281,22 @@ export default function BoothMap() {
         }`}
       >
         <div className="rounded-[28px] border border-white/70 bg-white/92 px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.08)] backdrop-blur-md">
-          <PrimaryFilterChips value={primaryFilter} onChange={handlePrimaryChange} />
+          <FestivalDateTabs
+            dates={FESTIVAL_DATES}
+            selectedDate={selectedDate}
+            onChange={(date) => {
+              setSelectedDate(date);
+              setSelectedMapItem(null);
+              setSelectedDetailItem(null);
+              setSelectedCollegeId(null);
+              setSheetMode("LIST");
+              setSheetSnap("PEEK");
+            }}
+          />
+
+          <div className="mt-2">
+            <PrimaryFilterChips value={primaryFilter} onChange={handlePrimaryChange} />
+          </div>
 
           {primaryFilter === "PUB" && (
             <div className="mt-2">
