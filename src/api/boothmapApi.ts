@@ -48,22 +48,26 @@ export type PubDetailResponse = {
   imageUrls: string[]
 }
 
-export async function getBoothMap() {
-  const res = await http.get<BoothMapResponse>("/map/booth-map")
-  return res.data
+export async function getBoothMap(date?: string) {
+  const query = date ? `?date=${encodeURIComponent(date)}` : "";
+  const res = await http.get<BoothMapResponse>(`/map/booth-map${query}`);
+  return res.data;
 }
 
-export async function getBoothSummary(boothId: number) {
-  const res = await http.get<BoothSummaryResponse>(`/map/booths/${boothId}`)
-  return res.data
+export async function getBoothSummary(boothId: number, date?: string) {
+  const query = date ? `?date=${encodeURIComponent(date)}` : "";
+  const res = await http.get<BoothSummaryResponse>(`/map/booths/${boothId}${query}`);
+  return res.data;
 }
 
-export async function getPubs() {
-  const res = await http.get<PubSummaryResponse[]>("/map/pubs")
-  return res.data
+export async function getPubs(date?: string) {
+  const query = date ? `?date=${encodeURIComponent(date)}` : "";
+  const res = await http.get<PubSummaryResponse[]>(`/map/pubs${query}`);
+  return res.data;
 }
 
-export async function getPubDetail(pubId: number) {
-  const res = await http.get<PubDetailResponse>(`/map/pubs/${pubId}`)
-  return res.data
+export async function getPubDetail(pubId: number, date?: string) {
+  const query = date ? `?date=${encodeURIComponent(date)}` : "";
+  const res = await http.get<PubDetailResponse>(`/map/pubs/${pubId}${query}`);
+  return res.data;
 }

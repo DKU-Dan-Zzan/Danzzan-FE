@@ -84,13 +84,23 @@ export type AdminMapBooth = {
 };
 
 export type AdminMapResponse = {
+  activeOperationDate: string;
   colleges: AdminMapCollege[];
   booths: AdminMapBooth[];
 };
 
-export async function getAdminMap(): Promise<AdminMapResponse> {
-  return fetchWithAuth<AdminMapResponse>("/admin/map", {
+export async function getAdminMap(date?: string): Promise<AdminMapResponse> {
+  const query = date ? `?date=${encodeURIComponent(date)}` : "";
+
+  return fetchWithAuth<AdminMapResponse>(`/admin/map${query}`, {
     method: "GET",
+  });
+}
+
+export async function updateActiveOperationDate(operationDate: string): Promise<void> {
+  await fetchWithAuth<void>("/admin/map/active-date", {
+    method: "PUT",
+    body: JSON.stringify({ operationDate }),
   });
 }
 

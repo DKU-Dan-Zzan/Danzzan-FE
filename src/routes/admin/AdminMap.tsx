@@ -19,6 +19,7 @@ import {
   type AdminMapCollege,
   updateBoothLocation,
   updateCollegeLocation,
+  updateActiveOperationDate,
 } from "../../api/adminMapApi";
 import useKakaoMapLoader from "../../hooks/useKakaoMapLoader";
 
@@ -171,6 +172,9 @@ export default function AdminMap() {
     "보기 모드입니다. 부스 편집 또는 단과대 편집 모드를 선택해 주세요."
   );
 
+  const FESTIVAL_DATES = ["2026-05-12", "2026-05-13", "2026-05-14"];
+  const [selectedDate, setSelectedDate] = useState<string>("2026-05-12");
+
   const placedBooths = useMemo(
     () => booths.filter((booth) => booth.placed && booth.locationX != null && booth.locationY != null),
     [booths],
@@ -193,14 +197,15 @@ export default function AdminMap() {
 
   const selectedInfo = selectedBooth ?? selectedCollege;
 
-  const loadMapData = useCallback(async () => {
+  const loadMapData = useCallback(async (date?: string) => {
     try {
       setGlobalError(null);
       setLoading(true);
 
-      const data = await getAdminMap();
+      const data = await getAdminMap(date);
       setColleges(data.colleges ?? []);
       setBooths(data.booths ?? []);
+      setSelectedDate(data.activeOperationDate ?? date ?? "2026-05-12");
     } catch (error) {
       setGlobalError(
         error instanceof Error
@@ -597,6 +602,26 @@ export default function AdminMap() {
     setStatusMessage("보기 모드입니다. 편집하려면 부스 또는 단과대 편집 모드를 선택해 주세요.");
   };
 
+  const handleChangeDate = async (date: string) => {
+    try {
+      setSaving(true);
+      setGlobalError(null);
+
+      await updateActiveOperationDate(date);
+      setSelectedDate(date);
+      setSelectedItem(null);
+      setEditorMode("idle");
+      setStatusMessage(`운영 일차가 변경되었습니다. 현재 선택 날짜: ${date}`);
+      await loadMapData(date);
+    } catch (error) {
+      setGlobalError(
+        error instanceof Error ? error.message : "운영 날짜를 변경하지 못했습니다.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleClearBoothLocation = async () => {
     if (!selectedBooth) return;
 
@@ -672,6 +697,34 @@ export default function AdminMap() {
               <p>{globalError}</p>
             </div>
           )}
+
+          <section className="rounded-2xl border border-[var(--border-base)] bg-white p-4 shadow-sm">
+            <h2 className="text-sm font-bold text-[var(--text)]">현재 운영 일차</h2>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">
+              여기서 선택한 날짜는 관리자 지도 편집 기준이며, 사용자 지도 기본 날짜에도 반영됩니다.
+            </p>
+
+            <div className="mt-3 flex gap-2">
+              {FESTIVAL_DATES.map((date) => {
+                const isSelected = selectedDate === date;
+
+                return (
+                  <button
+                    key={date}
+                    type="button"
+                    onClick={() => void handleChangeDate(date)}
+                    className={`rounded-2xl px-4 py-2 text-sm font-semibold transition-colors ${
+                      isSelected
+                        ? "bg-[var(--accent)] text-white"
+                        : "border border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text)] hover:bg-[var(--border-base)]"
+                    }`}
+                  >
+                    {date}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
 
           <section className="rounded-2xl border border-[var(--border-base)] bg-white p-4 shadow-sm">
             <div className="flex items-center gap-2">
