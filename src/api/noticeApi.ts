@@ -9,6 +9,7 @@ export type NoticeDto = {
   category: string | null;
   isPinned: boolean;
   thumbnailImageUrl?: string | null;
+  imageUrls?: string[] | null;
   createdAt: string;
   updatedAt: string;
 };

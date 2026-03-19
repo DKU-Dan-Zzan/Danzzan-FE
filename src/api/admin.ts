@@ -217,7 +217,8 @@ export type NoticeImagePresignRequest = {
 
 export type NoticeImagePresignResponse = {
   presignedUrl: string;
-  imageUrl: string;
+  fileUrl: string;
+  imageUrl?: string;
   expiresAt?: string;
   method: "PUT";
 };
@@ -234,10 +235,32 @@ export async function updateNoticeDisplayOrder(
 export async function getNoticeImagePresign(
   body: NoticeImagePresignRequest,
 ): Promise<NoticeImagePresignResponse> {
-  return fetchWithAuth<NoticeImagePresignResponse>("/api/admin/notices/images/presign", {
+  const raw = await fetchWithAuth<unknown>("/api/admin/notices/images/presign", {
     method: "POST",
     body: JSON.stringify(body),
   });
+
+  // 백엔드 응답이 { presignedUrl, fileUrl } 또는 { data: { ... } } 형태일 수 있어 방어적으로 처리
+  const record = raw as Record<string, unknown>;
+  const maybeWrapped = (record?.data as Record<string, unknown> | undefined) ?? record;
+
+  const presignedUrl = maybeWrapped?.presignedUrl;
+  const fileUrl = maybeWrapped?.fileUrl;
+  const imageUrl = maybeWrapped?.imageUrl;
+  const method = (maybeWrapped?.method as "PUT" | undefined) ?? "PUT";
+  const expiresAt = maybeWrapped?.expiresAt as string | undefined;
+
+  if (typeof presignedUrl !== "string" || (!fileUrl && !imageUrl)) {
+    throw new Error("presign 응답 형식이 올바르지 않습니다.");
+  }
+
+  return {
+    presignedUrl,
+    fileUrl: typeof fileUrl === "string" ? fileUrl : (imageUrl as string),
+    imageUrl: typeof imageUrl === "string" ? imageUrl : undefined,
+    method,
+    expiresAt,
+  };
 }
 
 export type AdvertisementPlacement = "HOME_BOTTOM" | "MY_TICKET";
