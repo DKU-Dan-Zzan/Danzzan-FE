@@ -259,6 +259,7 @@ export default function BoothMap() {
             onViewportChange={setMapViewport}
             onClickBooth={onClickMarkerBooth}
             onClickCollege={onClickMarkerCollege}
+            onPrimaryFilterChange={handlePrimaryChange}
           />
         ) : (
           <Mapbox3DView
@@ -271,6 +272,7 @@ export default function BoothMap() {
             onViewportChange={setMapViewport}
             onClickBooth={onClickMarkerBooth}
             onClickCollege={onClickMarkerCollege}
+            onPrimaryFilterChange={handlePrimaryChange}
           />
         )}
       </div>

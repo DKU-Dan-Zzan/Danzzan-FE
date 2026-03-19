@@ -16,6 +16,7 @@ import type {
   SelectedMapItem,
   SheetSnap,
 } from "../types/boothmap.types"
+import { MAP_ZONES } from "../constants/mapZones";
 
 declare global {
   interface Window {
@@ -33,6 +34,7 @@ type Props = {
   onViewportChange: (next: MapViewport) => void;
   onClickBooth: (id: number) => void;
   onClickCollege: (id: number) => void;
+  onPrimaryFilterChange: (next: PrimaryFilter) => void;
 };
 
 const DEFAULT_CENTER = {
@@ -122,6 +124,7 @@ export default function KakaoMapView({
   onViewportChange,
   onClickBooth,
   onClickCollege,
+  onPrimaryFilterChange,
 }: Props) {
   const mapRef = useRef<HTMLDivElement | null>(null)
   const mapInstanceRef = useRef<any>(null)
@@ -131,6 +134,9 @@ export default function KakaoMapView({
 
   // 전체 오버레이를 배열 대신 Map으로 관리
   const overlayMapRef = useRef<Map<string, OverlayRecord>>(new Map())
+
+  const zoneOverlaysRef = useRef<any[]>([])
+  const prevPrimaryFilterRef = useRef<PrimaryFilter>(primaryFilter)
 
   // 이름 말풍선
 
@@ -486,6 +492,97 @@ export default function KakaoMapView({
     }
   }
 
+  const createZoneMarkerRecord = ({
+    id,
+    lat,
+    lng,
+    label,
+    type,
+    onClick,
+  }: {
+    id: string
+    lat: number
+    lng: number
+    label: string
+    type: MarkerType
+    onClick: () => void
+  }) => {
+    const { kakao } = window
+    const map = mapInstanceRef.current
+    const position = new kakao.maps.LatLng(lat, lng)
+
+    const content = createMarkerElement({
+      type,
+      isSelected: false,
+      title: label,
+      level: map?.getLevel?.() ?? 3,
+      onClick,
+    })
+
+    const overlay = new kakao.maps.CustomOverlay({
+      position,
+      content,
+      xAnchor: 0.5,
+      yAnchor: 1,
+      zIndex: 7,
+    })
+
+    overlay.setMap(map)
+    zoneOverlaysRef.current.push(overlay)
+    return overlay
+  }
+
+  const clearZoneOverlays = () => {
+    zoneOverlaysRef.current.forEach((overlay) => {
+      if (typeof overlay?.setMap === "function") {
+        overlay.setMap(null)
+      }
+    })
+    zoneOverlaysRef.current = []
+  }
+
+  const createZoneBounds = (polygons: Array<Array<{ lat: number; lng: number }>>) => {
+    const { kakao } = window
+    const bounds = new kakao.maps.LatLngBounds()
+
+    polygons.forEach((paths) => {
+      paths.forEach((point) => {
+        bounds.extend(new kakao.maps.LatLng(point.lat, point.lng))
+      })
+    })
+
+    return bounds
+  }
+
+  const createZonePolygon = ({
+    paths,
+    strokeColor,
+    fillColor,
+    fillOpacity,
+  }: {
+    paths: Array<{ lat: number; lng: number }>
+    strokeColor: string
+    fillColor: string
+    fillOpacity: number
+  }) => {
+    const { kakao } = window
+    const map = mapInstanceRef.current
+    if (!map) return null
+
+    const polygon = new kakao.maps.Polygon({
+      path: paths.map((point) => new kakao.maps.LatLng(point.lat, point.lng)),
+      strokeWeight: 2,
+      strokeColor,
+      strokeOpacity: 0.9,
+      fillColor,
+      fillOpacity,
+    })
+
+    polygon.setMap(map)
+    zoneOverlaysRef.current.push(polygon)
+    return polygon
+  }
+
   // 특정 overlay만 선택/비선택 스타일로 교체
   const replaceOverlaySelection = (
     key: string,
@@ -507,6 +604,19 @@ export default function KakaoMapView({
     record.overlay.setContent(content)
     record.overlay.setZIndex(isSelected ? 10 : 1)
   }
+
+  const pubZone = MAP_ZONES.find((zone) => zone.type === "PUB") ?? null
+  const foodTruckZone = MAP_ZONES.find((zone) => zone.type === "FOOD_TRUCK") ?? null
+
+  const pubCount = colleges.length
+  const foodTruckCount = booths.filter((booth) => booth.type === "FOOD_TRUCK").length
+
+  const shouldShowPubZoneSummary = primaryFilter === "ALL" && pubZone
+  const shouldShowFoodTruckZoneSummary = primaryFilter === "ALL" && foodTruckZone
+
+  const shouldShowPubZoneDetail = primaryFilter === "PUB" && pubZone
+  const shouldShowFoodTruckZoneDetail =
+    primaryFilter === "FOOD_TRUCK" && foodTruckZone
 
   // 현재 필터 기준으로 보여줄 데이터 계산
   const visibleItems = useMemo(() => {
@@ -550,8 +660,9 @@ export default function KakaoMapView({
     if (primaryFilter === "PUB") {
       colleges.forEach(addCollege)
     } else if (primaryFilter === "ALL") {
-      booths.forEach(addBooth)
-      colleges.forEach(addCollege)
+      booths
+        .filter((booth) => booth.type !== "FOOD_TRUCK")
+        .forEach(addBooth)
     } else {
       booths.forEach(addBooth)
     }
@@ -698,6 +809,113 @@ export default function KakaoMapView({
 
     prevSelectedKeyRef.current = nextKey
   }, [isLoaded, selectedMapItem, boothMap, collegeMap, sheetSnap, onClickBooth, onClickCollege, visibleItems])
+
+  useEffect(() => {
+    if (!isLoaded || !mapInstanceRef.current) return
+
+    clearZoneOverlays()
+
+    if (shouldShowPubZoneSummary && pubZone) {
+      pubZone.polygons.forEach((paths) => {
+        createZonePolygon({
+          paths,
+          strokeColor: "#1d4ed8",
+          fillColor: "#93c5fd",
+          fillOpacity: 0.22,
+        })
+      })
+
+      pubZone.markers.forEach((marker) => {
+        createZoneMarkerRecord({
+          id: marker.id,
+          lat: marker.lat,
+          lng: marker.lng,
+          label: "주점 구역",
+          type: "PUB",
+          onClick: () => onPrimaryFilterChange("PUB"),
+        })
+      })
+    }
+
+    if (shouldShowFoodTruckZoneSummary && foodTruckZone) {
+      foodTruckZone.polygons.forEach((paths) => {
+        createZonePolygon({
+          paths,
+          strokeColor: "#dc2626",
+          fillColor: "#fca5a5",
+          fillOpacity: 0.22,
+        })
+      })
+
+      foodTruckZone.markers.forEach((marker) => {
+        createZoneMarkerRecord({
+          id: marker.id,
+          lat: marker.lat,
+          lng: marker.lng,
+          label: "푸드트럭 구역",
+          type: "FOOD_TRUCK",
+          onClick: () => onPrimaryFilterChange("FOOD_TRUCK"),
+        })
+      })
+    }
+
+    if (shouldShowPubZoneDetail && pubZone) {
+      pubZone.polygons.forEach((paths) => {
+        createZonePolygon({
+          paths,
+          strokeColor: "#1d4ed8",
+          fillColor: "#93c5fd",
+          fillOpacity: 0.12,
+        })
+      })
+    }
+
+    if (shouldShowFoodTruckZoneDetail && foodTruckZone) {
+      foodTruckZone.polygons.forEach((paths) => {
+        createZonePolygon({
+          paths,
+          strokeColor: "#dc2626",
+          fillColor: "#fca5a5",
+          fillOpacity: 0.12,
+        })
+      })
+    }
+
+    return () => {
+      clearZoneOverlays()
+    }
+  }, [
+    isLoaded,
+    primaryFilter,
+    shouldShowPubZoneSummary,
+    shouldShowFoodTruckZoneSummary,
+    shouldShowPubZoneDetail,
+    shouldShowFoodTruckZoneDetail,
+    pubZone,
+    foodTruckZone,
+    onPrimaryFilterChange,
+  ])
+
+  useEffect(() => {
+    if (!isLoaded || !mapInstanceRef.current || !window.kakao?.maps) return
+
+    const map = mapInstanceRef.current
+    const previous = prevPrimaryFilterRef.current
+
+    if (previous === primaryFilter) return
+
+    if (primaryFilter === "PUB" && pubZone) {
+      const bounds = createZoneBounds(pubZone.polygons)
+      map.setBounds(bounds)
+    }
+
+    if (primaryFilter === "FOOD_TRUCK" && foodTruckZone) {
+      const bounds = createZoneBounds(foodTruckZone.polygons)
+      map.setBounds(bounds)
+    }
+
+    prevPrimaryFilterRef.current = primaryFilter
+  }, [isLoaded, primaryFilter, pubZone, foodTruckZone])
 
   if (isError) {
     return (

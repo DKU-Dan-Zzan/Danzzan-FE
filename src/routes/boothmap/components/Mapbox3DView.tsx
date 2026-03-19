@@ -8,6 +8,7 @@ import type {
   SelectedMapItem,
   SheetSnap,
 } from "../types/boothmap.types";
+import { MAP_ZONES } from "../constants/mapZones";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
@@ -21,6 +22,7 @@ type Props = {
   onViewportChange: (next: MapViewport) => void;
   onClickBooth: (id: number) => void;
   onClickCollege: (id: number) => void;
+  onPrimaryFilterChange: (next: PrimaryFilter) => void;
 };
 
 const DEFAULT_ZOOM = 16.6;
@@ -36,6 +38,12 @@ const SOURCE_ID = "booth-points";
 const BASE_CIRCLE_LAYER_ID = "booth-base-circle";
 const BASE_ICON_LAYER_ID = "booth-base-icon";
 const HIT_AREA_LAYER_ID = "booth-hit-area";
+
+const PUB_ZONE_SOURCE_ID = "pub-zone-source";
+const PUB_ZONE_FILL_LAYER_ID = "pub-zone-fill-layer";
+
+const FOOD_TRUCK_ZONE_SOURCE_ID = "foodtruck-zone-source";
+const FOOD_TRUCK_ZONE_FILL_LAYER_ID = "foodtruck-zone-fill-layer";
 
 type MarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "EVENT" | "FACILITY";
 
@@ -181,6 +189,49 @@ function buildSelectedMarkerElement(type: MarkerType, title: string) {
   return wrapper;
 }
 
+function buildZoneDotElement(color: string, label: string, count: number) {
+  const wrapper = document.createElement("button");
+  wrapper.type = "button";
+  wrapper.title = label;
+  wrapper.setAttribute("aria-label", label);
+  wrapper.style.position = "relative";
+  wrapper.style.width = "22px";
+  wrapper.style.height = "22px";
+  wrapper.style.padding = "0";
+  wrapper.style.border = "0";
+  wrapper.style.background = "transparent";
+  wrapper.style.cursor = "pointer";
+
+  const dot = document.createElement("div");
+  dot.style.width = "22px";
+  dot.style.height = "22px";
+  dot.style.borderRadius = "9999px";
+  dot.style.background = color;
+  dot.style.border = "3px solid white";
+  dot.style.boxShadow = "0 8px 18px rgba(15,23,42,0.18)";
+
+  const badge = document.createElement("div");
+  badge.textContent = String(count);
+  badge.style.position = "absolute";
+  badge.style.left = "50%";
+  badge.style.top = "-28px";
+  badge.style.transform = "translateX(-50%)";
+  badge.style.padding = "4px 8px";
+  badge.style.borderRadius = "9999px";
+  badge.style.background = "#111827";
+  badge.style.color = "white";
+  badge.style.fontSize = "11px";
+  badge.style.fontWeight = "700";
+  badge.style.whiteSpace = "nowrap";
+  badge.style.boxShadow = "0 6px 14px rgba(15,23,42,0.18)";
+  badge.style.pointerEvents = "none";
+
+  wrapper.appendChild(dot);
+  wrapper.appendChild(badge);
+
+  return wrapper;
+}
+
 function buildLabelElement(name: string) {
   const bubble = document.createElement("div");
   bubble.className =
@@ -256,6 +307,26 @@ function getSelectedItemData(
   };
 }
 
+function buildZoneFeatureCollection(
+  polygons: Array<Array<{ lat: number; lng: number }>>
+): GeoJSON.FeatureCollection<GeoJSON.Polygon> {
+  return {
+    type: "FeatureCollection",
+    features: polygons.map((polygon, index) => ({
+      type: "Feature",
+      id: index,
+      geometry: {
+        type: "Polygon",
+        coordinates: [[
+          ...polygon.map((point) => [point.lng, point.lat] as [number, number]),
+          [polygon[0].lng, polygon[0].lat],
+        ]],
+      },
+      properties: {},
+    })),
+  };
+}
+
 export default function Mapbox3DView({
   booths,
   colleges,
@@ -266,6 +337,7 @@ export default function Mapbox3DView({
   onViewportChange,
   onClickBooth,
   onClickCollege,
+  onPrimaryFilterChange,
 }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -274,6 +346,8 @@ export default function Mapbox3DView({
   const labelMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const imagesLoadedRef = useRef(false);
   const lastViewportRef = useRef<MapViewport>(viewport);
+  const zoneMarkerRefs = useRef<mapboxgl.Marker[]>([]);
+  const prevPrimaryFilterRef = useRef<PrimaryFilter>(primaryFilter);
 
   const boothMap = useMemo(() => {
     const map = new Map<number, Booth>();
@@ -286,6 +360,21 @@ export default function Mapbox3DView({
     colleges.forEach((college) => map.set(college.id, college));
     return map;
   }, [colleges]);
+
+  const pubZone = useMemo(
+    () => MAP_ZONES.find((zone) => zone.type === "PUB") ?? null,
+    []
+  );
+
+  const foodTruckZone = useMemo(
+    () => MAP_ZONES.find((zone) => zone.type === "FOOD_TRUCK") ?? null,
+    []
+  );
+
+  const pubCount = colleges.length;
+  const foodTruckCount = booths.filter(
+    (booth) => booth.type === "FOOD_TRUCK"
+  ).length;
 
   const layerGeoJson = useMemo<GeoJSON.FeatureCollection<GeoJSON.Point>>(() => {
     const features: GeoJSON.Feature<GeoJSON.Point>[] = [];
@@ -331,8 +420,9 @@ export default function Mapbox3DView({
     if (primaryFilter === "PUB") {
       colleges.forEach(addCollege);
     } else if (primaryFilter === "ALL") {
-      booths.forEach(addBooth);
-      colleges.forEach(addCollege);
+      booths
+        .filter((booth) => booth.type !== "FOOD_TRUCK")
+        .forEach(addBooth);
     } else {
       booths.forEach(addBooth);
     }
@@ -357,9 +447,19 @@ export default function Mapbox3DView({
     }
   };
 
+  const clearZoneMarkers = () => {
+    zoneMarkerRefs.current.forEach((marker) => marker.remove());
+    zoneMarkerRefs.current = [];
+  };
+
   const clearSelectionOverlays = () => {
     clearSelectedMarker();
     clearLabelMarker();
+  };
+
+  const clearAllCustomMarkers = () => {
+    clearSelectionOverlays();
+    clearZoneMarkers();
   };
 
   const ensureImages = async (map: mapboxgl.Map) => {
@@ -499,6 +599,8 @@ export default function Mapbox3DView({
         },
       });
 
+      upsertZonePolygons(map);
+
       map.on("click", HIT_AREA_LAYER_ID, (event) => {
         const feature = event.features?.[0];
         if (!feature) return;
@@ -532,6 +634,51 @@ export default function Mapbox3DView({
         if (hitFeatures.length === 0) {
           clearSelectionOverlays();
         }
+      });
+    }
+  };
+
+  const upsertZonePolygons = (map: mapboxgl.Map) => {
+    const pubData = buildZoneFeatureCollection(pubZone?.polygons ?? []);
+    const foodTruckData = buildZoneFeatureCollection(foodTruckZone?.polygons ?? []);
+
+    const upsertSource = (sourceId: string, data: GeoJSON.FeatureCollection<GeoJSON.Polygon>) => {
+      const source = map.getSource(sourceId) as mapboxgl.GeoJSONSource | undefined;
+      if (source) {
+        source.setData(data);
+        return;
+      }
+
+      map.addSource(sourceId, {
+        type: "geojson",
+        data,
+      });
+    };
+
+    upsertSource(PUB_ZONE_SOURCE_ID, pubData);
+    upsertSource(FOOD_TRUCK_ZONE_SOURCE_ID, foodTruckData);
+
+    if (!map.getLayer(PUB_ZONE_FILL_LAYER_ID)) {
+      map.addLayer({
+        id: PUB_ZONE_FILL_LAYER_ID,
+        type: "fill",
+        source: PUB_ZONE_SOURCE_ID,
+        paint: {
+          "fill-color": "#5aa3f8",
+          "fill-opacity": 0,
+        },
+      });
+    }
+
+    if (!map.getLayer(FOOD_TRUCK_ZONE_FILL_LAYER_ID)) {
+      map.addLayer({
+        id: FOOD_TRUCK_ZONE_FILL_LAYER_ID,
+        type: "fill",
+        source: FOOD_TRUCK_ZONE_SOURCE_ID,
+        paint: {
+          "fill-color": "#fa6464",
+          "fill-opacity": 0,
+        },
       });
     }
   };
@@ -678,7 +825,7 @@ export default function Mapbox3DView({
     return () => {
       resizeObserverRef.current?.disconnect();
       resizeObserverRef.current = null;
-      clearSelectionOverlays();
+      clearAllCustomMarkers();
 
       if (mapRef.current) {
         mapRef.current.remove();
@@ -696,6 +843,143 @@ export default function Mapbox3DView({
 
     source.setData(layerGeoJson);
   }, [layerGeoJson]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !map.isStyleLoaded()) return;
+
+    upsertZonePolygons(map);
+    clearZoneMarkers();
+
+    const showPubSummary = primaryFilter === "ALL" && !!pubZone;
+    const showFoodTruckSummary = primaryFilter === "ALL" && !!foodTruckZone;
+    const showPubDetail = primaryFilter === "PUB" && !!pubZone;
+    const showFoodTruckDetail =
+      primaryFilter === "FOOD_TRUCK" && !!foodTruckZone;
+
+    if (map.getLayer(PUB_ZONE_FILL_LAYER_ID)) {
+      map.setPaintProperty(
+        PUB_ZONE_FILL_LAYER_ID,
+        "fill-opacity",
+        showPubSummary || showPubDetail ? (showPubSummary ? 0.22 : 0.12) : 0
+      );
+    }
+
+    if (map.getLayer(FOOD_TRUCK_ZONE_FILL_LAYER_ID)) {
+      map.setPaintProperty(
+        FOOD_TRUCK_ZONE_FILL_LAYER_ID,
+        "fill-opacity",
+        showFoodTruckSummary || showFoodTruckDetail
+          ? showFoodTruckSummary
+            ? 0.22
+            : 0.12
+          : 0
+      );
+    }
+
+    if (showPubSummary && pubZone) {
+      pubZone.markers.forEach((marker) => {
+        const element = buildZoneDotElement("#2563eb", "주점 구역", pubCount);
+        element.onclick = (event) => {
+          event.stopPropagation();
+          onPrimaryFilterChange("PUB");
+        };
+
+        const zoneMarker = new mapboxgl.Marker({
+          element,
+          anchor: "center",
+        })
+          .setLngLat([marker.lng, marker.lat])
+          .addTo(map);
+
+        zoneMarkerRefs.current.push(zoneMarker);
+      });
+    }
+
+    if (showFoodTruckSummary && foodTruckZone) {
+      foodTruckZone.markers.forEach((marker) => {
+        const element = buildZoneDotElement(
+          "#ef4444",
+          "푸드트럭 구역",
+          foodTruckCount
+        );
+        element.onclick = (event) => {
+          event.stopPropagation();
+          onPrimaryFilterChange("FOOD_TRUCK");
+        };
+
+        const zoneMarker = new mapboxgl.Marker({
+          element,
+          anchor: "center",
+        })
+          .setLngLat([marker.lng, marker.lat])
+          .addTo(map);
+
+        zoneMarkerRefs.current.push(zoneMarker);
+      });
+    }
+
+    return () => {
+      clearZoneMarkers();
+    };
+  }, [
+    primaryFilter,
+    pubZone,
+    foodTruckZone,
+    pubCount,
+    foodTruckCount,
+    onPrimaryFilterChange,
+  ]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    const previous = prevPrimaryFilterRef.current;
+    if (previous === primaryFilter) return;
+
+    if (primaryFilter === "PUB" && pubZone) {
+      const bounds = new mapboxgl.LngLatBounds();
+      pubZone.polygons.forEach((polygon) => {
+        polygon.forEach((point) => {
+          bounds.extend([point.lng, point.lat]);
+        });
+      });
+
+      const currentBearing = map.getBearing();
+      const currentPitch = map.getPitch();
+
+      map.fitBounds(bounds, {
+        padding: 60,
+        duration: 800,
+        essential: true,
+        bearing: currentBearing,
+        pitch: currentPitch,
+      });
+    }
+
+    if (primaryFilter === "FOOD_TRUCK" && foodTruckZone) {
+      const bounds = new mapboxgl.LngLatBounds();
+      foodTruckZone.polygons.forEach((polygon) => {
+        polygon.forEach((point) => {
+          bounds.extend([point.lng, point.lat]);
+        });
+      });
+
+      const currentBearing = map.getBearing();
+      const currentPitch = map.getPitch();
+
+      map.fitBounds(bounds, {
+        padding: 60,
+        duration: 800,
+        essential: true,
+        bearing: currentBearing,
+        pitch: currentPitch,
+      });
+    }
+
+    prevPrimaryFilterRef.current = primaryFilter;
+  }, [primaryFilter, pubZone, foodTruckZone]);
 
   useEffect(() => {
     const map = mapRef.current;
