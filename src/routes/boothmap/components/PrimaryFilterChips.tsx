@@ -6,7 +6,7 @@ const chips: Array<{ label: string; value: PrimaryFilter }> = [
   { label: "ALL", value: "ALL" },
   { label: "주점", value: "PUB" },
   { label: "푸드트럭", value: "FOOD_TRUCK" },
-  { label: "체험", value: "EXPERIENCE" },
+  { label: "부스", value: "EXPERIENCE" },
   { label: "이벤트", value: "EVENT" },
   { label: "편의시설", value: "FACILITY" },
 ];
