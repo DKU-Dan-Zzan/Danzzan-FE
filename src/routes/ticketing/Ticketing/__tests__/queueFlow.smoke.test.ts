@@ -60,9 +60,9 @@ describe("queueFlow smoke", () => {
     expect(result.reserveCalls).toBe(0);
   });
 
-  it("WAITING -> SUCCESS -> 입력/확인 화면 진입", () => {
+  it("WAITING -> SUCCESS -> 이미 예매 완료 화면 진입", () => {
     const result = runQueueFlowSmoke("WAITING", ["SUCCESS"]);
-    expect(result.step).toBe("in-progress");
+    expect(result.step).toBe("already");
     expect(result.reserveCalls).toBe(0);
   });
 
