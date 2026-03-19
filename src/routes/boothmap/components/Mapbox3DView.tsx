@@ -37,7 +37,7 @@ const BASE_CIRCLE_LAYER_ID = "booth-base-circle";
 const BASE_ICON_LAYER_ID = "booth-base-icon";
 const HIT_AREA_LAYER_ID = "booth-hit-area";
 
-type MarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "FACILITY";
+type MarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "EVENT" | "FACILITY";
 
 type MapFeatureProperties = {
   id: number;
@@ -63,6 +63,11 @@ function getMarkerConfig(type: MarkerType) {
       return {
         color: "#10b981",
         iconPath: "/markers/booth-experience.svg",
+      };
+    case "EVENT":
+      return {
+        color: "#f6da3b",
+        iconPath: "/markers/booth-event.svg",
       };
     case "FACILITY":
       return {
@@ -364,6 +369,7 @@ export default function Mapbox3DView({
       { id: "marker-pub", src: "/markers/booth-pub.svg" },
       { id: "marker-foodtruck", src: "/markers/booth-foodtruck.svg" },
       { id: "marker-experience", src: "/markers/booth-experience.svg" },
+      { id: "marker-event", src: "/markers/booth-event.svg" },
       { id: "marker-facility", src: "/markers/facility-restroom.svg" },
     ];
 
@@ -420,6 +426,8 @@ export default function Mapbox3DView({
             "#ef4444",
             "EXPERIENCE",
             "#10b981",
+            "EVENT",
+            "#f6da3b",
             "FACILITY",
             "#3b82f6",
             "#0a559c",
@@ -448,6 +456,8 @@ export default function Mapbox3DView({
             "marker-foodtruck",
             "EXPERIENCE",
             "marker-experience",
+            "EVENT",
+            "marker-event",
             "FACILITY",
             "marker-facility",
             "marker-experience",

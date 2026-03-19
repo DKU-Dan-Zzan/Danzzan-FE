@@ -46,6 +46,7 @@ function createCollegeMarkerSvg(selected: boolean) {
 function getBoothColor(type?: string) {
   if (type === "FOOD_TRUCK") return "#ef4444";
   if (type === "EXPERIENCE") return "#10b981";
+  if (type === "EVENT") return "#f6e33b";
   if (type === "FACILITY") return "#3b82f6";
   return "#10b981";
 }

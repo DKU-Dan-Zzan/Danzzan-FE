@@ -79,6 +79,7 @@ const PIN_URL_MAP: Record<MarkerType, string> = {
   PUB: createPinDataUrl(BOOTHMAP_MARKER_THEME.PUB.color),
   FOOD_TRUCK: createPinDataUrl(BOOTHMAP_MARKER_THEME.FOOD_TRUCK.color),
   EXPERIENCE: createPinDataUrl(BOOTHMAP_MARKER_THEME.EXPERIENCE.color),
+  EVENT: createPinDataUrl(BOOTHMAP_MARKER_THEME.EVENT.color),
   FACILITY: createPinDataUrl(BOOTHMAP_MARKER_THEME.FACILITY.color),
 }
 
@@ -86,6 +87,7 @@ const PIN_BOTTOM_OFFSET_MAP: Record<MarkerType, number> = {
   PUB: 2,
   FOOD_TRUCK: 1,
   EXPERIENCE: 1,
+  EVENT: 1,
   FACILITY: 0,
 }
 
