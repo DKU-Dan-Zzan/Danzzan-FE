@@ -263,6 +263,85 @@ export async function getNoticeImagePresign(
   };
 }
 
+export type AdImageUploadRequest = {
+  fileName: string;
+  contentType: string;
+  fileSize?: number;
+};
+
+type AdImageUploadResponseCommon = {
+  presignedUrl: string;
+  imageUrl: string;
+  method: "PUT";
+  expiresAt?: string;
+};
+
+export async function getAdminAdUploadUrl(
+  body: AdImageUploadRequest,
+): Promise<AdImageUploadResponseCommon> {
+  const raw = await fetchWithAuth<unknown>("/api/admin/ads/upload-url", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+
+  const record = raw as Record<string, unknown>;
+  const maybeWrapped = (record?.data as Record<string, unknown> | undefined) ?? record;
+
+  const presignedUrl = maybeWrapped?.presignedUrl;
+  const imageUrl = maybeWrapped?.imageUrl;
+  const method = (maybeWrapped?.method as "PUT" | undefined) ?? "PUT";
+  const expiresAt = maybeWrapped?.expiresAt as string | undefined;
+
+  if (typeof presignedUrl !== "string" || typeof imageUrl !== "string") {
+    throw new Error("광고 업로드 URL 응답 형식이 올바르지 않습니다.");
+  }
+
+  return { presignedUrl, imageUrl, method, expiresAt };
+}
+
+export async function getAdminAdImagePresign(
+  body: AdImageUploadRequest,
+): Promise<AdImageUploadResponseCommon> {
+  const raw = await fetchWithAuth<unknown>("/api/admin/ads/images/presign", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+
+  const record = raw as Record<string, unknown>;
+  const maybeWrapped = (record?.data as Record<string, unknown> | undefined) ?? record;
+
+  const presignedUrl = maybeWrapped?.presignedUrl;
+  const fileUrl = maybeWrapped?.fileUrl;
+  const imageUrl = maybeWrapped?.imageUrl;
+  const method = (maybeWrapped?.method as "PUT" | undefined) ?? "PUT";
+  const expiresAt = maybeWrapped?.expiresAt as string | undefined;
+
+  const resolvedImageUrl = typeof imageUrl === "string" ? imageUrl : fileUrl;
+  if (typeof presignedUrl !== "string" || typeof resolvedImageUrl !== "string") {
+    throw new Error("광고 이미지 presign 응답 형식이 올바르지 않습니다.");
+  }
+
+  return { presignedUrl, imageUrl: resolvedImageUrl, method, expiresAt };
+}
+
+/**
+ * 백엔드가 두 가지 업로드 프리사인 엔드포인트 중 무엇을 제공하든(예: /upload-url 또는 /images/presign)
+ * 프론트는 동일한 인터페이스로 업로드 URL을 얻도록 합니다.
+ */
+export async function getAdminAdImageUpload(
+  body: AdImageUploadRequest,
+): Promise<AdImageUploadResponseCommon> {
+  try {
+    return await getAdminAdImagePresign(body);
+  } catch (error) {
+    const err = error as Error & { status?: number };
+    if (err.status === 404 || err.status === 405) {
+      return await getAdminAdUploadUrl(body);
+    }
+    throw error;
+  }
+}
+
 export type AdvertisementPlacement = "HOME_BOTTOM" | "MY_TICKET";
 
 export type AdvertisementResponse = {
@@ -287,5 +366,31 @@ export async function createAdminAd(
   return fetchWithAuth<AdvertisementResponse>("/api/admin/ads", {
     method: "POST",
     body: JSON.stringify(body),
+  });
+}
+
+export async function toggleAdminAdActive(
+  id: number,
+  isActive: boolean,
+): Promise<AdvertisementResponse> {
+  return fetchWithAuth<AdvertisementResponse>(`/api/admin/ads/${id}/active`, {
+    method: "PATCH",
+    body: JSON.stringify({ isActive }),
+  });
+}
+
+export async function setAdminAdsActiveByPlacement(
+  placement: AdvertisementPlacement,
+  isActive: boolean,
+): Promise<void> {
+  await fetchWithAuth<void>(`/api/admin/ads/${placement}/active`, {
+    method: "PATCH",
+    body: JSON.stringify({ isActive }),
+  });
+}
+
+export async function deleteAdminAd(id: number): Promise<void> {
+  await fetchWithAuth<void>(`/api/admin/ads/${id}`, {
+    method: "DELETE",
   });
 }
