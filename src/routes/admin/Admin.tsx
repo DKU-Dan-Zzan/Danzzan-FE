@@ -21,8 +21,11 @@ import {
   deleteAdminNotice,
   restoreAdminNotice,
   getNoticeImagePresign,
+  getAdminAdImageUpload,
   getAdminNotices,
   getEmergencyAdminNotice,
+  deleteAdminAd,
+  setAdminAdsActiveByPlacement,
   type AdvertisementPlacement,
   type AdvertisementResponse,
   type NoticeStatusFilter,
@@ -95,6 +98,7 @@ function Admin() {
 
   const [initialLoaded, setInitialLoaded] = useState(false);
   const [noticeImageUploading, setNoticeImageUploading] = useState(false);
+  const [adImageUploading, setAdImageUploading] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -188,6 +192,26 @@ function Admin() {
       setGlobalError(error instanceof Error ? error.message : "광고 정보를 불러오지 못했습니다.");
     } finally {
       setAdLoading(false);
+    }
+  };
+
+  const handleDeleteAd = async (placement: AdvertisementPlacement) => {
+    const ad = placement === "HOME_BOTTOM" ? homeBottomAd : myTicketAd;
+    if (!ad) return;
+
+    const confirmed = window.confirm("이 광고를 삭제하시겠습니까?");
+    if (!confirmed) return;
+
+    try {
+      setGlobalError(null);
+      await setAdminAdsActiveByPlacement(placement, false);
+      await reloadAds();
+      window.alert("삭제되었습니다.");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "광고 삭제에 실패했습니다.";
+      setGlobalError(message);
+      window.alert(message);
     }
   };
 
@@ -314,7 +338,17 @@ function Admin() {
           fileSize: file.size,
         });
 
-        await fetch(presign.presignedUrl, {
+        if (import.meta.env.DEV) {
+          // presign 응답 구조 디버깅용
+          console.log("[notice presign]", presign);
+        }
+
+        if (!presign.presignedUrl) {
+          console.error("[notice presign] presignedUrl is undefined", presign);
+          throw new Error("presignedUrl이 비어 있습니다. presign API 응답을 확인해 주세요.");
+        }
+
+        const putRes = await fetch(presign.presignedUrl, {
           method: presign.method,
           headers: {
             "Content-Type": file.type,
@@ -322,12 +356,25 @@ function Admin() {
           body: file,
         });
 
-        setEditingNotice((prev) =>
-          prev ? { ...prev, images: [...prev.images, presign.imageUrl] } : prev,
-        );
+        if (!putRes.ok) {
+          const errorText = await putRes.text().catch(() => "");
+          const message = [
+            `S3 업로드 실패: ${putRes.status} ${putRes.statusText}`,
+            errorText ? `응답: ${errorText}` : "",
+          ]
+            .filter(Boolean)
+            .join("\n");
+          throw new Error(message);
+        }
+
+        const url = presign.imageUrl ?? presign.fileUrl;
+        setEditingNotice((prev) => (prev ? { ...prev, images: [...prev.images, url] } : prev));
       }
     } catch (error) {
-      setGlobalError(error instanceof Error ? error.message : "이미지 업로드에 실패했습니다.");
+      const message =
+        error instanceof Error ? error.message : "이미지 업로드에 실패했습니다.";
+      setGlobalError(message);
+      window.alert(message);
     } finally {
       setNoticeImageUploading(false);
     }
@@ -449,6 +496,62 @@ function Admin() {
       await reloadAds();
     } catch (error) {
       setGlobalError(error instanceof Error ? error.message : "광고를 저장하지 못했습니다.");
+    }
+  };
+
+  const handleUploadAdImage = async (file: File) => {
+    if (!editingAd) return;
+
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    const maxSizeBytes = 5 * 1024 * 1024;
+
+    if (!allowedTypes.includes(file.type)) {
+      window.alert("이미지는 JPG, JPEG, PNG, WEBP 형식만 업로드할 수 있습니다.");
+      return;
+    }
+
+    if (file.size > maxSizeBytes) {
+      window.alert("이미지 크기는 최대 5MB까지 업로드할 수 있습니다.");
+      return;
+    }
+
+    try {
+      setAdImageUploading(true);
+      setGlobalError(null);
+
+      const uploadMeta = await getAdminAdImageUpload({
+        fileName: file.name,
+        contentType: file.type,
+        fileSize: file.size,
+      });
+
+      const putRes = await fetch(uploadMeta.presignedUrl, {
+        method: uploadMeta.method,
+        headers: {
+          "Content-Type": file.type,
+        },
+        body: file,
+      });
+
+      if (!putRes.ok) {
+        const errorText = await putRes.text().catch(() => "");
+        const message = [
+          `광고 이미지 업로드 실패: ${putRes.status} ${putRes.statusText}`,
+          errorText ? `응답: ${errorText}` : "",
+        ]
+          .filter(Boolean)
+          .join("\n");
+        throw new Error(message);
+      }
+
+      setEditingAd((prev) => (prev ? { ...prev, imageUrl: uploadMeta.imageUrl } : prev));
+      window.alert("이미지 업로드가 완료되었습니다.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "이미지 업로드에 실패했습니다.";
+      setGlobalError(message);
+      window.alert(message);
+    } finally {
+      setAdImageUploading(false);
     }
   };
 
@@ -624,7 +727,7 @@ function Admin() {
             <table className="min-w-full text-left text-xs">
               <thead className="bg-[var(--surface-subtle)] text-[var(--text-muted)]">
                 <tr>
-                  <th className="px-4 py-2 font-semibold">제목</th>
+                  <th className="px-4 py-2 font-semibold">제목 / 썸네일</th>
                   <th className="px-4 py-2 font-semibold">작성자</th>
                   <th className="px-4 py-2 font-semibold">날짜</th>
                   <th className="px-3 py-2 text-center font-semibold">
@@ -653,11 +756,18 @@ function Admin() {
                 {effectivePinned.map((notice, index) => (
                   <tr key={notice.id} className="bg-orange-50/60">
                     <td className="px-4 py-2 align-middle">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-2">
                         <span className="inline-flex items-center gap-1 rounded-full bg-orange-500 px-2 py-0.5 text-[10px] font-semibold text-white">
                           <span>📌</span>
                           <span>상단 고정</span>
                         </span>
+                        {notice.thumbnailImageUrl && (
+                          <img
+                            src={notice.thumbnailImageUrl}
+                            alt={notice.title}
+                            className="h-8 w-8 flex-shrink-0 rounded-lg object-cover"
+                          />
+                        )}
                         <span className="truncate text-sm font-semibold text-[var(--text)]">
                           {notice.title}
                         </span>
@@ -731,7 +841,16 @@ function Admin() {
                 {noticeOthers.map((notice) => (
                   <tr key={notice.id}>
                     <td className="px-4 py-2 align-middle">
-                      <span className="truncate text-sm text-[var(--text)]">{notice.title}</span>
+                      <div className="flex items-center gap-2">
+                        {notice.thumbnailImageUrl && (
+                          <img
+                            src={notice.thumbnailImageUrl}
+                            alt={notice.title}
+                            className="h-8 w-8 flex-shrink-0 rounded-lg object-cover"
+                          />
+                        )}
+                        <span className="truncate text-sm text-[var(--text)]">{notice.title}</span>
+                      </div>
                     </td>
                     <td className="px-4 py-2 text-[var(--text-muted)]">{notice.author}</td>
                     <td className="px-4 py-2 text-[var(--text-muted)]">
@@ -832,20 +951,34 @@ function Admin() {
                     HOME_BOTTOM 위치에 노출되는 배너입니다.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingAd({
-                      title: homeBottomAd?.title ?? "",
-                      imageUrl: homeBottomAd?.imageUrl ?? "",
-                      placement: "HOME_BOTTOM",
-                    });
-                  }}
-                  className="flex h-8 items-center gap-1 rounded-2xl border border-[var(--border-base)] bg-white px-3 text-[11px] font-semibold text-[var(--text)] hover:bg-[var(--border-base)]"
-                >
-                  <Pencil className="h-3.5 w-3.5" strokeWidth={2.3} />
-                  배너 변경
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingAd({
+                        title: homeBottomAd?.title ?? "",
+                        imageUrl: homeBottomAd?.imageUrl ?? "",
+                        placement: "HOME_BOTTOM",
+                      });
+                    }}
+                    className="flex h-8 items-center gap-1 rounded-2xl border border-[var(--border-base)] bg-white px-3 text-[11px] font-semibold text-[var(--text)] hover:bg-[var(--border-base)]"
+                  >
+                    <Pencil className="h-3.5 w-3.5" strokeWidth={2.3} />
+                    배너 변경
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!homeBottomAd}
+                    onClick={() => void handleDeleteAd("HOME_BOTTOM")}
+                    className={`flex h-8 items-center justify-center rounded-2xl border px-3 text-[11px] font-semibold ${
+                      !homeBottomAd
+                        ? "cursor-not-allowed border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text-muted)] opacity-60"
+                        : "border-red-200 bg-red-50 text-red-500 hover:bg-red-100"
+                    }`}
+                  >
+                    삭제
+                  </button>
+                </div>
               </div>
               <div className="overflow-hidden rounded-xl border border-[var(--border-base)] bg-white">
                 {homeBottomAd?.imageUrl ? (
@@ -855,7 +988,7 @@ function Admin() {
                     className="h-24 w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-24 items-center justify-center text-[11px] text-[var(--text-muted)]">
+                  <div className="flex h-24 items-center justify-center text-[11px] font-semibold text-[var(--accent)]">
                     등록된 배너가 없습니다.
                   </div>
                 )}
@@ -870,20 +1003,34 @@ function Admin() {
                     MY_TICKET 위치에 노출되는 배너입니다.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingAd({
-                      title: myTicketAd?.title ?? "",
-                      imageUrl: myTicketAd?.imageUrl ?? "",
-                      placement: "MY_TICKET",
-                    });
-                  }}
-                  className="flex h-8 items-center gap-1 rounded-2xl border border-[var(--border-base)] bg-white px-3 text-[11px] font-semibold text-[var(--text)] hover:bg-[var(--border-base)]"
-                >
-                  <Pencil className="h-3.5 w-3.5" strokeWidth={2.3} />
-                  배너 변경
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingAd({
+                        title: myTicketAd?.title ?? "",
+                        imageUrl: myTicketAd?.imageUrl ?? "",
+                        placement: "MY_TICKET",
+                      });
+                    }}
+                    className="flex h-8 items-center gap-1 rounded-2xl border border-[var(--border-base)] bg-white px-3 text-[11px] font-semibold text-[var(--text)] hover:bg-[var(--border-base)]"
+                  >
+                    <Pencil className="h-3.5 w-3.5" strokeWidth={2.3} />
+                    배너 변경
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!myTicketAd}
+                    onClick={() => void handleDeleteAd("MY_TICKET")}
+                    className={`flex h-8 items-center justify-center rounded-2xl border px-3 text-[11px] font-semibold ${
+                      !myTicketAd
+                        ? "cursor-not-allowed border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text-muted)] opacity-60"
+                        : "border-red-200 bg-red-50 text-red-500 hover:bg-red-100"
+                    }`}
+                  >
+                    삭제
+                  </button>
+                </div>
               </div>
               <div className="overflow-hidden rounded-xl border border-[var(--border-base)] bg-white">
                 {myTicketAd?.imageUrl ? (
@@ -893,7 +1040,7 @@ function Admin() {
                     className="h-24 w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-24 items-center justify-center text-[11px] text-[var(--text-muted)]">
+                  <div className="flex h-24 items-center justify-center text-[11px] font-semibold text-[var(--accent)]">
                     등록된 배너가 없습니다.
                   </div>
                 )}
@@ -909,8 +1056,8 @@ function Admin() {
 
       {/* 공지 작성/수정 모달 */}
       {editingNotice && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-3xl rounded-2xl bg-white p-5 shadow-xl">
+        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 px-4 py-6">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-5 shadow-xl">
             <h3 className="text-base font-bold text-[var(--text)]">
               {editingNotice.id ? "공지 수정" : "새 공지 등록"}
             </h3>
@@ -1001,11 +1148,18 @@ function Admin() {
                   </div>
                   {editingNotice.images.length > 0 && (
                     <div className="mt-4 grid w-full max-w-sm grid-cols-3 gap-2">
-                      {editingNotice.images.map((url) => {
-                        const isThumbnail = editingNotice.thumbnailImageUrl === url;
+                      {editingNotice.images.map((url, index) => {
+                        const isThumbnail =
+                          (editingNotice.thumbnailImageUrl || editingNotice.images[0]) === url;
                         return (
-                          <div
+                          <button
                             key={url}
+                            type="button"
+                            onClick={() =>
+                              setEditingNotice((prev) =>
+                                prev ? { ...prev, thumbnailImageUrl: url } : prev,
+                              )
+                            }
                             className={`group relative h-20 overflow-hidden rounded-xl border ${
                               isThumbnail
                                 ? "border-[var(--accent)] ring-2 ring-[var(--accent)]/40"
@@ -1013,44 +1167,35 @@ function Admin() {
                             } bg-white`}
                           >
                             <img src={url} alt="공지 이미지" className="h-full w-full object-cover" />
-                            <div className="absolute inset-x-1 bottom-1 flex justify-between gap-1 text-[9px]">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setEditingNotice((prev) =>
-                                    prev ? { ...prev, thumbnailImageUrl: url } : prev,
-                                  )
-                                }
-                                className={`flex-1 rounded-full px-1.5 py-0.5 font-semibold ${
-                                  isThumbnail
-                                    ? "bg-[var(--accent)] text-white"
-                                    : "bg-black/60 text-white"
-                                }`}
-                              >
-                                {isThumbnail ? "썸네일" : "썸네일로"}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setEditingNotice((prev) =>
-                                    prev
-                                      ? {
-                                          ...prev,
-                                          images: prev.images.filter((img) => img !== url),
-                                          thumbnailImageUrl:
-                                            prev.thumbnailImageUrl === url
-                                              ? ""
-                                              : prev.thumbnailImageUrl,
-                                        }
-                                      : prev,
-                                  )
-                                }
-                                className="rounded-full bg-black/60 px-1.5 py-0.5 font-semibold text-white"
-                              >
-                                삭제
-                              </button>
-                            </div>
-                          </div>
+                            {isThumbnail && (
+                              <div className="absolute inset-0 flex items-start justify-end p-1">
+                                <span className="rounded-full bg-black/55 px-2 py-0.5 text-[9px] font-semibold text-white">
+                                  대표 이미지
+                                </span>
+                              </div>
+                            )}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingNotice((prev) =>
+                                  prev
+                                    ? {
+                                        ...prev,
+                                        images: prev.images.filter((img) => img !== url),
+                                        thumbnailImageUrl:
+                                          prev.thumbnailImageUrl === url
+                                            ? prev.images.filter((img) => img !== url)[0] ?? ""
+                                            : prev.thumbnailImageUrl,
+                                      }
+                                    : prev,
+                                );
+                              }}
+                              className="absolute inset-x-1 bottom-1 rounded-full bg-black/60 px-1.5 py-0.5 text-[9px] font-semibold text-white"
+                            >
+                              삭제
+                            </button>
+                          </button>
                         );
                       })}
                     </div>
@@ -1106,7 +1251,7 @@ function Admin() {
                     type="submit"
                     className="rounded-2xl bg-[var(--accent)] px-4 py-2 font-semibold text-white shadow-sm hover:brightness-95"
                   >
-                    저장하기
+                    {editingNotice.id ? "수정하기" : "등록하기"}
                   </button>
                 </div>
               </div>
@@ -1117,8 +1262,8 @@ function Admin() {
 
       {/* 광고 작성/수정 모달 (위치별 1개, 교체 저장) */}
       {editingAd && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl">
+        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 px-4 py-6">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-xl">
             <h3 className="text-sm font-bold text-[var(--text)]">
               광고 배너 등록/교체
             </h3>
@@ -1138,46 +1283,56 @@ function Admin() {
               </div>
 
               <div className="space-y-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[var(--text)]">
-                    노출 위치 (고정)
-                  </label>
-                  <div className="inline-flex items-center gap-2 rounded-full bg-[var(--surface-subtle)] px-3 py-1.5 text-[11px] font-semibold text-[var(--text-muted)]">
-                    <ImageIcon className="h-3.5 w-3.5" strokeWidth={2.3} />
-                    <span>
-                      {editingAd.placement === "HOME_BOTTOM"
-                        ? "HOME_BOTTOM (홈 화면 하단)"
-                        : "MY_TICKET (내 티켓 화면)"}
-                    </span>
-                  </div>
-                </div>
-
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-[var(--text)]">
-                    이미지 URL
+                    광고 이미지 업로드 (1장)
                   </label>
-                  <input
-                    type="url"
-                    value={editingAd.imageUrl}
-                    onChange={(e) =>
-                      setEditingAd((prev) =>
-                        prev ? { ...prev, imageUrl: e.target.value } : prev,
-                      )
-                    }
-                    className="h-9 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-xs focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/15"
-                    placeholder="https:// 예시..."
-                    required
-                  />
-                  <p className="text-[10px] text-[var(--text-muted)]">
-                    S3 등에 업로드된 이미지의 전체 URL을 입력해 주세요.
-                  </p>
-                  {editingAd.imageUrl && (
-                    <div className="mt-2 overflow-hidden rounded-xl border border-[var(--border-base)] bg-white">
-                      <img
-                        src={editingAd.imageUrl}
-                        alt={editingAd.title || "광고 미리보기"}
-                        className="h-24 w-full object-cover"
+                  <div
+                    className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-6 text-center"
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const file = e.dataTransfer.files?.[0];
+                      if (file) void handleUploadAdImage(file);
+                    }}
+                  >
+                    <UploadCloud className="h-8 w-8 text-[var(--text-muted)]" strokeWidth={2.3} />
+                    <p className="mt-2 text-sm font-semibold text-[var(--text-muted)]">
+                      이미지를 드래그&드롭하거나 파일 선택으로 업로드하세요.
+                    </p>
+                    <p className="text-[11px] text-[var(--text-muted)]">
+                      (JPG, JPEG, PNG, WEBP / 1장당 최대 5MB)
+                    </p>
+                    <label className="mt-3 inline-flex cursor-pointer items-center justify-center rounded-2xl bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:brightness-95">
+                      {adImageUploading ? "업로드 중..." : "파일 선택"}
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                        className="hidden"
+                        disabled={adImageUploading}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            void handleUploadAdImage(file);
+                            e.target.value = "";
+                          }
+                        }}
                       />
+                    </label>
+                  </div>
+                  {editingAd.imageUrl && (
+                    <div className="mt-2 space-y-2">
+                      <div className="overflow-hidden rounded-xl border border-[var(--border-base)] bg-white">
+                        <img
+                          src={editingAd.imageUrl}
+                          alt={editingAd.title || "광고 미리보기"}
+                          className="h-24 w-full object-cover"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1193,9 +1348,10 @@ function Admin() {
                 </button>
                 <button
                   type="submit"
+                  disabled={adImageUploading}
                   className="rounded-2xl bg-[var(--accent)] px-4 py-2 font-semibold text-white shadow-sm hover:brightness-95"
                 >
-                  저장
+                  {editingAd.id ? "수정하기" : "등록하기"}
                 </button>
               </div>
             </form>
