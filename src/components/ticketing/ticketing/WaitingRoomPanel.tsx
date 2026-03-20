@@ -6,7 +6,7 @@ import {
   TICKETING_CLASSES,
   TICKETING_NARROW_PANEL_CLASS,
 } from "@/components/ticketing/ticketing/ticketingShared";
-import { isRemainingFresh } from "@/routes/ticketing/Ticketing/queueFlowUtils";
+import { isRemainingFresh } from "@/hooks/ticketing/queue/flow-utils";
 import type { PlacementAd } from "@/types/ticketing/model/ad.model";
 
 interface WaitingRoomPanelProps {

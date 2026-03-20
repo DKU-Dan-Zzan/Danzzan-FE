@@ -3,7 +3,6 @@ import {
   resolveRoleFromAccessToken,
   type AuthRole,
 } from "@/api/common/authCore";
-import type { UserRole } from "@/types/ticketing/model/auth.model";
 
 const DUMMY_ORIGIN = "http://dummy-auth";
 
@@ -95,7 +94,7 @@ export const buildLoginRedirectPath = (
 
 export const isRoleAuthenticated = (options: {
   accessToken?: string | null;
-  role?: UserRole | null;
+  role?: AuthRole | null;
   requiredRole: AuthRole;
 }): boolean => {
   if (!options.accessToken) {

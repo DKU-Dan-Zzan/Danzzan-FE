@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { Ticket } from "lucide-react"
 import { useSyncExternalStore } from "react"
 import { authStore } from "@/store/ticketing/authStore"
-import { getMyTicketNavigationTarget } from "@/routes/ticketing/authNavigation"
+import { getMyTicketNavigationTarget } from "@/lib/ticketing/navigation/auth-navigation"
 import { AppTopBar } from "@/components/layout/AppTopBar"
 
 const Header = () => {

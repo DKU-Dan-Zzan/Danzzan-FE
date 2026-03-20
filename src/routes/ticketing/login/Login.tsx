@@ -6,7 +6,7 @@ import { Input } from "@/components/ticketing/common/ui/input";
 import { Label } from "@/components/ticketing/common/ui/label";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { TICKETING_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
-import { resolveTicketingLoginRedirect } from "@/routes/ticketing/authNavigation";
+import { resolveTicketingLoginRedirect } from "@/lib/ticketing/navigation/auth-navigation";
 
 export default function Login() {
   const navigate = useNavigate();
