@@ -1,4 +1,5 @@
 import { http } from "../lib/http";
+import { adGateway } from "./common/adGateway";
 import type { PageResponse } from "./admin";
 
 export type NoticeDto = {
@@ -64,13 +65,18 @@ export type ClientAdDto = {
 };
 
 export async function getPlacementAd(placement: PlacementKey): Promise<ClientAdDto | null> {
-  const res = await http.get<ClientAdDto>(`/api/ads`, {
-    params: { placement },
-  });
-
-  if (res.status === 204 || !res.data) {
+  const ad = await adGateway.getPlacementAd(placement, { prefer: "web" });
+  if (!ad) {
     return null;
   }
 
-  return res.data;
+  return {
+    id: ad.id ?? 0,
+    title: ad.title ?? ad.altText ?? "광고 배너",
+    imageUrl: ad.imageUrl,
+    placement,
+    isActive: ad.isActive,
+    createdAt: ad.createdAt ?? "",
+    updatedAt: ad.updatedAt ?? "",
+  };
 }

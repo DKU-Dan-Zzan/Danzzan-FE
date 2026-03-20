@@ -1,38 +1,7 @@
-import { createHttpClient } from "@/api/ticketing/httpClient";
+import { adGateway } from "@/api/common/adGateway";
 import { mapPlacementAdDtoToModel } from "@/lib/ticketing/mappers/adMapper";
-import { authStore } from "@/store/ticketing/authStore";
-import type { PlacementAdDto } from "@/types/ticketing/dto/ad.dto";
 import type { AdPlacementKey, PlacementAd } from "@/types/ticketing/model/ad.model";
-import { env, requireEnv } from "@/utils/ticketing/env";
-
-const getAdClient = () =>
-  createHttpClient({
-    baseUrl: requireEnv(
-      env.ticketingApiBaseUrl,
-      "VITE_TICKETING_API_BASE_URL (or VITE_API_BASE_URL)",
-    ),
-    getAccessToken: authStore.getAccessToken,
-  });
-
-type ApiEnvelope<T> = {
-  data?: T | null;
-} & Record<string, unknown>;
-
-const unwrapApiData = <T>(
-  payload: T | ApiEnvelope<T> | null | undefined,
-): T | null => {
-  if (!payload || typeof payload !== "object") {
-    return null;
-  }
-
-  const record = payload as Record<string, unknown>;
-  const maybeData = record.data;
-  if (maybeData && typeof maybeData === "object") {
-    return maybeData as T;
-  }
-
-  return payload as T;
-};
+import { env } from "@/utils/ticketing/env";
 
 const mockWaitingRoomAd: PlacementAd = {
   placement: "WAITING_ROOM_MAIN",
@@ -52,18 +21,23 @@ export const adApi = {
       return placement === "WAITING_ROOM_MAIN" ? mockWaitingRoomAd : null;
     }
 
-    const client = getAdClient();
-    const dto = await client.get<PlacementAdDto | ApiEnvelope<PlacementAdDto> | null>(
-      `/ads/placements/${placement}`,
-      { signal },
-    );
-
-    const normalized = unwrapApiData(dto);
-    if (!normalized) {
+    const ad = await adGateway.getPlacementAd(placement, {
+      signal,
+      prefer: "ticketing",
+    });
+    if (!ad) {
       return null;
     }
 
-    const mapped = mapPlacementAdDtoToModel(normalized);
+    const mapped = mapPlacementAdDtoToModel({
+      placement: ad.placement,
+      imageUrl: ad.imageUrl,
+      linkUrl: ad.linkUrl,
+      altText: ad.altText ?? ad.title ?? "단짠 대기열 광고",
+      isActive: ad.isActive,
+      updatedAt: ad.updatedAt ?? undefined,
+    });
+
     if (!mapped.isActive || !mapped.imageUrl) {
       return null;
     }
