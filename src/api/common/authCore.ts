@@ -36,7 +36,15 @@ const parseJwtPayload = (token: string): Record<string, unknown> | null => {
     if (!payloadPart) {
       return null;
     }
-    const decoded = JSON.parse(atob(payloadPart)) as Record<string, unknown>;
+
+    // JWT payload is base64url encoded and may be unpadded.
+    const base64 = payloadPart
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+    const padLength = (4 - (base64.length % 4)) % 4;
+    const padded = base64.padEnd(base64.length + padLength, "=");
+
+    const decoded = JSON.parse(atob(padded)) as Record<string, unknown>;
     return decoded;
   } catch {
     return null;

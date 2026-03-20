@@ -5,6 +5,13 @@ import {
   resolveScopedRedirect,
 } from "@/routes/common/authGuard";
 
+const createJwtLikeToken = (payload: Record<string, unknown>): string => {
+  const encode = (value: Record<string, unknown>) =>
+    Buffer.from(JSON.stringify(value)).toString("base64url");
+
+  return `${encode({ alg: "HS256", typ: "JWT" })}.${encode(payload)}.signature`;
+};
+
 describe("authGuard", () => {
   it("scope 밖 redirect는 fallback으로 치환한다", () => {
     expect(
@@ -47,5 +54,17 @@ describe("authGuard", () => {
         requiredRole: "admin",
       }),
     ).toBe(false);
+  });
+
+  it("role 상태값이 비어도 토큰 role 클레임으로 인증을 판별한다", () => {
+    const token = createJwtLikeToken({ role: "ROLE_ADMIN" });
+
+    expect(
+      isRoleAuthenticated({
+        accessToken: token,
+        role: null,
+        requiredRole: "admin",
+      }),
+    ).toBe(true);
   });
 });

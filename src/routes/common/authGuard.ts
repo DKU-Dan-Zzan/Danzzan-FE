@@ -1,4 +1,8 @@
-import { hasRequiredRole, type AuthRole } from "@/api/common/authCore";
+import {
+  hasRequiredRole,
+  resolveRoleFromAccessToken,
+  type AuthRole,
+} from "@/api/common/authCore";
 import type { UserRole } from "@/types/ticketing/model/auth.model";
 
 const DUMMY_ORIGIN = "http://dummy-auth";
@@ -97,5 +101,8 @@ export const isRoleAuthenticated = (options: {
   if (!options.accessToken) {
     return false;
   }
-  return hasRequiredRole(options.requiredRole, options.role ?? null);
+
+  // Token claim should be source of truth when available.
+  const tokenRole = resolveRoleFromAccessToken(options.accessToken);
+  return hasRequiredRole(options.requiredRole, tokenRole ?? options.role ?? null);
 };
