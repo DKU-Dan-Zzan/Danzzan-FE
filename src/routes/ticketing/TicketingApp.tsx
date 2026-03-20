@@ -3,14 +3,14 @@ import { useAuth } from "@/hooks/ticketing/useAuth";
 import { AdminLayout } from "@/components/ticketing/layout/AdminLayout";
 import { UserLayout } from "@/components/ticketing/layout/UserLayout";
 import Login from "@/routes/ticketing/Login/Login";
-import ResetPassword from "@/routes/ticketing/ResetPassword/ResetPassword";
+import ResetPassword from "@/routes/ticketing/reset-password/ResetPassword";
 import Signup from "@/routes/ticketing/Signup/Signup";
 import Ticketing from "@/routes/ticketing/Ticketing/Ticketing";
-import MyTicket from "@/routes/ticketing/MyTicket/MyTicket";
-import AdminLogin from "@/routes/ticketing/admin/Login/AdminLogin";
-import WristbandPage from "@/routes/ticketing/admin/Wristband/WristbandPage";
-import TokenRequired from "@/routes/ticketing/admin/TokenRequired/TokenRequired";
-import NotFoundPage from "@/routes/ticketing/NotFound/NotFoundPage";
+import MyTicket from "@/routes/ticketing/my-ticket/MyTicket";
+import AdminLogin from "@/routes/ticketing/admin/login/AdminLogin";
+import WristbandPage from "@/routes/ticketing/admin/wristband/WristbandPage";
+import TokenRequired from "@/routes/ticketing/admin/token-required/TokenRequired";
+import NotFoundPage from "@/routes/ticketing/not-found/NotFoundPage";
 import {
   buildLoginRedirectPath,
   buildReturnTo,
