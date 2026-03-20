@@ -69,19 +69,23 @@ export default function LineupCarousel({
   if (count === 0) return null
 
   return (
-    <section className="home-content-block">
-      <div className="home-lineup-card" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+    <section className="mx-auto w-full max-w-[var(--home-content-max-width)]">
+      <div
+        className="relative touch-pan-y overflow-hidden rounded-[var(--home-card-radius)] border border-[var(--home-card-border)] bg-[var(--home-card-bg)] shadow-[var(--home-lineup-card-shadow)]"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         <div style={{ aspectRatio: aspect }}>
           <div
-            className="home-carousel-track"
+            className="flex h-full w-full transition-transform duration-500 ease-out"
             style={{ transform: `translateX(${translateX})` }}
           >
             {banners.map((banner) => (
-              <div key={banner.id} className="home-carousel-slide">
+              <div key={banner.id} className="relative h-full min-w-full">
                 <img
                   src={banner.imageUrl}
                   alt={banner.alt ?? "라인업 이미지"}
-                  className="home-carousel-image"
+                  className="h-full w-full object-cover"
                   draggable={false}
                 />
               </div>
@@ -91,7 +95,7 @@ export default function LineupCarousel({
       </div>
 
       {count > 1 && (
-        <div className="home-carousel-dots is-lineup">
+        <div className="mt-[var(--home-dot-margin-top)] flex justify-center gap-[var(--home-dot-gap)]">
           {banners.map((banner, i) => {
             const active = i === safeIndex
             return (
@@ -100,7 +104,9 @@ export default function LineupCarousel({
                 type="button"
                 onClick={() => setIndex(i)}
                 aria-label={`라인업 ${i + 1}로 이동`}
-                className={`home-carousel-dot ${active ? "is-active" : ""}`}
+                className={`h-[var(--home-dot-height)] rounded-full bg-[var(--home-card-border)] transition-all duration-300 ${
+                  active ? "w-[var(--home-dot-active-width)]" : "w-[var(--home-dot-width)]"
+                }`}
               />
             )
           })}

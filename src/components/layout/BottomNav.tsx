@@ -16,24 +16,24 @@ const BottomNav = () => {
       data-app-bottom-nav
       className="fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-[430px] h-[calc(var(--app-bottom-nav-height,56px)_+_env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)]"
     >
-      <div className="app-bottom-nav-backdrop absolute inset-0" />
+      <div className="absolute inset-0 border-t border-[var(--app-nav-border)] bg-[var(--app-nav-bg)] shadow-[var(--app-nav-shadow)] backdrop-blur-[16px]" />
 
-      <div className="app-bottom-nav-inner relative flex items-center">
+      <div className="relative flex h-[var(--app-bottom-nav-height)] items-center">
         {navItems.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}
             end={to === "/"}
             className={({ isActive }) =>
-              `app-bottom-nav-link relative flex h-full flex-1 flex-col items-center justify-center transition-all duration-200 ${isActive ? "is-active" : ""}`
+              `relative flex h-full flex-1 flex-col items-center justify-center text-[length:var(--app-bottom-nav-label-size)] transition-all duration-200 ${isActive ? "text-[var(--app-nav-text-active)]" : "text-[var(--app-nav-text)]"}`
             }
           >
             {({ isActive }) => (
               <>
-                <Icon strokeWidth={2} className="app-bottom-nav-icon" />
+                <Icon strokeWidth={2} className="h-[var(--app-bottom-nav-icon-size)] w-[var(--app-bottom-nav-icon-size)]" />
 
                 {isActive && (
-                  <div className="app-bottom-nav-indicator" />
+                  <div className="absolute bottom-[var(--app-bottom-nav-indicator-bottom)] h-[var(--app-bottom-nav-indicator-height)] w-[var(--app-bottom-nav-indicator-width)] rounded-full bg-[var(--accent)]" />
                 )}
 
                 <span className="mt-1 text-center leading-none">{label}</span>

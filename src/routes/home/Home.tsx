@@ -119,30 +119,30 @@ function Home() {
   }, [])
 
   return (
-    <div className="home-page-root">
+    <div className="flow-root min-h-full bg-[var(--bg-page-soft)]">
       {error && (
-        <div className="home-status-banner is-error">
+        <div className="mx-auto mt-3 w-full max-w-[var(--home-content-max-width)] rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-xs leading-[1.35] text-[var(--status-danger-text)]">
           {error}
         </div>
       )}
 
       <div>
         <EmergencyNotice notice={notice} />
-        <div className="home-section-poster">
+        <div className="mt-[var(--home-section-poster-margin-top)]">
           <PosterCarousel posters={posters} />
         </div>
         <LineupSection banners={lineups} />
-        <div className="home-section-performance">
+        <div className="mt-[var(--home-section-performance-margin-top)]">
           <CurrentPerformanceSection />
         </div>
 
-        <div className="home-section-ad">
+        <div>
           <AdBanner imageUrl={homeBottomAd?.imageUrl} alt={homeBottomAd?.title} />
         </div>
       </div>
 
       {loading && (
-        <div className="home-status-banner is-loading">
+        <div className="mx-auto mt-3 w-full max-w-[var(--home-content-max-width)] rounded-xl border border-[var(--home-card-border)] bg-[var(--home-card-bg)] px-3 py-2 text-xs leading-[1.35] text-[var(--text-muted)]">
           로딩 중...
         </div>
       )}

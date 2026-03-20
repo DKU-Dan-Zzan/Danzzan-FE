@@ -46,16 +46,16 @@ export function UserLayout() {
           <AppTopBar
             title={pageTitle}
             showSafeAreaOverlay
-            headerClassName="app-main-header sticky top-0 z-40 border-b border-[var(--app-header-border)] pt-[env(safe-area-inset-top)]"
+            headerClassName="sticky top-0 z-40 border-b border-[var(--app-header-border)] bg-[var(--app-header-bg)] [background-image:var(--app-header-bg-gradient)] bg-no-repeat bg-[length:100%_100%] pt-[env(safe-area-inset-top)]"
             containerClassName="relative mx-auto h-16 w-full max-w-md px-4"
           >
             <button
               onClick={handleBack}
-              className="app-header-ticket-button absolute top-1/2 left-4 -translate-y-1/2"
+              className="absolute top-1/2 left-4 flex h-[var(--app-header-ticket-btn-size)] w-[var(--app-header-ticket-btn-size)] -translate-y-1/2 items-center justify-center rounded-full border border-[var(--app-header-ticket-btn-border)] bg-[linear-gradient(145deg,var(--app-header-ticket-btn-bg-start)_0%,var(--app-header-ticket-btn-bg-end)_100%)] shadow-[var(--app-header-ticket-btn-shadow)] backdrop-blur-[6px] transition-[transform,box-shadow,filter] duration-[180ms] hover:shadow-[var(--app-header-ticket-btn-shadow-hover)] hover:brightness-[1.01] active:scale-[0.96]"
               aria-label="뒤로가기"
               title="뒤로가기"
             >
-              <ArrowLeft size={18} className="app-header-ticket-icon" />
+              <ArrowLeft size={18} className="text-[var(--app-header-ticket-btn-icon)]" />
             </button>
           </AppTopBar>
         ) : undefined

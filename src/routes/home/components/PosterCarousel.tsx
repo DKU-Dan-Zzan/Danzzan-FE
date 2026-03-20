@@ -40,14 +40,14 @@ export default function PosterCarousel({
   // 데이터 없을 때 placeholder UI (디자인 유지)
   if (count === 0) {
     return (
-      <section className="home-content-block">
-        <div className="home-poster-placeholder-card">
-          <div className="home-poster-placeholder-center" style={{ aspectRatio: aspect }}>
-            <div className="home-poster-placeholder-content">
-              <div className="home-poster-placeholder-title">
+      <section className="mx-auto w-full max-w-[var(--home-content-max-width)]">
+        <div className="relative overflow-hidden rounded-[var(--home-card-radius)] border border-[var(--home-card-border)] bg-[var(--home-poster-placeholder-bg)] shadow-[var(--home-poster-placeholder-shadow)]">
+          <div className="flex items-center justify-center" style={{ aspectRatio: aspect }}>
+            <div className="text-center">
+              <div className="text-[15px] leading-[1.3] font-semibold text-[var(--text)]">
                 2026 단국축제
               </div>
-              <div className="home-poster-placeholder-subtitle">
+              <div className="mt-1 text-xs leading-[1.3] text-[var(--text-muted)]">
                 축제 포스터 영역
               </div>
             </div>
@@ -58,26 +58,26 @@ export default function PosterCarousel({
   }
 
   return (
-    <section className="home-content-block">
+    <section className="mx-auto w-full max-w-[var(--home-content-max-width)]">
       {/* 포스터 카드 */}
-      <div className="home-poster-card">
+      <div className="relative overflow-hidden rounded-[var(--home-card-radius)] border border-[var(--home-card-border)] bg-[var(--home-card-bg)] shadow-[var(--home-poster-card-shadow)]">
         {/* 비율 고정 */}
         <div style={{ aspectRatio: aspect }}>
           {/* 슬라이드 트랙 */}
           <div
-            className="home-carousel-track"
+            className="flex h-full w-full transition-transform duration-500 ease-out"
             style={{ transform: `translateX(${translateX})` }}
           >
             {posters.map((p) => (
-              <div key={p.id} className="home-carousel-slide">
+              <div key={p.id} className="relative h-full min-w-full">
                 <img
                   src={p.imageUrl}
                   alt={p.alt ?? "축제 포스터"}
-                  className="home-carousel-image"
+                  className="h-full w-full object-cover"
                   draggable={false}
                 />
                 {/* 텍스트 올릴 때 가독성용(선택) */}
-                <div className="home-poster-overlay" />
+                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgb(0_0_0_/_0.2),rgb(0_0_0_/_0),rgb(0_0_0_/_0.1))]" />
               </div>
             ))}
           </div>
@@ -86,7 +86,7 @@ export default function PosterCarousel({
 
       {/* 도트 인디케이터 */}
       {count > 1 && (
-        <div className="home-carousel-dots">
+        <div className="mt-[var(--home-dot-margin-top)] flex justify-center gap-[var(--home-dot-gap)]">
           {posters.map((p, i) => {
             const active = i === safeIndex
             return (
@@ -95,7 +95,9 @@ export default function PosterCarousel({
                 type="button"
                 onClick={() => setIndex(i)}
                 aria-label={`포스터 ${i + 1}로 이동`}
-                className={`home-carousel-dot ${active ? "is-active" : ""}`}
+                className={`h-[var(--home-dot-height)] rounded-full bg-[var(--home-card-border)] transition-all duration-300 ${
+                  active ? "w-[var(--home-dot-active-width)] bg-[var(--accent)]" : "w-[var(--home-dot-width)]"
+                }`}
               />
             )
           })}

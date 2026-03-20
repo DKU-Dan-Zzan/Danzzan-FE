@@ -74,7 +74,7 @@ export default function CurrentPerformanceSection() {
   return (
     <section className="px-5">
       <div className="mx-auto w-full max-w-[314px]">
-        <p className="home-caption-text home-current-performance-caption">
+        <p className="mb-[var(--home-current-performance-caption-gap)] text-center text-[length:var(--home-lineup-caption-font-size)] leading-[1.4] font-semibold text-[var(--home-lineup-caption-color)]">
           현재 진행 중인 공연을 지금 확인하세요
         </p>
 
@@ -82,11 +82,11 @@ export default function CurrentPerformanceSection() {
           type="button"
           onClick={() => navigate(`/timetable?date=${today}`)}
           style={{ aspectRatio: CARD_ASPECT_RATIO }}
-          className="home-current-performance-card w-full rounded-[22px] border border-gray-100 bg-white px-5 py-4 transition active:scale-[0.99]"
+          className="w-full rounded-[22px] border border-[var(--home-card-border)] bg-[var(--home-card-bg)] px-5 py-4 shadow-[var(--home-current-performance-card-shadow)] transition active:scale-[0.99]"
         >
           {status === "active" && currentPerformance ? (
             <div className="flex h-full items-center gap-4">
-              <div className="h-[68px] w-[68px] shrink-0 overflow-hidden rounded-full border border-gray-200 bg-gray-100">
+              <div className="h-[68px] w-[68px] shrink-0 overflow-hidden rounded-full border border-[var(--home-card-border)] bg-[var(--surface-subtle)]">
                 <img
                   src={currentPerformance.artistImageUrl || "/images/default-artist.png"}
                   alt={currentPerformance.artistName}
@@ -95,23 +95,23 @@ export default function CurrentPerformanceSection() {
               </div>
 
               <div className="min-w-0 flex-1 text-left">
-                <p className="truncate text-[18px] font-bold leading-tight text-gray-900">
+                <p className="truncate text-[18px] font-bold leading-tight text-[var(--text)]">
                   {currentPerformance.artistName}
                 </p>
 
-                <p className="mt-1 text-[14px] font-medium text-gray-500">
+                <p className="mt-1 text-[14px] font-medium text-[var(--text-muted)]">
                   {currentPerformance.startTime} - {currentPerformance.endTime}
                 </p>
               </div>
             </div>
           ) : (
             <div className="flex h-full items-center gap-4">
-              <div className="flex h-[68px] w-[68px] shrink-0 items-center justify-center rounded-full border border-gray-200 bg-gray-100 text-xs font-semibold text-gray-500">
+              <div className="flex h-[68px] w-[68px] shrink-0 items-center justify-center rounded-full border border-[var(--home-card-border)] bg-[var(--surface-subtle)] text-xs font-semibold text-[var(--text-muted)]">
                 NOW
               </div>
               <div className="min-w-0 flex-1 text-left">
-                <p className="text-[16px] font-semibold leading-tight text-gray-800">{helperText}</p>
-                <p className="mt-1 text-[13px] font-medium text-gray-500">타임테이블에서 다음 공연을 확인해 보세요.</p>
+                <p className="text-[16px] font-semibold leading-tight text-[var(--text)]">{helperText}</p>
+                <p className="mt-1 text-[13px] font-medium text-[var(--text-muted)]">타임테이블에서 다음 공연을 확인해 보세요.</p>
               </div>
             </div>
           )}

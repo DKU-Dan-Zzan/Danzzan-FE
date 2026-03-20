@@ -17,10 +17,10 @@ export default function LineupSection({
 
   return (
     <>
-      <p className="home-content-block home-caption-text home-lineup-caption">
+      <p className="mx-auto mt-[var(--home-lineup-caption-margin-top)] w-full max-w-[var(--home-content-max-width)] text-center text-[length:var(--home-lineup-caption-font-size)] leading-[1.4] font-semibold text-[var(--home-lineup-caption-color)]">
         {caption}
       </p>
-      <div className="home-section-lineup">
+      <div className="mt-[var(--home-section-lineup-margin-top)]">
         <LineupCarousel banners={banners} />
       </div>
     </>
