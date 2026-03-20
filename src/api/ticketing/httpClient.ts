@@ -102,7 +102,9 @@ export const createHttpClient = (options: {
         sessionExpiredMessage,
         forbiddenMessage,
         readStatus: readAxiosStatus,
-        execute: async (accessToken, _context) => {
+        execute: async (accessToken, context) => {
+          const isRetry = context.isRetry;
+          void isRetry;
           const headers = {
             ...(config.requestOptions?.headers ?? {}),
           } as Record<string, string>;
