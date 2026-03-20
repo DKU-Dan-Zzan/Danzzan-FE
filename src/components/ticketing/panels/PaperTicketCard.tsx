@@ -115,7 +115,7 @@ const SIDE_CUTOUT_CLASS_NAME =
 
 export function PaperTicketCard({ ticket }: PaperTicketCardProps) {
   const status = statusDisplayMap[ticket.status];
-  const { dayLabel, dateLabel, venueLabel, queueLabel, wristbandValue, entryLabel, entryValue } =
+  const { dayLabel, dateLabel, queueLabel, wristbandValue, entryLabel, entryValue } =
     getGuideLines(ticket);
 
   return (

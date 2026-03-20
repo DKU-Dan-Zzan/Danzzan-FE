@@ -19,6 +19,8 @@ export function AuthSegmentedControl({ activeTab }: AuthSegmentedControlProps) {
     const from = (location.state as { authTabFrom?: AuthTab } | null)?.authTabFrom;
 
     if (!from || from === activeTab) {
+      // Existing animation flow intentionally updates local indicator state during effect.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIndicatorIndex(activeIndex);
       return;
     }
