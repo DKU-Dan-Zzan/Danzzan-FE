@@ -1,4 +1,5 @@
 ﻿import axios, { AxiosError } from "axios";
+import { JSON_HEADERS } from "@/api/common/httpConstants";
 
 export type RequestParams = Record<string, string | number | boolean | null | undefined>;
 
@@ -32,7 +33,7 @@ export const createHttpClient = (options: {
 
   const instance = axios.create({
     baseURL: baseUrl,
-    headers: { "Content-Type": "application/json" },
+    headers: { ...JSON_HEADERS },
     withCredentials: true,
   });
 
@@ -47,10 +48,6 @@ export const createHttpClient = (options: {
   instance.interceptors.response.use(
     (response) => response.data,
     (error: AxiosError) => {
-      const message = error.response?.data
-        ? JSON.stringify(error.response.data)
-        : error.message;
-
       throw new HttpError(
         `Request failed with status ${error.response?.status ?? "unknown"}`,
         error.response?.status ?? 500,

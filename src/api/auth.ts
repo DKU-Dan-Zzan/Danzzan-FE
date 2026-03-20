@@ -1,4 +1,8 @@
-export const getBaseUrl = () => "http://localhost:8080";
+import { getApiBaseUrl } from "@/api/common/baseUrl";
+import { parseFetchResponse } from "@/api/common/fetchAuth";
+import { JSON_HEADERS } from "@/api/common/httpConstants";
+
+export const getBaseUrl = () => getApiBaseUrl();
 
 export type LoginRequest = {
   studentNumber: string;
@@ -14,32 +18,17 @@ export type ReissueResponse = {
   accessToken: string;
 };
 
-async function handleResponse<T>(res: Response): Promise<T> {
-  const text = await res.text();
-  const data = text ? (JSON.parse(text) as T) : ({} as T);
-
-  if (!res.ok) {
-    const message =
-      (data as { message?: string })?.message ??
-      (data as { error?: string })?.error ??
-      `요청 실패 (${res.status})`;
-    throw new Error(message);
-  }
-
-  return data;
-}
-
 export async function authLogin(body: LoginRequest): Promise<LoginResponse> {
   const base = getBaseUrl();
 
   const res = await fetch(`${base}/auth/login`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: JSON_HEADERS,
     credentials: "include",
     body: JSON.stringify(body),
   });
 
-  return handleResponse<LoginResponse>(res);
+  return parseFetchResponse<LoginResponse>(res);
 }
 
 /** Body 없음. 쿠키(refreshToken)만 credentials: 'include'로 전송. 서버가 Set-Cookie로 쿠키 삭제 */
@@ -50,7 +39,7 @@ export async function authLogout(): Promise<void> {
   try {
     await fetch(`${base}/auth/logout`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: JSON_HEADERS,
       credentials: "include",
     });
   } catch {
@@ -64,9 +53,9 @@ export async function authReissue(): Promise<ReissueResponse> {
 
   const res = await fetch(`${base}/auth/reissue`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: JSON_HEADERS,
     credentials: "include",
   });
 
-  return handleResponse<ReissueResponse>(res);
+  return parseFetchResponse<ReissueResponse>(res);
 }

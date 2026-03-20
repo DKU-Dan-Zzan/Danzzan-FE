@@ -1,10 +1,9 @@
 import axios from "axios";
-import { getBaseUrl } from "../api/auth";
+import { getApiBaseUrl } from "@/api/common/baseUrl";
+import { JSON_HEADERS } from "@/api/common/httpConstants";
 
 export const http = axios.create({
-  baseURL: getBaseUrl(),
+  baseURL: getApiBaseUrl(),
   withCredentials: false,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  headers: { ...JSON_HEADERS },
 });
