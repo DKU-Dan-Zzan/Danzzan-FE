@@ -2,10 +2,10 @@
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { AdminLayout } from "@/components/ticketing/layout/AdminLayout";
 import { UserLayout } from "@/components/ticketing/layout/UserLayout";
-import Login from "@/routes/ticketing/Login/Login";
+import Login from "@/routes/ticketing/login/Login";
 import ResetPassword from "@/routes/ticketing/reset-password/ResetPassword";
-import Signup from "@/routes/ticketing/Signup/Signup";
-import Ticketing from "@/routes/ticketing/Ticketing/Ticketing";
+import Signup from "@/routes/ticketing/signup/Signup";
+import Ticketing from "@/routes/ticketing/ticketing/Ticketing";
 import MyTicket from "@/routes/ticketing/my-ticket/MyTicket";
 import AdminLogin from "@/routes/ticketing/admin/login/AdminLogin";
 import WristbandPage from "@/routes/ticketing/admin/wristband/WristbandPage";
