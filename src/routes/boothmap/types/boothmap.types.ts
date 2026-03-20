@@ -2,7 +2,7 @@
 
 export type MapMode = "2D" | "3D";
 
-export type BoothType = "EXPERIENCE" | "FOOD_TRUCK" | "FACILITY";
+export type BoothType = "EXPERIENCE" | "FOOD_TRUCK" | "EVENT" | "FACILITY";
 export type PrimaryFilter = "ALL" | "PUB" | BoothType;
 
 export type SheetMode = "LIST" | "DETAIL";

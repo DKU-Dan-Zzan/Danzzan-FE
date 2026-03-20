@@ -5,6 +5,7 @@ import type { Booth } from "../types/boothmap.types";
 const typeLabel: Record<string, string> = {
   FOOD_TRUCK: "FOOD_TRUCK",
   EXPERIENCE: "EXPERIENCE",
+  EVENT: "EVENT",
   FACILITY: "FACILITY",
 };
 

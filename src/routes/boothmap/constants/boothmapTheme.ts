@@ -1,4 +1,4 @@
-export type BoothmapMarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "FACILITY";
+export type BoothmapMarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "EVENT" | "FACILITY";
 
 type MarkerTheme = {
   color: string;
@@ -21,6 +21,10 @@ export const BOOTHMAP_MARKER_THEME: Record<BoothmapMarkerType, MarkerTheme> = {
   FACILITY: {
     color: "#3b82f6",
     iconPath: "/markers/facility-restroom.svg",
+  },
+  EVENT: {
+    color: "#f6ca3b",
+    iconPath: "/markers/booth-event.svg",
   },
 };
 
