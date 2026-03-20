@@ -1,7 +1,9 @@
 import { useCallback, useSyncExternalStore } from "react";
 import { hasRequiredRole, resolveRoleFromAccessToken } from "@/api/common/authCore";
+import { adminAuthApi } from "@/api/ticketing/adminAuthApi";
 import { authStore } from "@/store/ticketing/authStore";
-import { authLogin, authLogout, authReissue } from "../api/auth";
+import type { AuthSession } from "@/types/ticketing/model/auth.model";
+import { authLogout } from "../api/auth";
 
 const requireAdminRole = (accessToken: string): void => {
   const role = resolveRoleFromAccessToken(accessToken);
@@ -10,22 +12,8 @@ const requireAdminRole = (accessToken: string): void => {
   }
 };
 
-const setAdminSession = (accessToken: string): void => {
-  authStore.setSession(
-    {
-      tokens: {
-        accessToken,
-        refreshToken: "",
-        expiresIn: null,
-      },
-      user: null,
-    },
-    "admin",
-    {
-      persist: false,
-      refreshMode: "cookie",
-    },
-  );
+const setAdminSession = (session: AuthSession): void => {
+  authStore.setSession(session, "admin");
 };
 
 export function useAdminAuth() {
@@ -42,9 +30,12 @@ export function useAdminAuth() {
       throw new Error("학번과 비밀번호를 입력해 주세요.");
     }
 
-    const res = await authLogin({ studentNumber: studentNumber.trim(), password });
-    requireAdminRole(res.accessToken);
-    setAdminSession(res.accessToken);
+    const session = await adminAuthApi.login({
+      studentId: studentNumber.trim(),
+      password,
+    });
+    requireAdminRole(session.tokens.accessToken);
+    setAdminSession(session);
   }, []);
 
   const logout = useCallback(async () => {
@@ -55,15 +46,21 @@ export function useAdminAuth() {
     }
   }, []);
 
-  /** 페이지 로드 시 쿠키(refreshToken)로 세션 복구. 성공 시 true, 실패 시 false */
+  /** 페이지 로드 시 저장된 세션/재발급 토큰으로 세션 복구. 성공 시 true, 실패 시 false */
   const tryRestoreSession = useCallback(async (): Promise<boolean> => {
+    const current = authStore.getSnapshot();
+    if (current.tokens?.accessToken && current.role === "admin") {
+      return true;
+    }
+
     try {
-      const res = await authReissue();
-      requireAdminRole(res.accessToken);
-      setAdminSession(res.accessToken);
+      const reissued = await authStore.refreshAccessToken();
+      if (!reissued) {
+        return false;
+      }
+      requireAdminRole(reissued);
       return true;
     } catch {
-      authStore.clear();
       return false;
     }
   }, []);
