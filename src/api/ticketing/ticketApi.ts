@@ -36,6 +36,9 @@ const getTicketingClient = () =>
       "VITE_TICKETING_API_BASE_URL (or VITE_API_BASE_URL)",
     ),
     getAccessToken: authStore.getAccessToken,
+    refreshAccessToken: authStore.refreshAccessToken,
+    clearSession: authStore.clear,
+    refreshKey: "ticketing-auth",
   });
 
 type ApiEnvelope<T> = {

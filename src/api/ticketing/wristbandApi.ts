@@ -29,6 +29,9 @@ const getClient = () =>
       "VITE_API_BASE_URL (or VITE_API_URL)",
     ),
     getAccessToken: authStore.getAccessToken,
+    refreshAccessToken: authStore.refreshAccessToken,
+    clearSession: authStore.clear,
+    refreshKey: "ticketing-auth",
   });
 
 /** ApiResponse 래퍼에서 data를 추출 */

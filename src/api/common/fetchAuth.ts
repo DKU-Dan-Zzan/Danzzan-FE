@@ -1,3 +1,4 @@
+import { withAuthRetry } from "@/api/common/authCore";
 import { JSON_CONTENT_TYPE } from "@/api/common/httpConstants";
 
 type ApiErrorBody = {
@@ -70,7 +71,11 @@ type CreateFetchWithAuthOptions = {
   getAccessToken: () => string | null;
   reissueAccessToken: () => Promise<string | null>;
   sessionExpiredMessage?: string;
+  forbiddenMessage?: string;
   credentials?: RequestCredentials;
+  refreshKey?: string;
+  clearSession?: () => void | Promise<void>;
+  onForbidden?: () => void | Promise<void>;
 };
 
 export const createFetchWithAuth = ({
@@ -78,30 +83,33 @@ export const createFetchWithAuth = ({
   getAccessToken,
   reissueAccessToken,
   sessionExpiredMessage = "세션이 만료되었습니다. 다시 로그인해 주세요.",
+  forbiddenMessage = "권한이 없습니다.",
   credentials,
+  refreshKey,
+  clearSession,
+  onForbidden,
 }: CreateFetchWithAuthOptions) => {
   return async <T>(input: string, init: RequestInit = {}): Promise<T> => {
     const base = getBaseUrl();
 
-    const makeRequest = (accessToken?: string) =>
-      fetch(`${base}${input}`, {
-        ...init,
-        credentials: credentials ?? init.credentials,
-        headers: buildHeaders(init.headers, accessToken),
-      });
-
-    const token = getAccessToken();
-    let res = await makeRequest(token ?? undefined);
-
-    if (res.status === 401) {
-      const reissued = await reissueAccessToken();
-      if (!reissued) {
-        throw new Error(sessionExpiredMessage);
-      }
-      res = await makeRequest(reissued);
-    }
-
-    return parseFetchResponse<T>(res);
+    return withAuthRetry<T>({
+      getAccessToken,
+      refreshAccessToken: reissueAccessToken,
+      refreshKey,
+      sessionExpiredMessage,
+      forbiddenMessage,
+      onSessionExpired: clearSession,
+      onForbidden,
+      readStatus: getErrorStatus,
+      execute: async (accessToken) => {
+        const res = await fetch(`${base}${input}`, {
+          ...init,
+          credentials: credentials ?? init.credentials,
+          headers: buildHeaders(init.headers, accessToken ?? undefined),
+        });
+        return parseFetchResponse<T>(res);
+      },
+    });
   };
 };
 

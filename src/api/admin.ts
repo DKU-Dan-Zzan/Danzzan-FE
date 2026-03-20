@@ -1,12 +1,18 @@
 import { getApiBaseUrl } from "@/api/common/baseUrl";
 import { createFetchWithAuth } from "@/api/common/fetchAuth";
-import { getAdminAccessToken, reissueAdminToken } from "../hooks/useAdminAuth";
+import {
+  clearAdminSession,
+  getAdminAccessToken,
+  reissueAdminToken,
+} from "../hooks/useAdminAuth";
 
 const fetchWithAuth = createFetchWithAuth({
   getBaseUrl: getApiBaseUrl,
   getAccessToken: getAdminAccessToken,
   reissueAccessToken: reissueAdminToken,
+  refreshKey: "admin-auth",
   sessionExpiredMessage: "세션이 만료되었습니다. 다시 로그인해 주세요.",
+  clearSession: clearAdminSession,
 });
 
 export type PageResponse<T> = {

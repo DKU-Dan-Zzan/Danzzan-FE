@@ -112,6 +112,9 @@ const getTicketingClient = () =>
   createHttpClient({
     baseUrl: env.ticketingApiBaseUrl || env.apiBaseUrl || getApiBaseUrl(),
     getAccessToken: authStore.getAccessToken,
+    refreshAccessToken: authStore.refreshAccessToken,
+    clearSession: authStore.clear,
+    refreshKey: "ticketing-auth",
   });
 
 const requestWebAd = async (
