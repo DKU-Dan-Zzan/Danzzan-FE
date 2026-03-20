@@ -3,7 +3,7 @@ import { Ticket } from "lucide-react"
 import { useSyncExternalStore } from "react"
 import { authStore } from "@/store/ticketing/authStore"
 import { getMyTicketNavigationTarget } from "@/routes/ticketing/authNavigation"
-import { AppHeaderLogo } from "@/components/layout/AppHeaderLogo"
+import { AppTopBar } from "@/components/layout/AppTopBar"
 
 const Header = () => {
   const navigate = useNavigate()
@@ -19,17 +19,7 @@ const Header = () => {
   }
 
   return (
-    <header
-      className="
-        app-main-header
-        sticky top-0 z-50
-        border-b border-[var(--app-header-border)]
-        pt-[env(safe-area-inset-top)]
-      "
-    >
-      <div className="relative mx-auto h-16 max-w-[430px] px-4">
-        <AppHeaderLogo />
-
+    <AppTopBar>
         <button
           onClick={handleTicketClick}
           aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
@@ -38,8 +28,7 @@ const Header = () => {
         >
           <Ticket size={20} className="app-header-ticket-icon" />
         </button>
-      </div>
-    </header>
+    </AppTopBar>
   )
 }
 

@@ -13,6 +13,7 @@ const navItems = [
 const BottomNav = () => {
   return (
     <nav
+      data-app-bottom-nav
       className="fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-[430px] h-[calc(var(--app-bottom-nav-height,56px)_+_env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)]"
     >
       <div className="app-bottom-nav-backdrop absolute inset-0" />
