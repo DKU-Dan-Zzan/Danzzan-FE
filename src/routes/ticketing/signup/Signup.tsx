@@ -4,10 +4,10 @@ import {
   CircleAlert,
   KeyRound,
 } from "lucide-react";
-import { Button } from "@/components/ticketing/common/ui/button";
-import { Checkbox } from "@/components/ticketing/common/ui/checkbox";
-import { Input } from "@/components/ticketing/common/ui/input";
-import { Label } from "@/components/ticketing/common/ui/label";
+import { Button } from "@/components/common/ui/button";
+import { Checkbox } from "@/components/common/ui/checkbox";
+import { Input } from "@/components/common/ui/input";
+import { Label } from "@/components/common/ui/label";
 import { PasswordPolicyChecklist } from "@/components/ticketing/auth/PasswordPolicyChecklist";
 import { signupApi } from "@/api/ticketing/signupApi";
 import { HttpError } from "@/api/ticketing/httpClient";

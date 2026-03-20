@@ -4,9 +4,9 @@ import { CircleAlert, Clock3, KeyRound, MailCheck, RotateCcw } from "lucide-reac
 import { HttpError } from "@/api/ticketing/httpClient";
 import { passwordResetApi } from "@/api/ticketing/passwordResetApi";
 import { PasswordPolicyChecklist } from "@/components/ticketing/auth/PasswordPolicyChecklist";
-import { Button } from "@/components/ticketing/common/ui/button";
-import { Input } from "@/components/ticketing/common/ui/input";
-import { Label } from "@/components/ticketing/common/ui/label";
+import { Button } from "@/components/common/ui/button";
+import { Input } from "@/components/common/ui/input";
+import { Label } from "@/components/common/ui/label";
 import {
   getPasswordPolicyErrorMessage,
   getPasswordPolicyState,

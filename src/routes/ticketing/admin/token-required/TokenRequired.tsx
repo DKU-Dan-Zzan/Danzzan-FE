@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ticketing/common/ui/button";
-import { Card } from "@/components/ticketing/common/ui/card";
+import { Button } from "@/components/common/ui/button";
+import { Card } from "@/components/common/ui/card";
 import { env } from "@/utils/ticketing/env";
 
 type TokenRequiredProps = {

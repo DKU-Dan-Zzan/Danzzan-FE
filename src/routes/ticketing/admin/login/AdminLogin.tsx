@@ -7,10 +7,10 @@ import {
   ShieldCheck,
   TimerReset,
 } from "lucide-react";
-import { Button } from "@/components/ticketing/common/ui/button";
-import { Card } from "@/components/ticketing/common/ui/card";
-import { Input } from "@/components/ticketing/common/ui/input";
-import { Label } from "@/components/ticketing/common/ui/label";
+import { Button } from "@/components/common/ui/button";
+import { Card } from "@/components/common/ui/card";
+import { Input } from "@/components/common/ui/input";
+import { Label } from "@/components/common/ui/label";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { resolveScopedRedirect } from "@/routes/common/authGuard";
 

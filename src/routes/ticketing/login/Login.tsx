@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { CircleAlert, GraduationCap } from "lucide-react";
-import { Button } from "@/components/ticketing/common/ui/button";
-import { Input } from "@/components/ticketing/common/ui/input";
-import { Label } from "@/components/ticketing/common/ui/label";
+import { Button } from "@/components/common/ui/button";
+import { Input } from "@/components/common/ui/input";
+import { Label } from "@/components/common/ui/label";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { TICKETING_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
 import { resolveTicketingLoginRedirect } from "@/lib/ticketing/navigation/auth-navigation";
