@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { Card } from "@/components/ticketing/common/ui/card";
-import { Button } from "@/components/ticketing/common/ui/button";
+import { Card } from "@/components/common/ui/card";
+import { Button } from "@/components/common/ui/button";
 import { useWristband } from "@/hooks/ticketing/useWristband";
 import type { WristbandSession } from "@/types/ticketing/model/wristband.model";
 

@@ -1,6 +1,6 @@
-import { Card } from "@/components/ticketing/common/ui/card";
-import { cn } from "@/components/ticketing/common/ui/utils";
-import { TICKETING_CLASSES } from "@/components/ticketing/ticketing/ticketingShared";
+import { Card } from "@/components/common/ui/card";
+import { cn } from "@/components/common/ui/utils";
+import { TICKETING_CLASSES } from "@/components/ticketing/panels/ticketingShared";
 import type { Ticket } from "@/types/ticketing/model/ticket.model";
 
 interface PaperTicketCardProps {

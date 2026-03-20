@@ -1,12 +1,12 @@
-import { Button } from "@/components/ticketing/common/ui/button";
-import { Card } from "@/components/ticketing/common/ui/card";
+import { Button } from "@/components/common/ui/button";
+import { Card } from "@/components/common/ui/card";
 import { TicketCheck } from "lucide-react";
-import { PaperTicketCard } from "@/components/ticketing/ticketing/PaperTicketCard";
-import { TicketingAdBannerCard } from "@/components/ticketing/ticketing/TicketingAdBannerCard";
+import { PaperTicketCard } from "@/components/ticketing/panels/PaperTicketCard";
+import { TicketingAdBannerCard } from "@/components/ticketing/panels/TicketingAdBannerCard";
 import {
   TICKETING_CLASSES,
   TicketingRefreshButton,
-} from "@/components/ticketing/ticketing/ticketingShared";
+} from "@/components/ticketing/panels/ticketingShared";
 import type { PlacementAd } from "@/types/ticketing/model/ad.model";
 import type { Ticket } from "@/types/ticketing/model/ticket.model";
 

@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import { ArrowRight, ClipboardList, Ticket, TicketCheck } from "lucide-react";
-import { Card } from "@/components/ticketing/common/ui/card";
-import { TICKETING_CLASSES, TICKETING_MIDDLE_PANEL_CLASS } from "@/components/ticketing/ticketing/ticketingShared";
+import { Card } from "@/components/common/ui/card";
+import { TICKETING_CLASSES, TICKETING_MIDDLE_PANEL_CLASS } from "@/components/ticketing/panels/ticketingShared";
 
 interface TicketingHomePanelProps {
   onOpenTicketingList: () => void;

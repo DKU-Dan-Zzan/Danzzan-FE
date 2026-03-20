@@ -1,7 +1,7 @@
 import { ArrowRight, CheckCircle2, ListChecks } from "lucide-react";
-import { Button } from "@/components/ticketing/common/ui/button";
-import { Card } from "@/components/ticketing/common/ui/card";
-import { TICKETING_CLASSES, TICKETING_NARROW_PANEL_CLASS } from "@/components/ticketing/ticketing/ticketingShared";
+import { Button } from "@/components/common/ui/button";
+import { Card } from "@/components/common/ui/card";
+import { TICKETING_CLASSES, TICKETING_NARROW_PANEL_CLASS } from "@/components/ticketing/panels/ticketingShared";
 
 interface ReservationAlreadyPanelProps {
   onGoMyTickets: () => void;

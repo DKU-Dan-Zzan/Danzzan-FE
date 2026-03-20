@@ -1,12 +1,12 @@
-import { Button } from "@/components/ticketing/common/ui/button";
-import { Card } from "@/components/ticketing/common/ui/card";
-import { Checkbox } from "@/components/ticketing/common/ui/checkbox";
-import { cn } from "@/components/ticketing/common/ui/utils";
+import { Button } from "@/components/common/ui/button";
+import { Card } from "@/components/common/ui/card";
+import { Checkbox } from "@/components/common/ui/checkbox";
+import { cn } from "@/components/common/ui/utils";
 import {
   TICKETING_CLASSES,
   TICKETING_NARROW_PANEL_CLASS,
   TicketingStepTitle,
-} from "@/components/ticketing/ticketing/ticketingShared";
+} from "@/components/ticketing/panels/ticketingShared";
 
 interface TicketingReservationPanelProps {
   eventTitle: string;

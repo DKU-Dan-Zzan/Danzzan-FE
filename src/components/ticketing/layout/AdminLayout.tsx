@@ -1,6 +1,6 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
-import { Button } from "@/components/ticketing/common/ui/button";
+import { Button } from "@/components/common/ui/button";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { env } from "@/utils/ticketing/env";
 import { TicketAdminShell } from "@/components/ticketing/layout/TicketAdminShell";

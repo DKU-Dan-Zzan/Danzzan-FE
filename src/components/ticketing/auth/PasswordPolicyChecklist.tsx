@@ -1,5 +1,5 @@
 import { CheckCircle2, Circle } from "lucide-react";
-import { cn } from "@/components/ticketing/common/ui/utils";
+import { cn } from "@/components/common/ui/utils";
 import type { PasswordPolicyState } from "@/lib/ticketing/passwordPolicy";
 
 type PasswordPolicyChecklistProps = {

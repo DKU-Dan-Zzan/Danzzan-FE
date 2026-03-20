@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Card } from "@/components/ticketing/common/ui/card";
-import { Button } from "@/components/ticketing/common/ui/button";
-import { Input } from "@/components/ticketing/common/ui/input";
-import { Label } from "@/components/ticketing/common/ui/label";
+import { Card } from "@/components/common/ui/card";
+import { Button } from "@/components/common/ui/button";
+import { Input } from "@/components/common/ui/input";
+import { Label } from "@/components/common/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ticketing/common/ui/dialog";
+} from "@/components/common/ui/dialog";
 import {
   Table,
   TableBody,
@@ -18,7 +18,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ticketing/common/ui/table";
+} from "@/components/common/ui/table";
 import { ArrowLeft, Info } from "lucide-react";
 import { useWristband } from "@/hooks/ticketing/useWristband";
 import type { WristbandAttendee, WristbandStats } from "@/types/ticketing/model/wristband.model";

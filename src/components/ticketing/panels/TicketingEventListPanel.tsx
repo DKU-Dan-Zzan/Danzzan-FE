@@ -1,14 +1,14 @@
 import { useMemo } from "react";
 import { CalendarClock, Clock3 } from "lucide-react";
-import { Badge } from "@/components/ticketing/common/ui/badge";
-import { Button } from "@/components/ticketing/common/ui/button";
-import { Card } from "@/components/ticketing/common/ui/card";
-import { cn } from "@/components/ticketing/common/ui/utils";
+import { Badge } from "@/components/common/ui/badge";
+import { Button } from "@/components/common/ui/button";
+import { Card } from "@/components/common/ui/card";
+import { cn } from "@/components/common/ui/utils";
 import {
   TICKETING_CLASSES,
   TICKETING_WIDE_PANEL_CLASS,
   TicketingRefreshButton,
-} from "@/components/ticketing/ticketing/ticketingShared";
+} from "@/components/ticketing/panels/ticketingShared";
 import type { TicketingEvent } from "@/types/ticketing/model/ticket.model";
 
 interface TicketingEventListPanelProps {
