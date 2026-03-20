@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MyTicketListPanel } from "@/components/ticketing/ticketing/MyTicketListPanel";
+import { MyTicketListPanel } from "@/components/ticketing/panels/MyTicketListPanel";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { useTicketing } from "@/hooks/ticketing/useTicketing";
 import type { PlacementAd } from "@/types/ticketing/model/ad.model";
@@ -21,6 +21,7 @@ export default function MyTicket() {
   }, [getMyTickets]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadMyTickets();
   }, [loadMyTickets]);
 
