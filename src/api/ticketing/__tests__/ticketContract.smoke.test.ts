@@ -20,6 +20,11 @@ describe("ticketContract smoke", () => {
       status: "SUCCESS",
       remaining: 17,
       queuePosition: null,
+      mySequence: null,
+      aheadCount: null,
+      estimatedWaitSeconds: null,
+      readyUntil: null,
+      admissionState: undefined,
     });
   });
 
@@ -36,6 +41,11 @@ describe("ticketContract smoke", () => {
       status: "WAITING",
       remaining: undefined,
       queuePosition: 142,
+      mySequence: null,
+      aheadCount: null,
+      estimatedWaitSeconds: null,
+      readyUntil: null,
+      admissionState: undefined,
     });
   });
 

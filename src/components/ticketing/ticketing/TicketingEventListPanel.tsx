@@ -83,15 +83,15 @@ const resolveViewStatus = (
     return "soldout";
   }
 
-  if (openAtMs !== null && now < openAtMs) {
-    return "upcoming";
+  if (event.status === "open") {
+    return "open";
   }
 
-  if (event.status === "upcoming" && openAtMs === null) {
-    return "upcoming";
+  if (openAtMs !== null && now >= openAtMs) {
+    return "open";
   }
 
-  return "open";
+  return "upcoming";
 };
 
 const formatEventDateTime = (event: TicketingEvent, openAtMs: number | null): string => {
@@ -161,7 +161,7 @@ export function TicketingEventListPanel({
                   요일별 예매 오픈시간을 확인하여 티켓팅에 참여하세요.
                 </p>
                 <p className={`mt-1 ${TICKETING_CLASSES.typography.infoBannerBody} text-[var(--text-muted)]`}>
-                  오픈 10분 전부터 카운트다운이 시작되며, 0초 이후 예매 버튼이 활성화됩니다.
+                  오픈 10분 전부터 카운트다운이 시작되며, 예매 오픈 시 버튼이 활성화됩니다.
                 </p>
               </div>
             </div>

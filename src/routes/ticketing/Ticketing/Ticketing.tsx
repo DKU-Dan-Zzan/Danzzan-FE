@@ -402,7 +402,6 @@ export default function Ticketing() {
     setAgreementChecked(false);
     setReservationError(null);
     setQueueStatus("WAITING");
-    setStep("waiting");
     applyQueueEventToUrl(event.id);
 
     try {
@@ -540,7 +539,7 @@ export default function Ticketing() {
     void (async () => {
       try {
         const statusResponse = await ticketApi.getTicketQueueStatus(activeEventId, controller.signal);
-        await handleQueueStatus(statusResponse.status, activeEventId);
+        await handleQueueStatus(statusResponse.status, activeEventId, statusResponse.queuePosition);
       } catch (error) {
         const parsed = parseApiError(error);
         if (parsed.status === 401 || parsed.code === "UNAUTHORIZED") {

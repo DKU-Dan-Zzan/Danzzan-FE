@@ -20,8 +20,9 @@ export const resolveQueueStatusAction = (status: QueueRequestStatus): QueueStatu
     case "WAITING":
       return "waiting";
     case "ADMITTED":
-    case "SUCCESS":
       return "reserve";
+    case "SUCCESS":
+      return "already";
     case "SOLD_OUT":
       return "soldout";
     case "ALREADY":
