@@ -42,6 +42,32 @@ type ApiEnvelope<T> = {
   data?: T | null;
 } & Record<string, unknown>;
 
+const readTicketEventListDto = (
+  payload: TicketEventListResponseDto | ApiEnvelope<TicketEventListResponseDto>,
+): TicketEventListResponseDto => {
+  try {
+    return unwrapApiObjectEnvelope<TicketEventListResponseDto>(payload, "/tickets/events");
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "응답 형식 오류";
+    throw new Error(
+      `티켓 이벤트 목록 응답 형식 검증에 실패했습니다. 백엔드 계약을 확인해 주세요. (${message})`,
+    );
+  }
+};
+
+const readMyTicketListDto = (
+  payload: TicketListResponseDto | ApiEnvelope<TicketListResponseDto>,
+): TicketListResponseDto => {
+  try {
+    return unwrapApiObjectEnvelope<TicketListResponseDto>(payload, "/tickets/me");
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "응답 형식 오류";
+    throw new Error(
+      `내 티켓 목록 응답 형식 검증에 실패했습니다. 백엔드 계약을 확인해 주세요. (${message})`,
+    );
+  }
+};
+
 const addMinutesToIso = (minutes: number) => {
   return new Date(Date.now() + minutes * 60_000).toISOString();
 };
@@ -158,9 +184,8 @@ export const ticketApi = {
     }
 
     const client = getTicketingClient();
-    // TODO(ticketing-api): Confirm endpoint path and response spec for student ticketing event list.
     const raw = await client.get<TicketEventListResponseDto | ApiEnvelope<TicketEventListResponseDto>>("/tickets/events");
-    const dto = unwrapApiObjectEnvelope<TicketEventListResponseDto>(raw, "/tickets/events");
+    const dto = readTicketEventListDto(raw);
     return mapTicketEventListDtoToModel(dto);
   },
 
@@ -356,9 +381,8 @@ export const ticketApi = {
     }
 
     const client = getTicketingClient();
-    // TODO(ticketing-api): Confirm endpoint path for student my-ticket list.
     const raw = await client.get<TicketListResponseDto | ApiEnvelope<TicketListResponseDto>>("/tickets/me");
-    const dto = unwrapApiObjectEnvelope<TicketListResponseDto>(raw, "/tickets/me");
+    const dto = readMyTicketListDto(raw);
     return mapTicketListDtoToModel(dto);
   },
 };
