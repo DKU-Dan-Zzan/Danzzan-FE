@@ -20,7 +20,7 @@ export function AdminShell({
   actions,
   eyebrow = "ADMIN PORTAL",
   rootClassName = "min-h-dvh bg-[var(--bg-base)]",
-  headerClassName = "border-b border-[var(--border-base)] bg-[var(--bg-base)]",
+  headerClassName = "border-b border-[var(--border-base)] bg-[var(--admin-header-bg)]",
   headerInnerClassName = "mx-auto flex w-full max-w-[1360px] items-center justify-between px-8 py-3",
   headingClassName = "text-2xl font-semibold text-[var(--text)]",
   eyebrowClassName = "text-[8px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]",

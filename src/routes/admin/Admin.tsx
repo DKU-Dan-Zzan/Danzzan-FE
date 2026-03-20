@@ -560,7 +560,7 @@ function Admin() {
     <>
       <AdminShell
         title="공지 및 광고 관리자 페이지"
-        headerClassName="sticky top-0 z-20 border-b border-[var(--border-base)] bg-[var(--bg-base)]"
+        headerClassName="sticky top-0 z-20 border-b border-[var(--border-base)] bg-[var(--admin-header-bg)]"
         mainClassName="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-5"
         actions={
           <>

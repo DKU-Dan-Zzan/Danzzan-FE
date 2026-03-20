@@ -650,7 +650,7 @@ export default function AdminMap() {
   return (
     <AdminShell
       title="지도 편집 관리자 페이지"
-      headerClassName="sticky top-0 z-20 border-b border-[var(--border-base)] bg-[var(--bg-base)]"
+      headerClassName="sticky top-0 z-20 border-b border-[var(--border-base)] bg-[var(--admin-header-bg)]"
       mainClassName="mx-auto grid w-full max-w-[1360px] gap-6 px-6 py-6 lg:grid-cols-[360px_minmax(0,1fr)]"
       actions={
         <>
