@@ -22,6 +22,7 @@ import {
   updateActiveOperationDate,
 } from "../../api/adminMapApi";
 import useKakaoMapLoader from "../../hooks/useKakaoMapLoader";
+import { AdminShell } from "@/components/layout/AdminShell";
 
 declare global {
   interface Window {
@@ -647,50 +648,41 @@ export default function AdminMap() {
   };
 
   return (
-    <div className="min-h-dvh bg-[var(--bg-base)]">
-      <header className="sticky top-0 z-20 border-b border-[var(--border-base)] bg-[var(--bg-base)]">
-        <div className="mx-auto flex w-full max-w-[1360px] items-center justify-between px-8 py-3">
-          <div>
-            <p className="text-[8px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">
-              ADMIN PORTAL
-            </p>
-            <h1 className="text-2xl font-semibold text-[var(--text)]">
-              지도 편집 관리자 페이지
-            </h1>
-          </div>
+    <AdminShell
+      title="지도 편집 관리자 페이지"
+      headerClassName="sticky top-0 z-20 border-b border-[var(--border-base)] bg-[var(--bg-base)]"
+      mainClassName="mx-auto grid w-full max-w-[1360px] gap-6 px-6 py-6 lg:grid-cols-[360px_minmax(0,1fr)]"
+      actions={
+        <>
+          <button
+            type="button"
+            onClick={() => navigate("/admin")}
+            className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
+          >
+            <ArrowLeft className="h-4 w-4" strokeWidth={2.3} />
+            관리자 홈
+          </button>
 
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => navigate("/admin")}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
-            >
-              <ArrowLeft className="h-4 w-4" strokeWidth={2.3} />
-              관리자 홈
-            </button>
+          <button
+            type="button"
+            onClick={() => void loadMapData()}
+            className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
+          >
+            <RefreshCcw className="h-4 w-4" strokeWidth={2.3} />
+            새로고침
+          </button>
 
-            <button
-              type="button"
-              onClick={() => void loadMapData()}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
-            >
-              <RefreshCcw className="h-4 w-4" strokeWidth={2.3} />
-              새로고침
-            </button>
-
-            <button
-              type="button"
-              disabled
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md bg-[var(--accent)] px-3 text-sm font-medium text-white opacity-70"
-            >
-              <Save className="h-4 w-4" strokeWidth={2.3} />
-              {saving ? "저장 중..." : "즉시 저장"}
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto grid w-full max-w-[1360px] gap-6 px-6 py-6 lg:grid-cols-[360px_minmax(0,1fr)]">
+          <button
+            type="button"
+            disabled
+            className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md bg-[var(--accent)] px-3 text-sm font-medium text-white opacity-70"
+          >
+            <Save className="h-4 w-4" strokeWidth={2.3} />
+            {saving ? "저장 중..." : "즉시 저장"}
+          </button>
+        </>
+      }
+    >
         <aside className="space-y-4">
           {globalError && (
             <div className="flex items-start gap-2 rounded-2xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-3 text-sm text-[var(--status-danger-text)]">
@@ -931,7 +923,6 @@ export default function AdminMap() {
             )}
           </div>
         </section>
-      </main>
-    </div>
+    </AdminShell>
   );
 }

@@ -36,6 +36,7 @@ import {
   updateEmergencyAdminNotice,
 } from "../../api/admin";
 import { getPlacementAd, type ClientAdDto } from "../../api/noticeApi";
+import { AdminShell } from "@/components/layout/AdminShell";
 
 type NoticeAuthor = "개발팀" | "총학생회";
 
@@ -556,18 +557,13 @@ function Admin() {
   };
 
   return (
-    <div className="min-h-dvh bg-[var(--bg-base)]">
-      <header className="sticky top-0 z-20 border-b border-[var(--border-base)] bg-[var(--bg-base)]">
-        <div className="mx-auto flex w-full max-w-[1360px] items-center justify-between px-8 py-3">
-          <div>
-            <p className="text-[8px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">
-              ADMIN PORTAL
-            </p>
-            <h1 className="text-2xl font-semibold text-[var(--text)]">
-              공지 및 광고 관리자 페이지
-            </h1>
-          </div>
-          <div className="flex items-center gap-2">
+    <>
+      <AdminShell
+        title="공지 및 광고 관리자 페이지"
+        headerClassName="sticky top-0 z-20 border-b border-[var(--border-base)] bg-[var(--bg-base)]"
+        mainClassName="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-5"
+        actions={
+          <>
             <span className="rounded-full border border-[var(--border-base)] bg-[var(--surface-subtle)] px-2.5 py-0.5 text-xs font-semibold text-[var(--text-muted)]">
               운영자: 관리자
             </span>
@@ -589,11 +585,9 @@ function Admin() {
               <LogOut className="h-4 w-4" strokeWidth={2.3} />
               로그아웃
             </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-5">
+          </>
+        }
+      >
         {globalError && (
           <div className="flex items-start gap-2 rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-sm text-[var(--status-danger-text)]">
             <AlertCircle className="mt-0.5 h-4 w-4" strokeWidth={2.3} />
@@ -1048,11 +1042,11 @@ function Admin() {
             </div>
           </div>
 
-          {adLoading && (
+        {adLoading && (
             <p className="mt-3 text-xs text-[var(--text-muted)]">광고 정보를 불러오는 중입니다...</p>
           )}
         </section>
-      </main>
+      </AdminShell>
 
       {/* 공지 작성/수정 모달 */}
       {editingNotice && (
@@ -1358,7 +1352,7 @@ function Admin() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
