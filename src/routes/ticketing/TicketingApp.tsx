@@ -11,30 +11,54 @@ import AdminLogin from "@/routes/ticketing/admin/Login/AdminLogin";
 import WristbandPage from "@/routes/ticketing/admin/Wristband/WristbandPage";
 import TokenRequired from "@/routes/ticketing/admin/TokenRequired/TokenRequired";
 import NotFoundPage from "@/routes/ticketing/NotFound/NotFoundPage";
+import {
+  buildLoginRedirectPath,
+  buildReturnTo,
+  isRoleAuthenticated,
+} from "@/routes/common/authGuard";
 import { env } from "@/utils/ticketing/env";
 import "@/routes/ticketing/index.css";
 
 function RequireStudentAuth() {
-  const { isAuthenticated, role } = useAuth();
+  const { session } = useAuth();
   const location = useLocation();
+  const returnTo = buildReturnTo(location.pathname, location.search);
 
-  if (!isAuthenticated || role !== "student") {
-    const redirect = encodeURIComponent(location.pathname + location.search);
-    return <Navigate to={`/ticket/login?redirect=${redirect}`} replace />;
+  if (
+    !isRoleAuthenticated({
+      accessToken: session.tokens?.accessToken,
+      role: session.role,
+      requiredRole: "student",
+    })
+  ) {
+    return <Navigate to={buildLoginRedirectPath("/ticket/login", returnTo)} replace />;
   }
 
   return <Outlet />;
 }
 
 function RequireAdminAuth() {
-  const { isAuthenticated, role } = useAuth();
+  const { session } = useAuth();
+  const location = useLocation();
+  const returnTo = buildReturnTo(location.pathname, location.search);
 
   if (env.apiMode === "mock") {
     return <Outlet />;
   }
 
-  if (!isAuthenticated || role !== "admin") {
-    return <TokenRequired />;
+  if (
+    !isRoleAuthenticated({
+      accessToken: session.tokens?.accessToken,
+      role: session.role,
+      requiredRole: "admin",
+    })
+  ) {
+    return (
+      <TokenRequired
+        loginRedirectPath={buildLoginRedirectPath("/ticket/admin/login", returnTo)}
+        returnTo={returnTo}
+      />
+    );
   }
 
   return <Outlet />;

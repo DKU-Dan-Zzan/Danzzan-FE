@@ -3,7 +3,15 @@ import { Button } from "@/components/ticketing/common/ui/button";
 import { Card } from "@/components/ticketing/common/ui/card";
 import { env } from "@/utils/ticketing/env";
 
-export default function TokenRequired() {
+type TokenRequiredProps = {
+  loginRedirectPath?: string;
+  returnTo?: string;
+};
+
+export default function TokenRequired({
+  loginRedirectPath = "/ticket/admin/login",
+  returnTo = "/ticket/admin",
+}: TokenRequiredProps) {
   const navigate = useNavigate();
 
   return (
@@ -16,6 +24,9 @@ export default function TokenRequired() {
             현재 모드는 <span className="font-semibold">{env.apiMode.toUpperCase()}</span>입니다.
             라이브 모드에서는 관리자 토큰이 있어야 팔찌 배부 화면에 접근할 수 있습니다.
           </p>
+          <p className="text-xs text-[var(--admin-auth-subtext)]">
+            요청 경로: {returnTo}
+          </p>
         </div>
 
         <div className="space-y-2 rounded-lg border border-[var(--admin-auth-help-border)] bg-[var(--admin-auth-help-bg)] p-4 text-sm text-[var(--admin-auth-help-text)]">
@@ -27,7 +38,7 @@ export default function TokenRequired() {
         </div>
 
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Button className="flex-1" onClick={() => navigate("/ticket/admin/login")}>관리자 로그인</Button>
+          <Button className="flex-1" onClick={() => navigate(loginRedirectPath)}>관리자 로그인</Button>
           <Button variant="outline" className="flex-1" onClick={() => navigate("/ticket/admin")}>관리 시스템 선택</Button>
         </div>
       </Card>

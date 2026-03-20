@@ -6,12 +6,16 @@ import { Card } from "@/components/ticketing/common/ui/card";
 import { Input } from "@/components/ticketing/common/ui/input";
 import { Label } from "@/components/ticketing/common/ui/label";
 import { useAuth } from "@/hooks/ticketing/useAuth";
+import { resolveScopedRedirect } from "@/routes/common/authGuard";
 
 export default function AdminLogin() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { login } = useAuth();
-  const redirect = searchParams.get("redirect");
+  const redirect = resolveScopedRedirect(searchParams.get("redirect"), {
+    scope: "/ticket/admin",
+    fallback: "/ticket/admin/wristband",
+  });
   const [studentId, setStudentId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -24,11 +28,7 @@ export default function AdminLogin() {
 
     try {
       await login({ studentId, password }, "admin");
-      if (redirect && redirect.startsWith("/ticket/admin")) {
-        navigate(redirect);
-        return;
-      }
-      navigate("/ticket/admin/wristband");
+      navigate(redirect);
     } catch (err) {
       setError(err instanceof Error ? err.message : "로그인에 실패했습니다.");
     } finally {

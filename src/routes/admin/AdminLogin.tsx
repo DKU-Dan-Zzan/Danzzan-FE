@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { CircleAlert, Eye, EyeOff, House, ShieldCheck } from "lucide-react";
 import { ADMIN_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
+import { resolveScopedRedirect } from "@/routes/common/authGuard";
 import { getAdminSession, useAdminAuth } from "../../hooks/useAdminAuth";
 
 export default function AdminLogin() {
@@ -14,7 +15,10 @@ export default function AdminLogin() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const redirect = searchParams.get("redirect") || "/admin";
+  const redirect = resolveScopedRedirect(searchParams.get("redirect"), {
+    scope: "/admin",
+    fallback: "/admin",
+  });
 
   if (getAdminSession()) {
     return <Navigate to={redirect} replace />;

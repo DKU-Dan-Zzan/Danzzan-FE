@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
+import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom'
 import AppLayout from './components/layout/AppLayout'
 import AdminLayout from './components/layout/AdminLayout'
 
@@ -13,10 +13,12 @@ import AdminLogin from "./routes/admin/AdminLogin";
 import AdminMap from "./routes/admin/AdminMap";
 import { useAdminAuth } from "./hooks/useAdminAuth";
 import { useEffect, useState } from "react";
+import { buildLoginRedirectPath, buildReturnTo } from "@/routes/common/authGuard";
 import TicketingApp from "./routes/ticketing/TicketingApp";
 
 function ProtectedAdminRoute() {
   const { isAuthenticated, tryRestoreSession } = useAdminAuth();
+  const location = useLocation();
   const [restoreDone, setRestoreDone] = useState(false);
 
   useEffect(() => {
@@ -32,7 +34,15 @@ function ProtectedAdminRoute() {
     );
   }
   if (!isAuthenticated) {
-    return <Navigate to="/admin/login" replace />;
+    return (
+      <Navigate
+        to={buildLoginRedirectPath(
+          "/admin/login",
+          buildReturnTo(location.pathname, location.search),
+        )}
+        replace
+      />
+    );
   }
   return <Outlet />;
 }
