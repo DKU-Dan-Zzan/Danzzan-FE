@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useSyncExternalStore } from "react";
+import { authLogout } from "@/api/auth";
 import { authStore } from "@/store/ticketing/authStore";
 import { authApi } from "@/api/ticketing/authApi";
 import { GraduationCap, IdCard, User } from "lucide-react";
@@ -78,6 +79,7 @@ function MyPage() {
   }
 
   const handleLogout = () => {
+    void authLogout();
     authStore.clear();
     navigate("/ticket/login", { replace: true });
   };

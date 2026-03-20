@@ -1,4 +1,5 @@
 import { createHttpClient } from "@/api/ticketing/httpClient";
+import { hasRequiredRole, resolveRoleFromAccessToken } from "@/api/common/authCore";
 import { authStore } from "@/store/ticketing/authStore";
 import type { AuthCredentials, AuthSession } from "@/types/ticketing/model/auth.model";
 import { env, requireEnv } from "@/utils/ticketing/env";
@@ -47,11 +48,15 @@ export const adminAuthApi = {
       },
     );
 
-    // JWT에서 role 정보를 디코딩하여 ADMIN인지 확인
+    // JWT role 클레임으로 관리자 권한 판별
     const accessToken = dto?.accessToken ?? "";
     const refreshToken = dto?.refreshToken ?? "";
+    const role = resolveRoleFromAccessToken(accessToken);
+    if (!hasRequiredRole("admin", role)) {
+      throw new Error("관리자 권한이 없는 계정입니다.");
+    }
 
-    let user = null;
+    let user: AuthSession["user"] = null;
     if (accessToken) {
       try {
         const payloadPart = accessToken.split(".")[1];
@@ -59,19 +64,20 @@ export const adminAuthApi = {
         user = {
           id: decoded.sub ?? "",
           name: "",
-          role: decoded.role === "ROLE_ADMIN" ? "admin" as const : "unknown" as const,
+          role: "admin" as const,
           department: "",
           studentId: decoded.studentId ?? "",
           college: decoded.college ?? "",
         };
-
-        if (decoded.role !== "ROLE_ADMIN") {
-          throw new Error("관리자 권한이 없는 계정입니다.");
-        }
-      } catch (e) {
-        if (e instanceof Error && e.message.includes("관리자 권한")) {
-          throw e;
-        }
+      } catch {
+        user = {
+          id: "",
+          name: "",
+          role: "admin",
+          department: "",
+          studentId: payload.studentId,
+          college: "",
+        };
       }
     }
 

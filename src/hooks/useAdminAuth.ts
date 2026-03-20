@@ -1,25 +1,41 @@
-import { useCallback, useState } from "react";
+import { useCallback, useSyncExternalStore } from "react";
+import { hasRequiredRole, resolveRoleFromAccessToken } from "@/api/common/authCore";
+import { authStore } from "@/store/ticketing/authStore";
 import { authLogin, authLogout, authReissue } from "../api/auth";
 
-/** Access Token은 스펙대로 메모리에만 보관 (XSS 시 탈취 위험 감소) */
-let inMemoryAccessToken: string | null = null;
+const requireAdminRole = (accessToken: string): void => {
+  const role = resolveRoleFromAccessToken(accessToken);
+  if (!hasRequiredRole("admin", role)) {
+    throw new Error("관리자 권한이 없는 계정입니다.");
+  }
+};
 
-function getAccessToken(): string | null {
-  return inMemoryAccessToken;
-}
-
-function setAccessToken(token: string): void {
-  inMemoryAccessToken = token;
-}
-
-function clearAccessToken(): void {
-  inMemoryAccessToken = null;
-}
+const setAdminSession = (accessToken: string): void => {
+  authStore.setSession(
+    {
+      tokens: {
+        accessToken,
+        refreshToken: "",
+        expiresIn: null,
+      },
+      user: null,
+    },
+    "admin",
+    {
+      persist: false,
+      refreshMode: "cookie",
+    },
+  );
+};
 
 export function useAdminAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState(() =>
-    Boolean(inMemoryAccessToken)
+  const state = useSyncExternalStore(
+    authStore.subscribe,
+    authStore.getSnapshot,
+    authStore.getSnapshot,
   );
+
+  const isAuthenticated = Boolean(state.tokens?.accessToken) && state.role === "admin";
 
   const login = useCallback(async (studentNumber: string, password: string): Promise<void> => {
     if (!studentNumber.trim() || !password.trim()) {
@@ -27,25 +43,27 @@ export function useAdminAuth() {
     }
 
     const res = await authLogin({ studentNumber: studentNumber.trim(), password });
-    setAccessToken(res.accessToken);
-    setIsAuthenticated(true);
+    requireAdminRole(res.accessToken);
+    setAdminSession(res.accessToken);
   }, []);
 
   const logout = useCallback(async () => {
-    await authLogout();
-    clearAccessToken();
-    setIsAuthenticated(false);
+    try {
+      await authLogout();
+    } finally {
+      authStore.clear();
+    }
   }, []);
 
   /** 페이지 로드 시 쿠키(refreshToken)로 세션 복구. 성공 시 true, 실패 시 false */
   const tryRestoreSession = useCallback(async (): Promise<boolean> => {
     try {
       const res = await authReissue();
-      setAccessToken(res.accessToken);
-      setIsAuthenticated(true);
+      requireAdminRole(res.accessToken);
+      setAdminSession(res.accessToken);
       return true;
     } catch {
-      clearAccessToken();
+      authStore.clear();
       return false;
     }
   }, []);
@@ -54,21 +72,29 @@ export function useAdminAuth() {
 }
 
 export function getAdminSession(): string | null {
-  return getAccessToken();
+  return authStore.getRole() === "admin" ? authStore.getAccessToken() : null;
+}
+
+export function clearAdminSession(): void {
+  authStore.clear();
 }
 
 export function getAdminAccessToken(): string | null {
-  return getAccessToken();
+  return authStore.getRole() === "admin" ? authStore.getAccessToken() : null;
 }
 
 /** Access 만료(401) 시 재발급 후 새 토큰 반환. 실패 시 null (로그인 페이지 이동 권장) */
 export async function reissueAdminToken(): Promise<string | null> {
+  const reissued = await authStore.refreshAccessToken();
+  if (!reissued) {
+    return null;
+  }
+
   try {
-    const res = await authReissue();
-    setAccessToken(res.accessToken);
-    return res.accessToken;
+    requireAdminRole(reissued);
+    return reissued;
   } catch {
-    clearAccessToken();
+    authStore.clear();
     return null;
   }
 }

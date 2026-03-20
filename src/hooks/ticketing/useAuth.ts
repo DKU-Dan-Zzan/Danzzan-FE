@@ -1,4 +1,5 @@
 ﻿import { useCallback, useSyncExternalStore } from "react";
+import { authLogout } from "@/api/auth";
 import { authApi } from "@/api/ticketing/authApi";
 import { adminAuthApi } from "@/api/ticketing/adminAuthApi";
 import { authStore } from "@/store/ticketing/authStore";
@@ -29,12 +30,15 @@ export const useAuth = () => {
   );
 
   const refresh = useCallback(async () => {
-    const session = await authApi.refresh();
-    authStore.setSession(session, state.role ?? undefined);
-    return session;
-  }, [state.role]);
+    const refreshed = await authStore.refreshAccessToken();
+    if (!refreshed) {
+      throw new Error("세션이 만료되었습니다. 다시 로그인해 주세요.");
+    }
+    return authStore.getSnapshot();
+  }, []);
 
   const logout = useCallback(() => {
+    void authLogout();
     authStore.clear();
   }, []);
 
