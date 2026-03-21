@@ -31,11 +31,13 @@ npm run dev
 
 ```bash
 npm run lint
+npm run lint:structure:report
 npm run typecheck
+npm run typecheck:test
 npm run test
 npm run build
 npm run lint:structure:changed
-npm run lint:structure:report
+npm run check:bundle-budget
 ```
 
 ## 구조 개요
@@ -64,8 +66,11 @@ src/
 
 상세 구조/규칙 문서는 아래를 참고하세요.
 
+- `docs/architecture/README.md`
 - `docs/architecture/frontend-structure-conventions.md`
 - `docs/architecture/server-state-standard.md`
+- `docs/architecture/onboarding-frontend.md`
+- `docs/architecture/adr/README.md`
 
 ## 아키텍처 규칙 (요약)
 
@@ -79,10 +84,12 @@ src/
 
 - 로컬 권장 순서:
   1. `npm run lint`
-  2. `npm run typecheck`
-  3. `npm run test`
-  4. `npm run build`
-  5. `npm run check:bundle-budget`
+  2. `npm run lint:structure:report`
+  3. `npm run typecheck`
+  4. `npm run typecheck:test`
+  5. `npm run test`
+  6. `npm run build`
+  7. `npm run check:bundle-budget`
 - CI:
   - `frontend-structure-check.yml`: changed-only 구조 게이트
   - `frontend-quality-check.yml`: lint/typecheck/test/build/bundle budget

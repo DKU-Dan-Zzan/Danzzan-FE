@@ -14,13 +14,14 @@
 
 ## 프로젝트 개요
 
-**Danzzan-FE**는 단국대학교 축제("단짠") 운영을 위한 프론트엔드 애플리케이션입니다.  
-일반 사용자 페이지(홈/공지/타임테이블/부스맵/마이페이지), 관리자 페이지, 티켓팅 및 팔찌 배부 운영 화면을 제공합니다.
+**Danzzan-FE**는 단국대학교 축제("단짠") 운영을 위한 프론트엔드 애플리케이션입니다.
+일반 사용자 앱(`app`)과 티켓팅 운영 앱(`ticketing`)이 한 저장소에서 공존합니다.
 
 - **언어 / 버전**: TypeScript 5.9, React 18.3
 - **프레임워크**: Vite 7, React Router 6
-- **스타일링**: Tailwind CSS 4 + CSS 변수 토큰
+- **스타일링**: Tailwind CSS 4 + CSS 변수 토큰(`src/index.css`)
 - **상태 관리**: `useSyncExternalStore` 기반 커스텀 auth store
+- **서버 상태**: TanStack Query(`useAppQuery`, `appQueryKeys`)
 - **HTTP**: axios + 공통 인증 재시도 래퍼(`withAuthRetry`)
 - **테스트**: Vitest
 - **기타**: PWA(vite-plugin-pwa), Mapbox GL
@@ -31,22 +32,21 @@
 
 ```bash
 # 의존성 설치
-npm install
+npm ci
 
 # 개발 서버
 npm run dev
 
-# 타입 검사
+# 정적 검증
+npm run lint
+npm run lint:structure:report
 npm run typecheck
-
-# 테스트
+npm run typecheck:test
 npm run test
 
-# 린트
-npm run lint
-
-# 프로덕션 빌드
+# 프로덕션 빌드 + 번들 예산
 npm run build
+npm run check:bundle-budget
 ```
 
 ---
@@ -56,26 +56,33 @@ npm run build
 ```text
 src/
 ├── api/
+│   ├── app/                    # 일반 앱 API
 │   ├── common/                 # 공통 인증/에러/HTTP 유틸
-│   └── ticketing/
-│       ├── generated/          # OpenAPI 생성 코드 (직접 수정 금지)
-│       ├── authApi.ts
-│       ├── adminAuthApi.ts
-│       └── wristbandApi.ts
+│   └── ticketing/              # 티켓팅 API(+ app API adapter)
 ├── components/
-│   ├── layout/                 # 일반/관리자 공통 레이아웃
-│   └── ticketing/              # 티켓팅 전용 UI 컴포넌트
+│   ├── app/
+│   ├── common/
+│   └── ticketing/
 ├── hooks/
-│   ├── useAdminAuth.ts
-│   └── ticketing/useAuth.ts
+│   ├── app/
+│   │   └── admin/              # useAdminNotices, useAdminAds 등
+│   └── ticketing/
 ├── routes/
-│   ├── admin/                  # 공지/광고 관리자
-│   ├── ticketing/              # 티켓팅 + 팔찌 배부
-│   └── common/                 # authGuard 등 공통 라우팅 유틸
-├── store/ticketing/authStore.ts
-├── lib/                        # env/mapper/유틸
-└── utils/ticketing/env.ts
+│   ├── admin/
+│   ├── boothmap/
+│   ├── home/
+│   ├── mypage/
+│   ├── notice/
+│   └── ticketing/
+├── store/
+│   ├── common/authStore.ts     # 인증 상태 단일 소스(canonical)
+│   └── ticketing/authStore.ts  # 호환용 re-export bridge
+├── lib/
+├── types/
+└── utils/
 ```
+
+구조 규칙의 canonical 문서는 `docs/architecture/frontend-structure-conventions.md`입니다.
 
 ---
 
@@ -86,9 +93,9 @@ src/
 - 티켓팅 앱은 `/ticket/*`로 분리되어 `src/routes/ticketing/TicketingApp.tsx`에서 별도 라우팅합니다.
 
 ### 인증/인가
-- 인증 상태 단일 소스는 `authStore`입니다 (`src/store/ticketing/authStore.ts`).
-- 권한 판정은 `isRoleAuthenticated`를 사용하고, **토큰의 role 클레임을 우선**합니다.
-- 관리자 로그인은 티켓팅 기준(`POST /user/login`, body: `studentId`)을 사용합니다.
+- 인증 상태 단일 소스는 `authStore`이며 canonical 경로는 `src/store/common/authStore.ts`입니다.
+- `src/store/ticketing/authStore.ts`는 레거시 소비처를 위한 bridge(re-export)입니다.
+- 권한 판정은 `isRoleAuthenticated`를 사용하고, **토큰 role 클레임을 우선**합니다.
 - 리다이렉트는 반드시 `buildReturnTo`, `buildLoginRedirectPath`, `resolveScopedRedirect`를 사용해 오픈 리다이렉트 위험을 방지합니다.
 
 ### 티켓팅 관리자 보호 라우트
@@ -97,51 +104,44 @@ src/
 
 ---
 
-## 환경 변수 · 프록시
+## 구조 경계 규칙
 
-- `VITE_API_BASE_URL` (우선)
-- `VITE_API_URL` (레거시 fallback)
-- `VITE_TICKETING_API_BASE_URL`
-- `VITE_BACKEND_TARGET` (`serverdb` | `compose`)
-- `VITE_API_MODE` (`live` | `mock`)
-- `VITE_DEV_ACCESS_TOKEN` (개발 편의용)
-
-개발 서버 프록시는 `vite.config.ts`에서 `/api -> 백엔드`로 연결되며, 경로의 `/api` 접두사는 rewrite로 제거됩니다.
+- 구조 게이트는 `scripts/verify-structure.mjs`에서 관리합니다.
+- `ticketing`의 비-API 레이어(`routes/hooks/components/.../ticketing/*`)는 `@/api/app/*`를 직접 import하지 않습니다.
+- app API가 필요하면 `src/api/ticketing/*` adapter를 통해 우회합니다.
+- `components/hooks/lib/types`의 import 방향 규칙은 `docs/architecture/frontend-structure-conventions.md`를 따릅니다.
 
 ---
 
-## 코드 컨벤션
+## 스타일 · 접근성 규칙
 
-### TypeScript
-- `strict` 모드를 유지합니다.
-- 경로 별칭 `@/* -> src/*`를 사용합니다.
-- `any` 도입은 지양하고, 기존 DTO/Model 타입을 우선 재사용합니다.
-
-### API 계층
-- 화면 컴포넌트에서 axios를 직접 호출하지 말고 `src/api/**` 레이어를 사용합니다.
-- 인증 재시도/401 처리 로직은 `api/common` 계층에서 일관되게 처리합니다.
-- `src/api/ticketing/generated/**`는 생성 코드이므로 직접 수정하지 않습니다.
-
-### 스타일/디자인
-- 하드코딩 색상보다 CSS 변수 토큰(`--text`, `--accent`, `--border-base` 등)을 우선 사용합니다.
-- 티켓팅 화면은 `src/index.css`의 토큰 체계를 따릅니다.
-- 기존 디자인 시스템이 있는 화면에서는 톤/간격/타이포를 유지합니다.
+- 스타일은 Tailwind-first를 원칙으로 하고, 전역 토큰은 `src/index.css`에서 관리합니다.
+- 신규 전역 selector 또는 raw hex 도입은 구조 문서의 정책을 따릅니다.
+- 상호작용 UI는 `button`/`a` 등 시맨틱 요소를 우선 사용하고, icon-only 버튼은 `aria-label`을 필수로 둡니다.
+- ESLint `jsx-a11y` 규칙 위반은 PR 머지 전에 모두 해소합니다.
 
 ---
 
-## 테스트/검증 체크리스트
+## 문서 규칙
 
-변경 제출 전 최소 아래를 수행합니다.
+아키텍처/온보딩 문서의 canonical 위치는 `docs/architecture/*`입니다.
 
-1. `npm run typecheck`
-2. 변경 범위 테스트 실행 (`npm run test -- <file>` 또는 `npm run test`)
-3. 인증/라우팅 변경 시 리다이렉트 및 role 판정 동작 확인
+- 구조/경계 변경: `frontend-structure-conventions.md` 동시 수정
+- 서버 상태 정책 변경: `server-state-standard.md` 동시 수정
+- 장기 의사결정 추가/변경: `docs/architecture/adr/*`에 ADR 추가
+- 신규 인원 온보딩 플로우 변경: `docs/architecture/onboarding-frontend.md` 동시 수정
+
+문서 인덱스와 리뷰 체크리스트는 `docs/architecture/README.md`를 사용합니다.
 
 ---
 
-## 주의 사항
+## PR 전 체크리스트
 
-1. `authStore.clear()`는 관리자/학생 세션 모두를 제거하므로 사용 위치를 신중히 선택합니다.
-2. 권한 관련 버그가 의심되면 `session.role`만 보지 말고 JWT role 클레임 파싱 경로를 함께 확인합니다.
-3. `/admin`과 `/ticket/admin`은 화면은 다르지만 인증 스토어를 공유하므로 세션 복구/로그아웃 영향 범위를 함께 고려합니다.
-4. PWA 서비스워커가 활성화되어 있어 정적 리소스 변경 시 캐시 영향(강력 새로고침)을 염두에 둡니다.
+1. `npm run lint`
+2. `npm run lint:structure:report`
+3. `npm run typecheck`
+4. `npm run typecheck:test`
+5. `npm run test`
+6. `npm run build`
+7. `npm run check:bundle-budget`
+8. 인증/라우팅 변경 시 핵심 사용자 흐름(로그인, 리다이렉트, 관리자 진입) 수동 점검
