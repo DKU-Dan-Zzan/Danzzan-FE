@@ -132,13 +132,13 @@ function Notice() {
       {/* 상단 타이틀 & 검색 */}
       <section className="bg-white px-4 pb-4 pt-4 shadow-[0_8px_24px_rgba(15,23,42,0.08)]">
         <div className="mb-3">
-          <p className="text-[11px] font-semibold text-[#2563EB]">단짠 공지사항</p>
-          <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[#0F172A]">
+          <p className="text-[11px] font-semibold text-blue-600">단짠 공지사항</p>
+          <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-slate-900">
             축제 소식 한눈에 보기
           </h1>
         </div>
         <div className="flex gap-2">
-          <div className="flex-1 rounded-full bg-[#F3F4F6] px-4 py-2 shadow-inner">
+          <div className="flex-1 rounded-full bg-gray-100 px-4 py-2 shadow-inner">
             <input
               type="text"
               value={keyword}
@@ -177,20 +177,20 @@ function Notice() {
               key={notice.id}
               type="button"
               onClick={() => void handleOpenDetail(notice.id)}
-              className="group flex w-full items-center justify-between rounded-[18px] border border-[#E5EDFF] bg-white px-4 py-3 text-left shadow-[0_8px_18px_rgba(15,23,42,0.06)] transition-transform active:scale-[0.99]"
+              className="group flex w-full items-center justify-between rounded-[18px] border border-blue-100 bg-white px-4 py-3 text-left shadow-[0_8px_18px_rgba(15,23,42,0.06)] transition-transform active:scale-[0.99]"
             >
               <div className="flex min-w-0 flex-1 items-center gap-2.5">
-                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#E0EBFF] text-[11px] font-semibold text-[#2563EB]">
+                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-[11px] font-semibold text-blue-600">
                   ★
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-[13px] font-semibold text-[#111827]">
+                  <p className="truncate text-[13px] font-semibold text-gray-900">
                     {notice.title}
                   </p>
-                  <p className="mt-0.5 line-clamp-1 text-[11px] text-[#6B7280]">{notice.content}</p>
+                  <p className="mt-0.5 line-clamp-1 text-[11px] text-gray-500">{notice.content}</p>
                 </div>
               </div>
-              <span className="ml-2 flex-shrink-0 text-[11px] text-[#9CA3AF]">
+              <span className="ml-2 flex-shrink-0 text-[11px] text-gray-400">
                 {formatDate(notice.createdAt)}
               </span>
             </button>
@@ -201,11 +201,11 @@ function Notice() {
               key={notice.id}
               type="button"
               onClick={() => void handleOpenDetail(notice.id)}
-              className="group flex w-full items-center justify-between rounded-[18px] border border-[#E5E7EB] bg-white px-4 py-3 text-left shadow-[0_4px_12px_rgba(15,23,42,0.05)] transition-transform active:scale-[0.99]"
+              className="group flex w-full items-center justify-between rounded-[18px] border border-gray-200 bg-white px-4 py-3 text-left shadow-[0_4px_12px_rgba(15,23,42,0.05)] transition-transform active:scale-[0.99]"
             >
               <div className="flex min-w-0 flex-1 items-center gap-2.5">
                 {notice.thumbnailImageUrl && (
-                  <div className="flex h-9 w-9 flex-shrink-0 overflow-hidden rounded-xl border border-[#E5E7EB] bg-[#F9FAFB]">
+                  <div className="flex h-9 w-9 flex-shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
                     <img
                       src={notice.thumbnailImageUrl}
                       alt={notice.title}
@@ -214,13 +214,13 @@ function Notice() {
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="truncate text-[13px] font-semibold text-[#111827]">
+                  <p className="truncate text-[13px] font-semibold text-gray-900">
                     {notice.title}
                   </p>
-                  <p className="mt-0.5 line-clamp-1 text-[11px] text-[#6B7280]">{notice.content}</p>
+                  <p className="mt-0.5 line-clamp-1 text-[11px] text-gray-500">{notice.content}</p>
                 </div>
               </div>
-              <span className="ml-2 flex-shrink-0 text-[11px] text-[#9CA3AF]">
+              <span className="ml-2 flex-shrink-0 text-[11px] text-gray-400">
                 {formatDate(notice.createdAt)}
               </span>
             </button>
@@ -228,12 +228,12 @@ function Notice() {
         </div>
 
         {pageState.totalPages > 1 && (
-          <div className="mt-4 flex items-center justify-center gap-3 text-[11px] text-[#6B7280]">
+          <div className="mt-4 flex items-center justify-center gap-3 text-[11px] text-gray-500">
             <button
               type="button"
               disabled={pageState.page === 0}
               onClick={() => handleChangePage(pageState.page - 1)}
-              className="rounded-full border border-[#E5E7EB] bg-white px-3 py-1 disabled:opacity-50"
+              className="rounded-full border border-gray-200 bg-white px-3 py-1 disabled:opacity-50"
             >
               이전
             </button>
@@ -244,7 +244,7 @@ function Notice() {
               type="button"
               disabled={pageState.page + 1 >= pageState.totalPages}
               onClick={() => handleChangePage(pageState.page + 1)}
-              className="rounded-full border border-[#E5E7EB] bg-white px-3 py-1 disabled:opacity-50"
+              className="rounded-full border border-gray-200 bg-white px-3 py-1 disabled:opacity-50"
             >
               다음
             </button>
@@ -256,12 +256,12 @@ function Notice() {
       {(detailState.notice || detailState.loading || detailState.error) && (
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 px-4 py-6">
           <div className="max-h-[90vh] w-full max-w-xl overflow-hidden rounded-3xl bg-white shadow-[0_18px_45px_rgba(15,23,42,0.45)]">
-            <div className="flex items-center justify-between border-b border-[#E5E7EB] px-5 py-3.5">
-              <p className="text-[13px] font-semibold text-[#111827]">공지 상세</p>
+            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-3.5">
+              <p className="text-[13px] font-semibold text-gray-900">공지 상세</p>
               <button
                 type="button"
                 onClick={handleCloseDetail}
-                className="rounded-full bg-[#F3F4F6] px-2.5 py-1 text-[11px] font-semibold text-[#4B5563]"
+                className="rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-semibold text-gray-600"
               >
                 닫기
               </button>
@@ -282,14 +282,14 @@ function Notice() {
 
               {detailState.notice && !detailState.loading && (
                 <article>
-                  <header className="border-b border-[#E5E7EB] pb-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#F97316]">
+                  <header className="border-b border-gray-200 pb-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-orange-500">
                       FESTIVAL NOTICE
                     </p>
-                    <h2 className="mt-1 text-[15px] font-extrabold leading-snug text-[#111827]">
+                    <h2 className="mt-1 text-[15px] font-extrabold leading-snug text-gray-900">
                       {detailState.notice.title}
                     </h2>
-                    <div className="mt-2 flex items-center justify-between text-[11px] text-[#9CA3AF]">
+                    <div className="mt-2 flex items-center justify-between text-[11px] text-gray-400">
                       <span>{detailState.notice.author}</span>
                       <span>{formatDate(detailState.notice.createdAt)}</span>
                     </div>
@@ -298,7 +298,7 @@ function Notice() {
                   {(detailState.notice.imageUrls?.length ?? 0) > 0 ? (
                     <div className="mt-3">
                       <div
-                        className="relative overflow-hidden rounded-2xl border border-[#E5E7EB] bg-[#F9FAFB]"
+                        className="relative overflow-hidden rounded-2xl border border-gray-200 bg-gray-50"
                         onTouchStart={(e) => {
                           if (e.touches.length === 1) {
                             setDragStartX(e.touches[0].clientX);
@@ -389,8 +389,8 @@ function Notice() {
                               onClick={() => setActiveImageIndex(idx)}
                               className={`h-1.5 rounded-full transition-all ${
                                 activeImageIndex === idx
-                                  ? "w-4 bg-[#2563EB]"
-                                  : "w-1.5 bg-[#D1D5DB]"
+                                  ? "w-4 bg-blue-600"
+                                  : "w-1.5 bg-gray-300"
                               }`}
                             />
                           ))}
@@ -398,7 +398,7 @@ function Notice() {
                       </div>
                     </div>
                   ) : detailState.notice.thumbnailImageUrl ? (
-                    <div className="mt-3 overflow-hidden rounded-2xl border border-[#E5E7EB]">
+                    <div className="mt-3 overflow-hidden rounded-2xl border border-gray-200">
                       <img
                         src={detailState.notice.thumbnailImageUrl}
                         alt={detailState.notice.title}
@@ -407,7 +407,7 @@ function Notice() {
                     </div>
                   ) : null}
 
-                  <div className="mt-4 whitespace-pre-wrap text-[13px] leading-relaxed text-[#111827]">
+                  <div className="mt-4 whitespace-pre-wrap text-[13px] leading-relaxed text-gray-900">
                     {detailState.notice.content}
                   </div>
                 </article>
