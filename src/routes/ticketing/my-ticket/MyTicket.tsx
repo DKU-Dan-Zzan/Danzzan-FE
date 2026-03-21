@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/ticketing/useAuth";
 import { useTicketing } from "@/hooks/ticketing/useTicketing";
 import type { PlacementAd } from "@/types/ticketing/model/ad.model";
 import type { Ticket } from "@/types/ticketing/model/ticket.model";
-import { getPlacementAd as getWebPlacementAd, type PlacementKey as WebPlacementKey } from "@/api/noticeApi";
+import { getPlacementAd as getWebPlacementAd, type PlacementKey as WebPlacementKey } from "@/api/app/notice/noticeApi";
 
 export default function MyTicket() {
   const navigate = useNavigate();

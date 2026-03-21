@@ -14,7 +14,7 @@ import {
   UploadCloud,
   Map,
 } from "lucide-react";
-import { useAdminAuth } from "../../hooks/useAdminAuth";
+import { useAdminAuth } from "@/hooks/app/admin/useAdminAuth";
 import {
   createAdminNotice,
   deleteAdminNotice,
@@ -31,8 +31,8 @@ import {
   updateAdminNotice,
   updateNoticeDisplayOrder,
   updateEmergencyAdminNotice,
-} from "../../api/admin";
-import { getPlacementAd, type ClientAdDto } from "../../api/noticeApi";
+} from "@/api/app/admin/adminApi";
+import { getPlacementAd, type ClientAdDto } from "@/api/app/notice/noticeApi";
 import { AdminShell } from "@/components/layout/AdminShell";
 
 type NoticeAuthor = "개발팀" | "총학생회";

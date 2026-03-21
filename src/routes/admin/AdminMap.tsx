@@ -19,8 +19,8 @@ import {
   type AdminMapCollege,
   updateBoothLocation,
   updateCollegeLocation,
-} from "../../api/adminMapApi";
-import useKakaoMapLoader from "../../hooks/useKakaoMapLoader";
+} from "@/api/app/admin/adminMapApi";
+import useKakaoMapLoader from "@/hooks/app/boothmap/useKakaoMapLoader";
 import { AdminShell } from "@/components/layout/AdminShell";
 import type {
   KakaoCustomOverlay,
@@ -28,7 +28,7 @@ import type {
   KakaoMap,
   KakaoMarker,
   KakaoMouseEvent,
-} from "@/types/kakao-map";
+} from "@/types/app/boothmap/kakao-map";
 
 declare global {
   interface Window {

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useSyncExternalStore } from "react";
-import { authLogout } from "@/api/auth";
+import { authLogout } from "@/api/app/auth/authApi";
 import { authStore } from "@/store/ticketing/authStore";
 import { authApi } from "@/api/ticketing/authApi";
 import { GraduationCap, IdCard, User } from "lucide-react";

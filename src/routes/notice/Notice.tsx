@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getNoticeDetail, getNotices, type NoticeDto } from "../../api/noticeApi";
+import { getNoticeDetail, getNotices, type NoticeDto } from "@/api/app/notice/noticeApi";
 
 type CategoryKey = "ALL" | "GENERAL" | "EVENT";
 

@@ -1,5 +1,5 @@
 ﻿import { useCallback, useSyncExternalStore } from "react";
-import { authLogout } from "@/api/auth";
+import { authLogout } from "@/api/app/auth/authApi";
 import { authApi } from "@/api/ticketing/authApi";
 import { adminAuthApi } from "@/api/ticketing/adminAuthApi";
 import { authStore } from "@/store/ticketing/authStore";
