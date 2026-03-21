@@ -754,6 +754,7 @@ function Admin() {
                             type="button"
                             disabled={index === 0}
                             onClick={() => movePinnedItem(index, "up")}
+                            aria-label={`${notice.title} 핀 공지 위로 이동`}
                             className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--surface-subtle)] text-[var(--text-muted)] disabled:opacity-40"
                           >
                             <ArrowUp className="h-3.5 w-3.5" strokeWidth={2.3} />
@@ -762,6 +763,7 @@ function Admin() {
                             type="button"
                             disabled={index === effectivePinned.length - 1}
                             onClick={() => movePinnedItem(index, "down")}
+                            aria-label={`${notice.title} 핀 공지 아래로 이동`}
                             className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--surface-subtle)] text-[var(--text-muted)] disabled:opacity-40"
                           >
                             <ArrowDown className="h-3.5 w-3.5" strokeWidth={2.3} />
@@ -771,6 +773,7 @@ function Admin() {
                         <button
                           type="button"
                           onClick={() => openEditNotice(notice)}
+                          aria-label={`${notice.title} 공지 수정`}
                           className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--surface-subtle)] text-[var(--text-muted)] hover:bg-[var(--border-base)]"
                         >
                           <Pencil className="h-3.5 w-3.5" strokeWidth={2.3} />
@@ -782,6 +785,7 @@ function Admin() {
                         <button
                           type="button"
                           onClick={() => void handleRestoreNotice(notice.id)}
+                          aria-label={`${notice.title} 공지 복원`}
                           className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--status-success-bg)] text-[var(--status-success)] hover:bg-[var(--status-success-border)]"
                         >
                           <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.3} />
@@ -790,6 +794,7 @@ function Admin() {
                         <button
                           type="button"
                           onClick={() => void handleArchiveNotice(notice.id)}
+                          aria-label={`${notice.title} 공지 삭제`}
                           className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--status-danger-bg)] text-[var(--status-danger)] hover:bg-[var(--status-danger-border)]"
                         >
                           <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
@@ -823,6 +828,7 @@ function Admin() {
                         <button
                           type="button"
                           onClick={() => openEditNotice(notice)}
+                          aria-label={`${notice.title} 공지 수정`}
                           className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--surface-subtle)] text-[var(--text-muted)] hover:bg-[var(--border-base)]"
                         >
                           <Pencil className="h-3.5 w-3.5" strokeWidth={2.3} />
@@ -834,6 +840,7 @@ function Admin() {
                         <button
                           type="button"
                           onClick={() => void handleRestoreNotice(notice.id)}
+                          aria-label={`${notice.title} 공지 복원`}
                           className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--status-success-bg)] text-[var(--status-success)] hover:bg-[var(--status-success-border)]"
                         >
                           <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.3} />
@@ -842,6 +849,7 @@ function Admin() {
                         <button
                           type="button"
                           onClick={() => void handleArchiveNotice(notice.id)}
+                          aria-label={`${notice.title} 공지 삭제`}
                           className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--status-danger-bg)] text-[var(--status-danger)] hover:bg-[var(--status-danger-border)]"
                         >
                           <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
@@ -1122,14 +1130,8 @@ function Admin() {
                         const isThumbnail =
                           (editingNotice.thumbnailImageUrl || editingNotice.images[0]) === url;
                         return (
-                          <button
+                          <div
                             key={url}
-                            type="button"
-                            onClick={() =>
-                              setEditingNotice((prev) =>
-                                prev ? { ...prev, thumbnailImageUrl: url } : prev,
-                              )
-                            }
                             className={cn(
                               "group relative h-20 overflow-hidden rounded-xl border bg-[var(--surface)]",
                               isThumbnail
@@ -1138,6 +1140,16 @@ function Admin() {
                             )}
                           >
                             <img src={url} alt="공지 이미지" className="h-full w-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setEditingNotice((prev) =>
+                                  prev ? { ...prev, thumbnailImageUrl: url } : prev,
+                                )
+                              }
+                              aria-label={isThumbnail ? "대표 이미지로 선택됨" : "대표 이미지로 선택"}
+                              className="absolute inset-0"
+                            />
                             {isThumbnail && (
                               <div className="absolute inset-0 flex items-start justify-end p-1">
                                 <span className="rounded-full bg-[var(--admin-dialog-overlay-bg)] px-2 py-0.5 text-[9px] font-semibold text-[var(--text-on-accent)]">
@@ -1147,8 +1159,7 @@ function Admin() {
                             )}
                             <button
                               type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
+                              onClick={() => {
                                 setEditingNotice((prev) =>
                                   prev
                                     ? {
@@ -1162,11 +1173,12 @@ function Admin() {
                                     : prev,
                                 );
                               }}
-                              className="absolute inset-x-1 bottom-1 rounded-full bg-[var(--admin-dialog-overlay-bg)] px-1.5 py-0.5 text-[9px] font-semibold text-[var(--text-on-accent)]"
+                              aria-label="공지 이미지 삭제"
+                              className="absolute inset-x-1 bottom-1 z-10 rounded-full bg-[var(--admin-dialog-overlay-bg)] px-1.5 py-0.5 text-[9px] font-semibold text-[var(--text-on-accent)]"
                             >
                               삭제
                             </button>
-                          </button>
+                          </div>
                         );
                       })}
                     </div>

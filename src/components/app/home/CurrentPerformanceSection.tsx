@@ -103,31 +103,21 @@ export default function CurrentPerformanceSection() {
               <div className="min-w-0 flex-1 text-left">
                 <p className="text-[16px] font-semibold leading-tight text-[var(--text)]">{helperText}</p>
                 <p className="mt-1 text-[13px] font-medium text-[var(--text-muted)]">타임테이블에서 다음 공연을 확인해 보세요.</p>
-                {status === "error" && (
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      handleRetry();
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        handleRetry();
-                      }
-                    }}
-                    className="mt-1 inline-flex text-[12px] font-semibold text-[var(--accent)] underline underline-offset-2"
-                  >
-                    다시 시도
-                  </span>
-                )}
               </div>
             </div>
           )}
         </button>
+        {status === "error" && (
+          <div className="mt-2 text-center">
+            <button
+              type="button"
+              onClick={handleRetry}
+              className="inline-flex text-[12px] font-semibold text-[var(--accent)] underline underline-offset-2"
+            >
+              다시 시도
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

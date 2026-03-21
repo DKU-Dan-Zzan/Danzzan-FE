@@ -414,6 +414,7 @@ function Notice() {
                               key={idx}
                               type="button"
                               onClick={() => setActiveImageIndex(idx)}
+                              aria-label={`공지 이미지 ${idx + 1}번 보기`}
                               className={cn(
                                 "h-1.5 rounded-full transition-all",
                                 activeImageIndex === idx
