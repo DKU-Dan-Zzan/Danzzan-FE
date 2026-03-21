@@ -19,17 +19,27 @@ export type LineupImageDto = {
   imageUrl: string
 }
 
-export async function getHomeImages() {
-  const res = await http.get<HomeImageDto[]>("/home/images")
+type RequestOptions = {
+  signal?: AbortSignal
+}
+
+export async function getHomeImages(options?: RequestOptions) {
+  const res = await http.get<HomeImageDto[]>("/home/images", {
+    signal: options?.signal,
+  })
   return res.data
 }
 
-export async function getEmergencyNotice() {
-  const res = await http.get<EmergencyNoticeDto | null>("/home/emergencyNotice")
+export async function getEmergencyNotice(options?: RequestOptions) {
+  const res = await http.get<EmergencyNoticeDto | null>("/home/emergencyNotice", {
+    signal: options?.signal,
+  })
   return res.data
 }
 
-export async function getLineupImages() {
-  const res = await http.get<LineupImageDto[]>("/home/lineup-images")
+export async function getLineupImages(options?: RequestOptions) {
+  const res = await http.get<LineupImageDto[]>("/home/lineup-images", {
+    signal: options?.signal,
+  })
   return res.data
 }

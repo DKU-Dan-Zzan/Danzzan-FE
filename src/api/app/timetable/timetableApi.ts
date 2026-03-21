@@ -13,17 +13,24 @@ export type ContentImageDto = {
   detailImageUrl: string
 }
 
-export async function getPerformances(date: string) {
+type RequestOptions = {
+  signal?: AbortSignal
+}
+
+export async function getPerformances(date: string, options?: RequestOptions) {
   const res = await http.get<TimetableResponseDto>(
     "/timetable/performances",
     {
-      params: { date }
+      params: { date },
+      signal: options?.signal,
     }
   )
   return res.data
 }
 
-export async function getContentImages() {
-  const res = await http.get<ContentImageDto[]>("timetable/content-images")
+export async function getContentImages(options?: RequestOptions) {
+  const res = await http.get<ContentImageDto[]>("timetable/content-images", {
+    signal: options?.signal,
+  })
   return res.data
 }

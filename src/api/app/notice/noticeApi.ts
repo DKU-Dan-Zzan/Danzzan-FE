@@ -33,6 +33,10 @@ export type NoticeListParams = {
   size?: number;
 };
 
+type RequestOptions = {
+  signal?: AbortSignal;
+};
+
 function buildQuery(params?: Record<string, string | number | boolean | undefined>): string {
   if (!params) return "";
   const searchParams = new URLSearchParams();
@@ -46,6 +50,7 @@ function buildQuery(params?: Record<string, string | number | boolean | undefine
 
 export async function getNotices(
   params: NoticeListParams,
+  options?: RequestOptions,
 ): Promise<PageResponse<NoticeDto>> {
   const query = buildQuery({
     keyword: params.keyword,
@@ -54,12 +59,16 @@ export async function getNotices(
     size: params.size ?? 10,
   });
 
-  const res = await http.get<PageResponse<NoticeDto>>(`/notices${query}`);
+  const res = await http.get<PageResponse<NoticeDto>>(`/notices${query}`, {
+    signal: options?.signal,
+  });
   return res.data;
 }
 
-export async function getNoticeDetail(id: number): Promise<NoticeDto> {
-  const res = await http.get<NoticeDto>(`/notices/${id}`);
+export async function getNoticeDetail(id: number, options?: RequestOptions): Promise<NoticeDto> {
+  const res = await http.get<NoticeDto>(`/notices/${id}`, {
+    signal: options?.signal,
+  });
   return res.data;
 }
 
@@ -75,8 +84,14 @@ export type ClientAdDto = {
   updatedAt: string;
 };
 
-export async function getPlacementAd(placement: PlacementKey): Promise<ClientAdDto | null> {
-  const ad = await adGateway.getPlacementAd(placement, { prefer: "web" });
+export async function getPlacementAd(
+  placement: PlacementKey,
+  options?: RequestOptions,
+): Promise<ClientAdDto | null> {
+  const ad = await adGateway.getPlacementAd(placement, {
+    prefer: "web",
+    signal: options?.signal,
+  });
   if (!ad) {
     return null;
   }

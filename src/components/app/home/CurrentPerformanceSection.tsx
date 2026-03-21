@@ -6,6 +6,7 @@ import {
   formatDateToYYYYMMDD,
   getCurrentPerformance,
 } from "@/utils/app/timetable";
+import { appQueryKeys, useAppQuery } from "@/lib/query";
 
 const CARD_WIDTH = 314.4;
 const CARD_HEIGHT = 94;
@@ -14,30 +15,14 @@ const CARD_ASPECT_RATIO = `${CARD_WIDTH} / ${CARD_HEIGHT}`;
 export default function CurrentPerformanceSection() {
   const navigate = useNavigate();
 
-  const [performances, setPerformances] = useState<Performance[]>([]);
   const [now, setNow] = useState(new Date());
   const [today, setToday] = useState(formatDateToYYYYMMDD(new Date()));
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
 
-  useEffect(() => {
-    const fetchTodayPerformances = async () => {
-      try {
-        setLoading(true);
-        setError(false);
-
-        const data = await getPerformances(today);
-        setPerformances(data.performances ?? []);
-      } catch (e) {
-        console.error("[CurrentPerformanceSection] 공연 목록 조회 실패:", e);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTodayPerformances();
-  }, [today]);
+  const performancesQuery = useAppQuery({
+    queryKey: appQueryKeys.timetablePerformances(today),
+    queryFn: ({ signal }) => getPerformances(today, { signal }),
+    staleTime: 60_000,
+  });
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -52,11 +37,13 @@ export default function CurrentPerformanceSection() {
   }, []);
 
   const currentPerformance = useMemo(() => {
+    const performances: Performance[] = performancesQuery.data?.performances ?? [];
     return getCurrentPerformance(performances, now);
-  }, [performances, now]);
-  const status = loading
+  }, [performancesQuery.data, now]);
+
+  const status = performancesQuery.isPending
     ? "loading"
-    : error
+    : performancesQuery.isError
       ? "error"
       : currentPerformance
         ? "active"
@@ -66,10 +53,14 @@ export default function CurrentPerformanceSection() {
     status === "loading"
       ? "현재 진행 중인 공연을 확인하고 있어요."
       : status === "error"
-        ? "공연 정보를 불러오지 못했어요. 잠시 후 다시 확인해 주세요."
+        ? performancesQuery.error?.message ?? "공연 정보를 불러오지 못했어요. 잠시 후 다시 확인해 주세요."
         : status === "empty"
           ? "현재 진행 중인 공연이 없습니다."
           : null;
+
+  const handleRetry = () => {
+    void performancesQuery.refetch();
+  };
 
   return (
     <section className="px-5">
@@ -112,6 +103,27 @@ export default function CurrentPerformanceSection() {
               <div className="min-w-0 flex-1 text-left">
                 <p className="text-[16px] font-semibold leading-tight text-[var(--text)]">{helperText}</p>
                 <p className="mt-1 text-[13px] font-medium text-[var(--text-muted)]">타임테이블에서 다음 공연을 확인해 보세요.</p>
+                {status === "error" && (
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      handleRetry();
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        handleRetry();
+                      }
+                    }}
+                    className="mt-1 inline-flex text-[12px] font-semibold text-[var(--accent)] underline underline-offset-2"
+                  >
+                    다시 시도
+                  </span>
+                )}
               </div>
             </div>
           )}
