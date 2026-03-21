@@ -7,8 +7,10 @@ import { execSync } from "node:child_process"
 const RULE_IDS = [
   "DIR_KEBAB_CASE",
   "FILE_COMPONENT_PASCAL_CASE",
+  "LAYER_API_NO_HOOKS_IMPORT",
   "LAYER_COMPONENTS_NO_ROUTES_IMPORT",
   "LAYER_HOOKS_NO_ROUTES_IMPORT",
+  "LAYER_LIB_NO_ROUTES_IMPORT",
   "LAYER_TYPES_NO_RUNTIME_IMPORT",
   "STYLE_NO_NEW_GLOBAL_SELECTOR",
   "STYLE_NO_NEW_RAW_HEX",
@@ -485,6 +487,38 @@ function run() {
     }
   }
 
+  // LAYER_API_NO_HOOKS_IMPORT
+  {
+    const files = selectFiles(
+      allFiles,
+      changedFiles,
+      options.mode,
+      (file) => isInsideDir(file, "src/api") && CODE_FILE_EXTENSIONS.has(path.extname(file))
+    )
+
+    const patterns = [
+      /from\s+["']@\/hooks\//,
+      /from\s+["'][^"']*\/hooks\/[^"']*["']/,
+      /import\(\s*["']@\/hooks\//,
+      /import\(\s*["'][^"']*\/hooks\/[^"']*["']/,
+    ]
+
+    for (const file of files) {
+      const lines = readFileLines(file)
+      lines.forEach((lineText, index) => {
+        if (patterns.some((pattern) => pattern.test(lineText))) {
+          collector.add(
+            "LAYER_API_NO_HOOKS_IMPORT",
+            file,
+            index + 1,
+            "api layer must not import hooks layer",
+            { file }
+          )
+        }
+      })
+    }
+  }
+
   // LAYER_HOOKS_NO_ROUTES_IMPORT
   {
     const files = selectFiles(
@@ -510,6 +544,38 @@ function run() {
             file,
             index + 1,
             "hooks layer must not import routes layer",
+            { file }
+          )
+        }
+      })
+    }
+  }
+
+  // LAYER_LIB_NO_ROUTES_IMPORT
+  {
+    const files = selectFiles(
+      allFiles,
+      changedFiles,
+      options.mode,
+      (file) => isInsideDir(file, "src/lib") && CODE_FILE_EXTENSIONS.has(path.extname(file))
+    )
+
+    const patterns = [
+      /from\s+["']@\/routes\//,
+      /from\s+["'][^"']*\/routes\/[^"']*["']/,
+      /import\(\s*["']@\/routes\//,
+      /import\(\s*["'][^"']*\/routes\/[^"']*["']/,
+    ]
+
+    for (const file of files) {
+      const lines = readFileLines(file)
+      lines.forEach((lineText, index) => {
+        if (patterns.some((pattern) => pattern.test(lineText))) {
+          collector.add(
+            "LAYER_LIB_NO_ROUTES_IMPORT",
+            file,
+            index + 1,
+            "lib layer must not import routes layer",
             { file }
           )
         }
