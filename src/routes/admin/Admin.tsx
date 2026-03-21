@@ -34,35 +34,12 @@ import {
 } from "@/api/app/admin/adminApi";
 import { getPlacementAd, type ClientAdDto } from "@/api/app/notice/noticeApi";
 import { AdminShell } from "@/components/layout/AdminShell";
-
-type NoticeAuthor = "개발팀" | "총학생회";
-
-type NoticeFormState = {
-  id?: number;
-  title: string;
-  content: string;
-  author: NoticeAuthor;
-  isPinned: boolean;
-  thumbnailImageUrl: string;
-  images: string[];
-};
-
-type AdFormState = {
-  id?: number;
-  title: string;
-  imageUrl: string;
-  placement: AdvertisementPlacement;
-};
-
-function formatDate(dateString: string) {
-  if (!dateString) return "-";
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return dateString;
-  const year = date.getFullYear();
-  const month = `${date.getMonth() + 1}`.padStart(2, "0");
-  const day = `${date.getDate()}`.padStart(2, "0");
-  return `${year}.${month}.${day}`;
-}
+import {
+  formatDate,
+  type AdFormState,
+  type NoticeAuthor,
+  type NoticeFormState,
+} from "@/routes/admin/admin-view-model";
 
 function Admin() {
   const navigate = useNavigate();
