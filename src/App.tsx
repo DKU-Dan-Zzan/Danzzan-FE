@@ -11,7 +11,7 @@ import MyPage from "./routes/mypage/MyPage";
 import Admin from "./routes/admin/Admin";
 import AdminLogin from "./routes/admin/AdminLogin";
 import AdminMap from "./routes/admin/AdminMap";
-import { useAdminAuth } from "./hooks/useAdminAuth";
+import { useAdminAuth } from "@/hooks/app/admin/useAdminAuth";
 import { useEffect, useState } from "react";
 import { buildLoginRedirectPath, buildReturnTo } from "@/routes/common/authGuard";
 import TicketingApp from "./routes/ticketing/TicketingApp";
