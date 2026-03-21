@@ -381,6 +381,7 @@ export default function AdminMap() {
     markerRefs.current = [];
 
     const bounds = new kakao.maps.LatLngBounds();
+    let hasPosition = false;
 
     colleges.forEach((college) => {
       if (college.locationX == null || college.locationY == null) return;
@@ -474,6 +475,7 @@ export default function AdminMap() {
 
       markerRefs.current.push({ marker, overlay, dotOverlay });
       bounds.extend(position);
+      hasPosition = true;
     });
 
     placedBooths.forEach((booth) => {
@@ -567,12 +569,8 @@ export default function AdminMap() {
 
       markerRefs.current.push({ marker, overlay, dotOverlay });
       bounds.extend(position);
+      hasPosition = true;
     });
-
-    let hasPosition = false;
-
-    // college/booth loop 안에서 bounds.extend(position) 할 때
-    hasPosition = true;
 
     if (hasPosition) {
       map.setBounds(bounds);
