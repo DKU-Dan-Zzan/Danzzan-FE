@@ -33,6 +33,11 @@ import {
   updateEmergencyAdminNotice,
 } from "@/api/app/admin/adminApi";
 import { getPlacementAd, type ClientAdDto } from "@/api/app/notice/noticeApi";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/common/ui/dialog";
 import { cn } from "@/components/common/ui/utils";
 import { AdminShell } from "@/components/layout/AdminShell";
 import {
@@ -1012,12 +1017,19 @@ function Admin() {
       </AdminShell>
 
       {/* 공지 작성/수정 모달 */}
-      {editingNotice && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-[var(--admin-dialog-overlay-bg)] px-4 py-6">
-          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-[var(--surface)] p-5 shadow-xl">
-            <h3 className="text-base font-bold text-[var(--text)]">
+      <Dialog
+        open={Boolean(editingNotice)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingNotice(null);
+          }
+        }}
+      >
+        {editingNotice && (
+          <DialogContent className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-[var(--surface)] p-5 shadow-xl">
+            <DialogTitle className="text-base font-bold text-[var(--text)]">
               {editingNotice.id ? "공지 수정" : "새 공지 등록"}
-            </h3>
+            </DialogTitle>
             <form className="mt-4 space-y-5" onSubmit={handleSubmitNotice}>
               <div className="space-y-2">
                 <p className="text-xs font-semibold text-[var(--text)]">작성 주체</p>
@@ -1215,17 +1227,24 @@ function Admin() {
                 </div>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+          </DialogContent>
+        )}
+      </Dialog>
 
       {/* 광고 작성/수정 모달 (위치별 1개, 교체 저장) */}
-      {editingAd && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-[var(--admin-dialog-overlay-bg)] px-4 py-6">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-[var(--surface)] p-5 shadow-xl">
-            <h3 className="text-sm font-bold text-[var(--text)]">
+      <Dialog
+        open={Boolean(editingAd)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingAd(null);
+          }
+        }}
+      >
+        {editingAd && (
+          <DialogContent className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-[var(--surface)] p-5 shadow-xl">
+            <DialogTitle className="text-sm font-bold text-[var(--text)]">
               광고 배너 등록/교체
-            </h3>
+            </DialogTitle>
             <form className="mt-4 space-y-4" onSubmit={handleSubmitAd}>
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-[var(--text)]">광고 제목</label>
@@ -1314,9 +1333,9 @@ function Admin() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+          </DialogContent>
+        )}
+      </Dialog>
     </>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getNoticeDetail, getNotices, type NoticeDto } from "@/api/app/notice/noticeApi";
+import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialog";
 import { cn } from "@/components/common/ui/utils";
 
 type CategoryKey = "ALL" | "GENERAL" | "EVENT";
@@ -136,6 +137,7 @@ function Notice() {
     setPageState((prev) => ({ ...prev, page: nextPage }));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  const isDetailOpen = Boolean(detailState.notice || detailState.loading || detailState.error);
 
   return (
     <div className="pb-5">
@@ -269,11 +271,18 @@ function Notice() {
       </section>
 
       {/* 상세 보기 패널 */}
-      {(detailState.notice || detailState.loading || detailState.error) && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-[var(--admin-dialog-overlay-bg)] px-4 py-6">
-          <div className="max-h-[90vh] w-full max-w-xl overflow-hidden rounded-3xl bg-[var(--surface)] shadow-[0_18px_45px_var(--shadow-color)]">
+      <Dialog
+        open={isDetailOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            handleCloseDetail();
+          }
+        }}
+      >
+        {isDetailOpen && (
+          <DialogContent className="max-h-[90vh] w-full max-w-xl overflow-hidden rounded-3xl bg-[var(--surface)] p-0 shadow-[0_18px_45px_var(--shadow-color)]">
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] px-5 py-3.5">
-              <p className="text-[13px] font-semibold text-[var(--text)]">공지 상세</p>
+              <DialogTitle className="text-[13px] font-semibold text-[var(--text)]">공지 상세</DialogTitle>
               <button
                 type="button"
                 onClick={handleCloseDetail}
@@ -430,9 +439,9 @@ function Notice() {
                 </article>
               )}
             </div>
-          </div>
-        </div>
-      )}
+          </DialogContent>
+        )}
+      </Dialog>
     </div>
   );
 }
