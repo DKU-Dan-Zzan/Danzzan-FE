@@ -4,7 +4,6 @@ import { authLogout } from "@/api/app/auth/authApi";
 import { studentProfileApi } from "@/api/app/auth/studentProfileApi";
 import { authStore } from "@/store/common/authStore";
 import { GraduationCap, IdCard, User } from "lucide-react";
-import "./index.css";
 
 const MYPAGE_GUEST_ROOT_CLASS =
   "mypage-root relative flex min-h-full flex-col items-center justify-center overflow-hidden bg-[var(--bg-page-soft)] px-6 py-[100px]";

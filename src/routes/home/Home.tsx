@@ -5,7 +5,6 @@ import EmergencyNotice, { type EmergencyNoticeData } from "@/components/app/home
 import LineupSection, { type LineupBanner } from "@/components/app/home/LineupSection"
 import CurrentPerformanceSection from "@/components/app/home/CurrentPerformanceSection";
 import AdBanner from "@/components/app/home/AdBanner";
-import "./index.css";
 
 import { getEmergencyNotice, getHomeImages, getLineupImages } from "@/api/app/home/homeApi"
 import { getPlacementAd } from "@/api/app/notice/noticeApi"

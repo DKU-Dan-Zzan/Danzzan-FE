@@ -11,7 +11,6 @@ import Timeline from "@/components/app/timetable/Timeline"
 import ContentImageSection from "@/components/app/timetable/ContentImage"
 import type { FestivalDay, Performance } from "@/types/app/timetable/timetable.types"
 import { appQueryKeys, useAppQuery } from "@/lib/query"
-import "./index.css"
 
 const FESTIVAL_DAYS: FestivalDay[] = [
   { key: "DAY-1", label: "1일차", date: "2026-05-12" },
