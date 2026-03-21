@@ -25,18 +25,25 @@ const BottomNav = () => {
             to={to}
             end={to === "/"}
             className={({ isActive }) =>
-              `relative flex h-full flex-1 flex-col items-center justify-center text-[length:var(--app-bottom-nav-label-size)] transition-all duration-200 ${isActive ? "text-[var(--app-nav-text-active)]" : "text-[var(--app-nav-text)]"}`
+              `relative flex h-full flex-1 flex-col items-center justify-center text-[length:var(--app-bottom-nav-label-size)] transition-[color,transform] duration-200 ease-out active:scale-[0.97] motion-reduce:transform-none motion-reduce:transition-none ${isActive ? "text-[var(--app-nav-text-active)]" : "text-[var(--app-nav-text)]"}`
             }
           >
             {({ isActive }) => (
               <>
-                <Icon strokeWidth={2} className="h-[var(--app-bottom-nav-icon-size)] w-[var(--app-bottom-nav-icon-size)]" />
+                <Icon
+                  strokeWidth={2}
+                  className={`h-[var(--app-bottom-nav-icon-size)] w-[var(--app-bottom-nav-icon-size)] transition-transform duration-200 ease-out motion-reduce:transform-none motion-reduce:transition-none ${isActive ? "-translate-y-[1px] scale-[1.04]" : "translate-y-0 scale-100"}`}
+                />
 
-                {isActive && (
-                  <div className="absolute bottom-[var(--app-bottom-nav-indicator-bottom)] h-[var(--app-bottom-nav-indicator-height)] w-[var(--app-bottom-nav-indicator-width)] rounded-full bg-[var(--accent)]" />
-                )}
+                <div
+                  className={`absolute bottom-[var(--app-bottom-nav-indicator-bottom)] h-[var(--app-bottom-nav-indicator-height)] w-[var(--app-bottom-nav-indicator-width)] origin-center rounded-full bg-[var(--app-nav-text-active)] transition-[opacity,transform] duration-200 ease-out motion-reduce:transform-none motion-reduce:transition-none ${isActive ? "opacity-100 scale-x-100" : "opacity-0 scale-x-50"}`}
+                />
 
-                <span className="mt-1 text-center leading-none">{label}</span>
+                <span
+                  className={`mt-1 text-center leading-none transition-transform duration-200 ease-out motion-reduce:transform-none motion-reduce:transition-none ${isActive ? "-translate-y-px font-semibold" : "font-medium"}`}
+                >
+                  {label}
+                </span>
               </>
             )}
           </NavLink>
