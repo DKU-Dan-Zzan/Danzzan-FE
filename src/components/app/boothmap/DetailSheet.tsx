@@ -105,6 +105,23 @@ export default function DetailSheet({
     }
   }, [selectedItem])
 
+  useEffect(() => {
+    if (!viewerImage) {
+      return
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setViewerImage(null)
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [viewerImage])
+
   if (!selectedItem) {
     return (
       <div className="py-6 text-center text-sm font-semibold text-[var(--boothmap-text-muted)]">
@@ -188,12 +205,19 @@ export default function DetailSheet({
 
           {boothDetail.imageUrl && (
             <div className="mt-3 rounded-xl bg-[var(--boothmap-surface-soft)] p-2">
-              <img
-                src={boothDetail.imageUrl}
-                loading="lazy"
+              <button
+                type="button"
                 onClick={() => setViewerImage(boothDetail.imageUrl)}
-                className="mx-auto max-h-[320px] w-auto max-w-full rounded-xl object-contain cursor-pointer"
-              />
+                aria-label="부스 이미지 확대 보기"
+                className="mx-auto block max-h-[320px] w-auto max-w-full cursor-pointer rounded-xl"
+              >
+                <img
+                  src={boothDetail.imageUrl}
+                  alt={`${boothDetail.name} 이미지`}
+                  loading="lazy"
+                  className="mx-auto max-h-[320px] w-auto max-w-full rounded-xl object-contain"
+                />
+              </button>
             </div>
           )}
 
@@ -204,11 +228,15 @@ export default function DetailSheet({
 
         {viewerImage && (
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="이미지 확대 보기"
             className="fixed inset-0 z-[999] flex items-center justify-center bg-black/90"
             onClick={() => setViewerImage(null)}
           >
             <img
               src={viewerImage}
+              alt="확대 이미지"
               className="max-h-[90%] max-w-[90%] rounded-xl"
             />
           </div>
@@ -267,12 +295,19 @@ export default function DetailSheet({
                     key={i}
                     className="w-[85%] flex-shrink-0 snap-start"
                   >
-                    <img
-                      src={img}
-                      loading="lazy"
+                    <button
+                      type="button"
                       onClick={() => setViewerImage(img)}
-                      className="w-full rounded-xl object-contain cursor-pointer"
-                    />
+                      aria-label={`주점 이미지 ${i + 1} 확대 보기`}
+                      className="block w-full cursor-pointer rounded-xl"
+                    >
+                      <img
+                        src={img}
+                        alt={`${pubDetail.name} 이미지 ${i + 1}`}
+                        loading="lazy"
+                        className="w-full rounded-xl object-contain"
+                      />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -322,11 +357,15 @@ export default function DetailSheet({
         {/* Fullscreen viewer */}
         {viewerImage && (
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="이미지 확대 보기"
             className="fixed inset-0 z-[999] flex items-center justify-center bg-black/90"
             onClick={() => setViewerImage(null)}
           >
             <img
               src={viewerImage}
+              alt="확대 이미지"
               className="max-h-[90%] max-w-[90%] rounded-xl"
             />
           </div>

@@ -19,6 +19,8 @@ export default function MapFloatingToggle({
       <button
         type="button"
         onClick={() => onChange("2D")}
+        aria-label="2D 지도 보기"
+        aria-pressed={mode === "2D"}
         className={[
           "rounded-full px-3 py-2 text-[11px] font-extrabold transition",
           mode === "2D" ? MODE_BUTTON_ACTIVE_CLASS : MODE_BUTTON_INACTIVE_CLASS,
@@ -30,6 +32,8 @@ export default function MapFloatingToggle({
       <button
         type="button"
         onClick={() => onChange("3D")}
+        aria-label="3D 지도 보기"
+        aria-pressed={mode === "3D"}
         className={[
           "rounded-full px-2.5 py-1.5 text-[10px] font-extrabold transition",
           mode === "3D" ? MODE_BUTTON_ACTIVE_CLASS : MODE_BUTTON_INACTIVE_CLASS,
