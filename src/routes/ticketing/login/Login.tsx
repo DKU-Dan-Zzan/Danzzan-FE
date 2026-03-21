@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { CircleAlert, GraduationCap } from "lucide-react";
+import { HttpError } from "@/api/ticketing/httpClient";
 import { Button } from "@/components/common/ui/button";
 import { Input } from "@/components/common/ui/input";
 import { Label } from "@/components/common/ui/label";
@@ -29,7 +30,18 @@ export default function Login() {
       await login({ studentId, password }, "student");
       navigate(redirect);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "로그인에 실패했습니다.");
+      if (err instanceof HttpError) {
+        const payload = err.payload as { error?: string; message?: string } | undefined;
+        const message = payload?.error ?? payload?.message;
+
+        if (err.status === 401) {
+          setError(message || "학번 또는 비밀번호가 올바르지 않습니다.");
+        } else {
+          setError(message || "로그인에 실패했습니다.");
+        }
+      } else {
+        setError(err instanceof Error ? err.message : "로그인에 실패했습니다.");
+      }
     } finally {
       setSubmitting(false);
     }
