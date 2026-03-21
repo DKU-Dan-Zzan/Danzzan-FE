@@ -171,13 +171,9 @@
   .ticketing-root {
     @apply bg-background text-foreground;
     background-color: var(--bg-base);
+    font-size: var(--font-size);
     font-family: "Pretendard Variable", "Pretendard", "SUIT", "Noto Sans KR",
       system-ui, -apple-system, "Segoe UI", sans-serif;
-  }
-
-  .ticketing-root {
-    background-color: var(--bg-base);
-    font-size: var(--font-size);
   }
 
   .ticketing-root h1 {
@@ -220,59 +216,5 @@
     font-size: var(--text-base);
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
-  }
-}
-
-@layer components {
-  .ticketing-dialog-overlay {
-    background-color: var(--admin-dialog-overlay-bg, rgba(15, 23, 42, 0.52));
-  }
-
-  [data-slot="dialog-content"].admin-confirm-dialog {
-    background-color: var(--admin-dialog-bg);
-    border-color: var(--admin-dialog-border);
-    box-shadow: 0 24px 56px var(--admin-dialog-shadow);
-  }
-
-  [data-slot="dialog-content"].admin-confirm-dialog--issue {
-    background-color: var(--admin-dialog-issue-bg);
-    border-color: var(--admin-dialog-issue-border);
-  }
-
-  [data-slot="dialog-content"].admin-confirm-dialog--cancel {
-    background-color: var(--admin-dialog-cancel-bg);
-    border-color: var(--admin-dialog-cancel-border);
-  }
-
-  [data-slot="dialog-title"].admin-confirm-dialog__title--issue {
-    color: var(--admin-dialog-issue-title);
-  }
-
-  [data-slot="dialog-title"].admin-confirm-dialog__title--cancel {
-    color: var(--admin-dialog-cancel-title);
-  }
-
-  [data-slot="dialog-description"].admin-confirm-dialog__description {
-    color: var(--admin-dialog-description-text);
-  }
-
-  [data-slot="button"].admin-confirm-dialog__confirm--issue {
-    border: 1px solid var(--admin-issue-action-border);
-    background-color: var(--admin-issue-action-bg);
-    color: var(--admin-issue-action-text);
-  }
-
-  [data-slot="button"].admin-confirm-dialog__confirm--issue:hover {
-    background-color: var(--admin-issue-action-hover-bg);
-  }
-
-  [data-slot="button"].admin-confirm-dialog__confirm--cancel {
-    border: 1px solid var(--admin-danger-action-border);
-    background-color: var(--admin-danger-action-bg);
-    color: var(--admin-danger-action-text);
-  }
-
-  [data-slot="button"].admin-confirm-dialog__confirm--cancel:hover {
-    background-color: var(--admin-danger-action-hover-bg);
   }
 }

@@ -22,6 +22,7 @@ import {
 import { ArrowLeft, Info } from "lucide-react";
 import { useWristband } from "@/hooks/ticketing/useWristband";
 import type { WristbandAttendee, WristbandStats } from "@/types/ticketing/model/wristband.model";
+import { cn } from "@/components/common/ui/utils";
 
 interface WristbandOperationScreenProps {
   eventId: string;
@@ -175,6 +176,15 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
   };
 
   const isCancelConfirm = confirmAction === "cancel";
+  const confirmDialogContentClass = isCancelConfirm
+    ? "border-[var(--admin-dialog-cancel-border)] bg-[var(--admin-dialog-cancel-bg)] shadow-[0_24px_56px_var(--admin-dialog-shadow)]"
+    : "border-[var(--admin-dialog-issue-border)] bg-[var(--admin-dialog-issue-bg)] shadow-[0_24px_56px_var(--admin-dialog-shadow)]";
+  const confirmDialogTitleClass = isCancelConfirm
+    ? "text-[var(--admin-dialog-cancel-title)]"
+    : "text-[var(--admin-dialog-issue-title)]";
+  const confirmActionButtonClass = isCancelConfirm
+    ? "!border-[var(--admin-danger-action-border)] !bg-[var(--admin-danger-action-bg)] !text-[var(--admin-danger-action-text)] hover:!bg-[var(--admin-danger-action-hover-bg)]"
+    : "border-[var(--admin-issue-action-border)] bg-[var(--admin-issue-action-bg)] text-[var(--admin-issue-action-text)] hover:bg-[var(--admin-issue-action-hover-bg)]";
 
   return (
     <div className="space-y-6">
@@ -444,16 +454,12 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
           }
         }}
       >
-        <DialogContent
-          className={`admin-confirm-dialog ${isCancelConfirm ? "admin-confirm-dialog--cancel" : "admin-confirm-dialog--issue"}`}
-        >
+        <DialogContent className={confirmDialogContentClass}>
           <DialogHeader>
-            <DialogTitle
-              className={isCancelConfirm ? "admin-confirm-dialog__title--cancel" : "admin-confirm-dialog__title--issue"}
-            >
+            <DialogTitle className={confirmDialogTitleClass}>
               {isCancelConfirm ? "팔찌 지급 취소 확인" : "팔찌 지급 확인"}
             </DialogTitle>
-            <DialogDescription className="admin-confirm-dialog__description">
+            <DialogDescription className="text-[var(--admin-dialog-description-text)]">
               {isCancelConfirm
                 ? "해당 학생의 지급 완료 상태를 취소하시겠습니까? 취소 이력은 로그에 남습니다."
                 : "해당 학생에게 팔찌를 지급 처리하시겠습니까?"}
@@ -471,11 +477,7 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
             </Button>
             <Button
               variant={isCancelConfirm ? "destructive" : "default"}
-              className={
-                isCancelConfirm
-                  ? "admin-confirm-dialog__confirm--cancel !border-[var(--admin-danger-action-border)] !bg-[var(--admin-danger-action-bg)] !text-[var(--admin-danger-action-text)] hover:!bg-[var(--admin-danger-action-hover-bg)]"
-                  : "admin-confirm-dialog__confirm--issue"
-              }
+              className={cn(confirmActionButtonClass)}
               onClick={handleConfirmAction}
               disabled={issuing}
             >
