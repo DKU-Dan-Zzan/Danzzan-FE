@@ -55,4 +55,5 @@ function Button({
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- shadcn 패턴으로 variants를 함께 export
 export { Button, buttonVariants };
