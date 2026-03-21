@@ -64,6 +64,20 @@ function RequireAdminAuth() {
   return <Outlet />;
 }
 
+function LegacyMyTicketRedirect() {
+  const location = useLocation();
+
+  return (
+    <Navigate
+      to={{
+        pathname: "/ticket/my-ticket",
+        search: location.search,
+      }}
+      replace
+    />
+  );
+}
+
 export default function TicketingApp() {
   return (
     <div className="ticketing-root">
@@ -76,7 +90,8 @@ export default function TicketingApp() {
           <Route path="signup" element={<Signup />} />
           <Route element={<RequireStudentAuth />}>
             <Route path="ticketing" element={<Ticketing />} />
-            <Route path="myticket" element={<MyTicket />} />
+            <Route path="my-ticket" element={<MyTicket />} />
+            <Route path="myticket" element={<LegacyMyTicketRedirect />} />
           </Route>
         </Route>
 

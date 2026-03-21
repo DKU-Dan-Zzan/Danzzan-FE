@@ -47,6 +47,20 @@ function ProtectedAdminRoute() {
   return <Outlet />;
 }
 
+function LegacyMyTicketRedirect() {
+  const location = useLocation();
+
+  return (
+    <Navigate
+      to={{
+        pathname: "/ticket/my-ticket",
+        search: location.search,
+      }}
+      replace
+    />
+  );
+}
+
 function App() {
   return (
     <Routes>
@@ -77,7 +91,7 @@ function App() {
       <Route path="/signup" element={<Navigate to="/ticket/signup" replace />} />
       <Route path="/reset-password" element={<Navigate to="/ticket/reset-password" replace />} />
       <Route path="/ticketing" element={<Navigate to="/ticket/ticketing" replace />} />
-      <Route path="/myticket" element={<Navigate to="/ticket/myticket" replace />} />
+      <Route path="/myticket" element={<LegacyMyTicketRedirect />} />
     </Routes>
   )
 }

@@ -667,7 +667,7 @@ export default function Ticketing() {
         onOpenTicketingList={() => {
           void openList();
         }}
-        onOpenMyTickets={() => navigate("/ticket/myticket")}
+        onOpenMyTickets={() => navigate("/ticket/my-ticket")}
       />
     );
   }
@@ -756,7 +756,7 @@ export default function Ticketing() {
   if (step === "already") {
     return (
       <ReservationAlreadyPanel
-        onGoMyTickets={() => navigate("/ticket/myticket")}
+        onGoMyTickets={() => navigate("/ticket/my-ticket")}
         onBackToList={() => {
           setActiveEventId(null);
           setActiveEventTitle("");
@@ -770,7 +770,7 @@ export default function Ticketing() {
 
   return (
     <ReservationSuccessPanel
-      onGoMyTickets={() => navigate("/ticket/myticket")}
+      onGoMyTickets={() => navigate("/ticket/my-ticket")}
     />
   );
 }

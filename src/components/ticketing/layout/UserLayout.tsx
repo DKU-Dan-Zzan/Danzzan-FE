@@ -11,7 +11,9 @@ export function UserLayout() {
   const { isAuthenticated, role } = useAuth();
   const isAuthPage = location.pathname === "/ticket/login" || location.pathname === "/ticket/signup";
   const isTicketingPage = location.pathname.startsWith("/ticket/ticketing");
-  const isMyTicketPage = location.pathname.startsWith("/ticket/myticket");
+  const isMyTicketPage =
+    location.pathname.startsWith("/ticket/my-ticket") ||
+    location.pathname.startsWith("/ticket/myticket");
   const showHeader = isAuthenticated && role === "student" && !isAuthPage;
   const pageTitle = "축제 포털";
 

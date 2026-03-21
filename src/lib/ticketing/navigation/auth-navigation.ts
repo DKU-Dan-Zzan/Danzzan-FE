@@ -1,6 +1,6 @@
 import { resolveScopedRedirect } from "@/routes/common/authGuard";
 
-export const MY_TICKET_PATH = "/ticket/myticket";
+export const MY_TICKET_PATH = "/ticket/my-ticket";
 export const TICKETING_DEFAULT_PATH = "/ticket/ticketing";
 
 export const getMyTicketNavigationTarget = (isStudentLoggedIn: boolean) =>

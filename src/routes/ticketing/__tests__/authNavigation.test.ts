@@ -13,11 +13,12 @@ describe("authNavigation", () => {
     );
   });
 
-  it("로그인 학생 내 티켓 클릭 시 myticket 경로를 반환한다", () => {
+  it("로그인 학생 내 티켓 클릭 시 canonical my-ticket 경로를 반환한다", () => {
     expect(getMyTicketNavigationTarget(true)).toBe(MY_TICKET_PATH);
   });
 
   it("허용된 ticket 내부 redirect를 유지한다", () => {
+    expect(resolveTicketingLoginRedirect("/ticket/my-ticket")).toBe("/ticket/my-ticket");
     expect(resolveTicketingLoginRedirect("/ticket/myticket")).toBe("/ticket/myticket");
     expect(resolveTicketingLoginRedirect("/ticket/ticketing?eventId=7")).toBe("/ticket/ticketing?eventId=7");
   });
@@ -25,8 +26,8 @@ describe("authNavigation", () => {
   it("외부/비정상 redirect는 기본 경로로 대체한다", () => {
     expect(resolveTicketingLoginRedirect(null)).toBe(TICKETING_DEFAULT_PATH);
     expect(resolveTicketingLoginRedirect("https://evil.example.com")).toBe(TICKETING_DEFAULT_PATH);
-    expect(resolveTicketingLoginRedirect("https://evil.example.com/ticket/myticket")).toBe(TICKETING_DEFAULT_PATH);
-    expect(resolveTicketingLoginRedirect("//evil.example.com/ticket/myticket")).toBe(TICKETING_DEFAULT_PATH);
+    expect(resolveTicketingLoginRedirect("https://evil.example.com/ticket/my-ticket")).toBe(TICKETING_DEFAULT_PATH);
+    expect(resolveTicketingLoginRedirect("//evil.example.com/ticket/my-ticket")).toBe(TICKETING_DEFAULT_PATH);
     expect(resolveTicketingLoginRedirect("/mypage")).toBe(TICKETING_DEFAULT_PATH);
   });
 
