@@ -8,6 +8,9 @@
     "typecheck": "tsc -b --pretty false",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "lint:structure:report": "node scripts/verify-structure.mjs --mode=report",
+    "lint:structure:changed": "node scripts/verify-structure.mjs --mode=changed",
+    "lint:structure:strict": "node scripts/verify-structure.mjs --mode=strict",
     "test": "vitest run",
     "preview": "vite preview"
   },
