@@ -1,10 +1,9 @@
 import axios from "axios";
-import { getApiBaseUrl } from "@/api/common/baseUrl";
+import { getApiBaseUrl, getTicketingApiBaseUrl } from "@/api/common/baseUrl";
 import { getErrorStatus } from "@/api/common/fetchAuth";
-import { createHttpClient, HttpError } from "@/api/ticketing/httpClient";
+import { createHttpClient, HttpError } from "@/api/common/httpClient";
 import { http } from "@/lib/http";
-import { authStore } from "@/store/ticketing/authStore";
-import { env } from "@/utils/ticketing/env";
+import { authStore } from "@/store/common/authStore";
 
 export type AdGatewayPlacement = "HOME_BOTTOM" | "MY_TICKET" | "WAITING_ROOM_MAIN";
 
@@ -110,7 +109,7 @@ const normalizeAdPayload = (
 
 const getTicketingClient = () =>
   createHttpClient({
-    baseUrl: env.ticketingApiBaseUrl || env.apiBaseUrl || getApiBaseUrl(),
+    baseUrl: getTicketingApiBaseUrl() || getApiBaseUrl(),
     getAccessToken: authStore.getAccessToken,
     refreshAccessToken: authStore.refreshAccessToken,
     clearSession: authStore.clear,

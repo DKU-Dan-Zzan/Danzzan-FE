@@ -1,6 +1,17 @@
 import { http } from "@/lib/http";
 import { adGateway } from "@/api/common/adGateway";
-import type { PageResponse } from "@/api/app/admin/adminApi";
+
+type PageResponse<T> = {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+  numberOfElements: number;
+  empty: boolean;
+};
 
 export type NoticeDto = {
   id: number;

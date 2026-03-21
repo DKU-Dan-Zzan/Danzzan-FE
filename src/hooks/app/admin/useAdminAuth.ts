@@ -1,7 +1,7 @@
 import { useCallback, useSyncExternalStore } from "react";
-import { adminAuthApi } from "@/api/ticketing/adminAuthApi";
-import { authStore } from "@/store/ticketing/authStore";
-import type { AuthSession } from "@/types/ticketing/model/auth.model";
+import { adminAuthApi } from "@/api/app/admin/adminAuthApi";
+import { authStore } from "@/store/common/authStore";
+import type { AuthSession } from "@/types/common/auth.model";
 import { authLogout } from "@/api/app/auth/authApi";
 import { requireAdminRole } from "@/lib/app/admin/admin-auth-session";
 

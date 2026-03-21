@@ -1,5 +1,5 @@
 import { hasRequiredRole, resolveRoleFromAccessToken } from "@/api/common/authCore";
-import { authStore } from "@/store/ticketing/authStore";
+import { authStore } from "@/store/common/authStore";
 
 export const requireAdminRole = (accessToken: string): void => {
   const role = resolveRoleFromAccessToken(accessToken);

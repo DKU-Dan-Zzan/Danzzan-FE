@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useSyncExternalStore } from "react";
 import { authLogout } from "@/api/app/auth/authApi";
-import { authStore } from "@/store/ticketing/authStore";
-import { authApi } from "@/api/ticketing/authApi";
+import { studentProfileApi } from "@/api/app/auth/studentProfileApi";
+import { authStore } from "@/store/common/authStore";
 import { GraduationCap, IdCard, User } from "lucide-react";
 import "./index.css";
 
@@ -38,7 +38,7 @@ function MyPage() {
     let cancelled = false;
     (async () => {
       try {
-        const freshUser = await authApi.me();
+        const freshUser = await studentProfileApi.me();
         if (!freshUser || cancelled) {
           return;
         }
