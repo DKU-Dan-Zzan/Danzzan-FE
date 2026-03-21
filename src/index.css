@@ -269,3 +269,225 @@ body,
 .scrollbar-hide::-webkit-scrollbar {
   display: none;             /* Chrome/Safari */
 }
+
+/* Ticketing styles consolidated from src/routes/ticketing/index.css */
+@custom-variant dark (&:is(.dark *));
+
+.ticketing-root {
+  --font-size: 16px;
+
+  /* Ticketing typography scale tokens */
+  --ticketing-text-button: 0.82rem;
+  --ticketing-text-button-compact: 0.79rem;
+  --ticketing-text-badge: 0.82rem;
+  --ticketing-text-hero-title: 1.2rem;
+  --ticketing-text-hero-description: 0.88rem;
+  --ticketing-text-card-title: 1.12rem;
+  --ticketing-text-card-subtitle: 0.9rem;
+  --ticketing-text-section-title: 0.8rem;
+  --ticketing-text-section-body: 0.82rem;
+  --ticketing-text-section-body-sm: 0.74rem;
+  --ticketing-text-helper: 0.84rem;
+  --ticketing-text-step-title: 0.78rem;
+  --ticketing-text-info-banner-title: 0.85rem;
+  --ticketing-text-info-banner-body: 0.88rem;
+  --ticketing-text-paper-title: 0.87rem;
+  --ticketing-text-queue-label: 0.78rem;
+  --ticketing-text-queue-value: 1.25rem;
+  --ticketing-text-ticket-meta: 0.86rem;
+  --ticketing-text-ticket-footer: 0.7rem;
+  --ticketing-text-watermark: 0.58rem;
+  --ticketing-text-state-title: 1.3rem;
+  --ticketing-text-state-body: 0.82rem;
+  --ticketing-text-overline: 0.7rem;
+  --ticketing-text-header-overline: 0.62rem;
+  --ticketing-text-step-index: 0.7125rem;
+  --ticketing-text-holder-overline: 0.82rem;
+  --ticketing-text-paper-status: 0.82rem;
+  --ticketing-text-paper-label: 0.78rem;
+  --ticketing-text-paper-value: 0.96rem;
+  --ticketing-text-paper-queue: 1.02rem;
+  --ticketing-text-paper-time: 0.86rem;
+  --ticketing-text-reservation-countdown: 1.02rem;
+
+  /*
+   * Color tokens are centralized in src/index.css.
+   * Ticketing keeps only domain typography/spacing tokens here.
+   */
+}
+
+.ticketing-root.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+@theme inline {
+  --color-bg-base: var(--bg-base);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-surface-tint-subtle: var(--surface-tint-subtle);
+  --color-surface-tint: var(--surface-tint);
+  --color-surface-tint-strong: var(--surface-tint-strong);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-base: var(--border-base);
+  --color-border-strong: var(--border-strong);
+  --color-shadow: var(--shadow-color);
+
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-accent-solid: var(--accent);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent-soft);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--status-success);
+  --color-warning: var(--status-warning);
+  --color-danger: var(--status-danger);
+  --color-info: var(--status-info);
+  --color-neutral: var(--status-neutral);
+  --color-status-success: var(--status-success);
+  --color-status-success-bg: var(--status-success-bg);
+  --color-status-success-border: var(--status-success-border);
+  --color-status-success-text: var(--status-success-text);
+  --color-status-warning: var(--status-warning);
+  --color-status-warning-bg: var(--status-warning-bg);
+  --color-status-warning-border: var(--status-warning-border);
+  --color-status-warning-text: var(--status-warning-text);
+  --color-status-danger: var(--status-danger);
+  --color-status-danger-bg: var(--status-danger-bg);
+  --color-status-danger-border: var(--status-danger-border);
+  --color-status-danger-text: var(--status-danger-text);
+  --color-status-info: var(--status-info);
+  --color-status-info-bg: var(--status-info-bg);
+  --color-status-info-border: var(--status-info-border);
+  --color-status-info-text: var(--status-info-text);
+  --color-status-neutral: var(--status-neutral);
+  --color-status-neutral-bg: var(--status-neutral-bg);
+  --color-status-neutral-border: var(--status-neutral-border);
+  --color-status-neutral-text: var(--status-neutral-text);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  .ticketing-root :where(button, input, textarea, select, [data-slot]) {
+    @apply border-border outline-ring/50;
+  }
+
+  .ticketing-root {
+    @apply bg-background text-foreground;
+    background-color: var(--bg-base);
+    font-size: var(--font-size);
+    font-family: "Pretendard Variable", "Pretendard", "SUIT", "Noto Sans KR",
+      system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  .ticketing-root h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  .ticketing-root h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  .ticketing-root h3 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  .ticketing-root h4 {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  .ticketing-root label {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  .ticketing-root button {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  .ticketing-root input {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
+  }
+}
