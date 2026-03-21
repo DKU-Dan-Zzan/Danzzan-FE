@@ -104,7 +104,16 @@ export const wristbandMock = {
     const scoped = getAttendeesByEvent(eventId);
     const found = scoped.find((a) => a.studentId === studentId.trim());
     if (!found) return null;
-    const { eventId: _, ...attendee } = found;
+    const attendee: WristbandAttendee = {
+      ticketId: found.ticketId,
+      studentId: found.studentId,
+      name: found.name,
+      college: found.college,
+      department: found.department,
+      hasWristband: found.hasWristband,
+      issuedAt: found.issuedAt,
+      issuerAdminName: found.issuerAdminName,
+    };
     return attendee;
   },
   issueWristband: (keyword: string, eventId: string): void => {

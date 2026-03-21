@@ -1,6 +1,6 @@
 // 드래그로 높이를 조절하고(PEEK/HALF/FULL) 스냅되는 BottomSheet 컴포넌트
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SheetMode, SheetSnap } from "../types/boothmap.types";
 
 type SnapPx = { PEEK: number; HALF: number; FULL: number };
@@ -36,19 +36,25 @@ export default function BottomSheet({
   bottomOffset?: number;
   frameWidth?: number;
 }) {
-  const buildSnaps = () => {
+  const buildSnaps = useCallback(() => {
     const usable = window.innerHeight - bottomOffset;
     return {
       PEEK: 40,
       HALF: Math.round(usable * 0.48),
       FULL: Math.round(usable * 0.82),
     } satisfies SnapPx;
-  };
+  }, [bottomOffset]);
 
-  const snaps = useMemo<SnapPx>(() => buildSnaps(), [bottomOffset]);
+  const snaps = useMemo<SnapPx>(() => buildSnaps(), [buildSnaps]);
   const [height, setHeight] = useState<number>(snaps[snap]);
+  const [isDragging, setIsDragging] = useState(false);
 
-  useEffect(() => setHeight(snaps[snap]), [snap, snaps]);
+  useEffect(() => {
+    const rafId = requestAnimationFrame(() => {
+      setHeight(snaps[snap]);
+    });
+    return () => cancelAnimationFrame(rafId);
+  }, [snap, snaps]);
 
   useEffect(() => {
     const onResize = () => {
@@ -57,8 +63,7 @@ export default function BottomSheet({
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [snap, bottomOffset]);
+  }, [buildSnaps, snap]);
 
   const isDraggingRef = useRef(false);
   const startYRef = useRef(0);
@@ -72,6 +77,7 @@ export default function BottomSheet({
 
   const onPointerDown = (e: React.PointerEvent) => {
     isDraggingRef.current = true;
+    setIsDragging(true);
     startYRef.current = e.clientY;
     startHeightRef.current = height;
     lastYRef.current = e.clientY;
@@ -101,6 +107,7 @@ export default function BottomSheet({
   const endDrag = () => {
     if (!isDraggingRef.current) return;
     isDraggingRef.current = false;
+    setIsDragging(false);
 
     const v = velocityRef.current;
     const currentSnap = nearestSnap(height, snaps);
@@ -133,7 +140,7 @@ export default function BottomSheet({
         width: `min(${frameWidth}px, 100vw)`,
         bottom: bottomOffset,
         height,
-        transition: isDraggingRef.current ? "none" : "height 180ms ease",
+        transition: isDragging ? "none" : "height 180ms ease",
       }}
     >
       {/* handle */}

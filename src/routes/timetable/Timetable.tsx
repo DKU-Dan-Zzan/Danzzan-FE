@@ -113,8 +113,9 @@ export default function Timetable() {
         setItems([])
         setLoadError("공연 정보를 불러오지 못했습니다.")
       } finally {
-        if (!mounted) return
-        setIsLoading(false)
+        if (mounted) {
+          setIsLoading(false)
+        }
       }
     }
 
@@ -144,8 +145,9 @@ export default function Timetable() {
         setContentImages([])
         setImageLoadError("콘텐츠 이미지를 불러오지 못했습니다.")
       } finally {
-        if (!mounted) return
-        setIsImageLoading(false)
+        if (mounted) {
+          setIsImageLoading(false)
+        }
       }
     }
 

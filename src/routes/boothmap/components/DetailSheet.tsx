@@ -92,8 +92,9 @@ export default function DetailSheet({
         if (!isMounted) return
         setIsError(true)
       } finally {
-        if (!isMounted) return
-        setIsLoading(false)
+        if (isMounted) {
+          setIsLoading(false)
+        }
       }
     }
 

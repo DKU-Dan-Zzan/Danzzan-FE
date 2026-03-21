@@ -29,7 +29,7 @@ function formatDate(dateString: string) {
 
 function Notice() {
   const [keyword, setKeyword] = useState("");
-  const [category, setCategory] = useState<CategoryKey>("ALL");
+  const [category] = useState<CategoryKey>("ALL");
   const [pageState, setPageState] = useState<NoticePageState>({
     notices: [],
     page: 0,

@@ -1,10 +1,11 @@
 // 카카오맵 JavaScript SDK를 한 번만 로드하고 준비 상태를 반환하는 훅
 
 import { useEffect, useState } from "react"
+import type { KakaoGlobal } from "@/types/kakao-map"
 
 declare global {
   interface Window {
-    kakao: any
+    kakao: KakaoGlobal
   }
 }
 

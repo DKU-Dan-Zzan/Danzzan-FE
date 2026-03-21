@@ -19,14 +19,20 @@ import {
   type AdminMapCollege,
   updateBoothLocation,
   updateCollegeLocation,
-  updateActiveOperationDate,
 } from "../../api/adminMapApi";
 import useKakaoMapLoader from "../../hooks/useKakaoMapLoader";
 import { AdminShell } from "@/components/layout/AdminShell";
+import type {
+  KakaoCustomOverlay,
+  KakaoGlobal,
+  KakaoMap,
+  KakaoMarker,
+  KakaoMouseEvent,
+} from "@/types/kakao-map";
 
 declare global {
   interface Window {
-    kakao: any;
+    kakao: KakaoGlobal;
   }
 }
 
@@ -68,7 +74,7 @@ function createBoothMarkerSvg(type: string | undefined, selected: boolean) {
 }
 
 function createMarkerImage(
-  kakao: any,
+  kakao: KakaoGlobal,
   options: {
     kind: "booth" | "college";
     boothType?: string;
@@ -154,12 +160,20 @@ type SelectedItem =
 
 export default function AdminMap() {
   const navigate = useNavigate();
-  const { isLoaded: isKakaoLoaded, isError: isKakaoError } = useKakaoMapLoader();
+  const { isLoaded: isKakaoLoaded } = useKakaoMapLoader();
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<any>(null);
-  const mapClickHandlerRef = useRef<((mouseEvent: any) => void) | null>(null);
-  const markerRefs = useRef<Array<{ marker: any; overlay: any | null; dotOverlay: any }>>([]);
+  const mapRef = useRef<KakaoMap | null>(null);
+  const mapClickHandlerRef = useRef<((mouseEvent: KakaoMouseEvent) => void) | null>(
+    null,
+  );
+  const markerRefs = useRef<
+    Array<{
+      marker: KakaoMarker;
+      overlay: KakaoCustomOverlay | null;
+      dotOverlay: KakaoCustomOverlay;
+    }>
+  >([]);
 
   const [editorMode, setEditorMode] = useState<EditorMode>("idle");
   const [selectedItem, setSelectedItem] = useState<SelectedItem>(null);
@@ -322,7 +336,7 @@ export default function AdminMap() {
       kakao.maps.event.removeListener(map, "click", mapClickHandlerRef.current);
     }
 
-    const handleMapClick = (mouseEvent: any) => {
+    const handleMapClick = (mouseEvent: KakaoMouseEvent) => {
       const latlng = mouseEvent.latLng;
       const lat = latlng.getLat();
       const lng = latlng.getLng();
@@ -609,7 +623,6 @@ export default function AdminMap() {
       setSaving(true);
       setGlobalError(null);
 
-      // await updateActiveOperationDate(date);
       setSelectedDate(date);
       setSelectedItem(null);
       setEditorMode("idle");

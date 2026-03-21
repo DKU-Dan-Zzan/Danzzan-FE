@@ -832,6 +832,7 @@ export default function Mapbox3DView({
         mapRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- map 인스턴스 초기화/해제는 마운트 1회로 고정
   }, []);
 
   useEffect(() => {
@@ -922,6 +923,7 @@ export default function Mapbox3DView({
     return () => {
       clearZoneMarkers();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- zone marker 갱신은 필터/zone 변경 시점만 추적
   }, [
     primaryFilter,
     pubZone,
@@ -1035,6 +1037,7 @@ export default function Mapbox3DView({
         selectedMapItem?.kind === "college" ? "HALF" : sheetSnap,
       targetZoom: FOCUSED_ZOOM,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 선택 overlay 전환은 선택 데이터 변경 시점 기준으로 유지
   }, [selectedMapItem, sheetSnap, boothMap, collegeMap]);
 
   if (!mapboxgl.accessToken) {

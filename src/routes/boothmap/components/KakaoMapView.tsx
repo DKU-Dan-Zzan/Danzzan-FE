@@ -17,10 +17,16 @@ import type {
   SheetSnap,
 } from "../types/boothmap.types"
 import { MAP_ZONES } from "../constants/mapZones";
+import type {
+  KakaoCustomOverlay,
+  KakaoGlobal,
+  KakaoMap,
+  KakaoPolygon,
+} from "@/types/kakao-map"
 
 declare global {
   interface Window {
-    kakao: any
+    kakao: KakaoGlobal
   }
 }
 
@@ -52,7 +58,7 @@ const DANKOOK_BOUNDS = {
 type MarkerType = BoothmapMarkerType
 
 type OverlayRecord = {
-  overlay: any
+  overlay: KakaoCustomOverlay
   kind: "booth" | "college"
   id: number
   lat: number
@@ -127,7 +133,7 @@ export default function KakaoMapView({
   onPrimaryFilterChange,
 }: Props) {
   const mapRef = useRef<HTMLDivElement | null>(null)
-  const mapInstanceRef = useRef<any>(null)
+  const mapInstanceRef = useRef<KakaoMap | null>(null)
   const isInitialBoundsAppliedRef = useRef(false)
   const lastViewportRef = useRef<MapViewport>(viewport)
   const isClampingBoundsRef = useRef(false)
@@ -135,7 +141,7 @@ export default function KakaoMapView({
   // 전체 오버레이를 배열 대신 Map으로 관리
   const overlayMapRef = useRef<Map<string, OverlayRecord>>(new Map())
 
-  const zoneOverlaysRef = useRef<any[]>([])
+  const zoneOverlaysRef = useRef<Array<KakaoCustomOverlay | KakaoPolygon>>([])
   const prevPrimaryFilterRef = useRef<PrimaryFilter>(primaryFilter)
 
   // 이름 말풍선
@@ -157,6 +163,30 @@ export default function KakaoMapView({
     colleges.forEach((college) => map.set(college.id, college))
     return map
   }, [colleges])
+
+  const clampLatLng = (lat: number, lng: number) => ({
+    lat: Math.min(DANKOOK_BOUNDS.north, Math.max(DANKOOK_BOUNDS.south, lat)),
+    lng: Math.min(DANKOOK_BOUNDS.east, Math.max(DANKOOK_BOUNDS.west, lng)),
+  })
+
+  function clampMapCenter() {
+    const { kakao } = window
+    const map = mapInstanceRef.current
+    if (!map || !kakao || isClampingBoundsRef.current) return false
+
+    const center = map.getCenter()
+    const clamped = clampLatLng(center.getLat(), center.getLng())
+    const isOutOfBounds =
+      Math.abs(clamped.lat - center.getLat()) > 0.000001 ||
+      Math.abs(clamped.lng - center.getLng()) > 0.000001
+
+    if (!isOutOfBounds) return false
+
+    isClampingBoundsRef.current = true
+    map.setCenter(new kakao.maps.LatLng(clamped.lat, clamped.lng))
+    isClampingBoundsRef.current = false
+    return true
+  }
 
   // 지도 최초 생성
   useEffect(() => {
@@ -205,6 +235,7 @@ export default function KakaoMapView({
 
     mapInstanceRef.current = map
     isInitialBoundsAppliedRef.current = true
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 지도 idle 핸들러는 초기 마운트 시점 함수 캡처를 유지
   }, [isLoaded, onViewportChange, viewport])
 
   useEffect(() => {
@@ -233,37 +264,6 @@ export default function KakaoMapView({
 
     lastViewportRef.current = viewport
   }, [viewport])
-
-  const clearAllOverlays = () => {
-    overlayMapRef.current.forEach(({ overlay }) => {
-      overlay.setMap(null)
-    })
-    overlayMapRef.current.clear()
-  }
-
-  const clampLatLng = (lat: number, lng: number) => ({
-    lat: Math.min(DANKOOK_BOUNDS.north, Math.max(DANKOOK_BOUNDS.south, lat)),
-    lng: Math.min(DANKOOK_BOUNDS.east, Math.max(DANKOOK_BOUNDS.west, lng)),
-  })
-
-  const clampMapCenter = () => {
-    const { kakao } = window
-    const map = mapInstanceRef.current
-    if (!map || !kakao || isClampingBoundsRef.current) return false
-
-    const center = map.getCenter()
-    const clamped = clampLatLng(center.getLat(), center.getLng())
-    const isOutOfBounds =
-      Math.abs(clamped.lat - center.getLat()) > 0.000001 ||
-      Math.abs(clamped.lng - center.getLng()) > 0.000001
-
-    if (!isOutOfBounds) return false
-
-    isClampingBoundsRef.current = true
-    map.setCenter(new kakao.maps.LatLng(clamped.lat, clamped.lng))
-    isClampingBoundsRef.current = false
-    return true
-  }
 
   // offset 이동 함수
   const panToWithSheetOffset = ({
@@ -493,14 +493,12 @@ export default function KakaoMapView({
   }
 
   const createZoneMarkerRecord = ({
-    id,
     lat,
     lng,
     label,
     type,
     onClick,
   }: {
-    id: string
     lat: number
     lng: number
     label: string
@@ -607,9 +605,6 @@ export default function KakaoMapView({
 
   const pubZone = MAP_ZONES.find((zone) => zone.type === "PUB") ?? null
   const foodTruckZone = MAP_ZONES.find((zone) => zone.type === "FOOD_TRUCK") ?? null
-
-  const pubCount = colleges.length
-  const foodTruckCount = booths.filter((booth) => booth.type === "FOOD_TRUCK").length
 
   const shouldShowPubZoneSummary = primaryFilter === "ALL" && pubZone
   const shouldShowFoodTruckZoneSummary = primaryFilter === "ALL" && foodTruckZone
@@ -744,6 +739,7 @@ export default function KakaoMapView({
 
       isInitialBoundsAppliedRef.current = true
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- overlay 재구성은 현재 계산된 visibleItems 기준으로만 동작
   }, [
     isLoaded,
     visibleItems,
@@ -808,6 +804,7 @@ export default function KakaoMapView({
     }
 
     prevSelectedKeyRef.current = nextKey
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 선택 상태 effect는 현재 선택 key 전이만 추적
   }, [isLoaded, selectedMapItem, boothMap, collegeMap, sheetSnap, onClickBooth, onClickCollege, visibleItems])
 
   useEffect(() => {
@@ -827,7 +824,6 @@ export default function KakaoMapView({
 
       pubZone.markers.forEach((marker) => {
         createZoneMarkerRecord({
-          id: marker.id,
           lat: marker.lat,
           lng: marker.lng,
           label: "주점 구역",
@@ -849,7 +845,6 @@ export default function KakaoMapView({
 
       foodTruckZone.markers.forEach((marker) => {
         createZoneMarkerRecord({
-          id: marker.id,
           lat: marker.lat,
           lng: marker.lng,
           label: "푸드트럭 구역",
@@ -884,6 +879,7 @@ export default function KakaoMapView({
     return () => {
       clearZoneOverlays()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- zone overlay는 filter 변화만 반영하고 기존 핸들러 참조를 유지
   }, [
     isLoaded,
     primaryFilter,

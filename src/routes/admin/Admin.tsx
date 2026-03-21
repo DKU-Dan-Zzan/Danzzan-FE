@@ -5,7 +5,6 @@ import {
   ArrowDown,
   ArrowUp,
   Bell,
-  ImageIcon,
   LogOut,
   Megaphone,
   Pencil,
@@ -24,10 +23,8 @@ import {
   getAdminAdImageUpload,
   getAdminNotices,
   getEmergencyAdminNotice,
-  deleteAdminAd,
   setAdminAdsActiveByPlacement,
   type AdvertisementPlacement,
-  type AdvertisementResponse,
   type NoticeStatusFilter,
   type NoticeResponse,
   createAdminAd,
@@ -90,7 +87,6 @@ function Admin() {
   const [pinReorderList, setPinReorderList] = useState<NoticeResponse[]>([]);
   const [pinSaving, setPinSaving] = useState(false);
   // 광고
-  const [ads, setAds] = useState<AdvertisementResponse[]>([]);
   const [adLoading, setAdLoading] = useState(false);
   const [editingAd, setEditingAd] = useState<AdFormState | null>(null);
 
@@ -456,23 +452,6 @@ function Admin() {
     } finally {
       setPinSaving(false);
     }
-  };
-
-  const openNewAd = () => {
-    setEditingAd({
-      title: "",
-      imageUrl: "",
-      placement: "HOME_BOTTOM",
-    });
-  };
-
-  const openEditAd = (ad: AdvertisementResponse) => {
-    setEditingAd({
-      id: ad.id,
-      title: ad.title,
-      imageUrl: ad.imageUrl,
-      placement: ad.placement as AdvertisementPlacement,
-    });
   };
 
   const handleSubmitAd = async (event: FormEvent<HTMLFormElement>) => {
@@ -1142,7 +1121,7 @@ function Admin() {
                   </div>
                   {editingNotice.images.length > 0 && (
                     <div className="mt-4 grid w-full max-w-sm grid-cols-3 gap-2">
-                      {editingNotice.images.map((url, index) => {
+                      {editingNotice.images.map((url) => {
                         const isThumbnail =
                           (editingNotice.thumbnailImageUrl || editingNotice.images[0]) === url;
                         return (
