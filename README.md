@@ -65,6 +65,7 @@ src/
 상세 구조/규칙 문서는 아래를 참고하세요.
 
 - `docs/architecture/frontend-structure-conventions.md`
+- `docs/architecture/server-state-standard.md`
 
 ## 아키텍처 규칙 (요약)
 
