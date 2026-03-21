@@ -40,7 +40,7 @@
   - `src/utils/app/**`
   - `src/components/app/**`
 - 기존 경로는 bridge(`@deprecated`)를 유지한다.
-- bridge 제거는 G4에서 일괄 수행한다(이번 단계 제거 금지).
+- bridge 제거는 G4에서 일괄 수행한다.
 
 ### 3.6 G3 적용 상태 (2026-03-21)
 - boothmap 전역 클래스 의존 제거:
@@ -48,6 +48,16 @@
   - `.boothmap-mode-toggle-button` -> 컴포넌트 내부 Tailwind 조건부 클래스로 치환
 - `.boothmap-name-popup*` selector는 사용처 부재를 확인하고 `src/index.css`에서 제거.
 - `src/routes/notice/Notice.tsx`의 raw hex class를 semantic Tailwind 클래스(`text-blue-600`, `border-gray-200` 등)로 1차 치환.
+
+### 3.7 G4 적용 상태 (2026-03-21)
+- G2에서 도입했던 일반앱 bridge 소비처 import를 canonical 경로로 0화.
+- bridge 파일 35개 제거 완료.
+- dead path 제거:
+  - `src/routes/home/components`
+  - `src/routes/boothmap/components`
+  - `src/routes/boothmap/constants`
+  - `src/routes/boothmap/types`
+  - `src/routes/timetable/components`
 
 ## 4) 폴더 배치 규칙
 일반 앱과 ticketing은 레이어 경계를 유지한 채 공존한다.
@@ -63,17 +73,7 @@ G2에서 적용한 canonical 경로(일반앱):
 - Utils: `src/utils/app/boothmap/**`, `src/utils/app/timetable.ts`
 - Components: `src/components/app/{home,boothmap,timetable}/**`
 
-G2 bridge 유지 경로(제거 예정: G4):
-- `src/api/*.ts` (일반앱 엔드포인트 모듈)
-- `src/hooks/useAdminAuth.ts`, `src/hooks/useKakaoMapLoader.ts`
-- `src/types/kakao-map.ts`
-- `src/utils/timetable.ts`
-- `src/routes/home/components/**`
-- `src/routes/boothmap/components/**`
-- `src/routes/timetable/components/**`
-- `src/routes/boothmap/types/boothmap.types.ts`
-- `src/routes/timetable/timetable.types.ts`
-- `src/routes/boothmap/constants/{mapZones,boothmapTheme}.ts`
+G2 bridge 경로는 G4에서 모두 제거 완료.
 
 ## 5) 레이어 경계(import) 규칙
 아래 규칙은 금지 규칙이며, 위반 시 게이트를 실패 처리한다.
@@ -135,7 +135,7 @@ allowlist 파일: `config/structure-allowlist.json`
 - G0: changed-only 게이트를 PR에 적용한다.
   - 변경 파일에 대해서만 구조/레이어/스타일 신규 위반을 차단한다.
 - G1~G3: 위반 밀도가 높은 영역부터 순차 치환/정리한다.
-- G4~G5: allowlist 축소 후 strict 모드 전환 준비.
+- G4~G5: bridge 제거 완료 상태에서 allowlist 축소 후 strict 모드 전환 준비.
 - strict 전체 강제는 기존 위반 정리 후 활성화한다.
 
 ## 9) G1~G5 연계 계획
