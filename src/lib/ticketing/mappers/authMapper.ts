@@ -31,9 +31,31 @@ const mapAuthTokens = (dto: AuthLoginResponseDto): AuthTokens => {
   };
 };
 
-export const mapAuthLoginResponse = (dto: AuthLoginResponseDto): AuthSession => {
+type ApiEnvelope<T> = {
+  data?: T | null;
+} & Record<string, unknown>;
+
+const unwrapAuthLoginDto = (
+  dto: AuthLoginResponseDto | ApiEnvelope<AuthLoginResponseDto>,
+): AuthLoginResponseDto => {
+  if (!dto || typeof dto !== "object") {
+    return {};
+  }
+
+  const data = (dto as ApiEnvelope<AuthLoginResponseDto>).data;
+  if (data && typeof data === "object") {
+    return data;
+  }
+
+  return dto as AuthLoginResponseDto;
+};
+
+export const mapAuthLoginResponse = (
+  dto: AuthLoginResponseDto | ApiEnvelope<AuthLoginResponseDto>,
+): AuthSession => {
+  const normalized = unwrapAuthLoginDto(dto);
   return {
-    tokens: mapAuthTokens(dto),
-    user: mapAuthUserDto(dto.user),
+    tokens: mapAuthTokens(normalized),
+    user: mapAuthUserDto(normalized.user),
   };
 };
