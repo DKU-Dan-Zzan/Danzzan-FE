@@ -6,7 +6,13 @@ const resolvedApiBaseUrl = resolveApiBaseUrl({
   legacy: import.meta.env.VITE_API_URL,
   backendTarget,
 });
+const resolvedTicketingApiBaseUrl =
+  import.meta.env.VITE_TICKETING_API_BASE_URL?.trim() || resolvedApiBaseUrl;
 
 export const getApiBaseUrl = (): string => {
   return resolvedApiBaseUrl;
+};
+
+export const getTicketingApiBaseUrl = (): string => {
+  return resolvedTicketingApiBaseUrl;
 };
