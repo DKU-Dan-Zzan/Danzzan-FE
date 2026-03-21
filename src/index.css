@@ -195,16 +195,6 @@
   --app-header-ticket-btn-shadow-hover:
     inset 0 1px 0 rgba(255, 255, 255, 0.98),
     0 16px 24px -16px rgba(33, 66, 171, 0.42);
-  --boothmap-chip-active-bg: var(--brand-main);
-  --boothmap-chip-active-border: var(--brand-main);
-  --boothmap-chip-active-text: var(--text-on-accent);
-  --boothmap-chip-inactive-bg: #ffffff;
-  --boothmap-chip-inactive-border: #e5e7eb;
-  --boothmap-chip-inactive-text: #6b7280;
-  --boothmap-toggle-active-bg: var(--brand-main);
-  --boothmap-toggle-active-text: var(--text-on-accent);
-  --boothmap-toggle-inactive-text: #6b7280;
-
   /* Timetable semantic tokens */
   --timetable-tab-inactive: #8f9bb4;
   --timetable-empty-text: #8f9bb4;
@@ -238,42 +228,4 @@ body,
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;             /* Chrome/Safari */
-}
-
-.boothmap-chip {
-  border: 1px solid var(--boothmap-chip-inactive-border);
-  background-color: var(--boothmap-chip-inactive-bg);
-  color: var(--boothmap-chip-inactive-text);
-}
-
-.boothmap-chip.is-active {
-  border-color: var(--boothmap-chip-active-border);
-  background-color: var(--boothmap-chip-active-bg);
-  color: var(--boothmap-chip-active-text);
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.12);
-}
-
-.boothmap-mode-toggle-button {
-  color: var(--boothmap-toggle-inactive-text);
-}
-
-.boothmap-mode-toggle-button.is-active {
-  background-color: var(--boothmap-toggle-active-bg);
-  color: var(--boothmap-toggle-active-text);
-}
-
-/* 부스맵 Mapbox 기본 팝업 껍데기 제거 */
-.boothmap-name-popup .mapboxgl-popup-content {
-  background: transparent;
-  box-shadow: none;
-  padding: 0;
-  border-radius: 0;
-}
-
-.boothmap-name-popup .mapboxgl-popup-tip {
-  border-top-color: rgba(255, 255, 255, 0.96);
-}
-
-.boothmap-name-popup.mapboxgl-popup {
-  z-index: 30;
 }

@@ -42,6 +42,13 @@
 - 기존 경로는 bridge(`@deprecated`)를 유지한다.
 - bridge 제거는 G4에서 일괄 수행한다(이번 단계 제거 금지).
 
+### 3.6 G3 적용 상태 (2026-03-21)
+- boothmap 전역 클래스 의존 제거:
+  - `.boothmap-chip` -> 컴포넌트 내부 Tailwind 조건부 클래스로 치환
+  - `.boothmap-mode-toggle-button` -> 컴포넌트 내부 Tailwind 조건부 클래스로 치환
+- `.boothmap-name-popup*` selector는 사용처 부재를 확인하고 `src/index.css`에서 제거.
+- `src/routes/notice/Notice.tsx`의 raw hex class를 semantic Tailwind 클래스(`text-blue-600`, `border-gray-200` 등)로 1차 치환.
+
 ## 4) 폴더 배치 규칙
 일반 앱과 ticketing은 레이어 경계를 유지한 채 공존한다.
 
@@ -100,14 +107,14 @@ G2 bridge 유지 경로(제거 예정: G4):
 - 신규 raw hex 추가 금지(토큰 경유만 허용)
 
 ### 6.3 현재 기준선(참고)
-- `src/index.css` 전역 클래스 5종:
+- `src/index.css` 전역 클래스 2종:
   - `font-cute`
   - `scrollbar-hide`
+- 제거 완료:
   - `boothmap-chip`
   - `boothmap-mode-toggle-button`
-  - `boothmap-name-popup*` (제거 후보)
-- 즉시 제거 후보 selector: `boothmap-name-popup` 계열 3개 selector
-- Tailwind 우선 치환 대상: `boothmap-chip`, `boothmap-mode-toggle-button`
+  - `boothmap-name-popup*`
+- 잔여 raw hex 누적은 G3 이후에도 단계적으로 축소한다(특히 `index.css`, `src/routes/ticketing/index.css`).
 
 ## 7) 예외(allowlist) 정책
 allowlist 파일: `config/structure-allowlist.json`

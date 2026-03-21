@@ -22,27 +22,6 @@
       "expiresAt": "2026-12-31"
     },
     {
-      "ruleId": "STYLE_NO_NEW_GLOBAL_SELECTOR",
-      "target": ".boothmap-chip",
-      "reason": "G3 Tailwind 치환 우선 대상, 단기 유예",
-      "owner": "fe-platform",
-      "expiresAt": "2026-05-31"
-    },
-    {
-      "ruleId": "STYLE_NO_NEW_GLOBAL_SELECTOR",
-      "target": ".boothmap-mode-toggle-button",
-      "reason": "G3 Tailwind 치환 우선 대상, 단기 유예",
-      "owner": "fe-platform",
-      "expiresAt": "2026-05-31"
-    },
-    {
-      "ruleId": "STYLE_NO_NEW_GLOBAL_SELECTOR",
-      "target": ".boothmap-name-popup*",
-      "reason": "즉시 제거 후보지만 회귀 방지를 위한 초단기 유예",
-      "owner": "fe-platform",
-      "expiresAt": "2026-04-15"
-    },
-    {
       "ruleId": "STYLE_NO_NEW_RAW_HEX",
       "target": "src/components/app/boothmap/KakaoMapView.tsx",
       "reason": "Map SDK 렌더링 제약으로 인한 런타임 색상 지정 최소 허용",
