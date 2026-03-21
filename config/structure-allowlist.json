@@ -48,6 +48,13 @@
       "reason": "지도 SDK marker theme 상수의 최소 허용",
       "owner": "fe-platform",
       "expiresAt": "2026-06-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css",
+      "reason": "전역 디자인 토큰 루트 변수의 레거시 색상값 유지",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
     }
   ]
 }

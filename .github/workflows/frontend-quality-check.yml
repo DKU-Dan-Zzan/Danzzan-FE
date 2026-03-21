@@ -34,6 +34,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Structure Report
+        run: npm run lint:structure:report
+
       - name: Typecheck
         run: npm run typecheck
 
