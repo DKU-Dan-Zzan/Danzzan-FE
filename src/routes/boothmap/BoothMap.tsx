@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import {
+  Suspense,
+  lazy,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import type {
   Booth,
   College,
@@ -20,7 +27,6 @@ import BoothList from "@/components/app/boothmap/BoothList";
 import PubList from "@/components/app/boothmap/PubList";
 import DetailSheet from "@/components/app/boothmap/DetailSheet";
 import MapFloatingToggle from "@/components/app/boothmap/MapFloatingToggle";
-import Mapbox3DView from "@/components/app/boothmap/Mapbox3DView";
 import FestivalDateTabs from "@/components/app/boothmap/FestivalDateTabs";
 
 import {
@@ -30,6 +36,11 @@ import {
   type CollegeDto,
   type PubSummaryResponse,
 } from "@/api/app/boothmap/boothmapApi";
+
+const LazyMapbox3DView = lazy(async () => {
+  await import("mapbox-gl/dist/mapbox-gl.css");
+  return import("@/components/app/boothmap/Mapbox3DView");
+});
 
 const DEFAULT_MAP_VIEWPORT: MapViewport = {
   lat: 37.3201,
@@ -263,18 +274,26 @@ export default function BoothMap() {
             onPrimaryFilterChange={handlePrimaryChange}
           />
         ) : (
-          <Mapbox3DView
-            booths={visibleBooths}
-            colleges={visibleColleges}
-            primaryFilter={primaryFilter}
-            selectedMapItem={selectedMapItem}
-            sheetSnap={sheetSnap}
-            viewport={mapViewport}
-            onViewportChange={setMapViewport}
-            onClickBooth={onClickMarkerBooth}
-            onClickCollege={onClickMarkerCollege}
-            onPrimaryFilterChange={handlePrimaryChange}
-          />
+          <Suspense
+            fallback={
+              <div className="flex h-full w-full items-center justify-center bg-[var(--boothmap-surface)] text-sm font-semibold text-[var(--boothmap-text-subtle)]">
+                3D 지도를 불러오는 중...
+              </div>
+            }
+          >
+            <LazyMapbox3DView
+              booths={visibleBooths}
+              colleges={visibleColleges}
+              primaryFilter={primaryFilter}
+              selectedMapItem={selectedMapItem}
+              sheetSnap={sheetSnap}
+              viewport={mapViewport}
+              onViewportChange={setMapViewport}
+              onClickBooth={onClickMarkerBooth}
+              onClickCollege={onClickMarkerCollege}
+              onPrimaryFilterChange={handlePrimaryChange}
+            />
+          </Suspense>
         )}
       </div>
 

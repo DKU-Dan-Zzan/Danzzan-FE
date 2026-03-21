@@ -65,6 +65,15 @@ export default defineConfig(({ mode }) => {
         }
       })
     ],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            mapbox: ["mapbox-gl"],
+          },
+        },
+      },
+    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
