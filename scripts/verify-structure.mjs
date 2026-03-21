@@ -437,8 +437,11 @@ function run() {
       const baseName = parsed.name
       const isPascal = /^[A-Z][A-Za-z0-9]*$/.test(baseName)
       const isUtilityName = fileNameAllowlist.has(baseName)
+      const isTestFile =
+        file.includes("/__tests__/") ||
+        /\.(test|spec)$/.test(baseName)
 
-      if (!isPascal && !isUtilityName) {
+      if (!isPascal && !isUtilityName && !isTestFile) {
         collector.add(
           "FILE_COMPONENT_PASCAL_CASE",
           file,
