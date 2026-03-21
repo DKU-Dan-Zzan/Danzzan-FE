@@ -13,7 +13,7 @@ export default function PubList({
 
   if (!selectedCollegeId) {
     return (
-      <div className="py-6 text-center text-sm font-semibold text-gray-400">
+      <div className="py-6 text-center text-sm font-semibold text-[var(--boothmap-text-muted)]">
         단과대를 선택하면 주점이 보여요
       </div>
     );
@@ -21,7 +21,7 @@ export default function PubList({
 
   if (pubs.length === 0) {
     return (
-      <div className="py-6 text-center text-sm font-semibold text-gray-400">
+      <div className="py-6 text-center text-sm font-semibold text-[var(--boothmap-text-muted)]">
         해당 단과대 주점이 아직 없어요
       </div>
     );
@@ -36,7 +36,7 @@ export default function PubList({
           key={p.id}
           type="button"
           onClick={() => onSelectPub(p.id)}
-          className="w-full rounded-2xl border border-gray-200 bg-white p-3 text-left shadow-sm transition hover:shadow-md"
+          className="w-full rounded-2xl border border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] p-3 text-left shadow-sm transition hover:shadow-md"
         >
 
           <div className="flex items-center gap-3">
@@ -44,22 +44,22 @@ export default function PubList({
             {/* 왼쪽 텍스트 */}
             <div className="flex-1 min-w-0">
 
-              <div className="truncate text-base font-extrabold text-gray-900">
+              <div className="truncate text-base font-extrabold text-[var(--boothmap-text)]">
                 {p.name}
               </div>
 
               {p.department && (
-                <div className="mt-1 truncate text-sm font-semibold text-gray-500">
+                <div className="mt-1 truncate text-sm font-semibold text-[var(--boothmap-text-subtle)]">
                   {p.department}
                 </div>
               )}
 
-              <div className="mt-1 line-clamp-2 text-sm font-medium text-gray-600">
+              <div className="mt-1 line-clamp-2 text-sm font-medium text-[var(--boothmap-text-subtle)]">
                 {p.intro ?? "소개가 아직 없어요"}
               </div>
 
               {p.instagram && (
-                <div className="mt-2 text-xs font-bold text-blue-500">
+                <div className="mt-2 text-xs font-bold text-[var(--boothmap-accent)]">
                   {p.instagram}
                 </div>
               )}
@@ -77,7 +77,7 @@ export default function PubList({
             )}
 
             {/* chevron */}
-            <ChevronRight className="text-gray-400 w-5 h-5" />
+            <ChevronRight className="h-5 w-5 text-[var(--boothmap-text-muted)]" />
 
           </div>
 

@@ -22,6 +22,12 @@ import {
 } from "@/api/app/admin/adminMapApi";
 import useKakaoMapLoader from "@/hooks/app/boothmap/useKakaoMapLoader";
 import { AdminShell } from "@/components/layout/AdminShell";
+import {
+  getBoothmapColor,
+  getBoothmapLabelAccent,
+  getBoothmapMarkerColor,
+  parseBoothmapMarkerType,
+} from "@/utils/app/boothmap/boothmapTheme";
 import type {
   KakaoCustomOverlay,
   KakaoGlobal,
@@ -37,8 +43,12 @@ declare global {
 }
 
 function createCollegeMarkerSvg(selected: boolean) {
-  const stroke = selected ? "#1d4ed8" : "#1e40af";
-  const fill = selected ? "#dbeafe" : "#eff6ff";
+  const stroke = selected
+    ? getBoothmapColor("collegeStrokeSelected")
+    : getBoothmapColor("collegeStrokeDefault");
+  const fill = selected
+    ? getBoothmapColor("collegeFillSelected")
+    : getBoothmapColor("collegeFillDefault");
 
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
     <svg width="44" height="52" viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -51,18 +61,14 @@ function createCollegeMarkerSvg(selected: boolean) {
 }
 
 function getBoothColor(type?: string) {
-  if (type === "FOOD_TRUCK") return "#ef4444";
-  if (type === "EXPERIENCE") return "#10b981";
-  if (type === "EVENT") return "#f6da3b";
-  if (type === "FACILITY") return "#3b82f6";
-  return "#10b981";
+  return getBoothmapMarkerColor(parseBoothmapMarkerType(type));
 }
 
 function createBoothMarkerSvg(type: string | undefined, selected: boolean) {
   const mainColor = getBoothColor(type);
-  const stroke = selected ? "#111827" : mainColor;
-  const fill = selected ? "#ffffff" : mainColor;
-  const inner = selected ? mainColor : "#ffffff";
+  const stroke = selected ? getBoothmapColor("overlayBadgeBackground") : mainColor;
+  const fill = selected ? getBoothmapColor("overlayBadgeText") : mainColor;
+  const inner = selected ? mainColor : getBoothmapColor("overlayBadgeText");
 
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
     <svg width="44" height="52" viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -101,11 +107,14 @@ function createLabelContent(options: {
   selected: boolean;
   dimmed: boolean;
 }) {
-  const accent = options.kind === "college" ? "#2563eb" : "#10b981";
-  const background = options.selected ? accent : "#ffffff";
-  const color = options.selected ? "#ffffff" : "#111827";
-  const border = options.selected ? accent : "#d1d5db";
+  const accent = getBoothmapLabelAccent(options.kind);
+  const background = options.selected ? accent : getBoothmapColor("overlayBadgeText");
+  const color = options.selected
+    ? getBoothmapColor("overlayBadgeText")
+    : getBoothmapColor("overlayBadgeBackground");
+  const border = options.selected ? accent : getBoothmapColor("overlayLabelBorder");
   const opacity = options.dimmed ? 0.55 : 1;
+  const shadow = getBoothmapColor("overlayShadow");
 
   return `
     <div style="
@@ -126,7 +135,7 @@ function createLabelContent(options: {
         font-weight:700;
         line-height:1;
         white-space:nowrap;
-        box-shadow:0 6px 14px rgba(15,23,42,0.12);
+        box-shadow:0 6px 14px ${shadow};
       ">
         ${options.name}
       </div>
@@ -135,9 +144,12 @@ function createLabelContent(options: {
 }
 
 function createAnchorDotContent(selected: boolean, kind: "booth" | "college") {
-  const color = kind === "college" ? "#2563eb" : "#10b981";
+  const color = getBoothmapLabelAccent(kind);
   const size = selected ? 10 : 8;
-  const border = selected ? "#111827" : "#ffffff";
+  const border = selected
+    ? getBoothmapColor("overlayBadgeBackground")
+    : getBoothmapColor("overlayBadgeText");
+  const shadow = getBoothmapColor("overlayShadow");
 
   return `
     <div style="
@@ -146,7 +158,7 @@ function createAnchorDotContent(selected: boolean, kind: "booth" | "college") {
       border-radius:999px;
       background:${color};
       border:2px solid ${border};
-      box-shadow:0 2px 6px rgba(15,23,42,0.18);
+      box-shadow:0 2px 6px ${shadow};
       pointer-events:none;
     "></div>
   `;
@@ -886,7 +898,7 @@ export default function AdminMap() {
                   <button
                     type="button"
                     onClick={() => void handleClearBoothLocation()}
-                    className="mt-2 inline-flex items-center gap-1 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-500 hover:bg-red-100"
+                    className="mt-2 inline-flex items-center gap-1 rounded-xl border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-danger-bg)] px-3 py-2 text-xs font-semibold text-[var(--boothmap-danger-text)] hover:brightness-95"
                   >
                     <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
                     부스 좌표 제거

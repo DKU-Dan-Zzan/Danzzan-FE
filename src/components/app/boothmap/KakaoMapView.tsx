@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useRef } from "react"
 import useKakaoMapLoader from "@/hooks/app/boothmap/useKakaoMapLoader"
 import {
-  BOOTHMAP_MARKER_THEME,
-  BOOTHMAP_SELECTED_RING,
-  BOOTHMAP_SELECTED_SHADOW_SOFT,
+  getBoothmapColor,
+  getBoothmapMarkerTheme,
+  getBoothmapZonePalette,
   type BoothmapMarkerType,
 } from "@/utils/app/boothmap/boothmapTheme"
 import type {
@@ -69,7 +69,7 @@ type OverlayRecord = {
 }
 
 function getMarkerConfig(type: MarkerType) {
-  return BOOTHMAP_MARKER_THEME[type] ?? BOOTHMAP_MARKER_THEME.PUB
+  return getBoothmapMarkerTheme(type)
 }
 
 // 물방울 핀 모양 SVG를 data url로 생성
@@ -80,15 +80,6 @@ function createPinDataUrl(color: string) {
     </svg>
   `
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`
-}
-
-// type별 pin url 캐싱
-const PIN_URL_MAP: Record<MarkerType, string> = {
-  PUB: createPinDataUrl(BOOTHMAP_MARKER_THEME.PUB.color),
-  FOOD_TRUCK: createPinDataUrl(BOOTHMAP_MARKER_THEME.FOOD_TRUCK.color),
-  EXPERIENCE: createPinDataUrl(BOOTHMAP_MARKER_THEME.EXPERIENCE.color),
-  EVENT: createPinDataUrl(BOOTHMAP_MARKER_THEME.EVENT.color),
-  FACILITY: createPinDataUrl(BOOTHMAP_MARKER_THEME.FACILITY.color),
 }
 
 const PIN_BOTTOM_OFFSET_MAP: Record<MarkerType, number> = {
@@ -316,7 +307,7 @@ export default function KakaoMapView({
   const buildLabelBubble = (name: string) => {
     const bubble = document.createElement("div")
     bubble.className =
-      "rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs font-bold text-gray-800 shadow-[0_6px_18px_rgba(0,0,0,0.16)] whitespace-nowrap backdrop-blur-sm"
+      "rounded-full border border-[var(--boothmap-overlay-label-border)] bg-[var(--boothmap-overlay-label-bg)] px-3 py-1.5 text-xs font-bold text-[var(--boothmap-overlay-label-text)] shadow-[0_6px_18px_var(--boothmap-overlay-shadow-soft)] whitespace-nowrap backdrop-blur-sm"
     bubble.innerText = name
     bubble.style.position = "absolute"
     bubble.style.left = "50%"
@@ -342,7 +333,7 @@ export default function KakaoMapView({
     onClick: () => void
   }) => {
     const { iconPath } = getMarkerConfig(type)
-    const pinUrl = PIN_URL_MAP[type]
+    const pinUrl = createPinDataUrl(getMarkerConfig(type).color)
     const scale = getMarkerScaleByLevel(level, isSelected)
     const width = Math.round((isSelected ? 46 : 40) * scale)
     const height = Math.round((isSelected ? 56 : 50) * scale)
@@ -357,9 +348,11 @@ export default function KakaoMapView({
     wrapper.style.cursor = "pointer"
     wrapper.style.userSelect = "none"
     wrapper.style.transition = "transform 0.18s ease"
+    const selectedShadowSoft = getBoothmapColor("selectedShadowSoft")
+    const overlayShadow = getBoothmapColor("overlayShadow")
     wrapper.style.filter = isSelected
-      ? `drop-shadow(0 10px 22px ${BOOTHMAP_SELECTED_SHADOW_SOFT})`
-      : "drop-shadow(0 8px 18px rgba(0,0,0,0.18))"
+      ? `drop-shadow(0 10px 22px ${selectedShadowSoft})`
+      : `drop-shadow(0 8px 18px ${overlayShadow})`
 
     const pinBottomOffset = PIN_BOTTOM_OFFSET_MAP[type] ?? 0
 
@@ -398,9 +391,9 @@ export default function KakaoMapView({
     debugDot.style.height = "8px"
     debugDot.style.transform = "translate(-50%, 50%)"
     debugDot.style.borderRadius = "9999px"
-    debugDot.style.background = "#111827"
-    debugDot.style.border = "2px solid white"
-    debugDot.style.boxShadow = "0 2px 6px rgba(0,0,0,0.15)"
+    debugDot.style.background = getBoothmapColor("overlayBadgeBackground")
+    debugDot.style.border = `2px solid ${getBoothmapColor("overlayBadgeText")}`
+    debugDot.style.boxShadow = `0 2px 6px ${getBoothmapColor("overlayShadow")}`
     debugDot.style.pointerEvents = "none"
 
     wrapper.appendChild(debugDot)
@@ -423,7 +416,7 @@ export default function KakaoMapView({
       ring.style.height = `${ringSize}px`
       ring.style.transform = "translate(-50%, -50%)"
       ring.style.borderRadius = "9999px"
-      ring.style.boxShadow = `0 0 0 5px ${BOOTHMAP_SELECTED_RING}`
+      ring.style.boxShadow = `0 0 0 5px ${getBoothmapColor("selectedRing")}`
       ring.style.pointerEvents = "none"
       wrapper.appendChild(ring)
     }
@@ -811,13 +804,15 @@ export default function KakaoMapView({
     if (!isLoaded || !mapInstanceRef.current) return
 
     clearZoneOverlays()
+    const pubZonePalette = getBoothmapZonePalette("PUB")
+    const foodTruckZonePalette = getBoothmapZonePalette("FOOD_TRUCK")
 
     if (shouldShowPubZoneSummary && pubZone) {
       pubZone.polygons.forEach((paths) => {
         createZonePolygon({
           paths,
-          strokeColor: "#1d4ed8",
-          fillColor: "#93c5fd",
+          strokeColor: pubZonePalette.stroke,
+          fillColor: pubZonePalette.fill,
           fillOpacity: 0.22,
         })
       })
@@ -837,8 +832,8 @@ export default function KakaoMapView({
       foodTruckZone.polygons.forEach((paths) => {
         createZonePolygon({
           paths,
-          strokeColor: "#dc2626",
-          fillColor: "#fca5a5",
+          strokeColor: foodTruckZonePalette.stroke,
+          fillColor: foodTruckZonePalette.fill,
           fillOpacity: 0.22,
         })
       })
@@ -858,8 +853,8 @@ export default function KakaoMapView({
       pubZone.polygons.forEach((paths) => {
         createZonePolygon({
           paths,
-          strokeColor: "#1d4ed8",
-          fillColor: "#93c5fd",
+          strokeColor: pubZonePalette.stroke,
+          fillColor: pubZonePalette.fill,
           fillOpacity: 0.12,
         })
       })
@@ -869,8 +864,8 @@ export default function KakaoMapView({
       foodTruckZone.polygons.forEach((paths) => {
         createZonePolygon({
           paths,
-          strokeColor: "#dc2626",
-          fillColor: "#fca5a5",
+          strokeColor: foodTruckZonePalette.stroke,
+          fillColor: foodTruckZonePalette.fill,
           fillOpacity: 0.12,
         })
       })
@@ -915,8 +910,8 @@ export default function KakaoMapView({
 
   if (isError) {
     return (
-      <div className="absolute inset-0 flex items-center justify-center bg-gray-50">
-        <div className="rounded-2xl border border-red-200 bg-white px-4 py-3 text-sm font-semibold text-red-500 shadow-sm">
+      <div className="absolute inset-0 flex items-center justify-center bg-[var(--boothmap-surface-muted)]">
+        <div className="rounded-2xl border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-surface)] px-4 py-3 text-sm font-semibold text-[var(--boothmap-danger-text)] shadow-sm">
           카카오맵을 불러오지 못했어요.
         </div>
       </div>
@@ -925,8 +920,8 @@ export default function KakaoMapView({
 
   if (!isLoaded) {
     return (
-      <div className="absolute inset-0 flex items-center justify-center bg-[#f8fafc]">
-        <div className="rounded-2xl border border-white/70 bg-white/92 px-4 py-3 text-sm font-semibold text-gray-500 shadow-[0_8px_24px_rgba(0,0,0,0.08)] backdrop-blur-md">
+      <div className="absolute inset-0 flex items-center justify-center bg-[var(--boothmap-surface-muted)]">
+        <div className="rounded-2xl border border-[var(--boothmap-panel-border)] bg-[var(--boothmap-panel-bg)] px-4 py-3 text-sm font-semibold text-[var(--boothmap-text-subtle)] shadow-[var(--boothmap-panel-shadow)] backdrop-blur-md">
           지도를 불러오는 중...
         </div>
       </div>

@@ -14,9 +14,9 @@ const chips: Array<{ label: string; value: PrimaryFilter }> = [
 const CHIP_BASE_CLASS =
   "shrink-0 rounded-full border px-4 py-2 text-sm font-extrabold transition";
 const CHIP_ACTIVE_CLASS =
-  "border-[var(--brand-main)] bg-[var(--brand-main)] text-[var(--text-on-accent)] shadow-[0_1px_2px_rgb(15_23_42/0.12)]";
+  "border-[var(--boothmap-marker-pub)] bg-[var(--boothmap-marker-pub)] text-[var(--boothmap-overlay-badge-text)] shadow-[0_1px_2px_var(--boothmap-overlay-shadow)]";
 const CHIP_INACTIVE_CLASS =
-  "border-[var(--line-soft)] bg-[var(--surface-card)] text-[var(--text-muted)] hover:border-[var(--brand-soft)]/70 hover:text-[var(--text)]";
+  "border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] text-[var(--boothmap-text-subtle)] hover:border-[var(--boothmap-marker-pub)] hover:text-[var(--boothmap-text)]";
 
 export default function PrimaryFilterChips({
   value,

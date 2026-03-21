@@ -9,6 +9,13 @@ import type {
   SheetSnap,
 } from "@/types/app/boothmap/boothmap.types";
 import { MAP_ZONES } from "@/utils/app/boothmap/mapZones";
+import {
+  getBoothmapColor,
+  getBoothmapMarkerColor,
+  getBoothmapMarkerTheme,
+  getBoothmapZonePalette,
+  type BoothmapMarkerType,
+} from "@/utils/app/boothmap/boothmapTheme";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
@@ -45,7 +52,7 @@ const PUB_ZONE_FILL_LAYER_ID = "pub-zone-fill-layer";
 const FOOD_TRUCK_ZONE_SOURCE_ID = "foodtruck-zone-source";
 const FOOD_TRUCK_ZONE_FILL_LAYER_ID = "foodtruck-zone-fill-layer";
 
-type MarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "EVENT" | "FACILITY";
+type MarkerType = BoothmapMarkerType;
 
 type MapFeatureProperties = {
   id: number;
@@ -56,38 +63,7 @@ type MapFeatureProperties = {
 };
 
 function getMarkerConfig(type: MarkerType) {
-  switch (type) {
-    case "PUB":
-      return {
-        color: "#0a559c",
-        iconPath: "/markers/booth-pub.svg",
-      };
-    case "FOOD_TRUCK":
-      return {
-        color: "#ef4444",
-        iconPath: "/markers/booth-foodtruck.svg",
-      };
-    case "EXPERIENCE":
-      return {
-        color: "#10b981",
-        iconPath: "/markers/booth-experience.svg",
-      };
-    case "EVENT":
-      return {
-        color: "#f6da3b",
-        iconPath: "/markers/booth-event.svg",
-      };
-    case "FACILITY":
-      return {
-        color: "#3b82f6",
-        iconPath: "/markers/facility-restroom.svg",
-      };
-    default:
-      return {
-        color: "#0a559c",
-        iconPath: "/markers/booth-experience.svg",
-      };
-  }
+  return getBoothmapMarkerTheme(type);
 }
 
 function createPinDataUrl(color: string) {
@@ -119,6 +95,9 @@ function mapboxZoomToKakaoLevel(zoom: number) {
 function buildSelectedMarkerElement(type: MarkerType, title: string) {
   const { iconPath, color } = getMarkerConfig(type);
   const pinUrl = createPinDataUrl(color);
+  const selectedShadow = getBoothmapColor("selectedShadow");
+  const overlayShadow = getBoothmapColor("overlayShadow");
+  const selectedRing = getBoothmapColor("selectedRing");
 
   const wrapper = document.createElement("button");
   wrapper.type = "button";
@@ -132,7 +111,7 @@ function buildSelectedMarkerElement(type: MarkerType, title: string) {
   wrapper.style.background = "transparent";
   wrapper.style.cursor = "pointer";
   wrapper.style.userSelect = "none";
-  wrapper.style.filter = "drop-shadow(0 14px 24px rgba(10,85,156,0.28))";
+  wrapper.style.filter = `drop-shadow(0 14px 24px ${selectedShadow})`;
 
   const shadow = document.createElement("div");
   shadow.style.position = "absolute";
@@ -142,7 +121,7 @@ function buildSelectedMarkerElement(type: MarkerType, title: string) {
   shadow.style.height = "8px";
   shadow.style.transform = "translateX(-50%)";
   shadow.style.borderRadius = "9999px";
-  shadow.style.background = "rgba(15,23,42,0.18)";
+  shadow.style.background = overlayShadow;
   shadow.style.filter = "blur(3px)";
   shadow.style.pointerEvents = "none";
 
@@ -178,7 +157,7 @@ function buildSelectedMarkerElement(type: MarkerType, title: string) {
   ring.style.height = "26px";
   ring.style.transform = "translate(-50%, -50%)";
   ring.style.borderRadius = "9999px";
-  ring.style.boxShadow = "0 0 0 5px rgba(10,85,156,0.18)";
+  ring.style.boxShadow = `0 0 0 5px ${selectedRing}`;
   ring.style.pointerEvents = "none";
 
   wrapper.appendChild(shadow);
@@ -190,6 +169,10 @@ function buildSelectedMarkerElement(type: MarkerType, title: string) {
 }
 
 function buildZoneDotElement(color: string, label: string, count: number) {
+  const overlayShadow = getBoothmapColor("overlayShadow");
+  const overlayBadgeBackground = getBoothmapColor("overlayBadgeBackground");
+  const overlayBadgeText = getBoothmapColor("overlayBadgeText");
+
   const wrapper = document.createElement("button");
   wrapper.type = "button";
   wrapper.title = label;
@@ -208,7 +191,7 @@ function buildZoneDotElement(color: string, label: string, count: number) {
   dot.style.borderRadius = "9999px";
   dot.style.background = color;
   dot.style.border = "3px solid white";
-  dot.style.boxShadow = "0 8px 18px rgba(15,23,42,0.18)";
+  dot.style.boxShadow = `0 8px 18px ${overlayShadow}`;
 
   const badge = document.createElement("div");
   badge.textContent = String(count);
@@ -218,12 +201,12 @@ function buildZoneDotElement(color: string, label: string, count: number) {
   badge.style.transform = "translateX(-50%)";
   badge.style.padding = "4px 8px";
   badge.style.borderRadius = "9999px";
-  badge.style.background = "#111827";
-  badge.style.color = "white";
+  badge.style.background = overlayBadgeBackground;
+  badge.style.color = overlayBadgeText;
   badge.style.fontSize = "11px";
   badge.style.fontWeight = "700";
   badge.style.whiteSpace = "nowrap";
-  badge.style.boxShadow = "0 6px 14px rgba(15,23,42,0.18)";
+  badge.style.boxShadow = `0 6px 14px ${overlayShadow}`;
   badge.style.pointerEvents = "none";
 
   wrapper.appendChild(dot);
@@ -235,7 +218,7 @@ function buildZoneDotElement(color: string, label: string, count: number) {
 function buildLabelElement(name: string) {
   const bubble = document.createElement("div");
   bubble.className =
-    "rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs font-bold text-gray-800 shadow-[0_6px_18px_rgba(0,0,0,0.16)] whitespace-nowrap backdrop-blur-sm";
+    "rounded-full border border-[var(--boothmap-overlay-label-border)] bg-[var(--boothmap-overlay-label-bg)] px-3 py-1.5 text-xs font-bold text-[var(--boothmap-overlay-label-text)] shadow-[0_6px_18px_var(--boothmap-overlay-shadow-soft)] whitespace-nowrap backdrop-blur-sm";
   bubble.innerText = name;
   return bubble;
 }
@@ -245,7 +228,7 @@ async function loadSvgAsImageBitmap(
   {
     size = 32,
     padding = 4,
-    tintColor = "#ffffff",
+    tintColor = getBoothmapColor("overlayBadgeText"),
   }: { size?: number; padding?: number; tintColor?: string } = {}
 ): Promise<ImageBitmap> {
   const img = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -489,6 +472,14 @@ export default function Mapbox3DView({
 
   const createLayers = async (map: mapboxgl.Map) => {
     await ensureImages(map);
+    const markerColorMap: Record<MarkerType, string> = {
+      PUB: getBoothmapMarkerColor("PUB"),
+      FOOD_TRUCK: getBoothmapMarkerColor("FOOD_TRUCK"),
+      EXPERIENCE: getBoothmapMarkerColor("EXPERIENCE"),
+      EVENT: getBoothmapMarkerColor("EVENT"),
+      FACILITY: getBoothmapMarkerColor("FACILITY"),
+    };
+    const overlayBadgeText = getBoothmapColor("overlayBadgeText");
 
     if (!map.getSource(SOURCE_ID)) {
       map.addSource(SOURCE_ID, {
@@ -521,18 +512,18 @@ export default function Mapbox3DView({
             "match",
             ["get", "markerType"],
             "PUB",
-            "#0a559c",
+            markerColorMap.PUB,
             "FOOD_TRUCK",
-            "#ef4444",
+            markerColorMap.FOOD_TRUCK,
             "EXPERIENCE",
-            "#10b981",
+            markerColorMap.EXPERIENCE,
             "EVENT",
-            "#f6da3b",
+            markerColorMap.EVENT,
             "FACILITY",
-            "#3b82f6",
-            "#0a559c",
+            markerColorMap.FACILITY,
+            markerColorMap.EXPERIENCE,
           ],
-          "circle-stroke-color": "#ffffff",
+          "circle-stroke-color": overlayBadgeText,
           "circle-stroke-width": 2,
           "circle-opacity": 0.96,
           "circle-pitch-alignment": "viewport",
@@ -594,7 +585,7 @@ export default function Mapbox3DView({
         source: SOURCE_ID,
         paint: {
           "circle-radius": 20,
-          "circle-color": "#000000",
+          "circle-color": getBoothmapColor("overlayBadgeBackground"),
           "circle-opacity": 0,
         },
       });
@@ -639,6 +630,8 @@ export default function Mapbox3DView({
   };
 
   const upsertZonePolygons = (map: mapboxgl.Map) => {
+    const pubZonePalette = getBoothmapZonePalette("PUB");
+    const foodTruckZonePalette = getBoothmapZonePalette("FOOD_TRUCK");
     const pubData = buildZoneFeatureCollection(pubZone?.polygons ?? []);
     const foodTruckData = buildZoneFeatureCollection(foodTruckZone?.polygons ?? []);
 
@@ -664,7 +657,7 @@ export default function Mapbox3DView({
         type: "fill",
         source: PUB_ZONE_SOURCE_ID,
         paint: {
-          "fill-color": "#5aa3f8",
+          "fill-color": pubZonePalette.fill,
           "fill-opacity": 0,
         },
       });
@@ -676,7 +669,7 @@ export default function Mapbox3DView({
         type: "fill",
         source: FOOD_TRUCK_ZONE_SOURCE_ID,
         paint: {
-          "fill-color": "#fa6464",
+          "fill-color": foodTruckZonePalette.fill,
           "fill-opacity": 0,
         },
       });
@@ -879,8 +872,9 @@ export default function Mapbox3DView({
     }
 
     if (showPubSummary && pubZone) {
+      const pubZonePalette = getBoothmapZonePalette("PUB");
       pubZone.markers.forEach((marker) => {
-        const element = buildZoneDotElement("#2563eb", "주점 구역", pubCount);
+        const element = buildZoneDotElement(pubZonePalette.dot, "주점 구역", pubCount);
         element.onclick = (event) => {
           event.stopPropagation();
           onPrimaryFilterChange("PUB");
@@ -898,12 +892,9 @@ export default function Mapbox3DView({
     }
 
     if (showFoodTruckSummary && foodTruckZone) {
+      const foodTruckZonePalette = getBoothmapZonePalette("FOOD_TRUCK");
       foodTruckZone.markers.forEach((marker) => {
-        const element = buildZoneDotElement(
-          "#ef4444",
-          "푸드트럭 구역",
-          foodTruckCount
-        );
+        const element = buildZoneDotElement(foodTruckZonePalette.dot, "푸드트럭 구역", foodTruckCount);
         element.onclick = (event) => {
           event.stopPropagation();
           onPrimaryFilterChange("FOOD_TRUCK");
@@ -1042,8 +1033,8 @@ export default function Mapbox3DView({
 
   if (!mapboxgl.accessToken) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-gray-50">
-        <div className="rounded-2xl border border-red-200 bg-white px-4 py-3 text-sm font-semibold text-red-500 shadow-sm">
+      <div className="flex h-full w-full items-center justify-center bg-[var(--boothmap-surface-muted)]">
+        <div className="rounded-2xl border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-surface)] px-4 py-3 text-sm font-semibold text-[var(--boothmap-danger-text)] shadow-sm">
           Mapbox access token is missing.
         </div>
       </div>

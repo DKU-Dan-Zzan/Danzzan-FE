@@ -33,6 +33,7 @@ import {
   updateEmergencyAdminNotice,
 } from "@/api/app/admin/adminApi";
 import { getPlacementAd, type ClientAdDto } from "@/api/app/notice/noticeApi";
+import { cn } from "@/components/common/ui/utils";
 import { AdminShell } from "@/components/layout/AdminShell";
 import {
   formatDate,
@@ -527,7 +528,7 @@ function Admin() {
             <button
               type="button"
               onClick={() => navigate("/admin/map")}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
+              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-[var(--surface)] px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
             >
               <Map className="h-4 w-4" strokeWidth={2.3} />
               지도 편집
@@ -536,7 +537,7 @@ function Admin() {
             <button
               type="button"
               onClick={handleLogout}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
+              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-[var(--surface)] px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
             >
               <LogOut className="h-4 w-4" strokeWidth={2.3} />
               로그아웃
@@ -552,22 +553,23 @@ function Admin() {
         )}
 
         {/* 긴급 공지 */}
-        <section className="rounded-2xl border border-red-100 bg-red-50/60 p-4 shadow-sm">
+        <section className="rounded-2xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] p-4 shadow-sm">
           <header className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Megaphone className="h-4 w-4 text-red-500" strokeWidth={2.3} />
-              <h2 className="text-sm font-bold text-red-600">긴급 공지</h2>
+              <Megaphone className="h-4 w-4 text-[var(--status-danger)]" strokeWidth={2.3} />
+              <h2 className="text-sm font-bold text-[var(--status-danger)]">긴급 공지</h2>
             </div>
-            <label className="flex items-center gap-2 text-xs font-semibold text-red-600">
+            <label className="flex items-center gap-2 text-xs font-semibold text-[var(--status-danger)]">
               <span>사용 여부</span>
               <button
                 type="button"
                 onClick={() => setEmergencyActive((prev) => !prev)}
-                className={`inline-flex h-6 items-center rounded-full px-2 text-[11px] font-semibold transition-colors ${
+                className={cn(
+                  "inline-flex h-6 items-center rounded-full px-2 text-[11px] font-semibold transition-colors",
                   emergencyActive
-                    ? "bg-red-500 text-white"
-                    : "bg-red-100 text-red-500"
-                }`}
+                    ? "bg-[var(--status-danger)] text-[var(--text-on-accent)]"
+                    : "bg-[var(--status-danger-border)] text-[var(--status-danger)]",
+                )}
               >
                 {emergencyActive ? "ON" : "OFF"}
               </button>
@@ -579,15 +581,15 @@ function Admin() {
               value={emergencyMessage}
               onChange={(e) => setEmergencyMessage(e.target.value)}
               placeholder="홈 화면 상단에 노출될 한 줄 메시지를 입력해 주세요."
-              className="w-full resize-none rounded-2xl border border-red-100 bg-white/80 px-3 py-2 text-sm text-[var(--text)] placeholder:text-red-300 shadow-inner focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-200"
+              className="w-full resize-none rounded-2xl border border-[var(--status-danger-border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--status-danger-border)] shadow-inner focus:border-[var(--status-danger-border)] focus:outline-none focus:ring-2 focus:ring-[var(--status-danger-border)]"
             />
-            <div className="flex items-center justify-between text-[11px] text-red-500">
+            <div className="flex items-center justify-between text-[11px] text-[var(--status-danger)]">
               <span>※ 한 줄 공지는 단 한 개만 사용됩니다.</span>
               <button
                 type="button"
                 disabled={emergencyLoading}
                 onClick={() => void handleSaveEmergency()}
-                className="inline-flex items-center gap-1 rounded-2xl bg-red-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:brightness-95 disabled:opacity-60"
+                className="inline-flex items-center gap-1 rounded-2xl bg-[var(--status-danger)] px-3 py-1.5 text-xs font-semibold text-[var(--text-on-accent)] shadow-sm transition hover:brightness-95 disabled:opacity-60"
               >
                 <Bell className="h-3.5 w-3.5" strokeWidth={2.4} />
                 {emergencyLoading ? "저장 중..." : "긴급 공지 저장"}
@@ -597,7 +599,7 @@ function Admin() {
         </section>
 
         {/* 일반 공지 목록 */}
-        <section className="rounded-2xl border border-[var(--border-base)] bg-white p-4 shadow-sm">
+        <section className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface)] p-4 shadow-sm">
           <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-sm font-bold text-[var(--text)]">일반 공지 목록</h2>
@@ -617,11 +619,12 @@ function Admin() {
                       setNoticeStatus(item.key);
                       void reloadNotices(0, noticeKeyword, item.key);
                     }}
-                    className={`rounded-full px-3 py-1 ${
+                    className={cn(
+                      "rounded-full px-3 py-1",
                       noticeStatus === item.key
-                        ? "bg-[var(--accent)] text-white"
-                        : "bg-[var(--surface-subtle)] text-[var(--text-muted)]"
-                    }`}
+                        ? "bg-[var(--accent)] text-[var(--text-on-accent)]"
+                        : "bg-[var(--surface-subtle)] text-[var(--text-muted)]",
+                    )}
                   >
                     {item.label}
                   </button>
@@ -644,7 +647,7 @@ function Admin() {
               <button
                 type="button"
                 onClick={() => void reloadNotices(0, noticeKeyword)}
-                className="h-9 rounded-2xl bg-[var(--accent)] px-3 text-xs font-semibold text-white shadow-sm hover:brightness-95"
+                className="h-9 rounded-2xl bg-[var(--accent)] px-3 text-xs font-semibold text-[var(--text-on-accent)] shadow-sm hover:brightness-95"
               >
                 검색
               </button>
@@ -652,13 +655,14 @@ function Admin() {
                 type="button"
                 disabled={noticeStatus !== "ACTIVE"}
                 onClick={pinReorderMode ? cancelPinReorder : startPinReorder}
-                className={`flex h-9 items-center gap-1 rounded-2xl border px-3 text-xs font-semibold ${
+                className={cn(
+                  "flex h-9 items-center gap-1 rounded-2xl border px-3 text-xs font-semibold",
                   noticeStatus !== "ACTIVE"
                     ? "cursor-not-allowed border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text-muted)] opacity-60"
                     : pinReorderMode
-                      ? "border-orange-400 bg-orange-50 text-orange-700"
-                      : "border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text)] hover:bg-[var(--border-base)]"
-                }`}
+                      ? "border-[var(--status-warning-border)] bg-[var(--status-warning-bg)] text-[var(--status-warning-text)]"
+                      : "border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text)] hover:bg-[var(--border-base)]",
+                )}
               >
                 {pinReorderMode ? "핀 순서 변경 취소" : "핀 공지 순서변경"}
               </button>
@@ -688,7 +692,7 @@ function Admin() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--border-base)] bg-white">
+              <tbody className="divide-y divide-[var(--border-base)] bg-[var(--surface)]">
                 {noticeLoading && (
                   <tr>
                     <td colSpan={5} className="px-4 py-6 text-center text-[var(--text-muted)]">
@@ -704,10 +708,10 @@ function Admin() {
                   </tr>
                 )}
                 {effectivePinned.map((notice, index) => (
-                  <tr key={notice.id} className="bg-orange-50/60">
+                  <tr key={notice.id} className="bg-[var(--status-warning-bg)]">
                     <td className="px-4 py-2 align-middle">
                       <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-orange-500 px-2 py-0.5 text-[10px] font-semibold text-white">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--status-warning)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-on-accent)]">
                           <span>📌</span>
                           <span>상단 고정</span>
                         </span>
@@ -730,11 +734,12 @@ function Admin() {
                     <td className="px-3 py-2 text-center">
                       {noticeStatus === "ALL" ? (
                         <span
-                          className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                          className={cn(
+                            "inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-semibold",
                             notice.isActive === false
-                              ? "bg-slate-100 text-slate-600"
-                              : "bg-emerald-50 text-emerald-600"
-                          }`}
+                              ? "bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)]"
+                              : "bg-[var(--status-success-bg)] text-[var(--status-success)]",
+                          )}
                         >
                           {notice.isActive === false ? "보관됨" : "게시중"}
                         </span>
@@ -772,7 +777,7 @@ function Admin() {
                         <button
                           type="button"
                           onClick={() => void handleRestoreNotice(notice.id)}
-                          className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--status-success-bg)] text-[var(--status-success)] hover:bg-[var(--status-success-border)]"
                         >
                           <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.3} />
                         </button>
@@ -780,7 +785,7 @@ function Admin() {
                         <button
                           type="button"
                           onClick={() => void handleArchiveNotice(notice.id)}
-                          className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100"
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--status-danger-bg)] text-[var(--status-danger)] hover:bg-[var(--status-danger-border)]"
                         >
                           <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
                         </button>
@@ -824,7 +829,7 @@ function Admin() {
                         <button
                           type="button"
                           onClick={() => void handleRestoreNotice(notice.id)}
-                          className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--status-success-bg)] text-[var(--status-success)] hover:bg-[var(--status-success-border)]"
                         >
                           <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.3} />
                         </button>
@@ -832,7 +837,7 @@ function Admin() {
                         <button
                           type="button"
                           onClick={() => void handleArchiveNotice(notice.id)}
-                          className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100"
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--status-danger-bg)] text-[var(--status-danger)] hover:bg-[var(--status-danger-border)]"
                         >
                           <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
                         </button>
@@ -873,7 +878,7 @@ function Admin() {
                 type="button"
                 disabled={pinSaving}
                 onClick={() => void handleSavePinOrder()}
-                className="inline-flex items-center gap-1 rounded-full bg-orange-500 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
+                className="inline-flex items-center gap-1 rounded-full bg-[var(--status-warning)] px-3 py-1.5 text-xs font-semibold text-[var(--text-on-accent)] disabled:opacity-60"
               >
                 {pinSaving ? "저장 중..." : "핀 공지 순서 저장"}
               </button>
@@ -882,7 +887,7 @@ function Admin() {
         </section>
 
         {/* 광고 배너 관리 (위치별 1개만) */}
-        <section className="mb-6 rounded-2xl border border-[var(--border-base)] bg-white p-4 shadow-sm">
+        <section className="mb-6 rounded-2xl border border-[var(--border-base)] bg-[var(--surface)] p-4 shadow-sm">
           <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-sm font-bold text-[var(--text)]">광고 배너 관리</h2>
@@ -911,7 +916,7 @@ function Admin() {
                         placement: "HOME_BOTTOM",
                       });
                     }}
-                    className="flex h-8 items-center gap-1 rounded-2xl border border-[var(--border-base)] bg-white px-3 text-[11px] font-semibold text-[var(--text)] hover:bg-[var(--border-base)]"
+                    className="flex h-8 items-center gap-1 rounded-2xl border border-[var(--border-base)] bg-[var(--surface)] px-3 text-[11px] font-semibold text-[var(--text)] hover:bg-[var(--border-base)]"
                   >
                     <Pencil className="h-3.5 w-3.5" strokeWidth={2.3} />
                     배너 변경
@@ -920,17 +925,18 @@ function Admin() {
                     type="button"
                     disabled={!homeBottomAd}
                     onClick={() => void handleDeleteAd("HOME_BOTTOM")}
-                    className={`flex h-8 items-center justify-center rounded-2xl border px-3 text-[11px] font-semibold ${
+                    className={cn(
+                      "flex h-8 items-center justify-center rounded-2xl border px-3 text-[11px] font-semibold",
                       !homeBottomAd
                         ? "cursor-not-allowed border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text-muted)] opacity-60"
-                        : "border-red-200 bg-red-50 text-red-500 hover:bg-red-100"
-                    }`}
+                        : "border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] text-[var(--status-danger)] hover:bg-[var(--status-danger-border)]",
+                    )}
                   >
                     삭제
                   </button>
                 </div>
               </div>
-              <div className="overflow-hidden rounded-xl border border-[var(--border-base)] bg-white">
+              <div className="overflow-hidden rounded-xl border border-[var(--border-base)] bg-[var(--surface)]">
                 {homeBottomAd?.imageUrl ? (
                   <img
                     src={homeBottomAd.imageUrl}
@@ -963,7 +969,7 @@ function Admin() {
                         placement: "MY_TICKET",
                       });
                     }}
-                    className="flex h-8 items-center gap-1 rounded-2xl border border-[var(--border-base)] bg-white px-3 text-[11px] font-semibold text-[var(--text)] hover:bg-[var(--border-base)]"
+                    className="flex h-8 items-center gap-1 rounded-2xl border border-[var(--border-base)] bg-[var(--surface)] px-3 text-[11px] font-semibold text-[var(--text)] hover:bg-[var(--border-base)]"
                   >
                     <Pencil className="h-3.5 w-3.5" strokeWidth={2.3} />
                     배너 변경
@@ -972,17 +978,18 @@ function Admin() {
                     type="button"
                     disabled={!myTicketAd}
                     onClick={() => void handleDeleteAd("MY_TICKET")}
-                    className={`flex h-8 items-center justify-center rounded-2xl border px-3 text-[11px] font-semibold ${
+                    className={cn(
+                      "flex h-8 items-center justify-center rounded-2xl border px-3 text-[11px] font-semibold",
                       !myTicketAd
                         ? "cursor-not-allowed border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text-muted)] opacity-60"
-                        : "border-red-200 bg-red-50 text-red-500 hover:bg-red-100"
-                    }`}
+                        : "border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] text-[var(--status-danger)] hover:bg-[var(--status-danger-border)]",
+                    )}
                   >
                     삭제
                   </button>
                 </div>
               </div>
-              <div className="overflow-hidden rounded-xl border border-[var(--border-base)] bg-white">
+              <div className="overflow-hidden rounded-xl border border-[var(--border-base)] bg-[var(--surface)]">
                 {myTicketAd?.imageUrl ? (
                   <img
                     src={myTicketAd.imageUrl}
@@ -1006,8 +1013,8 @@ function Admin() {
 
       {/* 공지 작성/수정 모달 */}
       {editingNotice && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 px-4 py-6">
-          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-5 shadow-xl">
+        <div className="fixed inset-0 z-30 flex items-center justify-center bg-[var(--admin-dialog-overlay-bg)] px-4 py-6">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-[var(--surface)] p-5 shadow-xl">
             <h3 className="text-base font-bold text-[var(--text)]">
               {editingNotice.id ? "공지 수정" : "새 공지 등록"}
             </h3>
@@ -1024,11 +1031,12 @@ function Admin() {
                           prev ? { ...prev, author } : prev,
                         )
                       }
-                      className={`flex items-center gap-2 rounded-2xl border px-3 py-1.5 ${
+                      className={cn(
+                        "flex items-center gap-2 rounded-2xl border px-3 py-1.5",
                         editingNotice.author === author
                           ? "border-[var(--accent)] bg-[var(--accent)]/5 text-[var(--accent)]"
-                          : "border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text-muted)]"
-                      }`}
+                          : "border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text-muted)]",
+                      )}
                     >
                       <span className="text-[10px]">•</span>
                       <span className="text-xs font-semibold">{author}</span>
@@ -1079,7 +1087,7 @@ function Admin() {
                     (JPG, JPEG, PNG, WEBP / 1장당 최대 5MB, 최대 10장)
                   </p>
                   <div className="mt-3 flex w-full max-w-sm justify-center">
-                    <label className="inline-flex cursor-pointer items-center justify-center rounded-2xl bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:brightness-95">
+                    <label className="inline-flex cursor-pointer items-center justify-center rounded-2xl bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-[var(--text-on-accent)] shadow-sm hover:brightness-95">
                       {noticeImageUploading ? "업로드 중..." : "파일 선택"}
                       <input
                         type="file"
@@ -1110,16 +1118,17 @@ function Admin() {
                                 prev ? { ...prev, thumbnailImageUrl: url } : prev,
                               )
                             }
-                            className={`group relative h-20 overflow-hidden rounded-xl border ${
+                            className={cn(
+                              "group relative h-20 overflow-hidden rounded-xl border bg-[var(--surface)]",
                               isThumbnail
                                 ? "border-[var(--accent)] ring-2 ring-[var(--accent)]/40"
-                                : "border-[var(--border-base)]"
-                            } bg-white`}
+                                : "border-[var(--border-base)]",
+                            )}
                           >
                             <img src={url} alt="공지 이미지" className="h-full w-full object-cover" />
                             {isThumbnail && (
                               <div className="absolute inset-0 flex items-start justify-end p-1">
-                                <span className="rounded-full bg-black/55 px-2 py-0.5 text-[9px] font-semibold text-white">
+                                <span className="rounded-full bg-[var(--admin-dialog-overlay-bg)] px-2 py-0.5 text-[9px] font-semibold text-[var(--text-on-accent)]">
                                   대표 이미지
                                 </span>
                               </div>
@@ -1141,7 +1150,7 @@ function Admin() {
                                     : prev,
                                 );
                               }}
-                              className="absolute inset-x-1 bottom-1 rounded-full bg-black/60 px-1.5 py-0.5 text-[9px] font-semibold text-white"
+                              className="absolute inset-x-1 bottom-1 rounded-full bg-[var(--admin-dialog-overlay-bg)] px-1.5 py-0.5 text-[9px] font-semibold text-[var(--text-on-accent)]"
                             >
                               삭제
                             </button>
@@ -1199,7 +1208,7 @@ function Admin() {
                   </button>
                   <button
                     type="submit"
-                    className="rounded-2xl bg-[var(--accent)] px-4 py-2 font-semibold text-white shadow-sm hover:brightness-95"
+                    className="rounded-2xl bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--text-on-accent)] shadow-sm hover:brightness-95"
                   >
                     {editingNotice.id ? "수정하기" : "등록하기"}
                   </button>
@@ -1212,8 +1221,8 @@ function Admin() {
 
       {/* 광고 작성/수정 모달 (위치별 1개, 교체 저장) */}
       {editingAd && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 px-4 py-6">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-xl">
+        <div className="fixed inset-0 z-30 flex items-center justify-center bg-[var(--admin-dialog-overlay-bg)] px-4 py-6">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-[var(--surface)] p-5 shadow-xl">
             <h3 className="text-sm font-bold text-[var(--text)]">
               광고 배너 등록/교체
             </h3>
@@ -1257,7 +1266,7 @@ function Admin() {
                     <p className="text-[11px] text-[var(--text-muted)]">
                       (JPG, JPEG, PNG, WEBP / 1장당 최대 5MB)
                     </p>
-                    <label className="mt-3 inline-flex cursor-pointer items-center justify-center rounded-2xl bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:brightness-95">
+                    <label className="mt-3 inline-flex cursor-pointer items-center justify-center rounded-2xl bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-[var(--text-on-accent)] shadow-sm hover:brightness-95">
                       {adImageUploading ? "업로드 중..." : "파일 선택"}
                       <input
                         type="file"
@@ -1276,7 +1285,7 @@ function Admin() {
                   </div>
                   {editingAd.imageUrl && (
                     <div className="mt-2 space-y-2">
-                      <div className="overflow-hidden rounded-xl border border-[var(--border-base)] bg-white">
+                      <div className="overflow-hidden rounded-xl border border-[var(--border-base)] bg-[var(--surface)]">
                         <img
                           src={editingAd.imageUrl}
                           alt={editingAd.title || "광고 미리보기"}
@@ -1299,7 +1308,7 @@ function Admin() {
                 <button
                   type="submit"
                   disabled={adImageUploading}
-                  className="rounded-2xl bg-[var(--accent)] px-4 py-2 font-semibold text-white shadow-sm hover:brightness-95"
+                  className="rounded-2xl bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--text-on-accent)] shadow-sm hover:brightness-95"
                 >
                   {editingAd.id ? "수정하기" : "등록하기"}
                 </button>

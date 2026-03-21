@@ -3,9 +3,9 @@
 import type { MapMode } from "@/types/app/boothmap/boothmap.types";
 
 const MODE_BUTTON_ACTIVE_CLASS =
-  "bg-[linear-gradient(145deg,var(--brand-main)_0%,var(--accent)_100%)] text-[var(--text-on-accent)] shadow-[0_10px_18px_rgba(10,85,156,0.26)]";
+  "bg-[var(--boothmap-toggle-active-bg)] text-[var(--boothmap-overlay-badge-text)] shadow-[var(--boothmap-toggle-active-shadow)]";
 const MODE_BUTTON_INACTIVE_CLASS =
-  "bg-transparent text-[var(--text-muted)] hover:bg-white/80 hover:text-[var(--text)]";
+  "bg-transparent text-[var(--boothmap-text-subtle)] hover:bg-[var(--boothmap-overlay-label-bg)] hover:text-[var(--boothmap-text)]";
 
 export default function MapFloatingToggle({
   mode,
@@ -15,7 +15,7 @@ export default function MapFloatingToggle({
   onChange: (mode: MapMode) => void;
 }) {
   return (
-    <div className="flex items-center gap-1 rounded-full border border-white/70 bg-white/95 p-1 shadow-[0_8px_24px_rgba(0,0,0,0.12)] backdrop-blur-md">
+    <div className="flex items-center gap-1 rounded-full border border-[var(--boothmap-panel-border)] bg-[var(--boothmap-panel-bg)] p-1 shadow-[var(--boothmap-panel-shadow)] backdrop-blur-md">
       <button
         type="button"
         onClick={() => onChange("2D")}

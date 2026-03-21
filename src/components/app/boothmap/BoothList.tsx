@@ -17,7 +17,11 @@ export default function BoothList({
   onSelectBooth: (id: number) => void;
 }) {
   if (booths.length === 0) {
-    return <div className="py-6 text-center text-sm font-semibold text-gray-400">표시할 부스가 없어요</div>;
+    return (
+      <div className="py-6 text-center text-sm font-semibold text-[var(--boothmap-text-muted)]">
+        표시할 부스가 없어요
+      </div>
+    );
   }
 
   return (
@@ -27,13 +31,13 @@ export default function BoothList({
           key={b.id}
           type="button"
           onClick={() => onSelectBooth(b.id)}
-          className="w-full rounded-2xl border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:shadow-md"
+          className="w-full rounded-2xl border border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] p-4 text-left shadow-sm transition hover:shadow-md"
         >
-          <div className="truncate text-base font-extrabold text-gray-900">{b.name}</div>
-          <div className="mt-1 line-clamp-2 text-sm font-medium text-gray-600">
+          <div className="truncate text-base font-extrabold text-[var(--boothmap-text)]">{b.name}</div>
+          <div className="mt-1 line-clamp-2 text-sm font-medium text-[var(--boothmap-text-subtle)]">
             {b.description ?? "설명이 아직 없어요"}
           </div>
-          <div className="mt-3 text-xs font-bold text-gray-400">{typeLabel[b.type]}</div>
+          <div className="mt-3 text-xs font-bold text-[var(--boothmap-text-muted)]">{typeLabel[b.type]}</div>
         </button>
       ))}
     </div>

@@ -228,8 +228,8 @@ export default function BoothMap() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-white">
-        <div className="text-sm font-semibold text-gray-500">
+      <div className="flex h-screen items-center justify-center bg-[var(--boothmap-surface)]">
+        <div className="text-sm font-semibold text-[var(--boothmap-text-subtle)]">
           부스맵을 불러오는 중...
         </div>
       </div>
@@ -238,8 +238,8 @@ export default function BoothMap() {
 
   if (isError) {
     return (
-      <div className="flex h-screen items-center justify-center bg-white">
-        <div className="text-sm font-semibold text-red-500">
+      <div className="flex h-screen items-center justify-center bg-[var(--boothmap-surface)]">
+        <div className="text-sm font-semibold text-[var(--boothmap-danger-text)]">
           부스맵 정보를 불러오지 못했어요.
         </div>
       </div>
@@ -247,7 +247,7 @@ export default function BoothMap() {
   }
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-white">
+    <div className="relative h-screen w-full overflow-hidden bg-[var(--boothmap-surface)]">
       <div className="absolute inset-0">
         {mode === "2D" ? (
           <KakaoMapView
@@ -283,7 +283,7 @@ export default function BoothMap() {
           sheetSnap === "FULL" ? "z-[40]" : "z-[70]"
         }`}
       >
-        <div className="rounded-[28px] border border-white/70 bg-white/92 px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.08)] backdrop-blur-md">
+        <div className="rounded-[28px] border border-[var(--boothmap-panel-border)] bg-[var(--boothmap-panel-bg)] px-4 py-3 shadow-[var(--boothmap-panel-shadow)] backdrop-blur-md">
           <FestivalDateTabs
             dates={FESTIVAL_DATES}
             selectedDate={selectedDate}

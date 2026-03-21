@@ -107,7 +107,7 @@ export default function DetailSheet({
 
   if (!selectedItem) {
     return (
-      <div className="py-6 text-center text-sm font-semibold text-gray-400">
+      <div className="py-6 text-center text-sm font-semibold text-[var(--boothmap-text-muted)]">
         선택된 항목이 없어요
       </div>
     )
@@ -116,26 +116,26 @@ export default function DetailSheet({
   if (isLoading) {
     return (
       <div className="space-y-3">
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="rounded-2xl border border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] p-4 shadow-sm">
           <div className="flex items-start justify-between">
             <div className="space-y-2">
-              <div className="h-6 w-32 animate-pulse rounded bg-gray-200" />
-              <div className="h-4 w-20 animate-pulse rounded bg-gray-100" />
+              <div className="h-6 w-32 animate-pulse rounded bg-[var(--boothmap-surface-softer)]" />
+              <div className="h-4 w-20 animate-pulse rounded bg-[var(--boothmap-surface-soft)]" />
             </div>
 
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-xl font-bold"
+              className="text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)] text-xl font-bold"
             >
               ✕
             </button>
           </div>
 
-          <div className="mt-4 h-44 w-full animate-pulse rounded-xl bg-gray-200" />
+          <div className="mt-4 h-44 w-full animate-pulse rounded-xl bg-[var(--boothmap-surface-softer)]" />
           <div className="mt-4 space-y-2">
-            <div className="h-4 w-full animate-pulse rounded bg-gray-100" />
-            <div className="h-4 w-5/6 animate-pulse rounded bg-gray-100" />
-            <div className="h-4 w-2/3 animate-pulse rounded bg-gray-100" />
+            <div className="h-4 w-full animate-pulse rounded bg-[var(--boothmap-surface-soft)]" />
+            <div className="h-4 w-5/6 animate-pulse rounded bg-[var(--boothmap-surface-soft)]" />
+            <div className="h-4 w-2/3 animate-pulse rounded bg-[var(--boothmap-surface-soft)]" />
           </div>
         </div>
       </div>
@@ -144,13 +144,13 @@ export default function DetailSheet({
 
   if (isError) {
     return (
-      <div className="rounded-2xl border border-red-100 bg-white p-6 text-center shadow-sm">
-        <div className="text-sm font-semibold text-red-500">
+      <div className="rounded-2xl border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-surface)] p-6 text-center shadow-sm">
+        <div className="text-sm font-semibold text-[var(--boothmap-danger-text)]">
           상세 정보를 불러오지 못했어요
         </div>
         <button
           onClick={onClose}
-          className="mt-4 rounded-xl bg-gray-100 px-4 py-2 text-sm font-bold text-gray-700"
+          className="mt-4 rounded-xl bg-[var(--boothmap-surface-soft)] px-4 py-2 text-sm font-bold text-[var(--boothmap-text-subtle)]"
         >
           닫기
         </button>
@@ -164,15 +164,15 @@ export default function DetailSheet({
 
     return (
       <div className="space-y-3">
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="rounded-2xl border border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] p-4 shadow-sm">
           <div className="flex items-start justify-between">
             <div>
-              <div className="text-lg font-extrabold text-gray-900">
+              <div className="text-lg font-extrabold text-[var(--boothmap-text)]">
                 {boothDetail.name}
               </div>
 
               {booth?.type && (
-                <div className="text-sm font-bold text-gray-500">
+                <div className="text-sm font-bold text-[var(--boothmap-text-subtle)]">
                   {booth.type}
                 </div>
               )}
@@ -180,14 +180,14 @@ export default function DetailSheet({
 
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-xl font-bold"
+              className="text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)] text-xl font-bold"
             >
               ✕
             </button>
           </div>
 
           {boothDetail.imageUrl && (
-            <div className="mt-3 rounded-xl bg-gray-100 p-2">
+            <div className="mt-3 rounded-xl bg-[var(--boothmap-surface-soft)] p-2">
               <img
                 src={boothDetail.imageUrl}
                 loading="lazy"
@@ -197,7 +197,7 @@ export default function DetailSheet({
             </div>
           )}
 
-          <div className="mt-4 text-sm font-medium leading-6 text-gray-700">
+          <div className="mt-4 text-sm font-medium leading-6 text-[var(--boothmap-text-subtle)]">
             {boothDetail.description || "설명이 아직 없어요"}
           </div>
         </div>
@@ -228,15 +228,15 @@ export default function DetailSheet({
 
     return (
       <div className="space-y-3">
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="rounded-2xl border border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] p-4 shadow-sm">
           {/* 헤더 */}
           <div className="flex items-start justify-between">
             <div>
-              <div className="text-lg font-extrabold text-gray-900">
+              <div className="text-lg font-extrabold text-[var(--boothmap-text)]">
                 {pubDetail.name}
               </div>
 
-              <div className="text-sm font-bold text-gray-500">
+              <div className="text-sm font-bold text-[var(--boothmap-text-subtle)]">
                 {displayCollege}
                 {pubDetail.department ? ` · ${pubDetail.department}` : ""}
               </div>
@@ -244,7 +244,7 @@ export default function DetailSheet({
 
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-xl font-bold"
+              className="text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)] text-xl font-bold"
             >
               ✕
             </button>
@@ -279,12 +279,12 @@ export default function DetailSheet({
 
               <div className="mt-2 flex justify-center gap-1">
                 {imageUrls.map((_, i) => (
-                  <div
-                    key={i}
-                    className={`h-1.5 w-1.5 rounded-full ${
-                      currentIndex === i ? "bg-blue-500" : "bg-gray-300"
-                    }`}
-                  />
+                    <div
+                      key={i}
+                      className={`h-1.5 w-1.5 rounded-full ${
+                      currentIndex === i ? "bg-[var(--boothmap-accent)]" : "bg-[var(--boothmap-surface-softer)]"
+                      }`}
+                    />
                 ))}
               </div>
             </div>
@@ -292,13 +292,13 @@ export default function DetailSheet({
 
           {/* intro */}
           {pubDetail.intro && (
-            <div className="mt-4 rounded-xl bg-blue-50 px-3 py-2 text-sm font-bold text-blue-700">
+            <div className="mt-4 rounded-xl bg-[var(--boothmap-accent-soft)] px-3 py-2 text-sm font-bold text-[var(--boothmap-accent-text)]">
               {pubDetail.intro}
             </div>
           )}
 
           {/* description */}
-          <div className="mt-4 text-sm font-medium leading-6 text-gray-700">
+          <div className="mt-4 text-sm font-medium leading-6 text-[var(--boothmap-text-subtle)]">
             {pubDetail.description || summaryPub?.intro || "설명이 아직 없어요"}
           </div>
 
@@ -312,7 +312,7 @@ export default function DetailSheet({
               }
               target="_blank"
               rel="noreferrer"
-              className="mt-4 block text-sm font-extrabold text-blue-600 underline underline-offset-2"
+              className="mt-4 block text-sm font-extrabold text-[var(--boothmap-accent)] underline underline-offset-2"
             >
               {pubDetail.instagram}
             </a>
@@ -336,7 +336,7 @@ export default function DetailSheet({
   }
 
   return (
-    <div className="py-6 text-center text-sm font-semibold text-gray-400">
+    <div className="py-6 text-center text-sm font-semibold text-[var(--boothmap-text-muted)]">
       표시할 상세 정보가 없어요
     </div>
   )

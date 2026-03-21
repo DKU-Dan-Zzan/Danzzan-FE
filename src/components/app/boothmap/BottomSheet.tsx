@@ -131,7 +131,7 @@ export default function BottomSheet({
   return (
     <div
       className={[
-        "fixed z-50 flex flex-col overflow-hidden border-t border-gray-200 bg-white shadow-[0_-10px_30px_rgba(0,0,0,0.08)]",
+        "fixed z-50 flex flex-col overflow-hidden border-t border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] shadow-[var(--boothmap-bottom-sheet-shadow)]",
         "rounded-t-2xl",
       ].join(" ")}
       style={{
@@ -153,7 +153,7 @@ export default function BottomSheet({
         onPointerCancel={endDrag}
         aria-label="bottom-sheet-handle"
       >
-        <div className="mx-auto h-1.5 w-12 rounded-full bg-gray-200" />
+        <div className="mx-auto h-1.5 w-12 rounded-full bg-[var(--boothmap-surface-softer)]" />
       </div>
 
       {mode === "DETAIL" && (
@@ -161,7 +161,7 @@ export default function BottomSheet({
           <button
             type="button"
             onClick={onBackToList}
-            className="text-m font-extrabold text-blue-600"
+            className="text-m font-extrabold text-[var(--boothmap-accent-text)]"
           >
             ← 목록으로
           </button>
