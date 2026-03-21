@@ -93,7 +93,15 @@ export const hasRequiredRole = (
   requiredRole: AuthRole,
   currentRole: AuthRole | null,
 ): boolean => {
-  return requiredRole === currentRole;
+  if (!currentRole) {
+    return false;
+  }
+
+  if (requiredRole === "student") {
+    return currentRole === "student" || currentRole === "admin";
+  }
+
+  return currentRole === "admin";
 };
 
 type RefreshQueueOptions = {

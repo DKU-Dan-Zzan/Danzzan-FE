@@ -67,4 +67,16 @@ describe("authGuard", () => {
       }),
     ).toBe(true);
   });
+
+  it("admin 토큰은 student 권한이 필요한 라우트도 접근 가능하다", () => {
+    const token = createJwtLikeToken({ role: "ROLE_ADMIN" });
+
+    expect(
+      isRoleAuthenticated({
+        accessToken: token,
+        role: "admin",
+        requiredRole: "student",
+      }),
+    ).toBe(true);
+  });
 });
