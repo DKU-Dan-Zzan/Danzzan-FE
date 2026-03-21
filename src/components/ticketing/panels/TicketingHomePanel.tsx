@@ -90,6 +90,7 @@ export function TicketingHomePanel({
             key={action.key}
             type="button"
             onClick={action.onClick}
+            aria-label={action.title}
             className="group block w-full text-left focus-visible:outline-none"
           >
             <Card className={action.cardClassName}>

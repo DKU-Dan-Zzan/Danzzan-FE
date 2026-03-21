@@ -818,6 +818,7 @@ export default function AdminMap() {
                     key={booth.id}
                     type="button"
                     onClick={() => handleSelectBooth(booth.id)}
+                    aria-label={`${booth.name} 선택`}
                     className={`w-full rounded-2xl border px-3 py-3 text-left transition-colors ${
                       isSelected
                         ? "border-[var(--accent)] bg-[var(--accent)]/10 ring-2 ring-[var(--accent)]/20"
@@ -851,6 +852,7 @@ export default function AdminMap() {
                     key={college.id}
                     type="button"
                     onClick={() => handleSelectCollege(college.id)}
+                    aria-label={`${college.name} 선택`}
                     className={`w-full rounded-2xl border px-3 py-3 text-left transition-colors ${
                       isSelected
                         ? "border-[var(--accent)] bg-[var(--accent)]/10 ring-2 ring-[var(--accent)]/20"
