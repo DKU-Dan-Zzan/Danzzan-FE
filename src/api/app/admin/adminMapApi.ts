@@ -4,7 +4,7 @@ import {
   clearAdminSession,
   getAdminAccessToken,
   reissueAdminToken,
-} from "@/hooks/app/admin/useAdminAuth";
+} from "@/lib/app/admin/admin-auth-session";
 
 const fetchWithAuth = createFetchWithAuth({
   getBaseUrl: getApiBaseUrl,

@@ -3,7 +3,8 @@ import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { CircleAlert, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { ADMIN_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
 import { resolveScopedRedirect } from "@/routes/common/authGuard";
-import { getAdminSession, useAdminAuth } from "@/hooks/app/admin/useAdminAuth";
+import { useAdminAuth } from "@/hooks/app/admin/useAdminAuth";
+import { getAdminSession } from "@/lib/app/admin/admin-auth-session";
 
 export default function AdminLogin() {
   const navigate = useNavigate();

@@ -1,16 +1,9 @@
 import { useCallback, useSyncExternalStore } from "react";
-import { hasRequiredRole, resolveRoleFromAccessToken } from "@/api/common/authCore";
 import { adminAuthApi } from "@/api/ticketing/adminAuthApi";
 import { authStore } from "@/store/ticketing/authStore";
 import type { AuthSession } from "@/types/ticketing/model/auth.model";
 import { authLogout } from "@/api/app/auth/authApi";
-
-const requireAdminRole = (accessToken: string): void => {
-  const role = resolveRoleFromAccessToken(accessToken);
-  if (!hasRequiredRole("admin", role)) {
-    throw new Error("관리자 권한이 없는 계정입니다.");
-  }
-};
+import { requireAdminRole } from "@/lib/app/admin/admin-auth-session";
 
 const setAdminSession = (session: AuthSession): void => {
   authStore.setSession(session, "admin");
@@ -66,32 +59,4 @@ export function useAdminAuth() {
   }, []);
 
   return { isAuthenticated, login, logout, tryRestoreSession };
-}
-
-export function getAdminSession(): string | null {
-  return authStore.getRole() === "admin" ? authStore.getAccessToken() : null;
-}
-
-export function clearAdminSession(): void {
-  authStore.clear();
-}
-
-export function getAdminAccessToken(): string | null {
-  return authStore.getRole() === "admin" ? authStore.getAccessToken() : null;
-}
-
-/** Access 만료(401) 시 재발급 후 새 토큰 반환. 실패 시 null (로그인 페이지 이동 권장) */
-export async function reissueAdminToken(): Promise<string | null> {
-  const reissued = await authStore.refreshAccessToken();
-  if (!reissued) {
-    return null;
-  }
-
-  try {
-    requireAdminRole(reissued);
-    return reissued;
-  } catch {
-    authStore.clear();
-    return null;
-  }
 }
