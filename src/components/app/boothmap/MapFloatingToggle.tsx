@@ -2,6 +2,11 @@
 
 import type { MapMode } from "@/types/app/boothmap/boothmap.types";
 
+const MODE_BUTTON_ACTIVE_CLASS =
+  "bg-[linear-gradient(145deg,var(--brand-main)_0%,var(--accent)_100%)] text-[var(--text-on-accent)] shadow-[0_10px_18px_rgba(10,85,156,0.26)]";
+const MODE_BUTTON_INACTIVE_CLASS =
+  "bg-transparent text-[var(--text-muted)] hover:bg-white/80 hover:text-[var(--text)]";
+
 export default function MapFloatingToggle({
   mode,
   onChange,
@@ -15,8 +20,8 @@ export default function MapFloatingToggle({
         type="button"
         onClick={() => onChange("2D")}
         className={[
-          "boothmap-mode-toggle-button rounded-full px-3 py-2 text-[11px] font-extrabold transition",
-          mode === "2D" ? "is-active" : "bg-transparent",
+          "rounded-full px-3 py-2 text-[11px] font-extrabold transition",
+          mode === "2D" ? MODE_BUTTON_ACTIVE_CLASS : MODE_BUTTON_INACTIVE_CLASS,
         ].join(" ")}
       >
         2D
@@ -26,8 +31,8 @@ export default function MapFloatingToggle({
         type="button"
         onClick={() => onChange("3D")}
         className={[
-          "boothmap-mode-toggle-button rounded-full px-2.5 py-1.5 text-[10px] font-extrabold",
-          mode === "3D" ? "is-active" : "bg-transparent",
+          "rounded-full px-2.5 py-1.5 text-[10px] font-extrabold transition",
+          mode === "3D" ? MODE_BUTTON_ACTIVE_CLASS : MODE_BUTTON_INACTIVE_CLASS,
         ].join(" ")}
       >
         3D
