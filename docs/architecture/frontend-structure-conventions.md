@@ -82,6 +82,10 @@ G2 bridge 경로는 G4에서 모두 제거 완료.
   - `src/components/**` -> `@/routes/*` 또는 routes 상대경로 import 금지
 - `LAYER_HOOKS_NO_ROUTES_IMPORT`
   - `src/hooks/**` -> `@/routes/*` 또는 routes 상대경로 import 금지
+- `LAYER_API_NO_HOOKS_IMPORT`
+  - `src/api/**` -> `@/hooks/*` 또는 hooks 상대경로 import 금지
+- `LAYER_LIB_NO_ROUTES_IMPORT`
+  - `src/lib/**` -> `@/routes/*` 또는 routes 상대경로 import 금지
 - `LAYER_TYPES_NO_RUNTIME_IMPORT`
   - `src/types/**` -> `@/api|@/hooks|@/routes|@/components` import 금지
 
