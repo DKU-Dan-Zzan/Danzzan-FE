@@ -1,4 +1,4 @@
-import { resolveScopedRedirect } from "@/routes/common/authGuard";
+import { resolveScopedRedirect } from "@/lib/common/auth-redirect";
 
 export const MY_TICKET_PATH = "/ticket/my-ticket";
 export const TICKETING_DEFAULT_PATH = "/ticket/ticketing";
