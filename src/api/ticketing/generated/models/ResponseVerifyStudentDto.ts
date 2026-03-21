@@ -1,7 +1,7 @@
 /* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
-/* eslint-disable */
+ 
 import type { ResponseScrappedStudentInfoDto } from './ResponseScrappedStudentInfoDto';
 /**
  * 단국대 학생 인증 응답

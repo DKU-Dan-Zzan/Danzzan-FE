@@ -1,7 +1,7 @@
 /* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
-/* eslint-disable */
+ 
 import type { TicketSearchItemDTO } from './TicketSearchItemDTO';
 /**
  * 학생 학번 기준 티켓 조회 응답

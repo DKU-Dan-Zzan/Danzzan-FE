@@ -20,7 +20,7 @@ const runQueueFlowSmoke = (
   polledStatuses: QueueRequestStatus[],
 ): { step: SmokeStep; reserveCalls: number } => {
   let step: SmokeStep = "list";
-  let reserveCalls = 0;
+  const reserveCalls = 0;
 
   const applyStatus = (status: QueueRequestStatus) => {
     const action = resolveQueueStatusAction(status);
