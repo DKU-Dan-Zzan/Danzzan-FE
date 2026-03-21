@@ -26,6 +26,12 @@
 - G0: 기존 URL 동작은 변경하지 않는다.
 - G1: kebab-case 통일 정책을 적용한다.
 
+### 3.4 G1 적용 상태 (2026-03-21)
+- canonical: `/ticket/my-ticket`
+- legacy redirect 유지:
+  - `/ticket/myticket` -> `/ticket/my-ticket`
+  - `/myticket` -> `/ticket/my-ticket`
+
 ## 4) 폴더 배치 규칙
 일반 앱과 ticketing은 레이어 경계를 유지한 채 공존한다.
 
