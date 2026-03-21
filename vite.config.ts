@@ -66,6 +66,9 @@ export default defineConfig(({ mode }) => {
       })
     ],
     build: {
+      // mapbox-gl is intentionally isolated in a lazy-loaded chunk.
+      // Keep warning enabled, but lift threshold to avoid noisy false positives.
+      chunkSizeWarningLimit: 1800,
       rollupOptions: {
         output: {
           manualChunks: {
