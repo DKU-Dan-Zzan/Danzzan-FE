@@ -13,7 +13,8 @@
     "lint:structure:strict": "node scripts/verify-structure.mjs --mode=strict",
     "test": "vitest run",
     "preview": "vite preview",
-    "typecheck:test": "tsc -p tsconfig.test.json --pretty false"
+    "typecheck:test": "tsc -p tsconfig.test.json --pretty false",
+    "check:bundle-budget": "node scripts/check-bundle-budget.mjs"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

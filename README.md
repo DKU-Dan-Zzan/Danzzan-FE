@@ -82,9 +82,10 @@ src/
   2. `npm run typecheck`
   3. `npm run test`
   4. `npm run build`
+  5. `npm run check:bundle-budget`
 - CI:
   - `frontend-structure-check.yml`: changed-only 구조 게이트
-  - `frontend-quality-check.yml`: lint/typecheck/test/build
+  - `frontend-quality-check.yml`: lint/typecheck/test/build/bundle budget
 
 ## 리팩토링/기여 가이드
 
