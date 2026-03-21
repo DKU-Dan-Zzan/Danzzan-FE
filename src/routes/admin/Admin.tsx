@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AlertCircle,
@@ -15,13 +15,14 @@ import {
   Map,
 } from "lucide-react";
 import { useAdminAuth } from "@/hooks/app/admin/useAdminAuth";
+import { useAdminAds } from "@/hooks/app/admin/useAdminAds";
+import { useAdminNotices } from "@/hooks/app/admin/useAdminNotices";
 import {
   createAdminNotice,
   deleteAdminNotice,
   restoreAdminNotice,
   getNoticeImagePresign,
   getAdminAdImageUpload,
-  getAdminNotices,
   getEmergencyAdminNotice,
   setAdminAdsActiveByPlacement,
   type AdvertisementPlacement,
@@ -32,7 +33,6 @@ import {
   updateNoticeDisplayOrder,
   updateEmergencyAdminNotice,
 } from "@/api/app/admin/adminApi";
-import { getPlacementAd, type ClientAdDto } from "@/api/app/notice/noticeApi";
 import {
   Dialog,
   DialogContent,
@@ -52,31 +52,44 @@ function Admin() {
   const { logout } = useAdminAuth();
 
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const handleAdminDataError = useCallback((message: string) => {
+    setGlobalError(message);
+  }, []);
 
   // 긴급 공지
   const [emergencyMessage, setEmergencyMessage] = useState("");
   const [emergencyActive, setEmergencyActive] = useState(true);
   const [emergencyLoading, setEmergencyLoading] = useState(false);
 
-  // 일반 공지
-  const [noticeKeyword, setNoticeKeyword] = useState("");
-  const [noticePage, setNoticePage] = useState(0);
-  const [noticeTotalPages, setNoticeTotalPages] = useState(0);
-  const [notices, setNotices] = useState<NoticeResponse[]>([]);
-  const [noticeLoading, setNoticeLoading] = useState(false);
+  const {
+    noticeKeyword,
+    setNoticeKeyword,
+    noticePage,
+    noticeTotalPages,
+    notices,
+    noticeLoading,
+    noticeStatus,
+    setNoticeStatus,
+    reloadNotices,
+  } = useAdminNotices({
+    onError: handleAdminDataError,
+  });
+
+  const {
+    adLoading,
+    homeBottomAd,
+    myTicketAd,
+    reloadAds,
+  } = useAdminAds({
+    onError: handleAdminDataError,
+  });
+
   const [editingNotice, setEditingNotice] = useState<NoticeFormState | null>(null);
-  const [noticeStatus, setNoticeStatus] = useState<NoticeStatusFilter>("ACTIVE");
   const [pinReorderMode, setPinReorderMode] = useState(false);
   const [pinReorderList, setPinReorderList] = useState<NoticeResponse[]>([]);
   const [pinSaving, setPinSaving] = useState(false);
-  // 광고
-  const [adLoading, setAdLoading] = useState(false);
   const [editingAd, setEditingAd] = useState<AdFormState | null>(null);
 
-  const [homeBottomAd, setHomeBottomAd] = useState<ClientAdDto | null>(null);
-  const [myTicketAd, setMyTicketAd] = useState<ClientAdDto | null>(null);
-
-  const [initialLoaded, setInitialLoaded] = useState(false);
   const [noticeImageUploading, setNoticeImageUploading] = useState(false);
   const [adImageUploading, setAdImageUploading] = useState(false);
 
@@ -85,95 +98,39 @@ function Admin() {
     navigate("/admin/login", { replace: true });
   };
 
-  // 초기 로딩
   useEffect(() => {
-    const loadInitial = async () => {
+    let cancelled = false;
+
+    void (async () => {
       try {
-        setGlobalError(null);
         setEmergencyLoading(true);
-        setNoticeLoading(true);
-
-        const [emergencyRes, noticePageRes] = await Promise.all([
-          getEmergencyAdminNotice(),
-          getAdminNotices({ page: 0, size: 10, status: "ACTIVE" }),
-        ]);
-
+        const emergencyRes = await getEmergencyAdminNotice();
+        if (cancelled) {
+          return;
+        }
         setEmergencyMessage(emergencyRes.message ?? "");
         setEmergencyActive(Boolean(emergencyRes.isActive));
-
-        setNotices(noticePageRes.content);
-        setNoticePage(noticePageRes.number);
-        setNoticeTotalPages(noticePageRes.totalPages);
-
-        // 광고는 위치별 최신 1개만 조회
-        try {
-          const [homeBottom, myTicket] = await Promise.all([
-            getPlacementAd("HOME_BOTTOM"),
-            getPlacementAd("MY_TICKET"),
-          ]);
-          setHomeBottomAd(homeBottom);
-          setMyTicketAd(myTicket);
-        } catch (error) {
-          // 광고 조회 실패는 전체 에러로 올리지 않고 조용히 무시
-          console.error(error);
-        } finally {
-          setAdLoading(false);
-        }
       } catch (error) {
-        setGlobalError(error instanceof Error ? error.message : "데이터를 불러오지 못했습니다.");
+        if (cancelled) {
+          return;
+        }
+        setGlobalError(error instanceof Error ? error.message : "긴급 공지를 불러오지 못했습니다.");
       } finally {
-        setEmergencyLoading(false);
-        setNoticeLoading(false);
-        setInitialLoaded(true);
+        if (!cancelled) {
+          setEmergencyLoading(false);
+        }
       }
+    })();
+
+    return () => {
+      cancelled = true;
     };
+  }, []);
 
-    if (!initialLoaded) {
-      void loadInitial();
-    }
-  }, [initialLoaded]);
-
-  // 공지 재조회
-  const reloadNotices = async (
-    page = 0,
-    keyword = noticeKeyword,
-    status: NoticeStatusFilter = noticeStatus,
-  ) => {
-    try {
-      setGlobalError(null);
-      setNoticeLoading(true);
-      const res = await getAdminNotices({
-        page,
-        size: 10,
-        keyword: keyword.trim() || undefined,
-        status,
-      });
-      setNotices(res.content);
-      setNoticePage(res.number);
-      setNoticeTotalPages(res.totalPages);
-    } catch (error) {
-      setGlobalError(error instanceof Error ? error.message : "공지 목록을 불러오지 못했습니다.");
-    } finally {
-      setNoticeLoading(false);
-    }
-  };
-
-  // 광고 재조회
-  const reloadAds = async () => {
-    try {
-      setAdLoading(true);
-      const [homeBottom, myTicket] = await Promise.all([
-        getPlacementAd("HOME_BOTTOM"),
-        getPlacementAd("MY_TICKET"),
-      ]);
-      setHomeBottomAd(homeBottom);
-      setMyTicketAd(myTicket);
-    } catch (error) {
-      setGlobalError(error instanceof Error ? error.message : "광고 정보를 불러오지 못했습니다.");
-    } finally {
-      setAdLoading(false);
-    }
-  };
+  useEffect(() => {
+    void reloadNotices(0, "", "ACTIVE");
+    void reloadAds();
+  }, [reloadNotices, reloadAds]);
 
   const handleDeleteAd = async (placement: AdvertisementPlacement) => {
     const ad = placement === "HOME_BOTTOM" ? homeBottomAd : myTicketAd;
