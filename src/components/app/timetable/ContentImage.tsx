@@ -5,6 +5,7 @@ type ContentImageSectionProps = {
   images: ContentImageDto[]
   isLoading: boolean
   error: string | null
+  onRetry?: () => void
   selectedImage: ContentImageDto | null
   onSelectImage: (image: ContentImageDto) => void
   onCloseImage: () => void
@@ -14,6 +15,7 @@ export default function ContentImageSection({
   images,
   isLoading,
   error,
+  onRetry,
   selectedImage,
   onSelectImage,
   onCloseImage,
@@ -29,7 +31,16 @@ export default function ContentImageSection({
   if (error) {
     return (
       <div className="py-12 text-center text-[var(--timetable-empty-text)]">
-        콘텐츠 이미지를 불러오지 못했습니다.
+        <p>{error}</p>
+        {onRetry && (
+          <button
+            type="button"
+            onClick={onRetry}
+            className="mt-2 rounded-md border border-[var(--border-subtle)] bg-[var(--surface)] px-2 py-1 text-xs font-semibold text-[var(--text)]"
+          >
+            다시 시도
+          </button>
+        )}
       </div>
     )
   }

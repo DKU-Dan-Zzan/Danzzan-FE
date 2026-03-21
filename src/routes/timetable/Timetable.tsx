@@ -10,6 +10,7 @@ import DayTabs from "@/components/app/timetable/DayTabs"
 import Timeline from "@/components/app/timetable/Timeline"
 import ContentImageSection from "@/components/app/timetable/ContentImage"
 import type { FestivalDay, Performance } from "@/types/app/timetable/timetable.types"
+import { appQueryKeys, useAppQuery } from "@/lib/query"
 import "./index.css"
 
 const FESTIVAL_DAYS: FestivalDay[] = [
@@ -56,107 +57,61 @@ function findNowOrNextTarget(items: Performance[], nowMinutes: number) {
 export default function Timetable() {
   const [searchParams] = useSearchParams()
 
-  const [activeIdx, setActiveIdx] = useState(1)
-  const [scrollTargetId, setScrollTargetId] = useState<number | null>(null)
-  const [nowTargetId, setNowTargetId] = useState<number | null>(null)
-
-  const [items, setItems] = useState<Performance[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [loadError, setLoadError] = useState<string | null>(null)
-
-  const [contentImages, setContentImages] = useState<ContentImageDto[]>([])
-  const [isImageLoading, setIsImageLoading] = useState(false)
-  const [imageLoadError, setImageLoadError] = useState<string | null>(null)
-  const [selectedImage, setSelectedImage] = useState<ContentImageDto | null>(null)
-
-  const didAutoInitRef = useRef(false)
-  const didAutoScrollRef = useRef(false)
-
-  useEffect(() => {
-    if (didAutoInitRef.current) return
-    didAutoInitRef.current = true
-
+  const [activeIdx, setActiveIdx] = useState(() => {
     const queryDate = searchParams.get("date")
     const baseDate = queryDate || todayISODateLocal()
-
     const targetIdx = FESTIVAL_DAYS.findIndex((d) => d.date === baseDate)
-    if (targetIdx !== -1) {
-      setActiveIdx(targetIdx)
-    }
-  }, [searchParams])
+    return targetIdx !== -1 ? targetIdx : 1
+  })
+  const [scrollTargetId, setScrollTargetId] = useState<number | null>(null)
+  const [clockTick, setClockTick] = useState(() => Date.now())
+
+  const [selectedImage, setSelectedImage] = useState<ContentImageDto | null>(null)
+
+  const didAutoScrollRef = useRef(false)
 
   const activeDay = FESTIVAL_DAYS[activeIdx]
   const activeDate = activeDay.date
   const isDay1 = activeDay.key === "DAY-1"
+  const isTodayTab = activeDate === todayISODateLocal()
+
+  const performancesQuery = useAppQuery({
+    queryKey: appQueryKeys.timetablePerformances(activeDate),
+    enabled: !isDay1,
+    queryFn: ({ signal }) => getPerformances(activeDate, { signal }),
+    staleTime: 60_000,
+  })
+
+  const contentImagesQuery = useAppQuery({
+    queryKey: appQueryKeys.timetableContentImages(),
+    enabled: isDay1,
+    queryFn: ({ signal }) => getContentImages({ signal }),
+    staleTime: 10 * 60_000,
+  })
+
+  const items: Performance[] = useMemo(
+    () => performancesQuery.data?.performances ?? [],
+    [performancesQuery.data],
+  )
+  const isLoading = performancesQuery.isPending
+  const loadError = performancesQuery.error?.message ?? null
+
+  const contentImages = contentImagesQuery.data ?? []
+  const isImageLoading = contentImagesQuery.isPending
+  const imageLoadError = contentImagesQuery.error?.message ?? null
+  const nowTargetId = useMemo(() => {
+    if (!isTodayTab || items.length === 0) {
+      return null
+    }
+
+    const now = new Date(clockTick)
+    const nowMinutes = now.getHours() * 60 + now.getMinutes()
+    const { nowId } = findNowOrNextTarget(items, nowMinutes)
+    return nowId
+  }, [clockTick, isTodayTab, items])
 
   const title = useMemo(() => "타임테이블", [])
   const subtitle = useMemo(() => "공연 타임테이블을 확인하세요", [])
-
-  useEffect(() => {
-    if (isDay1) {
-      setItems([])
-      setIsLoading(false)
-      setLoadError(null)
-      return
-    }
-
-    let mounted = true
-
-    async function run() {
-      setIsLoading(true)
-      setLoadError(null)
-      try {
-        const data = await getPerformances(activeDate)
-        if (!mounted) return
-        setItems(data.performances ?? [])
-      } catch {
-        if (!mounted) return
-        setItems([])
-        setLoadError("공연 정보를 불러오지 못했습니다.")
-      } finally {
-        if (mounted) {
-          setIsLoading(false)
-        }
-      }
-    }
-
-    run()
-    return () => {
-      mounted = false
-    }
-  }, [activeDate, isDay1])
-
-  useEffect(() => {
-    if (!isDay1) {
-      setSelectedImage(null)
-      return
-    }
-
-    let mounted = true
-
-    async function run() {
-      setIsImageLoading(true)
-      setImageLoadError(null)
-      try {
-        const data = await getContentImages()
-        if (!mounted) return
-        setContentImages(data ?? [])
-      } catch {
-        if (!mounted) return
-        setContentImages([])
-        setImageLoadError("콘텐츠 이미지를 불러오지 못했습니다.")
-      } finally {
-        if (mounted) {
-          setIsImageLoading(false)
-        }
-      }
-    }
-
-    run()
-    return () => {
-      mounted = false
-    }
-  }, [isDay1])
 
   useEffect(() => {
     if (!selectedImage) return
@@ -175,45 +130,37 @@ export default function Timetable() {
   }, [selectedImage])
 
   useEffect(() => {
-    const today = todayISODateLocal()
-    const isTodayTab = activeDate === today
-    if (!isTodayTab) {
-      setNowTargetId(null)
-      return
-    }
-    if (items.length === 0) return
+    if (!isTodayTab || items.length === 0) return
 
     const now = new Date()
     const nowMinutes = now.getHours() * 60 + now.getMinutes()
 
-    const { nowId, scrollId } = findNowOrNextTarget(items, nowMinutes)
-    setNowTargetId(nowId)
+    const { scrollId } = findNowOrNextTarget(items, nowMinutes)
 
     if (!didAutoScrollRef.current) {
       didAutoScrollRef.current = true
-      setScrollTargetId(null)
-      requestAnimationFrame(() => setScrollTargetId(scrollId))
+      requestAnimationFrame(() => {
+        setScrollTargetId(null)
+        requestAnimationFrame(() => setScrollTargetId(scrollId))
+      })
     }
-  }, [activeDate, items])
+  }, [isTodayTab, items])
 
   useEffect(() => {
-    const today = todayISODateLocal()
-    const isTodayTab = activeDate === today
     if (!isTodayTab || items.length === 0) return
 
     const id = window.setInterval(() => {
-      const now = new Date()
-      const nowMinutes = now.getHours() * 60 + now.getMinutes()
-      const { nowId } = findNowOrNextTarget(items, nowMinutes)
-      setNowTargetId(nowId)
+      setClockTick(Date.now())
     }, 60_000)
 
     return () => window.clearInterval(id)
-  }, [activeDate, items])
+  }, [isTodayTab, items])
 
   const handleChangeDay = (idx: number) => {
     setActiveIdx(idx)
     setScrollTargetId(null)
+    setClockTick(Date.now())
+    setSelectedImage(null)
     didAutoScrollRef.current = false
   }
 
@@ -244,6 +191,9 @@ export default function Timetable() {
               selectedImage={selectedImage}
               onSelectImage={setSelectedImage}
               onCloseImage={() => setSelectedImage(null)}
+              onRetry={() => {
+                void contentImagesQuery.refetch()
+              }}
             />
           ) : isLoading ? (
             <div className="py-12 text-center text-[var(--timetable-empty-text)]">
@@ -251,7 +201,16 @@ export default function Timetable() {
             </div>
           ) : loadError ? (
             <div className="py-12 text-center text-[var(--timetable-empty-text)]">
-              공연 정보를 불러오지 못했습니다.
+              <p>{loadError}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  void performancesQuery.refetch()
+                }}
+                className="mt-2 rounded-md border border-[var(--border-subtle)] bg-[var(--surface)] px-2 py-1 text-xs font-semibold text-[var(--text)]"
+              >
+                다시 시도
+              </button>
             </div>
           ) : items.length === 0 ? (
             <div className="py-12 text-center text-[var(--timetable-empty-text)]">
@@ -262,7 +221,7 @@ export default function Timetable() {
               <Timeline
                 items={items}
                 scrollTargetId={scrollTargetId}
-                nowTargetId={nowTargetId}
+                nowTargetId={isTodayTab ? nowTargetId : null}
               />
 
               <div className="mt-5 flex items-start gap-2 rounded-2xl border border-[var(--timetable-info-border)] bg-[var(--timetable-info-bg)] px-4 py-3">
