@@ -1,16 +1,6 @@
-﻿import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/ticketing/useAuth";
-import { AdminLayout } from "@/components/ticketing/layout/AdminLayout";
-import { UserLayout } from "@/components/ticketing/layout/UserLayout";
-import Login from "@/routes/ticketing/login/Login";
-import ResetPassword from "@/routes/ticketing/reset-password/ResetPassword";
-import Signup from "@/routes/ticketing/signup/Signup";
-import Ticketing from "@/routes/ticketing/ticketing/Ticketing";
-import MyTicket from "@/routes/ticketing/my-ticket/MyTicket";
-import AdminLogin from "@/routes/ticketing/admin/login/AdminLogin";
-import WristbandPage from "@/routes/ticketing/admin/wristband/WristbandPage";
-import TokenRequired from "@/routes/ticketing/admin/token-required/TokenRequired";
-import NotFoundPage from "@/routes/ticketing/not-found/NotFoundPage";
 import {
   buildLoginRedirectPath,
   buildReturnTo,
@@ -18,6 +8,34 @@ import {
 } from "@/routes/common/authGuard";
 import { env } from "@/utils/ticketing/env";
 import "@/routes/ticketing/index.css";
+
+const AdminLayout = lazy(() =>
+  import("@/components/ticketing/layout/AdminLayout").then((module) => ({
+    default: module.AdminLayout,
+  })),
+);
+const UserLayout = lazy(() =>
+  import("@/components/ticketing/layout/UserLayout").then((module) => ({
+    default: module.UserLayout,
+  })),
+);
+const Login = lazy(() => import("@/routes/ticketing/login/Login"));
+const ResetPassword = lazy(() => import("@/routes/ticketing/reset-password/ResetPassword"));
+const Signup = lazy(() => import("@/routes/ticketing/signup/Signup"));
+const Ticketing = lazy(() => import("@/routes/ticketing/ticketing/Ticketing"));
+const MyTicket = lazy(() => import("@/routes/ticketing/my-ticket/MyTicket"));
+const AdminLogin = lazy(() => import("@/routes/ticketing/admin/login/AdminLogin"));
+const WristbandPage = lazy(() => import("@/routes/ticketing/admin/wristband/WristbandPage"));
+const TokenRequired = lazy(() => import("@/routes/ticketing/admin/token-required/TokenRequired"));
+const NotFoundPage = lazy(() => import("@/routes/ticketing/not-found/NotFoundPage"));
+
+function TicketingRouteLoading() {
+  return (
+    <div className="flex min-h-dvh items-center justify-center text-[var(--text-muted)]">
+      화면 불러오는 중...
+    </div>
+  );
+}
 
 function RequireStudentAuth() {
   const { session } = useAuth();
@@ -81,30 +99,32 @@ function LegacyMyTicketRedirect() {
 export default function TicketingApp() {
   return (
     <div className="ticketing-root">
-      <Routes>
-        <Route index element={<Navigate to="login" replace />} />
+      <Suspense fallback={<TicketingRouteLoading />}>
+        <Routes>
+          <Route index element={<Navigate to="login" replace />} />
 
-        <Route element={<UserLayout />}>
-          <Route path="login" element={<Login />} />
-          <Route path="reset-password" element={<ResetPassword />} />
-          <Route path="signup" element={<Signup />} />
-          <Route element={<RequireStudentAuth />}>
-            <Route path="ticketing" element={<Ticketing />} />
-            <Route path="my-ticket" element={<MyTicket />} />
-            <Route path="myticket" element={<LegacyMyTicketRedirect />} />
+          <Route element={<UserLayout />}>
+            <Route path="login" element={<Login />} />
+            <Route path="reset-password" element={<ResetPassword />} />
+            <Route path="signup" element={<Signup />} />
+            <Route element={<RequireStudentAuth />}>
+              <Route path="ticketing" element={<Ticketing />} />
+              <Route path="my-ticket" element={<MyTicket />} />
+              <Route path="myticket" element={<LegacyMyTicketRedirect />} />
+            </Route>
           </Route>
-        </Route>
 
-        <Route path="admin" element={<AdminLogin />} />
-        <Route path="admin/login" element={<AdminLogin />} />
-        <Route path="admin/*" element={<RequireAdminAuth />}>
-          <Route element={<AdminLayout />}>
-            <Route path="wristband" element={<WristbandPage />} />
+          <Route path="admin" element={<AdminLogin />} />
+          <Route path="admin/login" element={<AdminLogin />} />
+          <Route path="admin/*" element={<RequireAdminAuth />}>
+            <Route element={<AdminLayout />}>
+              <Route path="wristband" element={<WristbandPage />} />
+            </Route>
           </Route>
-        </Route>
 
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Suspense>
     </div>
   );
 }
