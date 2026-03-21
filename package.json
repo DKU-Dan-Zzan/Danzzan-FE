@@ -12,7 +12,8 @@
     "lint:structure:changed": "node scripts/verify-structure.mjs --mode=changed",
     "lint:structure:strict": "node scripts/verify-structure.mjs --mode=strict",
     "test": "vitest run",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck:test": "tsc -p tsconfig.test.json --pretty false"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

@@ -44,7 +44,7 @@ const runQueueFlowSmoke = (
 
   applyStatus(enterStatus);
   for (const status of polledStatuses) {
-    if (step !== "waiting") {
+    if ((step as SmokeStep) !== "waiting") {
       break;
     }
     applyStatus(status);

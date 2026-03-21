@@ -1,5 +1,4 @@
 import {
-  AuthBoundaryError,
   resolveRoleFromAccessToken,
   withAuthRetry,
 } from "@/api/common/authCore";
@@ -39,7 +38,7 @@ describe("authCore", () => {
           throw { status: 403 };
         },
       }),
-    ).rejects.toMatchObject<AuthBoundaryError>({
+    ).rejects.toMatchObject({
       code: "AUTH_FORBIDDEN",
       status: 403,
     });
@@ -84,7 +83,7 @@ describe("authCore", () => {
           return "ok";
         },
       }),
-    ).rejects.toMatchObject<AuthBoundaryError>({
+    ).rejects.toMatchObject({
       code: "AUTH_SESSION_EXPIRED",
       status: 401,
     });
