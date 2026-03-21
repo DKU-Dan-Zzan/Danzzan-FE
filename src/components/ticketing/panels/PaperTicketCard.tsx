@@ -1,6 +1,7 @@
 import { Card } from "@/components/common/ui/card";
 import { cn } from "@/components/common/ui/utils";
 import { TICKETING_CLASSES } from "@/components/ticketing/panels/TicketingShared";
+import { resolveTicketDayLabel } from "@/lib/ticketing/festivalDay";
 import type { Ticket } from "@/types/ticketing/model/ticket.model";
 
 interface PaperTicketCardProps {
@@ -56,15 +57,6 @@ const toCompactEventDate = (value: string): string => {
   return normalized;
 };
 
-const getDayNumberFromEventName = (value: string): string | null => {
-  const matched = value.match(/(\d+)\s*일차/);
-  if (!matched) {
-    return null;
-  }
-
-  return matched[1];
-};
-
 const getGuideLines = (
   ticket: Ticket,
 ): {
@@ -77,9 +69,11 @@ const getGuideLines = (
   entryValue: string;
 } => {
   const dateLabel = ticket.eventDate ? toCompactEventDate(ticket.eventDate) : "미정";
-  const dayNumber = ticket.eventName ? getDayNumberFromEventName(ticket.eventName) : null;
   const venueLabel = ticket.venue || "단국존";
-  const dayLabel = dayNumber ? `DAY ${dayNumber}` : "DAY 미정";
+  const dayLabel = resolveTicketDayLabel({
+    eventDate: ticket.eventDate,
+    eventName: ticket.eventName,
+  });
   const queueLabel = ticket.queueNumber != null
     ? String(ticket.queueNumber)
     : ticket.id.slice(-4).toUpperCase();
