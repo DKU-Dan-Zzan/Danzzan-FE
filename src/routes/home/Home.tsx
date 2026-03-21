@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react"
 
-import PosterCarousel, { type Poster } from "./components/PosterCarousel"
-import EmergencyNotice, { type EmergencyNoticeData } from "./components/EmergencyNotice"
-import LineupSection, { type LineupBanner } from "./components/LineupSection"
-import CurrentPerformanceSection from "./components/CurrentPerformanceSection";
-import AdBanner from "./components/AdBanner";
+import PosterCarousel, { type Poster } from "@/components/app/home/PosterCarousel"
+import EmergencyNotice, { type EmergencyNoticeData } from "@/components/app/home/EmergencyNotice"
+import LineupSection, { type LineupBanner } from "@/components/app/home/LineupSection"
+import CurrentPerformanceSection from "@/components/app/home/CurrentPerformanceSection";
+import AdBanner from "@/components/app/home/AdBanner";
 
-import { getEmergencyNotice, getHomeImages, getLineupImages } from "../../api/homeApi"
-import { getPlacementAd, type ClientAdDto } from "../../api/noticeApi"
+import { getEmergencyNotice, getHomeImages, getLineupImages } from "@/api/app/home/homeApi"
+import { getPlacementAd, type ClientAdDto } from "@/api/app/notice/noticeApi"
 
 const dummyPosters: Poster[] = [
   { id: "p1", imageUrl: "/posters/dummy.jpg", alt: "2026 단국축제 포스터" },

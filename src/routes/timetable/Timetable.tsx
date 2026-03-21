@@ -5,11 +5,11 @@ import {
   getContentImages,
   getPerformances,
   type ContentImageDto,
-} from "../../api/timetableApi"
-import DayTabs from "./components/DayTabs"
-import Timeline from "./components/Timeline"
-import ContentImageSection from "./components/ContentImage"
-import type { FestivalDay, Performance } from "./timetable.types"
+} from "@/api/app/timetable/timetableApi"
+import DayTabs from "@/components/app/timetable/DayTabs"
+import Timeline from "@/components/app/timetable/Timeline"
+import ContentImageSection from "@/components/app/timetable/ContentImage"
+import type { FestivalDay, Performance } from "@/types/app/timetable/timetable.types"
 
 const FESTIVAL_DAYS: FestivalDay[] = [
   { key: "DAY-1", label: "1일차", date: "2026-05-12" },

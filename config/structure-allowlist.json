@@ -44,14 +44,14 @@
     },
     {
       "ruleId": "STYLE_NO_NEW_RAW_HEX",
-      "target": "src/routes/boothmap/components/KakaoMapView.tsx",
+      "target": "src/components/app/boothmap/KakaoMapView.tsx",
       "reason": "Map SDK 렌더링 제약으로 인한 런타임 색상 지정 최소 허용",
       "owner": "fe-platform",
       "expiresAt": "2026-06-30"
     },
     {
       "ruleId": "STYLE_NO_NEW_RAW_HEX",
-      "target": "src/routes/boothmap/components/Mapbox3DView.tsx",
+      "target": "src/components/app/boothmap/Mapbox3DView.tsx",
       "reason": "Map SDK 렌더링 제약으로 인한 런타임 색상 지정 최소 허용",
       "owner": "fe-platform",
       "expiresAt": "2026-06-30"
@@ -65,7 +65,7 @@
     },
     {
       "ruleId": "STYLE_NO_NEW_RAW_HEX",
-      "target": "src/routes/boothmap/constants/boothmapTheme.ts",
+      "target": "src/utils/app/boothmap/boothmapTheme.ts",
       "reason": "지도 SDK marker theme 상수의 최소 허용",
       "owner": "fe-platform",
       "expiresAt": "2026-06-30"

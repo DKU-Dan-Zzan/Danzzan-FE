@@ -10,18 +10,18 @@ import type {
   SelectedDetailItem,
   SheetMode,
   SheetSnap,
-} from "./types/boothmap.types";
+} from "@/types/app/boothmap/boothmap.types";
 
-import PrimaryFilterChips from "./components/PrimaryFilterChips";
-import SecondaryCollegeChips from "./components/SecondaryCollegeChips";
-import KakaoMapView from "./components/KakaoMapView";
-import BottomSheet from "./components/BottomSheet";
-import BoothList from "./components/BoothList";
-import PubList from "./components/PubList";
-import DetailSheet from "./components/DetailSheet";
-import MapFloatingToggle from "./components/MapFloatingToggle";
-import Mapbox3DView from "./components/Mapbox3DView";
-import FestivalDateTabs from "./components/FestivalDateTabs";
+import PrimaryFilterChips from "@/components/app/boothmap/PrimaryFilterChips";
+import SecondaryCollegeChips from "@/components/app/boothmap/SecondaryCollegeChips";
+import KakaoMapView from "@/components/app/boothmap/KakaoMapView";
+import BottomSheet from "@/components/app/boothmap/BottomSheet";
+import BoothList from "@/components/app/boothmap/BoothList";
+import PubList from "@/components/app/boothmap/PubList";
+import DetailSheet from "@/components/app/boothmap/DetailSheet";
+import MapFloatingToggle from "@/components/app/boothmap/MapFloatingToggle";
+import Mapbox3DView from "@/components/app/boothmap/Mapbox3DView";
+import FestivalDateTabs from "@/components/app/boothmap/FestivalDateTabs";
 
 import {
   getBoothMap,
@@ -29,7 +29,7 @@ import {
   type BoothDto,
   type CollegeDto,
   type PubSummaryResponse,
-} from "../../api/boothmapApi";
+} from "@/api/app/boothmap/boothmapApi";
 
 const DEFAULT_MAP_VIEWPORT: MapViewport = {
   lat: 37.3201,

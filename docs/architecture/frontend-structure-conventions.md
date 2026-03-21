@@ -32,12 +32,41 @@
   - `/ticket/myticket` -> `/ticket/my-ticket`
   - `/myticket` -> `/ticket/my-ticket`
 
+### 3.5 G2 적용 상태 (2026-03-21)
+- 일반앱 canonical 레이어를 `app` 네임스페이스로 1차 정렬:
+  - `src/api/app/**`
+  - `src/hooks/app/**`
+  - `src/types/app/**`
+  - `src/utils/app/**`
+  - `src/components/app/**`
+- 기존 경로는 bridge(`@deprecated`)를 유지한다.
+- bridge 제거는 G4에서 일괄 수행한다(이번 단계 제거 금지).
+
 ## 4) 폴더 배치 규칙
 일반 앱과 ticketing은 레이어 경계를 유지한 채 공존한다.
 
 - 일반 앱 레이어: `src/{api,components,hooks,lib,routes,store,types,utils}`
 - ticketing 레이어: `src/{api,components,hooks,lib,routes,store,types,utils}/ticketing/**`
 - route 전용 UI는 `src/routes/*/components`에 둘 수 있으나, G2에서 공통 레이어 정렬을 목표로 한다.
+
+G2에서 적용한 canonical 경로(일반앱):
+- API: `src/api/app/{auth,admin,boothmap,home,notice,timetable}/**`
+- Hooks: `src/hooks/app/{admin,boothmap}/**`
+- Types: `src/types/app/{boothmap,timetable}/**`
+- Utils: `src/utils/app/boothmap/**`, `src/utils/app/timetable.ts`
+- Components: `src/components/app/{home,boothmap,timetable}/**`
+
+G2 bridge 유지 경로(제거 예정: G4):
+- `src/api/*.ts` (일반앱 엔드포인트 모듈)
+- `src/hooks/useAdminAuth.ts`, `src/hooks/useKakaoMapLoader.ts`
+- `src/types/kakao-map.ts`
+- `src/utils/timetable.ts`
+- `src/routes/home/components/**`
+- `src/routes/boothmap/components/**`
+- `src/routes/timetable/components/**`
+- `src/routes/boothmap/types/boothmap.types.ts`
+- `src/routes/timetable/timetable.types.ts`
+- `src/routes/boothmap/constants/{mapZones,boothmapTheme}.ts`
 
 ## 5) 레이어 경계(import) 규칙
 아래 규칙은 금지 규칙이며, 위반 시 게이트를 실패 처리한다.
