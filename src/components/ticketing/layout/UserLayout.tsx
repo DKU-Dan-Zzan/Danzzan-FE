@@ -4,17 +4,21 @@ import { useAuth } from "@/hooks/ticketing/useAuth";
 import BottomNav from "@/components/layout/BottomNav";
 import { AppTopBar } from "@/components/layout/AppTopBar";
 import { AppShell } from "@/components/layout/AppShell";
+import { shouldShowTicketingHeader } from "@/lib/ticketing/navigation/headerVisibility";
 
 export function UserLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, role } = useAuth();
-  const isAuthPage = location.pathname === "/ticket/login" || location.pathname === "/ticket/signup";
+  const { session, role } = useAuth();
   const isTicketingPage = location.pathname.startsWith("/ticket/ticketing");
   const isMyTicketPage =
     location.pathname.startsWith("/ticket/my-ticket") ||
     location.pathname.startsWith("/ticket/myticket");
-  const showHeader = isAuthenticated && role === "student" && !isAuthPage;
+  const showHeader = shouldShowTicketingHeader({
+    pathname: location.pathname,
+    accessToken: session.tokens?.accessToken,
+    role,
+  });
   const pageTitle = "축제 포털";
 
   const handleBack = () => {
