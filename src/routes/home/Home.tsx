@@ -5,6 +5,7 @@ import EmergencyNotice, { type EmergencyNoticeData } from "@/components/app/home
 import LineupSection, { type LineupBanner } from "@/components/app/home/LineupSection"
 import CurrentPerformanceSection from "@/components/app/home/CurrentPerformanceSection";
 import AdBanner from "@/components/app/home/AdBanner";
+import "./index.css";
 
 import { getEmergencyNotice, getHomeImages, getLineupImages } from "@/api/app/home/homeApi"
 import { getPlacementAd, type ClientAdDto } from "@/api/app/notice/noticeApi"
@@ -119,7 +120,7 @@ function Home() {
   }, [])
 
   return (
-    <div className="flow-root min-h-full bg-[var(--bg-page-soft)]">
+    <div className="home-root flow-root min-h-full bg-[var(--bg-page-soft)]">
       {error && (
         <div className="mx-auto mt-3 w-full max-w-[var(--home-content-max-width)] rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-xs leading-[1.35] text-[var(--status-danger-text)]">
           {error}

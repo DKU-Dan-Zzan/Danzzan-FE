@@ -10,6 +10,7 @@ import DayTabs from "@/components/app/timetable/DayTabs"
 import Timeline from "@/components/app/timetable/Timeline"
 import ContentImageSection from "@/components/app/timetable/ContentImage"
 import type { FestivalDay, Performance } from "@/types/app/timetable/timetable.types"
+import "./index.css"
 
 const FESTIVAL_DAYS: FestivalDay[] = [
   { key: "DAY-1", label: "1일차", date: "2026-05-12" },
@@ -217,7 +218,7 @@ export default function Timetable() {
   }
 
   return (
-    <div className="flex h-screen min-h-0 flex-col bg-[var(--bg-page-soft)]">
+    <div className="timetable-root flex h-screen min-h-0 flex-col bg-[var(--bg-page-soft)]">
       <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
         <div className="px-5 pt-5">
           <div className="text-[38px] font-extrabold text-[var(--accent)] font-cute">

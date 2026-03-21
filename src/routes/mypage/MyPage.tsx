@@ -4,6 +4,7 @@ import { authLogout } from "@/api/app/auth/authApi";
 import { authStore } from "@/store/ticketing/authStore";
 import { authApi } from "@/api/ticketing/authApi";
 import { GraduationCap, IdCard, User } from "lucide-react";
+import "./index.css";
 
 function MyPage() {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ function MyPage() {
 
   if (!isLoggedIn) {
     return (
-      <div className="relative flex min-h-full flex-col items-center justify-center overflow-hidden bg-[var(--bg-page-soft)] px-6 py-[100px]">
+      <div className="mypage-root relative flex min-h-full flex-col items-center justify-center overflow-hidden bg-[var(--bg-page-soft)] px-6 py-[100px]">
         <div className="relative flex w-full max-w-sm flex-col items-center gap-5 rounded-[28px] border border-[var(--mypage-guest-card-border)] bg-[var(--mypage-guest-card-bg)] px-6 py-8 text-center shadow-[var(--mypage-guest-card-shadow)] backdrop-blur-[6px]">
           <div className="flex h-20 w-20 items-center justify-center rounded-[24px] border border-[var(--mypage-guest-icon-border)] bg-[linear-gradient(145deg,var(--mypage-guest-icon-bg-start)_0%,var(--mypage-guest-icon-bg-end)_100%)] shadow-[var(--mypage-guest-icon-shadow)]">
             <User size={38} className="text-[var(--text-on-accent)]" />
@@ -100,7 +101,7 @@ function MyPage() {
   ];
 
   return (
-    <div className="relative min-h-full overflow-hidden bg-[var(--bg-page-soft)]">
+    <div className="mypage-root relative min-h-full overflow-hidden bg-[var(--bg-page-soft)]">
       <div className="relative px-4 pt-[var(--app-header-first-card-gap)]">
         <div className="relative overflow-hidden rounded-[30px] border border-[var(--mypage-portal-card-border)] bg-[linear-gradient(145deg,var(--mypage-portal-card-bg-start)_0%,var(--mypage-portal-card-bg-mid)_45%,var(--mypage-portal-card-bg-end)_100%)] shadow-[0_24px_42px_-24px_var(--mypage-portal-card-shadow)] before:pointer-events-none before:absolute before:inset-0 before:rounded-[30px] before:border before:border-[var(--mypage-portal-card-inner-border)] before:content-['']">
           <div className="relative flex items-start justify-between gap-4 px-5 py-6">

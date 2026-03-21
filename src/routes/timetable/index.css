@@ -1,0 +1,12 @@
+.timetable-root {
+  --timetable-tab-inactive: rgb(143 155 180);
+  --timetable-empty-text: rgb(143 155 180);
+  --timetable-card-bg: rgb(255 255 255);
+  --timetable-card-border: var(--border-base);
+  --timetable-line: rgba(47, 86, 199, 0.55);
+  --timetable-info-bg: rgba(47, 86, 199, 0.1);
+  --timetable-info-border: rgba(47, 86, 199, 0.2);
+  --timetable-info-text: rgb(42 79 184);
+  --timetable-overlay-bg: rgba(15, 23, 42, 0.8);
+  --timetable-close-bg: rgba(255, 255, 255, 0.9);
+}
