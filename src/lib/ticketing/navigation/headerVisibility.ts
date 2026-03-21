@@ -7,7 +7,11 @@ type HeaderVisibilityOptions = {
 };
 
 const isTicketingAuthPage = (pathname: string): boolean => {
-  return pathname === "/ticket/login" || pathname === "/ticket/signup";
+  return (
+    pathname === "/ticket/login" ||
+    pathname === "/ticket/signup" ||
+    pathname.startsWith("/ticket/reset-password")
+  );
 };
 
 export const shouldShowTicketingHeader = ({
@@ -16,7 +20,7 @@ export const shouldShowTicketingHeader = ({
   role,
 }: HeaderVisibilityOptions): boolean => {
   if (isTicketingAuthPage(pathname)) {
-    return false;
+    return true;
   }
 
   if (!accessToken) {

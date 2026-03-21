@@ -10,6 +10,10 @@ export function UserLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { session, role } = useAuth();
+  const isTicketingAuthPage =
+    location.pathname === "/ticket/login" ||
+    location.pathname === "/ticket/signup" ||
+    location.pathname.startsWith("/ticket/reset-password");
   const isTicketingPage = location.pathname.startsWith("/ticket/ticketing");
   const isMyTicketPage =
     location.pathname.startsWith("/ticket/my-ticket") ||
@@ -44,6 +48,11 @@ export function UserLayout() {
   };
 
   const bottomNavPaddingClass = "pb-[calc(84px+env(safe-area-inset-bottom)+0.75rem)]";
+  const contentTopPaddingClass = isMyTicketPage
+    ? "pt-3"
+    : isTicketingAuthPage
+      ? "pt-1"
+      : "pt-[var(--app-header-first-card-gap)]";
 
   return (
     <AppShell
@@ -74,7 +83,7 @@ export function UserLayout() {
       <div
         className={
           showHeader
-            ? `relative mx-auto w-full max-w-md px-4 ${isMyTicketPage ? "pt-3" : "pt-[var(--app-header-first-card-gap)]"} ${bottomNavPaddingClass}`
+            ? `relative mx-auto w-full max-w-md px-4 ${contentTopPaddingClass} ${bottomNavPaddingClass}`
             : `relative mx-auto min-h-screen w-full max-w-md ${bottomNavPaddingClass}`
         }
       >
