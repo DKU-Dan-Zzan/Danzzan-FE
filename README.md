@@ -70,6 +70,7 @@ src/
 ## 아키텍처 규칙 (요약)
 
 - `non-ticketing` 코드에서 `@/.../ticketing/*`를 직접 import하지 않습니다.
+- `ticketing`의 비-API 레이어(`routes/hooks/components/.../ticketing/*`)는 `@/api/app/*`를 직접 import하지 않습니다.
 - API 레이어는 hooks 레이어를 import하지 않습니다.
 - `types` 레이어는 runtime 레이어(api/hooks/routes/components)를 import하지 않습니다.
 - 스타일은 Tailwind-first를 우선하고, 전역 스타일은 `src/index.css` 기준으로 관리합니다.

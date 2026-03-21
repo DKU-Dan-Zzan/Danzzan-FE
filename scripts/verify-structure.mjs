@@ -9,6 +9,7 @@ const RULE_IDS = [
   "FILE_COMPONENT_PASCAL_CASE",
   "LAYER_API_NO_HOOKS_IMPORT",
   "LAYER_NON_TICKETING_NO_TICKETING_IMPORT",
+  "LAYER_TICKETING_NON_API_NO_APP_API_IMPORT",
   "LAYER_COMPONENTS_NO_ROUTES_IMPORT",
   "LAYER_HOOKS_NO_ROUTES_IMPORT",
   "LAYER_LIB_NO_ROUTES_IMPORT",
@@ -514,6 +515,40 @@ function run() {
             file,
             index + 1,
             "non-ticketing layer must not import ticketing namespace directly",
+            { file }
+          )
+        }
+      })
+    }
+  }
+
+  // LAYER_TICKETING_NON_API_NO_APP_API_IMPORT
+  {
+    const files = selectFiles(
+      allFiles,
+      changedFiles,
+      options.mode,
+      (file) =>
+        isInsideDir(file, "src") &&
+        file.includes("/ticketing/") &&
+        CODE_FILE_EXTENSIONS.has(path.extname(file)) &&
+        !isInsideDir(file, "src/api/ticketing")
+    )
+
+    const patterns = [
+      /from\s+["']@\/api\/app\//,
+      /import\(\s*["']@\/api\/app\//,
+    ]
+
+    for (const file of files) {
+      const lines = readFileLines(file)
+      lines.forEach((lineText, index) => {
+        if (patterns.some((pattern) => pattern.test(lineText))) {
+          collector.add(
+            "LAYER_TICKETING_NON_API_NO_APP_API_IMPORT",
+            file,
+            index + 1,
+            "ticketing non-api layer must not import app api directly",
             { file }
           )
         }

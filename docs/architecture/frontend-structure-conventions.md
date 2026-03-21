@@ -86,6 +86,9 @@ G2 bridge 경로는 G4에서 모두 제거 완료.
   - `src/api/**` -> `@/hooks/*` 또는 hooks 상대경로 import 금지
 - `LAYER_NON_TICKETING_NO_TICKETING_IMPORT`
   - `src/**`(단, `*/ticketing/*` 경로 제외) -> `@/api|@/store|@/types|@/lib|@/utils/ticketing/*` 직접 import 금지
+- `LAYER_TICKETING_NON_API_NO_APP_API_IMPORT`
+  - `src/**/ticketing/**`(단, `src/api/ticketing/**` 제외) -> `@/api/app/*` 직접 import 금지
+  - ticketing 라우트/훅/컴포넌트는 ticketing API adapter(`src/api/ticketing/**`)를 통해서만 일반앱 API를 사용한다.
 - `LAYER_LIB_NO_ROUTES_IMPORT`
   - `src/lib/**` -> `@/routes/*` 또는 routes 상대경로 import 금지
 - `LAYER_TYPES_NO_RUNTIME_IMPORT`
