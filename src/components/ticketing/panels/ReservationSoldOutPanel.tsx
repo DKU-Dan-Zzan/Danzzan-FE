@@ -1,7 +1,7 @@
 import { RotateCcw, TicketX } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
-import { TICKETING_CLASSES, TICKETING_NARROW_PANEL_CLASS } from "@/components/ticketing/panels/ticketingShared";
+import { TICKETING_CLASSES, TICKETING_NARROW_PANEL_CLASS } from "@/components/ticketing/panels/TicketingShared";
 
 interface ReservationSoldOutPanelProps {
   description?: string;

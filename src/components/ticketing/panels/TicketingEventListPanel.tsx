@@ -8,7 +8,7 @@ import {
   TICKETING_CLASSES,
   TICKETING_WIDE_PANEL_CLASS,
   TicketingRefreshButton,
-} from "@/components/ticketing/panels/ticketingShared";
+} from "@/components/ticketing/panels/TicketingShared";
 import type { TicketingEvent } from "@/types/ticketing/model/ticket.model";
 
 interface TicketingEventListPanelProps {

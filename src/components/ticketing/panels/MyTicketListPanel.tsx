@@ -6,7 +6,7 @@ import { TicketingAdBannerCard } from "@/components/ticketing/panels/TicketingAd
 import {
   TICKETING_CLASSES,
   TicketingRefreshButton,
-} from "@/components/ticketing/panels/ticketingShared";
+} from "@/components/ticketing/panels/TicketingShared";
 import type { PlacementAd } from "@/types/ticketing/model/ad.model";
 import type { Ticket } from "@/types/ticketing/model/ticket.model";
 

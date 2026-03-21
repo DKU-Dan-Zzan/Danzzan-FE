@@ -5,7 +5,7 @@ import { TicketingAdBannerCard } from "@/components/ticketing/panels/TicketingAd
 import {
   TICKETING_CLASSES,
   TICKETING_NARROW_PANEL_CLASS,
-} from "@/components/ticketing/panels/ticketingShared";
+} from "@/components/ticketing/panels/TicketingShared";
 import { isRemainingFresh } from "@/hooks/ticketing/queue/flow-utils";
 import type { PlacementAd } from "@/types/ticketing/model/ad.model";
 

@@ -6,7 +6,7 @@ import {
   TICKETING_CLASSES,
   TICKETING_NARROW_PANEL_CLASS,
   TicketingStepTitle,
-} from "@/components/ticketing/panels/ticketingShared";
+} from "@/components/ticketing/panels/TicketingShared";
 
 interface TicketingReservationPanelProps {
   eventTitle: string;
