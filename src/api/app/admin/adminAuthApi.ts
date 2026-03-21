@@ -3,7 +3,7 @@ import { createHttpClient } from "@/api/common/httpClient";
 import { hasRequiredRole, resolveRoleFromAccessToken } from "@/api/common/authCore";
 import { authStore } from "@/store/common/authStore";
 import type { AuthCredentials, AuthSession } from "@/types/common/auth.model";
-import { env } from "@/utils/ticketing/env";
+import { env } from "@/utils/common/env";
 
 const getClient = () =>
   createHttpClient({

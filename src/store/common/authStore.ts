@@ -10,7 +10,7 @@ import type {
   AuthUser,
   UserRole,
 } from "@/types/common/auth.model";
-import { env } from "@/utils/ticketing/env";
+import { env } from "@/utils/common/env";
 
 const STORAGE_KEY = "danzzan.auth";
 const LEGACY_ACCESS_TOKEN_KEYS = [

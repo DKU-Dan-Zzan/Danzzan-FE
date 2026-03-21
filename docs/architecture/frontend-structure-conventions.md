@@ -4,14 +4,14 @@
 이 문서는 `DANZ-228` 기준으로 프론트엔드 협업 규칙을 고정한다.
 범위는 아래 파일/디렉터리에 대한 구조/명명/레이어/스타일 규칙이다.
 
-- 적용 범위: `src/**`, `src/index.css`, `src/routes/ticketing/index.css`
+- 적용 범위: `src/**`, `src/index.css`
 - 적용 단계: G0(규칙 고정), G1~G5(실제 리팩토링)
 
 ## 2) 정책 결정값(고정)
 - URL 세그먼트: G0에서는 현행 유지(`myticket` 포함), G1에서 통일 정책 적용.
 - 파일명 예외: `src/components/common/ui/*` 소문자 파일명은 allowlist로 예외 허용.
 - Map SDK 스타일: Tailwind 우선 원칙 유지, SDK 제약 인라인/런타임 스타일은 최소 허용 후 문서화.
-- CSS 스코프: `src/index.css`(앱 전역) + `src/routes/ticketing/index.css`(티켓팅 전역) 분리 유지, G3 이후 통합 재검토.
+- CSS 스코프: G5 기준 `src/index.css` 단일 전역 스코프를 유지한다(기존 ticketing 전역 CSS는 통합 완료).
 
 ## 3) 명명 규칙
 ### 3.1 디렉터리명
@@ -84,6 +84,8 @@ G2 bridge 경로는 G4에서 모두 제거 완료.
   - `src/hooks/**` -> `@/routes/*` 또는 routes 상대경로 import 금지
 - `LAYER_API_NO_HOOKS_IMPORT`
   - `src/api/**` -> `@/hooks/*` 또는 hooks 상대경로 import 금지
+- `LAYER_NON_TICKETING_NO_TICKETING_IMPORT`
+  - `src/**`(단, `*/ticketing/*` 경로 제외) -> `@/api|@/store|@/types|@/lib|@/utils/ticketing/*` 직접 import 금지
 - `LAYER_LIB_NO_ROUTES_IMPORT`
   - `src/lib/**` -> `@/routes/*` 또는 routes 상대경로 import 금지
 - `LAYER_TYPES_NO_RUNTIME_IMPORT`
@@ -118,7 +120,7 @@ G2 bridge 경로는 G4에서 모두 제거 완료.
   - `boothmap-chip`
   - `boothmap-mode-toggle-button`
   - `boothmap-name-popup*`
-- 잔여 raw hex 누적은 G3 이후에도 단계적으로 축소한다(특히 `index.css`, `src/routes/ticketing/index.css`).
+- 잔여 raw hex 누적은 G3 이후에도 단계적으로 축소한다(특히 `src/index.css`).
 
 ## 7) 예외(allowlist) 정책
 allowlist 파일: `config/structure-allowlist.json`

@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { CircleAlert, Eye, EyeOff, ShieldCheck } from "lucide-react";
-import { ADMIN_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
+import { ADMIN_AUTH_INPUT_CLASS_NAME } from "@/lib/common/authInputClassNames";
 import { resolveScopedRedirect } from "@/routes/common/authGuard";
 import { useAdminAuth } from "@/hooks/app/admin/useAdminAuth";
 import { getAdminSession } from "@/lib/app/admin/admin-auth-session";
