@@ -28,6 +28,79 @@ const WristbandPage = lazy(() => import("@/routes/ticketing/admin/wristband/Wris
 const TokenRequired = lazy(() => import("@/routes/ticketing/admin/token-required/TokenRequired"));
 const NotFoundPage = lazy(() => import("@/routes/ticketing/not-found/NotFoundPage"));
 
+const TICKETING_ROOT_CLASS_NAME = [
+  "ticketing-root",
+  "[--font-size:16px]",
+  "[--ticketing-text-button:0.82rem]",
+  "[--ticketing-text-button-compact:0.79rem]",
+  "[--ticketing-text-badge:0.82rem]",
+  "[--ticketing-text-hero-title:1.2rem]",
+  "[--ticketing-text-hero-description:0.88rem]",
+  "[--ticketing-text-card-title:1.12rem]",
+  "[--ticketing-text-card-subtitle:0.9rem]",
+  "[--ticketing-text-section-title:0.8rem]",
+  "[--ticketing-text-section-body:0.82rem]",
+  "[--ticketing-text-section-body-sm:0.74rem]",
+  "[--ticketing-text-helper:0.84rem]",
+  "[--ticketing-text-step-title:0.78rem]",
+  "[--ticketing-text-info-banner-title:0.85rem]",
+  "[--ticketing-text-info-banner-body:0.88rem]",
+  "[--ticketing-text-paper-title:0.87rem]",
+  "[--ticketing-text-queue-label:0.78rem]",
+  "[--ticketing-text-queue-value:1.25rem]",
+  "[--ticketing-text-ticket-meta:0.86rem]",
+  "[--ticketing-text-ticket-footer:0.7rem]",
+  "[--ticketing-text-watermark:0.58rem]",
+  "[--ticketing-text-state-title:1.3rem]",
+  "[--ticketing-text-state-body:0.82rem]",
+  "[--ticketing-text-overline:0.7rem]",
+  "[--ticketing-text-header-overline:0.62rem]",
+  "[--ticketing-text-step-index:0.7125rem]",
+  "[--ticketing-text-holder-overline:0.82rem]",
+  "[--ticketing-text-paper-status:0.82rem]",
+  "[--ticketing-text-paper-label:0.78rem]",
+  "[--ticketing-text-paper-value:0.96rem]",
+  "[--ticketing-text-paper-queue:1.02rem]",
+  "[--ticketing-text-paper-time:0.86rem]",
+  "[--ticketing-text-reservation-countdown:1.02rem]",
+  "bg-background",
+  "text-foreground",
+  "[background-color:var(--bg-base)]",
+  "[font-size:var(--font-size)]",
+  "[font-family:Pretendard_Variable,Pretendard,SUIT,'Noto_Sans_KR',system-ui,-apple-system,'Segoe_UI',sans-serif]",
+  "[&_button]:border-border",
+  "[&_button]:outline-ring/50",
+  "[&_input]:border-border",
+  "[&_input]:outline-ring/50",
+  "[&_textarea]:border-border",
+  "[&_textarea]:outline-ring/50",
+  "[&_select]:border-border",
+  "[&_select]:outline-ring/50",
+  "[&_[data-slot]]:border-border",
+  "[&_[data-slot]]:outline-ring/50",
+  "[&_h1]:text-2xl",
+  "[&_h1]:font-medium",
+  "[&_h1]:leading-[1.5]",
+  "[&_h2]:text-xl",
+  "[&_h2]:font-medium",
+  "[&_h2]:leading-[1.5]",
+  "[&_h3]:text-lg",
+  "[&_h3]:font-medium",
+  "[&_h3]:leading-[1.5]",
+  "[&_h4]:text-base",
+  "[&_h4]:font-medium",
+  "[&_h4]:leading-[1.5]",
+  "[&_label]:text-base",
+  "[&_label]:font-medium",
+  "[&_label]:leading-[1.5]",
+  "[&_button]:text-base",
+  "[&_button]:font-medium",
+  "[&_button]:leading-[1.5]",
+  "[&_input]:text-base",
+  "[&_input]:font-normal",
+  "[&_input]:leading-[1.5]",
+].join(" ");
+
 function TicketingRouteLoading() {
   return (
     <div className="flex min-h-dvh items-center justify-center text-[var(--text-muted)]">
@@ -97,7 +170,7 @@ function LegacyMyTicketRedirect() {
 
 export default function TicketingApp() {
   return (
-    <div className="ticketing-root">
+    <div className={TICKETING_ROOT_CLASS_NAME}>
       <Suspense fallback={<TicketingRouteLoading />}>
         <Routes>
           <Route index element={<Navigate to="login" replace />} />
