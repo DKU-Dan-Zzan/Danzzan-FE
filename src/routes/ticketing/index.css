@@ -387,7 +387,7 @@
 }
 
 @layer base {
-  .ticketing-root * {
+  .ticketing-root :where(button, input, textarea, select, [data-slot]) {
     @apply border-border outline-ring/50;
   }
 
