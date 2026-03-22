@@ -1,10 +1,10 @@
 // 역할: 티켓팅 사용자 인증(로그인·토큰 재발급·내 정보 조회) API를 캡슐화합니다.
 import { createHttpClient } from "@/api/ticketing/httpClient";
 import { mapAuthLoginResponse, mapAuthUserDto } from "@/lib/ticketing/mappers/authMapper";
-import { authStore } from "@/store/ticketing/authStore";
+import { authStore } from "@/store/common/authStore";
 import type { AuthLoginResponseDto, AuthUserDto } from "@/types/ticketing/dto/auth.dto";
 import type { AuthCredentials, AuthSession } from "@/types/ticketing/model/auth.model";
-import { env, requireEnv } from "@/utils/ticketing/env";
+import { env, requireEnv } from "@/utils/common/env";
 
 const getAuthClient = () =>
   createHttpClient({

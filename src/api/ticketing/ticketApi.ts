@@ -13,7 +13,7 @@ import {
   mapTicketListDtoToModel,
   mapTicketReservationDtoToModel,
 } from "@/lib/ticketing/mappers/ticketMapper";
-import { authStore } from "@/store/ticketing/authStore";
+import { authStore } from "@/store/common/authStore";
 import type {
   TicketEventListResponseDto,
   TicketListResponseDto,
@@ -28,7 +28,7 @@ import type {
   TicketingEvent,
   TicketReservationResult,
 } from "@/types/ticketing/model/ticket.model";
-import { env, requireEnv } from "@/utils/ticketing/env";
+import { env, requireEnv } from "@/utils/common/env";
 
 const getTicketingClient = () =>
   createHttpClient({

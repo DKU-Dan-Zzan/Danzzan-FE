@@ -8,7 +8,7 @@ import {
   buildReturnTo,
   isRoleAuthenticated,
 } from "@/routes/common/authGuard";
-import { env } from "@/utils/ticketing/env";
+import { env } from "@/utils/common/env";
 
 const AdminLayout = lazy(() =>
   import("@/components/ticketing/layout/AdminLayout").then((module) => ({

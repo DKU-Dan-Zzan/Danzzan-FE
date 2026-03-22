@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { useAuth } from "@/hooks/ticketing/useAuth";
-import { env } from "@/utils/ticketing/env";
+import { env } from "@/utils/common/env";
 import { TicketAdminShell } from "@/components/ticketing/layout/TicketAdminShell";
 
 export function AdminLayout() {

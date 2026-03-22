@@ -2,7 +2,7 @@
 import { adGateway } from "@/api/common/adGateway";
 import { mapPlacementAdDtoToModel } from "@/lib/ticketing/mappers/adMapper";
 import type { AdPlacementKey, PlacementAd } from "@/types/ticketing/model/ad.model";
-import { env } from "@/utils/ticketing/env";
+import { env } from "@/utils/common/env";
 
 const mockWaitingRoomAd: PlacementAd = {
   placement: "WAITING_ROOM_MAIN",

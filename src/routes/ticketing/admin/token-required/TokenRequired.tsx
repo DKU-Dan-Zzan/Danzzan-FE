@@ -2,7 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
-import { env } from "@/utils/ticketing/env";
+import { env } from "@/utils/common/env";
 
 type TokenRequiredProps = {
   loginRedirectPath?: string;
