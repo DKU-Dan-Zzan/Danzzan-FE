@@ -37,6 +37,9 @@ jobs:
       - name: Structure Report
         run: npm run lint:structure:report
 
+      - name: Dependency Cycles
+        run: npm run check:deps-cycles
+
       - name: Typecheck
         run: npm run typecheck
 

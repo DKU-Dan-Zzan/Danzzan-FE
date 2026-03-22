@@ -1,5 +1,16 @@
-import type { ContentImageDto, TimetableResponseDto } from "@/api/app/timetable/timetableApi"
 import type { Performance } from "@/types/app/timetable/timetable.types"
+
+export type TimetableResponseDto = {
+  date: string
+  performances: Performance[]
+}
+
+export type ContentImageDto = {
+  id: number
+  name: string
+  previewImageUrl: string
+  detailImageUrl: string
+}
 
 type RecordLike = Record<string, unknown>
 

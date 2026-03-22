@@ -725,6 +725,8 @@ function run() {
       "@/components/ticketing/common/ui/",
       "@/components/ticketing/ticketing/",
       "@/components/ticketing/common/figma/",
+      "@/store/ticketing/authStore",
+      "@/utils/ticketing/env",
     ]
 
     for (const file of files) {
@@ -819,15 +821,22 @@ function run() {
 
   // STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION
   {
-    const scopedFiles = changedFiles.filter((file) => {
+    const scopedFiles = selectFiles(
+      allFiles,
+      changedFiles,
+      options.mode,
+      (file) => {
       if (!CODE_FILE_EXTENSIONS.has(path.extname(file))) return false
       return isInsideDir(file, "src/routes") || isInsideDir(file, "src/components")
-    })
+      }
+    )
 
     const templateInterpolationPattern = /className\s*=\s*{\s*`[^`]*\$\{/
 
     for (const file of scopedFiles) {
-      const lineObjects = changedAddedLines.get(file) ?? []
+      const lineObjects = options.mode === "changed"
+        ? (changedAddedLines.get(file) ?? [])
+        : readFileLines(file).map((text, idx) => ({ line: idx + 1, text }))
 
       for (const item of lineObjects) {
         if (!templateInterpolationPattern.test(item.text)) continue

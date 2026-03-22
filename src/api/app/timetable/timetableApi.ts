@@ -1,21 +1,10 @@
 import { http } from "@/lib/http"
-import type { Performance } from "@/types/app/timetable/timetable.types"
 import {
   parseContentImagesContract,
   parsePerformancesContract,
 } from "@/api/app/timetable/timetableContract"
 
-export type TimetableResponseDto = {
-  date: string
-  performances: Performance[]
-}
-
-export type ContentImageDto = {
-  id: number
-  name: string
-  previewImageUrl: string
-  detailImageUrl: string
-}
+export type { TimetableResponseDto, ContentImageDto } from "@/api/app/timetable/timetableContract"
 
 type RequestOptions = {
   signal?: AbortSignal

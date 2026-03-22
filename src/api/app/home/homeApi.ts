@@ -5,22 +5,7 @@ import {
   parseLineupImagesContract,
 } from "@/api/app/home/homeContract"
 
-export type HomeImageDto = {
-  id: number
-  imageUrl: string
-  version?: string | null
-}
-
-export type EmergencyNoticeDto = {
-  id: number
-  content: string
-  updatedAt?: string | null
-}
-
-export type LineupImageDto = {
-  id: number
-  imageUrl: string
-}
+export type { HomeImageDto, EmergencyNoticeDto, LineupImageDto } from "@/api/app/home/homeContract"
 
 type RequestOptions = {
   signal?: AbortSignal

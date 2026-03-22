@@ -1,8 +1,19 @@
-import type {
-  EmergencyNoticeDto,
-  HomeImageDto,
-  LineupImageDto,
-} from "@/api/app/home/homeApi"
+export type HomeImageDto = {
+  id: number
+  imageUrl: string
+  version?: string | null
+}
+
+export type EmergencyNoticeDto = {
+  id: number
+  content: string
+  updatedAt?: string | null
+}
+
+export type LineupImageDto = {
+  id: number
+  imageUrl: string
+}
 
 type RecordLike = Record<string, unknown>
 

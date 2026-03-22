@@ -433,6 +433,160 @@
       "reason": "전역 디자인 토큰 팔레트 승인값",
       "owner": "fe-platform",
       "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/app/boothmap/DetailSheet.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/app/boothmap/FestivalDateTabs.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/app/home/EmergencyNotice.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/app/home/LineupCarousel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/app/home/PosterCarousel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/app/timetable/TimelineItem.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/common/figma/ImageWithFallback.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/admin/WristbandOperationScreen.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/MyTicketListPanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/PaperTicketCard.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/ReservationAlreadyPanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/ReservationProcessingPanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/ReservationSoldOutPanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/ReservationSuccessPanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/TicketingEventListPanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/TicketingHomePanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/TicketingReservationPanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/TicketingShared.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/WaitingRoomPanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/routes/admin/AdminLogin.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/routes/admin/AdminMap.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/routes/ticketing/reset-password/ResetPassword.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
     }
   ]
 }

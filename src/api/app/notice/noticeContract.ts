@@ -1,4 +1,27 @@
-import type { NoticeDto, PageResponse } from "@/api/app/notice/noticeApi";
+export type PageResponse<T> = {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+  numberOfElements: number;
+  empty: boolean;
+};
+
+export type NoticeDto = {
+  id: number;
+  title: string;
+  content: string;
+  author: string;
+  category: string | null;
+  isPinned: boolean;
+  thumbnailImageUrl?: string | null;
+  imageUrls?: string[] | null;
+  createdAt: string;
+  updatedAt: string;
+};
 
 type RecordLike = Record<string, unknown>;
 
