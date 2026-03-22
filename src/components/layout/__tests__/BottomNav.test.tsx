@@ -97,4 +97,25 @@ describe("BottomNav", () => {
 
     expect(markup).toContain('href="/ticket/ticketing"');
   });
+
+  it("만료된 토큰 상태에서는 티켓팅 탭이 로그인 redirect를 가리킨다", () => {
+    authStore.setSession(
+      {
+        tokens: {
+          accessToken: createJwtLikeToken({
+            role: "ROLE_ADMIN",
+            exp: Math.floor(Date.now() / 1000) - 60,
+          }),
+          refreshToken: "",
+          expiresIn: null,
+        },
+        user: null,
+      },
+      "admin",
+    );
+
+    const markup = renderBottomNav("/notice");
+
+    expect(markup).toContain('href="/ticket/login?redirect=%2Fticket%2Fticketing"');
+  });
 });

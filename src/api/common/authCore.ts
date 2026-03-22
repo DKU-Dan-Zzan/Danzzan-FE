@@ -61,6 +61,21 @@ const normalizeRoleClaim = (role: unknown): AuthRole | null => {
   return null;
 };
 
+const toExpiryEpochMs = (expClaim: unknown): number | null => {
+  if (typeof expClaim === "number" && Number.isFinite(expClaim)) {
+    return expClaim * 1000;
+  }
+
+  if (typeof expClaim === "string" && expClaim.trim()) {
+    const parsed = Number(expClaim);
+    if (Number.isFinite(parsed)) {
+      return parsed * 1000;
+    }
+  }
+
+  return null;
+};
+
 export const resolveRoleFromAccessToken = (token: string | null | undefined): AuthRole | null => {
   if (!token) {
     return null;
@@ -87,6 +102,27 @@ export const resolveRoleFromAccessToken = (token: string | null | undefined): Au
   }
 
   return null;
+};
+
+export const isAccessTokenExpired = (
+  token: string | null | undefined,
+  nowMs = Date.now(),
+): boolean => {
+  if (!token) {
+    return true;
+  }
+
+  const payload = parseJwtPayload(token);
+  if (!payload) {
+    return false;
+  }
+
+  const expiry = toExpiryEpochMs(payload.exp);
+  if (expiry == null) {
+    return false;
+  }
+
+  return expiry <= nowMs;
 };
 
 export const hasRequiredRole = (

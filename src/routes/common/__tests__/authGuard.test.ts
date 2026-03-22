@@ -79,4 +79,26 @@ describe("authGuard", () => {
       }),
     ).toBe(true);
   });
+
+  it("만료된 토큰은 역할이 맞아도 인증 실패로 처리한다", () => {
+    const expired = createJwtLikeToken({
+      role: "ROLE_ADMIN",
+      exp: Math.floor(Date.now() / 1000) - 60,
+    });
+
+    expect(
+      isRoleAuthenticated({
+        accessToken: expired,
+        role: "admin",
+        requiredRole: "admin",
+      }),
+    ).toBe(false);
+    expect(
+      isRoleAuthenticated({
+        accessToken: expired,
+        role: "admin",
+        requiredRole: "student",
+      }),
+    ).toBe(false);
+  });
 });

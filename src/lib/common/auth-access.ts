@@ -1,5 +1,6 @@
 import {
   hasRequiredRole,
+  isAccessTokenExpired,
   resolveRoleFromAccessToken,
   type AuthRole,
 } from "@/api/common/authCore";
@@ -10,6 +11,9 @@ export const hasAuthenticatedRole = (options: {
   requiredRole: AuthRole;
 }): boolean => {
   if (!options.accessToken) {
+    return false;
+  }
+  if (isAccessTokenExpired(options.accessToken)) {
     return false;
   }
 
