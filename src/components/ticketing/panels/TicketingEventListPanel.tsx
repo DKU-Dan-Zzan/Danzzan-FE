@@ -1,3 +1,4 @@
+// 역할: 티켓팅 도메인 화면 구성을 위한 UI 컴포넌트를 제공합니다.
 import { useMemo } from "react";
 import { CalendarClock, Clock3 } from "lucide-react";
 import { Badge } from "@/components/common/ui/badge";

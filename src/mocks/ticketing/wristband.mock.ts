@@ -1,3 +1,4 @@
+// 역할: 티켓팅 도메인 테스트/개발용 목 데이터 모듈입니다.
 import type {
   WristbandAttendee,
   WristbandSession,

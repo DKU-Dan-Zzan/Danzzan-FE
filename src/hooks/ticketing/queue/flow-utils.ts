@@ -1,3 +1,4 @@
+// 역할: 티켓팅 도메인 상태/비동기 흐름을 관리하는 React Hook 모듈입니다.
 import type { QueueRequestStatus } from "@/types/ticketing/model/ticket.model";
 
 export const FOREGROUND_POLL_INTERVAL = 2000;

@@ -1,4 +1,5 @@
-﻿import { useCallback, useState } from "react";
+﻿// 역할: 티켓팅 도메인 상태/비동기 흐름을 관리하는 React Hook 모듈입니다.
+import { useCallback, useState } from "react";
 import { wristbandApi } from "@/api/ticketing/wristbandApi";
 import type { WristbandAttendee, WristbandSession, WristbandStats } from "@/types/ticketing/model/wristband.model";
 

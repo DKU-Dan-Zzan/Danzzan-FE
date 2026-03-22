@@ -1,3 +1,4 @@
+// 역할: 티켓팅 도메인 공통 로직(매퍼/유틸/네비게이션)을 제공하는 모듈입니다.
 export type FestivalDayRule = {
   dayNumber: number;
   date: string;

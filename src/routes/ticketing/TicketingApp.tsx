@@ -1,3 +1,4 @@
+// 역할: 티켓팅 도메인 라우트와 화면 흐름을 구성하는 모듈입니다.
 import { lazy, Suspense } from "react";
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { cn } from "@/components/common/ui/utils";

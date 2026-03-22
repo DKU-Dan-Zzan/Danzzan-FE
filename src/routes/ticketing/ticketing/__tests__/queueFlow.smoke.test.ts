@@ -1,3 +1,4 @@
+// 역할: 티켓팅 도메인 동작을 검증하는 테스트 모듈입니다.
 import type { QueueRequestStatus } from "@/types/ticketing/model/ticket.model";
 import {
   BACKGROUND_POLL_INTERVAL,

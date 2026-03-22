@@ -1,4 +1,5 @@
-﻿import { useCallback, useSyncExternalStore } from "react";
+﻿// 역할: 티켓팅 도메인 상태/비동기 흐름을 관리하는 React Hook 모듈입니다.
+import { useCallback, useSyncExternalStore } from "react";
 import { authApi } from "@/api/ticketing/authApi";
 import { adminAuthApi } from "@/api/ticketing/adminAuthApi";
 import { authLogout } from "@/api/ticketing/authLogoutApi";

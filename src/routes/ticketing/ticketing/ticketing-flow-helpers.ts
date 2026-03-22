@@ -1,3 +1,4 @@
+// 역할: 티켓팅 도메인 라우트와 화면 흐름을 구성하는 모듈입니다.
 import { HttpError } from "@/api/ticketing/httpClient";
 import type { ReserveErrorCode } from "@/types/ticketing/model/ticket.model";
 

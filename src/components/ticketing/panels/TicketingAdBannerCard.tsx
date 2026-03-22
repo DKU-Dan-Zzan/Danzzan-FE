@@ -1,3 +1,4 @@
+// 역할: 티켓팅 화면 광고 배너 슬롯의 이미지/링크 렌더링과 접근성 포커스 스타일을 담당합니다.
 import { Megaphone } from "lucide-react";
 import { Card } from "@/components/common/ui/card";
 import { cn } from "@/components/common/ui/utils";
