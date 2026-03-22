@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
+import { cn } from "@/components/common/ui/utils";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import {
   buildLoginRedirectPath,
@@ -28,7 +29,7 @@ const WristbandPage = lazy(() => import("@/routes/ticketing/admin/wristband/Wris
 const TokenRequired = lazy(() => import("@/routes/ticketing/admin/token-required/TokenRequired"));
 const NotFoundPage = lazy(() => import("@/routes/ticketing/not-found/NotFoundPage"));
 
-const TICKETING_ROOT_CLASS_NAME = [
+const TICKETING_ROOT_CLASS_NAME = cn(
   "ticketing-root",
   "[--font-size:16px]",
   "[--ticketing-text-button:0.82rem]",
@@ -99,7 +100,7 @@ const TICKETING_ROOT_CLASS_NAME = [
   "[&_input]:text-base",
   "[&_input]:font-normal",
   "[&_input]:leading-[1.5]",
-].join(" ");
+);
 
 function TicketingRouteLoading() {
   return (

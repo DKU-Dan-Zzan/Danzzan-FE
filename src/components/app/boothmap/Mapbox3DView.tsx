@@ -1044,8 +1044,7 @@ export default function Mapbox3DView({
   return (
     <div
       ref={containerRef}
-      className="relative h-full w-full"
-      style={{ minHeight: 0, minWidth: 0 }}
+      className="relative h-full w-full min-h-0 min-w-0"
     />
   );
 }

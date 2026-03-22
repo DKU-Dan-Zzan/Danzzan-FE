@@ -54,6 +54,21 @@ describe("BottomNav", () => {
     expect(markup).toContain("opacity-0 scale-x-50");
   });
 
+  it("탭 링크에 키보드 포커스 스타일을 제공한다", () => {
+    const markup = renderBottomNav("/notice");
+
+    expect(markup).toContain("focus-visible:outline-none");
+    expect(markup).toContain("focus-visible:ring-2");
+    expect(markup).toContain("focus-visible:ring-[var(--ring)]");
+  });
+
+  it("모바일 셸 최대 폭을 토큰으로 사용한다", () => {
+    const markup = renderBottomNav("/notice");
+
+    expect(markup).toContain("max-w-[var(--app-mobile-shell-max-width)]");
+    expect(markup).not.toContain("max-w-[430px]");
+  });
+
   it("비로그인 상태에서는 티켓팅 탭이 로그인 redirect를 가리킨다", () => {
     authStore.clear();
 

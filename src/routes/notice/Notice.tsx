@@ -134,21 +134,21 @@ function Notice() {
             <label htmlFor="notice-search-input" className="sr-only">
               공지 검색
             </label>
-            <input
-              id="notice-search-input"
-              type="text"
+              <input
+                id="notice-search-input"
+                type="text"
               value={keyword}
               onChange={(e) => {
                 setKeyword(e.target.value);
                 if (page !== 0) {
                   setPage(0);
                 }
-              }}
-              placeholder="공지 제목 또는 내용을 검색해 보세요"
-              className="h-7 w-full bg-transparent text-[13px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none"
-            />
+                }}
+                placeholder="공지 제목 또는 내용을 검색해 보세요"
+                className="h-7 w-full bg-transparent text-[13px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-subtle)]"
+              />
+            </div>
           </div>
-        </div>
       </section>
 
       {/* 목록 영역 */}

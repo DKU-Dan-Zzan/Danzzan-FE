@@ -49,7 +49,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)]">
-      <div className="mx-auto w-full max-w-[420px] px-5 pb-6">
+      <div className="mx-auto w-full max-w-[var(--ticketing-mobile-shell-max-width)] px-5 pb-6 sm:px-6">
         <div className="mt-3">
           <p className="text-[length:var(--ticketing-text-helper)] font-semibold text-[var(--text-muted)]">
             재학생 전용 축제 포털 서비스
@@ -105,7 +105,7 @@ export default function Login() {
 
             <Button
               type="submit"
-              className="h-11 w-full rounded-2xl bg-[var(--accent)] text-white shadow-[0_10px_18px_-12px_var(--shadow-color)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:opacity-55"
+              className="h-11 w-full rounded-2xl bg-[var(--accent)] text-white shadow-[0_10px_18px_-12px_var(--shadow-color)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)] disabled:translate-y-0 disabled:opacity-55"
               disabled={submitting || !canSubmit}
             >
               <GraduationCap className="h-4 w-4" strokeWidth={2.3} />
@@ -117,7 +117,7 @@ export default function Login() {
             <Link
               to="/ticket/signup"
               state={{ authTabFrom: "login" }}
-              className="inline-flex items-center gap-1 text-sm font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--accent)]"
+              className="inline-flex items-center gap-1 text-sm font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
             >
               <span>축제 포털을 처음 이용하시나요?</span>
               <span className="font-semibold text-[var(--accent)]">회원가입</span>
@@ -125,7 +125,7 @@ export default function Login() {
 
             <Link
               to="/ticket/reset-password"
-              className="inline-flex items-center gap-1 text-sm font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--accent)]"
+              className="inline-flex items-center gap-1 text-sm font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
             >
               <span>비밀번호를 잊으셨나요?</span>
               <span className="font-semibold text-[var(--accent)]">비밀번호 재설정</span>

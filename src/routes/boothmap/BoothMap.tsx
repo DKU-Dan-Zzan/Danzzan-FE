@@ -43,6 +43,7 @@ import {
   getVisibleColleges,
   getVisiblePubs,
 } from "@/routes/boothmap/boothMapSelectors";
+import { cn } from "@/components/common/ui/utils";
 
 const LazyMapbox3DView = lazy(async () => {
   await import("mapbox-gl/dist/mapbox-gl.css");
@@ -63,6 +64,11 @@ const FESTIVAL_DATES = [
   { label: "2일차", value: "2026-05-13" },
   { label: "3일차", value: "2026-05-14" },
 ]
+const TOP_PANEL_Z_INDEX_CLASS: Record<SheetSnap, string> = {
+  PEEK: "z-[70]",
+  HALF: "z-[70]",
+  FULL: "z-[40]",
+}
 
 function mapCollegeDtoToCollege(dto: CollegeDto): College {
   return {
@@ -291,9 +297,10 @@ export default function BoothMap() {
       </div>
 
       <div
-        className={`absolute left-1/2 top-3 w-[calc(100%-24px)] max-w-[430px] -translate-x-1/2 ${
-          sheetSnap === "FULL" ? "z-[40]" : "z-[70]"
-        }`}
+        className={cn(
+          "absolute left-1/2 top-3 w-[calc(100%-24px)] max-w-[var(--app-mobile-shell-max-width)] -translate-x-1/2",
+          TOP_PANEL_Z_INDEX_CLASS[sheetSnap],
+        )}
       >
         <div className="rounded-[28px] border border-[var(--boothmap-panel-border)] bg-[var(--boothmap-panel-bg)] px-4 py-3 shadow-[var(--boothmap-panel-shadow)] backdrop-blur-md">
           <FestivalDateTabs

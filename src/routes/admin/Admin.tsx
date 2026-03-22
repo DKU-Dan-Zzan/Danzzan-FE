@@ -59,6 +59,11 @@ import {
   validateImageFile,
   validateNoticePayload,
 } from "@/routes/admin/adminEditorLogic";
+import {
+  ADMIN_FOCUS_VISIBLE_RING_CLASS,
+  ADMIN_PRIMARY_ACTION_BUTTON_CLASS,
+  ADMIN_SECONDARY_ACTION_BUTTON_CLASS,
+} from "@/routes/admin/adminStyleClasses";
 
 function Admin() {
   const navigate = useNavigate();
@@ -492,7 +497,11 @@ function Admin() {
               value={emergencyMessage}
               onChange={(e) => setEmergencyMessage(e.target.value)}
               placeholder="홈 화면 상단에 노출될 한 줄 메시지를 입력해 주세요."
-              className="w-full resize-none rounded-2xl border border-[var(--status-danger-border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--status-danger-border)] shadow-inner focus:border-[var(--status-danger-border)] focus:outline-none focus:ring-2 focus:ring-[var(--status-danger-border)]"
+              className={cn(
+                "w-full resize-none rounded-2xl border border-[var(--status-danger-border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--status-danger-border)] shadow-inner",
+                ADMIN_FOCUS_VISIBLE_RING_CLASS,
+                "focus-visible:border-[var(--status-danger-border)] focus-visible:ring-[var(--status-danger-border)]",
+              )}
             />
             <div className="flex items-center justify-between text-[11px] text-[var(--status-danger)]">
               <span>※ 한 줄 공지는 단 한 개만 사용됩니다.</span>
@@ -500,7 +509,10 @@ function Admin() {
                 type="button"
                 disabled={emergencyLoading}
                 onClick={() => void handleSaveEmergency()}
-                className="inline-flex items-center gap-1 rounded-2xl bg-[var(--status-danger)] px-3 py-1.5 text-xs font-semibold text-[var(--text-on-accent)] shadow-sm transition hover:brightness-95 disabled:opacity-60"
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-2xl bg-[var(--status-danger)] px-3 py-1.5 text-xs font-semibold text-[var(--text-on-accent)] shadow-sm transition hover:brightness-95 disabled:opacity-60",
+                  ADMIN_FOCUS_VISIBLE_RING_CLASS,
+                )}
               >
                 <Bell className="h-3.5 w-3.5" strokeWidth={2.4} />
                 {emergencyLoading ? "저장 중..." : "긴급 공지 저장"}
@@ -553,12 +565,19 @@ function Admin() {
                   }
                 }}
                 placeholder="제목으로 검색"
-                className="h-9 w-40 rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-xs placeholder:text-[var(--text-muted)] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/15"
+                className={cn(
+                  "h-9 w-40 rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-xs placeholder:text-[var(--text-muted)]",
+                  ADMIN_FOCUS_VISIBLE_RING_CLASS,
+                  "focus-visible:border-[var(--accent)] focus-visible:ring-[var(--ring)]",
+                )}
               />
               <button
                 type="button"
                 onClick={() => void reloadNotices(0, noticeKeyword)}
-                className="h-9 rounded-2xl bg-[var(--accent)] px-3 text-xs font-semibold text-[var(--text-on-accent)] shadow-sm hover:brightness-95"
+                className={cn(
+                  "h-9 rounded-2xl bg-[var(--accent)] px-3 text-xs font-semibold text-[var(--text-on-accent)] shadow-sm hover:brightness-95",
+                  ADMIN_FOCUS_VISIBLE_RING_CLASS,
+                )}
               >
                 검색
               </button>
@@ -982,7 +1001,11 @@ function Admin() {
                     )
                   }
                   placeholder="공지사항 제목을 입력해주세요"
-                  className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/15"
+                  className={cn(
+                    "h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 text-sm",
+                    ADMIN_FOCUS_VISIBLE_RING_CLASS,
+                    "focus-visible:border-[var(--accent)] focus-visible:ring-[var(--ring)]",
+                  )}
                   required
                 />
               </div>
@@ -1013,7 +1036,10 @@ function Admin() {
                     (JPG, JPEG, PNG, WEBP / 1장당 최대 5MB, 최대 10장)
                   </p>
                   <div className="mt-3 flex w-full max-w-sm justify-center">
-                    <label className="inline-flex cursor-pointer items-center justify-center rounded-2xl bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-[var(--text-on-accent)] shadow-sm hover:brightness-95">
+                    <label className={cn(
+                      "inline-flex cursor-pointer items-center justify-center rounded-2xl bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-[var(--text-on-accent)] shadow-sm hover:brightness-95",
+                      ADMIN_FOCUS_VISIBLE_RING_CLASS,
+                    )}>
                       {noticeImageUploading ? "업로드 중..." : "파일 선택"}
                       <input
                         type="file"
@@ -1108,7 +1134,11 @@ function Admin() {
                     )
                   }
                   placeholder="공지사항 본문을 입력해주세요"
-                  className="w-full resize-none rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-3 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/15"
+                  className={cn(
+                    "w-full resize-none rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-3 text-sm",
+                    ADMIN_FOCUS_VISIBLE_RING_CLASS,
+                    "focus-visible:border-[var(--accent)] focus-visible:ring-[var(--ring)]",
+                  )}
                   required
                 />
               </div>
@@ -1132,13 +1162,13 @@ function Admin() {
                   <button
                     type="button"
                     onClick={() => setEditingNotice(null)}
-                    className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-2 text-[var(--text-muted)]"
+                    className={ADMIN_SECONDARY_ACTION_BUTTON_CLASS}
                   >
                     취소
                   </button>
                   <button
                     type="submit"
-                    className="rounded-2xl bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--text-on-accent)] shadow-sm hover:brightness-95"
+                    className={ADMIN_PRIMARY_ACTION_BUTTON_CLASS}
                   >
                     {editingNotice.id ? "수정하기" : "등록하기"}
                   </button>
@@ -1172,7 +1202,11 @@ function Admin() {
                   onChange={(e) =>
                     setEditingAd((prev) => (prev ? { ...prev, title: e.target.value } : prev))
                   }
-                  className="h-9 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-xs focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/15"
+                  className={cn(
+                    "h-9 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-xs",
+                    ADMIN_FOCUS_VISIBLE_RING_CLASS,
+                    "focus-visible:border-[var(--accent)] focus-visible:ring-[var(--ring)]",
+                  )}
                   placeholder="메인 배너 광고 제목"
                   required
                 />
@@ -1203,7 +1237,10 @@ function Admin() {
                     <p className="text-[11px] text-[var(--text-muted)]">
                       (JPG, JPEG, PNG, WEBP / 1장당 최대 5MB)
                     </p>
-                    <label className="mt-3 inline-flex cursor-pointer items-center justify-center rounded-2xl bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-[var(--text-on-accent)] shadow-sm hover:brightness-95">
+                    <label className={cn(
+                      "mt-3 inline-flex cursor-pointer items-center justify-center rounded-2xl bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-[var(--text-on-accent)] shadow-sm hover:brightness-95",
+                      ADMIN_FOCUS_VISIBLE_RING_CLASS,
+                    )}>
                       {adImageUploading ? "업로드 중..." : "파일 선택"}
                       <input
                         type="file"
@@ -1238,14 +1275,14 @@ function Admin() {
                 <button
                   type="button"
                   onClick={() => setEditingAd(null)}
-                  className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-2 text-[var(--text-muted)]"
+                  className={ADMIN_SECONDARY_ACTION_BUTTON_CLASS}
                 >
                   취소
                 </button>
                 <button
                   type="submit"
                   disabled={adImageUploading}
-                  className="rounded-2xl bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--text-on-accent)] shadow-sm hover:brightness-95"
+                  className={ADMIN_PRIMARY_ACTION_BUTTON_CLASS}
                 >
                   {editingAd.id ? "수정하기" : "등록하기"}
                 </button>

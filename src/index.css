@@ -14,6 +14,9 @@
   --shadow-color: rgba(15, 23, 42, 0.12);
   --admin-header-bg: #f8fbff;
   --app-bottom-nav-height: 56px;
+  --app-mobile-shell-max-width: 430px;
+  --ticketing-mobile-shell-max-width: 420px;
+  --ticketing-ad-slot-max-width: 18rem;
   --app-bottom-nav-icon-size: 20px;
   --app-bottom-nav-label-size: 10px;
   --app-bottom-nav-indicator-width: 16px;

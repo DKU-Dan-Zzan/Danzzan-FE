@@ -1,5 +1,6 @@
 // ALL/주점/푸드트럭/체험/편의시설 1차 필터 칩 컴포넌트입니다.
 
+import { cn } from "@/components/common/ui/utils";
 import type { PrimaryFilter } from "@/types/app/boothmap/boothmap.types";
 
 const chips: Array<{ label: string; value: PrimaryFilter }> = [
@@ -12,7 +13,7 @@ const chips: Array<{ label: string; value: PrimaryFilter }> = [
 ];
 
 const CHIP_BASE_CLASS =
-  "shrink-0 rounded-full border px-4 py-2 text-sm font-extrabold transition";
+  "shrink-0 rounded-full border px-4 py-2 text-sm font-extrabold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--boothmap-surface)]";
 const CHIP_ACTIVE_CLASS =
   "border-[var(--boothmap-marker-pub)] bg-[var(--boothmap-marker-pub)] text-[var(--boothmap-overlay-badge-text)] shadow-[0_1px_2px_var(--boothmap-overlay-shadow)]";
 const CHIP_INACTIVE_CLASS =
@@ -32,17 +33,17 @@ export default function PrimaryFilterChips({
           const active = value === c.value;
 
           return (
-            <button
-              key={c.value}
-              type="button"
-              onClick={() => onChange(c.value)}
-              className={[
-                CHIP_BASE_CLASS,
-                active ? CHIP_ACTIVE_CLASS : CHIP_INACTIVE_CLASS,
-              ].join(" ")}
-            >
-              {c.label}
-            </button>
+              <button
+                key={c.value}
+                type="button"
+                onClick={() => onChange(c.value)}
+                className={cn(
+                  CHIP_BASE_CLASS,
+                  active ? CHIP_ACTIVE_CLASS : CHIP_INACTIVE_CLASS,
+                )}
+              >
+                {c.label}
+              </button>
           );
         })}
       </div>
