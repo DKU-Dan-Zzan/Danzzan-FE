@@ -2,6 +2,7 @@ import type {
   CreateAdvertisementRequest,
   CreateNoticeRequest,
   NoticeResponse,
+  UpdateEmergencyRequest,
 } from "@/api/app/admin/adminApi";
 import type {
   AdFormState,
@@ -57,6 +58,16 @@ export const buildAdPayload = (form: AdFormState): CreateAdvertisementRequest =>
     title: form.title.trim(),
     imageUrl: form.imageUrl.trim(),
     placement: form.placement,
+  };
+};
+
+export const buildEmergencyPayload = (
+  message: string,
+  isActive: boolean,
+): UpdateEmergencyRequest => {
+  return {
+    message: message.trim(),
+    isActive,
   };
 };
 

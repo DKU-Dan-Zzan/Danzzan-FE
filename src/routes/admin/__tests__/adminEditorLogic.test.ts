@@ -4,6 +4,7 @@ import {
   MAX_IMAGE_UPLOAD_BYTES,
   MAX_NOTICE_IMAGE_COUNT,
   buildAdPayload,
+  buildEmergencyPayload,
   buildNoticePayload,
   createEmptyNoticeForm,
   createNoticeEditForm,
@@ -82,6 +83,13 @@ describe("adminEditorLogic", () => {
       title: "배너",
       imageUrl: "https://cdn.example.com/banner.png",
       placement: "HOME_BOTTOM",
+    });
+  });
+
+  it("긴급 공지 payload는 빈 입력도 명시적으로 초기화한다", () => {
+    expect(buildEmergencyPayload("   ", true)).toEqual({
+      message: "",
+      isActive: true,
     });
   });
 

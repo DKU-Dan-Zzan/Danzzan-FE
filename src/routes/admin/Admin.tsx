@@ -50,6 +50,7 @@ import { appQueryKeys, useAppQuery } from "@/lib/query";
 import {
   MAX_NOTICE_IMAGE_COUNT,
   buildAdPayload,
+  buildEmergencyPayload,
   buildNoticePayload,
   createEmptyNoticeForm,
   createNoticeEditForm,
@@ -165,10 +166,7 @@ function Admin() {
     try {
       setGlobalError(null);
       setEmergencySaving(true);
-      await updateEmergencyAdminNotice({
-        message: emergencyMessage.trim() || undefined,
-        isActive: emergencyActive,
-      });
+      await updateEmergencyAdminNotice(buildEmergencyPayload(emergencyMessage, emergencyActive));
       await emergencyQuery.refetch();
       window.alert("변경 완료했습니다.");
     } catch (error) {
