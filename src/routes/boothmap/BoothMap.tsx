@@ -37,6 +37,12 @@ import {
   type PubSummaryResponse,
 } from "@/api/app/boothmap/boothmapApi";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
+import {
+  getShouldShowPubList,
+  getVisibleBooths,
+  getVisibleColleges,
+  getVisiblePubs,
+} from "@/routes/boothmap/boothMapSelectors";
 
 const LazyMapbox3DView = lazy(async () => {
   await import("mapbox-gl/dist/mapbox-gl.css");
@@ -172,25 +178,18 @@ export default function BoothMap() {
   };
 
   const visibleBooths = useMemo(() => {
-    if (primaryFilter === "ALL") return booths;
-    if (primaryFilter === "PUB") return [];
-    return booths.filter((b) => b.type === primaryFilter);
+    return getVisibleBooths(primaryFilter, booths);
   }, [primaryFilter, booths]);
 
   const visibleColleges = useMemo(() => {
-    if (primaryFilter === "ALL") return colleges;
-    if (primaryFilter !== "PUB") return [];
-    if (!selectedCollegeId) return colleges;
-    return colleges.filter((c) => c.id === selectedCollegeId);
+    return getVisibleColleges(primaryFilter, colleges, selectedCollegeId);
   }, [primaryFilter, colleges, selectedCollegeId]);
 
   const visiblePubs = useMemo(() => {
-    if (!selectedCollegeId) return pubs;
-    return pubs.filter((p) => p.college_id === selectedCollegeId);
+    return getVisiblePubs(pubs, selectedCollegeId);
   }, [pubs, selectedCollegeId]);
 
-  const shouldShowPubList =
-    primaryFilter === "PUB" || selectedMapItem?.kind === "college";
+  const shouldShowPubList = getShouldShowPubList(primaryFilter, selectedMapItem);
 
   const onClickMarkerBooth = useCallback((id: number) => {
     setSelectedMapItem({ kind: "booth", id });
