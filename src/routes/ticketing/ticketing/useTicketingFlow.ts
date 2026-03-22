@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { adApi } from "@/api/ticketing/adApi";
 import { ticketApi } from "@/api/ticketing/ticketApi";
 import { useTicketing } from "@/hooks/ticketing/useTicketing";
+import { useQueueStatusQuery } from "@/hooks/ticketing/useQueueStatusQuery";
 import {
   BACKGROUND_POLL_INTERVAL,
   FOREGROUND_POLL_INTERVAL,
@@ -66,6 +67,7 @@ export function useTicketingFlow() {
   const restoreAttemptedRef = useRef(false);
   const adLoadedRef = useRef(false);
   const wasOnlineRef = useRef(isNetworkOnline);
+  const { refetch: refetchQueueStatus } = useQueueStatusQuery(activeEventId, { enabled: false });
 
   const listErrorMessage = useMemo(() => {
     if (listNotice) {
@@ -289,7 +291,6 @@ export function useTicketingFlow() {
 
   const checkQueueStatus = useCallback(async (
     eventId: string,
-    signal?: AbortSignal,
   ): Promise<QueueRequestStatus | null> => {
     if (!isNetworkOnline) {
       setWaitingPolling(false);
@@ -297,8 +298,20 @@ export function useTicketingFlow() {
       return null;
     }
 
+    if (activeEventId !== eventId) {
+      return null;
+    }
+
     try {
-      const statusResponse = await ticketApi.getTicketQueueStatus(eventId, signal);
+      const queryResult = await refetchQueueStatus();
+      if (queryResult.error) {
+        throw queryResult.error;
+      }
+      const statusResponse = queryResult.data;
+      if (!statusResponse) {
+        return null;
+      }
+
       setWaitingError(null);
       pollBackoffRef.current = 0;
       await handleQueueStatus(
@@ -309,10 +322,6 @@ export function useTicketingFlow() {
       );
       return statusResponse.status;
     } catch (error) {
-      if (signal?.aborted) {
-        return null;
-      }
-
       const parsed = parseApiError(error);
       if (parsed.status === 401 || parsed.code === "UNAUTHORIZED") {
         handleUnauthorized();
@@ -322,7 +331,7 @@ export function useTicketingFlow() {
       setWaitingError("네트워크 상태가 불안정합니다. 잠시 후 자동으로 다시 확인합니다.");
       return null;
     }
-  }, [handleQueueStatus, handleUnauthorized, isNetworkOnline]);
+  }, [activeEventId, handleQueueStatus, handleUnauthorized, isNetworkOnline, refetchQueueStatus]);
 
   const handleEnterQueue = useCallback(async (event: TicketingEvent) => {
     if (!acquireSingleFlight(enterLockRef)) {
@@ -473,30 +482,12 @@ export function useTicketingFlow() {
     }
 
     setStep("waiting");
-    const controller = new AbortController();
     setWaitingPolling(true);
 
-    void (async () => {
-      try {
-        const statusResponse = await ticketApi.getTicketQueueStatus(activeEventId, controller.signal);
-        await handleQueueStatus(statusResponse.status, activeEventId, statusResponse.queuePosition);
-      } catch (error) {
-        const parsed = parseApiError(error);
-        if (parsed.status === 401 || parsed.code === "UNAUTHORIZED") {
-          handleUnauthorized();
-          return;
-        }
-        setQueueStatus("WAITING");
-        setWaitingError("대기 상태를 확인하지 못했습니다. 새로고침 후 다시 시도해주세요.");
-      } finally {
-        setWaitingPolling(false);
-      }
-    })();
-
-    return () => {
-      controller.abort();
-    };
-  }, [activeEventId, handleQueueStatus, handleUnauthorized, isNetworkOnline]);
+    void checkQueueStatus(activeEventId).finally(() => {
+      setWaitingPolling(false);
+    });
+  }, [activeEventId, checkQueueStatus, isNetworkOnline]);
 
   useEffect(() => {
     const wasOnline = wasOnlineRef.current;
@@ -520,7 +511,6 @@ export function useTicketingFlow() {
 
     let cancelled = false;
     let timerId: number | null = null;
-    let currentController: AbortController | null = null;
 
     const scheduleNextPoll = (delay: number) => {
       if (cancelled) {
@@ -536,11 +526,9 @@ export function useTicketingFlow() {
         return;
       }
 
-      currentController?.abort();
-      currentController = new AbortController();
       setWaitingPolling(true);
 
-      const status = await checkQueueStatus(activeEventId, currentController.signal);
+      const status = await checkQueueStatus(activeEventId);
 
       if (cancelled) {
         return;
@@ -565,7 +553,6 @@ export function useTicketingFlow() {
       if (timerId !== null) {
         window.clearTimeout(timerId);
       }
-      currentController?.abort();
       setWaitingPolling(false);
       pollBackoffRef.current = 0;
     };

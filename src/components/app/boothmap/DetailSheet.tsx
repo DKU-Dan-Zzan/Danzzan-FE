@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import type { Booth, College, Pub, SelectedDetailItem } from "@/types/app/boothmap/boothmap.types"
 import {
-  getBoothSummary,
-  getPubDetail,
-  type BoothSummaryResponse,
-  type PubDetailResponse,
-} from "@/api/app/boothmap/boothmapApi"
+  useBoothDetailQuery,
+  usePubDetailQuery,
+} from "@/hooks/app/boothmap/useBoothDetailQuery"
+import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialog"
 
 export default function DetailSheet({
   selectedItem,
@@ -22,105 +21,63 @@ export default function DetailSheet({
 }) {
   const [viewerImage, setViewerImage] = useState<string | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
+  const lastFocusedElementRef = useRef<HTMLElement | null>(null)
 
-  const [boothDetail, setBoothDetail] = useState<BoothSummaryResponse | null>(null)
-  const [pubDetail, setPubDetail] = useState<PubDetailResponse | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isError, setIsError] = useState(false)
+  const selectedBoothId = selectedItem?.kind === "booth" ? selectedItem.id : null
+  const selectedPubId = selectedItem?.kind === "pub" ? selectedItem.id : null
 
-  // 간단한 상세 캐시
-  const boothCacheRef = useRef<Map<number, BoothSummaryResponse>>(new Map())
-  const pubCacheRef = useRef<Map<number, PubDetailResponse>>(new Map())
+  const boothDetailQuery = useBoothDetailQuery(selectedBoothId)
+  const pubDetailQuery = usePubDetailQuery(selectedPubId)
 
-  // 선택 항목이 바뀌면 뷰어/슬라이드 상태 초기화
-  useEffect(() => {
+  const boothDetail = selectedItem?.kind === "booth" ? (boothDetailQuery.data ?? null) : null
+  const pubDetail = selectedItem?.kind === "pub" ? (pubDetailQuery.data ?? null) : null
+  const isLoading = selectedItem?.kind === "booth"
+    ? boothDetailQuery.isPending
+    : selectedItem?.kind === "pub"
+      ? pubDetailQuery.isPending
+      : false
+  const isError = selectedItem?.kind === "booth"
+    ? Boolean(boothDetailQuery.error)
+    : selectedItem?.kind === "pub"
+      ? Boolean(pubDetailQuery.error)
+      : false
+
+  const openViewer = useCallback((image: string) => {
+    if (typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
+      lastFocusedElementRef.current = document.activeElement
+    } else {
+      lastFocusedElementRef.current = null
+    }
+    setViewerImage(image)
+  }, [])
+
+  const handleViewerOpenChange = useCallback((open: boolean) => {
+    if (open) {
+      return
+    }
+
     setViewerImage(null)
-    setCurrentIndex(0)
-  }, [selectedItem])
-
-  useEffect(() => {
-    if (!selectedItem) {
-      setBoothDetail(null)
-      setPubDetail(null)
-      return
+    const previous = lastFocusedElementRef.current
+    if (previous) {
+      previous.focus()
     }
+    lastFocusedElementRef.current = null
+  }, [])
 
-    const item = selectedItem
-    let isMounted = true
-
-    async function fetchDetail() {
-      try {
-        setIsLoading(true)
-        setIsError(false)
-
-        if (item.kind === "booth") {
-          setPubDetail(null)
-
-          const cached = boothCacheRef.current.get(item.id)
-          if (cached) {
-            if (!isMounted) return
-            setBoothDetail(cached)
-            return
-          }
-
-          const data = await getBoothSummary(item.id)
-          if (!isMounted) return
-
-          boothCacheRef.current.set(item.id, data)
-          setBoothDetail(data)
-          return
-        }
-
-        if (item.kind === "pub") {
-          setBoothDetail(null)
-
-          const cached = pubCacheRef.current.get(item.id)
-          if (cached) {
-            if (!isMounted) return
-            setPubDetail(cached)
-            return
-          }
-
-          const data = await getPubDetail(item.id)
-          if (!isMounted) return
-
-          pubCacheRef.current.set(item.id, data)
-          setPubDetail(data)
-        }
-      } catch (error) {
-        console.error("상세 정보 조회 실패", error)
-        if (!isMounted) return
-        setIsError(true)
-      } finally {
-        if (isMounted) {
-          setIsLoading(false)
-        }
-      }
-    }
-
-    fetchDetail()
-
-    return () => {
-      isMounted = false
-    }
-  }, [selectedItem])
-
-  useEffect(() => {
-    if (!viewerImage) {
-      return
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setViewerImage(null)
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-    }
-  }, [viewerImage])
+  const imageViewerDialog = (
+    <Dialog open={Boolean(viewerImage)} onOpenChange={handleViewerOpenChange}>
+      <DialogContent className="max-h-[92vh] w-fit max-w-[92vw] border-0 bg-transparent p-0 shadow-none">
+        <DialogTitle className="sr-only">이미지 확대 보기</DialogTitle>
+        {viewerImage && (
+          <img
+            src={viewerImage}
+            alt="확대 이미지"
+            className="max-h-[90vh] max-w-[90vw] rounded-xl"
+          />
+        )}
+      </DialogContent>
+    </Dialog>
+  )
 
   if (!selectedItem) {
     return (
@@ -178,6 +135,7 @@ export default function DetailSheet({
   if (selectedItem.kind === "booth" && boothDetail) {
     // fallback 용: 기존 배열에서 좌표/타입 등 다른 정보 찾고 싶을 때 쓸 수 있음
     const booth = booths.find((x) => x.id === selectedItem.id)
+    const boothImageUrl = boothDetail.imageUrl ?? null
 
     return (
       <div className="space-y-3">
@@ -203,16 +161,16 @@ export default function DetailSheet({
             </button>
           </div>
 
-          {boothDetail.imageUrl && (
+          {boothImageUrl && (
             <div className="mt-3 rounded-xl bg-[var(--boothmap-surface-soft)] p-2">
               <button
                 type="button"
-                onClick={() => setViewerImage(boothDetail.imageUrl)}
+                onClick={() => openViewer(boothImageUrl)}
                 aria-label="부스 이미지 확대 보기"
                 className="mx-auto block max-h-[320px] w-auto max-w-full cursor-pointer rounded-xl"
               >
                 <img
-                  src={boothDetail.imageUrl}
+                  src={boothImageUrl}
                   alt={`${boothDetail.name} 이미지`}
                   loading="lazy"
                   className="mx-auto max-h-[320px] w-auto max-w-full rounded-xl object-contain"
@@ -226,21 +184,7 @@ export default function DetailSheet({
           </div>
         </div>
 
-        {viewerImage && (
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="이미지 확대 보기"
-            className="fixed inset-0 z-[999] flex items-center justify-center bg-black/90"
-            onClick={() => setViewerImage(null)}
-          >
-            <img
-              src={viewerImage}
-              alt="확대 이미지"
-              className="max-h-[90%] max-w-[90%] rounded-xl"
-            />
-          </div>
-        )}
+        {imageViewerDialog}
       </div>
     )
   }
@@ -297,7 +241,7 @@ export default function DetailSheet({
                   >
                     <button
                       type="button"
-                      onClick={() => setViewerImage(img)}
+                      onClick={() => openViewer(img)}
                       aria-label={`주점 이미지 ${i + 1} 확대 보기`}
                       className="block w-full cursor-pointer rounded-xl"
                     >
@@ -354,22 +298,7 @@ export default function DetailSheet({
           )}
         </div>
 
-        {/* Fullscreen viewer */}
-        {viewerImage && (
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="이미지 확대 보기"
-            className="fixed inset-0 z-[999] flex items-center justify-center bg-black/90"
-            onClick={() => setViewerImage(null)}
-          >
-            <img
-              src={viewerImage}
-              alt="확대 이미지"
-              className="max-h-[90%] max-w-[90%] rounded-xl"
-            />
-          </div>
-        )}
+        {imageViewerDialog}
       </div>
     )
   }

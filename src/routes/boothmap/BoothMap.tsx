@@ -83,7 +83,7 @@ function mapBoothDtoToBooth(dto: BoothDto): Booth {
   return {
     id: dto.boothId,
     name: dto.name,
-    type: dto.type as Booth["type"],
+    type: dto.type,
     location_x: dto.locationX,
     location_y: dto.locationY,
   };

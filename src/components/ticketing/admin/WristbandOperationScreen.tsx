@@ -22,6 +22,7 @@ import {
 } from "@/components/common/ui/table";
 import { ArrowLeft, Info } from "lucide-react";
 import { useWristband } from "@/hooks/ticketing/useWristband";
+import { useWristbandStatsQuery } from "@/hooks/ticketing/useWristbandStatsQuery";
 import type { WristbandAttendee, WristbandStats } from "@/types/ticketing/model/wristband.model";
 import { cn } from "@/components/common/ui/utils";
 
@@ -35,37 +36,30 @@ interface WristbandOperationScreenProps {
 type ConfirmAction = "issue" | "cancel";
 
 export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: WristbandOperationScreenProps) {
-  const { getStats, findAttendee, issueWristband, cancelWristband, error } = useWristband();
+  const { findAttendee, issueWristband, cancelWristband, error } = useWristband();
+  const statsQuery = useWristbandStatsQuery(eventId);
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
   const [issuing, setIssuing] = useState(false);
   const [searchResults, setSearchResults] = useState<WristbandAttendee[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [stats, setStats] = useState<WristbandStats | null>(null);
-  const [statsLoading, setStatsLoading] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [selectedAttendee, setSelectedAttendee] = useState<WristbandAttendee | null>(null);
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>("issue");
 
   useEffect(() => {
-    let active = true;
-    setStatsLoading(true);
-    getStats(eventId)
-      .then((data) => {
-        if (active) {
-          setStats(data);
-        }
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        if (active) {
-          setStatsLoading(false);
-        }
-      });
-    return () => {
-      active = false;
-    };
-  }, [eventId, getStats]);
+    if (!statsQuery.data) {
+      return;
+    }
+    setStats(statsQuery.data);
+  }, [statsQuery.data]);
+
+  const statsLoading = statsQuery.isPending || statsQuery.isFetching;
+  const resolvedErrorMessage =
+    error?.message ??
+    statsQuery.error?.message ??
+    null;
 
   const resolvedStats = useMemo(() => {
     return (
@@ -204,9 +198,9 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
         </Button>
       </div>
 
-      {error && (
+      {resolvedErrorMessage && (
         <div className="rounded-lg border border-[var(--admin-alert-error-border)] bg-[var(--admin-alert-error-bg)] px-4 py-3 text-sm text-[var(--admin-alert-error-text)]">
-          {error.message || "요청에 실패했습니다. 서버 상태 또는 토큰 설정을 확인해주세요."}
+          {resolvedErrorMessage || "요청에 실패했습니다. 서버 상태 또는 토큰 설정을 확인해주세요."}
         </div>
       )}
 

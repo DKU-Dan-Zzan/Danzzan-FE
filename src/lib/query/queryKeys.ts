@@ -23,8 +23,12 @@ export const appQueryKeys = {
   adminPlacementAd: (placement: "HOME_BOTTOM" | "MY_TICKET") =>
     ["admin", "ad", { placement }] as const,
   boothMapData: (date: string) => ["boothmap", "data", { date }] as const,
+  boothMapBoothDetail: (boothId: number) => ["boothmap", "booth-detail", { boothId }] as const,
+  boothMapPubDetail: (pubId: number) => ["boothmap", "pub-detail", { pubId }] as const,
   myTicketList: () => ["ticketing", "my-ticket", "list"] as const,
   myTicketAd: () => ["ticketing", "my-ticket", "ad"] as const,
+  ticketingQueueStatus: (eventId: string) => ["ticketing", "queue-status", { eventId }] as const,
+  ticketingWristbandStats: (eventId: string) => ["ticketing", "wristband-stats", { eventId }] as const,
   noticeList: (params: NoticeListKeyParams) => ["notice", "list", params] as const,
   noticeDetail: (id: number) => ["notice", "detail", { id }] as const,
   timetablePerformances: (date: string) => ["timetable", "performances", { date }] as const,
