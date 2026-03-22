@@ -1,47 +1,43 @@
 // 역할: 티켓팅 전체 상태머신(대기열·예매·성공/실패)과 사이드이펙트를 관리하는 핵심 훅입니다.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "react-router-dom";
-import { adApi } from "@/api/ticketing/adApi";
-import { ticketApi } from "@/api/ticketing/ticketApi";
-import { useTicketing } from "@/hooks/ticketing/useTicketing";
+import { useEnterQueueMutation } from "@/hooks/ticketing/useEnterQueueMutation";
 import { useQueueStatusQuery } from "@/hooks/ticketing/useQueueStatusQuery";
+import { useTicketingEventsQuery } from "@/hooks/ticketing/useTicketingEventsQuery";
+import { useWaitingRoomAdQuery } from "@/hooks/ticketing/useWaitingRoomAdQuery";
+import { appQueryKeys } from "@/lib/query";
 import {
-  BACKGROUND_POLL_INTERVAL,
-  FOREGROUND_POLL_INTERVAL,
-  MAX_BACKOFF_EXPONENT,
   acquireSingleFlight,
-  computePollingDelay,
-  readQueueEventIdFromSearch,
   releaseSingleFlight,
   resolveQueueStatusAction,
 } from "@/hooks/ticketing/queue/flow-utils";
 import {
-  asReserveErrorCode as parseReserveErrorCode,
-  DEFAULT_SOLD_OUT_DESCRIPTION,
   OFFLINE_WAITING_MESSAGE,
   parseApiError,
-  type ParsedApiError,
+} from "@/routes/ticketing/ticketing/ticketing-flow-helpers";
+import { useQueuePolling } from "@/routes/ticketing/ticketing/flow/useQueuePolling";
+import { useQueueUrlSync } from "@/routes/ticketing/ticketing/flow/useQueueUrlSync";
+import { useReservationAction } from "@/routes/ticketing/ticketing/flow/useReservationAction";
+import type { TicketingStep } from "@/routes/ticketing/ticketing/flow/types";
+import type { QueueRequestStatus, TicketingEvent } from "@/types/ticketing/model/ticket.model";
+import {
+  DEFAULT_SOLD_OUT_DESCRIPTION,
   QUEUE_WAITING_SOLD_OUT_DESCRIPTION,
 } from "@/routes/ticketing/ticketing/ticketing-flow-helpers";
-import type { PlacementAd } from "@/types/ticketing/model/ad.model";
-import type { QueueRequestStatus, TicketingEvent } from "@/types/ticketing/model/ticket.model";
 
-export type TicketingStep = "home" | "list" | "waiting" | "in-progress" | "reserving" | "soldout" | "already" | "success";
+export type { TicketingStep } from "@/routes/ticketing/ticketing/flow/types";
 
 export function useTicketingFlow() {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
-  const {
-    loading: listLoading,
-    error: listError,
-    clearError,
-    getTicketingEvents,
-  } = useTicketing();
+  const enterQueueMutation = useEnterQueueMutation();
+  const enterLockRef = useRef(false);
 
   const [step, setStep] = useState<TicketingStep>("home");
-  const [events, setEvents] = useState<TicketingEvent[]>([]);
   const [now, setNow] = useState(() => Date.now());
-  const [activeEventId, setActiveEventId] = useState<string | null>(() => readQueueEventIdFromSearch(window.location.search));
+  const [activeEventId, setActiveEventId] = useState<string | null>(null);
   const [activeEventTitle, setActiveEventTitle] = useState("");
 
   const [, setQueueStatus] = useState<QueueRequestStatus>("NONE");
@@ -57,84 +53,88 @@ export function useTicketingFlow() {
   const [reserveMessage, setReserveMessage] = useState("입장 상태가 확인되어 예매를 진행하고 있습니다.");
   const [agreementChecked, setAgreementChecked] = useState(false);
   const [reservationError, setReservationError] = useState<string | null>(null);
-
-  const [waitingAd, setWaitingAd] = useState<PlacementAd | null>(null);
   const [soldOutDescription, setSoldOutDescription] = useState(DEFAULT_SOLD_OUT_DESCRIPTION);
 
-  const enterLockRef = useRef(false);
-  const reserveLockRef = useRef(false);
-  const pollBackoffRef = useRef(0);
-  const restoreAttemptedRef = useRef(false);
-  const adLoadedRef = useRef(false);
-  const wasOnlineRef = useRef(isNetworkOnline);
+  const eventsQuery = useTicketingEventsQuery(step === "list");
+  const waitingRoomAdQuery = useWaitingRoomAdQuery(step === "waiting");
   const { refetch: refetchQueueStatus } = useQueueStatusQuery(activeEventId, { enabled: false });
 
+  const { applyQueueEventToUrl } = useQueueUrlSync({
+    activeEventId,
+    setActiveEventId,
+    setActiveEventTitle,
+    setListNotice,
+    setStep,
+    resetQueueFlowState: () => {
+      setQueueStatus("NONE");
+      setWaitingQueuePosition(null);
+      setWaitingQueuePositionUpdatedAt(null);
+      setWaitingError(null);
+      setWaitingPolling(false);
+      setSoldOutDescription(DEFAULT_SOLD_OUT_DESCRIPTION);
+      setReserveProcessing(false);
+      setReserveErrorMessage(null);
+      setReserveMessage("입장 상태가 확인되어 예매를 진행하고 있습니다.");
+      setAgreementChecked(false);
+      setReservationError(null);
+    },
+    clearError: () => {
+      setListNotice(null);
+    },
+  });
+
+  const { executeReserve, resetReservationAgreement } = useReservationAction({
+    setStep,
+    setEvents: (updater) => {
+      queryClient.setQueryData<TicketingEvent[]>(
+        appQueryKeys.ticketingEvents(),
+        (current = []) =>
+          typeof updater === "function"
+            ? (updater as (previous: TicketingEvent[]) => TicketingEvent[])(current)
+            : updater,
+      );
+    },
+    setActiveEventId,
+    setReserveProcessing,
+    setReserveErrorMessage,
+    setReserveMessage,
+    setAgreementChecked,
+    setReservationError,
+    setSoldOutDescription,
+    setListNotice,
+    applyQueueEventToUrl,
+    moveToList: async (options?: { preserveNotice?: boolean }) => {
+      setStep("list");
+      if (!options?.preserveNotice) {
+        setListNotice(null);
+      }
+      await eventsQuery.refetch();
+    },
+    handleUnauthorized: () => {
+      const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
+      navigate(`/ticket/login?redirect=${redirect}`, { replace: true });
+    },
+  });
+
+  const events = useMemo(() => eventsQuery.data ?? [], [eventsQuery.data]);
+  const listLoading = eventsQuery.isPending || eventsQuery.isFetching;
   const listErrorMessage = useMemo(() => {
     if (listNotice) {
       return listNotice;
     }
-    return listError?.message ?? null;
-  }, [listNotice, listError?.message]);
+    return eventsQuery.error?.message ?? null;
+  }, [eventsQuery.error?.message, listNotice]);
 
-  const queueEventFromSearch = useMemo(
-    () => readQueueEventIdFromSearch(location.search),
-    [location.search],
-  );
-
-  const applyQueueEventToUrl = useCallback((eventId: string | null) => {
-    const params = new URLSearchParams(location.search);
-    if (eventId) {
-      params.set("eventId", eventId);
-    } else {
-      params.delete("eventId");
-    }
-    const nextSearch = params.toString();
-    const currentSearch = location.search.startsWith("?")
-      ? location.search.slice(1)
-      : location.search;
-    if (nextSearch === currentSearch) {
+  useEffect(() => {
+    if (!activeEventId) {
+      setActiveEventTitle("");
       return;
     }
-
-    navigate(
-      {
-        pathname: "/ticket/ticketing",
-        search: nextSearch ? `?${nextSearch}` : "",
-      },
-      { replace: true },
-    );
-  }, [location.search, navigate]);
-
-  const handleUnauthorized = useCallback(() => {
-    const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
-    navigate(`/ticket/login?redirect=${redirect}`, { replace: true });
-  }, [location.pathname, location.search, navigate]);
-
-  const loadEvents = useCallback(async (): Promise<TicketingEvent[]> => {
-    const fetched = await getTicketingEvents();
-    setEvents(fetched);
-    if (activeEventId) {
-      const matched = fetched.find((event) => event.id === activeEventId);
-      if (matched) {
-        setActiveEventTitle(matched.title);
-      }
+    const matched = events.find((event) => event.id === activeEventId);
+    if (matched) {
+      setActiveEventTitle(matched.title);
     }
-    return fetched;
-  }, [activeEventId, getTicketingEvents]);
-
-  const resetQueueFlowState = useCallback(() => {
-    setQueueStatus("NONE");
-    setWaitingQueuePosition(null);
-    setWaitingQueuePositionUpdatedAt(null);
-    setWaitingError(null);
-    setWaitingPolling(false);
-    setSoldOutDescription(DEFAULT_SOLD_OUT_DESCRIPTION);
-    setReserveProcessing(false);
-    setReserveErrorMessage(null);
-    setReserveMessage("입장 상태가 확인되어 예매를 진행하고 있습니다.");
-    setAgreementChecked(false);
-    setReservationError(null);
-  }, []);
+  }, [activeEventId, events]);
 
   const updateWaitingQueuePosition = useCallback((queuePosition: number | null) => {
     setWaitingQueuePosition(queuePosition);
@@ -146,105 +146,13 @@ export function useTicketingFlow() {
     if (!options?.preserveNotice) {
       setListNotice(null);
     }
-    clearError();
-    await loadEvents();
-  }, [clearError, loadEvents]);
+    await eventsQuery.refetch();
+  }, [eventsQuery, setStep]);
 
-  const applyReserveError = useCallback(async (
-    eventId: string,
-    parsedError: ParsedApiError,
-  ) => {
-    const reserveCode = parseReserveErrorCode(parsedError.code);
-    if (parsedError.status === 401 || reserveCode === "UNAUTHORIZED") {
-      handleUnauthorized();
-      return;
-    }
-
-    switch (reserveCode) {
-      case "RESERVE_ALREADY_RESERVED":
-        setStep("already");
-        setActiveEventId(null);
-        setReservationError(null);
-        break;
-      case "RESERVE_SOLD_OUT":
-        setSoldOutDescription(DEFAULT_SOLD_OUT_DESCRIPTION);
-        setStep("soldout");
-        setActiveEventId(null);
-        setReservationError(null);
-        break;
-      case "RESERVE_NOT_OPEN":
-        setStep("in-progress");
-        setReserveProcessing(false);
-        setReserveMessage("예매 오픈 시간이 아직 되지 않았습니다. 잠시 후 다시 시도해주세요.");
-        setReserveErrorMessage("오픈 전 상태입니다. 티켓 오픈 시각 이후 다시 시도해주세요.");
-        setReservationError("오픈 전 상태입니다. 티켓 오픈 시각 이후 다시 시도해주세요.");
-        break;
-      case "EVENT_NOT_FOUND":
-        setActiveEventId(null);
-        setListNotice("해당 티켓 정보를 찾을 수 없어 목록으로 이동합니다.");
-        setReservationError(null);
-        await moveToList({ preserveNotice: true });
-        break;
-      case "TEMPORARY_ERROR":
-      default:
-        setStep("in-progress");
-        setReserveProcessing(false);
-        setReserveMessage("일시적인 오류가 발생했습니다. 네트워크 상태를 확인한 뒤 다시 시도해주세요.");
-        setReserveErrorMessage("요청 처리에 실패했습니다. 잠시 후 다시 시도해주세요.");
-        setReservationError("요청 처리에 실패했습니다. 잠시 후 다시 시도해주세요.");
-        break;
-    }
-
-    if (reserveCode === "RESERVE_ALREADY_RESERVED") {
-      // 상태 확인 동기화를 위해 내 티켓 화면에서 최신 정보를 확인하도록 유도합니다.
-      void ticketApi.getMyTickets().catch(() => null);
-    }
-
-    if (reserveCode !== "RESERVE_NOT_OPEN" && reserveCode !== "TEMPORARY_ERROR") {
-      applyQueueEventToUrl(null);
-    } else {
-      applyQueueEventToUrl(eventId);
-    }
-  }, [applyQueueEventToUrl, handleUnauthorized, moveToList]);
-
-  const executeReserve = useCallback(async (eventId: string) => {
-    if (!acquireSingleFlight(reserveLockRef)) {
-      return;
-    }
-    setStep("reserving");
-    setReserveProcessing(true);
-    setReserveErrorMessage(null);
-    setReserveMessage("입장 상태가 확인되어 예매를 진행하고 있습니다.");
-    setReservationError(null);
-
-    try {
-      await ticketApi.activateTicket(eventId);
-      await ticketApi.reserveTicket(eventId);
-      setEvents((prev) =>
-        prev.map((event) => {
-          if (event.id !== eventId) {
-            return event;
-          }
-          if (event.remainingCount === null) {
-            return event;
-          }
-          return {
-            ...event,
-            remainingCount: Math.max(event.remainingCount - 1, 0),
-          };
-        }),
-      );
-      setStep("success");
-      setActiveEventId(null);
-      applyQueueEventToUrl(null);
-    } catch (error) {
-      const parsedError = parseApiError(error);
-      await applyReserveError(eventId, parsedError);
-    } finally {
-      setReserveProcessing(false);
-      releaseSingleFlight(reserveLockRef);
-    }
-  }, [applyQueueEventToUrl, applyReserveError]);
+  const handleUnauthorized = useCallback(() => {
+    const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
+    navigate(`/ticket/login?redirect=${redirect}`, { replace: true });
+  }, [location.pathname, location.search, navigate]);
 
   const handleQueueStatus = useCallback(async (
     status: QueueRequestStatus,
@@ -264,8 +172,7 @@ export function useTicketingFlow() {
         return;
       case "reserve":
         setWaitingError(null);
-        setAgreementChecked(false);
-        setReservationError(null);
+        resetReservationAgreement();
         setStep("in-progress");
         return;
       case "soldout":
@@ -287,7 +194,7 @@ export function useTicketingFlow() {
         applyQueueEventToUrl(null);
         await moveToList({ preserveNotice: true });
     }
-  }, [applyQueueEventToUrl, moveToList, updateWaitingQueuePosition]);
+  }, [applyQueueEventToUrl, moveToList, resetReservationAgreement, updateWaitingQueuePosition]);
 
   const checkQueueStatus = useCallback(async (
     eventId: string,
@@ -313,7 +220,6 @@ export function useTicketingFlow() {
       }
 
       setWaitingError(null);
-      pollBackoffRef.current = 0;
       await handleQueueStatus(
         statusResponse.status,
         eventId,
@@ -333,7 +239,20 @@ export function useTicketingFlow() {
     }
   }, [activeEventId, handleQueueStatus, handleUnauthorized, isNetworkOnline, refetchQueueStatus]);
 
-  const handleEnterQueue = useCallback(async (event: TicketingEvent) => {
+  useQueuePolling({
+    step,
+    activeEventId,
+    isNetworkOnline,
+    waitingError,
+    setStep,
+    setQueueStatus,
+    setWaitingError,
+    setWaitingPolling,
+    setIsNetworkOnline,
+    checkQueueStatus,
+  });
+
+  const handleEnterQueue = useCallback(async (event: { id: string; title: string }) => {
     if (!acquireSingleFlight(enterLockRef)) {
       return;
     }
@@ -342,19 +261,19 @@ export function useTicketingFlow() {
       setListNotice("인터넷 연결을 확인한 뒤 다시 시도해주세요.");
       return;
     }
+
     setActiveEventId(event.id);
     setActiveEventTitle(event.title);
     setListNotice(null);
     setWaitingError(null);
     setWaitingQueuePosition(null);
     setWaitingQueuePositionUpdatedAt(null);
-    setAgreementChecked(false);
-    setReservationError(null);
+    resetReservationAgreement();
     setQueueStatus("WAITING");
     applyQueueEventToUrl(event.id);
 
     try {
-      const enterResponse = await ticketApi.enterTicketQueue(event.id);
+      const enterResponse = await enterQueueMutation.mutateAsync(event.id);
       await handleQueueStatus(
         enterResponse.status,
         event.id,
@@ -374,7 +293,16 @@ export function useTicketingFlow() {
     } finally {
       releaseSingleFlight(enterLockRef);
     }
-  }, [applyQueueEventToUrl, handleQueueStatus, handleUnauthorized, isNetworkOnline, moveToList]);
+  }, [
+    applyQueueEventToUrl,
+    enterQueueMutation,
+    enterLockRef,
+    handleQueueStatus,
+    handleUnauthorized,
+    isNetworkOnline,
+    moveToList,
+    resetReservationAgreement,
+  ]);
 
   const handleAgreementCheckedChange = useCallback((checked: boolean) => {
     setAgreementChecked(checked);
@@ -409,184 +337,23 @@ export function useTicketingFlow() {
     return () => window.clearInterval(intervalId);
   }, [step]);
 
-  useEffect(() => {
-    const handleOnline = () => {
-      setIsNetworkOnline(true);
-    };
-    const handleOffline = () => {
-      setIsNetworkOnline(false);
-    };
-
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (step !== "waiting") {
-      return;
-    }
-
-    if (!isNetworkOnline) {
-      setWaitingPolling(false);
-      setWaitingError(OFFLINE_WAITING_MESSAGE);
-      return;
-    }
-
-    if (waitingError === OFFLINE_WAITING_MESSAGE) {
-      setWaitingError(null);
-    }
-  }, [isNetworkOnline, step, waitingError]);
-
-  useEffect(() => {
-    if (activeEventId === queueEventFromSearch) {
-      return;
-    }
-    setActiveEventId(queueEventFromSearch);
-  }, [activeEventId, queueEventFromSearch]);
-
-  useEffect(() => {
-    const state = location.state as { resetToHome?: number } | null;
-    if (!state?.resetToHome) {
-      return;
-    }
-
-    resetQueueFlowState();
-    setActiveEventId(null);
-    setActiveEventTitle("");
-    setListNotice(null);
-    setStep("home");
-    clearError();
-    applyQueueEventToUrl(null);
-  }, [applyQueueEventToUrl, clearError, location.state, resetQueueFlowState]);
-
-  useEffect(() => {
-    if (restoreAttemptedRef.current) {
-      return;
-    }
-    restoreAttemptedRef.current = true;
-
-    if (!activeEventId) {
-      return;
-    }
-
-    if (!isNetworkOnline) {
-      setQueueStatus("WAITING");
-      setWaitingError(OFFLINE_WAITING_MESSAGE);
-      setWaitingPolling(false);
-      return;
-    }
-
-    setStep("waiting");
-    setWaitingPolling(true);
-
-    void checkQueueStatus(activeEventId).finally(() => {
-      setWaitingPolling(false);
-    });
-  }, [activeEventId, checkQueueStatus, isNetworkOnline]);
-
-  useEffect(() => {
-    const wasOnline = wasOnlineRef.current;
-    wasOnlineRef.current = isNetworkOnline;
-
-    if (wasOnline || !isNetworkOnline || step !== "waiting" || !activeEventId) {
-      return;
-    }
-
-    setWaitingError(null);
-    setWaitingPolling(true);
-    void checkQueueStatus(activeEventId).finally(() => {
-      setWaitingPolling(false);
-    });
-  }, [activeEventId, checkQueueStatus, isNetworkOnline, step]);
-
-  useEffect(() => {
-    if (step !== "waiting" || !activeEventId || !isNetworkOnline) {
-      return;
-    }
-
-    let cancelled = false;
-    let timerId: number | null = null;
-
-    const scheduleNextPoll = (delay: number) => {
-      if (cancelled) {
-        return;
-      }
-      timerId = window.setTimeout(() => {
-        void runPoll();
-      }, delay);
-    };
-
-    const runPoll = async () => {
-      if (cancelled) {
-        return;
-      }
-
-      setWaitingPolling(true);
-
-      const status = await checkQueueStatus(activeEventId);
-
-      if (cancelled) {
-        return;
-      }
-
-      if (status === "WAITING" || status === null) {
-        const baseDelay = document.hidden ? BACKGROUND_POLL_INTERVAL : FOREGROUND_POLL_INTERVAL;
-        if (status === null) {
-          pollBackoffRef.current = Math.min(pollBackoffRef.current + 1, MAX_BACKOFF_EXPONENT);
-        } else {
-          pollBackoffRef.current = 0;
-        }
-        const delay = computePollingDelay(baseDelay, pollBackoffRef.current);
-        scheduleNextPoll(delay);
-      }
-    };
-
-    scheduleNextPoll(computePollingDelay(FOREGROUND_POLL_INTERVAL, 0));
-
-    return () => {
-      cancelled = true;
-      if (timerId !== null) {
-        window.clearTimeout(timerId);
-      }
-      setWaitingPolling(false);
-      pollBackoffRef.current = 0;
-    };
-  }, [activeEventId, checkQueueStatus, isNetworkOnline, step]);
-
-  useEffect(() => {
-    if (step !== "waiting" || adLoadedRef.current) {
-      return;
-    }
-
-    adLoadedRef.current = true;
-    const controller = new AbortController();
-
-    void adApi
-      .getPlacementAd("WAITING_ROOM_MAIN", controller.signal)
-      .then((ad) => {
-        setWaitingAd(ad);
-      })
-      .catch(() => {
-        setWaitingAd(null);
-      });
-
-    return () => {
-      controller.abort();
-    };
-  }, [step]);
-
   const backToList = useCallback(() => {
     setActiveEventId(null);
     setActiveEventTitle("");
-    resetQueueFlowState();
+    setQueueStatus("NONE");
+    setWaitingQueuePosition(null);
+    setWaitingQueuePositionUpdatedAt(null);
+    setWaitingError(null);
+    setWaitingPolling(false);
+    setSoldOutDescription(DEFAULT_SOLD_OUT_DESCRIPTION);
+    setReserveProcessing(false);
+    setReserveErrorMessage(null);
+    setReserveMessage("입장 상태가 확인되어 예매를 진행하고 있습니다.");
+    setAgreementChecked(false);
+    setReservationError(null);
     applyQueueEventToUrl(null);
     void moveToList();
-  }, [applyQueueEventToUrl, moveToList, resetQueueFlowState]);
+  }, [applyQueueEventToUrl, moveToList]);
 
   const openList = useCallback(() => {
     backToList();
@@ -594,8 +361,8 @@ export function useTicketingFlow() {
 
   const refreshList = useCallback(() => {
     setListNotice(null);
-    void loadEvents();
-  }, [loadEvents]);
+    void eventsQuery.refetch();
+  }, [eventsQuery]);
 
   const openMyTickets = useCallback(() => {
     navigate("/ticket/my-ticket");
@@ -620,7 +387,7 @@ export function useTicketingFlow() {
     waitingPolling,
     isNetworkOnline,
     waitingError,
-    waitingAd,
+    waitingAd: waitingRoomAdQuery.data ?? null,
     agreementChecked,
     reserveProcessing,
     reservationError,
