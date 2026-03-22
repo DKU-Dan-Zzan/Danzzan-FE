@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 역할: 프론트엔드 구조/레이어/스타일 규칙 위반을 점검해 CI 품질 게이트를 제공합니다.
 
 import fs from "node:fs"
 import path from "node:path"
