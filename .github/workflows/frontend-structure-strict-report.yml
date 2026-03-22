@@ -1,0 +1,40 @@
+name: Frontend Structure Strict Report
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+jobs:
+  strict-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run strict structure report (non-blocking)
+        id: strict_report
+        continue-on-error: true
+        run: npm run lint:structure:strict -- --allowlist config/structure-allowlist.json
+
+      - name: Write summary
+        if: always()
+        run: |
+          if [ "${{ steps.strict_report.outcome }}" = "success" ]; then
+            echo "### Strict structure report: PASS" >> "$GITHUB_STEP_SUMMARY"
+            echo "- No structure violations in strict mode." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "### Strict structure report: NEEDS CLEANUP" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Strict mode found violations. This workflow is non-blocking by design." >> "$GITHUB_STEP_SUMMARY"
+            echo "- Follow-up cleanup should reduce violations before blocking adoption." >> "$GITHUB_STEP_SUMMARY"
+          fi
