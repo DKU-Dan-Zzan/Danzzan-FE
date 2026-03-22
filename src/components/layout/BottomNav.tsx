@@ -1,16 +1,36 @@
 import { NavLink } from "react-router-dom";
 import { Clock, Home, Map, Megaphone, Ticket, User } from "lucide-react";
+import { useSyncExternalStore } from "react";
+import { hasAuthenticatedRole } from "@/lib/common/auth-access";
+import { getTicketingNavigationTarget } from "@/lib/common/ticketing-navigation";
+import { authStore } from "@/store/common/authStore";
 
 const navItems = [
   { to: "/", icon: Home, label: "홈" },
   { to: "/timetable", icon: Clock, label: "타임테이블" },
   { to: "/map", icon: Map, label: "부스맵" },
   { to: "/notice", icon: Megaphone, label: "공지사항" },
-  { to: "/ticket/ticketing", icon: Ticket, label: "티켓팅" },
   { to: "/mypage", icon: User, label: "내정보" },
 ];
 
 const BottomNav = () => {
+  const session = useSyncExternalStore(
+    authStore.subscribe,
+    authStore.getSnapshot,
+    authStore.getSnapshot,
+  );
+  const hasTicketingAccess = hasAuthenticatedRole({
+    accessToken: session.tokens?.accessToken,
+    role: session.role,
+    requiredRole: "student",
+  });
+  const ticketingTarget = getTicketingNavigationTarget(hasTicketingAccess);
+  const items = [
+    ...navItems.slice(0, 4),
+    { to: ticketingTarget, icon: Ticket, label: "티켓팅" },
+    navItems[4],
+  ];
+
   return (
     <nav
       data-app-bottom-nav
@@ -19,7 +39,7 @@ const BottomNav = () => {
       <div className="absolute inset-0 border-t border-[var(--app-nav-border)] bg-[var(--app-nav-bg)] shadow-[var(--app-nav-shadow)] backdrop-blur-[16px]" />
 
       <div className="relative flex h-[var(--app-bottom-nav-height)] items-center">
-        {navItems.map(({ to, icon: Icon, label }) => (
+        {items.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}

@@ -1,8 +1,5 @@
-import {
-  hasRequiredRole,
-  resolveRoleFromAccessToken,
-  type AuthRole,
-} from "@/api/common/authCore";
+import { type AuthRole } from "@/api/common/authCore";
+import { hasAuthenticatedRole } from "@/lib/common/auth-access";
 export {
   buildLoginRedirectPath,
   buildReturnTo,
@@ -14,11 +11,5 @@ export const isRoleAuthenticated = (options: {
   role?: AuthRole | null;
   requiredRole: AuthRole;
 }): boolean => {
-  if (!options.accessToken) {
-    return false;
-  }
-
-  // Token claim should be source of truth when available.
-  const tokenRole = resolveRoleFromAccessToken(options.accessToken);
-  return hasRequiredRole(options.requiredRole, tokenRole ?? options.role ?? null);
+  return hasAuthenticatedRole(options);
 };

@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { StaticRouter } from "react-router-dom/server";
 import BottomNav from "@/components/layout/BottomNav";
+import { authStore } from "@/store/common/authStore";
 
 function renderBottomNav(location: string) {
   return renderToStaticMarkup(
@@ -11,8 +12,16 @@ function renderBottomNav(location: string) {
   );
 }
 
+const createJwtLikeToken = (payload: Record<string, unknown>): string => {
+  const encode = (value: Record<string, unknown>) =>
+    Buffer.from(JSON.stringify(value)).toString("base64url");
+
+  return `${encode({ alg: "HS256", typ: "JWT" })}.${encode(payload)}.signature`;
+};
+
 describe("BottomNav", () => {
   afterEach(() => {
+    authStore.clear();
     vi.restoreAllMocks();
   });
 
@@ -43,5 +52,49 @@ describe("BottomNav", () => {
     expect(markup).toContain("-translate-y-[1px] scale-[1.04]");
     expect(markup).toContain("opacity-100 scale-x-100");
     expect(markup).toContain("opacity-0 scale-x-50");
+  });
+
+  it("비로그인 상태에서는 티켓팅 탭이 로그인 redirect를 가리킨다", () => {
+    authStore.clear();
+
+    const markup = renderBottomNav("/notice");
+
+    expect(markup).toContain('href="/ticket/login?redirect=%2Fticket%2Fticketing"');
+  });
+
+  it("student 로그인 상태에서는 티켓팅 탭이 티켓팅 홈을 가리킨다", () => {
+    authStore.setSession(
+      {
+        tokens: {
+          accessToken: createJwtLikeToken({ role: "ROLE_USER" }),
+          refreshToken: "",
+          expiresIn: null,
+        },
+        user: null,
+      },
+      "student",
+    );
+
+    const markup = renderBottomNav("/notice");
+
+    expect(markup).toContain('href="/ticket/ticketing"');
+  });
+
+  it("admin 로그인 상태에서도 티켓팅 탭이 티켓팅 홈을 가리킨다", () => {
+    authStore.setSession(
+      {
+        tokens: {
+          accessToken: createJwtLikeToken({ role: "ROLE_ADMIN" }),
+          refreshToken: "",
+          expiresIn: null,
+        },
+        user: null,
+      },
+      "admin",
+    );
+
+    const markup = renderBottomNav("/notice");
+
+    expect(markup).toContain('href="/ticket/ticketing"');
   });
 });
