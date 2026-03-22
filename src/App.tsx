@@ -1,24 +1,63 @@
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
-import { lazy, Suspense, useEffect, useState, type ReactNode } from "react";
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useState,
+  type ComponentType,
+  type LazyExoticComponent,
+  type ReactNode,
+} from "react";
 import { useAdminAuth } from "@/hooks/app/admin/useAdminAuth";
 import { buildLoginRedirectPath, buildReturnTo } from "@/routes/common/authGuard";
+import AppLayout from "./components/layout/AppLayout";
+import Home from "./routes/home/Home";
+import Timetable from "./routes/timetable/Timetable";
+import TicketingApp from "./routes/ticketing/TicketingApp";
 
-const AppLayout = lazy(() => import("./components/layout/AppLayout"));
+type LazyWithPreload<T extends ComponentType<any>> = LazyExoticComponent<T> & {
+  preload: () => Promise<{ default: T }>;
+};
+
+const lazyWithPreload = <T extends ComponentType<any>>(
+  factory: () => Promise<{ default: T }>,
+): LazyWithPreload<T> => {
+  const Component = lazy(factory) as LazyWithPreload<T>;
+  Component.preload = factory;
+  return Component;
+};
+
 const AdminLayout = lazy(() => import("./components/layout/AdminLayout"));
-const Home = lazy(() => import("./routes/home/Home"));
-const Notice = lazy(() => import("./routes/notice/Notice"));
-const Timetable = lazy(() => import("./routes/timetable/Timetable"));
-const BoothMap = lazy(() => import("./routes/boothmap/BoothMap"));
-const MyPage = lazy(() => import("./routes/mypage/MyPage"));
+const Notice = lazyWithPreload(() => import("./routes/notice/Notice"));
+const BoothMap = lazyWithPreload(() => import("./routes/boothmap/BoothMap"));
+const MyPage = lazyWithPreload(() => import("./routes/mypage/MyPage"));
 const Admin = lazy(() => import("./routes/admin/Admin"));
 const AdminLogin = lazy(() => import("./routes/admin/AdminLogin"));
 const AdminMap = lazy(() => import("./routes/admin/AdminMap"));
-const TicketingApp = lazy(() => import("./routes/ticketing/TicketingApp"));
 
 function RouteLoading() {
+  const [visibleFallback, setVisibleFallback] = useState(false);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setVisibleFallback(true);
+    }, 320);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
+
+  if (!visibleFallback) {
+    return null;
+  }
+
   return (
-    <div className="flex min-h-dvh items-center justify-center text-[var(--text-muted)]">
-      화면 불러오는 중...
+    <div className="flex min-h-dvh items-center justify-center">
+      <div
+        className="h-5 w-5 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--accent)]"
+        aria-label="페이지 전환 중"
+      />
     </div>
   );
 }
@@ -73,13 +112,25 @@ function LegacyMyTicketRedirect() {
 }
 
 function App() {
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void Notice.preload();
+      void BoothMap.preload();
+      void MyPage.preload();
+    }, 200);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
+
   return (
     <Routes>
       {/* 일반 사용자: 헤더/바텀네비 적용 */}
-      <Route element={withRouteSuspense(<AppLayout />)}>
-        <Route path="/" element={withRouteSuspense(<Home />)} />
+      <Route element={<AppLayout />}>
+        <Route path="/" element={<Home />} />
         <Route path="/notice" element={withRouteSuspense(<Notice />)} />
-        <Route path="/timetable" element={withRouteSuspense(<Timetable />)} />
+        <Route path="/timetable" element={<Timetable />} />
         <Route path="/map" element={withRouteSuspense(<BoothMap />)} />
         <Route path="/mypage" element={withRouteSuspense(<MyPage />)} />
       </Route>
@@ -96,7 +147,7 @@ function App() {
         </Route>
       </Route>
 
-      <Route path="/ticket/*" element={withRouteSuspense(<TicketingApp />)} />
+      <Route path="/ticket/*" element={<TicketingApp />} />
 
       <Route path="/login" element={<Navigate to="/ticket/login" replace />} />
       <Route path="/signup" element={<Navigate to="/ticket/signup" replace />} />

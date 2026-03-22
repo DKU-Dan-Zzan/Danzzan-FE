@@ -2,12 +2,14 @@
 import { lazy, Suspense } from "react";
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { cn } from "@/components/common/ui/utils";
+import { UserLayout } from "@/components/ticketing/layout/UserLayout";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import {
   buildLoginRedirectPath,
   buildReturnTo,
   isRoleAuthenticated,
 } from "@/routes/common/authGuard";
+import Ticketing from "@/routes/ticketing/ticketing/Ticketing";
 import { env } from "@/utils/common/env";
 
 const AdminLayout = lazy(() =>
@@ -15,15 +17,9 @@ const AdminLayout = lazy(() =>
     default: module.AdminLayout,
   })),
 );
-const UserLayout = lazy(() =>
-  import("@/components/ticketing/layout/UserLayout").then((module) => ({
-    default: module.UserLayout,
-  })),
-);
 const Login = lazy(() => import("@/routes/ticketing/login/Login"));
 const ResetPassword = lazy(() => import("@/routes/ticketing/reset-password/ResetPassword"));
 const Signup = lazy(() => import("@/routes/ticketing/signup/Signup"));
-const Ticketing = lazy(() => import("@/routes/ticketing/ticketing/Ticketing"));
 const MyTicket = lazy(() => import("@/routes/ticketing/my-ticket/MyTicket"));
 const AdminLogin = lazy(() => import("@/routes/ticketing/admin/login/AdminLogin"));
 const WristbandPage = lazy(() => import("@/routes/ticketing/admin/wristband/WristbandPage"));
