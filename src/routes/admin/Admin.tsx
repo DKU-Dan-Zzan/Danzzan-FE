@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AlertCircle,
@@ -17,22 +17,7 @@ import {
 import { useAdminAuth } from "@/hooks/app/admin/useAdminAuth";
 import { useAdminAds } from "@/hooks/app/admin/useAdminAds";
 import { useAdminNotices } from "@/hooks/app/admin/useAdminNotices";
-import {
-  createAdminNotice,
-  deleteAdminNotice,
-  restoreAdminNotice,
-  getNoticeImagePresign,
-  getAdminAdImageUpload,
-  getEmergencyAdminNotice,
-  setAdminAdsActiveByPlacement,
-  type AdvertisementPlacement,
-  type NoticeStatusFilter,
-  type NoticeResponse,
-  createAdminAd,
-  updateAdminNotice,
-  updateNoticeDisplayOrder,
-  updateEmergencyAdminNotice,
-} from "@/api/app/admin/adminApi";
+import type { NoticeStatusFilter } from "@/api/app/admin/adminApi";
 import {
   Dialog,
   DialogContent,
@@ -50,46 +35,27 @@ import {
 } from "@/components/common/ui/alert-dialog";
 import { cn } from "@/components/common/ui/utils";
 import { AdminShell } from "@/components/layout/AdminShell";
-import { Toaster, toast } from "sonner";
+import { Toaster } from "sonner";
 import {
   formatDate,
-  type AdFormState,
   type NoticeAuthor,
-  type NoticeFormState,
 } from "@/routes/admin/admin-view-model";
-import { appQueryKeys, useAppQuery } from "@/lib/query";
-import {
-  MAX_NOTICE_IMAGE_COUNT,
-  buildAdPayload,
-  buildEmergencyPayload,
-  buildNoticePayload,
-  createEmptyNoticeForm,
-  createNoticeEditForm,
-  createUploadFailureMessage,
-  uploadToPresignedUrl,
-  validateAdPayload,
-  validateImageFile,
-  validateNoticePayload,
-} from "@/routes/admin/adminEditorLogic";
+import type { AdminConfirmDialogState } from "@/routes/admin/adminConfirmDialog";
+import { useAdminAdActions } from "@/routes/admin/hooks/useAdminAdActions";
+import { useAdminNoticeActions } from "@/routes/admin/hooks/useAdminNoticeActions";
+import { useEmergencyNotice } from "@/routes/admin/hooks/useEmergencyNotice";
 import {
   ADMIN_FOCUS_VISIBLE_RING_CLASS,
   ADMIN_PRIMARY_ACTION_BUTTON_CLASS,
   ADMIN_SECONDARY_ACTION_BUTTON_CLASS,
 } from "@/routes/admin/adminStyleClasses";
 
-type ConfirmDialogState = {
-  title: string;
-  description: string;
-  confirmLabel?: string;
-  onConfirm: () => Promise<void> | void;
-};
-
 function Admin() {
   const navigate = useNavigate();
   const { logout } = useAdminAuth();
 
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const [confirmDialogState, setConfirmDialogState] = useState<ConfirmDialogState | null>(null);
+  const [confirmDialogState, setConfirmDialogState] = useState<AdminConfirmDialogState | null>(null);
   const [confirming, setConfirming] = useState(false);
   const handleAdminDataError = useCallback((message: string) => {
     setGlobalError(message);
@@ -117,11 +83,6 @@ function Admin() {
     }
   }, [confirmDialogState]);
 
-  // 긴급 공지
-  const [emergencyMessage, setEmergencyMessage] = useState("");
-  const [emergencyActive, setEmergencyActive] = useState(true);
-  const [emergencySaving, setEmergencySaving] = useState(false);
-
   const {
     noticeKeyword,
     setNoticeKeyword,
@@ -145,346 +106,68 @@ function Admin() {
     onError: handleAdminDataError,
   });
 
-  const [editingNotice, setEditingNotice] = useState<NoticeFormState | null>(null);
-  const [pinReorderMode, setPinReorderMode] = useState(false);
-  const [pinReorderList, setPinReorderList] = useState<NoticeResponse[]>([]);
-  const [pinSaving, setPinSaving] = useState(false);
-  const [editingAd, setEditingAd] = useState<AdFormState | null>(null);
-
-  const [noticeImageUploading, setNoticeImageUploading] = useState(false);
-  const [adImageUploading, setAdImageUploading] = useState(false);
-
-  const emergencyQuery = useAppQuery({
-    queryKey: appQueryKeys.adminEmergencyNotice(),
-    queryFn: ({ signal }) => getEmergencyAdminNotice({ signal }),
-    staleTime: 30_000,
+  const {
+    emergencyMessage,
+    setEmergencyMessage,
+    emergencyActive,
+    setEmergencyActive,
+    emergencyLoading,
+    handleSaveEmergency,
+  } = useEmergencyNotice({
+    setGlobalError,
   });
 
-  const emergencyLoading =
-    emergencyQuery.isPending || emergencyQuery.isFetching || emergencySaving;
+  const {
+    editingNotice,
+    setEditingNotice,
+    noticePinned,
+    noticeOthers,
+    effectivePinned,
+    pinReorderMode,
+    pinSaving,
+    noticeImageUploading,
+    openNewNotice,
+    openEditNotice,
+    handleSubmitNotice,
+    handleUploadNoticeImages,
+    handleArchiveNotice,
+    handleRestoreNotice,
+    startPinReorder,
+    cancelPinReorder,
+    movePinnedItem,
+    handleSavePinOrder,
+  } = useAdminNoticeActions({
+    notices,
+    noticeStatus,
+    noticePage,
+    reloadNotices,
+    setGlobalError,
+    openConfirmDialog: (dialogState) => {
+      setConfirmDialogState(dialogState);
+    },
+  });
+
+  const {
+    editingAd,
+    setEditingAd,
+    adImageUploading,
+    openAdEditor,
+    handleDeleteAd,
+    handleSubmitAd,
+    handleUploadAdImage,
+  } = useAdminAdActions({
+    homeBottomAd,
+    myTicketAd,
+    reloadAds,
+    setGlobalError,
+    openConfirmDialog: (dialogState) => {
+      setConfirmDialogState(dialogState);
+    },
+  });
 
   const handleLogout = async () => {
     await logout();
     navigate("/admin/login", { replace: true });
-  };
-
-  useEffect(() => {
-    if (!emergencyQuery.data) {
-      return;
-    }
-    setEmergencyMessage(emergencyQuery.data.message ?? "");
-    setEmergencyActive(Boolean(emergencyQuery.data.isActive));
-  }, [emergencyQuery.data]);
-
-  useEffect(() => {
-    if (!emergencyQuery.error) {
-      return;
-    }
-    setGlobalError(emergencyQuery.error.message || "긴급 공지를 불러오지 못했습니다.");
-  }, [emergencyQuery.error]);
-
-  const handleDeleteAd = async (placement: AdvertisementPlacement) => {
-    const ad = placement === "HOME_BOTTOM" ? homeBottomAd : myTicketAd;
-    if (!ad) return;
-
-    setConfirmDialogState({
-      title: "광고 삭제",
-      description: "이 광고를 삭제하시겠습니까?",
-      confirmLabel: "삭제",
-      onConfirm: async () => {
-        try {
-          setGlobalError(null);
-          await setAdminAdsActiveByPlacement(placement, false);
-          await reloadAds();
-          toast.success("광고를 삭제했습니다.");
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "광고 삭제에 실패했습니다.";
-          setGlobalError(message);
-          toast.error(message);
-        }
-      },
-    });
-  };
-
-  // 긴급 공지 저장
-  const handleSaveEmergency = async () => {
-    try {
-      setGlobalError(null);
-      setEmergencySaving(true);
-      await updateEmergencyAdminNotice(buildEmergencyPayload(emergencyMessage, emergencyActive));
-      await emergencyQuery.refetch();
-      toast.success("긴급 공지를 저장했습니다.");
-    } catch (error) {
-      setGlobalError(error instanceof Error ? error.message : "긴급 공지를 저장하지 못했습니다.");
-    } finally {
-      setEmergencySaving(false);
-    }
-  };
-
-  const noticePinned = useMemo(
-    () =>
-      noticeStatus === "DELETED"
-        ? []
-        : notices.filter((n) => (n.isPinned ?? n.isEmergency) === true),
-    [notices, noticeStatus],
-  );
-  const noticeOthers = useMemo(
-    () =>
-      noticeStatus === "DELETED"
-        ? notices
-        : notices.filter((n) => !(n.isPinned ?? n.isEmergency)),
-    [notices, noticeStatus],
-  );
-
-  const effectivePinned = pinReorderMode ? pinReorderList : noticePinned;
-
-  const openNewNotice = () => {
-    setEditingNotice(createEmptyNoticeForm());
-  };
-
-  const openEditNotice = (notice: NoticeResponse) => {
-    setEditingNotice(createNoticeEditForm(notice));
-  };
-
-  const handleSubmitNotice = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!editingNotice) return;
-
-    const payload = buildNoticePayload(editingNotice);
-    const validationMessage = validateNoticePayload(payload);
-
-    if (validationMessage) {
-      setGlobalError(validationMessage);
-      return;
-    }
-
-    try {
-      setGlobalError(null);
-      if (editingNotice.id) {
-        await updateAdminNotice(editingNotice.id, payload);
-      } else {
-        await createAdminNotice(payload);
-      }
-      setEditingNotice(null);
-      await reloadNotices(noticePage);
-    } catch (error) {
-      setGlobalError(error instanceof Error ? error.message : "공지를 저장하지 못했습니다.");
-    }
-  };
-
-  const handleUploadNoticeImages = async (files: FileList) => {
-    if (!editingNotice) return;
-
-    const currentCount = editingNotice.images.length;
-    const incomingFiles = Array.from(files);
-    const remainingSlots = MAX_NOTICE_IMAGE_COUNT - currentCount;
-
-    if (remainingSlots <= 0) {
-      toast.warning(`이미지는 최대 ${MAX_NOTICE_IMAGE_COUNT}개까지 업로드할 수 있습니다.`);
-      return;
-    }
-
-    const limitedFiles = incomingFiles.slice(0, remainingSlots);
-
-    try {
-      setNoticeImageUploading(true);
-
-      for (const file of limitedFiles) {
-        const validationMessage = validateImageFile(
-          file,
-          `"${file.name}" 파일이 5MB를 초과하여 업로드할 수 없습니다.`,
-        );
-        if (validationMessage) {
-          toast.warning(validationMessage);
-          continue;
-        }
-
-        const presign = await getNoticeImagePresign({
-          fileName: file.name,
-          contentType: file.type,
-          fileSize: file.size,
-        });
-
-        if (import.meta.env.DEV) {
-          // presign 응답 구조 디버깅용
-          console.log("[notice presign]", presign);
-        }
-
-        if (!presign.presignedUrl) {
-          console.error("[notice presign] presignedUrl is undefined", presign);
-          throw new Error("presignedUrl이 비어 있습니다. presign API 응답을 확인해 주세요.");
-        }
-
-        const putRes = await uploadToPresignedUrl(presign, file);
-
-        if (!putRes.ok) {
-          throw new Error(await createUploadFailureMessage("S3 업로드 실패", putRes));
-        }
-
-        const url = presign.imageUrl ?? presign.fileUrl;
-        setEditingNotice((prev) => (prev ? { ...prev, images: [...prev.images, url] } : prev));
-      }
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "이미지 업로드에 실패했습니다.";
-      setGlobalError(message);
-      toast.error(message);
-    } finally {
-      setNoticeImageUploading(false);
-    }
-  };
-
-  const handleArchiveNotice = async (id: number) => {
-    setConfirmDialogState({
-      title: "공지 보관",
-      description: "이 공지를 보관 처리하시겠습니까?",
-      confirmLabel: "보관",
-      onConfirm: async () => {
-        try {
-          setGlobalError(null);
-          await deleteAdminNotice(id);
-          await reloadNotices(noticePage);
-          toast.success("공지를 보관했습니다.");
-        } catch (error) {
-          const message = error instanceof Error ? error.message : "공지를 보관하지 못했습니다.";
-          setGlobalError(message);
-          toast.error(message);
-        }
-      },
-    });
-  };
-
-  const handleRestoreNotice = async (id: number) => {
-    setConfirmDialogState({
-      title: "공지 복원",
-      description: "이 공지를 다시 게시중 상태로 복원할까요?",
-      confirmLabel: "복원",
-      onConfirm: async () => {
-        try {
-          setGlobalError(null);
-          await restoreAdminNotice(id);
-          await reloadNotices(noticePage);
-          toast.success("공지를 복원했습니다.");
-        } catch (error) {
-          const message = error instanceof Error ? error.message : "공지를 복원하지 못했습니다.";
-          setGlobalError(message);
-          toast.error(message);
-        }
-      },
-    });
-  };
-
-  const startPinReorder = () => {
-    if (noticePinned.length === 0) {
-      toast.info("핀 공지가 없습니다.");
-      return;
-    }
-    setPinReorderList(noticePinned);
-    setPinReorderMode(true);
-  };
-
-  const cancelPinReorder = () => {
-    setPinReorderMode(false);
-    setPinReorderList([]);
-  };
-
-  const movePinnedItem = (index: number, direction: "up" | "down") => {
-    setPinReorderList((prev) => {
-      const next = [...prev];
-      const targetIndex = direction === "up" ? index - 1 : index + 1;
-      if (targetIndex < 0 || targetIndex >= next.length) return prev;
-      [next[index], next[targetIndex]] = [next[targetIndex], next[index]];
-      return next;
-    });
-  };
-
-  const handleSavePinOrder = async () => {
-    if (pinReorderList.length === 0) {
-      setPinReorderMode(false);
-      return;
-    }
-
-    try {
-      setPinSaving(true);
-      await updateNoticeDisplayOrder({
-        orders: pinReorderList.map((notice, index) => ({
-          id: notice.id,
-          displayOrder: index + 1,
-        })),
-      });
-      setPinReorderMode(false);
-      setPinReorderList([]);
-      await reloadNotices(noticePage);
-      toast.success("핀 공지 순서를 저장했습니다.");
-    } catch (error) {
-      setGlobalError(
-        error instanceof Error ? error.message : "핀 공지 순서를 저장하지 못했습니다.",
-      );
-    } finally {
-      setPinSaving(false);
-    }
-  };
-
-  const handleSubmitAd = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!editingAd) return;
-
-    const payload = buildAdPayload(editingAd);
-    const validationMessage = validateAdPayload(payload);
-
-    if (validationMessage) {
-      setGlobalError(validationMessage);
-      return;
-    }
-
-    try {
-      setGlobalError(null);
-      await createAdminAd(payload);
-      setEditingAd(null);
-      await reloadAds();
-    } catch (error) {
-      setGlobalError(error instanceof Error ? error.message : "광고를 저장하지 못했습니다.");
-    }
-  };
-
-  const handleUploadAdImage = async (file: File) => {
-    if (!editingAd) return;
-
-    const validationMessage = validateImageFile(
-      file,
-      "이미지 크기는 최대 5MB까지 업로드할 수 있습니다.",
-    );
-    if (validationMessage) {
-      toast.warning(validationMessage);
-      return;
-    }
-
-    try {
-      setAdImageUploading(true);
-      setGlobalError(null);
-
-      const uploadMeta = await getAdminAdImageUpload({
-        fileName: file.name,
-        contentType: file.type,
-        fileSize: file.size,
-      });
-
-      const putRes = await uploadToPresignedUrl(uploadMeta, file);
-
-      if (!putRes.ok) {
-        throw new Error(await createUploadFailureMessage("광고 이미지 업로드 실패", putRes));
-      }
-
-      setEditingAd((prev) => (prev ? { ...prev, imageUrl: uploadMeta.imageUrl } : prev));
-      toast.success("이미지 업로드가 완료되었습니다.");
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "이미지 업로드에 실패했습니다.";
-      setGlobalError(message);
-      toast.error(message);
-    } finally {
-      setAdImageUploading(false);
-    }
   };
 
   return (
@@ -906,13 +589,7 @@ function Admin() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => {
-                      setEditingAd({
-                        title: homeBottomAd?.title ?? "",
-                        imageUrl: homeBottomAd?.imageUrl ?? "",
-                        placement: "HOME_BOTTOM",
-                      });
-                    }}
+                    onClick={() => openAdEditor("HOME_BOTTOM")}
                     className="flex h-8 items-center gap-1 rounded-2xl border border-[var(--border-base)] bg-[var(--surface)] px-3 text-[11px] font-semibold text-[var(--text)] hover:bg-[var(--border-base)]"
                   >
                     <Pencil className="h-3.5 w-3.5" strokeWidth={2.3} />
@@ -959,13 +636,7 @@ function Admin() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => {
-                      setEditingAd({
-                        title: myTicketAd?.title ?? "",
-                        imageUrl: myTicketAd?.imageUrl ?? "",
-                        placement: "MY_TICKET",
-                      });
-                    }}
+                    onClick={() => openAdEditor("MY_TICKET")}
                     className="flex h-8 items-center gap-1 rounded-2xl border border-[var(--border-base)] bg-[var(--surface)] px-3 text-[11px] font-semibold text-[var(--text)] hover:bg-[var(--border-base)]"
                   >
                     <Pencil className="h-3.5 w-3.5" strokeWidth={2.3} />
