@@ -5,6 +5,7 @@ import EmergencyNotice, { type EmergencyNoticeData } from "@/components/app/home
 import LineupSection, { type LineupBanner } from "@/components/app/home/LineupSection"
 import CurrentPerformanceSection from "@/components/app/home/CurrentPerformanceSection";
 import AdBanner from "@/components/app/home/AdBanner";
+import DelayedSpinner from "@/components/common/loading/DelayedSpinner";
 
 import { getEmergencyNotice, getHomeImages, getLineupImages } from "@/api/app/home/homeApi"
 import { getPlacementAd } from "@/api/app/notice/noticeApi"
@@ -101,11 +102,18 @@ function Home() {
     }
   }, [emergencyNoticeQuery.data])
 
-  const loading =
+  const corePending =
     imagesQuery.isPending ||
+    emergencyNoticeQuery.isPending
+  const accessoryPending =
     lineupQuery.isPending ||
-    emergencyNoticeQuery.isPending ||
     homeBottomAdQuery.isPending
+  const shouldShowInlineSpinner =
+    corePending &&
+    !imagesQuery.data?.length &&
+    !emergencyNoticeQuery.data
+  const adImageUrl = homeBottomAdQuery.data?.imageUrl
+  const adTitle = homeBottomAdQuery.data?.title
 
   const error =
     imagesQuery.error?.message ??
@@ -146,14 +154,17 @@ function Home() {
         </div>
 
         <div>
-          <AdBanner imageUrl={homeBottomAdQuery.data?.imageUrl} alt={homeBottomAdQuery.data?.title} />
+          <AdBanner imageUrl={adImageUrl} alt={adTitle} />
         </div>
       </div>
 
-      {loading && (
-        <div className="mx-auto mt-3 w-full max-w-[var(--home-content-max-width)] rounded-xl border border-[var(--home-card-border)] bg-[var(--home-card-bg)] px-3 py-2 text-xs leading-[1.35] text-[var(--text-muted)]">
-          로딩 중...
-        </div>
+      {shouldShowInlineSpinner && (
+        <DelayedSpinner
+          delayMs={280}
+          label="홈 콘텐츠 동기화 중"
+          containerClassName="mx-auto mt-3 flex w-full max-w-[var(--home-content-max-width)] items-center justify-center py-2"
+          spinnerClassName="h-4 w-4 border-[var(--home-card-border)] border-t-[var(--accent)]"
+        />
       )}
     </div>
   )

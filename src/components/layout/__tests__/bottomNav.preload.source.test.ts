@@ -18,6 +18,9 @@ describe("BottomNav preload policy", () => {
     expect(source).toContain("onPointerEnter={() =>");
     expect(source).toContain("onFocus={() =>");
     expect(source).toContain("onTouchStart={() =>");
+    expect(source).toContain("onClick={() =>");
+    expect(source).toContain("markBottomNavTransitionStart(to);");
+    expect(source).toContain("warmTabRoute(to);");
     expect(source).toContain("void preloadRouteByPath(routePath);");
     expect(source).toContain("void prefetchTabDataByPath(routePath);");
   });

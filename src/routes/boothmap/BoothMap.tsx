@@ -45,10 +45,11 @@ import {
 } from "@/routes/boothmap/boothMapSelectors";
 import { cn } from "@/components/common/ui/utils";
 
-const LazyMapbox3DView = lazy(async () => {
+const loadMapbox3DView = async () => {
   await import("mapbox-gl/dist/mapbox-gl.css");
   return import("@/components/app/boothmap/Mapbox3DView");
-});
+};
+const LazyMapbox3DView = lazy(loadMapbox3DView);
 
 const DEFAULT_MAP_VIEWPORT: MapViewport = {
   lat: 37.3201,
@@ -70,6 +71,12 @@ const TOP_PANEL_Z_INDEX_CLASS: Record<SheetSnap, string> = {
   FULL: "z-[40]",
 }
 const MAP_MODE_TRANSITION_MS = 280;
+const MAPBOX_WARMUP_FALLBACK_DELAY_MS = 900;
+const MAPBOX_WARMUP_IDLE_TIMEOUT_MS = 1800;
+
+const warmupMapbox3DAssets = async () => {
+  await loadMapbox3DView();
+};
 
 function mapCollegeDtoToCollege(dto: CollegeDto): College {
   return {
@@ -157,6 +164,41 @@ export default function BoothMap() {
       window.clearTimeout(timeoutId);
     };
   }, [mode]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (typeof window.requestIdleCallback === "function") {
+      const idleId = window.requestIdleCallback(
+        () => {
+          if (cancelled) {
+            return;
+          }
+          void warmupMapbox3DAssets();
+        },
+        { timeout: MAPBOX_WARMUP_IDLE_TIMEOUT_MS },
+      );
+
+      return () => {
+        cancelled = true;
+        if (typeof window.cancelIdleCallback === "function") {
+          window.cancelIdleCallback(idleId);
+        }
+      };
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      if (cancelled) {
+        return;
+      }
+      void warmupMapbox3DAssets();
+    }, MAPBOX_WARMUP_FALLBACK_DELAY_MS);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
 
   const mapDataQuery = useAppQuery({
     queryKey: appQueryKeys.boothMapData(selectedDate),

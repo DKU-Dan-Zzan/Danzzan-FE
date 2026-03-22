@@ -91,6 +91,12 @@ describe("Tailwind source conventions", () => {
     const source = readSource("src/routes/boothmap/BoothMap.tsx");
 
     expect(source).toContain("const MAP_MODE_TRANSITION_MS = 280;");
+    expect(source).toContain("const MAPBOX_WARMUP_FALLBACK_DELAY_MS = 900;");
+    expect(source).toContain("const MAPBOX_WARMUP_IDLE_TIMEOUT_MS = 1800;");
+    expect(source).toContain("const warmupMapbox3DAssets = async () => {");
+    expect(source).toContain("if (typeof window.requestIdleCallback === \"function\")");
+    expect(source).toContain("window.requestIdleCallback(");
+    expect(source).toContain("window.setTimeout(() => {");
     expect(source).toContain("transition-all duration-300 ease-out");
     expect(source).toContain("opacity-100 translate-x-0 scale-100");
     expect(source).toContain("opacity-0 -translate-x-1 scale-[0.985]");

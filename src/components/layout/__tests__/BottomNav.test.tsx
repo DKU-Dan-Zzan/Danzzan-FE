@@ -47,11 +47,20 @@ describe("BottomNav", () => {
   it("활성 상태 전환용 마이크로 애니메이션 클래스를 포함한다", () => {
     const markup = renderBottomNav("/notice");
 
-    expect(markup).toContain("active:scale-[0.97]");
+    expect(markup).toContain("active:scale-[0.99]");
     expect(markup).toContain("motion-reduce:transform-none");
-    expect(markup).toContain("-translate-y-[1px] scale-[1.04]");
+    expect(markup).toContain("scale-[1.01]");
+    expect(markup).not.toContain("-translate-y-[1px] scale-[1.04]");
+    expect(markup).not.toContain("-translate-y-px");
     expect(markup).toContain("opacity-100 scale-x-100");
     expect(markup).toContain("opacity-0 scale-x-50");
+  });
+
+  it("탭 전환 애니메이션 duration은 120~160ms 구간을 사용한다", () => {
+    const markup = renderBottomNav("/notice");
+
+    expect(markup).toContain("duration-140");
+    expect(markup).not.toContain("duration-200");
   });
 
   it("탭 링크에 키보드 포커스 스타일을 제공한다", () => {

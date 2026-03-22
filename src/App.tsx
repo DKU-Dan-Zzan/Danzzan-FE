@@ -41,6 +41,8 @@ const MyPage = lazyWithPreload(() => import("./routes/mypage/MyPage"));
 const Admin = lazy(() => import("./routes/admin/Admin"));
 const AdminLogin = lazy(() => import("./routes/admin/AdminLogin"));
 const AdminMap = lazy(() => import("./routes/admin/AdminMap"));
+const ROUTE_WARMUP_FALLBACK_DELAY_MS = 160;
+const ROUTE_WARMUP_IDLE_TIMEOUT_MS = 1400;
 
 function RouteLoading() {
   return <DelayedSpinner delayMs={300} label="페이지 전환 중" />;
@@ -103,10 +105,29 @@ function App() {
     registerRoutePreloader("/map", BoothMap.preload);
     registerRoutePreloader("/mypage", MyPage.preload);
 
-    const timeoutId = window.setTimeout(() => {
+    const runWarmup = () => {
       void preloadBottomNavLazyRoutes();
       void prefetchBottomNavTabData();
-    }, 200);
+    };
+
+    if (typeof window.requestIdleCallback === "function") {
+      const idleId = window.requestIdleCallback(
+        () => {
+          runWarmup();
+        },
+        { timeout: ROUTE_WARMUP_IDLE_TIMEOUT_MS },
+      );
+
+      return () => {
+        if (typeof window.cancelIdleCallback === "function") {
+          window.cancelIdleCallback(idleId);
+        }
+      };
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      runWarmup();
+    }, ROUTE_WARMUP_FALLBACK_DELAY_MS);
 
     return () => {
       window.clearTimeout(timeoutId);

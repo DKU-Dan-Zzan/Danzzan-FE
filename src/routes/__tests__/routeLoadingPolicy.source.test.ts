@@ -35,7 +35,12 @@ describe("Route loading policy", () => {
     expect(source).toContain("registerRoutePreloader(\"/notice\", Notice.preload);");
     expect(source).toContain("registerRoutePreloader(\"/map\", BoothMap.preload);");
     expect(source).toContain("registerRoutePreloader(\"/mypage\", MyPage.preload);");
+    expect(source).toContain("if (typeof window.requestIdleCallback === \"function\")");
+    expect(source).toContain("window.requestIdleCallback(");
+    expect(source).toContain("window.setTimeout(() => {");
     expect(source).toContain("void preloadBottomNavLazyRoutes();");
+    expect(source).toContain("void prefetchBottomNavTabData();");
+    expect(source).toContain("markBottomNavTransitionComplete(location.pathname);");
 
     expect(source).toContain("<DelayedSpinner delayMs={300}");
     expect(source).not.toContain("setVisibleFallback(true)");
