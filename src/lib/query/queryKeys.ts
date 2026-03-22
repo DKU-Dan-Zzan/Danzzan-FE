@@ -5,11 +5,23 @@ export type NoticeListKeyParams = {
   size: number;
 };
 
+export type AdminNoticeListKeyParams = {
+  keyword: string;
+  status: "ACTIVE" | "DELETED" | "ALL";
+  page: number;
+  size: number;
+};
+
 export const appQueryKeys = {
   homeImages: () => ["home", "images"] as const,
   homeLineup: () => ["home", "lineup"] as const,
   homeEmergencyNotice: () => ["home", "emergency-notice"] as const,
   homeBottomAd: () => ["home", "ad", "HOME_BOTTOM"] as const,
+  adminEmergencyNotice: () => ["admin", "emergency-notice"] as const,
+  adminNotices: (params: AdminNoticeListKeyParams) => ["admin", "notices", params] as const,
+  adminPlacementAd: (placement: "HOME_BOTTOM" | "MY_TICKET") =>
+    ["admin", "ad", { placement }] as const,
+  boothMapData: (date: string) => ["boothmap", "data", { date }] as const,
   myTicketList: () => ["ticketing", "my-ticket", "list"] as const,
   myTicketAd: () => ["ticketing", "my-ticket", "ad"] as const,
   noticeList: (params: NoticeListKeyParams) => ["notice", "list", params] as const,

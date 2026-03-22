@@ -19,6 +19,10 @@ const fetchWithAuth = createFetchWithAuth({
   clearSession: clearAdminSession,
 });
 
+type RequestOptions = {
+  signal?: AbortSignal;
+};
+
 export type PageResponse<T> = {
   content: T[];
   totalElements: number;
@@ -46,9 +50,12 @@ export type UpdateEmergencyRequest = {
   isActive?: boolean;
 };
 
-export async function getEmergencyAdminNotice(): Promise<EmergencyNoticeResponse> {
+export async function getEmergencyAdminNotice(
+  options?: RequestOptions,
+): Promise<EmergencyNoticeResponse> {
   return fetchWithAuth<EmergencyNoticeResponse>("/api/admin/emergency", {
     method: "GET",
+    signal: options?.signal,
   });
 }
 
@@ -114,6 +121,7 @@ function buildQuery(params?: Record<string, string | number | boolean | undefine
 
 export async function getAdminNotices(
   params: NoticeListParams,
+  options?: RequestOptions,
 ): Promise<PageResponse<NoticeResponse>> {
   const query = buildQuery({
     keyword: params.keyword,
@@ -124,6 +132,7 @@ export async function getAdminNotices(
   });
   return fetchWithAuth<PageResponse<NoticeResponse>>(`/api/admin/notices${query}`, {
     method: "GET",
+    signal: options?.signal,
   });
 }
 

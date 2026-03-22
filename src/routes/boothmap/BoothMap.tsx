@@ -36,6 +36,7 @@ import {
   type CollegeDto,
   type PubSummaryResponse,
 } from "@/api/app/boothmap/boothmapApi";
+import { appQueryKeys, useAppQuery } from "@/lib/query";
 
 const LazyMapbox3DView = lazy(async () => {
   await import("mapbox-gl/dist/mapbox-gl.css");
@@ -101,12 +102,6 @@ export default function BoothMap() {
   const [sheetSnap, setSheetSnap] = useState<SheetSnap>("PEEK");
   const [selectedDate, setSelectedDate] = useState("2026-05-12");
   const [mapViewport, setMapViewport] = useState<MapViewport>(DEFAULT_MAP_VIEWPORT);
-
-  const [colleges, setColleges] = useState<College[]>([]);
-  const [booths, setBooths] = useState<Booth[]>([]);
-  const [pubs, setPubs] = useState<Pub[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
   const [bottomNavHeight, setBottomNavHeight] = useState(56);
 
   const frameWidth = 430;
@@ -134,45 +129,35 @@ export default function BoothMap() {
     };
   }, []);
 
-  useEffect(() => {
-    let isMounted = true;
+  const mapDataQuery = useAppQuery({
+    queryKey: appQueryKeys.boothMapData(selectedDate),
+    queryFn: async ({ signal }) => {
+      const [boothMapData, pubsData] = await Promise.all([
+        getBoothMap(selectedDate, { signal }),
+        getPubs(selectedDate, { signal }),
+      ]);
 
-    async function fetchMapData() {
-      try {
-        setIsLoading(true);
-        setIsError(false);
+      return {
+        colleges: boothMapData.colleges.map(mapCollegeDtoToCollege),
+        booths: boothMapData.booths.map(mapBoothDtoToBooth),
+        pubs: pubsData.map(mapPubSummaryToPub),
+      };
+    },
+    staleTime: 60_000,
+  });
 
-        const [boothMapData, pubsData] = await Promise.all([
-          getBoothMap(selectedDate),
-          getPubs(selectedDate),
-        ]);
-
-        if (!isMounted) return;
-
-        const mappedColleges = boothMapData.colleges.map(mapCollegeDtoToCollege);
-        const mappedBooths = boothMapData.booths.map(mapBoothDtoToBooth);
-        const mappedPubs = pubsData.map(mapPubSummaryToPub)
-
-        setColleges(mappedColleges);
-        setBooths(mappedBooths);
-        setPubs(mappedPubs);
-      } catch (error) {
-        console.error("부스맵 데이터 조회 실패", error);
-        if (!isMounted) return;
-        setIsError(true);
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    fetchMapData();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [selectedDate]);
+  const colleges = useMemo<College[]>(
+    () => mapDataQuery.data?.colleges ?? [],
+    [mapDataQuery.data?.colleges],
+  );
+  const booths = useMemo<Booth[]>(
+    () => mapDataQuery.data?.booths ?? [],
+    [mapDataQuery.data?.booths],
+  );
+  const pubs = useMemo<Pub[]>(
+    () => mapDataQuery.data?.pubs ?? [],
+    [mapDataQuery.data?.pubs],
+  );
 
   const handlePrimaryChange = (next: PrimaryFilter) => {
     setPrimaryFilter(next);
@@ -237,7 +222,7 @@ export default function BoothMap() {
     setSheetSnap("FULL");
   }, []);
 
-  if (isLoading) {
+  if (mapDataQuery.isPending && !mapDataQuery.data) {
     return (
       <div className="flex h-screen items-center justify-center bg-[var(--boothmap-surface)]">
         <div className="text-sm font-semibold text-[var(--boothmap-text-subtle)]">
@@ -247,11 +232,20 @@ export default function BoothMap() {
     );
   }
 
-  if (isError) {
+  if (mapDataQuery.error) {
     return (
       <div className="flex h-screen items-center justify-center bg-[var(--boothmap-surface)]">
-        <div className="text-sm font-semibold text-[var(--boothmap-danger-text)]">
-          부스맵 정보를 불러오지 못했어요.
+        <div className="rounded-xl border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-danger-bg)] px-4 py-3 text-sm font-semibold text-[var(--boothmap-danger-text)]">
+          <div>부스맵 정보를 불러오지 못했어요.</div>
+          <button
+            type="button"
+            onClick={() => {
+              void mapDataQuery.refetch();
+            }}
+            className="mt-2 rounded-md border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-surface)] px-2 py-1 text-xs font-semibold text-[var(--boothmap-danger-text)]"
+          >
+            다시 시도
+          </button>
         </div>
       </div>
     );

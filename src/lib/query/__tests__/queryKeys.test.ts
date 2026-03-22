@@ -20,4 +20,26 @@ describe("appQueryKeys", () => {
     expect(appQueryKeys.myTicketList()).toEqual(["ticketing", "my-ticket", "list"]);
     expect(appQueryKeys.myTicketAd()).toEqual(["ticketing", "my-ticket", "ad"]);
   });
+
+  it("admin/boothmap 키를 파라미터 포함 포맷으로 제공한다", () => {
+    expect(appQueryKeys.adminEmergencyNotice()).toEqual(["admin", "emergency-notice"]);
+    expect(
+      appQueryKeys.adminNotices({
+        keyword: "긴급",
+        status: "ACTIVE",
+        page: 0,
+        size: 10,
+      }),
+    ).toEqual([
+      "admin",
+      "notices",
+      {
+        keyword: "긴급",
+        status: "ACTIVE",
+        page: 0,
+        size: 10,
+      },
+    ]);
+    expect(appQueryKeys.boothMapData("2026-05-12")).toEqual(["boothmap", "data", { date: "2026-05-12" }]);
+  });
 });

@@ -48,26 +48,38 @@ export type PubDetailResponse = {
   imageUrls: string[]
 }
 
-export async function getBoothMap(date?: string) {
+type RequestOptions = {
+  signal?: AbortSignal
+}
+
+export async function getBoothMap(date?: string, options?: RequestOptions) {
   const query = date ? `?date=${encodeURIComponent(date)}` : "";
-  const res = await http.get<BoothMapResponse>(`/map/booth-map${query}`);
+  const res = await http.get<BoothMapResponse>(`/map/booth-map${query}`, {
+    signal: options?.signal,
+  });
   return res.data;
 }
 
-export async function getBoothSummary(boothId: number, date?: string) {
+export async function getBoothSummary(boothId: number, date?: string, options?: RequestOptions) {
   const query = date ? `?date=${encodeURIComponent(date)}` : "";
-  const res = await http.get<BoothSummaryResponse>(`/map/booths/${boothId}${query}`);
+  const res = await http.get<BoothSummaryResponse>(`/map/booths/${boothId}${query}`, {
+    signal: options?.signal,
+  });
   return res.data;
 }
 
-export async function getPubs(date?: string) {
+export async function getPubs(date?: string, options?: RequestOptions) {
   const query = date ? `?date=${encodeURIComponent(date)}` : "";
-  const res = await http.get<PubSummaryResponse[]>(`/map/pubs${query}`);
+  const res = await http.get<PubSummaryResponse[]>(`/map/pubs${query}`, {
+    signal: options?.signal,
+  });
   return res.data;
 }
 
-export async function getPubDetail(pubId: number, date?: string) {
+export async function getPubDetail(pubId: number, date?: string, options?: RequestOptions) {
   const query = date ? `?date=${encodeURIComponent(date)}` : "";
-  const res = await http.get<PubDetailResponse>(`/map/pubs/${pubId}${query}`);
+  const res = await http.get<PubDetailResponse>(`/map/pubs/${pubId}${query}`, {
+    signal: options?.signal,
+  });
   return res.data;
 }

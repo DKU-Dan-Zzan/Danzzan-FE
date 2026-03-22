@@ -46,6 +46,7 @@ import {
   type NoticeAuthor,
   type NoticeFormState,
 } from "@/routes/admin/admin-view-model";
+import { appQueryKeys, useAppQuery } from "@/lib/query";
 
 function Admin() {
   const navigate = useNavigate();
@@ -59,7 +60,7 @@ function Admin() {
   // 긴급 공지
   const [emergencyMessage, setEmergencyMessage] = useState("");
   const [emergencyActive, setEmergencyActive] = useState(true);
-  const [emergencyLoading, setEmergencyLoading] = useState(false);
+  const [emergencySaving, setEmergencySaving] = useState(false);
 
   const {
     noticeKeyword,
@@ -93,44 +94,34 @@ function Admin() {
   const [noticeImageUploading, setNoticeImageUploading] = useState(false);
   const [adImageUploading, setAdImageUploading] = useState(false);
 
+  const emergencyQuery = useAppQuery({
+    queryKey: appQueryKeys.adminEmergencyNotice(),
+    queryFn: ({ signal }) => getEmergencyAdminNotice({ signal }),
+    staleTime: 30_000,
+  });
+
+  const emergencyLoading =
+    emergencyQuery.isPending || emergencyQuery.isFetching || emergencySaving;
+
   const handleLogout = async () => {
     await logout();
     navigate("/admin/login", { replace: true });
   };
 
   useEffect(() => {
-    let cancelled = false;
-
-    void (async () => {
-      try {
-        setEmergencyLoading(true);
-        const emergencyRes = await getEmergencyAdminNotice();
-        if (cancelled) {
-          return;
-        }
-        setEmergencyMessage(emergencyRes.message ?? "");
-        setEmergencyActive(Boolean(emergencyRes.isActive));
-      } catch (error) {
-        if (cancelled) {
-          return;
-        }
-        setGlobalError(error instanceof Error ? error.message : "긴급 공지를 불러오지 못했습니다.");
-      } finally {
-        if (!cancelled) {
-          setEmergencyLoading(false);
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    if (!emergencyQuery.data) {
+      return;
+    }
+    setEmergencyMessage(emergencyQuery.data.message ?? "");
+    setEmergencyActive(Boolean(emergencyQuery.data.isActive));
+  }, [emergencyQuery.data]);
 
   useEffect(() => {
-    void reloadNotices(0, "", "ACTIVE");
-    void reloadAds();
-  }, [reloadNotices, reloadAds]);
+    if (!emergencyQuery.error) {
+      return;
+    }
+    setGlobalError(emergencyQuery.error.message || "긴급 공지를 불러오지 못했습니다.");
+  }, [emergencyQuery.error]);
 
   const handleDeleteAd = async (placement: AdvertisementPlacement) => {
     const ad = placement === "HOME_BOTTOM" ? homeBottomAd : myTicketAd;
@@ -156,16 +147,17 @@ function Admin() {
   const handleSaveEmergency = async () => {
     try {
       setGlobalError(null);
-      setEmergencyLoading(true);
+      setEmergencySaving(true);
       await updateEmergencyAdminNotice({
         message: emergencyMessage.trim() || undefined,
         isActive: emergencyActive,
       });
+      await emergencyQuery.refetch();
       window.alert("변경 완료했습니다.");
     } catch (error) {
       setGlobalError(error instanceof Error ? error.message : "긴급 공지를 저장하지 못했습니다.");
     } finally {
-      setEmergencyLoading(false);
+      setEmergencySaving(false);
     }
   };
 
