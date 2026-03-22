@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 동작을 검증하는 테스트 모듈입니다.
+// 역할: PaperTicketCard의 상태별 렌더링과 접근성 속성을 검증하는 테스트입니다.
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { PaperTicketCard } from "@/components/ticketing/panels/PaperTicketCard";

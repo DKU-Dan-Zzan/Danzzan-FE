@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 화면 구성을 위한 UI 컴포넌트를 제공합니다.
+// 역할: 티켓팅 인증 화면의 탭 전환용 세그먼트 컨트롤 UI를 제공합니다.
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/components/common/ui/utils";

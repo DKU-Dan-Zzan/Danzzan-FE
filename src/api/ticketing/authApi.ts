@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 API 호출/계약/클라이언트 로직을 제공하는 모듈입니다.
+// 역할: 티켓팅 사용자 인증(로그인·토큰 재발급·내 정보 조회) API를 캡슐화합니다.
 import { createHttpClient } from "@/api/ticketing/httpClient";
 import { mapAuthLoginResponse, mapAuthUserDto } from "@/lib/ticketing/mappers/authMapper";
 import { authStore } from "@/store/ticketing/authStore";

@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 공통 로직(매퍼/유틸/네비게이션)을 제공하는 모듈입니다.
+// 역할: 현재 티켓팅 경로에서 헤더 표시 여부를 판별하는 규칙을 제공합니다.
 import { hasRequiredRole, resolveRoleFromAccessToken, type AuthRole } from "@/api/common/authCore";
 
 type HeaderVisibilityOptions = {

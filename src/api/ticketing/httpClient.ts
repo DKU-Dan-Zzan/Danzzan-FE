@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 API 호출/계약/클라이언트 로직을 제공하는 모듈입니다.
+// 역할: 티켓팅 API 공통 HTTP 클라이언트(기본 URL, 헤더, 오류 처리)를 구성합니다.
 export {
   HttpError,
   createHttpClient,

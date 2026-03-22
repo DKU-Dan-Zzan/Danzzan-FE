@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 상태/비동기 흐름을 관리하는 React Hook 모듈입니다.
+// 역할: 티켓팅 대기열 상태머신에서 사용하는 재시도/백오프/상태 판별 유틸을 제공합니다.
 import type { QueueRequestStatus } from "@/types/ticketing/model/ticket.model";
 
 export const FOREGROUND_POLL_INTERVAL = 2000;

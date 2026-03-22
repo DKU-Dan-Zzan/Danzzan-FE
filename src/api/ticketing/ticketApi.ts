@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 API 호출/계약/클라이언트 로직을 제공하는 모듈입니다.
+// 역할: 대기열 진입·상태조회·예매·내 티켓 조회를 포함한 티켓팅 핵심 API를 제공합니다.
 import { createHttpClient } from "@/api/ticketing/httpClient";
 import {
   normalizeQueueEnterContract,

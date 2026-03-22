@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 라우트와 화면 흐름을 구성하는 모듈입니다.
+// 역할: 티켓팅 메인 플로우 훅 결과를 상태별 패널로 라우팅하는 화면 컨테이너입니다.
 import { ReservationAlreadyPanel } from "@/components/ticketing/panels/ReservationAlreadyPanel";
 import { ReservationProcessingPanel } from "@/components/ticketing/panels/ReservationProcessingPanel";
 import { ReservationSoldOutPanel } from "@/components/ticketing/panels/ReservationSoldOutPanel";

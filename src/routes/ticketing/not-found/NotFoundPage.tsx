@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 라우트와 화면 흐름을 구성하는 모듈입니다.
+// 역할: 티켓팅 도메인 내 존재하지 않는 경로에 대한 404 화면을 제공합니다.
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/common/ui/button";
 

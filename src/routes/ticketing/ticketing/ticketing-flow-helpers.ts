@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 라우트와 화면 흐름을 구성하는 모듈입니다.
+// 역할: 티켓팅 플로우 훅에서 재사용하는 파생 상태/오류 처리 헬퍼를 제공합니다.
 import { HttpError } from "@/api/ticketing/httpClient";
 import type { ReserveErrorCode } from "@/types/ticketing/model/ticket.model";
 

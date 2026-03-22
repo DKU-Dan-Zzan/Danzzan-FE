@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 라우트와 화면 흐름을 구성하는 모듈입니다.
+// 역할: 티켓팅 사용자 로그인 화면에서 자격 증명 제출과 오류 표시를 처리합니다.
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { CircleAlert, GraduationCap } from "lucide-react";

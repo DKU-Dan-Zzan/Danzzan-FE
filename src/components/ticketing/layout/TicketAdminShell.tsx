@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 화면 구성을 위한 UI 컴포넌트를 제공합니다.
+// 역할: 티켓팅 관리자 화면의 헤더/컨테이너/액션 영역을 표준화하는 셸 컴포넌트입니다.
 import type { ReactNode } from "react";
 import { AdminShell } from "@/components/layout/AdminShell";
 

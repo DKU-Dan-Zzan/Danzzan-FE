@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 화면 구성을 위한 UI 컴포넌트를 제공합니다.
+// 역할: 예매 처리 중 상태와 오류/재시도 UI를 제공하는 중간 단계 패널입니다.
 import { LoaderCircle, RotateCcw } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";

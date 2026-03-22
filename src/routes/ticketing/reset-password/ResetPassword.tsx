@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 라우트와 화면 흐름을 구성하는 모듈입니다.
+// 역할: 비밀번호 재설정 단계(인증/입력/완료)를 관리하는 화면입니다.
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { CircleAlert, Clock3, KeyRound, MailCheck, RotateCcw } from "lucide-react";

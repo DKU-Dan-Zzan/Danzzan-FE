@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 동작을 검증하는 테스트 모듈입니다.
+// 역할: 인증 상태별 티켓팅 이동 경로 계산 로직을 검증합니다.
 import { describe, expect, it } from "vitest";
 import {
   getMyTicketNavigationTarget,

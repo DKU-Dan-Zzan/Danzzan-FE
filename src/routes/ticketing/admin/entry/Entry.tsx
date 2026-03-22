@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 라우트와 화면 흐름을 구성하는 모듈입니다.
+// 역할: 관리자 입장(팔찌 운영 진입) 화면을 렌더링합니다.
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/common/ui/card";
 import { Button } from "@/components/common/ui/button";

@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 동작을 검증하는 테스트 모듈입니다.
+// 역할: 광고 배너 카드의 토큰 기반 스타일과 링크 접근성을 검증하는 테스트입니다.
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { TicketingAdBannerCard } from "@/components/ticketing/panels/TicketingAdBannerCard";

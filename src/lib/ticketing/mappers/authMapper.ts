@@ -1,4 +1,4 @@
-﻿// 역할: 티켓팅 도메인 공통 로직(매퍼/유틸/네비게이션)을 제공하는 모듈입니다.
+﻿// 역할: 인증 API 응답을 세션 도메인 모델로 매핑합니다.
 import type { AuthLoginResponseDto } from "@/types/ticketing/dto/auth.dto";
 import type { AuthSession, AuthTokens, AuthUser } from "@/types/ticketing/model/auth.model";
 

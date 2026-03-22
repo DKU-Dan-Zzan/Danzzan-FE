@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 라우트와 화면 흐름을 구성하는 모듈입니다.
+// 역할: 관리자 토큰 미보유/만료 시 재인증 안내 화면을 제공합니다.
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";

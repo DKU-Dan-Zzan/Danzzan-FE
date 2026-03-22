@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 동작을 검증하는 테스트 모듈입니다.
+// 역할: 대기열 상태 전이와 폴링 스케줄 핵심 시나리오를 스모크 테스트로 검증합니다.
 import type { QueueRequestStatus } from "@/types/ticketing/model/ticket.model";
 import {
   BACKGROUND_POLL_INTERVAL,

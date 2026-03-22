@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 API 호출/계약/클라이언트 로직을 제공하는 모듈입니다.
+// 역할: 티켓팅 비밀번호 재설정 플로우의 검증/변경 API를 제공합니다.
 import { createHttpClient } from "@/api/ticketing/httpClient";
 import { env, requireEnv } from "@/utils/ticketing/env";
 

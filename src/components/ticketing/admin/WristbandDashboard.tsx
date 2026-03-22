@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 화면 구성을 위한 UI 컴포넌트를 제공합니다.
+// 역할: 팔찌 운영 대시보드의 날짜별 세션 카드와 상태 요약 UI를 렌더링합니다.
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/common/ui/card";
 import { Button } from "@/components/common/ui/button";

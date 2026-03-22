@@ -1,4 +1,4 @@
-﻿// 역할: 티켓팅 도메인 상태/비동기 흐름을 관리하는 React Hook 모듈입니다.
+﻿// 역할: 티켓팅 인증 세션 조회/갱신/로그아웃을 React Hook 인터페이스로 제공합니다.
 import { useCallback, useSyncExternalStore } from "react";
 import { authApi } from "@/api/ticketing/authApi";
 import { adminAuthApi } from "@/api/ticketing/adminAuthApi";

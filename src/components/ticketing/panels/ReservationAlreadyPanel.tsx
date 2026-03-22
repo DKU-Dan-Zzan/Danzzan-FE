@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 화면 구성을 위한 UI 컴포넌트를 제공합니다.
+// 역할: 이미 예매 완료된 사용자의 안내 메시지와 다음 행동 버튼을 표시합니다.
 import { ArrowRight, CheckCircle2, ListChecks } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";

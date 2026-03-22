@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 화면 구성을 위한 UI 컴포넌트를 제공합니다.
+// 역할: 팔찌 지급 대상 검색/테이블/지급 액션을 처리하는 관리자 운영 화면 컴포넌트입니다.
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/common/ui/card";
 import { Button } from "@/components/common/ui/button";

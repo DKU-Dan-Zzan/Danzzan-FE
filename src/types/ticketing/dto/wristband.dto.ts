@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 타입 계약(DTO/Model)을 정의하는 모듈입니다.
+// 역할: 팔찌 운영 API DTO 타입을 정의합니다.
 // 백엔드 ApiResponse 래퍼
 export interface ApiResponse<T> {
   success: boolean;

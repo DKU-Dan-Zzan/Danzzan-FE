@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 공통 로직(매퍼/유틸/네비게이션)을 제공하는 모듈입니다.
+// 역할: 광고 API DTO를 화면에서 사용하는 광고 도메인 모델로 변환합니다.
 import type { PlacementAdDto } from "@/types/ticketing/dto/ad.dto";
 import type { AdPlacementKey, PlacementAd } from "@/types/ticketing/model/ad.model";
 

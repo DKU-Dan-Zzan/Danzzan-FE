@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 상태/비동기 흐름을 관리하는 React Hook 모듈입니다.
+// 역할: 남은 시간/순번 기반 폴링 주기를 계산하고 갱신하는 훅 로직을 제공합니다.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ticketApi } from "@/api/ticketing/ticketApi";
 

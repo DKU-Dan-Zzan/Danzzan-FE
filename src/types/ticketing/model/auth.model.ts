@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 타입 계약(DTO/Model)을 정의하는 모듈입니다.
+// 역할: 인증 세션/사용자 상태를 표현하는 도메인 모델 타입을 정의합니다.
 export type {
   AuthCredentials,
   AuthSession,

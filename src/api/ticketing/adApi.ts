@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 API 호출/계약/클라이언트 로직을 제공하는 모듈입니다.
+// 역할: 티켓팅 대기실/내티켓 광고 슬롯 데이터를 조회하는 API 어댑터를 제공합니다.
 import { adGateway } from "@/api/common/adGateway";
 import { mapPlacementAdDtoToModel } from "@/lib/ticketing/mappers/adMapper";
 import type { AdPlacementKey, PlacementAd } from "@/types/ticketing/model/ad.model";

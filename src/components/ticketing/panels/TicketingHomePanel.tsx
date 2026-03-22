@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 화면 구성을 위한 UI 컴포넌트를 제공합니다.
+// 역할: 티켓팅 홈의 시작 안내, 유의사항, 진입 CTA를 구성하는 첫 화면 패널입니다.
 import type { LucideIcon } from "lucide-react";
 import { ArrowRight, ClipboardList, Ticket, TicketCheck } from "lucide-react";
 import { Card } from "@/components/common/ui/card";

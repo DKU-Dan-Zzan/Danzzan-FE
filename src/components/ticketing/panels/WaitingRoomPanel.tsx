@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 화면 구성을 위한 UI 컴포넌트를 제공합니다.
+// 역할: 대기열 순번, 남은 시간, 진행 상태를 실시간으로 표시하는 대기실 패널입니다.
 import { Ticket } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/common/ui/card";

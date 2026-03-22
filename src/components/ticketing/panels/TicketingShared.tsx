@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 화면 구성을 위한 UI 컴포넌트를 제공합니다.
+// 역할: 티켓팅 패널 공통 클래스/보조 컴포넌트/타이포그래피 토큰을 제공합니다.
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { cn } from "@/components/common/ui/utils";

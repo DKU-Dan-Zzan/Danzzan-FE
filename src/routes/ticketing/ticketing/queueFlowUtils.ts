@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 라우트와 화면 흐름을 구성하는 모듈입니다.
+// 역할: 티켓팅 플로우에서 대기열 이벤트 해석/상태 계산을 보조하는 유틸을 제공합니다.
 export {
   BACKGROUND_POLL_INTERVAL,
   FOREGROUND_POLL_INTERVAL,

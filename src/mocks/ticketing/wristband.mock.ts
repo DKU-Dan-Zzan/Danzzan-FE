@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 테스트/개발용 목 데이터 모듈입니다.
+// 역할: 팔찌 운영 화면 개발/테스트에 사용하는 목 데이터 세트를 제공합니다.
 import type {
   WristbandAttendee,
   WristbandSession,

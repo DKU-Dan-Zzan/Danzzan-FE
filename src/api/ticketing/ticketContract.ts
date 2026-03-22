@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 API 호출/계약/클라이언트 로직을 제공하는 모듈입니다.
+// 역할: 티켓팅 API 응답 DTO를 런타임 검증하고 도메인 친화 구조로 정규화합니다.
 import type {
   TicketQueueEnterResponseDto,
   TicketQueueStatusResponseDto,

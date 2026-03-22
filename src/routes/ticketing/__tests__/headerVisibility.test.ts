@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 동작을 검증하는 테스트 모듈입니다.
+// 역할: 경로별 티켓팅 헤더 노출 규칙을 검증합니다.
 import { shouldShowTicketingHeader } from "@/lib/ticketing/navigation/headerVisibility";
 
 const createJwtLikeToken = (payload: Record<string, unknown>): string => {

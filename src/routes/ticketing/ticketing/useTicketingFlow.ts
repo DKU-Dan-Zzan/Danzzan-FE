@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 라우트와 화면 흐름을 구성하는 모듈입니다.
+// 역할: 티켓팅 전체 상태머신(대기열·예매·성공/실패)과 사이드이펙트를 관리하는 핵심 훅입니다.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { adApi } from "@/api/ticketing/adApi";

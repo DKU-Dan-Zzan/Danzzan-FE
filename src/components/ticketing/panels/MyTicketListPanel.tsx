@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 화면 구성을 위한 UI 컴포넌트를 제공합니다.
+// 역할: 발급된 티켓 목록과 빈 상태/오류 상태를 보여주는 내 티켓 패널을 렌더링합니다.
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
 import { TicketCheck } from "lucide-react";

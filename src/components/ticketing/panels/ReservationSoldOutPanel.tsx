@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 화면 구성을 위한 UI 컴포넌트를 제공합니다.
+// 역할: 매진 상태 안내와 대체 행동을 제공하는 예매 종료 패널을 렌더링합니다.
 import { RotateCcw, TicketX } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";

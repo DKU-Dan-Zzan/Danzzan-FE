@@ -1,2 +1,2 @@
-﻿// 역할: 티켓팅 도메인 화면 구성을 위한 UI 컴포넌트를 제공합니다.
+﻿// 역할: 티켓팅 패널 전반에서 공유하는 상수/문구/시간값을 중앙 정의합니다.
 export const REQUIRED_ACKNOWLEDGEMENT_CODE = "danfesta0513";

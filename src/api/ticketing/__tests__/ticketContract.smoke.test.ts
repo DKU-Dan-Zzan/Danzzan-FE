@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 동작을 검증하는 테스트 모듈입니다.
+// 역할: 티켓팅 계약 정규화 함수가 핵심 응답 형태를 안전하게 변환하는지 스모크 테스트로 검증합니다.
 import {
   TicketContractError,
   normalizeQueueEnterContract,

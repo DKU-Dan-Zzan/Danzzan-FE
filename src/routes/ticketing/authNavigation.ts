@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 라우트와 화면 흐름을 구성하는 모듈입니다.
+// 역할: 티켓팅 라우트에서 사용하는 인증 네비게이션 헬퍼를 제공합니다.
 export {
   getMyTicketNavigationTarget,
   MY_TICKET_PATH,

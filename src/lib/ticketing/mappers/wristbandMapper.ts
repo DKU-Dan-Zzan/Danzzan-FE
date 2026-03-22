@@ -1,4 +1,4 @@
-﻿// 역할: 티켓팅 도메인 공통 로직(매퍼/유틸/네비게이션)을 제공하는 모듈입니다.
+﻿// 역할: 팔찌 운영 API 응답 DTO를 관리자 화면 모델로 변환합니다.
 import type {
   EventSummaryDto,
   EventStatsResponseDto,

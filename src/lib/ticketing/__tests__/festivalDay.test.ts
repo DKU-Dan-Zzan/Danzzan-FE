@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 동작을 검증하는 테스트 모듈입니다.
+// 역할: 축제 날짜/일차 변환 유틸의 경계 조건을 검증하는 테스트입니다.
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_FESTIVAL_DAY_RULES,

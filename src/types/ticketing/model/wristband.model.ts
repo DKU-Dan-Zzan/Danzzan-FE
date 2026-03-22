@@ -1,4 +1,4 @@
-﻿// 역할: 티켓팅 도메인 타입 계약(DTO/Model)을 정의하는 모듈입니다.
+﻿// 역할: 관리자 팔찌 운영 화면에서 사용하는 도메인 모델 타입을 정의합니다.
 export interface WristbandStats {
   totalTickets: number;
   issuedCount: number;

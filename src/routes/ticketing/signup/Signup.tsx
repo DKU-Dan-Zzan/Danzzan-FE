@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 라우트와 화면 흐름을 구성하는 모듈입니다.
+// 역할: 회원가입 입력 검증과 가입 요청 제출을 처리하는 화면입니다.
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {

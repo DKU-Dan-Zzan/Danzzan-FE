@@ -1,4 +1,4 @@
-// 역할: 티켓팅 도메인 공통 로직(매퍼/유틸/네비게이션)을 제공하는 모듈입니다.
+// 역할: 인증 상태에 따라 티켓팅 라우트 이동 경로를 계산하는 네비게이션 규칙을 제공합니다.
 import { MY_TICKET_PATH, getMyTicketNavigationTarget } from "@/lib/common/my-ticket-navigation";
 import { resolveScopedRedirect } from "@/lib/common/auth-redirect";
 import { TICKETING_PATH } from "@/lib/common/ticketing-navigation";
