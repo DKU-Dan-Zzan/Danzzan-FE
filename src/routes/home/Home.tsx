@@ -109,7 +109,7 @@ function Home() {
     lineupQuery.isPending ||
     homeBottomAdQuery.isPending
   const shouldShowInlineSpinner =
-    corePending &&
+    (corePending || accessoryPending) &&
     !imagesQuery.data?.length &&
     !emergencyNoticeQuery.data
   const adImageUrl = homeBottomAdQuery.data?.imageUrl

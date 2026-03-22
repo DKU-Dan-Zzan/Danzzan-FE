@@ -59,6 +59,11 @@
   - `src/routes/boothmap/types`
   - `src/routes/timetable/components`
 
+### 3.8 G6 적용 상태 (2026-03-23)
+- `Admin.tsx`, `AdminMap.tsx`는 hooks/section 모듈 분리로 책임을 축소했다.
+- ticketing 서버 상태는 `useTicketingFlow` 기준으로 `Query + Mutation + flow module` 조합을 표준 패턴으로 적용했다.
+- 구조 게이트 외에 순환 의존 게이트(`npm run check:deps-cycles`)를 CI 검증 항목으로 추가했다.
+
 ## 4) 폴더 배치 규칙
 일반 앱과 ticketing은 레이어 경계를 유지한 채 공존한다.
 
@@ -89,6 +94,7 @@ G2 bridge 경로는 G4에서 모두 제거 완료.
 - `LAYER_TICKETING_NON_API_NO_APP_API_IMPORT`
   - `src/**/ticketing/**`(단, `src/api/ticketing/**` 제외) -> `@/api/app/*` 직접 import 금지
   - ticketing 라우트/훅/컴포넌트는 ticketing API adapter(`src/api/ticketing/**`)를 통해서만 일반앱 API를 사용한다.
+  - adapter는 도메인별 query/mutation hook에서만 소비하고, route 컴포넌트의 직접 API 호출은 금지한다.
 - `LAYER_LIB_NO_ROUTES_IMPORT`
   - `src/lib/**` -> `@/routes/*` 또는 routes 상대경로 import 금지
 - `LAYER_TYPES_NO_RUNTIME_IMPORT`
@@ -159,3 +165,15 @@ allowlist 파일: `config/structure-allowlist.json`
 - G3: 핵심 스타일 Tailwind 전환 (`boothmap-chip`, `boothmap-mode-toggle-button` 우선)
 - G4: legacy/bridge/dead path 제거, 전역 CSS 최소화
 - G5: lint/typecheck/test/build + 핵심 화면 회귀 검증
+
+## 10) 품질 게이트(2026-03-23)
+- 구조 규칙: `npm run lint:structure:changed|report|strict`
+- 순환 의존: `npm run check:deps-cycles` (madge, `src/**` cycle 0 유지)
+- 접근성 lint:
+  - `jsx-a11y/aria-role`
+  - `jsx-a11y/click-events-have-key-events`
+  - `jsx-a11y/control-has-associated-label`
+  - `jsx-a11y/interactive-supports-focus`
+  - `jsx-a11y/no-noninteractive-element-interactions`
+  - `jsx-a11y/role-has-required-aria-props`
+  - `jsx-a11y/role-supports-aria-props`

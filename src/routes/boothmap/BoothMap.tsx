@@ -152,8 +152,13 @@ export default function BoothMap() {
 
   useEffect(() => {
     if (mode === "3D") {
-      setRender3DLayer(true);
-      return;
+      const frameId = window.requestAnimationFrame(() => {
+        setRender3DLayer(true);
+      });
+
+      return () => {
+        window.cancelAnimationFrame(frameId);
+      };
     }
 
     const timeoutId = window.setTimeout(() => {

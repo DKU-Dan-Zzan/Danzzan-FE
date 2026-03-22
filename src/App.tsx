@@ -22,11 +22,11 @@ import Home from "./routes/home/Home";
 import Timetable from "./routes/timetable/Timetable";
 import TicketingApp from "./routes/ticketing/TicketingApp";
 
-type LazyWithPreload<T extends ComponentType<any>> = LazyExoticComponent<T> & {
+type LazyWithPreload<T extends ComponentType<unknown>> = LazyExoticComponent<T> & {
   preload: () => Promise<{ default: T }>;
 };
 
-const lazyWithPreload = <T extends ComponentType<any>>(
+const lazyWithPreload = <T extends ComponentType<unknown>>(
   factory: () => Promise<{ default: T }>,
 ): LazyWithPreload<T> => {
   const Component = lazy(factory) as LazyWithPreload<T>;
