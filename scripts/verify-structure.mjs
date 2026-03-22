@@ -16,6 +16,7 @@ const RULE_IDS = [
   "LAYER_TYPES_NO_RUNTIME_IMPORT",
   "STYLE_NO_NEW_GLOBAL_SELECTOR",
   "STYLE_NO_NEW_RAW_HEX",
+  "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
   "LEGACY_IMPORT_FORBIDDEN",
 ]
 
@@ -811,6 +812,32 @@ function run() {
             { value, file }
           )
         }
+      }
+    }
+  }
+
+  // STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION
+  {
+    const scopedFiles = changedFiles.filter((file) => {
+      if (!CODE_FILE_EXTENSIONS.has(path.extname(file))) return false
+      return isInsideDir(file, "src/routes") || isInsideDir(file, "src/components")
+    })
+
+    const templateInterpolationPattern = /className\s*=\s*{\s*`[^`]*\$\{/
+
+    for (const file of scopedFiles) {
+      const lineObjects = changedAddedLines.get(file) ?? []
+
+      for (const item of lineObjects) {
+        if (!templateInterpolationPattern.test(item.text)) continue
+
+        collector.add(
+          "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+          file,
+          item.line,
+          "className template interpolation is forbidden; use cn/cva/static class maps",
+          { file }
+        )
       }
     }
   }
