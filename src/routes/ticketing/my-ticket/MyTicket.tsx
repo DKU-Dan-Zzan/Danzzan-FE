@@ -1,73 +1,55 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { MyTicketListPanel } from "@/components/ticketing/panels/MyTicketListPanel";
 import { useAuth } from "@/hooks/ticketing/useAuth";
-import { useTicketing } from "@/hooks/ticketing/useTicketing";
+import { appQueryKeys, useAppQuery } from "@/lib/query";
 import type { PlacementAd } from "@/types/ticketing/model/ad.model";
-import type { Ticket } from "@/types/ticketing/model/ticket.model";
-import { getPlacementAd as getWebPlacementAd, type PlacementKey as WebPlacementKey } from "@/api/ticketing/noticeApi";
+import { ticketApi } from "@/api/ticketing/ticketApi";
+import { getPlacementAd as getWebPlacementAd } from "@/api/ticketing/noticeApi";
 
 export default function MyTicket() {
   const navigate = useNavigate();
   const { session } = useAuth();
-  const { loading, error, getMyTickets } = useTicketing();
 
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [waitingRoomAd, setWaitingRoomAd] = useState<PlacementAd | null>(null);
+  const myTicketsQuery = useAppQuery({
+    queryKey: appQueryKeys.myTicketList(),
+    queryFn: ({ signal }) => ticketApi.getMyTickets({ signal }),
+    staleTime: 30_000,
+  });
 
-  const loadMyTickets = useCallback(async () => {
-    const fetched = await getMyTickets();
-    setTickets(fetched);
-  }, [getMyTickets]);
+  const waitingRoomAdQuery = useAppQuery({
+    queryKey: appQueryKeys.myTicketAd(),
+    queryFn: ({ signal }) => getWebPlacementAd("MY_TICKET", { signal }),
+    staleTime: 5 * 60_000,
+  });
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void loadMyTickets();
-  }, [loadMyTickets]);
-
-  useEffect(() => {
-    let alive = true;
-
-    (async () => {
-      try {
-        const ad = await getWebPlacementAd("MY_TICKET" as WebPlacementKey);
-        if (!alive) return;
-
-        setWaitingRoomAd(
-          ad
-            ? {
-                placement: "WAITING_ROOM_MAIN",
-                imageUrl: ad.imageUrl,
-                linkUrl: null,
-                altText: ad.title,
-                isActive: ad.isActive,
-                updatedAt: ad.updatedAt,
-              }
-            : null,
-        );
-      } catch {
-        if (!alive) return;
-        setWaitingRoomAd(null);
-      }
-    })();
-
-    return () => {
-      alive = false;
+  const waitingRoomAd = useMemo<PlacementAd | null>(() => {
+    const ad = waitingRoomAdQuery.data;
+    if (!ad) {
+      return null;
+    }
+    return {
+      placement: "WAITING_ROOM_MAIN",
+      imageUrl: ad.imageUrl,
+      linkUrl: null,
+      altText: ad.title,
+      isActive: ad.isActive,
+      updatedAt: ad.updatedAt,
     };
-  }, []);
+  }, [waitingRoomAdQuery.data]);
 
   return (
     <MyTicketListPanel
-      tickets={tickets}
+      tickets={myTicketsQuery.data ?? []}
       student={{
         studentId: session.user?.studentId || "-",
         name: session.user?.name || "학생",
       }}
-      loading={loading}
-      errorMessage={error?.message ?? null}
+      loading={myTicketsQuery.isPending}
+      errorMessage={myTicketsQuery.error?.message ?? null}
       ad={waitingRoomAd}
       onRefresh={() => {
-        void loadMyTickets();
+        void myTicketsQuery.refetch();
       }}
       onGoTicketing={() => navigate("/ticket/ticketing")}
     />

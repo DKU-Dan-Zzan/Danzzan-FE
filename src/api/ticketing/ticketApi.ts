@@ -378,13 +378,20 @@ export const ticketApi = {
     );
   },
 
-  getMyTickets: async (): Promise<Ticket[]> => {
+  getMyTickets: async (
+    options?: { signal?: AbortSignal },
+  ): Promise<Ticket[]> => {
     if (env.apiMode === "mock") {
       return mapTicketListDtoToModel(mockMyTicketsDto);
     }
 
     const client = getTicketingClient();
-    const raw = await client.get<TicketListResponseDto | ApiEnvelope<TicketListResponseDto>>("/tickets/me");
+    const raw = await client.get<TicketListResponseDto | ApiEnvelope<TicketListResponseDto>>(
+      "/tickets/me",
+      {
+        signal: options?.signal,
+      },
+    );
     const dto = readMyTicketListDto(raw);
     return mapTicketListDtoToModel(dto);
   },

@@ -15,4 +15,9 @@ describe("appQueryKeys", () => {
       { date: "2026-05-13" },
     ]);
   });
+
+  it("my-ticket 목록/광고 키를 고정 포맷으로 제공한다", () => {
+    expect(appQueryKeys.myTicketList()).toEqual(["ticketing", "my-ticket", "list"]);
+    expect(appQueryKeys.myTicketAd()).toEqual(["ticketing", "my-ticket", "ad"]);
+  });
 });
