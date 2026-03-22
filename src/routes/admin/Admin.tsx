@@ -47,6 +47,18 @@ import {
   type NoticeFormState,
 } from "@/routes/admin/admin-view-model";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
+import {
+  MAX_NOTICE_IMAGE_COUNT,
+  buildAdPayload,
+  buildNoticePayload,
+  createEmptyNoticeForm,
+  createNoticeEditForm,
+  createUploadFailureMessage,
+  uploadToPresignedUrl,
+  validateAdPayload,
+  validateImageFile,
+  validateNoticePayload,
+} from "@/routes/admin/adminEditorLogic";
 
 function Admin() {
   const navigate = useNavigate();
@@ -179,43 +191,22 @@ function Admin() {
   const effectivePinned = pinReorderMode ? pinReorderList : noticePinned;
 
   const openNewNotice = () => {
-    setEditingNotice({
-      title: "",
-      content: "",
-      author: "개발팀",
-      isPinned: false,
-      thumbnailImageUrl: "",
-      images: [],
-    });
+    setEditingNotice(createEmptyNoticeForm());
   };
 
   const openEditNotice = (notice: NoticeResponse) => {
-    setEditingNotice({
-      id: notice.id,
-      title: notice.title,
-      content: notice.content,
-      author: (notice.author as NoticeAuthor) || "개발팀",
-      isPinned: Boolean(notice.isPinned ?? notice.isEmergency),
-      thumbnailImageUrl: notice.thumbnailImageUrl ?? "",
-      images: notice.imageUrls ?? [],
-    });
+    setEditingNotice(createNoticeEditForm(notice));
   };
 
   const handleSubmitNotice = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!editingNotice) return;
 
-    const payload = {
-      title: editingNotice.title.trim(),
-      content: editingNotice.content.trim(),
-      author: editingNotice.author,
-      isPinned: editingNotice.isPinned,
-      thumbnailImageUrl: editingNotice.thumbnailImageUrl.trim() || null,
-      images: editingNotice.images,
-    };
+    const payload = buildNoticePayload(editingNotice);
+    const validationMessage = validateNoticePayload(payload);
 
-    if (!payload.title || !payload.content) {
-      setGlobalError("제목과 내용을 모두 입력해 주세요.");
+    if (validationMessage) {
+      setGlobalError(validationMessage);
       return;
     }
 
@@ -238,26 +229,25 @@ function Admin() {
 
     const currentCount = editingNotice.images.length;
     const incomingFiles = Array.from(files);
-    const remainingSlots = 10 - currentCount;
+    const remainingSlots = MAX_NOTICE_IMAGE_COUNT - currentCount;
 
     if (remainingSlots <= 0) {
-      window.alert("이미지는 최대 10개까지 업로드할 수 있습니다.");
+      window.alert(`이미지는 최대 ${MAX_NOTICE_IMAGE_COUNT}개까지 업로드할 수 있습니다.`);
       return;
     }
 
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
     const limitedFiles = incomingFiles.slice(0, remainingSlots);
 
     try {
       setNoticeImageUploading(true);
 
       for (const file of limitedFiles) {
-        if (!allowedTypes.includes(file.type)) {
-          window.alert("이미지는 JPG, JPEG, PNG, WEBP 형식만 업로드할 수 있습니다.");
-          continue;
-        }
-        if (file.size > 5 * 1024 * 1024) {
-          window.alert(`"${file.name}" 파일이 5MB를 초과하여 업로드할 수 없습니다.`);
+        const validationMessage = validateImageFile(
+          file,
+          `"${file.name}" 파일이 5MB를 초과하여 업로드할 수 없습니다.`,
+        );
+        if (validationMessage) {
+          window.alert(validationMessage);
           continue;
         }
 
@@ -277,23 +267,10 @@ function Admin() {
           throw new Error("presignedUrl이 비어 있습니다. presign API 응답을 확인해 주세요.");
         }
 
-        const putRes = await fetch(presign.presignedUrl, {
-          method: presign.method,
-          headers: {
-            "Content-Type": file.type,
-          },
-          body: file,
-        });
+        const putRes = await uploadToPresignedUrl(presign, file);
 
         if (!putRes.ok) {
-          const errorText = await putRes.text().catch(() => "");
-          const message = [
-            `S3 업로드 실패: ${putRes.status} ${putRes.statusText}`,
-            errorText ? `응답: ${errorText}` : "",
-          ]
-            .filter(Boolean)
-            .join("\n");
-          throw new Error(message);
+          throw new Error(await createUploadFailureMessage("S3 업로드 실패", putRes));
         }
 
         const url = presign.imageUrl ?? presign.fileUrl;
@@ -390,14 +367,11 @@ function Admin() {
     event.preventDefault();
     if (!editingAd) return;
 
-    const payload = {
-      title: editingAd.title.trim(),
-      imageUrl: editingAd.imageUrl.trim(),
-      placement: editingAd.placement,
-    };
+    const payload = buildAdPayload(editingAd);
+    const validationMessage = validateAdPayload(payload);
 
-    if (!payload.title || !payload.imageUrl) {
-      setGlobalError("제목과 이미지를 모두 입력해 주세요.");
+    if (validationMessage) {
+      setGlobalError(validationMessage);
       return;
     }
 
@@ -414,16 +388,12 @@ function Admin() {
   const handleUploadAdImage = async (file: File) => {
     if (!editingAd) return;
 
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-    const maxSizeBytes = 5 * 1024 * 1024;
-
-    if (!allowedTypes.includes(file.type)) {
-      window.alert("이미지는 JPG, JPEG, PNG, WEBP 형식만 업로드할 수 있습니다.");
-      return;
-    }
-
-    if (file.size > maxSizeBytes) {
-      window.alert("이미지 크기는 최대 5MB까지 업로드할 수 있습니다.");
+    const validationMessage = validateImageFile(
+      file,
+      "이미지 크기는 최대 5MB까지 업로드할 수 있습니다.",
+    );
+    if (validationMessage) {
+      window.alert(validationMessage);
       return;
     }
 
@@ -437,23 +407,10 @@ function Admin() {
         fileSize: file.size,
       });
 
-      const putRes = await fetch(uploadMeta.presignedUrl, {
-        method: uploadMeta.method,
-        headers: {
-          "Content-Type": file.type,
-        },
-        body: file,
-      });
+      const putRes = await uploadToPresignedUrl(uploadMeta, file);
 
       if (!putRes.ok) {
-        const errorText = await putRes.text().catch(() => "");
-        const message = [
-          `광고 이미지 업로드 실패: ${putRes.status} ${putRes.statusText}`,
-          errorText ? `응답: ${errorText}` : "",
-        ]
-          .filter(Boolean)
-          .join("\n");
-        throw new Error(message);
+        throw new Error(await createUploadFailureMessage("광고 이미지 업로드 실패", putRes));
       }
 
       setEditingAd((prev) => (prev ? { ...prev, imageUrl: uploadMeta.imageUrl } : prev));
