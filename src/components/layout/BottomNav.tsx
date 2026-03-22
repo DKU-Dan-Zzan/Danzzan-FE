@@ -1,3 +1,4 @@
+// 역할: 앱 하단 고정 탭 내비게이션을 렌더링하고 인증 상태에 따라 티켓팅 탭 경로를 결정합니다.
 import { NavLink } from "react-router-dom";
 import { Clock, Home, Map, Megaphone, Ticket, User } from "lucide-react";
 import { useSyncExternalStore } from "react";

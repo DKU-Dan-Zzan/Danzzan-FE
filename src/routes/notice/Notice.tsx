@@ -1,3 +1,4 @@
+// 역할: 공지 목록/상세 조회와 검색·페이지네이션·이미지 뷰어 상호작용을 처리하는 공지 라우트 화면입니다.
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
 import { getNoticeDetail, getNotices } from "@/api/app/notice/noticeApi";

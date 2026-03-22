@@ -1,3 +1,4 @@
+// 역할: 관리자 화면에서 재사용하는 Tailwind 스타일 문자열(포커스 링/액션 버튼)을 중앙 관리합니다.
 export const ADMIN_FOCUS_VISIBLE_RING_CLASS =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]";
 

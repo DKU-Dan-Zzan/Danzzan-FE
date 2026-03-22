@@ -1,3 +1,4 @@
+// 역할: 앱 전역 React Query 키 팩토리를 정의해 캐시 키 규칙을 일관되게 유지합니다.
 export type NoticeListKeyParams = {
   keyword: string;
   category: string;
