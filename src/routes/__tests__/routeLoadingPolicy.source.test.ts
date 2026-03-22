@@ -27,15 +27,18 @@ describe("Route loading policy", () => {
   it("App router preloads bottom-nav lazy routes and uses delayed fallback without loading text", () => {
     const source = readSource("src/App.tsx");
 
+    expect(source).toContain("import DelayedSpinner from \"@/components/common/loading/DelayedSpinner\";");
     expect(source).toContain("const Notice = lazyWithPreload(() => import(\"./routes/notice/Notice\"));");
     expect(source).toContain("const BoothMap = lazyWithPreload(() => import(\"./routes/boothmap/BoothMap\"));");
     expect(source).toContain("const MyPage = lazyWithPreload(() => import(\"./routes/mypage/MyPage\"));");
 
-    expect(source).toContain("void Notice.preload();");
-    expect(source).toContain("void BoothMap.preload();");
-    expect(source).toContain("void MyPage.preload();");
+    expect(source).toContain("registerRoutePreloader(\"/notice\", Notice.preload);");
+    expect(source).toContain("registerRoutePreloader(\"/map\", BoothMap.preload);");
+    expect(source).toContain("registerRoutePreloader(\"/mypage\", MyPage.preload);");
+    expect(source).toContain("void preloadBottomNavLazyRoutes();");
 
-    expect(source).toContain("setVisibleFallback(true)");
+    expect(source).toContain("<DelayedSpinner delayMs={300}");
+    expect(source).not.toContain("setVisibleFallback(true)");
     expect(source).not.toContain("화면 불러오는 중...");
   });
 

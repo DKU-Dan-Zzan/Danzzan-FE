@@ -9,6 +9,12 @@ import {
   type ReactNode,
 } from "react";
 import { useAdminAuth } from "@/hooks/app/admin/useAdminAuth";
+import DelayedSpinner from "@/components/common/loading/DelayedSpinner";
+import {
+  preloadBottomNavLazyRoutes,
+  registerRoutePreloader,
+} from "@/lib/navigation/routePreload";
+import { markBottomNavTransitionComplete } from "@/lib/perf/navTiming";
 import { buildLoginRedirectPath, buildReturnTo } from "@/routes/common/authGuard";
 import AppLayout from "./components/layout/AppLayout";
 import Home from "./routes/home/Home";
@@ -36,30 +42,7 @@ const AdminLogin = lazy(() => import("./routes/admin/AdminLogin"));
 const AdminMap = lazy(() => import("./routes/admin/AdminMap"));
 
 function RouteLoading() {
-  const [visibleFallback, setVisibleFallback] = useState(false);
-
-  useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      setVisibleFallback(true);
-    }, 320);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, []);
-
-  if (!visibleFallback) {
-    return null;
-  }
-
-  return (
-    <div className="flex min-h-dvh items-center justify-center">
-      <div
-        className="h-5 w-5 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--accent)]"
-        aria-label="페이지 전환 중"
-      />
-    </div>
-  );
+  return <DelayedSpinner delayMs={300} label="페이지 전환 중" />;
 }
 
 const withRouteSuspense = (node: ReactNode) => {
@@ -112,17 +95,42 @@ function LegacyMyTicketRedirect() {
 }
 
 function App() {
+  const location = useLocation();
+
   useEffect(() => {
+    registerRoutePreloader("/notice", Notice.preload);
+    registerRoutePreloader("/map", BoothMap.preload);
+    registerRoutePreloader("/mypage", MyPage.preload);
+
     const timeoutId = window.setTimeout(() => {
-      void Notice.preload();
-      void BoothMap.preload();
-      void MyPage.preload();
+      void preloadBottomNavLazyRoutes();
     }, 200);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const firstFrameId = window.requestAnimationFrame(() => {
+      const secondFrameId = window.requestAnimationFrame(() => {
+        if (cancelled) {
+          return;
+        }
+        markBottomNavTransitionComplete(location.pathname);
+      });
+
+      if (cancelled) {
+        window.cancelAnimationFrame(secondFrameId);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(firstFrameId);
+    };
+  }, [location.pathname]);
 
   return (
     <Routes>
