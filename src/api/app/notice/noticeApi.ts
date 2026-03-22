@@ -1,7 +1,8 @@
 import { http } from "@/lib/http";
 import { adGateway } from "@/api/common/adGateway";
+import { parseNoticeDetailContract, parseNoticeListContract } from "@/api/app/notice/noticeContract";
 
-type PageResponse<T> = {
+export type PageResponse<T> = {
   content: T[];
   totalElements: number;
   totalPages: number;
@@ -59,17 +60,19 @@ export async function getNotices(
     size: params.size ?? 10,
   });
 
-  const res = await http.get<PageResponse<NoticeDto>>(`/notices${query}`, {
+  const endpoint = `/notices${query}`;
+  const res = await http.get<unknown>(endpoint, {
     signal: options?.signal,
   });
-  return res.data;
+  return parseNoticeListContract(res.data, endpoint);
 }
 
 export async function getNoticeDetail(id: number, options?: RequestOptions): Promise<NoticeDto> {
-  const res = await http.get<NoticeDto>(`/notices/${id}`, {
+  const endpoint = `/notices/${id}`;
+  const res = await http.get<unknown>(endpoint, {
     signal: options?.signal,
   });
-  return res.data;
+  return parseNoticeDetailContract(res.data, endpoint);
 }
 
 export type PlacementKey = "HOME_BOTTOM" | "MY_TICKET";

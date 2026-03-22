@@ -31,7 +31,20 @@ describe("noticeApi", () => {
 
   it("getNoticeDetail은 AbortSignal을 전달한다", async () => {
     const signal = new AbortController().signal;
-    const spy = vi.spyOn(http, "get").mockResolvedValue({ data: {} } as never);
+    const spy = vi.spyOn(http, "get").mockResolvedValue({
+      data: {
+        id: 10,
+        title: "공지",
+        content: "본문",
+        author: "관리자",
+        category: null,
+        isPinned: false,
+        thumbnailImageUrl: null,
+        imageUrls: [],
+        createdAt: "2026-03-22T00:00:00Z",
+        updatedAt: "2026-03-22T00:00:00Z",
+      },
+    } as never);
 
     await getNoticeDetail(10, { signal });
 

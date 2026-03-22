@@ -1,5 +1,9 @@
 import { http } from "@/lib/http"
 import type { Performance } from "@/types/app/timetable/timetable.types"
+import {
+  parseContentImagesContract,
+  parsePerformancesContract,
+} from "@/api/app/timetable/timetableContract"
 
 export type TimetableResponseDto = {
   date: string
@@ -18,19 +22,21 @@ type RequestOptions = {
 }
 
 export async function getPerformances(date: string, options?: RequestOptions) {
-  const res = await http.get<TimetableResponseDto>(
-    "/timetable/performances",
+  const endpoint = "/timetable/performances"
+  const res = await http.get<unknown>(
+    endpoint,
     {
       params: { date },
       signal: options?.signal,
     }
   )
-  return res.data
+  return parsePerformancesContract(res.data, endpoint)
 }
 
 export async function getContentImages(options?: RequestOptions) {
-  const res = await http.get<ContentImageDto[]>("timetable/content-images", {
+  const endpoint = "timetable/content-images"
+  const res = await http.get<unknown>(endpoint, {
     signal: options?.signal,
   })
-  return res.data
+  return parseContentImagesContract(res.data, endpoint)
 }

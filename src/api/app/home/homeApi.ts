@@ -1,4 +1,9 @@
 import { http } from "@/lib/http"
+import {
+  parseEmergencyNoticeContract,
+  parseHomeImagesContract,
+  parseLineupImagesContract,
+} from "@/api/app/home/homeContract"
 
 export type HomeImageDto = {
   id: number
@@ -24,22 +29,25 @@ type RequestOptions = {
 }
 
 export async function getHomeImages(options?: RequestOptions) {
-  const res = await http.get<HomeImageDto[]>("/home/images", {
+  const endpoint = "/home/images"
+  const res = await http.get<unknown>(endpoint, {
     signal: options?.signal,
   })
-  return res.data
+  return parseHomeImagesContract(res.data, endpoint)
 }
 
 export async function getEmergencyNotice(options?: RequestOptions) {
-  const res = await http.get<EmergencyNoticeDto | null>("/home/emergencyNotice", {
+  const endpoint = "/home/emergencyNotice"
+  const res = await http.get<unknown>(endpoint, {
     signal: options?.signal,
   })
-  return res.data
+  return parseEmergencyNoticeContract(res.data, endpoint)
 }
 
 export async function getLineupImages(options?: RequestOptions) {
-  const res = await http.get<LineupImageDto[]>("/home/lineup-images", {
+  const endpoint = "/home/lineup-images"
+  const res = await http.get<unknown>(endpoint, {
     signal: options?.signal,
   })
-  return res.data
+  return parseLineupImagesContract(res.data, endpoint)
 }
