@@ -69,6 +69,7 @@ const TOP_PANEL_Z_INDEX_CLASS: Record<SheetSnap, string> = {
   HALF: "z-[70]",
   FULL: "z-[40]",
 }
+const MAP_MODE_TRANSITION_MS = 280;
 
 function mapCollegeDtoToCollege(dto: CollegeDto): College {
   return {
@@ -106,6 +107,7 @@ function mapPubSummaryToPub(dto: PubSummaryResponse): Pub {
 
 export default function BoothMap() {
   const [mode, setMode] = useState<MapMode>("2D");
+  const [render3DLayer, setRender3DLayer] = useState(mode === "3D");
   const [primaryFilter, setPrimaryFilter] = useState<PrimaryFilter>("ALL");
   const [selectedMapItem, setSelectedMapItem] = useState<SelectedMapItem>(null);
   const [selectedDetailItem, setSelectedDetailItem] = useState<SelectedDetailItem>(null);
@@ -140,6 +142,21 @@ export default function BoothMap() {
       window.removeEventListener("resize", updateBottomNavHeight);
     };
   }, []);
+
+  useEffect(() => {
+    if (mode === "3D") {
+      setRender3DLayer(true);
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setRender3DLayer(false);
+    }, MAP_MODE_TRANSITION_MS);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [mode]);
 
   const mapDataQuery = useAppQuery({
     queryKey: appQueryKeys.boothMapData(selectedDate),
@@ -259,7 +276,14 @@ export default function BoothMap() {
   return (
     <div className="relative h-screen w-full overflow-hidden bg-[var(--boothmap-surface)]">
       <div className="absolute inset-0">
-        {mode === "2D" ? (
+        <div
+          className={cn(
+            "absolute inset-0 transition-all duration-300 ease-out",
+            mode === "2D"
+              ? "opacity-100 translate-x-0 scale-100 pointer-events-auto"
+              : "opacity-0 -translate-x-1 scale-[0.985] pointer-events-none",
+          )}
+        >
           <KakaoMapView
             booths={visibleBooths}
             colleges={visibleColleges}
@@ -272,27 +296,38 @@ export default function BoothMap() {
             onClickCollege={onClickMarkerCollege}
             onPrimaryFilterChange={handlePrimaryChange}
           />
-        ) : (
-          <Suspense
-            fallback={
-              <div className="flex h-full w-full items-center justify-center bg-[var(--boothmap-surface)] text-sm font-semibold text-[var(--boothmap-text-subtle)]">
-                3D 지도를 불러오는 중...
-              </div>
-            }
+        </div>
+
+        {render3DLayer && (
+          <div
+            className={cn(
+              "absolute inset-0 transition-all duration-300 ease-out",
+              mode === "3D"
+                ? "opacity-100 translate-x-0 scale-100 pointer-events-auto"
+                : "opacity-0 translate-x-1 scale-[0.985] pointer-events-none",
+            )}
           >
-            <LazyMapbox3DView
-              booths={visibleBooths}
-              colleges={visibleColleges}
-              primaryFilter={primaryFilter}
-              selectedMapItem={selectedMapItem}
-              sheetSnap={sheetSnap}
-              viewport={mapViewport}
-              onViewportChange={setMapViewport}
-              onClickBooth={onClickMarkerBooth}
-              onClickCollege={onClickMarkerCollege}
-              onPrimaryFilterChange={handlePrimaryChange}
-            />
-          </Suspense>
+            <Suspense
+              fallback={
+                <div className="flex h-full w-full items-center justify-center bg-[var(--boothmap-surface)] text-sm font-semibold text-[var(--boothmap-text-subtle)]">
+                  3D 지도를 불러오는 중...
+                </div>
+              }
+            >
+              <LazyMapbox3DView
+                booths={visibleBooths}
+                colleges={visibleColleges}
+                primaryFilter={primaryFilter}
+                selectedMapItem={selectedMapItem}
+                sheetSnap={sheetSnap}
+                viewport={mapViewport}
+                onViewportChange={setMapViewport}
+                onClickBooth={onClickMarkerBooth}
+                onClickCollege={onClickMarkerCollege}
+                onPrimaryFilterChange={handlePrimaryChange}
+              />
+            </Suspense>
+          </div>
         )}
       </div>
 
