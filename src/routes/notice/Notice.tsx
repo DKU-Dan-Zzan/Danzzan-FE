@@ -131,7 +131,11 @@ function Notice() {
         </div>
         <div className="flex gap-2">
           <div className="flex-1 rounded-full bg-[var(--surface-subtle)] px-4 py-2 shadow-inner">
+            <label htmlFor="notice-search-input" className="sr-only">
+              공지 검색
+            </label>
             <input
+              id="notice-search-input"
               type="text"
               value={keyword}
               onChange={(e) => {

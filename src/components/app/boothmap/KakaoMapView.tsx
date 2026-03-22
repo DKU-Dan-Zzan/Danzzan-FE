@@ -340,11 +340,16 @@ export default function KakaoMapView({
     const iconSize = Math.round((isSelected ? 20 : 18) * scale)
     const ringSize = Math.round(24 * scale)
 
-    const wrapper = document.createElement("div")
+    const wrapper = document.createElement("button")
+    wrapper.type = "button"
     wrapper.title = title
+    wrapper.setAttribute("aria-label", title)
     wrapper.style.position = "relative"
     wrapper.style.width = `${width}px`
     wrapper.style.height = `${height}px`
+    wrapper.style.padding = "0"
+    wrapper.style.border = "0"
+    wrapper.style.background = "transparent"
     wrapper.style.cursor = "pointer"
     wrapper.style.userSelect = "none"
     wrapper.style.transition = "transform 0.18s ease"
