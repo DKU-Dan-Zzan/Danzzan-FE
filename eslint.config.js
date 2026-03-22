@@ -7,7 +7,7 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'coverage']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -21,9 +21,14 @@ export default defineConfig([
     },
     rules: {
       'jsx-a11y/aria-role': 'error',
+      'jsx-a11y/click-events-have-key-events': 'error',
       'jsx-a11y/control-has-associated-label': ['error', {
         ignoreElements: ['audio', 'canvas', 'embed', 'input', 'textarea', 'tr', 'th'],
         ignoreRoles: ['grid', 'listbox', 'menu', 'menubar', 'radiogroup', 'row', 'tablist', 'toolbar', 'tree', 'treegrid'],
+      }],
+      'jsx-a11y/interactive-supports-focus': 'error',
+      'jsx-a11y/no-noninteractive-element-interactions': ['error', {
+        handlers: ['onClick', 'onKeyDown', 'onKeyUp', 'onKeyPress'],
       }],
       'jsx-a11y/role-has-required-aria-props': 'error',
       'jsx-a11y/role-supports-aria-props': 'error',

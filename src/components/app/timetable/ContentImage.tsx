@@ -1,5 +1,5 @@
 import type { ContentImageDto } from "@/api/app/timetable/timetableApi"
-import { XMarkIcon } from "@heroicons/react/24/outline"
+import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialog"
 
 type ContentImageSectionProps = {
   images: ContentImageDto[]
@@ -76,31 +76,27 @@ export default function ContentImageSection({
       </div>
 
       {selectedImage && (
-        <div
-          className="fixed inset-0 z-[100] bg-[var(--timetable-overlay-bg)]"
-          onClick={onCloseImage}
+        <Dialog
+          open={Boolean(selectedImage)}
+          onOpenChange={(open) => {
+            if (!open) {
+              onCloseImage()
+            }
+          }}
         >
-          <button
-            type="button"
-            className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--timetable-close-bg)] shadow-md"
-            onClick={onCloseImage}
-          >
-            <XMarkIcon className="h-5 w-5 text-[var(--text)]" />
-          </button>
-
-          <div
-            className="h-full overflow-y-auto px-4 py-16"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mx-auto flex min-h-full max-w-[430px] items-start justify-center">
-              <img
-                src={selectedImage.detailImageUrl}
-                alt={selectedImage.name}
-                className="w-full rounded-xl object-contain"
-              />
+          <DialogContent className="max-h-[92vh] w-fit max-w-[92vw] border-0 bg-transparent p-0 shadow-none">
+            <DialogTitle className="sr-only">{selectedImage.name}</DialogTitle>
+            <div className="max-h-[90vh] overflow-y-auto px-4 py-3">
+              <div className="mx-auto flex min-h-full max-w-[430px] items-start justify-center">
+                <img
+                  src={selectedImage.detailImageUrl}
+                  alt={selectedImage.name}
+                  className="w-full rounded-xl object-contain"
+                />
+              </div>
             </div>
-          </div>
-        </div>
+          </DialogContent>
+        </Dialog>
       )}
     </>
   )

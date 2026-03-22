@@ -23,6 +23,16 @@ import {
 import useKakaoMapLoader from "@/hooks/app/boothmap/useKakaoMapLoader";
 import { AdminShell } from "@/components/layout/AdminShell";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/common/ui/alert-dialog";
+import {
   getBoothmapColor,
   getBoothmapLabelAccent,
   getBoothmapMarkerColor,
@@ -196,6 +206,7 @@ export default function AdminMap() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [pendingClearBooth, setPendingClearBooth] = useState<{ id: number; name: string } | null>(null);
   const [statusMessage, setStatusMessage] = useState<string>(
     "보기 모드입니다. 부스 편집 또는 단과대 편집 모드를 선택해 주세요."
   );
@@ -647,20 +658,25 @@ export default function AdminMap() {
     }
   };
 
-  const handleClearBoothLocation = async () => {
+  const handleClearBoothLocation = () => {
     if (!selectedBooth) return;
+    setPendingClearBooth({ id: selectedBooth.id, name: selectedBooth.name });
+  };
 
-    const confirmed = window.confirm("이 부스의 지도 좌표를 제거하시겠습니까?");
-    if (!confirmed) return;
+  const confirmClearBoothLocation = async () => {
+    if (!pendingClearBooth) {
+      return;
+    }
 
     try {
       setSaving(true);
       setGlobalError(null);
-      await clearBoothLocation(selectedBooth.id);
-      updateBoothState(selectedBooth.id, null, null);
+      await clearBoothLocation(pendingClearBooth.id);
+      updateBoothState(pendingClearBooth.id, null, null);
       setSelectedItem(null);
       setEditorMode("idle");
-      setStatusMessage("부스 좌표를 제거했습니다.");
+      setStatusMessage(`부스 좌표를 제거했습니다: ${pendingClearBooth.name}`);
+      setPendingClearBooth(null);
     } catch (error) {
       setGlobalError(
         error instanceof Error ? error.message : "부스 좌표 제거에 실패했습니다.",
@@ -671,6 +687,7 @@ export default function AdminMap() {
   };
 
   return (
+    <>
     <AdminShell
       title="지도 편집 관리자 페이지"
       headerClassName="sticky top-0 z-20 border-b border-[var(--border-base)] bg-[var(--admin-header-bg)]"
@@ -897,7 +914,7 @@ export default function AdminMap() {
 
                   <button
                     type="button"
-                    onClick={() => void handleClearBoothLocation()}
+                    onClick={handleClearBoothLocation}
                     className="mt-2 inline-flex items-center gap-1 rounded-xl border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-danger-bg)] px-3 py-2 text-xs font-semibold text-[var(--boothmap-danger-text)] hover:brightness-95"
                   >
                     <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
@@ -949,5 +966,35 @@ export default function AdminMap() {
           </div>
         </section>
     </AdminShell>
+    <AlertDialog
+      open={Boolean(pendingClearBooth)}
+      onOpenChange={(open) => {
+        if (!open && !saving) {
+          setPendingClearBooth(null);
+        }
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>부스 좌표 제거</AlertDialogTitle>
+          <AlertDialogDescription>
+            선택한 부스의 지도 좌표를 제거하시겠습니까?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={saving}>취소</AlertDialogCancel>
+          <AlertDialogAction
+            disabled={saving}
+            onClick={(event) => {
+              event.preventDefault();
+              void confirmClearBoothLocation();
+            }}
+          >
+            {saving ? "처리 중..." : "제거"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }

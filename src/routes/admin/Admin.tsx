@@ -38,8 +38,19 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/common/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/common/ui/alert-dialog";
 import { cn } from "@/components/common/ui/utils";
 import { AdminShell } from "@/components/layout/AdminShell";
+import { Toaster, toast } from "sonner";
 import {
   formatDate,
   type AdFormState,
@@ -66,14 +77,45 @@ import {
   ADMIN_SECONDARY_ACTION_BUTTON_CLASS,
 } from "@/routes/admin/adminStyleClasses";
 
+type ConfirmDialogState = {
+  title: string;
+  description: string;
+  confirmLabel?: string;
+  onConfirm: () => Promise<void> | void;
+};
+
 function Admin() {
   const navigate = useNavigate();
   const { logout } = useAdminAuth();
 
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [confirmDialogState, setConfirmDialogState] = useState<ConfirmDialogState | null>(null);
+  const [confirming, setConfirming] = useState(false);
   const handleAdminDataError = useCallback((message: string) => {
     setGlobalError(message);
   }, []);
+
+  const closeConfirmDialog = useCallback(() => {
+    if (confirming) {
+      return;
+    }
+    setConfirmDialogState(null);
+  }, [confirming]);
+
+  const handleConfirmAction = useCallback(async () => {
+    const current = confirmDialogState;
+    if (!current) {
+      return;
+    }
+
+    try {
+      setConfirming(true);
+      await current.onConfirm();
+      setConfirmDialogState(null);
+    } finally {
+      setConfirming(false);
+    }
+  }, [confirmDialogState]);
 
   // 긴급 공지
   const [emergencyMessage, setEmergencyMessage] = useState("");
@@ -145,20 +187,24 @@ function Admin() {
     const ad = placement === "HOME_BOTTOM" ? homeBottomAd : myTicketAd;
     if (!ad) return;
 
-    const confirmed = window.confirm("이 광고를 삭제하시겠습니까?");
-    if (!confirmed) return;
-
-    try {
-      setGlobalError(null);
-      await setAdminAdsActiveByPlacement(placement, false);
-      await reloadAds();
-      window.alert("삭제되었습니다.");
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "광고 삭제에 실패했습니다.";
-      setGlobalError(message);
-      window.alert(message);
-    }
+    setConfirmDialogState({
+      title: "광고 삭제",
+      description: "이 광고를 삭제하시겠습니까?",
+      confirmLabel: "삭제",
+      onConfirm: async () => {
+        try {
+          setGlobalError(null);
+          await setAdminAdsActiveByPlacement(placement, false);
+          await reloadAds();
+          toast.success("광고를 삭제했습니다.");
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "광고 삭제에 실패했습니다.";
+          setGlobalError(message);
+          toast.error(message);
+        }
+      },
+    });
   };
 
   // 긴급 공지 저장
@@ -168,7 +214,7 @@ function Admin() {
       setEmergencySaving(true);
       await updateEmergencyAdminNotice(buildEmergencyPayload(emergencyMessage, emergencyActive));
       await emergencyQuery.refetch();
-      window.alert("변경 완료했습니다.");
+      toast.success("긴급 공지를 저장했습니다.");
     } catch (error) {
       setGlobalError(error instanceof Error ? error.message : "긴급 공지를 저장하지 못했습니다.");
     } finally {
@@ -235,7 +281,7 @@ function Admin() {
     const remainingSlots = MAX_NOTICE_IMAGE_COUNT - currentCount;
 
     if (remainingSlots <= 0) {
-      window.alert(`이미지는 최대 ${MAX_NOTICE_IMAGE_COUNT}개까지 업로드할 수 있습니다.`);
+      toast.warning(`이미지는 최대 ${MAX_NOTICE_IMAGE_COUNT}개까지 업로드할 수 있습니다.`);
       return;
     }
 
@@ -250,7 +296,7 @@ function Admin() {
           `"${file.name}" 파일이 5MB를 초과하여 업로드할 수 없습니다.`,
         );
         if (validationMessage) {
-          window.alert(validationMessage);
+          toast.warning(validationMessage);
           continue;
         }
 
@@ -283,41 +329,55 @@ function Admin() {
       const message =
         error instanceof Error ? error.message : "이미지 업로드에 실패했습니다.";
       setGlobalError(message);
-      window.alert(message);
+      toast.error(message);
     } finally {
       setNoticeImageUploading(false);
     }
   };
 
   const handleArchiveNotice = async (id: number) => {
-    const confirmed = window.confirm("이 공지를 보관 처리하시겠습니까?");
-    if (!confirmed) return;
-
-    try {
-      setGlobalError(null);
-      await deleteAdminNotice(id);
-      await reloadNotices(noticePage);
-    } catch (error) {
-      setGlobalError(error instanceof Error ? error.message : "공지를 보관하지 못했습니다.");
-    }
+    setConfirmDialogState({
+      title: "공지 보관",
+      description: "이 공지를 보관 처리하시겠습니까?",
+      confirmLabel: "보관",
+      onConfirm: async () => {
+        try {
+          setGlobalError(null);
+          await deleteAdminNotice(id);
+          await reloadNotices(noticePage);
+          toast.success("공지를 보관했습니다.");
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "공지를 보관하지 못했습니다.";
+          setGlobalError(message);
+          toast.error(message);
+        }
+      },
+    });
   };
 
   const handleRestoreNotice = async (id: number) => {
-    const confirmed = window.confirm("이 공지를 다시 게시중 상태로 복원할까요?");
-    if (!confirmed) return;
-
-    try {
-      setGlobalError(null);
-      await restoreAdminNotice(id);
-      await reloadNotices(noticePage);
-    } catch (error) {
-      setGlobalError(error instanceof Error ? error.message : "공지를 복원하지 못했습니다.");
-    }
+    setConfirmDialogState({
+      title: "공지 복원",
+      description: "이 공지를 다시 게시중 상태로 복원할까요?",
+      confirmLabel: "복원",
+      onConfirm: async () => {
+        try {
+          setGlobalError(null);
+          await restoreAdminNotice(id);
+          await reloadNotices(noticePage);
+          toast.success("공지를 복원했습니다.");
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "공지를 복원하지 못했습니다.";
+          setGlobalError(message);
+          toast.error(message);
+        }
+      },
+    });
   };
 
   const startPinReorder = () => {
     if (noticePinned.length === 0) {
-      window.alert("핀 공지가 없습니다.");
+      toast.info("핀 공지가 없습니다.");
       return;
     }
     setPinReorderList(noticePinned);
@@ -356,7 +416,7 @@ function Admin() {
       setPinReorderMode(false);
       setPinReorderList([]);
       await reloadNotices(noticePage);
-      window.alert("핀 공지 순서를 저장했습니다.");
+      toast.success("핀 공지 순서를 저장했습니다.");
     } catch (error) {
       setGlobalError(
         error instanceof Error ? error.message : "핀 공지 순서를 저장하지 못했습니다.",
@@ -396,7 +456,7 @@ function Admin() {
       "이미지 크기는 최대 5MB까지 업로드할 수 있습니다.",
     );
     if (validationMessage) {
-      window.alert(validationMessage);
+      toast.warning(validationMessage);
       return;
     }
 
@@ -417,11 +477,11 @@ function Admin() {
       }
 
       setEditingAd((prev) => (prev ? { ...prev, imageUrl: uploadMeta.imageUrl } : prev));
-      window.alert("이미지 업로드가 완료되었습니다.");
+      toast.success("이미지 업로드가 완료되었습니다.");
     } catch (error) {
       const message = error instanceof Error ? error.message : "이미지 업로드에 실패했습니다.";
       setGlobalError(message);
-      window.alert(message);
+      toast.error(message);
     } finally {
       setAdImageUploading(false);
     }
@@ -429,6 +489,7 @@ function Admin() {
 
   return (
     <>
+      <Toaster position="top-right" closeButton richColors />
       <AdminShell
         title="공지 및 광고 관리자 페이지"
         headerClassName="sticky top-0 z-20 border-b border-[var(--border-base)] bg-[var(--admin-header-bg)]"
@@ -1289,6 +1350,36 @@ function Admin() {
           </DialogContent>
         )}
       </Dialog>
+
+      <AlertDialog
+        open={Boolean(confirmDialogState)}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeConfirmDialog();
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmDialogState?.title ?? "확인"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmDialogState?.description ?? ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={confirming}>취소</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={confirming}
+              onClick={(event) => {
+                event.preventDefault();
+                void handleConfirmAction();
+              }}
+            >
+              {confirming ? "처리 중..." : (confirmDialogState?.confirmLabel ?? "확인")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
