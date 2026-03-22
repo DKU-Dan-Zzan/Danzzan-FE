@@ -57,5 +57,5 @@
 반드시 아래 순서로 검증한다.
 1. `npm run lint`
 2. `npm run typecheck`
-3. `npm run test`
+3. `npm run test:coverage`
 4. `npm run build`

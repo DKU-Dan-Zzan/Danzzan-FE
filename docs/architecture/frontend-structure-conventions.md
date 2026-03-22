@@ -135,6 +135,11 @@ allowlist 파일: `config/structure-allowlist.json`
 - `owner`
 - `expiresAt` (`YYYY-MM-DD`)
 
+`target` 권장 형식:
+- selector 예외: `.selector-name`
+- 파일 예외: `src/path/to/file.tsx`
+- raw hex 최소 예외: `src/index.css::#rrggbb` (`file::value` 형식)
+
 원칙:
 - 최소 허용만 등록한다.
 - 만료일이 지난 예외는 자동 유효하지 않다.

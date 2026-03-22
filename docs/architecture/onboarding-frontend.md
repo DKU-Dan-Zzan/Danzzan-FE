@@ -41,7 +41,7 @@
 2. `npm run lint:structure:report`
 3. `npm run typecheck`
 4. `npm run typecheck:test`
-5. `npm run test`
+5. `npm run test:coverage`
 6. `npm run build`
 7. `npm run check:bundle-budget`
 

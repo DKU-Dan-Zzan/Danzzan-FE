@@ -84,6 +84,25 @@ export default defineConfig(({ mode }) => {
     },
     test: {
       globals: true,
+      coverage: {
+        provider: "v8",
+        reporter: ["text", "json-summary", "lcov"],
+        reportsDirectory: "coverage",
+        include: ["src/**/*.{ts,tsx}"],
+        exclude: [
+          "src/main.tsx",
+          "src/vite-env.d.ts",
+          "**/*.d.ts",
+          "**/*.test.ts",
+          "**/*.test.tsx",
+        ],
+        thresholds: {
+          statements: 13,
+          branches: 10,
+          functions: 10,
+          lines: 13,
+        },
+      },
     },
   }
 })

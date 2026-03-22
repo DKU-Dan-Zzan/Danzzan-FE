@@ -51,8 +51,386 @@
     },
     {
       "ruleId": "STYLE_NO_NEW_RAW_HEX",
-      "target": "src/index.css",
-      "reason": "전역 디자인 토큰 루트 변수의 레거시 색상값 유지",
+      "target": "src/index.css::#0a559c",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#0f172a",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#10b981",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#111827",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#15803d",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#1b5e20",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#1d4ed8",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#1e40af",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#1f2937",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#2563eb",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#2e7d32",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#32405f",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#334155",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#3b82f6",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#475569",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#4b5563",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#61708f",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#7c4a00",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#8a1c16",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#8b97ad",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#93c5fd",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#9ca3af",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#a9473d",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#b26a00",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#b3261e",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#b71c1c",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#b91c1c",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#bfdbfe",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#c62828",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#c84f8c",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#d1d5db",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#dbeafe",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#dc2626",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#e2e8f0",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#e3776a",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#e5e7eb",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#e6007a",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ef4444",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#eff6ff",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f1f6fd",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f2f7ff",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f3f4f6",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f5a6cf",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f5cfe1",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f6ca3b",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f7faff",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f8fafc",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f8fbff",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fca5a5",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fecaca",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fee2e2",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffe6f3",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fff2f8",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fff5f5",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffffff",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
       "owner": "fe-platform",
       "expiresAt": "2026-12-31"
     }

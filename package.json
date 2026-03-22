@@ -14,7 +14,8 @@
     "test": "vitest run",
     "preview": "vite preview",
     "typecheck:test": "tsc -p tsconfig.test.json --pretty false",
-    "check:bundle-budget": "node scripts/check-bundle-budget.mjs"
+    "check:bundle-budget": "node scripts/check-bundle-budget.mjs",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
@@ -86,6 +87,7 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "@vitest/coverage-v8": "^4.1.0",
     "eslint": "^9.39.1",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^7.0.1",

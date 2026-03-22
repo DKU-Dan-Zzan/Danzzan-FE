@@ -256,16 +256,42 @@ function wildcardToRegex(pattern) {
 }
 
 function createAllowlistMatcher(allowlistEntries) {
-  const compiled = allowlistEntries.map((entry) => ({
-    ...entry,
-    regex: wildcardToRegex(entry.target),
-  }))
+  const compiled = allowlistEntries.map((entry) => {
+    const compositeParts = entry.target.split("::").map((part) => part.trim()).filter(Boolean)
+
+    if (compositeParts.length === 2) {
+      return {
+        ...entry,
+        targetType: "file-value",
+        fileRegex: wildcardToRegex(compositeParts[0]),
+        valueRegex: wildcardToRegex(compositeParts[1]),
+      }
+    }
+
+    return {
+      ...entry,
+      targetType: "single",
+      regex: wildcardToRegex(entry.target),
+    }
+  })
 
   return function isAllowed(ruleId, context = {}) {
     const candidates = compiled.filter((entry) => entry.ruleId === ruleId)
     if (candidates.length === 0) return false
 
     for (const candidate of candidates) {
+      if (candidate.targetType === "file-value") {
+        if (
+          context.file &&
+          context.value &&
+          candidate.fileRegex.test(context.file) &&
+          candidate.valueRegex.test(context.value)
+        ) {
+          return true
+        }
+        continue
+      }
+
       if (context.selector && candidate.target.startsWith(".")) {
         if (candidate.regex.test(context.selector)) return true
         continue
