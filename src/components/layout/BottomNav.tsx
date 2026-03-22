@@ -7,6 +7,7 @@ import { hasAuthenticatedRole } from "@/lib/common/auth-access";
 import { getTicketingNavigationTarget } from "@/lib/common/ticketing-navigation";
 import { preloadRouteByPath } from "@/lib/navigation/routePreload";
 import { markBottomNavTransitionStart } from "@/lib/perf/navTiming";
+import { prefetchTabDataByPath } from "@/lib/query/prefetchTabData";
 import { authStore } from "@/store/common/authStore";
 
 const navItems = [
@@ -53,6 +54,10 @@ const BottomNav = () => {
     { to: ticketingTarget, icon: Ticket, label: "티켓팅" },
     navItems[4],
   ];
+  const warmTabRoute = (routePath: string) => {
+    void preloadRouteByPath(routePath);
+    void prefetchTabDataByPath(routePath);
+  };
 
   return (
     <nav
@@ -68,16 +73,17 @@ const BottomNav = () => {
             to={to}
             end={to === "/"}
             onPointerEnter={() => {
-              void preloadRouteByPath(to);
+              warmTabRoute(to);
             }}
             onFocus={() => {
-              void preloadRouteByPath(to);
+              warmTabRoute(to);
             }}
             onTouchStart={() => {
-              void preloadRouteByPath(to);
+              warmTabRoute(to);
             }}
             onClick={() => {
               markBottomNavTransitionStart(to);
+              warmTabRoute(to);
             }}
             className={({ isActive }) => cn(
               BOTTOM_NAV_ITEM_BASE_CLASS,

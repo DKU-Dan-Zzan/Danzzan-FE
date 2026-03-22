@@ -15,6 +15,7 @@ import {
   registerRoutePreloader,
 } from "@/lib/navigation/routePreload";
 import { markBottomNavTransitionComplete } from "@/lib/perf/navTiming";
+import { prefetchBottomNavTabData } from "@/lib/query/prefetchTabData";
 import { buildLoginRedirectPath, buildReturnTo } from "@/routes/common/authGuard";
 import AppLayout from "./components/layout/AppLayout";
 import Home from "./routes/home/Home";
@@ -104,6 +105,7 @@ function App() {
 
     const timeoutId = window.setTimeout(() => {
       void preloadBottomNavLazyRoutes();
+      void prefetchBottomNavTabData();
     }, 200);
 
     return () => {

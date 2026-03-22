@@ -13,10 +13,13 @@ describe("BottomNav preload policy", () => {
   it("BottomNav는 탭 intent 이벤트에서 라우트 preload를 호출한다", () => {
     const source = readSource("src/components/layout/BottomNav.tsx");
 
+    expect(source).toContain('import { prefetchTabDataByPath } from "@/lib/query/prefetchTabData";');
+    expect(source).toContain("const warmTabRoute = (routePath: string) => {");
     expect(source).toContain("onPointerEnter={() =>");
     expect(source).toContain("onFocus={() =>");
     expect(source).toContain("onTouchStart={() =>");
-    expect(source).toContain("void preloadRouteByPath(to);");
+    expect(source).toContain("void preloadRouteByPath(routePath);");
+    expect(source).toContain("void prefetchTabDataByPath(routePath);");
   });
 
   it("routePreload 유틸은 하단 탭 lazy 대상 경로를 관리한다", () => {
@@ -35,5 +38,6 @@ describe("BottomNav preload policy", () => {
     expect(source).toContain("registerRoutePreloader(\"/map\", BoothMap.preload)");
     expect(source).toContain("registerRoutePreloader(\"/mypage\", MyPage.preload)");
     expect(source).toContain("void preloadBottomNavLazyRoutes()");
+    expect(source).toContain("void prefetchBottomNavTabData()");
   });
 });

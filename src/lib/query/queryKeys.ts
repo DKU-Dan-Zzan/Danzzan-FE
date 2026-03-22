@@ -27,6 +27,7 @@ export const appQueryKeys = {
   boothMapPubDetail: (pubId: number) => ["boothmap", "pub-detail", { pubId }] as const,
   myTicketList: () => ["ticketing", "my-ticket", "list"] as const,
   myTicketAd: () => ["ticketing", "my-ticket", "ad"] as const,
+  myPageProfile: () => ["mypage", "profile"] as const,
   ticketingQueueStatus: (eventId: string) => ["ticketing", "queue-status", { eventId }] as const,
   ticketingWristbandStats: (eventId: string) => ["ticketing", "wristband-stats", { eventId }] as const,
   noticeList: (params: NoticeListKeyParams) => ["notice", "list", params] as const,
