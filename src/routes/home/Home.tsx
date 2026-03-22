@@ -52,7 +52,8 @@ function Home() {
   const emergencyNoticeQuery = useAppQuery({
     queryKey: appQueryKeys.homeEmergencyNotice(),
     queryFn: ({ signal }) => getEmergencyNotice({ signal }),
-    staleTime: 30_000,
+    staleTime: 0,
+    refetchOnMount: "always",
   })
 
   const homeBottomAdQuery = useAppQuery({
@@ -96,7 +97,7 @@ function Home() {
       id: emergencyNoticeQuery.data.id,
       title: "긴급공지 및 내용",
       content: emergencyNoticeQuery.data.content,
-      updatedAt: emergencyNoticeQuery.data.updatedAt,
+      updatedAt: emergencyNoticeQuery.data.updatedAt ?? undefined,
     }
   }, [emergencyNoticeQuery.data])
 

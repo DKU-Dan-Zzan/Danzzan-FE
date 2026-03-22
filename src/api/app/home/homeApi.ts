@@ -14,9 +14,7 @@ export type HomeImageDto = {
 export type EmergencyNoticeDto = {
   id: number
   content: string
-  createdAt: string
-  updatedAt: string
-  isActive: boolean
+  updatedAt?: string | null
 }
 
 export type LineupImageDto = {

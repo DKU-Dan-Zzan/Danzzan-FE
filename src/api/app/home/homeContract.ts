@@ -121,7 +121,11 @@ export const parseEmergencyNoticeContract = (
   endpoint: string,
 ): EmergencyNoticeDto | null => {
   const unwrapped = unwrapEnvelope(payload)
-  if (unwrapped === null) {
+  if (
+    unwrapped === null ||
+    unwrapped === undefined ||
+    (typeof unwrapped === "string" && !unwrapped.trim())
+  ) {
     return null
   }
 
@@ -131,25 +135,17 @@ export const parseEmergencyNoticeContract = (
 
   const id = readNumber(unwrapped, "id")
   const content = readString(unwrapped, "content")
-  const createdAt = readString(unwrapped, "createdAt")
-  const updatedAt = readString(unwrapped, "updatedAt")
-  const isActive = unwrapped.isActive
+  const updatedAtRaw = readOptionalString(unwrapped, "updatedAt")
+  const updatedAt =
+    typeof updatedAtRaw === "string" ? updatedAtRaw.trim() || null : (updatedAtRaw ?? null)
 
-  if (
-    id === undefined ||
-    !content ||
-    !createdAt ||
-    !updatedAt ||
-    typeof isActive !== "boolean"
-  ) {
+  if (id === undefined || !content) {
     throw new HomeContractError(endpoint, "긴급 공지 응답 필수 필드가 누락되었습니다.")
   }
 
   return {
     id,
     content,
-    createdAt,
     updatedAt,
-    isActive,
   }
 }

@@ -19,8 +19,44 @@ describe("homeContract", () => {
     expect(parseEmergencyNoticeContract(null, "/home/emergencyNotice")).toBeNull();
   });
 
+  it("홈 긴급 공지 응답(id/content/updatedAt)을 파싱한다", () => {
+    expect(
+      parseEmergencyNoticeContract(
+        {
+          id: 1,
+          content: "우천 시 일부 공연이 지연될 수 있습니다.",
+          updatedAt: "52분 전",
+        },
+        "/home/emergencyNotice",
+      ),
+    ).toEqual({
+      id: 1,
+      content: "우천 시 일부 공연이 지연될 수 있습니다.",
+      updatedAt: "52분 전",
+    });
+  });
+
+  it("홈 긴급 공지의 updatedAt 누락을 허용한다", () => {
+    expect(
+      parseEmergencyNoticeContract(
+        {
+          id: 1,
+          content: "공지 내용",
+        },
+        "/home/emergencyNotice",
+      ),
+    ).toEqual({
+      id: 1,
+      content: "공지 내용",
+      updatedAt: null,
+    });
+  });
+
+  it("홈 긴급 공지 204(empty string) 응답을 허용한다", () => {
+    expect(parseEmergencyNoticeContract("", "/home/emergencyNotice")).toBeNull();
+  });
+
   it("필수 필드 누락 시 HomeContractError를 던진다", () => {
     expect(() => parseHomeImagesContract([{ id: 1 }], "/home/images")).toThrow(HomeContractError);
   });
 });
-
