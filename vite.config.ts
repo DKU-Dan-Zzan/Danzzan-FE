@@ -4,6 +4,46 @@ import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
 import { VitePWA } from "vite-plugin-pwa"
 
+const resolveManualChunk = (id: string) => {
+  if (!id.includes("node_modules")) {
+    return undefined
+  }
+
+  if (id.includes("/mapbox-gl/")) {
+    return "mapbox"
+  }
+
+  if (
+    id.includes("/@remix-run/router/") ||
+    id.includes("/react-router/") ||
+    id.includes("/react-router-dom/")
+  ) {
+    return "router"
+  }
+
+  if (
+    id.includes("/react-dom/") ||
+    id.includes("/react/") ||
+    id.includes("/scheduler/")
+  ) {
+    return "react-vendor"
+  }
+
+  if (id.includes("/@tanstack/")) {
+    return "react-query"
+  }
+
+  if (id.includes("/axios/")) {
+    return "http"
+  }
+
+  if (id.includes("/tailwind-merge/")) {
+    return "tailwind-merge"
+  }
+
+  return undefined
+}
+
 const resolveProxyTarget = (env: Record<string, string>) => {
   const explicitTarget = env.VITE_PROXY_TARGET?.trim()
   if (explicitTarget) {
@@ -71,9 +111,7 @@ export default defineConfig(({ mode }) => {
       chunkSizeWarningLimit: 1750,
       rollupOptions: {
         output: {
-          manualChunks: {
-            mapbox: ["mapbox-gl"],
-          },
+          manualChunks: resolveManualChunk,
         },
       },
     },
