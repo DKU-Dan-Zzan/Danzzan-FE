@@ -158,7 +158,7 @@ export function TicketingHomePanel({
             </section>
           ))}
         </div>
-        <section className="mt-4 border-t border-[var(--border-subtle)] pt-4">
+        <section className="border-t border-[var(--border-subtle)] pt-4">
           <h4 className={`${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--accent)]`}>
             💡 유의사항
           </h4>
