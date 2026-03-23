@@ -11,6 +11,30 @@ const setAdminSession = (session: AuthSession): void => {
   authStore.setSession(session, "admin");
 };
 
+export function resolveAdminLoginErrorMessage(error: unknown): string {
+  const status =
+    typeof error === "object" &&
+    error !== null &&
+    "status" in error &&
+    typeof (error as { status?: unknown }).status === "number"
+      ? (error as { status: number }).status
+      : null;
+
+  if (status === 401) {
+    return "학번 또는 비밀번호가 올바르지 않습니다.";
+  }
+
+  if (status === 403) {
+    return "관리자 권한이 없는 계정입니다.";
+  }
+
+  if (error instanceof Error && error.message.trim().length > 0) {
+    return error.message;
+  }
+
+  return "로그인에 실패했습니다.";
+}
+
 export function useAdminAuth() {
   const state = useSyncExternalStore(
     authStore.subscribe,
@@ -25,10 +49,15 @@ export function useAdminAuth() {
       throw new Error("학번과 비밀번호를 입력해 주세요.");
     }
 
-    const session = await adminAuthApi.login({
-      studentId: studentNumber.trim(),
-      password,
-    });
+    let session: AuthSession;
+    try {
+      session = await adminAuthApi.login({
+        studentId: studentNumber.trim(),
+        password,
+      });
+    } catch (error) {
+      throw new Error(resolveAdminLoginErrorMessage(error));
+    }
     requireAdminRole(session.tokens.accessToken);
     setAdminSession(session);
   }, []);
