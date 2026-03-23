@@ -12,6 +12,10 @@ const AD_SLOT_MAX_WIDTH_CLASS = "max-w-[var(--ticketing-ad-slot-max-width)]";
 const AD_SLOT_ASPECT_RATIO_CLASS = "aspect-[16/4.7]";
 const AD_LINK_FOCUS_VISIBLE_CLASS =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]";
+const AD_IMAGE_ONLY_FRAME_CLASS =
+  "overflow-hidden border border-[var(--timetable-card-border)] bg-[var(--timetable-card-bg)]";
+const AD_IMAGE_ONLY_IMAGE_CLASS = "block h-[70px] w-full object-cover";
+const AD_IMAGE_ONLY_SLOT_CLASS = "w-full bg-[var(--surface-subtle)]";
 
 const buildVersionedImageUrl = (imageUrl: string, updatedAt: string): string => {
   if (!imageUrl) {
@@ -27,12 +31,36 @@ const buildVersionedImageUrl = (imageUrl: string, updatedAt: string): string => 
 
 interface TicketingAdBannerCardProps {
   ad: PlacementAd | null;
+  variant?: "card" | "imageOnly";
 }
 
-export function TicketingAdBannerCard({ ad }: TicketingAdBannerCardProps) {
+export function TicketingAdBannerCard({ ad, variant = "card" }: TicketingAdBannerCardProps) {
   const adImageUrl = ad ? buildVersionedImageUrl(ad.imageUrl, ad.updatedAt) : AD_PLACEHOLDER_IMAGE;
   const adAlt = ad?.altText?.trim() || "단짠 대기열 광고";
   const adLink = ad?.linkUrl?.trim() || null;
+
+  if (variant === "imageOnly") {
+    return (
+      <div className={AD_IMAGE_ONLY_FRAME_CLASS}>
+        {adLink ? (
+          <a
+            href={adLink}
+            target="_blank"
+            rel="noreferrer"
+            className={cn("block", AD_LINK_FOCUS_VISIBLE_CLASS)}
+          >
+            <div className={AD_IMAGE_ONLY_SLOT_CLASS}>
+              <img src={adImageUrl} alt={adAlt} className={AD_IMAGE_ONLY_IMAGE_CLASS} loading="lazy" />
+            </div>
+          </a>
+        ) : (
+          <div className={AD_IMAGE_ONLY_SLOT_CLASS}>
+            <img src={adImageUrl} alt={adAlt} className={AD_IMAGE_ONLY_IMAGE_CLASS} loading="lazy" />
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <Card className={cn(TICKETING_CLASSES.card.summaryInfo, "gap-1.5 px-3 py-2.5")}>

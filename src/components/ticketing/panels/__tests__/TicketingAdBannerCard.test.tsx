@@ -29,4 +29,12 @@ describe("TicketingAdBannerCard", () => {
     expect(markup).toContain("focus-visible:ring-2");
     expect(markup).toContain("focus-visible:ring-[var(--ring)]");
   });
+
+  it("내 티켓용 imageOnly 변형은 이미지 단독 배너 스타일을 사용한다", () => {
+    const markup = renderToStaticMarkup(<TicketingAdBannerCard ad={null} variant="imageOnly" />);
+
+    expect(markup).toContain("border-[var(--timetable-card-border)]");
+    expect(markup).toContain("h-[70px]");
+    expect(markup).not.toContain("max-w-[var(--ticketing-ad-slot-max-width)]");
+  });
 });
