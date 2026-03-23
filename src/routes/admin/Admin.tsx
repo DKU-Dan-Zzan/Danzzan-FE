@@ -704,7 +704,7 @@ function Admin() {
         }}
       >
         {editingNotice && (
-          <DialogContent className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-[var(--surface)] p-5 shadow-xl">
+          <DialogContent className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-5 shadow-xl">
             <DialogTitle className="text-base font-bold text-[var(--text)]">
               {editingNotice.id ? "공지 수정" : "새 공지 등록"}
             </DialogTitle>
