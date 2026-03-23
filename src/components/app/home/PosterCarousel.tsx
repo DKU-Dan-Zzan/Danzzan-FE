@@ -42,7 +42,7 @@ export default function PosterCarousel({
   if (count === 0) {
     return (
       <section className="mx-auto w-full max-w-[var(--home-content-max-width)]">
-        <div className="relative overflow-hidden rounded-[var(--home-card-radius)] border border-[var(--home-card-border)] bg-[var(--home-poster-placeholder-bg)] shadow-[var(--home-poster-placeholder-shadow)]">
+        <div className="relative overflow-hidden rounded-none border border-[var(--home-card-border)] bg-[var(--home-poster-placeholder-bg)] shadow-[var(--home-poster-placeholder-shadow)]">
           <div className="flex items-center justify-center" style={{ aspectRatio: aspect }}>
             <div className="text-center">
               <div className="text-[15px] leading-[1.3] font-semibold text-[var(--text)]">
@@ -61,7 +61,7 @@ export default function PosterCarousel({
   return (
     <section className="mx-auto w-full max-w-[var(--home-content-max-width)]">
       {/* 포스터 카드 */}
-      <div className="relative overflow-hidden rounded-[var(--home-card-radius)] border border-[var(--home-card-border)] bg-[var(--home-card-bg)] shadow-[var(--home-poster-card-shadow)]">
+      <div className="relative overflow-hidden rounded-none border border-[var(--home-card-border)] bg-[var(--home-card-bg)] shadow-[var(--home-poster-card-shadow)]">
         {/* 비율 고정 */}
         <div style={{ aspectRatio: aspect }}>
           {/* 슬라이드 트랙 */}
