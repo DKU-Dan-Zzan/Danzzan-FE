@@ -75,9 +75,9 @@ export default function AdminLogin() {
               <p className="text-sm font-semibold text-[var(--text-muted)]">
                 관리자 전용
               </p>
-              <h2 className="text-[30px] font-black leading-tight tracking-[-0.02em] text-[var(--text)] md:text-[34px]">
+              <h1 className="text-[30px] font-black leading-tight tracking-[-0.02em] text-[var(--text)] md:text-[34px]">
                 팔찌 배부 운영 시스템
-              </h2>
+              </h1>
               <p className="text-sm text-[var(--admin-auth-subtext)]">
                 관리자 계정 인증 후 현장 운영 페이지로 이동합니다.
               </p>
