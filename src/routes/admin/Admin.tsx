@@ -51,6 +51,10 @@ import {
   ADMIN_SECONDARY_ACTION_BUTTON_CLASS,
 } from "@/routes/admin/adminStyleClasses";
 
+const ADMIN_PINNED_NOTICE_ROW_CLASS = "bg-[#FFF1ED]";
+const ADMIN_PINNED_NOTICE_BADGE_CLASS =
+  "inline-flex items-center gap-1 rounded-full bg-[#FF7F66] px-2 py-0.5 text-[10px] font-semibold text-white";
+
 function Admin() {
   const navigate = useNavigate();
   const { logout } = useAdminAuth();
@@ -381,10 +385,10 @@ function Admin() {
                   </tr>
                 )}
                 {effectivePinned.map((notice, index) => (
-                  <tr key={notice.id} className="bg-[var(--status-warning-bg)]">
+                  <tr key={notice.id} className={ADMIN_PINNED_NOTICE_ROW_CLASS}>
                     <td className="px-4 py-2 align-middle">
                       <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--status-warning)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-on-accent)]">
+                        <span className={ADMIN_PINNED_NOTICE_BADGE_CLASS}>
                           <span>📌</span>
                           <span>상단 고정</span>
                         </span>
