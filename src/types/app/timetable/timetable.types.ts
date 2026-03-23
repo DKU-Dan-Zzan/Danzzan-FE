@@ -1,3 +1,5 @@
+// 역할: 타임테이블 API와 화면 모델 간 공용 타입 계약을 정의한다.
+
 export type Performance = {
   performanceId: number
   startTime: string

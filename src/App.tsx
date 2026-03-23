@@ -1,3 +1,5 @@
+// 역할: 앱·티켓팅 라우트와 레이아웃 경계를 조합하는 최상위 라우터 컴포넌트를 정의한다.
+
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import {
   lazy,

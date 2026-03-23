@@ -1,3 +1,5 @@
+// 역할: 앱 전역 인증 사용자 상태를 보관하고 갱신하는 Zustand 스토어를 정의한다.
+
 import { resolveRoleFromAccessToken } from "@/api/common/authCore";
 import { logAuthWarn } from "@/api/common/authLogger";
 import {

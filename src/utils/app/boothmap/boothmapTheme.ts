@@ -1,3 +1,5 @@
+// 역할: 부스맵 카테고리별 색상/아이콘 테마 매핑 유틸을 제공한다.
+
 export type BoothmapMarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "EVENT" | "FACILITY";
 export type BoothmapZoneType = "PUB" | "FOOD_TRUCK";
 export type BoothmapLabelKind = "booth" | "college";

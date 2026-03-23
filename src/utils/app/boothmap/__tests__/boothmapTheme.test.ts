@@ -1,3 +1,5 @@
+// 역할: boothmapTheme 유틸의 색상/아이콘 매핑 규칙을 검증하는 테스트다.
+
 import { describe, expect, it } from "vitest";
 import {
   getBoothmapColor,

@@ -1,3 +1,5 @@
+// 역할: 타임테이블 화면에서 사용하는 날짜/시간 포맷 유틸을 제공한다.
+
 import type { Performance } from "@/types/app/timetable/timetable.types";
 
 /** Date -> YYYY-MM-DD */

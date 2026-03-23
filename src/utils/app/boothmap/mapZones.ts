@@ -1,3 +1,5 @@
+// 역할: 부스맵 좌표를 캠퍼스 존 단위로 분류하는 계산 유틸을 제공한다.
+
 export type MapZoneType = "PUB" | "FOOD_TRUCK";
 
 export type MapZonePoint = {

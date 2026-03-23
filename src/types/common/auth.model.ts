@@ -1,3 +1,5 @@
+// 역할: 인증 도메인에서 공유하는 사용자/세션 모델 타입을 정의한다.
+
 export type UserRole = "student" | "admin";
 
 export interface AuthTokens {

@@ -1,3 +1,5 @@
+// 역할: 공통 환경변수 값을 안전하게 읽기 위한 접근 유틸을 제공한다.
+
 import {
   normalizeEnvValue,
   resolveApiBaseUrl,

@@ -1,3 +1,5 @@
+// 역할: index.css 전역 선택자와 핵심 토큰 선언의 존재를 검증하는 테스트다.
+
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";

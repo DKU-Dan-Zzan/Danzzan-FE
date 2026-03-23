@@ -1,3 +1,5 @@
+// 역할: 카카오맵 SDK 객체와 오버레이 사용을 위한 타입 선언을 제공한다.
+
 export type KakaoLatLng = {
   getLat: () => number;
   getLng: () => number;
