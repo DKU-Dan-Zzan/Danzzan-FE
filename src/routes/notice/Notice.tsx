@@ -279,7 +279,10 @@ function Notice() {
         }}
       >
         {isDetailOpen && (
-          <DialogContent className="max-h-[90vh] w-full max-w-xl overflow-hidden rounded-3xl bg-[var(--surface)] p-0 shadow-[0_18px_45px_var(--shadow-color)]">
+          <DialogContent
+            showCloseButton={false}
+            className="max-h-[90vh] w-full max-w-xl overflow-hidden rounded-3xl bg-white p-0 shadow-[0_18px_45px_var(--shadow-color)]"
+          >
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] px-5 py-3.5">
               <DialogTitle className="text-[13px] font-semibold text-[var(--text)]">공지 상세</DialogTitle>
               <button
