@@ -288,7 +288,7 @@ function Notice() {
               <button
                 type="button"
                 onClick={handleCloseDetail}
-                className="rounded-full bg-[var(--surface-subtle)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-muted)]"
+                className="rounded-full border border-[var(--border-subtle)] bg-[var(--surface-subtle)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-muted)]"
               >
                 닫기
               </button>
