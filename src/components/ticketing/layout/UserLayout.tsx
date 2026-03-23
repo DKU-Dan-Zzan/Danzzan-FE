@@ -54,6 +54,9 @@ export function UserLayout() {
     : isTicketingAuthPage
       ? "pt-1"
       : "pt-[var(--app-header-first-card-gap)]";
+  const mainClassName = showHeader
+    ? "flex-1 overflow-x-hidden pt-[calc(env(safe-area-inset-top)+4rem)]"
+    : "flex-1 overflow-x-hidden";
 
   return (
     <AppShell
@@ -62,7 +65,7 @@ export function UserLayout() {
           <AppTopBar
             title={pageTitle}
             showSafeAreaOverlay
-            headerClassName="sticky top-0 z-40 border-b border-[var(--app-header-border)] bg-[var(--app-header-bg)] [background-image:var(--app-header-bg-gradient)] bg-no-repeat bg-[length:100%_100%] pt-[env(safe-area-inset-top)]"
+            headerClassName="fixed inset-x-0 top-0 z-40 border-b border-[var(--app-header-border)] bg-[var(--app-header-bg)] [background-image:var(--app-header-bg-gradient)] bg-no-repeat bg-[length:100%_100%] pt-[env(safe-area-inset-top)]"
             containerClassName="relative mx-auto h-16 w-full max-w-md px-4"
           >
             <button
@@ -80,7 +83,7 @@ export function UserLayout() {
       bottomNav={<BottomNav />}
       rootClassName="min-h-dvh overflow-x-hidden bg-[var(--bg-base)]"
       frameClassName="mx-auto flex min-h-dvh w-full max-w-[var(--app-mobile-shell-max-width)] flex-col bg-[var(--bg-base)] pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]"
-      mainClassName="flex-1 overflow-x-hidden"
+      mainClassName={mainClassName}
     >
       <div
         className={
