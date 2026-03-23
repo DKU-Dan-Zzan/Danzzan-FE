@@ -19,6 +19,13 @@ function formatDate(dateString: string) {
   return year + "." + month + "." + day;
 }
 
+function formatNoticeAuthor(author: string) {
+  if (author.trim() === "총학생회") {
+    return "LOU:D 총학생회";
+  }
+  return author;
+}
+
 const NOTICE_LIST_CARD_BASE_CLASS =
   "group flex w-full items-center justify-between rounded-[18px] px-4 py-3 text-left transition-transform active:scale-[0.99]";
 const NOTICE_LIST_CARD_PINNED_CLASS =
@@ -326,7 +333,7 @@ function Notice() {
                       {detailNotice.title}
                     </h2>
                     <div className="mt-2 flex items-center justify-between text-[11px] text-[var(--text-muted)]">
-                      <span>{detailNotice.author}</span>
+                      <span>{formatNoticeAuthor(detailNotice.author)}</span>
                       <span>{formatDate(detailNotice.createdAt)}</span>
                     </div>
                   </header>
