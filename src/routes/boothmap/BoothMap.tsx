@@ -385,7 +385,7 @@ export default function BoothMap() {
           TOP_PANEL_Z_INDEX_CLASS[sheetSnap],
         )}
       >
-        <div className="rounded-[28px] border border-[var(--boothmap-panel-border)] bg-[var(--boothmap-panel-bg)] px-4 py-3 shadow-[var(--boothmap-panel-shadow)] backdrop-blur-md">
+        <div className="rounded-[28px] border border-[var(--boothmap-panel-border)] bg-[var(--boothmap-panel-bg)] px-3 py-2 shadow-[var(--boothmap-panel-shadow)] backdrop-blur-md">
           <FestivalDateTabs
             dates={FESTIVAL_DATES}
             selectedDate={selectedDate}

@@ -14,7 +14,7 @@ const chips: Array<{ label: string; value: PrimaryFilter }> = [
 ];
 
 const CHIP_BASE_CLASS =
-  "shrink-0 rounded-full border px-4 py-2 text-sm font-extrabold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--boothmap-surface)]";
+  "shrink-0 rounded-full border px-3 py-2 text-sm font-extrabold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--boothmap-surface)]";
 const CHIP_ACTIVE_CLASS =
   "border-[var(--boothmap-marker-pub)] bg-[var(--boothmap-marker-pub)] text-[var(--boothmap-overlay-badge-text)] shadow-[0_1px_2px_var(--boothmap-overlay-shadow)]";
 const CHIP_INACTIVE_CLASS =
@@ -29,7 +29,7 @@ export default function PrimaryFilterChips({
 }) {
   return (
     <div className="-mx-1 overflow-x-auto px-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <div className="flex w-max gap-2">
+      <div className="flex w-max gap-1.5">
         {chips.map((c) => {
           const active = value === c.value;
 

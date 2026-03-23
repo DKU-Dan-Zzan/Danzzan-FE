@@ -4,7 +4,7 @@
 import type { College } from "@/types/app/boothmap/boothmap.types";
 
 const CHIP_BASE_CLASS =
-  "shrink-0 rounded-full border px-4 py-2 text-sm font-extrabold transition";
+  "shrink-0 rounded-full border px-3 py-2 text-sm font-extrabold transition";
 const CHIP_ACTIVE_CLASS =
   "border-[var(--boothmap-marker-pub)] bg-[var(--boothmap-marker-pub)] text-[var(--boothmap-overlay-badge-text)] shadow-[0_1px_2px_var(--boothmap-overlay-shadow)]";
 const CHIP_INACTIVE_CLASS =
@@ -24,7 +24,7 @@ export default function SecondaryCollegeChips({
   if (!visible) return null;
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div className="flex gap-1.5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       <button
         type="button"
         onClick={() => onSelect(null)}

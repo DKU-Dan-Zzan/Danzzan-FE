@@ -60,6 +60,15 @@ describe("Tailwind source conventions", () => {
 
     expect(source).toContain("cn(");
     expect(source).not.toContain(".join(\" \")");
+    expect(source).toContain("px-3 py-2 text-sm");
+    expect(source).toContain("gap-1.5");
+  });
+
+  it("SecondaryCollegeChips는 축소된 칩 간격/패딩을 유지한다", () => {
+    const source = readSource("src/components/app/boothmap/SecondaryCollegeChips.tsx");
+
+    expect(source).toContain("px-3 py-2 text-sm");
+    expect(source).toContain("flex gap-1.5");
   });
 
   it("TicketingApp 루트 클래스는 join 대신 cn 합성을 사용한다", () => {
@@ -102,5 +111,6 @@ describe("Tailwind source conventions", () => {
     expect(source).toContain("opacity-100 translate-x-0 scale-100");
     expect(source).toContain("opacity-0 -translate-x-1 scale-[0.985]");
     expect(source).toContain("opacity-0 translate-x-1 scale-[0.985]");
+    expect(source).toContain("px-3 py-2");
   });
 });
