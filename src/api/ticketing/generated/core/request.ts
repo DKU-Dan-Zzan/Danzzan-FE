@@ -1,4 +1,5 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+﻿// 역할: 생성 API 메서드가 공통으로 사용하는 HTTP 요청 실행기를 제공합니다.
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */

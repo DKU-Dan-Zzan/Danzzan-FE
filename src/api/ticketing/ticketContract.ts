@@ -1,3 +1,4 @@
+// 역할: 티켓팅 API 응답 DTO를 런타임 검증하고 도메인 친화 구조로 정규화합니다.
 import type {
   TicketQueueEnterResponseDto,
   TicketQueueStatusResponseDto,

@@ -1,0 +1,56 @@
+name: Frontend Quality Check
+
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "scripts/**"
+      - "config/**"
+      - "docs/**"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig*.json"
+      - "vite.config.ts"
+      - "eslint.config.js"
+      - ".github/workflows/frontend-quality-check.yml"
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Structure Report
+        run: npm run lint:structure:report
+
+      - name: Dependency Cycles
+        run: npm run check:deps-cycles
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Typecheck (tests)
+        run: npm run typecheck:test
+
+      - name: Test (coverage gate)
+        run: npm run test:coverage
+
+      - name: Build
+        run: npm run build
+
+      - name: Bundle Budget
+        run: npm run check:bundle-budget

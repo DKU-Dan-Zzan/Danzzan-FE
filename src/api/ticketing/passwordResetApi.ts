@@ -1,5 +1,6 @@
+// 역할: 티켓팅 비밀번호 재설정 플로우의 검증/변경 API를 제공합니다.
 import { createHttpClient } from "@/api/ticketing/httpClient";
-import { env, requireEnv } from "@/utils/ticketing/env";
+import { env, requireEnv } from "@/utils/common/env";
 
 type RequestResetCodeResponse = {
   requestId?: string;

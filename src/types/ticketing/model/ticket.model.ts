@@ -1,4 +1,5 @@
-﻿export type TicketStatus = "issued" | "used" | "cancelled" | "unknown";
+﻿// 역할: 티켓팅 플로우에서 사용하는 티켓·이벤트·대기열 도메인 모델 타입을 정의합니다.
+export type TicketStatus = "issued" | "used" | "cancelled" | "unknown";
 
 export interface Ticket {
   id: string;

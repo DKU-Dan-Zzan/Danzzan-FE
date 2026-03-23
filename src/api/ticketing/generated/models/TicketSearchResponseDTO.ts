@@ -1,7 +1,8 @@
+// 역할: OpenAPI 생성 모델 TicketSearchResponseDTO 타입을 정의합니다.
 /* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
-/* eslint-disable */
+ 
 import type { TicketSearchItemDTO } from './TicketSearchItemDTO';
 /**
  * 학생 학번 기준 티켓 조회 응답

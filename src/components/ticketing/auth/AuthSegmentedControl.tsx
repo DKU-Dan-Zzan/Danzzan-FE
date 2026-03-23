@@ -1,6 +1,7 @@
+// 역할: 티켓팅 인증 화면의 탭 전환용 세그먼트 컨트롤 UI를 제공합니다.
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { cn } from "@/components/ticketing/common/ui/utils";
+import { cn } from "@/components/common/ui/utils";
 
 type AuthTab = "login" | "signup";
 
@@ -19,6 +20,8 @@ export function AuthSegmentedControl({ activeTab }: AuthSegmentedControlProps) {
     const from = (location.state as { authTabFrom?: AuthTab } | null)?.authTabFrom;
 
     if (!from || from === activeTab) {
+      // Existing animation flow intentionally updates local indicator state during effect.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIndicatorIndex(activeIndex);
       return;
     }

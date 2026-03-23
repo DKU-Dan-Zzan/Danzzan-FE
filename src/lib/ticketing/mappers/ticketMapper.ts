@@ -1,4 +1,5 @@
-﻿import type {
+﻿// 역할: 티켓/이벤트/대기열 DTO를 UI 소비용 도메인 모델로 정규화합니다.
+import type {
   TicketDto,
   TicketEventDto,
   TicketEventListResponseDto,

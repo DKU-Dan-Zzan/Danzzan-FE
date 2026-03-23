@@ -1,3 +1,4 @@
+// 역할: 대기열 진입·상태조회·예매·내 티켓 조회를 포함한 티켓팅 핵심 API를 제공합니다.
 import { createHttpClient } from "@/api/ticketing/httpClient";
 import {
   normalizeQueueEnterContract,
@@ -12,7 +13,7 @@ import {
   mapTicketListDtoToModel,
   mapTicketReservationDtoToModel,
 } from "@/lib/ticketing/mappers/ticketMapper";
-import { authStore } from "@/store/ticketing/authStore";
+import { authStore } from "@/store/common/authStore";
 import type {
   TicketEventListResponseDto,
   TicketListResponseDto,
@@ -27,7 +28,7 @@ import type {
   TicketingEvent,
   TicketReservationResult,
 } from "@/types/ticketing/model/ticket.model";
-import { env, requireEnv } from "@/utils/ticketing/env";
+import { env, requireEnv } from "@/utils/common/env";
 
 const getTicketingClient = () =>
   createHttpClient({
@@ -36,11 +37,40 @@ const getTicketingClient = () =>
       "VITE_TICKETING_API_BASE_URL (or VITE_API_BASE_URL)",
     ),
     getAccessToken: authStore.getAccessToken,
+    refreshAccessToken: authStore.refreshAccessToken,
+    clearSession: authStore.clear,
+    refreshKey: "ticketing-auth",
   });
 
 type ApiEnvelope<T> = {
   data?: T | null;
 } & Record<string, unknown>;
+
+const readTicketEventListDto = (
+  payload: TicketEventListResponseDto | ApiEnvelope<TicketEventListResponseDto>,
+): TicketEventListResponseDto => {
+  try {
+    return unwrapApiObjectEnvelope<TicketEventListResponseDto>(payload, "/tickets/events");
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "응답 형식 오류";
+    throw new Error(
+      `티켓 이벤트 목록 응답 형식 검증에 실패했습니다. 백엔드 계약을 확인해 주세요. (${message})`,
+    );
+  }
+};
+
+const readMyTicketListDto = (
+  payload: TicketListResponseDto | ApiEnvelope<TicketListResponseDto>,
+): TicketListResponseDto => {
+  try {
+    return unwrapApiObjectEnvelope<TicketListResponseDto>(payload, "/tickets/me");
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "응답 형식 오류";
+    throw new Error(
+      `내 티켓 목록 응답 형식 검증에 실패했습니다. 백엔드 계약을 확인해 주세요. (${message})`,
+    );
+  }
+};
 
 const addMinutesToIso = (minutes: number) => {
   return new Date(Date.now() + minutes * 60_000).toISOString();
@@ -158,9 +188,8 @@ export const ticketApi = {
     }
 
     const client = getTicketingClient();
-    // TODO(ticketing-api): Confirm endpoint path and response spec for student ticketing event list.
     const raw = await client.get<TicketEventListResponseDto | ApiEnvelope<TicketEventListResponseDto>>("/tickets/events");
-    const dto = unwrapApiObjectEnvelope<TicketEventListResponseDto>(raw, "/tickets/events");
+    const dto = readTicketEventListDto(raw);
     return mapTicketEventListDtoToModel(dto);
   },
 
@@ -350,15 +379,21 @@ export const ticketApi = {
     );
   },
 
-  getMyTickets: async (): Promise<Ticket[]> => {
+  getMyTickets: async (
+    options?: { signal?: AbortSignal },
+  ): Promise<Ticket[]> => {
     if (env.apiMode === "mock") {
       return mapTicketListDtoToModel(mockMyTicketsDto);
     }
 
     const client = getTicketingClient();
-    // TODO(ticketing-api): Confirm endpoint path for student my-ticket list.
-    const raw = await client.get<TicketListResponseDto | ApiEnvelope<TicketListResponseDto>>("/tickets/me");
-    const dto = unwrapApiObjectEnvelope<TicketListResponseDto>(raw, "/tickets/me");
+    const raw = await client.get<TicketListResponseDto | ApiEnvelope<TicketListResponseDto>>(
+      "/tickets/me",
+      {
+        signal: options?.signal,
+      },
+    );
+    const dto = readMyTicketListDto(raw);
     return mapTicketListDtoToModel(dto);
   },
 };

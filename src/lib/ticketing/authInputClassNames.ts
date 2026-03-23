@@ -1,5 +1,5 @@
-export const TICKETING_AUTH_INPUT_CLASS_NAME =
-  "h-11 rounded-2xl border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20";
-
-export const ADMIN_AUTH_INPUT_CLASS_NAME =
-  "h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 placeholder:text-[var(--text-muted)] transition-all duration-200 focus:outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20";
+// 역할: 티켓팅 인증 화면에서 공통 재사용하는 입력 Tailwind 클래스 상수를 제공합니다.
+export {
+  ADMIN_AUTH_INPUT_CLASS_NAME,
+  TICKETING_AUTH_INPUT_CLASS_NAME,
+} from "@/lib/common/authInputClassNames";

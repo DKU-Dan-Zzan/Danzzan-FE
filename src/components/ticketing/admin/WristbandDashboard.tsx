@@ -1,6 +1,7 @@
+// 역할: 팔찌 운영 대시보드의 날짜별 세션 카드와 상태 요약 UI를 렌더링합니다.
 import { useEffect, useMemo, useState } from "react";
-import { Card } from "@/components/ticketing/common/ui/card";
-import { Button } from "@/components/ticketing/common/ui/button";
+import { Card } from "@/components/common/ui/card";
+import { Button } from "@/components/common/ui/button";
 import { useWristband } from "@/hooks/ticketing/useWristband";
 import type { WristbandSession } from "@/types/ticketing/model/wristband.model";
 

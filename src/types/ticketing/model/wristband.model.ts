@@ -1,4 +1,5 @@
-﻿export interface WristbandStats {
+﻿// 역할: 관리자 팔찌 운영 화면에서 사용하는 도메인 모델 타입을 정의합니다.
+export interface WristbandStats {
   totalTickets: number;
   issuedCount: number;
   pendingCount: number;

@@ -1,4 +1,5 @@
-﻿export interface AuthLoginRequestDto {
+﻿// 역할: 티켓팅 인증 API 송수신 DTO 타입을 정의합니다.
+export interface AuthLoginRequestDto {
   studentId?: string;
   password?: string;
 }

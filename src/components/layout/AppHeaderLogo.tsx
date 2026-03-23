@@ -1,9 +1,10 @@
+// 역할: 앱 레이아웃 레이어의 App Header Logo 구성 컴포넌트를 제공합니다.
 type AppHeaderLogoProps = {
   className?: string;
 };
 
 const BASE_CLASS_NAME =
-  "pointer-events-none absolute top-[75%] left-1/2 h-[61px] w-[270px] -translate-x-1/2 -translate-y-1/2 object-cover object-[50%_58%] select-none";
+  "pointer-events-none absolute top-1/2 left-1/2 h-[50px] w-[220px] -translate-x-1/2 -translate-y-1/2 object-contain object-center select-none";
 
 export function AppHeaderLogo({ className }: AppHeaderLogoProps) {
   return (

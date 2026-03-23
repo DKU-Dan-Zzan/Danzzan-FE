@@ -1,6 +1,7 @@
+// 역할: 부스맵 개발/테스트에서 사용하는 목업 부스·단과대 데이터를 제공합니다.
 // API 연동 전 임시로 사용하는 부스맵 더미 데이터
 
-import type { Booth, College, Pub } from "../types/boothmap.types";
+import type { Booth, College, Pub } from "@/types/app/boothmap/boothmap.types";
 
 export const mockColleges: College[] = [
   { id: 1, name: "소융대", location_x: 127.1266, location_y: 37.3224 },

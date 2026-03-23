@@ -1,3 +1,4 @@
+// 역할: 팔찌 운영 화면 개발/테스트에 사용하는 목 데이터 세트를 제공합니다.
 import type {
   WristbandAttendee,
   WristbandSession,
@@ -104,7 +105,16 @@ export const wristbandMock = {
     const scoped = getAttendeesByEvent(eventId);
     const found = scoped.find((a) => a.studentId === studentId.trim());
     if (!found) return null;
-    const { eventId: _, ...attendee } = found;
+    const attendee: WristbandAttendee = {
+      ticketId: found.ticketId,
+      studentId: found.studentId,
+      name: found.name,
+      college: found.college,
+      department: found.department,
+      hasWristband: found.hasWristband,
+      issuedAt: found.issuedAt,
+      issuerAdminName: found.issuerAdminName,
+    };
     return attendee;
   },
   issueWristband: (keyword: string, eventId: string): void => {
