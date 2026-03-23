@@ -688,7 +688,14 @@ function Admin() {
             </div>
           </div>
 
-        {adLoading && (
+          <div className="mt-3 space-y-1 text-[11px] text-[var(--text-muted)]">
+            <p>※ 홈 배너 슬롯 기준 권장 비율: 9:2 (약 4.49:1), 권장 크기: 1260×280px (최소 630×140px)</p>
+            <p>※ 내 티켓 배너 슬롯(높이 70px): iPhone 12~16 Pro(393px) 기준 약 361×70px(5.16:1), Galaxy S20+/S22/S23(360px) 기준 약 328×70px(4.69:1)</p>
+            <p>※ 현재 object-cover + 가변 너비 구조에서는 두 기기 모두 완전 무크롭이 되는 단일 비율을 만들 수 없습니다.</p>
+            <p>※ 비율이 다르면 잘릴 수 있으니, 주요 텍스트/로고는 중앙 안전영역(328×70 기준) 안쪽에 배치해 주세요.</p>
+          </div>
+
+          {adLoading && (
             <p className="mt-3 text-xs text-[var(--text-muted)]">광고 정보를 불러오는 중입니다...</p>
           )}
         </section>
