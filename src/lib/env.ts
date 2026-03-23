@@ -1,3 +1,5 @@
+// 역할: 환경 변수 읽기와 필수 키 검증 유틸을 제공한다.
+
 export type BackendTarget = "serverdb" | "compose";
 
 const DEFAULT_BACKEND_TARGET: BackendTarget = "serverdb";

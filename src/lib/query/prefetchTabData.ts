@@ -1,3 +1,5 @@
+// 역할: 탭 전환 전 필요한 데이터를 사전 조회하는 프리패치 유틸을 제공한다.
+
 import {
   getBoothMap,
   getPubs,

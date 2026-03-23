@@ -1,3 +1,5 @@
+// 역할: 관리자 인증 세션의 저장/복원 보조 로직을 제공한다.
+
 import { hasRequiredRole, resolveRoleFromAccessToken } from "@/api/common/authCore";
 import { authStore } from "@/store/common/authStore";
 

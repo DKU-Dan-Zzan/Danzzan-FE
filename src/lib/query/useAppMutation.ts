@@ -1,3 +1,5 @@
+// 역할: 앱 공통 Mutation 옵션과 에러 처리를 감싼 래퍼 훅을 제공한다.
+
 import {
   type MutationKey,
   type UseMutationOptions,

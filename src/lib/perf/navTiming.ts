@@ -1,3 +1,5 @@
+// 역할: 라우트 이동 구간의 성능 타이밍 측정 유틸을 제공한다.
+
 type NavTimingSummary = {
   route: string;
   samples: number;

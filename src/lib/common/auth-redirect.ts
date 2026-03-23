@@ -1,3 +1,5 @@
+// 역할: 인증 상태 기반 리다이렉트 경로 계산 로직을 제공한다.
+
 const DUMMY_ORIGIN = "http://dummy-auth";
 
 const isSafeInternalPath = (rawPath: string): boolean => {

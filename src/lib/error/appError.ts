@@ -1,3 +1,5 @@
+// 역할: API/도메인 오류를 화면 친화 메시지로 표준화하는 에러 모델을 정의한다.
+
 import axios from "axios";
 import { HttpError } from "@/api/common/httpClient";
 import { getErrorStatus } from "@/api/common/fetchAuth";

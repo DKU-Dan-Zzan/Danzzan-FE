@@ -1,3 +1,5 @@
+// 역할: 권한 상태에 따른 접근 제어 판단 로직을 제공한다.
+
 import {
   hasRequiredRole,
   isAccessTokenExpired,

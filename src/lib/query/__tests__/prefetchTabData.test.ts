@@ -1,3 +1,5 @@
+// 역할: prefetchTabData 모듈의 동작과 회귀 여부를 검증하는 테스트다.
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const {

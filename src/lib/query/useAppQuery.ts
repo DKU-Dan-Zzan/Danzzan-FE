@@ -1,3 +1,5 @@
+// 역할: 앱 공통 Query 옵션과 에러 정규화를 감싼 래퍼 훅을 제공한다.
+
 import {
   type QueryKey,
   type UseQueryOptions,

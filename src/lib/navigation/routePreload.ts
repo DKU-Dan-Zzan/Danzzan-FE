@@ -1,3 +1,5 @@
+// 역할: 라우트 preload 전략과 내비게이션 보조 유틸을 제공한다.
+
 export const BOTTOM_NAV_LAZY_PATHS = ["/notice", "/map", "/mypage"] as const;
 
 type BottomNavLazyPath = (typeof BOTTOM_NAV_LAZY_PATHS)[number];

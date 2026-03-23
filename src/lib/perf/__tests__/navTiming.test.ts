@@ -1,3 +1,5 @@
+// 역할: navTiming 모듈의 동작과 회귀 여부를 검증하는 테스트다.
+
 import { describe, expect, it } from "vitest";
 import { createNavTimingTracker } from "@/lib/perf/navTiming";
 

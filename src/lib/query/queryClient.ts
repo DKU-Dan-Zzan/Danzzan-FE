@@ -1,3 +1,5 @@
+// 역할: 애플리케이션 전역 QueryClient 기본 정책을 구성한다.
+
 import { QueryClient } from "@tanstack/react-query";
 import { normalizeAppError } from "@/lib/error/appError";
 
