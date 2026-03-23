@@ -280,7 +280,7 @@ function Admin() {
                 앱 노출 공지와 보관함 공지를 함께 관리할 수 있습니다.
               </p>
               <p className="mt-1 text-[11px] text-[var(--status-info-text)]">
-                보관함으로 이동한 공지는 학생용 앱 공지사항에서 보이지 않으며, 보관함 탭에서 다시 복원할 수 있습니다.
+                ※ 보관함으로 이동한 공지는 학생용 앱 공지사항에서 보이지 않으며, 보관함 탭에서 다시 복원할 수 있습니다.
               </p>
               <div className="mt-2 flex flex-wrap gap-1 text-[11px] font-semibold">
                 {([
