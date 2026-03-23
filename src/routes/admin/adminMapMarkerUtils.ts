@@ -1,3 +1,4 @@
+// 역할: 관리자 지도 마커 SVG/라벨/오버레이 렌더링 문자열 생성 유틸을 제공합니다.
 import {
   getBoothmapColor,
   getBoothmapLabelAccent,

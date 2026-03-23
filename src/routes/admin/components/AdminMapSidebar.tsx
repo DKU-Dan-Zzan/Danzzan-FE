@@ -1,3 +1,4 @@
+// 역할: 관리자 지도 편집 사이드바(날짜/모드/목록/선택정보) UI를 렌더링합니다.
 import { AlertCircle, Map, MapPin, School, Tent, Trash2 } from "lucide-react";
 import type { AdminMapBooth, AdminMapCollege } from "@/api/app/admin/adminMapApi";
 import { cn } from "@/components/common/ui/utils";

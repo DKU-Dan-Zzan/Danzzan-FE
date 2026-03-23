@@ -1,3 +1,4 @@
+// 역할: 관리자 공지/광고 에디터의 payload 생성, 이미지 업로드, 유효성 검증 로직을 제공합니다.
 import type {
   CreateAdvertisementRequest,
   CreateNoticeRequest,

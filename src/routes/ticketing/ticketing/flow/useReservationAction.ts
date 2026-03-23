@@ -1,3 +1,4 @@
+// 역할: 티켓 예매 요청/오류 분기/성공 후 상태 반영을 담당하는 액션 훅입니다.
 import { useCallback, useRef, type Dispatch, type SetStateAction } from "react";
 import { ticketApi } from "@/api/ticketing/ticketApi";
 import { useReserveTicketMutation } from "@/hooks/ticketing/useReserveTicketMutation";

@@ -1,3 +1,4 @@
+// 역할: Admin 화면의 핵심 섹션 렌더링 경로를 스모크 테스트로 검증합니다.
 // @vitest-environment jsdom
 import { act } from "react";
 import { createRoot } from "react-dom/client";

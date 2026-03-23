@@ -1,3 +1,4 @@
+// 역할: 관리자 공지/광고 운영 화면을 렌더링하고 편집 액션 훅을 조합합니다.
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {

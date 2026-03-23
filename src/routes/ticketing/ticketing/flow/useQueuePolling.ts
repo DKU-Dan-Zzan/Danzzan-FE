@@ -1,3 +1,4 @@
+// 역할: 티켓팅 대기열 폴링 주기·온라인복구·백오프 재시도 사이드이펙트를 관리합니다.
 import { useEffect, useRef, type Dispatch, type SetStateAction } from "react";
 import {
   BACKGROUND_POLL_INTERVAL,

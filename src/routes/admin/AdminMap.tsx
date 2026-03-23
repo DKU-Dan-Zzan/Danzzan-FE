@@ -1,3 +1,4 @@
+// 역할: 관리자 지도 편집 화면에서 부스/단과대 좌표 조회와 저장 상호작용을 관리합니다.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {

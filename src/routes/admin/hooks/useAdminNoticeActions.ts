@@ -1,3 +1,4 @@
+// 역할: 관리자 공지 생성·수정·보관·핀순서 액션과 업로드 흐름을 캡슐화합니다.
 import { useMemo, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import {

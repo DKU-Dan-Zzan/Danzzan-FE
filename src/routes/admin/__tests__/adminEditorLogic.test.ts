@@ -1,3 +1,4 @@
+// 역할: 관리자 공지/광고 에디터 유효성·payload 변환 로직을 단위 테스트합니다.
 import { describe, expect, it, vi } from "vitest";
 import type { NoticeResponse } from "@/api/app/admin/adminApi";
 import {

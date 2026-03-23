@@ -1,3 +1,4 @@
+// 역할: 관리자 공용 스타일 클래스 상수의 조합 규칙을 회귀 테스트합니다.
 import { describe, expect, it } from "vitest";
 import {
   ADMIN_FOCUS_VISIBLE_RING_CLASS,

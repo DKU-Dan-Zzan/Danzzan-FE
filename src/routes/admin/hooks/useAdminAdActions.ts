@@ -1,3 +1,4 @@
+// 역할: 관리자 광고 생성·삭제·이미지 업로드 액션 상태와 핸들러를 캡슐화합니다.
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import {

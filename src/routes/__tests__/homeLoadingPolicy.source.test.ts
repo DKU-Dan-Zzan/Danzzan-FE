@@ -1,3 +1,4 @@
+// 역할: Home 라우트 소스의 로딩 정책 분기(core/accessory/inline spinner)가 유지되는지 정적 회귀를 검증합니다.
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";

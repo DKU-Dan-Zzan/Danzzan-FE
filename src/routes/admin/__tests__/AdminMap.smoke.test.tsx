@@ -1,3 +1,4 @@
+// 역할: AdminMap 화면의 기본 데이터 로드와 편집 UI 렌더링을 스모크 테스트로 검증합니다.
 // @vitest-environment jsdom
 import { act } from "react";
 import { createRoot } from "react-dom/client";

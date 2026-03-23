@@ -1,3 +1,4 @@
+// 역할: 관리자 인증 정보를 입력받아 로그인 요청과 실패 메시지를 처리하는 화면입니다.
 import { useState, type FormEvent } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { CircleAlert, Eye, EyeOff, ShieldCheck } from "lucide-react";

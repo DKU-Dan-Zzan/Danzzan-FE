@@ -1,3 +1,4 @@
+// 역할: 라우트 전환 로딩 정책(스피너/지연 렌더) 관련 소스 규칙이 깨지지 않았는지 검증합니다.
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";

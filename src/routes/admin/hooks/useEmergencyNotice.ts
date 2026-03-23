@@ -1,3 +1,4 @@
+// 역할: 관리자 긴급공지 조회/편집/저장 상태를 관리하는 전용 훅입니다.
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {

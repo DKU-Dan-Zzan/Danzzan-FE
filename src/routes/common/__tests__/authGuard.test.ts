@@ -1,3 +1,4 @@
+// 역할: 공통 인증 가드 리다이렉트 경로 계산 규칙을 테스트합니다.
 import {
   buildLoginRedirectPath,
   buildReturnTo,

@@ -1,3 +1,4 @@
+// 역할: 타임테이블 라우트에서 날짜별 공연 목록과 콘텐츠 이미지를 조회·표시합니다.
 import { InformationCircleIcon } from "@heroicons/react/24/outline"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useSearchParams } from "react-router-dom"

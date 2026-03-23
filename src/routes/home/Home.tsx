@@ -1,3 +1,4 @@
+// 역할: 홈 라우트에서 포스터·라인업·긴급공지·하단광고 서버 상태를 조합해 렌더링합니다.
 import { useMemo } from "react"
 
 import PosterCarousel, { type Poster } from "@/components/app/home/PosterCarousel"

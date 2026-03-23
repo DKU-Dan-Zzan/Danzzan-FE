@@ -1,3 +1,4 @@
+// 역할: 내 정보 조회와 로그아웃 등 마이페이지 사용자 설정 동작을 제공하는 화면입니다.
 import { useNavigate } from "react-router-dom";
 import { useEffect, useSyncExternalStore } from "react";
 import { authLogout } from "@/api/app/auth/authApi";

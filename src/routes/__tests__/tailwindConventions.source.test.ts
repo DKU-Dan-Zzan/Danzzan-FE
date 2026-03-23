@@ -1,3 +1,4 @@
+// 역할: 라우트 레이어에서 Tailwind 규칙 위반 패턴이 재유입되지 않는지 소스 스캔으로 검증합니다.
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";

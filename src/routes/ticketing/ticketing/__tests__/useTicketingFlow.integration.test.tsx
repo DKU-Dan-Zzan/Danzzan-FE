@@ -1,3 +1,4 @@
+// 역할: 티켓팅 플로우 훅의 목록→대기열→예매 핵심 전이 경로를 통합 테스트합니다.
 // @vitest-environment jsdom
 import { act, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

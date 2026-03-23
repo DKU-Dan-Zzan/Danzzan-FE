@@ -1,3 +1,4 @@
+// 역할: 대기열 eventId를 URL 쿼리와 동기화하고 reset 내비게이션을 처리합니다.
 import { useCallback, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { readQueueEventIdFromSearch } from "@/hooks/ticketing/queue/flow-utils";

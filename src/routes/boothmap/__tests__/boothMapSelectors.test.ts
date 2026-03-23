@@ -1,3 +1,4 @@
+// 역할: 부스맵 필터/선택 셀렉터 함수의 분기 결과를 검증합니다.
 import { describe, expect, it } from "vitest";
 import type { Booth, College, PrimaryFilter, Pub } from "@/types/app/boothmap/boothmap.types";
 import {
