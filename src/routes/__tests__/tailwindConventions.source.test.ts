@@ -73,15 +73,15 @@ describe("Tailwind source conventions", () => {
     const source = readSource("src/components/app/boothmap/MapFloatingToggle.tsx");
 
     expect(source).toContain("relative inline-flex");
-    expect(source).toContain("absolute left-1 top-1 h-9 w-14");
-    expect(source).toContain("translate-x-14");
+    expect(source).toContain("absolute left-0.5 top-0.5 h-8 w-12");
+    expect(source).toContain("translate-x-12");
     expect(source).toContain("duration-300");
     expect(source).toContain("bg-[var(--boothmap-surface)]");
     expect(source).toContain("border-[var(--boothmap-border)]");
     expect(source).toContain("bg-[var(--boothmap-accent-soft)]");
     expect(source).toContain("text-[var(--boothmap-accent-text)]");
     expect(source).toContain("bg-[var(--boothmap-surface-muted)] text-[var(--boothmap-text)]");
-    expect(source).toContain("h-9 w-14");
+    expect(source).toContain("h-8 w-12");
     expect(source).toContain("text-xs font-semibold");
     expect(source).toContain("focus-visible:ring-2");
     expect(source).toContain("focus-visible:ring-[var(--ring)]");
