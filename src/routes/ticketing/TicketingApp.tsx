@@ -65,7 +65,6 @@ const TICKETING_ROOT_CLASS_NAME = cn(
   "text-foreground",
   "[background-color:var(--bg-base)]",
   "[font-size:var(--font-size)]",
-  "[font-family:Pretendard_Variable,Pretendard,SUIT,'Noto_Sans_KR',system-ui,-apple-system,'Segoe_UI',sans-serif]",
   "[&_button]:border-border",
   "[&_button]:outline-ring/50",
   "[&_input]:border-border",

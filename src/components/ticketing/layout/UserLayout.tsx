@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import BottomNav from "@/components/layout/BottomNav";
+import Footer from "@/components/layout/Footer";
 import { AppTopBar } from "@/components/layout/AppTopBar";
 import { AppShell } from "@/components/layout/AppShell";
 import { shouldShowTicketingHeader } from "@/lib/ticketing/navigation/headerVisibility";
@@ -48,7 +49,6 @@ export function UserLayout() {
     navigate("/ticket/login", { replace: true });
   };
 
-  const bottomNavPaddingClass = "pb-[calc(84px+env(safe-area-inset-bottom)+0.75rem)]";
   const contentTopPaddingClass = isMyTicketPage
     ? "pt-3"
     : isTicketingAuthPage
@@ -76,16 +76,17 @@ export function UserLayout() {
           </AppTopBar>
         ) : undefined
       }
+      footer={<Footer />}
       bottomNav={<BottomNav />}
-      rootClassName="min-h-screen overflow-x-hidden bg-[var(--bg-base)]"
-      frameClassName="mx-auto flex min-h-screen w-full flex-col"
+      rootClassName="min-h-dvh overflow-x-hidden bg-[var(--bg-base)]"
+      frameClassName="mx-auto flex min-h-dvh w-full max-w-[var(--app-mobile-shell-max-width)] flex-col bg-[var(--bg-base)] pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]"
       mainClassName="flex-1 overflow-x-hidden"
     >
       <div
         className={
           showHeader
-            ? `relative mx-auto w-full max-w-md px-4 ${contentTopPaddingClass} ${bottomNavPaddingClass}`
-            : `relative mx-auto min-h-screen w-full max-w-md ${bottomNavPaddingClass}`
+            ? `relative mx-auto w-full max-w-md px-4 ${contentTopPaddingClass}`
+            : "relative mx-auto min-h-screen w-full max-w-md"
         }
       >
         <Outlet />
