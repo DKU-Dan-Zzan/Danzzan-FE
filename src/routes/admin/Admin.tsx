@@ -51,9 +51,9 @@ import {
   ADMIN_SECONDARY_ACTION_BUTTON_CLASS,
 } from "@/routes/admin/adminStyleClasses";
 
-const ADMIN_PINNED_NOTICE_ROW_CLASS = "bg-[#FFF1ED]";
+const ADMIN_PINNED_NOTICE_ROW_CLASS = "bg-[var(--status-pending-bg)]";
 const ADMIN_PINNED_NOTICE_BADGE_CLASS =
-  "inline-flex items-center gap-1 rounded-full bg-[#FF7F66] px-2 py-0.5 text-[10px] font-semibold text-white";
+  "inline-flex items-center gap-1 rounded-full bg-[var(--status-pending)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-on-accent)]";
 
 function Admin() {
   const navigate = useNavigate();
@@ -368,13 +368,13 @@ function Admin() {
             <table className="min-w-full text-left text-xs">
               <thead className="bg-[var(--surface-subtle)] text-[var(--text-muted)]">
                 <tr>
-                  <th className="px-4 py-2 font-semibold">제목 / 썸네일</th>
-                  <th className="px-4 py-2 font-semibold">작성자</th>
-                  <th className="px-4 py-2 font-semibold">날짜</th>
-                  <th className="px-3 py-2 text-center font-semibold">
+                  <th className="border-r border-[var(--border-base)] px-4 py-2 text-sm font-semibold">제목 / 썸네일</th>
+                  <th className="border-r border-[var(--border-base)] px-4 py-2 text-sm font-semibold">작성자</th>
+                  <th className="border-r border-[var(--border-base)] px-4 py-2 text-sm font-semibold">날짜</th>
+                  <th className="border-r border-[var(--border-base)] px-3 py-2 text-center text-sm font-semibold">
                     {noticeStatus === "ALL" ? "상태" : pinReorderMode ? "순서" : "수정"}
                   </th>
-                  <th className="px-3 py-2 text-center font-semibold">
+                  <th className="px-3 py-2 text-center text-sm font-semibold">
                     {noticeStatus === "DELETED" ? "복원" : "보관함 이동"}
                   </th>
                 </tr>
@@ -396,7 +396,7 @@ function Admin() {
                 )}
                 {effectivePinned.map((notice, index) => (
                   <tr key={notice.id} className={ADMIN_PINNED_NOTICE_ROW_CLASS}>
-                    <td className="px-4 py-2 align-middle">
+                    <td className="border-r border-[var(--border-base)] px-4 py-2 align-middle">
                       <div className="flex items-center gap-2">
                         <span className={ADMIN_PINNED_NOTICE_BADGE_CLASS}>
                           <span>📌</span>
@@ -414,11 +414,11 @@ function Admin() {
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-2 text-[var(--text-muted)]">{notice.author}</td>
-                    <td className="px-4 py-2 text-[var(--text-muted)]">
+                    <td className="border-r border-[var(--border-base)] px-4 py-2 text-[var(--text-muted)]">{notice.author}</td>
+                    <td className="border-r border-[var(--border-base)] px-4 py-2 text-[var(--text-muted)]">
                       {formatDate(notice.createdAt)}
                     </td>
-                    <td className="px-3 py-2 text-center">
+                    <td className="border-r border-[var(--border-base)] px-3 py-2 text-center">
                       {noticeStatus === "ALL" ? (
                         <span
                           className={cn(
@@ -487,7 +487,7 @@ function Admin() {
                 ))}
                 {noticeOthers.map((notice) => (
                   <tr key={notice.id}>
-                    <td className="px-4 py-2 align-middle">
+                    <td className="border-r border-[var(--border-base)] px-4 py-2 align-middle">
                       <div className="flex items-center gap-2">
                         {notice.thumbnailImageUrl && (
                           <img
@@ -499,11 +499,11 @@ function Admin() {
                         <span className="truncate text-sm text-[var(--text)]">{notice.title}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-2 text-[var(--text-muted)]">{notice.author}</td>
-                    <td className="px-4 py-2 text-[var(--text-muted)]">
+                    <td className="border-r border-[var(--border-base)] px-4 py-2 text-[var(--text-muted)]">{notice.author}</td>
+                    <td className="border-r border-[var(--border-base)] px-4 py-2 text-[var(--text-muted)]">
                       {formatDate(notice.createdAt)}
                     </td>
-                    <td className="px-3 py-2 text-center">
+                    <td className="border-r border-[var(--border-base)] px-3 py-2 text-center">
                       {pinReorderMode ? (
                         <span className="text-[11px] text-[var(--text-muted)]">-</span>
                       ) : (
@@ -625,18 +625,43 @@ function Admin() {
                   </button>
                 </div>
               </div>
-              <div className="overflow-hidden rounded-xl border border-[var(--border-base)] bg-[var(--surface)]">
-                {homeBottomAd?.imageUrl ? (
-                  <img
-                    src={homeBottomAd.imageUrl}
-                    alt={homeBottomAd.title}
-                    className="h-24 w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-24 items-center justify-center text-[11px] font-semibold text-[var(--accent)]">
-                    등록된 배너가 없습니다.
+              <div className="space-y-2 rounded-xl border border-[var(--border-base)] bg-[var(--surface)] p-2">
+                <div className="flex flex-col items-center">
+                  <p className="mb-1 text-[10px] font-semibold text-[var(--text-muted)]">
+                    Galaxy 기준 미리보기 (360×70)
+                  </p>
+                  <div className="w-full max-w-[360px] overflow-hidden border border-[var(--border-base)] bg-[var(--surface-subtle)]">
+                    {homeBottomAd?.imageUrl ? (
+                      <img
+                        src={homeBottomAd.imageUrl}
+                        alt={homeBottomAd.title}
+                        className="h-[70px] w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-[70px] items-center justify-center text-[11px] font-semibold text-[var(--accent)]">
+                        등록된 배너가 없습니다.
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
+                <div className="flex flex-col items-center">
+                  <p className="mb-1 text-[10px] font-semibold text-[var(--text-muted)]">
+                    iPhone 일반 기준 미리보기 (375×70)
+                  </p>
+                  <div className="w-full max-w-[375px] overflow-hidden border border-[var(--border-base)] bg-[var(--surface-subtle)]">
+                    {homeBottomAd?.imageUrl ? (
+                      <img
+                        src={homeBottomAd.imageUrl}
+                        alt={homeBottomAd.title}
+                        className="h-[70px] w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-[70px] items-center justify-center text-[11px] font-semibold text-[var(--accent)]">
+                        등록된 배너가 없습니다.
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -672,27 +697,66 @@ function Admin() {
                   </button>
                 </div>
               </div>
-              <div className="overflow-hidden rounded-xl border border-[var(--border-base)] bg-[var(--surface)]">
-                {myTicketAd?.imageUrl ? (
-                  <img
-                    src={myTicketAd.imageUrl}
-                    alt={myTicketAd.title}
-                    className="h-24 w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-24 items-center justify-center text-[11px] font-semibold text-[var(--accent)]">
-                    등록된 배너가 없습니다.
+              <div className="space-y-2 rounded-xl border border-[var(--border-base)] bg-[var(--surface)] p-2">
+                <div className="flex flex-col items-center">
+                  <p className="mb-1 text-[10px] font-semibold text-[var(--text-muted)]">
+                    Galaxy 기준 미리보기 (360×70)
+                  </p>
+                  <div className="w-full max-w-[360px] overflow-hidden border border-[var(--border-base)] bg-[var(--surface-subtle)]">
+                    {myTicketAd?.imageUrl ? (
+                      <img
+                        src={myTicketAd.imageUrl}
+                        alt={myTicketAd.title}
+                        className="h-[70px] w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-[70px] items-center justify-center text-[11px] font-semibold text-[var(--accent)]">
+                        등록된 배너가 없습니다.
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
+                <div className="flex flex-col items-center">
+                  <p className="mb-1 text-[10px] font-semibold text-[var(--text-muted)]">
+                    iPhone 일반 기준 미리보기 (375×70)
+                  </p>
+                  <div className="w-full max-w-[375px] overflow-hidden border border-[var(--border-base)] bg-[var(--surface-subtle)]">
+                    {myTicketAd?.imageUrl ? (
+                      <img
+                        src={myTicketAd.imageUrl}
+                        alt={myTicketAd.title}
+                        className="h-[70px] w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-[70px] items-center justify-center text-[11px] font-semibold text-[var(--accent)]">
+                        등록된 배너가 없습니다.
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="mt-3 space-y-1 text-[11px] text-[var(--text-muted)]">
-            <p>※ 홈 배너 슬롯 기준 권장 비율: 9:2 (약 4.49:1), 권장 크기: 1260×280px (최소 630×140px)</p>
-            <p>※ 내 티켓 배너 슬롯(높이 70px): iPhone 12~16 Pro(393px) 기준 약 361×70px(5.16:1), Galaxy S20+/S22/S23(360px) 기준 약 328×70px(4.69:1)</p>
-            <p>※ 현재 object-cover + 가변 너비 구조에서는 두 기기 모두 완전 무크롭이 되는 단일 비율을 만들 수 없습니다.</p>
-            <p>※ 비율이 다르면 잘릴 수 있으니, 주요 텍스트/로고는 중앙 안전영역(328×70 기준) 안쪽에 배치해 주세요.</p>
+          <div className="mt-3 space-y-3 text-[11px] text-[var(--text-muted)]">
+            <div className="space-y-1">
+              <p className="font-semibold text-[var(--text)]">1. 배너 권장 규격</p>
+              <p>• 권장 크기: 1260 × 280 px (최소 630 × 140 px 이상)</p>
+              <p>• 권장 비율: 9 : 2 (4.49 : 1)</p>
+            </div>
+            <div className="space-y-1">
+              <p className="font-semibold text-[var(--text)]">2. 디자인 가이드 (필독)</p>
+              <p>
+                • 중앙 배치: 기기별 가로 폭이 달라 양 끝이 잘릴 수 있으니, 중요한 로고나 문구는 중앙 안전 영역(328px
+                이내)에 배치해 주세요.
+              </p>
+              <p>• 이미지 채우기: object-cover 방식으로 기기에 따라 이미지가 약간 확대되어 보일 수 있습니다.</p>
+            </div>
+            <div className="space-y-1">
+              <p className="font-semibold text-[var(--text)]">3. 미리보기 안내</p>
+              <p>• 가장 좁은 화면인 Galaxy(가로 360px)와 일반적인 iPhone(가로 375px) 기준을 함께 제공합니다.</p>
+              <p>• Galaxy 기준에서 안전하게 보이면 대부분의 기기에서 무리 없이 노출됩니다.</p>
+            </div>
           </div>
 
           {adLoading && (
@@ -1011,12 +1075,31 @@ function Admin() {
                   </div>
                   {editingAd.imageUrl && (
                     <div className="mt-2 space-y-2">
-                      <div className="overflow-hidden rounded-xl border border-[var(--border-base)] bg-[var(--surface)]">
-                        <img
-                          src={editingAd.imageUrl}
-                          alt={editingAd.title || "광고 미리보기"}
-                          className="h-24 w-full object-cover"
-                        />
+                      <div className="space-y-2">
+                        <div className="flex flex-col items-center">
+                          <p className="text-center text-[10px] font-semibold text-[var(--text-muted)]">
+                            Galaxy 기준 미리보기 (360×70)
+                          </p>
+                          <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-xl border border-[var(--border-base)] bg-[var(--surface)]">
+                            <img
+                              src={editingAd.imageUrl}
+                              alt={editingAd.title || "광고 미리보기"}
+                              className="h-[70px] w-full object-cover"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <p className="text-center text-[10px] font-semibold text-[var(--text-muted)]">
+                            iPhone 일반 기준 미리보기 (375×70)
+                          </p>
+                          <div className="mx-auto w-full max-w-[375px] overflow-hidden rounded-xl border border-[var(--border-base)] bg-[var(--surface)]">
+                            <img
+                              src={editingAd.imageUrl}
+                              alt={editingAd.title || "광고 미리보기"}
+                              className="h-[70px] w-full object-cover"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
