@@ -1,3 +1,4 @@
+// 역할: home 화면에서 사용하는 Current Performance Section UI 블록을 렌더링합니다.
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getPerformances } from "@/api/app/timetable/timetableApi";

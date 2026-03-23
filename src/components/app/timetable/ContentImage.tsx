@@ -1,3 +1,4 @@
+// 역할: timetable 화면에서 사용하는 Content Image UI 블록을 렌더링합니다.
 import type { ContentImageDto } from "@/api/app/timetable/timetableApi"
 import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialog"
 

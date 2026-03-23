@@ -1,3 +1,4 @@
+// 역할: home 화면에서 사용하는 Lineup Carousel UI 블록을 렌더링합니다.
 import { useEffect, useMemo, useRef, useState, type TouchEvent } from "react"
 
 export type LineupBanner = {

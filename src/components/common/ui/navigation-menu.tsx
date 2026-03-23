@@ -1,4 +1,5 @@
-﻿import * as React from "react";
+// 역할: 공용 UI 레이어의 navigation menu 컴포넌트를 제공합니다.
+import * as React from "react";
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 /* eslint-disable react-refresh/only-export-components */
 import { cva } from "class-variance-authority";

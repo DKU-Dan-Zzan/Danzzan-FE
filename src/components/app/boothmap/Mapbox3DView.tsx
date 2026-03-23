@@ -1,3 +1,4 @@
+// 역할: boothmap 화면에서 사용하는 Mapbox3 DView UI 블록을 렌더링합니다.
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import type {

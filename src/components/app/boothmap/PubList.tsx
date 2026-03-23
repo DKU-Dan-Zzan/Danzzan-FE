@@ -1,3 +1,4 @@
+// 역할: boothmap 화면에서 사용하는 Pub List UI 블록을 렌더링합니다.
 import type { Pub } from "@/types/app/boothmap/boothmap.types";
 import { ChevronRight } from "lucide-react"
 

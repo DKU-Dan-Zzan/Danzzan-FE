@@ -1,3 +1,4 @@
+// 역할: boothmap 화면 컴포넌트의 Primary Filter Chips.test 동작을 검증하는 테스트입니다.
 import { describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import PrimaryFilterChips from "@/components/app/boothmap/PrimaryFilterChips";

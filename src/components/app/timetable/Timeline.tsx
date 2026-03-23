@@ -1,3 +1,4 @@
+// 역할: timetable 화면에서 사용하는 Timeline UI 블록을 렌더링합니다.
 import { useLayoutEffect, useRef } from "react"
 import type { Performance } from "@/types/app/timetable/timetable.types"
 import TimelineItem from "./TimelineItem"

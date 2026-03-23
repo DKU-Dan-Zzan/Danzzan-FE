@@ -1,3 +1,4 @@
+// 역할: boothmap 화면에서 사용하는 Kakao Map View UI 블록을 렌더링합니다.
 // 카카오맵 2D 지도를 렌더링하고, 커스텀 오버레이 핀 마커와 이름 말풍선을 표시하는 컴포넌트
 
 import { useEffect, useMemo, useRef } from "react"

@@ -1,4 +1,5 @@
-﻿"use client";
+// 역할: 공용 UI 레이어의 select 컴포넌트를 제공합니다.
+"use client";
 
 import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";

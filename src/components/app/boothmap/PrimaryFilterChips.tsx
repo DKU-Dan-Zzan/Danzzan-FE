@@ -1,3 +1,4 @@
+// 역할: boothmap 화면에서 사용하는 Primary Filter Chips UI 블록을 렌더링합니다.
 // ALL/주점/푸드트럭/체험/편의시설 1차 필터 칩 컴포넌트입니다.
 
 import { cn } from "@/components/common/ui/utils";

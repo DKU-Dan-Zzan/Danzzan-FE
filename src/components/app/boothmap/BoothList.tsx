@@ -1,3 +1,4 @@
+// 역할: boothmap 화면에서 사용하는 Booth List UI 블록을 렌더링합니다.
 // 부스(푸드트럭/체험/편의시설) 목록을 렌더링하는 리스트 컴포넌트
 
 import type { Booth } from "@/types/app/boothmap/boothmap.types";

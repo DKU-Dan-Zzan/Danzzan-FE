@@ -1,3 +1,4 @@
+// 역할: home 화면에서 사용하는 Emergency Notice UI 블록을 렌더링합니다.
 import { useState } from "react"
 import { ChevronDown, Megaphone } from "lucide-react"
 

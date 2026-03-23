@@ -1,3 +1,4 @@
+// 역할: timetable 화면에서 사용하는 Day Tabs UI 블록을 렌더링합니다.
 import type { FestivalDay } from "@/types/app/timetable/timetable.types"
 
 export default function DayTabs({

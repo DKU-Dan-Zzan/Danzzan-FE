@@ -1,3 +1,4 @@
+// 역할: timetable 화면에서 사용하는 Timeline Item UI 블록을 렌더링합니다.
 import type { Performance } from "@/types/app/timetable/timetable.types"
 
 export default function TimelineItem({

@@ -1,3 +1,4 @@
+// 역할: layout 레이어의 Bottom Nav.test 동작과 회귀 조건을 검증하는 테스트입니다.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { StaticRouter } from "react-router-dom/server";

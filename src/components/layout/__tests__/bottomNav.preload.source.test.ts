@@ -1,3 +1,4 @@
+// 역할: layout 레이어의 bottom Nav.preload.source.test 동작과 회귀 조건을 검증하는 테스트입니다.
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";

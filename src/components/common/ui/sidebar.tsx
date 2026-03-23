@@ -1,4 +1,5 @@
-﻿"use client";
+// 역할: 공용 UI 레이어의 sidebar 컴포넌트를 제공합니다.
+"use client";
 
 /* eslint-disable react-refresh/only-export-components */
 import * as React from "react";

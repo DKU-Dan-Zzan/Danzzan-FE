@@ -1,3 +1,4 @@
+// 역할: 지연 노출 조건을 지원하는 공용 로딩 스피너 컴포넌트를 제공합니다.
 import { useEffect, useState } from "react";
 import { cn } from "@/components/common/ui/utils";
 

@@ -1,3 +1,4 @@
+// 역할: boothmap 화면에서 사용하는 Detail Sheet UI 블록을 렌더링합니다.
 import { useCallback, useRef, useState } from "react"
 import type { Booth, College, Pub, SelectedDetailItem } from "@/types/app/boothmap/boothmap.types"
 import {

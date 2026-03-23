@@ -1,3 +1,4 @@
+// 역할: boothmap 화면에서 사용하는 Secondary College Chips UI 블록을 렌더링합니다.
 // 주점 선택 시 단과대 secondary filter를 보여주는 칩 컴포넌트
 
 import type { College } from "@/types/app/boothmap/boothmap.types";

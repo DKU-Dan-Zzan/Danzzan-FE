@@ -1,3 +1,4 @@
+// 역할: home 화면 컴포넌트의 Current Performance Section.test 동작을 검증하는 테스트입니다.
 import { describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { StaticRouter } from "react-router-dom/server";

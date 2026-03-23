@@ -1,3 +1,4 @@
+// 역할: home 화면에서 사용하는 Ad Banner UI 블록을 렌더링합니다.
 type AdBannerProps = {
   imageUrl?: string
   alt?: string

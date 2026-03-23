@@ -1,3 +1,4 @@
+// 역할: boothmap 화면에서 사용하는 Festival Date Tabs UI 블록을 렌더링합니다.
 type FestivalDateTab = {
   label: string;
   value: string;

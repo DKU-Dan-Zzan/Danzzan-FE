@@ -1,3 +1,4 @@
+// 역할: 앱 레이아웃 레이어의 App Top Bar 구성 컴포넌트를 제공합니다.
 import type { ReactNode } from "react";
 import { AppHeaderLogo } from "@/components/layout/AppHeaderLogo";
 

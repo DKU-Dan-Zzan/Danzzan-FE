@@ -1,3 +1,4 @@
+// 역할: boothmap 화면에서 사용하는 Bottom Sheet UI 블록을 렌더링합니다.
 // 드래그로 높이를 조절하고(PEEK/HALF/FULL) 스냅되는 BottomSheet 컴포넌트
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";

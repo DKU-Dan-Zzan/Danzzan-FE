@@ -1,3 +1,4 @@
+// 역할: boothmap 화면에서 사용하는 Map Floating Toggle UI 블록을 렌더링합니다.
 // 지도 위에 떠 있는 2D/3D 전환용 작은 플로팅 토글 컴포넌트
 
 import type { MapMode } from "@/types/app/boothmap/boothmap.types";

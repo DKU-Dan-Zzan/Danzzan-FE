@@ -1,4 +1,5 @@
-﻿import { cn } from "./utils";
+// 역할: 공용 UI 레이어의 skeleton 컴포넌트를 제공합니다.
+import { cn } from "./utils";
 
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   return (

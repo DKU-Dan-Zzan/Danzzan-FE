@@ -1,4 +1,5 @@
-﻿"use client";
+// 역할: 공용 UI 레이어의 sonner 컴포넌트를 제공합니다.
+"use client";
 
 import { useTheme } from "next-themes";
 import { Toaster as Sonner, ToasterProps } from "sonner";

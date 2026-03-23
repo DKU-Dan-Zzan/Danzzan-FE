@@ -1,4 +1,5 @@
-﻿import * as React from "react";
+// 역할: 공용 UI 레이어의 card 컴포넌트를 제공합니다.
+import * as React from "react";
 
 import { cn } from "./utils";
 

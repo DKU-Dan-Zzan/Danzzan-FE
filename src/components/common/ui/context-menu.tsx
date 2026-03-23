@@ -1,4 +1,5 @@
-﻿"use client";
+// 역할: 공용 UI 레이어의 context menu 컴포넌트를 제공합니다.
+"use client";
 
 import * as React from "react";
 import * as ContextMenuPrimitive from "@radix-ui/react-context-menu";

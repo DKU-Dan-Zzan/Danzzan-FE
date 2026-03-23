@@ -1,3 +1,4 @@
+// 역할: 앱 레이아웃 레이어의 App Header Logo 구성 컴포넌트를 제공합니다.
 type AppHeaderLogoProps = {
   className?: string;
 };
