@@ -191,10 +191,14 @@ function Admin() {
             <button
               type="button"
               onClick={() => navigate("/admin/map")}
+              aria-label="지도 편집 (개발팀 전용)"
               className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-[var(--surface)] px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
             >
               <Map className="h-4 w-4" strokeWidth={2.3} />
-              지도 편집
+              <span>지도 편집</span>
+              <span className="rounded-full bg-[var(--status-warning-bg)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--status-warning-text)]">
+                개발팀 전용
+              </span>
             </button>
 
             <button
