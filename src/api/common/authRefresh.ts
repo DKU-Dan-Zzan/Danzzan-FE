@@ -1,3 +1,5 @@
+// 역할: 만료 토큰 갱신 요청과 응답 매핑을 담당한다.
+
 import { getApiBaseUrl } from "@/api/common/baseUrl";
 import { parseFetchResponse } from "@/api/common/fetchAuth";
 import { JSON_HEADERS } from "@/api/common/httpConstants";

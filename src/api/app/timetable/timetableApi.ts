@@ -1,3 +1,5 @@
+// 역할: timetable api 관련 HTTP 요청 함수를 제공하는 API 어댑터다.
+
 import { http } from "@/lib/http"
 import {
   parseContentImagesContract,

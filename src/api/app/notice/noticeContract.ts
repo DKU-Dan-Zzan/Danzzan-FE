@@ -1,3 +1,5 @@
+// 역할: notice contract 응답 스키마를 검증하고 도메인 형태로 정규화한다.
+
 export type PageResponse<T> = {
   content: T[];
   totalElements: number;

@@ -1,3 +1,5 @@
+// 역할: 인증 요청/재시도 과정을 추적하기 위한 로깅 유틸을 제공한다.
+
 type AuthLogValue = string | number | boolean | null | undefined;
 
 type AuthLogContext = Record<string, AuthLogValue>;

@@ -1,3 +1,5 @@
+// 역할: adminContract 모듈의 API 계약과 예외 처리를 검증하는 테스트다.
+
 import { describe, expect, it } from "vitest";
 import {
   AdminContractError,

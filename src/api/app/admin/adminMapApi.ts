@@ -1,3 +1,5 @@
+// 역할: admin map api 관련 HTTP 요청 함수를 제공하는 API 어댑터다.
+
 import { getApiBaseUrl } from "@/api/common/baseUrl";
 import { createFetchWithAuth } from "@/api/common/fetchAuth";
 import {

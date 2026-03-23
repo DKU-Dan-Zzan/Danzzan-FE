@@ -1,3 +1,5 @@
+// 역할: http client HTTP 클라이언트 인스턴스와 공통 인터셉터를 구성한다.
+
 import axios from "axios";
 import {
   isAuthBoundaryError,

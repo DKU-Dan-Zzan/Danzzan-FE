@@ -1,3 +1,5 @@
+// 역할: ad gateway 모듈의 API/계약 기능을 제공한다.
+
 import axios from "axios";
 import { getApiBaseUrl, getTicketingApiBaseUrl } from "@/api/common/baseUrl";
 import { getErrorStatus } from "@/api/common/fetchAuth";

@@ -1,3 +1,5 @@
+// 역할: admin auth api 관련 HTTP 요청 함수를 제공하는 API 어댑터다.
+
 import { getTicketingApiBaseUrl } from "@/api/common/baseUrl";
 import { createHttpClient } from "@/api/common/httpClient";
 import { hasRequiredRole, resolveRoleFromAccessToken } from "@/api/common/authCore";

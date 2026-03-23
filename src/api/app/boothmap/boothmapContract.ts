@@ -1,3 +1,5 @@
+// 역할: boothmap contract 응답 스키마를 검증하고 도메인 형태로 정규화한다.
+
 import type { BoothType } from "@/types/app/boothmap/boothmap.types";
 
 type RecordLike = Record<string, unknown>;

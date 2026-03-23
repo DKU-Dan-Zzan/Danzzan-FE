@@ -1,3 +1,5 @@
+// 역할: 인증 헤더를 포함한 공통 fetch 래퍼를 제공한다.
+
 import { withAuthRetry } from "@/api/common/authCore";
 import { JSON_CONTENT_TYPE } from "@/api/common/httpConstants";
 

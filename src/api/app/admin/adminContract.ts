@@ -1,3 +1,5 @@
+// 역할: admin contract 응답 스키마를 검증하고 도메인 형태로 정규화한다.
+
 type RecordLike = Record<string, unknown>;
 
 const isRecord = (value: unknown): value is RecordLike => {

@@ -1,3 +1,5 @@
+// 역할: timetableApi 모듈의 API 계약과 예외 처리를 검증하는 테스트다.
+
 import { afterEach, describe, expect, it } from "vitest";
 import { http } from "@/lib/http";
 import { getContentImages, getPerformances } from "@/api/app/timetable/timetableApi";

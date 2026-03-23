@@ -1,3 +1,5 @@
+// 역할: 환경별 API 베이스 URL 계산 로직을 제공한다.
+
 import { resolveApiBaseUrl, resolveBackendTarget } from "@/lib/env";
 
 const backendTarget = resolveBackendTarget(import.meta.env.VITE_BACKEND_TARGET);

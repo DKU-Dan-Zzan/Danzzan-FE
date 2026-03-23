@@ -1,3 +1,5 @@
+// 역할: 인증 갱신, 재시도, 토큰 저장을 포함한 공통 인증 흐름을 제공한다.
+
 import { logAuthWarn, maskToken } from "@/api/common/authLogger";
 
 export type AuthRole = "student" | "admin";
