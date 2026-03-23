@@ -85,8 +85,8 @@ export function UserLayout() {
       <div
         className={
           showHeader
-            ? `relative mx-auto w-full max-w-md px-4 ${contentTopPaddingClass}`
-            : "relative mx-auto min-h-screen w-full max-w-md"
+            ? `relative mx-auto min-h-full w-full max-w-md px-4 ${contentTopPaddingClass}`
+            : "relative mx-auto min-h-full w-full max-w-md"
         }
       >
         <Outlet />

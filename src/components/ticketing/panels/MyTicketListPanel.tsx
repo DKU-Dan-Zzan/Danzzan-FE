@@ -35,7 +35,7 @@ export function MyTicketListPanel({
   onRefresh,
   onGoTicketing,
 }: MyTicketListPanelProps) {
-  const panelClassName = "mx-auto w-full max-w-3xl space-y-2.5";
+  const panelClassName = "mx-auto flex min-h-full w-full max-w-3xl flex-col gap-2.5";
 
   return (
     <div className={panelClassName}>
@@ -119,7 +119,7 @@ export function MyTicketListPanel({
         </Card>
       )}
 
-      <div className="-mx-4">
+      <div className="-mx-4 mt-auto">
         <TicketingAdBannerCard ad={ad} variant="imageOnly" />
       </div>
     </div>
