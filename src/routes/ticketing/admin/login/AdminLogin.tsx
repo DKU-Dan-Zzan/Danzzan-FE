@@ -13,6 +13,7 @@ import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
 import { Input } from "@/components/common/ui/input";
 import { Label } from "@/components/common/ui/label";
+import { ADMIN_LOGIN_TITLE_CLASS } from "@/lib/common/adminLoginHeadingStyles";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { resolveScopedRedirect } from "@/routes/common/authGuard";
 
@@ -75,7 +76,7 @@ export default function AdminLogin() {
               <p className="text-sm font-semibold text-[var(--text-muted)]">
                 관리자 전용
               </p>
-              <h1 className="text-[30px] font-bold leading-tight tracking-[-0.02em] text-[var(--text)] md:text-[34px]">
+              <h1 className={ADMIN_LOGIN_TITLE_CLASS}>
                 팔찌 배부 운영 시스템
               </h1>
               <p className="text-sm text-[var(--admin-auth-subtext)]">

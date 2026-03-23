@@ -3,6 +3,7 @@ import { useState, type FormEvent } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { CircleAlert, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { ADMIN_AUTH_INPUT_CLASS_NAME } from "@/lib/common/authInputClassNames";
+import { ADMIN_LOGIN_TITLE_CLASS } from "@/lib/common/adminLoginHeadingStyles";
 import { resolveScopedRedirect } from "@/routes/common/authGuard";
 import { useAdminAuth } from "@/hooks/app/admin/useAdminAuth";
 import { getAdminSession } from "@/lib/app/admin/admin-auth-session";
@@ -61,7 +62,7 @@ export default function AdminLogin() {
               <p className="text-sm font-semibold text-[var(--text-muted)]">
                 관리자 전용
               </p>
-              <h1 className="text-[30px] font-black leading-tight tracking-[-0.02em] text-[var(--text)] md:text-[34px]">
+              <h1 className={ADMIN_LOGIN_TITLE_CLASS}>
                 공지사항/광고 업로드 시스템
               </h1>
               <p className="text-sm text-[var(--text-muted)]">
