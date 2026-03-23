@@ -1,3 +1,5 @@
+// 역할: Admin Ads 관련 상태와 부수효과를 캡슐화한 훅이다.
+
 import { useCallback, useEffect } from "react";
 import { getPlacementAd } from "@/api/app/notice/noticeApi";
 import { appQueryKeys, useAppQuery } from "@/lib/query";

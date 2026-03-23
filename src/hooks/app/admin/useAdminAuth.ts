@@ -1,3 +1,5 @@
+// 역할: Admin Auth 관련 상태와 부수효과를 캡슐화한 훅이다.
+
 import { useCallback, useSyncExternalStore } from "react";
 import { adminAuthApi } from "@/api/app/admin/adminAuthApi";
 import { authStore } from "@/store/common/authStore";

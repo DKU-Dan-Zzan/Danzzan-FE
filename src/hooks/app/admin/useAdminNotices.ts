@@ -1,3 +1,5 @@
+// 역할: Admin Notices 관련 상태와 부수효과를 캡슐화한 훅이다.
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   getAdminNotices,

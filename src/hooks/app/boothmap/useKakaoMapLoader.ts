@@ -1,3 +1,5 @@
+// 역할: Kakao Map Loader 관련 상태와 부수효과를 캡슐화한 훅이다.
+
 // 카카오맵 JavaScript SDK를 한 번만 로드하고 준비 상태를 반환하는 훅
 
 import { useEffect, useState } from "react"

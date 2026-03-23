@@ -1,3 +1,5 @@
+// 역할: Booth Detail 서버 상태 조회와 캐시 정책을 캡슐화한 훅이다.
+
 import {
   getBoothSummary,
   getPubDetail,
