@@ -250,8 +250,11 @@ function Admin() {
                 "focus-visible:border-[var(--status-danger-border)] focus-visible:ring-[var(--status-danger-border)]",
               )}
             />
-            <div className="flex items-center justify-between text-[11px] text-[var(--status-danger)]">
-              <span>※ 한 줄 공지는 단 한 개만 사용됩니다.</span>
+            <div className="flex items-start justify-between gap-3 text-[11px] text-[var(--status-danger)]">
+              <div className="space-y-1">
+                <p>※ 한 줄 공지는 단 한 개만 사용됩니다.</p>
+                <p>※ 긴급공지 내용을 비우고 저장하면 학생용 앱 홈에서 긴급공지 칸이 숨겨집니다.</p>
+              </div>
               <button
                 type="button"
                 disabled={emergencyLoading}
