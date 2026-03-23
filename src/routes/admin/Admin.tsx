@@ -274,13 +274,13 @@ function Admin() {
             <div>
               <h2 className="text-sm font-bold text-[var(--text)]">일반 공지 목록</h2>
               <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-                핀 공지 순서와 삭제된 공지를 함께 관리할 수 있습니다.
+                앱 노출 공지와 보관함 공지를 함께 관리할 수 있습니다.
               </p>
               <div className="mt-2 flex flex-wrap gap-1 text-[11px] font-semibold">
                 {([
-                  { key: "ACTIVE", label: "게시중" },
-                  { key: "DELETED", label: "보관됨" },
-                  { key: "ALL", label: "전체보기" },
+                  { key: "ACTIVE", label: "앱 노출중" },
+                  { key: "DELETED", label: "보관함" },
+                  { key: "ALL", label: "전체" },
                 ] satisfies { key: NoticeStatusFilter; label: string }[]).map((item) => (
                   <button
                     key={item.key}
@@ -365,7 +365,7 @@ function Admin() {
                     {noticeStatus === "ALL" ? "상태" : pinReorderMode ? "순서" : "수정"}
                   </th>
                   <th className="px-3 py-2 text-center font-semibold">
-                    {noticeStatus === "DELETED" ? "복원" : "보관"}
+                    {noticeStatus === "DELETED" ? "복원" : "보관함 이동"}
                   </th>
                 </tr>
               </thead>
@@ -418,7 +418,7 @@ function Admin() {
                               : "bg-[var(--status-success-bg)] text-[var(--status-success)]",
                           )}
                         >
-                          {notice.isActive === false ? "보관됨" : "게시중"}
+                          {notice.isActive === false ? "보관함" : "앱 노출중"}
                         </span>
                       ) : pinReorderMode ? (
                         <div className="flex items-center justify-center gap-1">
@@ -466,7 +466,7 @@ function Admin() {
                         <button
                           type="button"
                           onClick={() => void handleArchiveNotice(notice.id)}
-                          aria-label={`${notice.title} 공지 삭제`}
+                          aria-label={`${notice.title} 공지 보관함 이동`}
                           className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--status-danger-bg)] text-[var(--status-danger)] hover:bg-[var(--status-danger-border)]"
                         >
                           <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
@@ -521,7 +521,7 @@ function Admin() {
                         <button
                           type="button"
                           onClick={() => void handleArchiveNotice(notice.id)}
-                          aria-label={`${notice.title} 공지 삭제`}
+                          aria-label={`${notice.title} 공지 보관함 이동`}
                           className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--status-danger-bg)] text-[var(--status-danger)] hover:bg-[var(--status-danger-border)]"
                         >
                           <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />

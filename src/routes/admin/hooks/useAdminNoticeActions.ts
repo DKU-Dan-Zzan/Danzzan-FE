@@ -172,17 +172,17 @@ export const useAdminNoticeActions = ({
 
   const handleArchiveNotice = async (id: number) => {
     openConfirmDialog({
-      title: "공지 보관",
-      description: "이 공지를 보관 처리하시겠습니까?",
-      confirmLabel: "보관",
+      title: "공지 보관함 이동",
+      description: "이 공지는 학생용 앱 공지에서 숨김 처리되고, 보관함에서 다시 복원할 수 있습니다.",
+      confirmLabel: "보관함 이동",
       onConfirm: async () => {
         try {
           setGlobalError(null);
           await deleteAdminNotice(id);
           await reloadNotices(noticePage);
-          toast.success("공지를 보관했습니다.");
+          toast.success("공지를 보관함으로 이동했습니다.");
         } catch (error) {
-          const message = error instanceof Error ? error.message : "공지를 보관하지 못했습니다.";
+          const message = error instanceof Error ? error.message : "공지를 보관함으로 이동하지 못했습니다.";
           setGlobalError(message);
           toast.error(message);
         }
@@ -193,14 +193,14 @@ export const useAdminNoticeActions = ({
   const handleRestoreNotice = async (id: number) => {
     openConfirmDialog({
       title: "공지 복원",
-      description: "이 공지를 다시 게시중 상태로 복원할까요?",
+      description: "이 공지를 보관함에서 꺼내 학생용 앱 공지에 다시 노출할까요?",
       confirmLabel: "복원",
       onConfirm: async () => {
         try {
           setGlobalError(null);
           await restoreAdminNotice(id);
           await reloadNotices(noticePage);
-          toast.success("공지를 복원했습니다.");
+          toast.success("공지를 앱 공지로 복원했습니다.");
         } catch (error) {
           const message = error instanceof Error ? error.message : "공지를 복원하지 못했습니다.";
           setGlobalError(message);
