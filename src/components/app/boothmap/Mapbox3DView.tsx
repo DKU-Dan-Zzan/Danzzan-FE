@@ -38,6 +38,9 @@ const DEFAULT_ZOOM = 16.6;
 const DEFAULT_PITCH = 55;
 const DEFAULT_BEARING = -20;
 const FOCUSED_ZOOM = 17.8;
+const CATEGORY_FIT_PADDING = 40;
+const CATEGORY_FIT_ZOOM_BONUS = 0.45;
+const CATEGORY_FIT_MAX_ZOOM = 17.2;
 const DANKOOK_BOUNDS: [[number, number], [number, number]] = [
   [127.116, 37.315],
   [127.137, 37.3295],
@@ -312,6 +315,31 @@ function buildZoneFeatureCollection(
       properties: {},
     })),
   };
+}
+
+function fitCategoryBounds(
+  map: mapboxgl.Map,
+  bounds: mapboxgl.LngLatBounds,
+  options?: { bearing?: number; pitch?: number }
+) {
+  const camera = map.cameraForBounds(bounds, {
+    padding: CATEGORY_FIT_PADDING,
+    bearing: options?.bearing,
+    pitch: options?.pitch,
+  });
+
+  if (!camera) {
+    return;
+  }
+
+  map.easeTo({
+    center: camera.center,
+    zoom: Math.min((camera.zoom ?? DEFAULT_ZOOM) + CATEGORY_FIT_ZOOM_BONUS, CATEGORY_FIT_MAX_ZOOM),
+    bearing: camera.bearing,
+    pitch: camera.pitch,
+    duration: 800,
+    essential: true,
+  });
 }
 
 export default function Mapbox3DView({
@@ -953,10 +981,7 @@ export default function Mapbox3DView({
       const currentBearing = map.getBearing();
       const currentPitch = map.getPitch();
 
-      map.fitBounds(bounds, {
-        padding: 60,
-        duration: 800,
-        essential: true,
+      fitCategoryBounds(map, bounds, {
         bearing: currentBearing,
         pitch: currentPitch,
       });
@@ -973,17 +998,36 @@ export default function Mapbox3DView({
       const currentBearing = map.getBearing();
       const currentPitch = map.getPitch();
 
-      map.fitBounds(bounds, {
-        padding: 60,
-        duration: 800,
-        essential: true,
+      fitCategoryBounds(map, bounds, {
+        bearing: currentBearing,
+        pitch: currentPitch,
+      });
+    }
+
+    if (
+      primaryFilter !== "ALL" &&
+      primaryFilter !== "PUB" &&
+      primaryFilter !== "FOOD_TRUCK" &&
+      layerGeoJson.features.length > 0
+    ) {
+      const bounds = new mapboxgl.LngLatBounds();
+
+      layerGeoJson.features.forEach((feature) => {
+        const [lng, lat] = feature.geometry.coordinates;
+        bounds.extend([lng, lat]);
+      });
+
+      const currentBearing = map.getBearing();
+      const currentPitch = map.getPitch();
+
+      fitCategoryBounds(map, bounds, {
         bearing: currentBearing,
         pitch: currentPitch,
       });
     }
 
     prevPrimaryFilterRef.current = primaryFilter;
-  }, [primaryFilter, pubZone, foodTruckZone]);
+  }, [primaryFilter, pubZone, foodTruckZone, layerGeoJson]);
 
   useEffect(() => {
     const map = mapRef.current;

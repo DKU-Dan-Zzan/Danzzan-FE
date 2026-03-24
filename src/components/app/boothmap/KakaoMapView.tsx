@@ -558,6 +558,17 @@ export default function KakaoMapView({
     return bounds
   }
 
+  const createItemBounds = (items: Array<{ lat: number; lng: number }>) => {
+    const { kakao } = window
+    const bounds = new kakao.maps.LatLngBounds()
+
+    items.forEach((item) => {
+      bounds.extend(new kakao.maps.LatLng(item.lat, item.lng))
+    })
+
+    return bounds
+  }
+
   const createZonePolygon = ({
     paths,
     strokeColor,
@@ -923,8 +934,18 @@ export default function KakaoMapView({
       map.setBounds(bounds)
     }
 
+    if (
+      primaryFilter !== "ALL" &&
+      primaryFilter !== "PUB" &&
+      primaryFilter !== "FOOD_TRUCK" &&
+      visibleItems.length > 0
+    ) {
+      const bounds = createItemBounds(visibleItems)
+      map.setBounds(bounds)
+    }
+
     prevPrimaryFilterRef.current = primaryFilter
-  }, [isLoaded, primaryFilter, pubZone, foodTruckZone])
+  }, [isLoaded, primaryFilter, pubZone, foodTruckZone, visibleItems])
 
   if (isError) {
     return (
