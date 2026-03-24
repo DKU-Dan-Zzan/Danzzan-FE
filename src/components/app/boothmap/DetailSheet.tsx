@@ -1,11 +1,18 @@
-// 역할: boothmap 화면에서 사용하는 Detail Sheet UI 블록을 렌더링합니다.
-import { useCallback, useRef, useState } from "react"
-import type { Booth, College, Pub, SelectedDetailItem } from "@/types/app/boothmap/boothmap.types"
+import { useCallback, useRef, useState } from "react";
+import type { Booth, College, Pub, SelectedDetailItem } from "@/types/app/boothmap/boothmap.types";
 import {
   useBoothDetailQuery,
   usePubDetailQuery,
-} from "@/hooks/app/boothmap/useBoothDetailQuery"
-import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialog"
+} from "@/hooks/app/boothmap/useBoothDetailQuery";
+import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialog";
+
+const getOperatingTimeText = (startTime?: string | null, endTime?: string | null) => {
+  if (!startTime || !endTime) {
+    return null;
+  }
+
+  return `${startTime} ~ ${endTime}`;
+};
 
 export default function DetailSheet({
   selectedItem,
@@ -14,78 +21,78 @@ export default function DetailSheet({
   colleges,
   onClose,
 }: {
-  selectedItem: SelectedDetailItem
-  booths: Booth[]
-  pubs: Pub[]
-  colleges: College[]
-  onClose: () => void
+  selectedItem: SelectedDetailItem;
+  booths: Booth[];
+  pubs: Pub[];
+  colleges: College[];
+  onClose: () => void;
 }) {
-  const [viewerImage, setViewerImage] = useState<string | null>(null)
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const lastFocusedElementRef = useRef<HTMLElement | null>(null)
+  const [viewerImage, setViewerImage] = useState<string | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const lastFocusedElementRef = useRef<HTMLElement | null>(null);
 
-  const selectedBoothId = selectedItem?.kind === "booth" ? selectedItem.id : null
-  const selectedPubId = selectedItem?.kind === "pub" ? selectedItem.id : null
+  const selectedBoothId = selectedItem?.kind === "booth" ? selectedItem.id : null;
+  const selectedPubId = selectedItem?.kind === "pub" ? selectedItem.id : null;
 
-  const boothDetailQuery = useBoothDetailQuery(selectedBoothId)
-  const pubDetailQuery = usePubDetailQuery(selectedPubId)
+  const boothDetailQuery = useBoothDetailQuery(selectedBoothId);
+  const pubDetailQuery = usePubDetailQuery(selectedPubId);
 
-  const boothDetail = selectedItem?.kind === "booth" ? (boothDetailQuery.data ?? null) : null
-  const pubDetail = selectedItem?.kind === "pub" ? (pubDetailQuery.data ?? null) : null
+  const boothDetail = selectedItem?.kind === "booth" ? (boothDetailQuery.data ?? null) : null;
+  const pubDetail = selectedItem?.kind === "pub" ? (pubDetailQuery.data ?? null) : null;
   const isLoading = selectedItem?.kind === "booth"
     ? boothDetailQuery.isPending
     : selectedItem?.kind === "pub"
       ? pubDetailQuery.isPending
-      : false
+      : false;
   const isError = selectedItem?.kind === "booth"
     ? Boolean(boothDetailQuery.error)
     : selectedItem?.kind === "pub"
       ? Boolean(pubDetailQuery.error)
-      : false
+      : false;
 
   const openViewer = useCallback((image: string) => {
     if (typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
-      lastFocusedElementRef.current = document.activeElement
+      lastFocusedElementRef.current = document.activeElement;
     } else {
-      lastFocusedElementRef.current = null
+      lastFocusedElementRef.current = null;
     }
-    setViewerImage(image)
-  }, [])
+    setViewerImage(image);
+  }, []);
 
   const handleViewerOpenChange = useCallback((open: boolean) => {
     if (open) {
-      return
+      return;
     }
 
-    setViewerImage(null)
-    const previous = lastFocusedElementRef.current
+    setViewerImage(null);
+    const previous = lastFocusedElementRef.current;
     if (previous) {
-      previous.focus()
+      previous.focus();
     }
-    lastFocusedElementRef.current = null
-  }, [])
+    lastFocusedElementRef.current = null;
+  }, []);
 
   const imageViewerDialog = (
     <Dialog open={Boolean(viewerImage)} onOpenChange={handleViewerOpenChange}>
       <DialogContent className="max-h-[92vh] w-fit max-w-[92vw] border-0 bg-transparent p-0 shadow-none">
-        <DialogTitle className="sr-only">이미지 확대 보기</DialogTitle>
+        <DialogTitle className="sr-only">이미지 상세 보기</DialogTitle>
         {viewerImage && (
           <img
             src={viewerImage}
-            alt="확대 이미지"
+            alt="상세 이미지"
             className="max-h-[90vh] max-w-[90vw] rounded-xl"
           />
         )}
       </DialogContent>
     </Dialog>
-  )
+  );
 
   if (!selectedItem) {
     return (
       <div className="py-6 text-center text-sm font-semibold text-[var(--boothmap-text-muted)]">
         선택된 항목이 없어요
       </div>
-    )
+    );
   }
 
   if (isLoading) {
@@ -100,9 +107,9 @@ export default function DetailSheet({
 
             <button
               onClick={onClose}
-              className="text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)] text-xl font-bold"
+              className="text-xl font-bold text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)]"
             >
-              ✕
+              ×
             </button>
           </div>
 
@@ -114,7 +121,7 @@ export default function DetailSheet({
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (isError) {
@@ -130,13 +137,13 @@ export default function DetailSheet({
           닫기
         </button>
       </div>
-    )
+    );
   }
 
   if (selectedItem.kind === "booth" && boothDetail) {
-    // fallback 용: 기존 배열에서 좌표/타입 등 다른 정보 찾고 싶을 때 쓸 수 있음
-    const booth = booths.find((x) => x.id === selectedItem.id)
-    const boothImageUrl = boothDetail.imageUrl ?? null
+    const booth = booths.find((item) => item.id === selectedItem.id);
+    const boothImageUrl = boothDetail.imageUrl ?? null;
+    const operatingTimeText = getOperatingTimeText(boothDetail.startTime, boothDetail.endTime);
 
     return (
       <div className="space-y-3">
@@ -152,13 +159,19 @@ export default function DetailSheet({
                   {booth.type}
                 </div>
               )}
+
+              {operatingTimeText && (
+                <div className="mt-1 text-sm font-semibold text-[var(--boothmap-text-subtle)]">
+                  {operatingTimeText}
+                </div>
+              )}
             </div>
 
             <button
               onClick={onClose}
-              className="text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)] text-xl font-bold"
+              className="text-xl font-bold text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)]"
             >
-              ✕
+              ×
             </button>
           </div>
 
@@ -167,7 +180,7 @@ export default function DetailSheet({
               <button
                 type="button"
                 onClick={() => openViewer(boothImageUrl)}
-                aria-label="부스 이미지 확대 보기"
+                aria-label="부스 이미지 상세 보기"
                 className="mx-auto block max-h-[320px] w-auto max-w-full cursor-pointer rounded-xl"
               >
                 <img
@@ -181,28 +194,26 @@ export default function DetailSheet({
           )}
 
           <div className="mt-4 text-sm font-medium leading-6 text-[var(--boothmap-text-subtle)]">
-            {boothDetail.description || "설명이 아직 없어요"}
+            {boothDetail.description || "등록된 상세 정보가 없어요"}
           </div>
         </div>
 
         {imageViewerDialog}
       </div>
-    )
+    );
   }
 
   if (selectedItem.kind === "pub" && pubDetail) {
-    // 기존 summary 데이터는 fallback 용
-    const summaryPub = pubs.find((x) => x.id === selectedItem.id)
+    const summaryPub = pubs.find((item) => item.id === selectedItem.id);
     const fallbackCollege =
-      colleges.find((c) => c.id === summaryPub?.college_id)?.name ?? "단과대"
-
-    const displayCollege = pubDetail.collegeName || fallbackCollege
-    const imageUrls = pubDetail.imageUrls ?? []
+      colleges.find((college) => college.id === summaryPub?.college_id)?.name ?? "단과대";
+    const displayCollege = pubDetail.collegeName || fallbackCollege;
+    const imageUrls = pubDetail.imageUrls ?? [];
+    const operatingTimeText = getOperatingTimeText(pubDetail.startTime, pubDetail.endTime);
 
     return (
       <div className="space-y-3">
         <div className="rounded-2xl border border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] p-4 shadow-sm">
-          {/* 헤더 */}
           <div className="flex items-start justify-between">
             <div>
               <div className="text-lg font-extrabold text-[var(--boothmap-text)]">
@@ -211,44 +222,46 @@ export default function DetailSheet({
 
               <div className="text-sm font-bold text-[var(--boothmap-text-subtle)]">
                 {displayCollege}
-                {pubDetail.department ? ` · ${pubDetail.department}` : ""}
+                {pubDetail.department ? ` 쨌 ${pubDetail.department}` : ""}
               </div>
+
+              {operatingTimeText && (
+                <div className="mt-1 text-sm font-semibold text-[var(--boothmap-text-subtle)]">
+                  {operatingTimeText}
+                </div>
+              )}
             </div>
 
             <button
               onClick={onClose}
-              className="text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)] text-xl font-bold"
+              className="text-xl font-bold text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)]"
             >
-              ✕
+              ×
             </button>
           </div>
 
-          {/* 이미지 슬라이드 */}
           {imageUrls.length > 0 && (
             <div className="mt-3">
               <div
-                className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide"
-                onScroll={(e) => {
-                  const el = e.currentTarget
-                  const itemWidth = el.clientWidth * 0.85 + 12
-                  const index = Math.round(el.scrollLeft / itemWidth)
-                  setCurrentIndex(index)
+                className="flex snap-x snap-mandatory gap-3 overflow-x-auto scrollbar-hide"
+                onScroll={(event) => {
+                  const element = event.currentTarget;
+                  const itemWidth = element.clientWidth * 0.85 + 12;
+                  const index = Math.round(element.scrollLeft / itemWidth);
+                  setCurrentIndex(index);
                 }}
               >
-                {imageUrls.map((img, i) => (
-                  <div
-                    key={i}
-                    className="w-[85%] flex-shrink-0 snap-start"
-                  >
+                {imageUrls.map((imageUrl, index) => (
+                  <div key={index} className="w-[85%] flex-shrink-0 snap-start">
                     <button
                       type="button"
-                      onClick={() => openViewer(img)}
-                      aria-label={`주점 이미지 ${i + 1} 확대 보기`}
+                      onClick={() => openViewer(imageUrl)}
+                      aria-label={`주점 이미지 ${index + 1} 상세 보기`}
                       className="block w-full cursor-pointer rounded-xl"
                     >
                       <img
-                        src={img}
-                        alt={`${pubDetail.name} 이미지 ${i + 1}`}
+                        src={imageUrl}
+                        alt={`${pubDetail.name} 이미지 ${index + 1}`}
                         loading="lazy"
                         className="w-full rounded-xl object-contain"
                       />
@@ -258,31 +271,32 @@ export default function DetailSheet({
               </div>
 
               <div className="mt-2 flex justify-center gap-1">
-                {imageUrls.map((_, i) => (
-                    <div
-                      key={i}
-                      className={`h-1.5 w-1.5 rounded-full ${
-                      currentIndex === i ? "bg-[var(--boothmap-accent)]" : "bg-[var(--boothmap-surface-softer)]"
-                      }`}
-                    />
+                {imageUrls.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      currentIndex === index
+                        ? "bg-[var(--boothmap-accent)]"
+                        : "bg-[var(--boothmap-surface-softer)]"
+                    }`}
+                  />
                 ))}
               </div>
             </div>
           )}
 
-          {/* intro */}
           {pubDetail.intro && (
             <div className="mt-4 rounded-xl bg-[var(--boothmap-accent-soft)] px-3 py-2 text-sm font-bold text-[var(--boothmap-accent-text)]">
               {pubDetail.intro}
             </div>
           )}
 
-          {/* description */}
-          <div className="mt-4 text-sm font-medium leading-6 text-[var(--boothmap-text-subtle)]">
-            {pubDetail.description || summaryPub?.intro || "설명이 아직 없어요"}
-          </div>
+          {(pubDetail.description || summaryPub?.intro) && (
+            <div className="mt-4 text-sm font-medium leading-6 text-[var(--boothmap-text-subtle)]">
+              {pubDetail.description || summaryPub?.intro}
+            </div>
+          )}
 
-          {/* instagram */}
           {pubDetail.instagram && (
             <a
               href={
@@ -301,12 +315,12 @@ export default function DetailSheet({
 
         {imageViewerDialog}
       </div>
-    )
+    );
   }
 
   return (
     <div className="py-6 text-center text-sm font-semibold text-[var(--boothmap-text-muted)]">
       표시할 상세 정보가 없어요
     </div>
-  )
+  );
 }

@@ -96,6 +96,8 @@ function mapBoothDtoToBooth(dto: BoothDto): Booth {
     subType: dto.subType,
     location_x: dto.locationX,
     location_y: dto.locationY,
+    startTime: dto.startTime,
+    endTime: dto.endTime,
   };
 }
 
@@ -111,6 +113,8 @@ function mapPubSummaryToPub(dto: PubSummaryResponse): Pub {
     instagram: undefined,
     images: dto.mainImageUrl ? [dto.mainImageUrl] : [],
     mainImageUrl: dto.mainImageUrl ?? undefined,
+    startTime: dto.startTime,
+    endTime: dto.endTime,
   };
 }
 

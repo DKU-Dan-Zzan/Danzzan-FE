@@ -137,6 +137,8 @@ export type ContractBoothDto = {
   subType: BoothSubType | null;
   locationX: number;
   locationY: number;
+  startTime: string | null;
+  endTime: string | null;
 };
 
 export type ContractBoothMapResponse = {
@@ -147,29 +149,35 @@ export type ContractBoothMapResponse = {
 export type ContractBoothSummaryResponse = {
   boothId: number;
   name: string;
-  description: string;
+  description: string | null;
   imageUrl: string | null;
+  startTime: string | null;
+  endTime: string | null;
 };
 
 export type ContractPubSummaryResponse = {
   pubId: number;
   name: string;
-  intro: string;
-  department: string;
+  intro: string | null;
+  department: string | null;
   collegeId: number;
   collegeName: string;
   mainImageUrl: string | null;
+  startTime: string | null;
+  endTime: string | null;
 };
 
 export type ContractPubDetailResponse = {
   pubId: number;
   name: string;
-  intro: string;
-  description: string;
-  department: string;
-  collegeName: string;
-  instagram: string;
+  intro: string | null;
+  description: string | null;
+  department: string | null;
+  collegeName: string | null;
+  instagram: string | null;
   imageUrls: string[];
+  startTime: string | null;
+  endTime: string | null;
 };
 
 export const parseBoothMapContract = (payload: unknown, endpoint: string): ContractBoothMapResponse => {
@@ -219,6 +227,8 @@ export const parseBoothMapContract = (payload: unknown, endpoint: string): Contr
     const subType = parseBoothSubType(item.subType, endpoint, `booths[${index}]`);
     const locationX = readNumber(item, "locationX");
     const locationY = readNumber(item, "locationY");
+    const startTime = readNullableString(item, "startTime");
+    const endTime = readNullableString(item, "endTime");
     if (
       boothId === undefined ||
       !name ||
@@ -235,6 +245,8 @@ export const parseBoothMapContract = (payload: unknown, endpoint: string): Contr
       subType,
       locationX,
       locationY,
+      startTime: startTime ?? null,
+      endTime: endTime ?? null,
     };
   });
 
@@ -255,13 +267,17 @@ export const parseBoothSummaryContract = (
 
   const boothId = readNumber(unwrapped, "boothId");
   const name = readString(unwrapped, "name");
-  const description = readRawString(unwrapped, "description");
+  const description = readNullableString(unwrapped, "description");
   const imageUrl = readNullableString(unwrapped, "imageUrl");
+  const startTime = readNullableString(unwrapped, "startTime");
+  const endTime = readNullableString(unwrapped, "endTime");
   if (
     boothId === undefined ||
     !name ||
     description === undefined ||
-    imageUrl === undefined
+    imageUrl === undefined ||
+    startTime === undefined ||
+    endTime === undefined
   ) {
     throw new BoothmapContractError(endpoint, "부스 상세 응답 필수 필드가 누락되었습니다.");
   }
@@ -271,6 +287,8 @@ export const parseBoothSummaryContract = (
     name,
     description,
     imageUrl,
+    startTime,
+    endTime,
   };
 };
 
@@ -287,11 +305,13 @@ export const parsePubsContract = (payload: unknown, endpoint: string): ContractP
 
     const pubId = readNumber(item, "pubId");
     const name = readString(item, "name");
-    const intro = readRawString(item, "intro");
-    const department = readRawString(item, "department");
+    const intro = readNullableString(item, "intro");
+    const department = readNullableString(item, "department");
     const collegeId = readNumber(item, "collegeId");
     const collegeName = readString(item, "collegeName");
     const mainImageUrl = readNullableString(item, "mainImageUrl");
+    const startTime = readNullableString(item, "startTime");
+    const endTime = readNullableString(item, "endTime");
     if (
       pubId === undefined ||
       !name ||
@@ -299,7 +319,9 @@ export const parsePubsContract = (payload: unknown, endpoint: string): ContractP
       department === undefined ||
       collegeId === undefined ||
       !collegeName ||
-      mainImageUrl === undefined
+      mainImageUrl === undefined ||
+      startTime === undefined ||
+      endTime === undefined
     ) {
       throw new BoothmapContractError(endpoint, `pubs[${index}] 필수 필드가 누락되었습니다.`);
     }
@@ -312,6 +334,8 @@ export const parsePubsContract = (payload: unknown, endpoint: string): ContractP
       collegeId,
       collegeName,
       mainImageUrl,
+      startTime,
+      endTime,
     };
   });
 };
@@ -324,12 +348,14 @@ export const parsePubDetailContract = (payload: unknown, endpoint: string): Cont
 
   const pubId = readNumber(unwrapped, "pubId");
   const name = readString(unwrapped, "name");
-  const intro = readRawString(unwrapped, "intro");
-  const description = readRawString(unwrapped, "description");
-  const department = readRawString(unwrapped, "department");
-  const collegeName = readRawString(unwrapped, "collegeName");
-  const instagram = readRawString(unwrapped, "instagram");
+  const intro = readNullableString(unwrapped, "intro");
+  const description = readNullableString(unwrapped, "description");
+  const department = readNullableString(unwrapped, "department");
+  const collegeName = readNullableString(unwrapped, "collegeName");
+  const instagram = readNullableString(unwrapped, "instagram");
   const imageUrls = readStringArray(unwrapped, "imageUrls");
+  const startTime = readNullableString(unwrapped, "startTime");
+  const endTime = readNullableString(unwrapped, "endTime");
   if (
     pubId === undefined ||
     !name ||
@@ -338,7 +364,9 @@ export const parsePubDetailContract = (payload: unknown, endpoint: string): Cont
     department === undefined ||
     collegeName === undefined ||
     instagram === undefined ||
-    !imageUrls
+    !imageUrls ||
+    startTime === undefined ||
+    endTime === undefined
   ) {
     throw new BoothmapContractError(endpoint, "주점 상세 응답 필수 필드가 누락되었습니다.");
   }
@@ -352,5 +380,7 @@ export const parsePubDetailContract = (payload: unknown, endpoint: string): Cont
     collegeName,
     instagram,
     imageUrls,
+    startTime,
+    endTime,
   };
 };

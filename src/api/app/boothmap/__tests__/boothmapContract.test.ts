@@ -30,6 +30,8 @@ describe("boothmapContract", () => {
               subType: null,
               locationX: 127.12,
               locationY: 37.31,
+              startTime: "11:00",
+              endTime: "17:00",
             },
           ],
         },
@@ -69,6 +71,8 @@ describe("boothmapContract", () => {
         name: "체험 부스",
         description: "설명",
         imageUrl: null,
+        startTime: "11:00",
+        endTime: "17:00",
       },
       "/map/booths/7",
     );
@@ -78,6 +82,8 @@ describe("boothmapContract", () => {
       name: "체험 부스",
       description: "설명",
       imageUrl: null,
+      startTime: "11:00",
+      endTime: "17:00",
     });
   });
 
@@ -92,6 +98,8 @@ describe("boothmapContract", () => {
           collegeId: 2,
           collegeName: "공과대학",
           mainImageUrl: "https://cdn.example.com/pub.png",
+          startTime: "18:00",
+          endTime: "23:00",
         },
       ],
       "/map/pubs",
@@ -111,6 +119,8 @@ describe("boothmapContract", () => {
         collegeName: "공과대학",
         instagram: "@pub",
         imageUrls: ["https://cdn.example.com/1.png"],
+        startTime: "18:00",
+        endTime: "23:00",
       },
       "/map/pubs/3",
     );
@@ -129,6 +139,8 @@ describe("boothmapContract", () => {
             subType: "SMOKING_AREA",
             locationX: 120.5,
             locationY: 88.3,
+            startTime: "11:00",
+            endTime: "17:00",
           },
         ],
       },
