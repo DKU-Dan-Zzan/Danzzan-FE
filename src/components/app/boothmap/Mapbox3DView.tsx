@@ -174,9 +174,9 @@ function buildSelectedMarkerElement(type: MarkerType, title: string, subType?: B
   return wrapper;
 }
 
-function buildZoneDotElement(color: string, label: string, count: number) {
+function buildZoneMarkerElement(type: MarkerType, label: string) {
+  const { iconPath, color } = getMarkerConfig({ type });
   const overlayShadow = getBoothmapColor("overlayShadow");
-  const overlayBadgeBackground = getBoothmapColor("overlayBadgeBackground");
   const overlayBadgeText = getBoothmapColor("overlayBadgeText");
 
   const wrapper = document.createElement("button");
@@ -184,39 +184,37 @@ function buildZoneDotElement(color: string, label: string, count: number) {
   wrapper.title = label;
   wrapper.setAttribute("aria-label", label);
   wrapper.style.position = "relative";
-  wrapper.style.width = "22px";
-  wrapper.style.height = "22px";
+  wrapper.style.width = "24px";
+  wrapper.style.height = "24px";
   wrapper.style.padding = "0";
   wrapper.style.border = "0";
   wrapper.style.background = "transparent";
   wrapper.style.cursor = "pointer";
+  wrapper.style.filter = `drop-shadow(0 8px 18px ${overlayShadow})`;
 
   const dot = document.createElement("div");
-  dot.style.width = "22px";
-  dot.style.height = "22px";
+  dot.style.position = "absolute";
+  dot.style.inset = "0";
   dot.style.borderRadius = "9999px";
   dot.style.background = color;
-  dot.style.border = "3px solid white";
-  dot.style.boxShadow = `0 8px 18px ${overlayShadow}`;
+  dot.style.border = `3px solid ${overlayBadgeText}`;
 
-  const badge = document.createElement("div");
-  badge.textContent = String(count);
-  badge.style.position = "absolute";
-  badge.style.left = "50%";
-  badge.style.top = "-28px";
-  badge.style.transform = "translateX(-50%)";
-  badge.style.padding = "4px 8px";
-  badge.style.borderRadius = "9999px";
-  badge.style.background = overlayBadgeBackground;
-  badge.style.color = overlayBadgeText;
-  badge.style.fontSize = "11px";
-  badge.style.fontWeight = "700";
-  badge.style.whiteSpace = "nowrap";
-  badge.style.boxShadow = `0 6px 14px ${overlayShadow}`;
-  badge.style.pointerEvents = "none";
+  const icon = document.createElement("img");
+  icon.src = iconPath;
+  icon.alt = "";
+  icon.style.position = "absolute";
+  icon.style.left = "50%";
+  icon.style.top = "50%";
+  icon.style.width = "11px";
+  icon.style.height = "11px";
+  icon.style.transform = "translate(-50%, -50%)";
+  icon.style.objectFit = "contain";
+  icon.style.pointerEvents = "none";
+  icon.style.filter = "brightness(0) invert(1)";
+  icon.draggable = false;
 
   wrapper.appendChild(dot);
-  wrapper.appendChild(badge);
+  wrapper.appendChild(icon);
 
   return wrapper;
 }
@@ -385,11 +383,6 @@ export default function Mapbox3DView({
     () => MAP_ZONES.find((zone) => zone.type === "FOOD_TRUCK") ?? null,
     []
   );
-
-  const pubCount = colleges.length;
-  const foodTruckCount = booths.filter(
-    (booth) => booth.type === "FOOD_TRUCK"
-  ).length;
 
   const layerGeoJson = useMemo<GeoJSON.FeatureCollection<GeoJSON.Point>>(() => {
     const features: GeoJSON.Feature<GeoJSON.Point>[] = [];
@@ -911,9 +904,8 @@ export default function Mapbox3DView({
     }
 
     if (showPubSummary && pubZone) {
-      const pubZonePalette = getBoothmapZonePalette("PUB");
       pubZone.markers.forEach((marker) => {
-        const element = buildZoneDotElement(pubZonePalette.dot, "주점 구역", pubCount);
+        const element = buildZoneMarkerElement("PUB", "주점 구역");
         element.onclick = (event) => {
           event.stopPropagation();
           onPrimaryFilterChange("PUB");
@@ -931,9 +923,8 @@ export default function Mapbox3DView({
     }
 
     if (showFoodTruckSummary && foodTruckZone) {
-      const foodTruckZonePalette = getBoothmapZonePalette("FOOD_TRUCK");
       foodTruckZone.markers.forEach((marker) => {
-        const element = buildZoneDotElement(foodTruckZonePalette.dot, "푸드트럭 구역", foodTruckCount);
+        const element = buildZoneMarkerElement("FOOD_TRUCK", "푸드트럭 구역");
         element.onclick = (event) => {
           event.stopPropagation();
           onPrimaryFilterChange("FOOD_TRUCK");
@@ -958,8 +949,6 @@ export default function Mapbox3DView({
     primaryFilter,
     pubZone,
     foodTruckZone,
-    pubCount,
-    foodTruckCount,
     onPrimaryFilterChange,
   ]);
 
