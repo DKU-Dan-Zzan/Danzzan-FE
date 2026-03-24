@@ -222,7 +222,7 @@ export default function DetailSheet({
 
               <div className="text-sm font-bold text-[var(--boothmap-text-subtle)]">
                 {displayCollege}
-                {pubDetail.department ? ` 쨌 ${pubDetail.department}` : ""}
+                {pubDetail.department ? ` ${pubDetail.department}` : ""}
               </div>
 
               {operatingTimeText && (
