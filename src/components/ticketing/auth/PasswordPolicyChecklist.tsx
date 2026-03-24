@@ -1,5 +1,6 @@
+// 역할: 비밀번호 정책 충족 여부를 항목별로 표시하는 체크리스트 UI를 렌더링합니다.
 import { CheckCircle2, Circle } from "lucide-react";
-import { cn } from "@/components/ticketing/common/ui/utils";
+import { cn } from "@/components/common/ui/utils";
 import type { PasswordPolicyState } from "@/lib/ticketing/passwordPolicy";
 
 type PasswordPolicyChecklistProps = {

@@ -1,0 +1,48 @@
+name: Frontend Structure Check
+
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "scripts/**"
+      - "config/**"
+      - "docs/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/frontend-structure-check.yml"
+
+jobs:
+  structure-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Collect changed files
+        id: changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE_REF="origin/${{ github.base_ref }}"
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          CHANGED_FILES=$(git diff --name-only --diff-filter=ACMR "${BASE_REF}...HEAD" | paste -sd, -)
+          echo "changed_files=${CHANGED_FILES}" >> "$GITHUB_OUTPUT"
+          echo "Changed files: ${CHANGED_FILES}"
+
+      - name: Run changed-only structure gate
+        run: |
+          npm run lint:structure:changed -- \
+            --allowlist config/structure-allowlist.json \
+            --changed-files "${{ steps.changed.outputs.changed_files }}"

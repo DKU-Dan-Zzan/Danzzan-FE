@@ -42,3 +42,9 @@ coverage
 
 # Local poster source asset (do not commit)
 /public/posters/LOUD-main-poster.jpg
+
+# Private assets (do not commit)
+/public/apple-touch-icon.png
+/public/DAN-ZZAN.png
+/public/favicon.svg
+/public/posters/main-poster.jpeg

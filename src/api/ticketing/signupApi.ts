@@ -1,5 +1,6 @@
-﻿import { createHttpClient } from "@/api/ticketing/httpClient";
-import { env, requireEnv } from "@/utils/ticketing/env";
+﻿// 역할: 티켓팅 회원가입 요청과 응답 변환 로직을 제공합니다.
+import { createHttpClient } from "@/api/ticketing/httpClient";
+import { env, requireEnv } from "@/utils/common/env";
 
 const getClient = () =>
   createHttpClient({

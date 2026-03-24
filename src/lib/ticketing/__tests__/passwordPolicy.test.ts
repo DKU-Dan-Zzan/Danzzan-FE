@@ -1,3 +1,4 @@
+// 역할: 비밀번호 정책 검증 규칙(길이/조합/에러 메시지)을 테스트합니다.
 import { describe, expect, it } from "vitest";
 import {
   getPasswordPolicyErrorMessage,

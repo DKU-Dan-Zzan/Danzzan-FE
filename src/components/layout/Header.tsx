@@ -1,9 +1,10 @@
+// 역할: 앱 레이아웃 레이어의 Header 구성 컴포넌트를 제공합니다.
 import { useNavigate } from "react-router-dom"
 import { Ticket } from "lucide-react"
 import { useSyncExternalStore } from "react"
-import { authStore } from "@/store/ticketing/authStore"
-import { getMyTicketNavigationTarget } from "@/routes/ticketing/authNavigation"
-import { AppHeaderLogo } from "@/components/layout/AppHeaderLogo"
+import { authStore } from "@/store/common/authStore"
+import { getMyTicketNavigationTarget } from "@/lib/common/my-ticket-navigation"
+import { AppTopBar } from "@/components/layout/AppTopBar"
 
 const Header = () => {
   const navigate = useNavigate()
@@ -19,27 +20,16 @@ const Header = () => {
   }
 
   return (
-    <header
-      className="
-        app-main-header
-        sticky top-0 z-50
-        border-b border-[var(--app-header-border)]
-        pt-[env(safe-area-inset-top)]
-      "
-    >
-      <div className="relative mx-auto h-16 max-w-[430px] px-4">
-        <AppHeaderLogo />
-
+    <AppTopBar>
         <button
           onClick={handleTicketClick}
           aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
           title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
-          className="app-header-ticket-button absolute top-1/2 right-4 -translate-y-1/2"
+          className="absolute top-1/2 right-4 flex h-[var(--app-header-ticket-btn-size)] w-[var(--app-header-ticket-btn-size)] -translate-y-1/2 items-center justify-center rounded-full border border-[var(--app-header-ticket-btn-border)] bg-[linear-gradient(145deg,var(--app-header-ticket-btn-bg-start)_0%,var(--app-header-ticket-btn-bg-end)_100%)] shadow-[var(--app-header-ticket-btn-shadow)] backdrop-blur-[6px] transition-[transform,box-shadow,filter] duration-[180ms] hover:shadow-[var(--app-header-ticket-btn-shadow-hover)] hover:brightness-[1.01] active:scale-[0.96]"
         >
-          <Ticket size={20} className="app-header-ticket-icon" />
+          <Ticket size={20} className="text-[var(--app-header-ticket-btn-icon)]" />
         </button>
-      </div>
-    </header>
+    </AppTopBar>
   )
 }
 

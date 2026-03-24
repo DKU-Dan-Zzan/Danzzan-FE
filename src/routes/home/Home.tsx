@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react"
+// 역할: 홈 라우트에서 포스터·라인업·긴급공지·하단광고 서버 상태를 조합해 렌더링합니다.
+import { useMemo } from "react"
 
-import PosterCarousel, { type Poster } from "./components/PosterCarousel"
-import EmergencyNotice, { type EmergencyNoticeData } from "./components/EmergencyNotice"
-import LineupSection, { type LineupBanner } from "./components/LineupSection"
-import CurrentPerformanceSection from "./components/CurrentPerformanceSection";
-import AdBanner from "./components/AdBanner";
+import PosterCarousel, { type Poster } from "@/components/app/home/PosterCarousel"
+import EmergencyNotice, { type EmergencyNoticeData } from "@/components/app/home/EmergencyNotice"
+import LineupSection, { type LineupBanner } from "@/components/app/home/LineupSection"
+import CurrentPerformanceSection from "@/components/app/home/CurrentPerformanceSection";
+import AdBanner from "@/components/app/home/AdBanner";
+import DelayedSpinner from "@/components/common/loading/DelayedSpinner";
 
-import { getEmergencyNotice, getHomeImages, getLineupImages } from "../../api/homeApi"
-import { getPlacementAd, type ClientAdDto } from "../../api/noticeApi"
+import { getEmergencyNotice, getHomeImages, getLineupImages } from "@/api/app/home/homeApi"
+import { getPlacementAd } from "@/api/app/notice/noticeApi"
+import { appQueryKeys, useAppQuery } from "@/lib/query"
 
 const dummyPosters: Poster[] = [
   { id: "p1", imageUrl: "/posters/dummy.jpg", alt: "2026 단국축제 포스터" },
@@ -36,115 +39,133 @@ const withImageVersion = (imageUrl: string, version?: string | null) => {
 }
 
 function Home() {
-  const [posters, setPosters] = useState<Poster[]>(dummyPosters)
-  const [lineups, setLineups] = useState<LineupBanner[]>([])
-  const [notice, setNotice] = useState<EmergencyNoticeData | null>(null)
-  const [homeBottomAd, setHomeBottomAd] = useState<ClientAdDto | null>(null)
+  const imagesQuery = useAppQuery({
+    queryKey: appQueryKeys.homeImages(),
+    queryFn: ({ signal }) => getHomeImages({ signal }),
+    staleTime: 5 * 60_000,
+  })
 
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const lineupQuery = useAppQuery({
+    queryKey: appQueryKeys.homeLineup(),
+    queryFn: ({ signal }) => getLineupImages({ signal }),
+    staleTime: 5 * 60_000,
+  })
 
-  useEffect(() => {
-    let alive = true
+  const emergencyNoticeQuery = useAppQuery({
+    queryKey: appQueryKeys.homeEmergencyNotice(),
+    queryFn: ({ signal }) => getEmergencyNotice({ signal }),
+    staleTime: 0,
+    refetchOnMount: "always",
+  })
 
-    ;(async () => {
-      setLoading(true)
-      setError(null)
+  const homeBottomAdQuery = useAppQuery({
+    queryKey: appQueryKeys.homeBottomAd(),
+    queryFn: ({ signal }) => getPlacementAd("HOME_BOTTOM", { signal }),
+    staleTime: 5 * 60_000,
+  })
 
-      const [imagesResult, lineupResult, noticeResult, homeBottomAdResult] = await Promise.allSettled([
-        getHomeImages(),
-        getLineupImages(),
-        getEmergencyNotice(),
-        getPlacementAd("HOME_BOTTOM"),
-      ])
-
-      if (!alive) return
-
-      if (imagesResult.status === "fulfilled" && imagesResult.value?.length > 0) {
-        setPosters(
-          imagesResult.value.map((img, idx) => ({
-            id: `${img.id}-${img.version?.trim() || getVersionFromImageUrl(img.imageUrl) || "noversion"}`,
-            imageUrl: withImageVersion(img.imageUrl, img.version),
-            alt: `포스터 ${idx + 1}`,
-          }))
-        )
-      } else {
-        if (imagesResult.status === "rejected") {
-          setError(imagesResult.reason?.message ?? "홈 이미지 조회 실패")
-        }
-        setPosters(dummyPosters)
-      }
-
-      if (lineupResult.status === "fulfilled" && lineupResult.value?.length > 0) {
-        setLineups(
-          lineupResult.value.map((img, idx) => ({
-            id: String(img.id),
-            imageUrl: img.imageUrl,
-            alt: `라인업 이미지 ${idx + 1}`,
-          }))
-        )
-      } else {
-        if (lineupResult.status === "rejected") {
-          setError((prev) => prev ?? (lineupResult.reason?.message ?? "라인업 이미지 조회 실패"))
-        }
-        setLineups([])
-      }
-
-      if (noticeResult.status === "fulfilled" && noticeResult.value) {
-        setNotice({
-          id: noticeResult.value.id,
-          title: "긴급공지 및 내용",
-          content: noticeResult.value.content,
-          updatedAt: noticeResult.value.updatedAt,
-        })
-      } else {
-        setNotice(null)
-        if (noticeResult.status === "rejected") {
-          setError((prev) => prev ?? (noticeResult.reason?.message ?? "긴급 공지 조회 실패"))
-        }
-      }
-
-      if (homeBottomAdResult.status === "fulfilled") {
-        setHomeBottomAd(homeBottomAdResult.value ?? null)
-      } else {
-        setHomeBottomAd(null)
-      }
-
-      setLoading(false)
-    })()
-
-    return () => {
-      alive = false
+  const posters = useMemo<Poster[]>(() => {
+    const images = imagesQuery.data
+    if (!images?.length) {
+      return dummyPosters
     }
-  }, [])
+
+    return images.map((img, idx) => ({
+      id: `${img.id}-${img.version?.trim() || getVersionFromImageUrl(img.imageUrl) || "noversion"}`,
+      imageUrl: withImageVersion(img.imageUrl, img.version),
+      alt: `포스터 ${idx + 1}`,
+    }))
+  }, [imagesQuery.data])
+
+  const lineups = useMemo<LineupBanner[]>(() => {
+    const images = lineupQuery.data
+    if (!images?.length) {
+      return []
+    }
+
+    return images.map((img, idx) => ({
+      id: String(img.id),
+      imageUrl: img.imageUrl,
+      alt: `라인업 이미지 ${idx + 1}`,
+    }))
+  }, [lineupQuery.data])
+
+  const notice = useMemo<EmergencyNoticeData | null>(() => {
+    if (!emergencyNoticeQuery.data) {
+      return null
+    }
+
+    return {
+      id: emergencyNoticeQuery.data.id,
+      title: "긴급공지 및 내용",
+      content: emergencyNoticeQuery.data.content,
+      updatedAt: emergencyNoticeQuery.data.updatedAt ?? undefined,
+    }
+  }, [emergencyNoticeQuery.data])
+
+  const corePending =
+    imagesQuery.isPending ||
+    emergencyNoticeQuery.isPending
+  const accessoryPending =
+    lineupQuery.isPending ||
+    homeBottomAdQuery.isPending
+  const shouldShowInlineSpinner =
+    (corePending || accessoryPending) &&
+    !imagesQuery.data?.length &&
+    !emergencyNoticeQuery.data
+  const adImageUrl = homeBottomAdQuery.data?.imageUrl
+  const adTitle = homeBottomAdQuery.data?.title
+
+  const error =
+    imagesQuery.error?.message ??
+    lineupQuery.error?.message ??
+    emergencyNoticeQuery.error?.message ??
+    null
+
+  const handleRetryAll = () => {
+    void imagesQuery.refetch()
+    void lineupQuery.refetch()
+    void emergencyNoticeQuery.refetch()
+    void homeBottomAdQuery.refetch()
+  }
 
   return (
-    <div className="home-page-root">
+    <div className="home-root flow-root min-h-full bg-[var(--bg-page-soft)]">
       {error && (
-        <div className="home-status-banner is-error">
-          {error}
+        <div className="mx-auto mt-3 w-full max-w-[var(--home-content-max-width)] rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-xs leading-[1.35] text-[var(--status-danger-text)]">
+          <div>{error}</div>
+          <button
+            type="button"
+            onClick={handleRetryAll}
+            className="mt-2 rounded-md border border-[var(--status-danger-border)] bg-[var(--surface)] px-2 py-1 text-[11px] font-semibold text-[var(--status-danger-text)]"
+          >
+            다시 시도
+          </button>
         </div>
       )}
 
       <div>
         <EmergencyNotice notice={notice} />
-        <div className="home-section-poster">
+        <div className="mt-[var(--home-section-poster-margin-top)]">
           <PosterCarousel posters={posters} />
         </div>
         <LineupSection banners={lineups} />
-        <div className="home-section-performance">
+        <div className="mt-[var(--home-section-performance-margin-top)]">
           <CurrentPerformanceSection />
         </div>
 
-        <div className="home-section-ad">
-          <AdBanner imageUrl={homeBottomAd?.imageUrl} alt={homeBottomAd?.title} />
+        <div>
+          <AdBanner imageUrl={adImageUrl} alt={adTitle} />
         </div>
       </div>
 
-      {loading && (
-        <div className="home-status-banner is-loading">
-          로딩 중...
-        </div>
+      {shouldShowInlineSpinner && (
+        <DelayedSpinner
+          delayMs={280}
+          label="홈 콘텐츠 동기화 중"
+          containerClassName="mx-auto mt-3 flex w-full max-w-[var(--home-content-max-width)] items-center justify-center py-2"
+          spinnerClassName="h-4 w-4 border-[var(--home-card-border)] border-t-[var(--accent)]"
+        />
       )}
     </div>
   )

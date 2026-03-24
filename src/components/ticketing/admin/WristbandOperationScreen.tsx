@@ -1,8 +1,9 @@
+// 역할: 팔찌 지급 대상 검색/테이블/지급 액션을 처리하는 관리자 운영 화면 컴포넌트입니다.
 import { useEffect, useMemo, useState } from "react";
-import { Card } from "@/components/ticketing/common/ui/card";
-import { Button } from "@/components/ticketing/common/ui/button";
-import { Input } from "@/components/ticketing/common/ui/input";
-import { Label } from "@/components/ticketing/common/ui/label";
+import { Card } from "@/components/common/ui/card";
+import { Button } from "@/components/common/ui/button";
+import { Input } from "@/components/common/ui/input";
+import { Label } from "@/components/common/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ticketing/common/ui/dialog";
+} from "@/components/common/ui/dialog";
 import {
   Table,
   TableBody,
@@ -18,10 +19,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ticketing/common/ui/table";
+} from "@/components/common/ui/table";
 import { ArrowLeft, Info } from "lucide-react";
 import { useWristband } from "@/hooks/ticketing/useWristband";
+import { useWristbandStatsQuery } from "@/hooks/ticketing/useWristbandStatsQuery";
 import type { WristbandAttendee, WristbandStats } from "@/types/ticketing/model/wristband.model";
+import { cn } from "@/components/common/ui/utils";
 
 interface WristbandOperationScreenProps {
   eventId: string;
@@ -33,37 +36,30 @@ interface WristbandOperationScreenProps {
 type ConfirmAction = "issue" | "cancel";
 
 export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: WristbandOperationScreenProps) {
-  const { getStats, findAttendee, issueWristband, cancelWristband, error } = useWristband();
+  const { findAttendee, issueWristband, cancelWristband, error } = useWristband();
+  const statsQuery = useWristbandStatsQuery(eventId);
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
   const [issuing, setIssuing] = useState(false);
   const [searchResults, setSearchResults] = useState<WristbandAttendee[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [stats, setStats] = useState<WristbandStats | null>(null);
-  const [statsLoading, setStatsLoading] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [selectedAttendee, setSelectedAttendee] = useState<WristbandAttendee | null>(null);
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>("issue");
 
   useEffect(() => {
-    let active = true;
-    setStatsLoading(true);
-    getStats(eventId)
-      .then((data) => {
-        if (active) {
-          setStats(data);
-        }
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        if (active) {
-          setStatsLoading(false);
-        }
-      });
-    return () => {
-      active = false;
-    };
-  }, [eventId, getStats]);
+    if (!statsQuery.data) {
+      return;
+    }
+    setStats(statsQuery.data);
+  }, [statsQuery.data]);
+
+  const statsLoading = statsQuery.isPending || statsQuery.isFetching;
+  const resolvedErrorMessage =
+    error?.message ??
+    statsQuery.error?.message ??
+    null;
 
   const resolvedStats = useMemo(() => {
     return (
@@ -175,6 +171,15 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
   };
 
   const isCancelConfirm = confirmAction === "cancel";
+  const confirmDialogContentClass = isCancelConfirm
+    ? "border-[var(--admin-dialog-cancel-border)] bg-[var(--admin-dialog-cancel-bg)] shadow-[0_24px_56px_var(--admin-dialog-shadow)]"
+    : "border-[var(--admin-dialog-issue-border)] bg-[var(--admin-dialog-issue-bg)] shadow-[0_24px_56px_var(--admin-dialog-shadow)]";
+  const confirmDialogTitleClass = isCancelConfirm
+    ? "text-[var(--admin-dialog-cancel-title)]"
+    : "text-[var(--admin-dialog-issue-title)]";
+  const confirmActionButtonClass = isCancelConfirm
+    ? "!border-[var(--admin-danger-action-border)] !bg-[var(--admin-danger-action-bg)] !text-[var(--admin-danger-action-text)] hover:!bg-[var(--admin-danger-action-hover-bg)]"
+    : "border-[var(--admin-issue-action-border)] bg-[var(--admin-issue-action-bg)] text-[var(--admin-issue-action-text)] hover:bg-[var(--admin-issue-action-hover-bg)]";
 
   return (
     <div className="space-y-6">
@@ -193,9 +198,9 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
         </Button>
       </div>
 
-      {error && (
+      {resolvedErrorMessage && (
         <div className="rounded-lg border border-[var(--admin-alert-error-border)] bg-[var(--admin-alert-error-bg)] px-4 py-3 text-sm text-[var(--admin-alert-error-text)]">
-          {error.message || "요청에 실패했습니다. 서버 상태 또는 토큰 설정을 확인해주세요."}
+          {resolvedErrorMessage || "요청에 실패했습니다. 서버 상태 또는 토큰 설정을 확인해주세요."}
         </div>
       )}
 
@@ -444,16 +449,12 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
           }
         }}
       >
-        <DialogContent
-          className={`admin-confirm-dialog ${isCancelConfirm ? "admin-confirm-dialog--cancel" : "admin-confirm-dialog--issue"}`}
-        >
+        <DialogContent className={confirmDialogContentClass}>
           <DialogHeader>
-            <DialogTitle
-              className={isCancelConfirm ? "admin-confirm-dialog__title--cancel" : "admin-confirm-dialog__title--issue"}
-            >
+            <DialogTitle className={confirmDialogTitleClass}>
               {isCancelConfirm ? "팔찌 지급 취소 확인" : "팔찌 지급 확인"}
             </DialogTitle>
-            <DialogDescription className="admin-confirm-dialog__description">
+            <DialogDescription className="text-[var(--admin-dialog-description-text)]">
               {isCancelConfirm
                 ? "해당 학생의 지급 완료 상태를 취소하시겠습니까? 취소 이력은 로그에 남습니다."
                 : "해당 학생에게 팔찌를 지급 처리하시겠습니까?"}
@@ -471,11 +472,7 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
             </Button>
             <Button
               variant={isCancelConfirm ? "destructive" : "default"}
-              className={
-                isCancelConfirm
-                  ? "admin-confirm-dialog__confirm--cancel !border-[var(--admin-danger-action-border)] !bg-[var(--admin-danger-action-bg)] !text-[var(--admin-danger-action-text)] hover:!bg-[var(--admin-danger-action-hover-bg)]"
-                  : "admin-confirm-dialog__confirm--issue"
-              }
+              className={cn(confirmActionButtonClass)}
               onClick={handleConfirmAction}
               disabled={issuing}
             >

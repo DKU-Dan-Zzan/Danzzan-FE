@@ -1,4 +1,5 @@
-﻿import { useCallback, useState } from "react";
+﻿// 역할: 관리자 팔찌 운영 API 호출과 로딩/오류 상태를 묶어 제공하는 훅입니다.
+import { useCallback, useState } from "react";
 import { wristbandApi } from "@/api/ticketing/wristbandApi";
 import type { WristbandAttendee, WristbandSession, WristbandStats } from "@/types/ticketing/model/wristband.model";
 

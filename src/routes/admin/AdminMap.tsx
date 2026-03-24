@@ -1,16 +1,11 @@
+// 역할: 관리자 지도 편집 화면에서 부스/단과대 좌표 조회와 저장 상호작용을 관리합니다.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  AlertCircle,
   ArrowLeft,
   Loader2,
-  Map,
-  MapPin,
   RefreshCcw,
   Save,
-  School,
-  Tent,
-  Trash2,
 } from "lucide-react";
 import {
   clearBoothLocation,
@@ -19,146 +14,56 @@ import {
   type AdminMapCollege,
   updateBoothLocation,
   updateCollegeLocation,
-  updateActiveOperationDate,
-} from "../../api/adminMapApi";
-import useKakaoMapLoader from "../../hooks/useKakaoMapLoader";
+} from "@/api/app/admin/adminMapApi";
+import useKakaoMapLoader from "@/hooks/app/boothmap/useKakaoMapLoader";
+import { AdminMapSidebar } from "@/routes/admin/components/AdminMapSidebar";
+import { AdminShell } from "@/components/layout/AdminShell";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/common/ui/alert-dialog";
+import {
+  createAnchorDotContent,
+  createLabelContent,
+  createMarkerImage,
+} from "@/routes/admin/adminMapMarkerUtils";
+import type { EditorMode, SelectedItem } from "@/routes/admin/adminMapTypes";
+import type {
+  KakaoCustomOverlay,
+  KakaoGlobal,
+  KakaoMap,
+  KakaoMarker,
+  KakaoMouseEvent,
+} from "@/types/app/boothmap/kakao-map";
 
 declare global {
   interface Window {
-    kakao: any;
+    kakao: KakaoGlobal;
   }
 }
 
-function createCollegeMarkerSvg(selected: boolean) {
-  const stroke = selected ? "#1d4ed8" : "#1e40af";
-  const fill = selected ? "#dbeafe" : "#eff6ff";
-
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-    <svg width="44" height="52" viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M22 50C22 50 38 33.8 38 21C38 11.6112 30.3888 4 21 4C11.6112 4 4 11.6112 4 21C4 33.8 22 50 22 50Z"
-        fill="${fill}" stroke="${stroke}" stroke-width="3"/>
-      <path d="M14 20.5L22 15L30 20.5V29.5H14V20.5Z" fill="${stroke}"/>
-      <rect x="19.5" y="21.5" width="5" height="8" rx="1" fill="white"/>
-    </svg>
-  `)}`;
-}
-
-function getBoothColor(type?: string) {
-  if (type === "FOOD_TRUCK") return "#ef4444";
-  if (type === "EXPERIENCE") return "#10b981";
-  if (type === "EVENT") return "#f6da3b";
-  if (type === "FACILITY") return "#3b82f6";
-  return "#10b981";
-}
-
-function createBoothMarkerSvg(type: string | undefined, selected: boolean) {
-  const mainColor = getBoothColor(type);
-  const stroke = selected ? "#111827" : mainColor;
-  const fill = selected ? "#ffffff" : mainColor;
-  const inner = selected ? mainColor : "#ffffff";
-
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-    <svg width="44" height="52" viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M22 50C22 50 38 33.8 38 21C38 11.6112 30.3888 4 21 4C11.6112 4 4 11.6112 4 21C4 33.8 22 50 22 50Z"
-        fill="${fill}" stroke="${stroke}" stroke-width="3"/>
-      <circle cx="21" cy="21" r="7" fill="${inner}" />
-    </svg>
-  `)}`;
-}
-
-function createMarkerImage(
-  kakao: any,
-  options: {
-    kind: "booth" | "college";
-    boothType?: string;
-    selected: boolean;
-  },
-) {
-  const width = options.selected ? 44 : 36;
-  const height = options.selected ? 52 : 44;
-
-  const size = new kakao.maps.Size(width, height);
-  const offset = new kakao.maps.Point(width / 2, height);
-
-  const src =
-    options.kind === "college"
-      ? createCollegeMarkerSvg(options.selected)
-      : createBoothMarkerSvg(options.boothType, options.selected);
-
-  return new kakao.maps.MarkerImage(src, size, { offset });
-}
-
-function createLabelContent(options: {
-  name: string;
-  kind: "booth" | "college";
-  selected: boolean;
-  dimmed: boolean;
-}) {
-  const accent = options.kind === "college" ? "#2563eb" : "#10b981";
-  const background = options.selected ? accent : "#ffffff";
-  const color = options.selected ? "#ffffff" : "#111827";
-  const border = options.selected ? accent : "#d1d5db";
-  const opacity = options.dimmed ? 0.55 : 1;
-
-  return `
-    <div style="
-      pointer-events:none;
-      transform: translateY(-52px);
-      opacity:${opacity};
-    ">
-      <div style="
-        display:inline-flex;
-        align-items:center;
-        max-width:180px;
-        padding:6px 10px;
-        border-radius:999px;
-        border:1px solid ${border};
-        background:${background};
-        color:${color};
-        font-size:12px;
-        font-weight:700;
-        line-height:1;
-        white-space:nowrap;
-        box-shadow:0 6px 14px rgba(15,23,42,0.12);
-      ">
-        ${options.name}
-      </div>
-    </div>
-  `;
-}
-
-function createAnchorDotContent(selected: boolean, kind: "booth" | "college") {
-  const color = kind === "college" ? "#2563eb" : "#10b981";
-  const size = selected ? 10 : 8;
-  const border = selected ? "#111827" : "#ffffff";
-
-  return `
-    <div style="
-      width:${size}px;
-      height:${size}px;
-      border-radius:999px;
-      background:${color};
-      border:2px solid ${border};
-      box-shadow:0 2px 6px rgba(15,23,42,0.18);
-      pointer-events:none;
-    "></div>
-  `;
-}
-
-type EditorMode = "idle" | "booth" | "college";
-type SelectedItem =
-  | { kind: "booth"; id: number }
-  | { kind: "college"; id: number }
-  | null;
-
 export default function AdminMap() {
   const navigate = useNavigate();
-  const { isLoaded: isKakaoLoaded, isError: isKakaoError } = useKakaoMapLoader();
+  const { isLoaded: isKakaoLoaded } = useKakaoMapLoader();
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<any>(null);
-  const mapClickHandlerRef = useRef<((mouseEvent: any) => void) | null>(null);
-  const markerRefs = useRef<Array<{ marker: any; overlay: any | null; dotOverlay: any }>>([]);
+  const mapRef = useRef<KakaoMap | null>(null);
+  const mapClickHandlerRef = useRef<((mouseEvent: KakaoMouseEvent) => void) | null>(
+    null,
+  );
+  const markerRefs = useRef<
+    Array<{
+      marker: KakaoMarker;
+      overlay: KakaoCustomOverlay | null;
+      dotOverlay: KakaoCustomOverlay;
+    }>
+  >([]);
 
   const [editorMode, setEditorMode] = useState<EditorMode>("idle");
   const [selectedItem, setSelectedItem] = useState<SelectedItem>(null);
@@ -169,6 +74,7 @@ export default function AdminMap() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [pendingClearBooth, setPendingClearBooth] = useState<{ id: number; name: string } | null>(null);
   const [statusMessage, setStatusMessage] = useState<string>(
     "보기 모드입니다. 부스 편집 또는 단과대 편집 모드를 선택해 주세요."
   );
@@ -195,8 +101,6 @@ export default function AdminMap() {
     selectedItem?.kind === "college"
       ? colleges.find((college) => college.id === selectedItem.id) ?? null
       : null;
-
-  const selectedInfo = selectedBooth ?? selectedCollege;
 
   const loadMapData = useCallback(async (date?: string) => {
     try {
@@ -321,7 +225,7 @@ export default function AdminMap() {
       kakao.maps.event.removeListener(map, "click", mapClickHandlerRef.current);
     }
 
-    const handleMapClick = (mouseEvent: any) => {
+    const handleMapClick = (mouseEvent: KakaoMouseEvent) => {
       const latlng = mouseEvent.latLng;
       const lat = latlng.getLat();
       const lng = latlng.getLng();
@@ -354,6 +258,7 @@ export default function AdminMap() {
     markerRefs.current = [];
 
     const bounds = new kakao.maps.LatLngBounds();
+    let hasPosition = false;
 
     colleges.forEach((college) => {
       if (college.locationX == null || college.locationY == null) return;
@@ -447,6 +352,7 @@ export default function AdminMap() {
 
       markerRefs.current.push({ marker, overlay, dotOverlay });
       bounds.extend(position);
+      hasPosition = true;
     });
 
     placedBooths.forEach((booth) => {
@@ -540,12 +446,8 @@ export default function AdminMap() {
 
       markerRefs.current.push({ marker, overlay, dotOverlay });
       bounds.extend(position);
+      hasPosition = true;
     });
-
-    let hasPosition = false;
-
-    // college/booth loop 안에서 bounds.extend(position) 할 때
-    hasPosition = true;
 
     if (hasPosition) {
       map.setBounds(bounds);
@@ -608,7 +510,6 @@ export default function AdminMap() {
       setSaving(true);
       setGlobalError(null);
 
-      // await updateActiveOperationDate(date);
       setSelectedDate(date);
       setSelectedItem(null);
       setEditorMode("idle");
@@ -623,20 +524,25 @@ export default function AdminMap() {
     }
   };
 
-  const handleClearBoothLocation = async () => {
+  const handleClearBoothLocation = () => {
     if (!selectedBooth) return;
+    setPendingClearBooth({ id: selectedBooth.id, name: selectedBooth.name });
+  };
 
-    const confirmed = window.confirm("이 부스의 지도 좌표를 제거하시겠습니까?");
-    if (!confirmed) return;
+  const confirmClearBoothLocation = async () => {
+    if (!pendingClearBooth) {
+      return;
+    }
 
     try {
       setSaving(true);
       setGlobalError(null);
-      await clearBoothLocation(selectedBooth.id);
-      updateBoothState(selectedBooth.id, null, null);
+      await clearBoothLocation(pendingClearBooth.id);
+      updateBoothState(pendingClearBooth.id, null, null);
       setSelectedItem(null);
       setEditorMode("idle");
-      setStatusMessage("부스 좌표를 제거했습니다.");
+      setStatusMessage(`부스 좌표를 제거했습니다: ${pendingClearBooth.name}`);
+      setPendingClearBooth(null);
     } catch (error) {
       setGlobalError(
         error instanceof Error ? error.message : "부스 좌표 제거에 실패했습니다.",
@@ -647,262 +553,63 @@ export default function AdminMap() {
   };
 
   return (
-    <div className="min-h-dvh bg-[var(--bg-base)]">
-      <header className="sticky top-0 z-20 border-b border-[var(--border-base)] bg-[var(--bg-base)]">
-        <div className="mx-auto flex w-full max-w-[1360px] items-center justify-between px-8 py-3">
-          <div>
-            <p className="text-[8px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">
-              ADMIN PORTAL
-            </p>
-            <h1 className="text-2xl font-semibold text-[var(--text)]">
-              지도 편집 관리자 페이지
-            </h1>
-          </div>
+    <>
+    <AdminShell
+      title="지도 편집 관리자 페이지"
+      headerClassName="sticky top-0 z-20 border-b border-[var(--border-base)] bg-[var(--admin-header-bg)]"
+      mainClassName="mx-auto grid w-full max-w-[1360px] gap-6 px-6 py-6 lg:grid-cols-[360px_minmax(0,1fr)]"
+      actions={
+        <>
+          <button
+            type="button"
+            onClick={() => navigate("/admin")}
+            className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
+          >
+            <ArrowLeft className="h-4 w-4" strokeWidth={2.3} />
+            관리자 홈
+          </button>
 
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => navigate("/admin")}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
-            >
-              <ArrowLeft className="h-4 w-4" strokeWidth={2.3} />
-              관리자 홈
-            </button>
+          <button
+            type="button"
+            onClick={() => void loadMapData()}
+            className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
+          >
+            <RefreshCcw className="h-4 w-4" strokeWidth={2.3} />
+            새로고침
+          </button>
 
-            <button
-              type="button"
-              onClick={() => void loadMapData()}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
-            >
-              <RefreshCcw className="h-4 w-4" strokeWidth={2.3} />
-              새로고침
-            </button>
-
-            <button
-              type="button"
-              disabled
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md bg-[var(--accent)] px-3 text-sm font-medium text-white opacity-70"
-            >
-              <Save className="h-4 w-4" strokeWidth={2.3} />
-              {saving ? "저장 중..." : "즉시 저장"}
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto grid w-full max-w-[1360px] gap-6 px-6 py-6 lg:grid-cols-[360px_minmax(0,1fr)]">
-        <aside className="space-y-4">
-          {globalError && (
-            <div className="flex items-start gap-2 rounded-2xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-3 text-sm text-[var(--status-danger-text)]">
-              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={2.3} />
-              <p>{globalError}</p>
-            </div>
-          )}
-
-          <section className="rounded-2xl border border-[var(--border-base)] bg-white p-4 shadow-sm">
-            <h2 className="text-sm font-bold text-[var(--text)]">현재 운영 일차</h2>
-            <p className="mt-1 text-xs text-[var(--text-muted)]">
-              여기서 선택한 날짜는 관리자 지도 편집 기준입니다.
-            </p>
-
-            <div className="mt-3 flex gap-2">
-              {FESTIVAL_DATES.map((date) => {
-                const isSelected = selectedDate === date;
-
-                return (
-                  <button
-                    key={date}
-                    type="button"
-                    onClick={() => void handleChangeDate(date)}
-                    className={`rounded-2xl px-4 py-2 text-sm font-semibold transition-colors ${
-                      isSelected
-                        ? "bg-[var(--accent)] text-white"
-                        : "border border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text)] hover:bg-[var(--border-base)]"
-                    }`}
-                  >
-                    {date}
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-
-          <section className="rounded-2xl border border-[var(--border-base)] bg-white p-4 shadow-sm">
-            <div className="flex items-center gap-2">
-              <Map className="h-4 w-4 text-[var(--accent)]" strokeWidth={2.3} />
-              <h2 className="text-sm font-bold text-[var(--text)]">편집 도구</h2>
-            </div>
-
-            <p className="mt-1 text-xs text-[var(--text-muted)]">
-              부스 편집 모드에서는 부스만, 단과대 편집 모드에서는 단과대만 이동할 수 있습니다.
-            </p>
-
-            <div className="mt-4 flex flex-col gap-2">
-              <button
-                type="button"
-                onClick={activateBoothMode}
-                className={`flex items-center gap-2 rounded-2xl border px-3 py-3 text-sm font-semibold transition-colors ${
-                  editorMode === "booth"
-                    ? "border-[var(--accent)] bg-[var(--accent)]/5 text-[var(--accent)]"
-                    : "border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text)] hover:bg-[var(--border-base)]"
-                }`}
-              >
-                <Tent className="h-4 w-4" strokeWidth={2.3} />
-                부스 편집 모드
-              </button>
-
-              <button
-                type="button"
-                onClick={activateCollegeMode}
-                className={`flex items-center gap-2 rounded-2xl border px-3 py-3 text-sm font-semibold transition-colors ${
-                  editorMode === "college"
-                    ? "border-[var(--accent)] bg-[var(--accent)]/5 text-[var(--accent)]"
-                    : "border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text)] hover:bg-[var(--border-base)]"
-                }`}
-              >
-                <School className="h-4 w-4" strokeWidth={2.3} />
-                단과대 편집 모드
-              </button>
-
-              <button
-                type="button"
-                onClick={handleClearSelection}
-                className="flex items-center gap-2 rounded-2xl border border-[var(--border-base)] bg-white px-3 py-3 text-sm font-semibold text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-subtle)]"
-              >
-                <Trash2 className="h-4 w-4" strokeWidth={2.3} />
-                선택 해제
-              </button>
-            </div>
-
-            <div className="mt-4 rounded-2xl bg-[var(--surface-subtle)] px-3 py-3 text-xs leading-5 text-[var(--text-muted)]">
-              {statusMessage || "왼쪽 목록에서 항목을 선택하면 편집 안내가 여기에 표시됩니다."}
-            </div>
-          </section>
-
-          <section className="rounded-2xl border border-[var(--border-base)] bg-white p-4 shadow-sm">
-            <h2 className="text-sm font-bold text-[var(--text)]">배치 안 된 부스</h2>
-            <p className="mt-1 text-xs text-[var(--text-muted)]">
-              먼저 선택한 뒤 지도에서 위치를 지정해 주세요.
-            </p>
-
-            <div className="mt-3 max-h-64 space-y-2 overflow-y-auto">
-              {unplacedBooths.length === 0 && (
-                <div className="rounded-2xl bg-[var(--surface-subtle)] px-3 py-4 text-center text-sm text-[var(--text-muted)]">
-                  배치되지 않은 부스가 없습니다.
-                </div>
-              )}
-
-              {unplacedBooths.map((booth) => {
-                const isSelected =
-                  selectedItem?.kind === "booth" && selectedItem.id === booth.id;
-
-                return (
-                  <button
-                    key={booth.id}
-                    type="button"
-                    onClick={() => handleSelectBooth(booth.id)}
-                    className={`w-full rounded-2xl border px-3 py-3 text-left transition-colors ${
-                      isSelected
-                        ? "border-[var(--accent)] bg-[var(--accent)]/10 ring-2 ring-[var(--accent)]/20"
-                        : "border-[var(--border-base)] bg-[var(--surface-subtle)] hover:bg-[var(--border-base)]"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-sm font-semibold text-[var(--text)]">
-                        {booth.name}
-                      </span>
-                      <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-[var(--text-muted)]">
-                        {booth.type}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-
-          <section className="rounded-2xl border border-[var(--border-base)] bg-white p-4 shadow-sm">
-            <h2 className="text-sm font-bold text-[var(--text)]">단과대 목록</h2>
-
-            <div className="mt-3 max-h-64 space-y-2 overflow-y-auto">
-              {colleges.map((college) => {
-                const isSelected =
-                  selectedItem?.kind === "college" && selectedItem.id === college.id;
-
-                return (
-                  <button
-                    key={college.id}
-                    type="button"
-                    onClick={() => handleSelectCollege(college.id)}
-                    className={`w-full rounded-2xl border px-3 py-3 text-left transition-colors ${
-                      isSelected
-                        ? "border-[var(--accent)] bg-[var(--accent)]/10 ring-2 ring-[var(--accent)]/20"
-                        : "border-[var(--border-base)] bg-[var(--surface-subtle)] hover:bg-[var(--border-base)]"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-sm font-semibold text-[var(--text)]">
-                        {college.name}
-                      </span>
-                      <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-[var(--text-muted)]">
-                        {college.locationX != null && college.locationY != null ? "배치됨" : "미배치"}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-
-          <section className="rounded-2xl border border-[var(--border-base)] bg-white p-4 shadow-sm">
-            <h2 className="text-sm font-bold text-[var(--text)]">선택된 항목 정보</h2>
-
-            <div className="mt-3 rounded-2xl border border-dashed border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-6">
-              {!selectedInfo && (
-                <div className="text-center">
-                  <MapPin className="mx-auto h-5 w-5 text-[var(--text-muted)]" strokeWidth={2.3} />
-                  <p className="mt-2 text-sm font-semibold text-[var(--text-muted)]">
-                    아직 선택된 항목이 없습니다
-                  </p>
-                </div>
-              )}
-
-              {selectedBooth && (
-                <div className="space-y-2">
-                  <p className="text-sm font-bold text-[var(--text)]">{selectedBooth.name}</p>
-                  <p className="text-xs text-[var(--text-muted)]">유형: {selectedBooth.type}</p>
-                  <p className="text-xs text-[var(--text-muted)]">
-                    경도(X): {selectedBooth.locationX ?? "-"}
-                  </p>
-                  <p className="text-xs text-[var(--text-muted)]">
-                    위도(Y): {selectedBooth.locationY ?? "-"}
-                  </p>
-
-                  <button
-                    type="button"
-                    onClick={() => void handleClearBoothLocation()}
-                    className="mt-2 inline-flex items-center gap-1 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-500 hover:bg-red-100"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
-                    부스 좌표 제거
-                  </button>
-                </div>
-              )}
-
-              {selectedCollege && (
-                <div className="space-y-2">
-                  <p className="text-sm font-bold text-[var(--text)]">{selectedCollege.name}</p>
-                  <p className="text-xs text-[var(--text-muted)]">
-                    경도(X): {selectedCollege.locationX ?? "-"}
-                  </p>
-                  <p className="text-xs text-[var(--text-muted)]">
-                    위도(Y): {selectedCollege.locationY ?? "-"}
-                  </p>
-                </div>
-              )}
-            </div>
-          </section>
-        </aside>
+          <button
+            type="button"
+            disabled
+            className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md bg-[var(--accent)] px-3 text-sm font-medium text-white opacity-70"
+          >
+            <Save className="h-4 w-4" strokeWidth={2.3} />
+            {saving ? "저장 중..." : "즉시 저장"}
+          </button>
+        </>
+      }
+    >
+        <AdminMapSidebar
+          globalError={globalError}
+          festivalDates={FESTIVAL_DATES}
+          selectedDate={selectedDate}
+          editorMode={editorMode}
+          statusMessage={statusMessage}
+          unplacedBooths={unplacedBooths}
+          colleges={colleges}
+          selectedItem={selectedItem}
+          selectedBooth={selectedBooth}
+          selectedCollege={selectedCollege}
+          onChangeDate={(date) => {
+            void handleChangeDate(date);
+          }}
+          onActivateBoothMode={activateBoothMode}
+          onActivateCollegeMode={activateCollegeMode}
+          onClearSelection={handleClearSelection}
+          onSelectBooth={handleSelectBooth}
+          onSelectCollege={handleSelectCollege}
+          onClearBoothLocation={handleClearBoothLocation}
+        />
 
         <section className="rounded-2xl border border-[var(--border-base)] bg-white p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between">
@@ -931,7 +638,36 @@ export default function AdminMap() {
             )}
           </div>
         </section>
-      </main>
-    </div>
+    </AdminShell>
+    <AlertDialog
+      open={Boolean(pendingClearBooth)}
+      onOpenChange={(open) => {
+        if (!open && !saving) {
+          setPendingClearBooth(null);
+        }
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>부스 좌표 제거</AlertDialogTitle>
+          <AlertDialogDescription>
+            선택한 부스의 지도 좌표를 제거하시겠습니까?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={saving}>취소</AlertDialogCancel>
+          <AlertDialogAction
+            disabled={saving}
+            onClick={(event) => {
+              event.preventDefault();
+              void confirmClearBoothLocation();
+            }}
+          >
+            {saving ? "처리 중..." : "제거"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }

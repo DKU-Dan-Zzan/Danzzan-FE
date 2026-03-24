@@ -1,4 +1,12 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+// 역할: 부스맵 메인 라우트에서 2D/3D 지도, 필터, 상세 시트 상태를 통합 제어합니다.
+import {
+  Suspense,
+  lazy,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import type {
   Booth,
   College,
@@ -10,18 +18,17 @@ import type {
   SelectedDetailItem,
   SheetMode,
   SheetSnap,
-} from "./types/boothmap.types";
+} from "@/types/app/boothmap/boothmap.types";
 
-import PrimaryFilterChips from "./components/PrimaryFilterChips";
-import SecondaryCollegeChips from "./components/SecondaryCollegeChips";
-import KakaoMapView from "./components/KakaoMapView";
-import BottomSheet from "./components/BottomSheet";
-import BoothList from "./components/BoothList";
-import PubList from "./components/PubList";
-import DetailSheet from "./components/DetailSheet";
-import MapFloatingToggle from "./components/MapFloatingToggle";
-import Mapbox3DView from "./components/Mapbox3DView";
-import FestivalDateTabs from "./components/FestivalDateTabs";
+import PrimaryFilterChips from "@/components/app/boothmap/PrimaryFilterChips";
+import SecondaryCollegeChips from "@/components/app/boothmap/SecondaryCollegeChips";
+import KakaoMapView from "@/components/app/boothmap/KakaoMapView";
+import BottomSheet from "@/components/app/boothmap/BottomSheet";
+import BoothList from "@/components/app/boothmap/BoothList";
+import PubList from "@/components/app/boothmap/PubList";
+import DetailSheet from "@/components/app/boothmap/DetailSheet";
+import MapFloatingToggle from "@/components/app/boothmap/MapFloatingToggle";
+import FestivalDateTabs from "@/components/app/boothmap/FestivalDateTabs";
 
 import {
   getBoothMap,
@@ -29,7 +36,21 @@ import {
   type BoothDto,
   type CollegeDto,
   type PubSummaryResponse,
-} from "../../api/boothmapApi";
+} from "@/api/app/boothmap/boothmapApi";
+import { appQueryKeys, useAppQuery } from "@/lib/query";
+import {
+  getShouldShowPubList,
+  getVisibleBooths,
+  getVisibleColleges,
+  getVisiblePubs,
+} from "@/routes/boothmap/boothMapSelectors";
+import { cn } from "@/components/common/ui/utils";
+
+const loadMapbox3DView = async () => {
+  await import("mapbox-gl/dist/mapbox-gl.css");
+  return import("@/components/app/boothmap/Mapbox3DView");
+};
+const LazyMapbox3DView = lazy(loadMapbox3DView);
 
 const DEFAULT_MAP_VIEWPORT: MapViewport = {
   lat: 37.3201,
@@ -45,6 +66,18 @@ const FESTIVAL_DATES = [
   { label: "2일차", value: "2026-05-13" },
   { label: "3일차", value: "2026-05-14" },
 ]
+const TOP_PANEL_Z_INDEX_CLASS: Record<SheetSnap, string> = {
+  PEEK: "z-[70]",
+  HALF: "z-[70]",
+  FULL: "z-[40]",
+}
+const MAP_MODE_TRANSITION_MS = 280;
+const MAPBOX_WARMUP_FALLBACK_DELAY_MS = 900;
+const MAPBOX_WARMUP_IDLE_TIMEOUT_MS = 1800;
+
+const warmupMapbox3DAssets = async () => {
+  await loadMapbox3DView();
+};
 
 function mapCollegeDtoToCollege(dto: CollegeDto): College {
   return {
@@ -59,7 +92,7 @@ function mapBoothDtoToBooth(dto: BoothDto): Booth {
   return {
     id: dto.boothId,
     name: dto.name,
-    type: dto.type as Booth["type"],
+    type: dto.type,
     location_x: dto.locationX,
     location_y: dto.locationY,
   };
@@ -82,6 +115,7 @@ function mapPubSummaryToPub(dto: PubSummaryResponse): Pub {
 
 export default function BoothMap() {
   const [mode, setMode] = useState<MapMode>("2D");
+  const [render3DLayer, setRender3DLayer] = useState(mode === "3D");
   const [primaryFilter, setPrimaryFilter] = useState<PrimaryFilter>("ALL");
   const [selectedMapItem, setSelectedMapItem] = useState<SelectedMapItem>(null);
   const [selectedDetailItem, setSelectedDetailItem] = useState<SelectedDetailItem>(null);
@@ -90,12 +124,6 @@ export default function BoothMap() {
   const [sheetSnap, setSheetSnap] = useState<SheetSnap>("PEEK");
   const [selectedDate, setSelectedDate] = useState("2026-05-12");
   const [mapViewport, setMapViewport] = useState<MapViewport>(DEFAULT_MAP_VIEWPORT);
-
-  const [colleges, setColleges] = useState<College[]>([]);
-  const [booths, setBooths] = useState<Booth[]>([]);
-  const [pubs, setPubs] = useState<Pub[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
   const [bottomNavHeight, setBottomNavHeight] = useState(56);
 
   const frameWidth = 430;
@@ -124,43 +152,89 @@ export default function BoothMap() {
   }, []);
 
   useEffect(() => {
-    let isMounted = true;
+    if (mode === "3D") {
+      const frameId = window.requestAnimationFrame(() => {
+        setRender3DLayer(true);
+      });
 
-    async function fetchMapData() {
-      try {
-        setIsLoading(true);
-        setIsError(false);
-
-        const [boothMapData, pubsData] = await Promise.all([
-          getBoothMap(selectedDate),
-          getPubs(selectedDate),
-        ]);
-
-        if (!isMounted) return;
-
-        const mappedColleges = boothMapData.colleges.map(mapCollegeDtoToCollege);
-        const mappedBooths = boothMapData.booths.map(mapBoothDtoToBooth);
-        const mappedPubs = pubsData.map(mapPubSummaryToPub)
-
-        setColleges(mappedColleges);
-        setBooths(mappedBooths);
-        setPubs(mappedPubs);
-      } catch (error) {
-        console.error("부스맵 데이터 조회 실패", error);
-        if (!isMounted) return;
-        setIsError(true);
-      } finally {
-        if (!isMounted) return;
-        setIsLoading(false);
-      }
+      return () => {
+        window.cancelAnimationFrame(frameId);
+      };
     }
 
-    fetchMapData();
+    const timeoutId = window.setTimeout(() => {
+      setRender3DLayer(false);
+    }, MAP_MODE_TRANSITION_MS);
 
     return () => {
-      isMounted = false;
+      window.clearTimeout(timeoutId);
     };
-  }, [selectedDate]);
+  }, [mode]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (typeof window.requestIdleCallback === "function") {
+      const idleId = window.requestIdleCallback(
+        () => {
+          if (cancelled) {
+            return;
+          }
+          void warmupMapbox3DAssets();
+        },
+        { timeout: MAPBOX_WARMUP_IDLE_TIMEOUT_MS },
+      );
+
+      return () => {
+        cancelled = true;
+        if (typeof window.cancelIdleCallback === "function") {
+          window.cancelIdleCallback(idleId);
+        }
+      };
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      if (cancelled) {
+        return;
+      }
+      void warmupMapbox3DAssets();
+    }, MAPBOX_WARMUP_FALLBACK_DELAY_MS);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
+
+  const mapDataQuery = useAppQuery({
+    queryKey: appQueryKeys.boothMapData(selectedDate),
+    queryFn: async ({ signal }) => {
+      const [boothMapData, pubsData] = await Promise.all([
+        getBoothMap(selectedDate, { signal }),
+        getPubs(selectedDate, { signal }),
+      ]);
+
+      return {
+        colleges: boothMapData.colleges.map(mapCollegeDtoToCollege),
+        booths: boothMapData.booths.map(mapBoothDtoToBooth),
+        pubs: pubsData.map(mapPubSummaryToPub),
+      };
+    },
+    staleTime: 60_000,
+  });
+
+  const colleges = useMemo<College[]>(
+    () => mapDataQuery.data?.colleges ?? [],
+    [mapDataQuery.data?.colleges],
+  );
+  const booths = useMemo<Booth[]>(
+    () => mapDataQuery.data?.booths ?? [],
+    [mapDataQuery.data?.booths],
+  );
+  const pubs = useMemo<Pub[]>(
+    () => mapDataQuery.data?.pubs ?? [],
+    [mapDataQuery.data?.pubs],
+  );
 
   const handlePrimaryChange = (next: PrimaryFilter) => {
     setPrimaryFilter(next);
@@ -175,25 +249,18 @@ export default function BoothMap() {
   };
 
   const visibleBooths = useMemo(() => {
-    if (primaryFilter === "ALL") return booths;
-    if (primaryFilter === "PUB") return [];
-    return booths.filter((b) => b.type === primaryFilter);
+    return getVisibleBooths(primaryFilter, booths);
   }, [primaryFilter, booths]);
 
   const visibleColleges = useMemo(() => {
-    if (primaryFilter === "ALL") return colleges;
-    if (primaryFilter !== "PUB") return [];
-    if (!selectedCollegeId) return colleges;
-    return colleges.filter((c) => c.id === selectedCollegeId);
+    return getVisibleColleges(primaryFilter, colleges, selectedCollegeId);
   }, [primaryFilter, colleges, selectedCollegeId]);
 
   const visiblePubs = useMemo(() => {
-    if (!selectedCollegeId) return pubs;
-    return pubs.filter((p) => p.college_id === selectedCollegeId);
+    return getVisiblePubs(pubs, selectedCollegeId);
   }, [pubs, selectedCollegeId]);
 
-  const shouldShowPubList =
-    primaryFilter === "PUB" || selectedMapItem?.kind === "college";
+  const shouldShowPubList = getShouldShowPubList(primaryFilter, selectedMapItem);
 
   const onClickMarkerBooth = useCallback((id: number) => {
     setSelectedMapItem({ kind: "booth", id });
@@ -225,30 +292,46 @@ export default function BoothMap() {
     setSheetSnap("FULL");
   }, []);
 
-  if (isLoading) {
+  if (mapDataQuery.isPending && !mapDataQuery.data) {
     return (
-      <div className="flex h-screen items-center justify-center bg-white">
-        <div className="text-sm font-semibold text-gray-500">
+      <div className="flex h-screen items-center justify-center bg-[var(--boothmap-surface)]">
+        <div className="text-sm font-semibold text-[var(--boothmap-text-subtle)]">
           부스맵을 불러오는 중...
         </div>
       </div>
     );
   }
 
-  if (isError) {
+  if (mapDataQuery.error) {
     return (
-      <div className="flex h-screen items-center justify-center bg-white">
-        <div className="text-sm font-semibold text-red-500">
-          부스맵 정보를 불러오지 못했어요.
+      <div className="flex h-screen items-center justify-center bg-[var(--boothmap-surface)]">
+        <div className="rounded-xl border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-danger-bg)] px-4 py-3 text-sm font-semibold text-[var(--boothmap-danger-text)]">
+          <div>부스맵 정보를 불러오지 못했어요.</div>
+          <button
+            type="button"
+            onClick={() => {
+              void mapDataQuery.refetch();
+            }}
+            className="mt-2 rounded-md border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-surface)] px-2 py-1 text-xs font-semibold text-[var(--boothmap-danger-text)]"
+          >
+            다시 시도
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-white">
+    <div className="relative h-screen w-full overflow-hidden bg-[var(--boothmap-surface)]">
       <div className="absolute inset-0">
-        {mode === "2D" ? (
+        <div
+          className={cn(
+            "absolute inset-0 transition-all duration-300 ease-out",
+            mode === "2D"
+              ? "opacity-100 translate-x-0 scale-100 pointer-events-auto"
+              : "opacity-0 -translate-x-1 scale-[0.985] pointer-events-none",
+          )}
+        >
           <KakaoMapView
             booths={visibleBooths}
             colleges={visibleColleges}
@@ -261,28 +344,48 @@ export default function BoothMap() {
             onClickCollege={onClickMarkerCollege}
             onPrimaryFilterChange={handlePrimaryChange}
           />
-        ) : (
-          <Mapbox3DView
-            booths={visibleBooths}
-            colleges={visibleColleges}
-            primaryFilter={primaryFilter}
-            selectedMapItem={selectedMapItem}
-            sheetSnap={sheetSnap}
-            viewport={mapViewport}
-            onViewportChange={setMapViewport}
-            onClickBooth={onClickMarkerBooth}
-            onClickCollege={onClickMarkerCollege}
-            onPrimaryFilterChange={handlePrimaryChange}
-          />
+        </div>
+
+        {render3DLayer && (
+          <div
+            className={cn(
+              "absolute inset-0 transition-all duration-300 ease-out",
+              mode === "3D"
+                ? "opacity-100 translate-x-0 scale-100 pointer-events-auto"
+                : "opacity-0 translate-x-1 scale-[0.985] pointer-events-none",
+            )}
+          >
+            <Suspense
+              fallback={
+                <div className="flex h-full w-full items-center justify-center bg-[var(--boothmap-surface)] text-sm font-semibold text-[var(--boothmap-text-subtle)]">
+                  3D 지도를 불러오는 중...
+                </div>
+              }
+            >
+              <LazyMapbox3DView
+                booths={visibleBooths}
+                colleges={visibleColleges}
+                primaryFilter={primaryFilter}
+                selectedMapItem={selectedMapItem}
+                sheetSnap={sheetSnap}
+                viewport={mapViewport}
+                onViewportChange={setMapViewport}
+                onClickBooth={onClickMarkerBooth}
+                onClickCollege={onClickMarkerCollege}
+                onPrimaryFilterChange={handlePrimaryChange}
+              />
+            </Suspense>
+          </div>
         )}
       </div>
 
       <div
-        className={`absolute left-1/2 top-3 w-[calc(100%-24px)] max-w-[430px] -translate-x-1/2 ${
-          sheetSnap === "FULL" ? "z-[40]" : "z-[70]"
-        }`}
+        className={cn(
+          "absolute left-1/2 top-3 w-[calc(100%-24px)] max-w-[var(--app-mobile-shell-max-width)] -translate-x-1/2",
+          TOP_PANEL_Z_INDEX_CLASS[sheetSnap],
+        )}
       >
-        <div className="rounded-[28px] border border-white/70 bg-white/92 px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.08)] backdrop-blur-md">
+        <div className="rounded-[28px] border border-[var(--boothmap-panel-border)] bg-[var(--boothmap-panel-bg)] px-3 py-2 shadow-[var(--boothmap-panel-shadow)] backdrop-blur-md">
           <FestivalDateTabs
             dates={FESTIVAL_DATES}
             selectedDate={selectedDate}

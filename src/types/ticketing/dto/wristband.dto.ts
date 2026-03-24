@@ -1,3 +1,4 @@
+// 역할: 팔찌 운영 API DTO 타입을 정의합니다.
 // 백엔드 ApiResponse 래퍼
 export interface ApiResponse<T> {
   success: boolean;

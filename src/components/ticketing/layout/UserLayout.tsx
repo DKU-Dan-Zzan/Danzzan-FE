@@ -1,17 +1,30 @@
+// 역할: 티켓팅 사용자 화면 공통 상단바와 본문 레이아웃을 제공합니다.
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import BottomNav from "@/components/layout/BottomNav";
-import { AppHeaderLogo } from "@/components/layout/AppHeaderLogo";
+import Footer from "@/components/layout/Footer";
+import { AppTopBar } from "@/components/layout/AppTopBar";
+import { AppShell } from "@/components/layout/AppShell";
+import { shouldShowTicketingHeader } from "@/lib/ticketing/navigation/headerVisibility";
 
 export function UserLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, role } = useAuth();
-  const isAuthPage = location.pathname === "/ticket/login" || location.pathname === "/ticket/signup";
+  const { session, role } = useAuth();
+  const isTicketingAuthPage =
+    location.pathname === "/ticket/login" ||
+    location.pathname === "/ticket/signup" ||
+    location.pathname.startsWith("/ticket/reset-password");
   const isTicketingPage = location.pathname.startsWith("/ticket/ticketing");
-  const isMyTicketPage = location.pathname.startsWith("/ticket/myticket");
-  const showHeader = isAuthenticated && role === "student" && !isAuthPage;
+  const isMyTicketPage =
+    location.pathname.startsWith("/ticket/my-ticket") ||
+    location.pathname.startsWith("/ticket/myticket");
+  const showHeader = shouldShowTicketingHeader({
+    pathname: location.pathname,
+    accessToken: session.tokens?.accessToken,
+    role,
+  });
   const pageTitle = "축제 포털";
 
   const handleBack = () => {
@@ -36,45 +49,51 @@ export function UserLayout() {
     navigate("/ticket/login", { replace: true });
   };
 
-  const bottomNavPaddingClass = "pb-[calc(84px+env(safe-area-inset-bottom)+0.75rem)]";
+  const contentTopPaddingClass = isMyTicketPage
+    ? "pt-3"
+    : isTicketingAuthPage
+      ? "pt-1"
+      : "pt-[var(--app-header-first-card-gap)]";
+  const mainClassName = showHeader
+    ? "flex-1 overflow-x-hidden pt-[calc(env(safe-area-inset-top)+4rem)]"
+    : "flex-1 overflow-x-hidden";
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[var(--bg-base)]">
-      {showHeader && (
-        <>
-          <div
-            aria-hidden="true"
-            className="app-main-header pointer-events-none fixed inset-x-0 top-0 z-30 h-[max(env(safe-area-inset-top),2.75rem)] sm:hidden"
-          />
-          <header className="app-main-header sticky top-0 z-40 border-b border-[var(--app-header-border)] pt-[env(safe-area-inset-top)]">
-            <div className="relative mx-auto h-16 w-full max-w-md px-4">
-              <AppHeaderLogo />
-
-              <button
-                onClick={handleBack}
-                className="app-header-ticket-button absolute top-1/2 left-4 -translate-y-1/2"
-                aria-label="뒤로가기"
-                title="뒤로가기"
-              >
-                <ArrowLeft size={18} className="app-header-ticket-icon" />
-              </button>
-
-              <h1 className="sr-only">{pageTitle}</h1>
-            </div>
-          </header>
-        </>
-      )}
-
-      <main
+    <AppShell
+      header={
+        showHeader ? (
+          <AppTopBar
+            title={pageTitle}
+            showSafeAreaOverlay
+            headerClassName="fixed inset-x-0 top-0 z-40 border-b border-[var(--app-header-border)] bg-[var(--app-header-bg)] [background-image:var(--app-header-bg-gradient)] bg-no-repeat bg-[length:100%_100%] pt-[env(safe-area-inset-top)]"
+            containerClassName="relative mx-auto h-16 w-full max-w-md px-4"
+          >
+            <button
+              onClick={handleBack}
+              className="absolute top-1/2 left-4 flex h-[var(--app-header-ticket-btn-size)] w-[var(--app-header-ticket-btn-size)] -translate-y-1/2 items-center justify-center rounded-full border border-[var(--app-header-ticket-btn-border)] bg-[linear-gradient(145deg,var(--app-header-ticket-btn-bg-start)_0%,var(--app-header-ticket-btn-bg-end)_100%)] shadow-[var(--app-header-ticket-btn-shadow)] backdrop-blur-[6px] transition-[transform,box-shadow,filter] duration-[180ms] hover:shadow-[var(--app-header-ticket-btn-shadow-hover)] hover:brightness-[1.01] active:scale-[0.96]"
+              aria-label="뒤로가기"
+              title="뒤로가기"
+            >
+              <ArrowLeft size={18} className="text-[var(--app-header-ticket-btn-icon)]" />
+            </button>
+          </AppTopBar>
+        ) : undefined
+      }
+      footer={<Footer />}
+      bottomNav={<BottomNav />}
+      rootClassName="min-h-dvh overflow-x-hidden bg-[var(--bg-base)]"
+      frameClassName="mx-auto flex min-h-dvh w-full max-w-[var(--app-mobile-shell-max-width)] flex-col bg-[var(--bg-base)] pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]"
+      mainClassName={mainClassName}
+    >
+      <div
         className={
           showHeader
-            ? `relative mx-auto w-full max-w-md px-4 ${isMyTicketPage ? "pt-3" : "pt-[var(--app-header-first-card-gap)]"} ${bottomNavPaddingClass}`
-            : `relative mx-auto min-h-screen w-full max-w-md ${bottomNavPaddingClass}`
+            ? `relative mx-auto min-h-full w-full max-w-md px-4 ${contentTopPaddingClass}`
+            : "relative mx-auto min-h-full w-full max-w-md"
         }
       >
         <Outlet />
-      </main>
-      <BottomNav />
-    </div>
+      </div>
+    </AppShell>
   );
 }

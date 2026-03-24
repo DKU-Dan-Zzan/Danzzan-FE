@@ -1,4 +1,5 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+﻿// 역할: 취소 가능한 OpenAPI 비동기 요청 추상화를 제공합니다.
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */

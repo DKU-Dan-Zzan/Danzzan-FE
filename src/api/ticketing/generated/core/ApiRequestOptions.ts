@@ -1,4 +1,5 @@
-﻿/* generated using openapi-typescript-codegen -- do not edit */
+﻿// 역할: OpenAPI 요청 실행에 필요한 옵션 타입을 정의합니다.
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */

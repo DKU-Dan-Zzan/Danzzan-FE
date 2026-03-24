@@ -1,3 +1,4 @@
+// 역할: 티켓팅 비밀번호 정책 검사와 사용자 피드백 메시지 생성을 담당합니다.
 export const PASSWORD_MIN_LENGTH = 8;
 export const PASSWORD_SPECIAL_CHAR_REGEX = /[\W_]/;
 export const PASSWORD_POLICY_ERROR_MESSAGE =

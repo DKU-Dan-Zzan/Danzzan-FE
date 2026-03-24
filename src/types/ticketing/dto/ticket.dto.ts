@@ -1,4 +1,5 @@
-﻿export interface TicketDto {
+﻿// 역할: 티켓/이벤트/대기열 API DTO 타입을 정의합니다.
+export interface TicketDto {
   id?: string | number;
   status?: string;
   eventName?: string;

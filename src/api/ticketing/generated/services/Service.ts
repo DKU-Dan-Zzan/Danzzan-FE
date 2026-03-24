@@ -1,3 +1,4 @@
+// 역할: OpenAPI 스펙 기반 티켓팅 엔드포인트 메서드를 제공하는 서비스 클라이언트입니다.
 /* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */

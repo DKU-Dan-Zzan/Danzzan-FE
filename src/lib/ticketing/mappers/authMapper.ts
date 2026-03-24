@@ -1,4 +1,5 @@
-﻿import type { AuthLoginResponseDto } from "@/types/ticketing/dto/auth.dto";
+﻿// 역할: 인증 API 응답을 세션 도메인 모델로 매핑합니다.
+import type { AuthLoginResponseDto } from "@/types/ticketing/dto/auth.dto";
 import type { AuthSession, AuthTokens, AuthUser } from "@/types/ticketing/model/auth.model";
 
 const mapUserRole = (role?: string): AuthUser["role"] => {
@@ -31,9 +32,31 @@ const mapAuthTokens = (dto: AuthLoginResponseDto): AuthTokens => {
   };
 };
 
-export const mapAuthLoginResponse = (dto: AuthLoginResponseDto): AuthSession => {
+type ApiEnvelope<T> = {
+  data?: T | null;
+} & Record<string, unknown>;
+
+const unwrapAuthLoginDto = (
+  dto: AuthLoginResponseDto | ApiEnvelope<AuthLoginResponseDto>,
+): AuthLoginResponseDto => {
+  if (!dto || typeof dto !== "object") {
+    return {};
+  }
+
+  const data = (dto as ApiEnvelope<AuthLoginResponseDto>).data;
+  if (data && typeof data === "object") {
+    return data;
+  }
+
+  return dto as AuthLoginResponseDto;
+};
+
+export const mapAuthLoginResponse = (
+  dto: AuthLoginResponseDto | ApiEnvelope<AuthLoginResponseDto>,
+): AuthSession => {
+  const normalized = unwrapAuthLoginDto(dto);
   return {
-    tokens: mapAuthTokens(dto),
-    user: mapAuthUserDto(dto.user),
+    tokens: mapAuthTokens(normalized),
+    user: mapAuthUserDto(normalized.user),
   };
 };

@@ -1,0 +1,592 @@
+{
+  "entries": [
+    {
+      "ruleId": "FILE_COMPONENT_PASCAL_CASE",
+      "target": "src/components/common/ui/**",
+      "reason": "업스트림(shadcn/ui) 파일명 규칙과 동기화 유지",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_GLOBAL_SELECTOR",
+      "target": ".font-cute",
+      "reason": "전역 폰트 유틸 클래스",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_GLOBAL_SELECTOR",
+      "target": ".scrollbar-hide",
+      "reason": "크로스브라우저 스크롤바 숨김 유틸",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/components/app/boothmap/KakaoMapView.tsx",
+      "reason": "Map SDK 렌더링 제약으로 인한 런타임 색상 지정 최소 허용",
+      "owner": "fe-platform",
+      "expiresAt": "2026-06-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/components/app/boothmap/Mapbox3DView.tsx",
+      "reason": "Map SDK 렌더링 제약으로 인한 런타임 색상 지정 최소 허용",
+      "owner": "fe-platform",
+      "expiresAt": "2026-06-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/routes/admin/AdminMap.tsx",
+      "reason": "관리자 지도 편집 SDK 커스텀 마커 색상 지정 최소 허용",
+      "owner": "fe-platform",
+      "expiresAt": "2026-06-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/utils/app/boothmap/boothmapTheme.ts",
+      "reason": "지도 SDK marker theme 상수의 최소 허용",
+      "owner": "fe-platform",
+      "expiresAt": "2026-06-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#0a559c",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#0f172a",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#10b981",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#111827",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#15803d",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#1b5e20",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#1d4ed8",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#1e40af",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#1f2937",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#2563eb",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#2e7d32",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#32405f",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#334155",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#3b82f6",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#475569",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#4b5563",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#61708f",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#7c4a00",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#8a1c16",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#8b97ad",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#93c5fd",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#9ca3af",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#a9473d",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#b26a00",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#b3261e",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#b71c1c",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#b91c1c",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#bfdbfe",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#c62828",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#c84f8c",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#d1d5db",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#dbeafe",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#dc2626",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#e2e8f0",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#e3776a",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#e5e7eb",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#e6007a",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ef4444",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#eff6ff",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f1f6fd",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f2f7ff",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f3f4f6",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f5a6cf",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f5cfe1",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f6ca3b",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f7faff",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f8fafc",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f8fbff",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fca5a5",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fecaca",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fee2e2",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffe6f3",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fff2f8",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fff5f5",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffffff",
+      "reason": "전역 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/app/boothmap/DetailSheet.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/app/boothmap/FestivalDateTabs.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/app/home/EmergencyNotice.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/app/home/LineupCarousel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/app/home/PosterCarousel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/app/timetable/TimelineItem.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/common/figma/ImageWithFallback.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/admin/WristbandOperationScreen.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/MyTicketListPanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/PaperTicketCard.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/ReservationAlreadyPanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/ReservationProcessingPanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/ReservationSoldOutPanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/ReservationSuccessPanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/TicketingEventListPanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/TicketingHomePanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/TicketingReservationPanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/TicketingShared.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/components/ticketing/panels/WaitingRoomPanel.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/routes/admin/AdminLogin.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/routes/admin/AdminMap.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_CLASSNAME_TEMPLATE_INTERPOLATION",
+      "target": "src/routes/ticketing/reset-password/ResetPassword.tsx",
+      "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
+      "owner": "fe-platform",
+      "expiresAt": "2026-09-30"
+    }
+  ]
+}

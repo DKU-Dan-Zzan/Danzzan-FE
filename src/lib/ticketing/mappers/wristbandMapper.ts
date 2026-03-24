@@ -1,4 +1,5 @@
-﻿import type {
+﻿// 역할: 팔찌 운영 API 응답 DTO를 관리자 화면 모델로 변환합니다.
+import type {
   EventSummaryDto,
   EventStatsResponseDto,
   TicketSearchItemDto,
