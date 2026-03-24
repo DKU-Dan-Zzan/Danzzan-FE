@@ -1,6 +1,6 @@
 // 역할: boothmap contract 응답 스키마를 검증하고 도메인 형태로 정규화한다.
 
-import type { BoothType } from "@/types/app/boothmap/boothmap.types";
+import type { BoothSubType, BoothType } from "@/types/app/boothmap/boothmap.types";
 
 type RecordLike = Record<string, unknown>;
 
@@ -11,6 +11,12 @@ const BOOTH_TYPE_VALUES: BoothType[] = [
   "FACILITY",
 ];
 const boothTypeSet = new Set<BoothType>(BOOTH_TYPE_VALUES);
+const BOOTH_SUB_TYPE_VALUES: BoothSubType[] = [
+  "TOILET",
+  "RESTROOM",
+  "SMOKING_AREA",
+];
+const boothSubTypeSet = new Set<BoothSubType>(BOOTH_SUB_TYPE_VALUES);
 
 const isRecord = (value: unknown): value is RecordLike => {
   return Boolean(value) && typeof value === "object";
@@ -86,6 +92,27 @@ const parseBoothType = (raw: unknown, endpoint: string, label: string): BoothTyp
   return normalized;
 };
 
+const parseBoothSubType = (
+  raw: unknown,
+  endpoint: string,
+  label: string,
+): BoothSubType | null => {
+  if (raw === undefined || raw === null) {
+    return null;
+  }
+
+  if (typeof raw !== "string" || !raw.trim()) {
+    throw new BoothmapContractError(endpoint, `${label} subType 값이 올바르지 않습니다.`);
+  }
+
+  const normalized = raw.trim().toUpperCase() as BoothSubType;
+  if (!boothSubTypeSet.has(normalized)) {
+    return null;
+  }
+
+  return normalized;
+};
+
 export class BoothmapContractError extends Error {
   readonly endpoint: string;
 
@@ -107,6 +134,7 @@ export type ContractBoothDto = {
   boothId: number;
   name: string;
   type: BoothType;
+  subType: BoothSubType | null;
   locationX: number;
   locationY: number;
 };
@@ -188,6 +216,7 @@ export const parseBoothMapContract = (payload: unknown, endpoint: string): Contr
     const boothId = readNumber(item, "boothId");
     const name = readString(item, "name");
     const type = parseBoothType(item.type, endpoint, `booths[${index}]`);
+    const subType = parseBoothSubType(item.subType, endpoint, `booths[${index}]`);
     const locationX = readNumber(item, "locationX");
     const locationY = readNumber(item, "locationY");
     if (
@@ -203,6 +232,7 @@ export const parseBoothMapContract = (payload: unknown, endpoint: string): Contr
       boothId,
       name,
       type,
+      subType,
       locationX,
       locationY,
     };

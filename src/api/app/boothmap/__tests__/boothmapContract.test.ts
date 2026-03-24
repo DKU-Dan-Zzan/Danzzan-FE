@@ -27,6 +27,7 @@ describe("boothmapContract", () => {
               boothId: 1,
               name: "푸드트럭 A",
               type: "FOOD_TRUCK",
+              subType: null,
               locationX: 127.12,
               locationY: 37.31,
             },
@@ -38,6 +39,7 @@ describe("boothmapContract", () => {
 
     expect(parsed.colleges).toHaveLength(1);
     expect(parsed.booths[0]?.type).toBe("FOOD_TRUCK");
+    expect(parsed.booths[0]?.subType).toBeNull();
   });
 
   it("유효하지 않은 booth type은 오류를 던진다", () => {
@@ -114,5 +116,25 @@ describe("boothmapContract", () => {
     );
 
     expect(parsed.imageUrls).toHaveLength(1);
+  });
+  it("facility booth subType을 파싱한다", () => {
+    const parsed = parseBoothMapContract(
+      {
+        colleges: [],
+        booths: [
+          {
+            boothId: 10,
+            name: "흡연구역 A",
+            type: "FACILITY",
+            subType: "SMOKING_AREA",
+            locationX: 120.5,
+            locationY: 88.3,
+          },
+        ],
+      },
+      "/map/booth-map",
+    );
+
+    expect(parsed.booths[0]?.subType).toBe("SMOKING_AREA");
   });
 });

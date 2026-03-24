@@ -1,5 +1,7 @@
 // 역할: 부스맵 카테고리별 색상/아이콘 테마 매핑 유틸을 제공한다.
 
+import type { BoothSubType } from "@/types/app/boothmap/boothmap.types";
+
 export type BoothmapMarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "EVENT" | "FACILITY";
 export type BoothmapZoneType = "PUB" | "FOOD_TRUCK";
 export type BoothmapLabelKind = "booth" | "college";
@@ -101,6 +103,33 @@ export function getBoothmapMarkerTheme(type: BoothmapMarkerType): { color: strin
   return {
     color: getBoothmapColor(theme.colorToken),
     iconPath: theme.iconPath,
+  };
+}
+
+export function getBoothmapBoothMarkerTheme(params: {
+  type?: string | null;
+  subType?: BoothSubType | string | null;
+}): { color: string; iconPath: string } {
+  const markerType = parseBoothmapMarkerType(params.type ?? undefined);
+  const baseTheme = getBoothmapMarkerTheme(markerType);
+
+  if (markerType !== "FACILITY") {
+    return baseTheme;
+  }
+
+  const normalizedSubType =
+    typeof params.subType === "string" ? params.subType.trim().toUpperCase() : null;
+
+  if (normalizedSubType === "SMOKING_AREA") {
+    return {
+      color: baseTheme.color,
+      iconPath: "/markers/facility-smoking.svg",
+    };
+  }
+
+  return {
+    color: baseTheme.color,
+    iconPath: "/markers/facility-restroom.svg",
   };
 }
 

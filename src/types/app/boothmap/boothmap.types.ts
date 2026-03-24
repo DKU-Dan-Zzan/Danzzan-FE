@@ -5,6 +5,7 @@
 export type MapMode = "2D" | "3D";
 
 export type BoothType = "EXPERIENCE" | "FOOD_TRUCK" | "EVENT" | "FACILITY";
+export type BoothSubType = "TOILET" | "RESTROOM" | "SMOKING_AREA";
 export type PrimaryFilter = "ALL" | "PUB" | BoothType;
 
 export type SheetMode = "LIST" | "DETAIL";
@@ -30,6 +31,7 @@ export type Booth = {
   id: number;
   name: string;
   type: BoothType;
+  subType?: BoothSubType | null;
   description?: string;
   image_url?: string;
   location_x: number; // lng

@@ -12,6 +12,7 @@ import type {
 import { MAP_ZONES } from "@/utils/app/boothmap/mapZones";
 import {
   getBoothmapColor,
+  getBoothmapBoothMarkerTheme,
   getBoothmapMarkerColor,
   getBoothmapMarkerTheme,
   getBoothmapZonePalette,
@@ -60,11 +61,12 @@ type MapFeatureProperties = {
   kind: "booth" | "college";
   name: string;
   markerType: MarkerType;
+  markerIcon: string;
   isSelected: boolean;
 };
 
-function getMarkerConfig(type: MarkerType) {
-  return getBoothmapMarkerTheme(type);
+function getMarkerConfig(params: { type: MarkerType; subType?: Booth["subType"] }) {
+  return getBoothmapBoothMarkerTheme(params);
 }
 
 function createPinDataUrl(color: string) {
@@ -93,8 +95,8 @@ function mapboxZoomToKakaoLevel(zoom: number) {
   return Math.min(4, Math.max(1, Math.round((20.4 - zoom) / 1.5)));
 }
 
-function buildSelectedMarkerElement(type: MarkerType, title: string) {
-  const { iconPath, color } = getMarkerConfig(type);
+function buildSelectedMarkerElement(type: MarkerType, title: string, subType?: Booth["subType"]) {
+  const { iconPath, color } = getMarkerConfig({ type, subType });
   const pinUrl = createPinDataUrl(color);
   const selectedShadow = getBoothmapColor("selectedShadow");
   const overlayShadow = getBoothmapColor("overlayShadow");
@@ -277,6 +279,7 @@ function getSelectedItemData(
       lat: booth.location_y,
       name: booth.name,
       type: booth.type,
+      subType: booth.subType,
     };
   }
 
@@ -377,6 +380,7 @@ export default function Mapbox3DView({
           kind: "booth",
           name: booth.name,
           markerType: booth.type,
+          markerIcon: getMarkerConfig({ type: booth.type, subType: booth.subType }).iconPath,
           isSelected,
         } satisfies MapFeatureProperties,
       });
@@ -396,6 +400,7 @@ export default function Mapbox3DView({
           kind: "college",
           name: `${college.name} 주점`,
           markerType: "PUB",
+          markerIcon: getBoothmapMarkerTheme("PUB").iconPath,
           isSelected,
         } satisfies MapFeatureProperties,
       });
@@ -454,7 +459,8 @@ export default function Mapbox3DView({
       { id: "marker-foodtruck", src: "/markers/booth-foodtruck.svg" },
       { id: "marker-experience", src: "/markers/booth-experience.svg" },
       { id: "marker-event", src: "/markers/booth-event.svg" },
-      { id: "marker-facility", src: "/markers/facility-restroom.svg" },
+      { id: "marker-facility-restroom", src: "/markers/facility-restroom.svg" },
+      { id: "marker-facility-smoking", src: "/markers/facility-smoking.svg" },
     ];
 
     for (const imageDef of imageDefs) {
@@ -541,17 +547,19 @@ export default function Mapbox3DView({
         layout: {
           "icon-image": [
             "match",
-            ["get", "markerType"],
-            "PUB",
+            ["get", "markerIcon"],
+            "/markers/booth-pub.svg",
             "marker-pub",
-            "FOOD_TRUCK",
+            "/markers/booth-foodtruck.svg",
             "marker-foodtruck",
-            "EXPERIENCE",
+            "/markers/booth-experience.svg",
             "marker-experience",
-            "EVENT",
+            "/markers/booth-event.svg",
             "marker-event",
-            "FACILITY",
-            "marker-facility",
+            "/markers/facility-smoking.svg",
+            "marker-facility-smoking",
+            "/markers/facility-restroom.svg",
+            "marker-facility-restroom",
             "marker-experience",
           ],
           "icon-size": [
@@ -682,18 +690,20 @@ export default function Mapbox3DView({
     lat,
     name,
     type,
+    subType,
   }: {
     lng: number;
     lat: number;
     name: string;
     type: MarkerType;
+    subType?: Booth["subType"];
   }) => {
     const map = mapRef.current;
     if (!map) return;
 
     clearSelectionOverlays();
 
-    const selectedEl = buildSelectedMarkerElement(type, name);
+    const selectedEl = buildSelectedMarkerElement(type, name, subType);
     selectedMarkerRef.current = new mapboxgl.Marker({
       element: selectedEl,
       anchor: "bottom",
