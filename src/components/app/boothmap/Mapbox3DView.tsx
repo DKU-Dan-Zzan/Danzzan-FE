@@ -12,6 +12,7 @@ import type {
 import { MAP_ZONES } from "@/utils/app/boothmap/mapZones";
 import {
   getBoothmapColor,
+  getBoothmapBoothMarkerTheme,
   getBoothmapMarkerColor,
   getBoothmapMarkerTheme,
   getBoothmapZonePalette,
@@ -37,6 +38,9 @@ const DEFAULT_ZOOM = 16.6;
 const DEFAULT_PITCH = 55;
 const DEFAULT_BEARING = -20;
 const FOCUSED_ZOOM = 17.8;
+const CATEGORY_FIT_PADDING = 40;
+const CATEGORY_FIT_ZOOM_BONUS = 0.45;
+const CATEGORY_FIT_MAX_ZOOM = 17.2;
 const DANKOOK_BOUNDS: [[number, number], [number, number]] = [
   [127.116, 37.315],
   [127.137, 37.3295],
@@ -60,11 +64,12 @@ type MapFeatureProperties = {
   kind: "booth" | "college";
   name: string;
   markerType: MarkerType;
+  markerIcon: string;
   isSelected: boolean;
 };
 
-function getMarkerConfig(type: MarkerType) {
-  return getBoothmapMarkerTheme(type);
+function getMarkerConfig(params: { type: MarkerType; subType?: Booth["subType"] }) {
+  return getBoothmapBoothMarkerTheme(params);
 }
 
 function createPinDataUrl(color: string) {
@@ -93,8 +98,8 @@ function mapboxZoomToKakaoLevel(zoom: number) {
   return Math.min(4, Math.max(1, Math.round((20.4 - zoom) / 1.5)));
 }
 
-function buildSelectedMarkerElement(type: MarkerType, title: string) {
-  const { iconPath, color } = getMarkerConfig(type);
+function buildSelectedMarkerElement(type: MarkerType, title: string, subType?: Booth["subType"]) {
+  const { iconPath, color } = getMarkerConfig({ type, subType });
   const pinUrl = createPinDataUrl(color);
   const selectedShadow = getBoothmapColor("selectedShadow");
   const overlayShadow = getBoothmapColor("overlayShadow");
@@ -169,9 +174,9 @@ function buildSelectedMarkerElement(type: MarkerType, title: string) {
   return wrapper;
 }
 
-function buildZoneDotElement(color: string, label: string, count: number) {
+function buildZoneMarkerElement(type: MarkerType, label: string) {
+  const { iconPath, color } = getMarkerConfig({ type });
   const overlayShadow = getBoothmapColor("overlayShadow");
-  const overlayBadgeBackground = getBoothmapColor("overlayBadgeBackground");
   const overlayBadgeText = getBoothmapColor("overlayBadgeText");
 
   const wrapper = document.createElement("button");
@@ -179,39 +184,37 @@ function buildZoneDotElement(color: string, label: string, count: number) {
   wrapper.title = label;
   wrapper.setAttribute("aria-label", label);
   wrapper.style.position = "relative";
-  wrapper.style.width = "22px";
-  wrapper.style.height = "22px";
+  wrapper.style.width = "24px";
+  wrapper.style.height = "24px";
   wrapper.style.padding = "0";
   wrapper.style.border = "0";
   wrapper.style.background = "transparent";
   wrapper.style.cursor = "pointer";
+  wrapper.style.filter = `drop-shadow(0 8px 18px ${overlayShadow})`;
 
   const dot = document.createElement("div");
-  dot.style.width = "22px";
-  dot.style.height = "22px";
+  dot.style.position = "absolute";
+  dot.style.inset = "0";
   dot.style.borderRadius = "9999px";
   dot.style.background = color;
-  dot.style.border = "3px solid white";
-  dot.style.boxShadow = `0 8px 18px ${overlayShadow}`;
+  dot.style.border = `3px solid ${overlayBadgeText}`;
 
-  const badge = document.createElement("div");
-  badge.textContent = String(count);
-  badge.style.position = "absolute";
-  badge.style.left = "50%";
-  badge.style.top = "-28px";
-  badge.style.transform = "translateX(-50%)";
-  badge.style.padding = "4px 8px";
-  badge.style.borderRadius = "9999px";
-  badge.style.background = overlayBadgeBackground;
-  badge.style.color = overlayBadgeText;
-  badge.style.fontSize = "11px";
-  badge.style.fontWeight = "700";
-  badge.style.whiteSpace = "nowrap";
-  badge.style.boxShadow = `0 6px 14px ${overlayShadow}`;
-  badge.style.pointerEvents = "none";
+  const icon = document.createElement("img");
+  icon.src = iconPath;
+  icon.alt = "";
+  icon.style.position = "absolute";
+  icon.style.left = "50%";
+  icon.style.top = "50%";
+  icon.style.width = "11px";
+  icon.style.height = "11px";
+  icon.style.transform = "translate(-50%, -50%)";
+  icon.style.objectFit = "contain";
+  icon.style.pointerEvents = "none";
+  icon.style.filter = "brightness(0) invert(1)";
+  icon.draggable = false;
 
   wrapper.appendChild(dot);
-  wrapper.appendChild(badge);
+  wrapper.appendChild(icon);
 
   return wrapper;
 }
@@ -277,6 +280,7 @@ function getSelectedItemData(
       lat: booth.location_y,
       name: booth.name,
       type: booth.type,
+      subType: booth.subType,
     };
   }
 
@@ -309,6 +313,31 @@ function buildZoneFeatureCollection(
       properties: {},
     })),
   };
+}
+
+function fitCategoryBounds(
+  map: mapboxgl.Map,
+  bounds: mapboxgl.LngLatBounds,
+  options?: { bearing?: number; pitch?: number }
+) {
+  const camera = map.cameraForBounds(bounds, {
+    padding: CATEGORY_FIT_PADDING,
+    bearing: options?.bearing,
+    pitch: options?.pitch,
+  });
+
+  if (!camera) {
+    return;
+  }
+
+  map.easeTo({
+    center: camera.center,
+    zoom: Math.min((camera.zoom ?? DEFAULT_ZOOM) + CATEGORY_FIT_ZOOM_BONUS, CATEGORY_FIT_MAX_ZOOM),
+    bearing: camera.bearing,
+    pitch: camera.pitch,
+    duration: 800,
+    essential: true,
+  });
 }
 
 export default function Mapbox3DView({
@@ -355,11 +384,6 @@ export default function Mapbox3DView({
     []
   );
 
-  const pubCount = colleges.length;
-  const foodTruckCount = booths.filter(
-    (booth) => booth.type === "FOOD_TRUCK"
-  ).length;
-
   const layerGeoJson = useMemo<GeoJSON.FeatureCollection<GeoJSON.Point>>(() => {
     const features: GeoJSON.Feature<GeoJSON.Point>[] = [];
 
@@ -377,6 +401,7 @@ export default function Mapbox3DView({
           kind: "booth",
           name: booth.name,
           markerType: booth.type,
+          markerIcon: getMarkerConfig({ type: booth.type, subType: booth.subType }).iconPath,
           isSelected,
         } satisfies MapFeatureProperties,
       });
@@ -396,6 +421,7 @@ export default function Mapbox3DView({
           kind: "college",
           name: `${college.name} 주점`,
           markerType: "PUB",
+          markerIcon: getBoothmapMarkerTheme("PUB").iconPath,
           isSelected,
         } satisfies MapFeatureProperties,
       });
@@ -454,7 +480,8 @@ export default function Mapbox3DView({
       { id: "marker-foodtruck", src: "/markers/booth-foodtruck.svg" },
       { id: "marker-experience", src: "/markers/booth-experience.svg" },
       { id: "marker-event", src: "/markers/booth-event.svg" },
-      { id: "marker-facility", src: "/markers/facility-restroom.svg" },
+      { id: "marker-facility-restroom", src: "/markers/facility-restroom.svg" },
+      { id: "marker-facility-smoking", src: "/markers/facility-smoking.svg" },
     ];
 
     for (const imageDef of imageDefs) {
@@ -541,17 +568,19 @@ export default function Mapbox3DView({
         layout: {
           "icon-image": [
             "match",
-            ["get", "markerType"],
-            "PUB",
+            ["get", "markerIcon"],
+            "/markers/booth-pub.svg",
             "marker-pub",
-            "FOOD_TRUCK",
+            "/markers/booth-foodtruck.svg",
             "marker-foodtruck",
-            "EXPERIENCE",
+            "/markers/booth-experience.svg",
             "marker-experience",
-            "EVENT",
+            "/markers/booth-event.svg",
             "marker-event",
-            "FACILITY",
-            "marker-facility",
+            "/markers/facility-smoking.svg",
+            "marker-facility-smoking",
+            "/markers/facility-restroom.svg",
+            "marker-facility-restroom",
             "marker-experience",
           ],
           "icon-size": [
@@ -682,18 +711,20 @@ export default function Mapbox3DView({
     lat,
     name,
     type,
+    subType,
   }: {
     lng: number;
     lat: number;
     name: string;
     type: MarkerType;
+    subType?: Booth["subType"];
   }) => {
     const map = mapRef.current;
     if (!map) return;
 
     clearSelectionOverlays();
 
-    const selectedEl = buildSelectedMarkerElement(type, name);
+    const selectedEl = buildSelectedMarkerElement(type, name, subType);
     selectedMarkerRef.current = new mapboxgl.Marker({
       element: selectedEl,
       anchor: "bottom",
@@ -873,9 +904,8 @@ export default function Mapbox3DView({
     }
 
     if (showPubSummary && pubZone) {
-      const pubZonePalette = getBoothmapZonePalette("PUB");
       pubZone.markers.forEach((marker) => {
-        const element = buildZoneDotElement(pubZonePalette.dot, "주점 구역", pubCount);
+        const element = buildZoneMarkerElement("PUB", "주점 구역");
         element.onclick = (event) => {
           event.stopPropagation();
           onPrimaryFilterChange("PUB");
@@ -893,9 +923,8 @@ export default function Mapbox3DView({
     }
 
     if (showFoodTruckSummary && foodTruckZone) {
-      const foodTruckZonePalette = getBoothmapZonePalette("FOOD_TRUCK");
       foodTruckZone.markers.forEach((marker) => {
-        const element = buildZoneDotElement(foodTruckZonePalette.dot, "푸드트럭 구역", foodTruckCount);
+        const element = buildZoneMarkerElement("FOOD_TRUCK", "푸드트럭 구역");
         element.onclick = (event) => {
           event.stopPropagation();
           onPrimaryFilterChange("FOOD_TRUCK");
@@ -920,8 +949,6 @@ export default function Mapbox3DView({
     primaryFilter,
     pubZone,
     foodTruckZone,
-    pubCount,
-    foodTruckCount,
     onPrimaryFilterChange,
   ]);
 
@@ -943,10 +970,7 @@ export default function Mapbox3DView({
       const currentBearing = map.getBearing();
       const currentPitch = map.getPitch();
 
-      map.fitBounds(bounds, {
-        padding: 60,
-        duration: 800,
-        essential: true,
+      fitCategoryBounds(map, bounds, {
         bearing: currentBearing,
         pitch: currentPitch,
       });
@@ -963,17 +987,36 @@ export default function Mapbox3DView({
       const currentBearing = map.getBearing();
       const currentPitch = map.getPitch();
 
-      map.fitBounds(bounds, {
-        padding: 60,
-        duration: 800,
-        essential: true,
+      fitCategoryBounds(map, bounds, {
+        bearing: currentBearing,
+        pitch: currentPitch,
+      });
+    }
+
+    if (
+      primaryFilter !== "ALL" &&
+      primaryFilter !== "PUB" &&
+      primaryFilter !== "FOOD_TRUCK" &&
+      layerGeoJson.features.length > 0
+    ) {
+      const bounds = new mapboxgl.LngLatBounds();
+
+      layerGeoJson.features.forEach((feature) => {
+        const [lng, lat] = feature.geometry.coordinates;
+        bounds.extend([lng, lat]);
+      });
+
+      const currentBearing = map.getBearing();
+      const currentPitch = map.getPitch();
+
+      fitCategoryBounds(map, bounds, {
         bearing: currentBearing,
         pitch: currentPitch,
       });
     }
 
     prevPrimaryFilterRef.current = primaryFilter;
-  }, [primaryFilter, pubZone, foodTruckZone]);
+  }, [primaryFilter, pubZone, foodTruckZone, layerGeoJson]);
 
   useEffect(() => {
     const map = mapRef.current;

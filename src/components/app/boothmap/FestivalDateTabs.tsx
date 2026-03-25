@@ -30,7 +30,7 @@ export default function FestivalDateTabs({
               onClick={() => onChange(item.value)}
               className={`rounded-lg px-2 py-1.5 text-sm font-semibold transition-all ${
                 isSelected
-                  ? "bg-[var(--accent)] text-white shadow-[0_8px_18px_-10px_var(--shadow-color)]"
+                  ? "bg-[var(--boothmap-marker-pub)] text-[var(--boothmap-overlay-badge-text)] shadow-[0_1px_2px_var(--boothmap-overlay-shadow)]"
                   : "text-[var(--text-muted)] hover:bg-white/70 hover:text-[var(--text)]"
               }`}
             >

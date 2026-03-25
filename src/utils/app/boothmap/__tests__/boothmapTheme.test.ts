@@ -3,6 +3,7 @@
 import { describe, expect, it } from "vitest";
 import {
   getBoothmapColor,
+  getBoothmapBoothMarkerTheme,
   getBoothmapLabelAccent,
   getBoothmapMarkerTheme,
   getBoothmapZonePalette,
@@ -44,5 +45,23 @@ describe("boothmapTheme", () => {
   it("브라우저 환경이 아니면 fallback 색상을 반환한다", () => {
     expect(getBoothmapColor("overlayBadgeText")).toBe("#ffffff");
     expect(getBoothmapColor("overlayBadgeBackground")).toBe("#111827");
+  });
+  it("FACILITY는 subType에 따라 아이콘을 분기한다", () => {
+    expect(getBoothmapBoothMarkerTheme({ type: "FACILITY", subType: "SMOKING_AREA" })).toEqual({
+      color: "#3b82f6",
+      iconPath: "/markers/facility-smoking.svg",
+    });
+
+    expect(getBoothmapBoothMarkerTheme({ type: "FACILITY", subType: "TOILET" })).toEqual({
+      color: "#3b82f6",
+      iconPath: "/markers/facility-restroom.svg",
+    });
+  });
+
+  it("알 수 없는 FACILITY subType은 restroom 아이콘으로 fallback한다", () => {
+    expect(getBoothmapBoothMarkerTheme({ type: "FACILITY", subType: "UNKNOWN" })).toEqual({
+      color: "#3b82f6",
+      iconPath: "/markers/facility-restroom.svg",
+    });
   });
 });

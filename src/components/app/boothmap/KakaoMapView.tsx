@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef } from "react"
 import useKakaoMapLoader from "@/hooks/app/boothmap/useKakaoMapLoader"
 import {
   getBoothmapColor,
-  getBoothmapMarkerTheme,
+  getBoothmapBoothMarkerTheme,
   getBoothmapZonePalette,
   type BoothmapMarkerType,
 } from "@/utils/app/boothmap/boothmapTheme"
@@ -66,11 +66,12 @@ type OverlayRecord = {
   lng: number
   name: string
   type: MarkerType
+  subType?: Booth["subType"]
   onClick: () => void
 }
 
-function getMarkerConfig(type: MarkerType) {
-  return getBoothmapMarkerTheme(type)
+function getMarkerConfig(params: { type: MarkerType; subType?: Booth["subType"] }) {
+  return getBoothmapBoothMarkerTheme(params)
 }
 
 // 물방울 핀 모양 SVG를 data url로 생성
@@ -320,6 +321,7 @@ export default function KakaoMapView({
   // 마커 DOM 생성
   const createMarkerElement = ({
     type,
+    subType,
     isSelected,
     title,
     selectedLabel,
@@ -327,14 +329,15 @@ export default function KakaoMapView({
     onClick,
   }: {
     type: MarkerType
+    subType?: Booth["subType"]
     isSelected: boolean
     title: string
     selectedLabel?: string
     level: number
     onClick: () => void
   }) => {
-    const { iconPath } = getMarkerConfig(type)
-    const pinUrl = createPinDataUrl(getMarkerConfig(type).color)
+    const { iconPath, color } = getMarkerConfig({ type, subType })
+    const pinUrl = createPinDataUrl(color)
     const scale = getMarkerScaleByLevel(level, isSelected)
     const width = Math.round((isSelected ? 46 : 40) * scale)
     const height = Math.round((isSelected ? 56 : 50) * scale)
@@ -443,6 +446,7 @@ export default function KakaoMapView({
     lng,
     name,
     type,
+    subType,
     isSelected,
     onClick,
   }: {
@@ -452,6 +456,7 @@ export default function KakaoMapView({
     lng: number
     name: string
     type: MarkerType
+    subType?: Booth["subType"]
     isSelected: boolean
     onClick: () => void
   }): OverlayRecord => {
@@ -462,6 +467,7 @@ export default function KakaoMapView({
     const level = map?.getLevel?.() ?? 3
     const content = createMarkerElement({
       type,
+      subType,
       isSelected,
       title: name,
       selectedLabel: isSelected ? name : undefined,
@@ -487,6 +493,7 @@ export default function KakaoMapView({
       lng,
       name,
       type,
+      subType,
       onClick,
     }
   }
@@ -551,6 +558,17 @@ export default function KakaoMapView({
     return bounds
   }
 
+  const createItemBounds = (items: Array<{ lat: number; lng: number }>) => {
+    const { kakao } = window
+    const bounds = new kakao.maps.LatLngBounds()
+
+    items.forEach((item) => {
+      bounds.extend(new kakao.maps.LatLng(item.lat, item.lng))
+    })
+
+    return bounds
+  }
+
   const createZonePolygon = ({
     paths,
     strokeColor,
@@ -591,6 +609,7 @@ export default function KakaoMapView({
 
     const content = createMarkerElement({
       type: record.type,
+      subType: record.subType,
       isSelected,
       title: record.name,
       selectedLabel: isSelected ? record.name : undefined,
@@ -622,6 +641,7 @@ export default function KakaoMapView({
       lng: number
       name: string
       type: MarkerType
+      subType?: Booth["subType"]
       onClick: () => void
     }> = []
 
@@ -634,6 +654,7 @@ export default function KakaoMapView({
         lng: booth.location_x,
         name: booth.name,
         type: booth.type,
+        subType: booth.subType,
         onClick: () => onClickBooth(booth.id),
       })
     }
@@ -693,6 +714,7 @@ export default function KakaoMapView({
           lng: item.lng,
           name: item.name,
           type: item.type,
+          subType: item.subType,
           isSelected,
           onClick: item.onClick,
         })
@@ -713,6 +735,7 @@ export default function KakaoMapView({
             lng: item.lng,
             name: item.name,
             type: item.type,
+            subType: item.subType,
             isSelected,
             onClick: item.onClick,
           })
@@ -911,8 +934,18 @@ export default function KakaoMapView({
       map.setBounds(bounds)
     }
 
+    if (
+      primaryFilter !== "ALL" &&
+      primaryFilter !== "PUB" &&
+      primaryFilter !== "FOOD_TRUCK" &&
+      visibleItems.length > 0
+    ) {
+      const bounds = createItemBounds(visibleItems)
+      map.setBounds(bounds)
+    }
+
     prevPrimaryFilterRef.current = primaryFilter
-  }, [isLoaded, primaryFilter, pubZone, foodTruckZone])
+  }, [isLoaded, primaryFilter, pubZone, foodTruckZone, visibleItems])
 
   if (isError) {
     return (

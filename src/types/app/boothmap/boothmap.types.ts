@@ -5,6 +5,7 @@
 export type MapMode = "2D" | "3D";
 
 export type BoothType = "EXPERIENCE" | "FOOD_TRUCK" | "EVENT" | "FACILITY";
+export type BoothSubType = "TOILET" | "RESTROOM" | "SMOKING_AREA";
 export type PrimaryFilter = "ALL" | "PUB" | BoothType;
 
 export type SheetMode = "LIST" | "DETAIL";
@@ -30,23 +31,28 @@ export type Booth = {
   id: number;
   name: string;
   type: BoothType;
-  description?: string;
+  subType?: BoothSubType | null;
+  description?: string | null;
   image_url?: string;
   location_x: number; // lng
   location_y: number; // lat
+  startTime?: string | null;
+  endTime?: string | null;
 };
 
 export type Pub = {
   id: number;
   college_id: number;
   department_id: number;
-  department?: string;
+  department?: string | null;
   name: string;
-  intro?: string;
-  description?: string;
-  instagram?: string;
+  intro?: string | null;
+  description?: string | null;
+  instagram?: string | null;
   images?: string[];
   mainImageUrl?: string;
+  startTime?: string | null;
+  endTime?: string | null;
 };
 
 export type SelectedMapItem =

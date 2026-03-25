@@ -27,8 +27,11 @@ describe("boothmapContract", () => {
               boothId: 1,
               name: "푸드트럭 A",
               type: "FOOD_TRUCK",
+              subType: null,
               locationX: 127.12,
               locationY: 37.31,
+              startTime: "11:00",
+              endTime: "17:00",
             },
           ],
         },
@@ -38,6 +41,7 @@ describe("boothmapContract", () => {
 
     expect(parsed.colleges).toHaveLength(1);
     expect(parsed.booths[0]?.type).toBe("FOOD_TRUCK");
+    expect(parsed.booths[0]?.subType).toBeNull();
   });
 
   it("유효하지 않은 booth type은 오류를 던진다", () => {
@@ -67,6 +71,8 @@ describe("boothmapContract", () => {
         name: "체험 부스",
         description: "설명",
         imageUrl: null,
+        startTime: "11:00",
+        endTime: "17:00",
       },
       "/map/booths/7",
     );
@@ -76,6 +82,8 @@ describe("boothmapContract", () => {
       name: "체험 부스",
       description: "설명",
       imageUrl: null,
+      startTime: "11:00",
+      endTime: "17:00",
     });
   });
 
@@ -90,6 +98,8 @@ describe("boothmapContract", () => {
           collegeId: 2,
           collegeName: "공과대학",
           mainImageUrl: "https://cdn.example.com/pub.png",
+          startTime: "18:00",
+          endTime: "23:00",
         },
       ],
       "/map/pubs",
@@ -109,10 +119,34 @@ describe("boothmapContract", () => {
         collegeName: "공과대학",
         instagram: "@pub",
         imageUrls: ["https://cdn.example.com/1.png"],
+        startTime: "18:00",
+        endTime: "23:00",
       },
       "/map/pubs/3",
     );
 
     expect(parsed.imageUrls).toHaveLength(1);
+  });
+  it("facility booth subType을 파싱한다", () => {
+    const parsed = parseBoothMapContract(
+      {
+        colleges: [],
+        booths: [
+          {
+            boothId: 10,
+            name: "흡연구역 A",
+            type: "FACILITY",
+            subType: "SMOKING_AREA",
+            locationX: 120.5,
+            locationY: 88.3,
+            startTime: "11:00",
+            endTime: "17:00",
+          },
+        ],
+      },
+      "/map/booth-map",
+    );
+
+    expect(parsed.booths[0]?.subType).toBe("SMOKING_AREA");
   });
 });
