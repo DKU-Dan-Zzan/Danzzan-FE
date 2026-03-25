@@ -1,18 +1,11 @@
 import type { Booth } from "@/types/app/boothmap/boothmap.types";
+import { formatOperatingTime } from "@/utils/app/boothmap/formatOperatingTime";
 
 const typeLabel: Record<string, string> = {
   FOOD_TRUCK: "FOOD_TRUCK",
   EXPERIENCE: "EXPERIENCE",
   EVENT: "EVENT",
   FACILITY: "FACILITY",
-};
-
-const getOperatingTimeText = (startTime?: string | null, endTime?: string | null) => {
-  if (!startTime || !endTime) {
-    return null;
-  }
-
-  return `${startTime} ~ ${endTime}`;
 };
 
 export default function BoothList({
@@ -33,7 +26,7 @@ export default function BoothList({
   return (
     <div className="space-y-3">
       {booths.map((booth) => {
-        const operatingTimeText = getOperatingTimeText(booth.startTime, booth.endTime);
+        const operatingTimeText = formatOperatingTime(booth.startTime, booth.endTime);
 
         return (
           <button

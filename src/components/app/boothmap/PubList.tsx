@@ -1,13 +1,6 @@
 import type { Pub } from "@/types/app/boothmap/boothmap.types";
+import { formatOperatingTime } from "@/utils/app/boothmap/formatOperatingTime";
 import { ChevronRight } from "lucide-react";
-
-const getOperatingTimeText = (startTime?: string | null, endTime?: string | null) => {
-  if (!startTime || !endTime) {
-    return null;
-  }
-
-  return `${startTime} ~ ${endTime}`;
-};
 
 export default function PubList({
   pubs,
@@ -34,7 +27,7 @@ export default function PubList({
     );
   }
 
-  const commonOperatingTime = getOperatingTimeText(pubs[0]?.startTime, pubs[0]?.endTime);
+  const commonOperatingTime = formatOperatingTime(pubs[0]?.startTime, pubs[0]?.endTime);
 
   return (
     <div className="space-y-3">

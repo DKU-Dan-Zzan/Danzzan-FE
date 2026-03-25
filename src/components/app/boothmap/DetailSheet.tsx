@@ -5,14 +5,7 @@ import {
   usePubDetailQuery,
 } from "@/hooks/app/boothmap/useBoothDetailQuery";
 import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialog";
-
-const getOperatingTimeText = (startTime?: string | null, endTime?: string | null) => {
-  if (!startTime || !endTime) {
-    return null;
-  }
-
-  return `${startTime} ~ ${endTime}`;
-};
+import { formatOperatingTime } from "@/utils/app/boothmap/formatOperatingTime";
 
 export default function DetailSheet({
   selectedItem,
@@ -143,7 +136,7 @@ export default function DetailSheet({
   if (selectedItem.kind === "booth" && boothDetail) {
     const booth = booths.find((item) => item.id === selectedItem.id);
     const boothImageUrl = boothDetail.imageUrl ?? null;
-    const operatingTimeText = getOperatingTimeText(boothDetail.startTime, boothDetail.endTime);
+    const operatingTimeText = formatOperatingTime(boothDetail.startTime, boothDetail.endTime);
 
     return (
       <div className="space-y-3">
@@ -209,7 +202,7 @@ export default function DetailSheet({
       colleges.find((college) => college.id === summaryPub?.college_id)?.name ?? "단과대";
     const displayCollege = pubDetail.collegeName || fallbackCollege;
     const imageUrls = pubDetail.imageUrls ?? [];
-    const operatingTimeText = getOperatingTimeText(pubDetail.startTime, pubDetail.endTime);
+    const operatingTimeText = formatOperatingTime(pubDetail.startTime, pubDetail.endTime);
 
     return (
       <div className="space-y-3">
