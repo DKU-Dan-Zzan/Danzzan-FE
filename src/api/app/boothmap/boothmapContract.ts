@@ -48,14 +48,6 @@ const readString = (record: RecordLike, key: string): string | undefined => {
   return value.trim();
 };
 
-const readRawString = (record: RecordLike, key: string): string | undefined => {
-  const value = record[key];
-  if (typeof value !== "string") {
-    return undefined;
-  }
-  return value;
-};
-
 const readNullableString = (record: RecordLike, key: string): string | null | undefined => {
   const value = record[key];
   if (value === undefined) {
