@@ -9,6 +9,7 @@ import {
   getBoothmapZonePalette,
   type BoothmapMarkerType,
 } from "@/utils/app/boothmap/boothmapTheme"
+import { getBottomSheetCoveredRatio } from "@/utils/app/boothmap/sheetSnap";
 import type {
   Booth,
   College,
@@ -281,12 +282,7 @@ export default function KakaoMapView({
     const targetLatLng = new kakao.maps.LatLng(lat, lng)
     const mapHeight = mapRef.current.clientHeight
 
-    let coveredHeight = 0
-    if (targetSnap === "HALF") {
-      coveredHeight = mapHeight * 0.48
-    } else if (targetSnap === "FULL") {
-      coveredHeight = mapHeight * 0.82
-    }
+    const coveredHeight = mapHeight * getBottomSheetCoveredRatio(targetSnap)
 
     const visibleCenterY = (mapHeight - coveredHeight) / 2 + 65
 
