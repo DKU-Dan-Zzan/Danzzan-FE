@@ -100,9 +100,12 @@ export default function DetailSheet({
             </div>
 
             <button
+              type="button"
               onClick={onClose}
+              aria-label="닫기"
               className="text-xl font-bold text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)]"
             >
+              ×
             </button>
           </div>
 
@@ -162,9 +165,12 @@ export default function DetailSheet({
             </div>
 
             <button
+              type="button"
               onClick={onClose}
+              aria-label="닫기"
               className="text-xl font-bold text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)]"
             >
+              ×
             </button>
           </div>
 
@@ -228,9 +234,12 @@ export default function DetailSheet({
             </div>
 
             <button
+              type="button"
               onClick={onClose}
+              aria-label="닫기"
               className="text-xl font-bold text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)]"
             >
+              ×
             </button>
           </div>
 
