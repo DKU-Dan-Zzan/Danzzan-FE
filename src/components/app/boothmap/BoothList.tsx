@@ -1,4 +1,5 @@
 import type { Booth } from "@/types/app/boothmap/boothmap.types";
+import { formatDescription } from "@/utils/app/boothmap/formatDescription";
 import { formatOperatingTime } from "@/utils/app/boothmap/formatOperatingTime";
 
 const typeLabel: Record<string, string> = {
@@ -27,6 +28,7 @@ export default function BoothList({
     <div className="space-y-3">
       {booths.map((booth) => {
         const operatingTimeText = formatOperatingTime(booth.startTime, booth.endTime);
+        const description = formatDescription(booth.description);
 
         return (
           <button
@@ -45,9 +47,9 @@ export default function BoothList({
               </div>
             )}
 
-            {booth.description && (
-              <div className="mt-1 line-clamp-2 text-sm font-medium text-[var(--boothmap-text-subtle)]">
-                {booth.description}
+            {description && (
+              <div className="mt-1 line-clamp-2 whitespace-pre-line text-sm font-medium text-[var(--boothmap-text-subtle)]">
+                {description}
               </div>
             )}
 

@@ -5,6 +5,7 @@ import {
   usePubDetailQuery,
 } from "@/hooks/app/boothmap/useBoothDetailQuery";
 import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialog";
+import { formatDescription } from "@/utils/app/boothmap/formatDescription";
 import { formatOperatingTime } from "@/utils/app/boothmap/formatOperatingTime";
 
 export default function DetailSheet({
@@ -102,7 +103,6 @@ export default function DetailSheet({
               onClick={onClose}
               className="text-xl font-bold text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)]"
             >
-              ×
             </button>
           </div>
 
@@ -137,6 +137,7 @@ export default function DetailSheet({
     const booth = booths.find((item) => item.id === selectedItem.id);
     const boothImageUrl = boothDetail.imageUrl ?? null;
     const operatingTimeText = formatOperatingTime(boothDetail.startTime, boothDetail.endTime);
+    const description = formatDescription(boothDetail.description);
 
     return (
       <div className="space-y-3">
@@ -164,7 +165,6 @@ export default function DetailSheet({
               onClick={onClose}
               className="text-xl font-bold text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)]"
             >
-              ×
             </button>
           </div>
 
@@ -186,8 +186,8 @@ export default function DetailSheet({
             </div>
           )}
 
-          <div className="mt-4 text-sm font-medium leading-6 text-[var(--boothmap-text-subtle)]">
-            {boothDetail.description || "등록된 상세 정보가 없어요"}
+          <div className="mt-4 whitespace-pre-line text-sm font-medium leading-6 text-[var(--boothmap-text-subtle)]">
+            {description || "등록된 상세 정보가 없어요"}
           </div>
         </div>
 
@@ -203,6 +203,8 @@ export default function DetailSheet({
     const displayCollege = pubDetail.collegeName || fallbackCollege;
     const imageUrls = pubDetail.imageUrls ?? [];
     const operatingTimeText = formatOperatingTime(pubDetail.startTime, pubDetail.endTime);
+    const intro = formatDescription(pubDetail.intro);
+    const description = formatDescription(pubDetail.description || summaryPub?.intro);
 
     return (
       <div className="space-y-3">
@@ -229,7 +231,6 @@ export default function DetailSheet({
               onClick={onClose}
               className="text-xl font-bold text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)]"
             >
-              ×
             </button>
           </div>
 
@@ -278,15 +279,15 @@ export default function DetailSheet({
             </div>
           )}
 
-          {pubDetail.intro && (
-            <div className="mt-4 rounded-xl bg-[var(--boothmap-accent-soft)] px-3 py-2 text-sm font-bold text-[var(--boothmap-accent-text)]">
-              {pubDetail.intro}
+          {intro && (
+            <div className="mt-4 whitespace-pre-line rounded-xl bg-[var(--boothmap-accent-soft)] px-3 py-2 text-sm font-bold text-[var(--boothmap-accent-text)]">
+              {intro}
             </div>
           )}
 
-          {(pubDetail.description || summaryPub?.intro) && (
-            <div className="mt-4 text-sm font-medium leading-6 text-[var(--boothmap-text-subtle)]">
-              {pubDetail.description || summaryPub?.intro}
+          {description && (
+            <div className="mt-4 whitespace-pre-line text-sm font-medium leading-6 text-[var(--boothmap-text-subtle)]">
+              {description}
             </div>
           )}
 
