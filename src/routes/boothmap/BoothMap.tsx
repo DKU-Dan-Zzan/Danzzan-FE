@@ -125,6 +125,7 @@ export default function BoothMap() {
   const [selectedMapItem, setSelectedMapItem] = useState<SelectedMapItem>(null);
   const [selectedDetailItem, setSelectedDetailItem] = useState<SelectedDetailItem>(null);
   const [selectedCollegeId, setSelectedCollegeId] = useState<number | null>(null);
+  const [pubListCollegeId, setPubListCollegeId] = useState<number | null>(null);
   const [sheetMode, setSheetMode] = useState<SheetMode>("LIST");
   const [sheetSnap, setSheetSnap] = useState<SheetSnap>("PEEK");
   const [selectedDate, setSelectedDate] = useState("2026-05-12");
@@ -247,6 +248,7 @@ export default function BoothMap() {
     setSelectedDetailItem(null);
     setSheetMode("LIST");
     setSheetSnap("PEEK");
+    setPubListCollegeId(null);
 
     if (next !== "PUB") {
       setSelectedCollegeId(null);
@@ -262,8 +264,11 @@ export default function BoothMap() {
   }, [primaryFilter, colleges, selectedCollegeId]);
 
   const visiblePubs = useMemo(() => {
-    return getVisiblePubs(pubs, selectedCollegeId);
-  }, [pubs, selectedCollegeId]);
+    const targetCollegeId = primaryFilter === "PUB"
+      ? (selectedCollegeId ?? pubListCollegeId)
+      : pubListCollegeId;
+    return getVisiblePubs(pubs, targetCollegeId);
+  }, [primaryFilter, pubs, pubListCollegeId, selectedCollegeId]);
 
   const shouldShowPubList = getShouldShowPubList(primaryFilter, selectedMapItem);
 
@@ -271,12 +276,13 @@ export default function BoothMap() {
     setSelectedMapItem({ kind: "booth", id });
     setSelectedDetailItem({ kind: "booth", id });
     setSelectedCollegeId(null);
+    setPubListCollegeId(null);
     setSheetMode("DETAIL");
     setSheetSnap("PEEK");
   }, []);
 
   const onClickMarkerCollege = useCallback((id: number) => {
-    setSelectedCollegeId(id);
+    setPubListCollegeId(id);
     setSelectedMapItem({ kind: "college", id });
     setSelectedDetailItem(null);
     setSheetMode("LIST");
@@ -287,6 +293,7 @@ export default function BoothMap() {
     setSelectedMapItem({ kind: "booth", id });
     setSelectedDetailItem({ kind: "booth", id });
     setSelectedCollegeId(null);
+    setPubListCollegeId(null);
     setSheetMode("DETAIL");
     setSheetSnap("HALF");
   }, []);
@@ -399,6 +406,7 @@ export default function BoothMap() {
               setSelectedMapItem(null);
               setSelectedDetailItem(null);
               setSelectedCollegeId(null);
+              setPubListCollegeId(null);
               setSheetMode("LIST");
               setSheetSnap("PEEK");
             }}
@@ -416,6 +424,7 @@ export default function BoothMap() {
                 selectedCollegeId={selectedCollegeId}
                 onSelect={(idOrNull) => {
                   setSelectedCollegeId(idOrNull);
+                  setPubListCollegeId(idOrNull);
                   setSelectedMapItem(idOrNull ? { kind: "college", id: idOrNull } : null);
                   setSelectedDetailItem(null);
                   setSheetMode("LIST");
@@ -456,7 +465,11 @@ export default function BoothMap() {
           shouldShowPubList ? (
             <PubList
               pubs={visiblePubs}
-              selectedCollegeId={selectedCollegeId}
+              selectedCollegeId={
+                primaryFilter === "PUB"
+                  ? (selectedCollegeId ?? pubListCollegeId)
+                  : pubListCollegeId
+              }
               onSelectPub={onSelectPubFromList}
             />
           ) : (
