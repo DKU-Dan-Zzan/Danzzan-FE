@@ -85,14 +85,14 @@ export default function ContentImageSection({
             }
           }}
         >
-          <DialogContent className="max-h-[92vh] w-fit max-w-[92vw] border-0 bg-transparent p-0 shadow-none">
+          <DialogContent className="h-[100dvh] max-h-[100dvh] w-screen max-w-none border-0 bg-transparent p-0 shadow-none sm:h-auto sm:max-h-[92vh] sm:w-fit sm:max-w-[92vw]">
             <DialogTitle className="sr-only">{selectedImage.name}</DialogTitle>
-            <div className="max-h-[90vh] overflow-y-auto px-4 py-3">
-              <div className="mx-auto flex min-h-full max-w-[430px] items-start justify-center">
+            <div className="h-full overflow-y-auto overscroll-contain px-3 py-[max(env(safe-area-inset-top),0.75rem)] sm:max-h-[90vh] sm:px-4 sm:py-3">
+              <div className="mx-auto flex min-h-full w-full max-w-none items-start justify-center sm:max-w-[430px]">
                 <img
                   src={selectedImage.detailImageUrl}
                   alt={selectedImage.name}
-                  className="w-full rounded-xl object-contain"
+                  className="h-auto w-full rounded-xl object-contain"
                 />
               </div>
             </div>
