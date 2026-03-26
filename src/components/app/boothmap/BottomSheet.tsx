@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SheetMode, SheetSnap } from "@/types/app/boothmap/boothmap.types";
+import { BOTTOM_SHEET_HEIGHT_RATIO } from "@/utils/app/boothmap/sheetSnap";
 
 type SnapPx = { PEEK: number; HALF: number; FULL: number };
 
@@ -41,8 +42,8 @@ export default function BottomSheet({
     const usable = window.innerHeight - bottomOffset;
     return {
       PEEK: 40,
-      HALF: Math.round(usable * 0.48),
-      FULL: Math.round(usable * 0.82),
+      HALF: Math.round(usable * BOTTOM_SHEET_HEIGHT_RATIO.HALF),
+      FULL: Math.round(usable * BOTTOM_SHEET_HEIGHT_RATIO.FULL),
     } satisfies SnapPx;
   }, [bottomOffset]);
 

@@ -18,6 +18,7 @@ import {
   getBoothmapZonePalette,
   type BoothmapMarkerType,
 } from "@/utils/app/boothmap/boothmapTheme";
+import { getMapboxOffsetYBySnap } from "@/utils/app/boothmap/sheetSnap";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
@@ -86,12 +87,6 @@ function createPinDataUrl(color: string) {
     </svg>
   `;
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-}
-
-function getOffsetYBySnap(sheetSnap: SheetSnap) {
-  if (sheetSnap === "FULL") return 220;
-  if (sheetSnap === "HALF") return 140;
-  return 80;
 }
 
 function mapboxZoomToKakaoLevel(zoom: number) {
@@ -759,7 +754,7 @@ export default function Mapbox3DView({
     const point = map.project([lng, lat]);
     const adjustedPoint = new mapboxgl.Point(
       point.x,
-      point.y + getOffsetYBySnap(targetSnap)
+      point.y + getMapboxOffsetYBySnap(targetSnap)
     );
     const nextCenter = map.unproject(adjustedPoint);
 
