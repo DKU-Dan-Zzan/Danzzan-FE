@@ -1,0 +1,3 @@
+// 역할: 상단 액션 원형 버튼(홈 티켓 버튼/티켓팅 뒤로가기)의 공통 스타일 클래스를 제공합니다.
+export const APP_HEADER_ROUND_BUTTON_BASE_CLASS =
+  "absolute top-1/2 flex h-[var(--app-header-ticket-btn-size)] w-[var(--app-header-ticket-btn-size)] -translate-y-1/2 items-center justify-center rounded-full border border-[var(--app-header-ticket-btn-border)] bg-[linear-gradient(145deg,var(--app-header-ticket-btn-bg-start)_0%,var(--app-header-ticket-btn-bg-end)_100%)] shadow-[var(--app-header-ticket-btn-shadow)] backdrop-blur-[6px] transition-[transform,box-shadow,filter] duration-[180ms] hover:shadow-[var(--app-header-ticket-btn-shadow-hover)] hover:brightness-[1.01] active:scale-[0.96]";
