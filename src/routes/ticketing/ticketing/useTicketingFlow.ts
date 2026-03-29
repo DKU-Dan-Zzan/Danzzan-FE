@@ -59,28 +59,32 @@ export function useTicketingFlow() {
   const waitingRoomAdQuery = useWaitingRoomAdQuery(step === "waiting");
   const { refetch: refetchQueueStatus } = useQueueStatusQuery(activeEventId, { enabled: false });
 
+  const resetQueueFlowState = useCallback(() => {
+    setQueueStatus("NONE");
+    setWaitingQueuePosition(null);
+    setWaitingQueuePositionUpdatedAt(null);
+    setWaitingError(null);
+    setWaitingPolling(false);
+    setSoldOutDescription(DEFAULT_SOLD_OUT_DESCRIPTION);
+    setReserveProcessing(false);
+    setReserveErrorMessage(null);
+    setReserveMessage("입장 상태가 확인되어 예매를 진행하고 있습니다.");
+    setAgreementChecked(false);
+    setReservationError(null);
+  }, []);
+
+  const clearQueueError = useCallback(() => {
+    setListNotice(null);
+  }, []);
+
   const { applyQueueEventToUrl } = useQueueUrlSync({
     activeEventId,
     setActiveEventId,
     setActiveEventTitle,
     setListNotice,
     setStep,
-    resetQueueFlowState: () => {
-      setQueueStatus("NONE");
-      setWaitingQueuePosition(null);
-      setWaitingQueuePositionUpdatedAt(null);
-      setWaitingError(null);
-      setWaitingPolling(false);
-      setSoldOutDescription(DEFAULT_SOLD_OUT_DESCRIPTION);
-      setReserveProcessing(false);
-      setReserveErrorMessage(null);
-      setReserveMessage("입장 상태가 확인되어 예매를 진행하고 있습니다.");
-      setAgreementChecked(false);
-      setReservationError(null);
-    },
-    clearError: () => {
-      setListNotice(null);
-    },
+    resetQueueFlowState,
+    clearError: clearQueueError,
   });
 
   const { executeReserve, resetReservationAgreement } = useReservationAction({
