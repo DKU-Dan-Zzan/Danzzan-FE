@@ -66,7 +66,7 @@ export default function CurrentPerformanceSection() {
   return (
     <section className="px-5">
       <div className="mx-auto w-full max-w-[314px]">
-        <p className="mb-[var(--home-current-performance-caption-gap)] text-center text-[length:var(--home-lineup-caption-font-size)] leading-[1.4] font-semibold text-[var(--home-lineup-caption-color)]">
+        <p className="mb-[var(--home-current-performance-caption-gap)] text-center text-[length:var(--home-lineup-caption-font-size)] leading-[1.4] font-bold text-[var(--home-lineup-caption-color)]">
           현재 진행 중인 공연을 지금 확인하세요
         </p>
 
