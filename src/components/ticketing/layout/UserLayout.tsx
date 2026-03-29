@@ -60,6 +60,7 @@ export function UserLayout() {
 
   return (
     <AppShell
+      colorScheme="webapp"
       header={
         showHeader ? (
           <AppTopBar

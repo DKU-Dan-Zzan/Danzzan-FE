@@ -12,6 +12,7 @@ const Layout = () => {
 
   return (
     <AppShell
+      colorScheme="webapp"
       header={<Header />}
       footer={!hideFooter ? <Footer /> : undefined}
       bottomNav={<BottomNav />}
