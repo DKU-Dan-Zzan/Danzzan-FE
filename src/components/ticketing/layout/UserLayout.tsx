@@ -13,11 +13,13 @@ export function UserLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { session, role } = useAuth();
+  const isTicketingLoginPage = location.pathname === "/ticket/login";
   const isTicketingAuthPage =
-    location.pathname === "/ticket/login" ||
+    isTicketingLoginPage ||
     location.pathname === "/ticket/signup" ||
     location.pathname.startsWith("/ticket/reset-password");
   const isTicketingPage = location.pathname.startsWith("/ticket/ticketing");
+  const isBackButtonDisabled = isTicketingLoginPage || isTicketingPage;
   const isMyTicketPage =
     location.pathname.startsWith("/ticket/my-ticket") ||
     location.pathname.startsWith("/ticket/myticket");
@@ -71,10 +73,12 @@ export function UserLayout() {
             containerClassName="relative mx-auto h-16 w-full max-w-md px-4"
           >
             <button
-              onClick={handleBack}
+              onClick={isBackButtonDisabled ? undefined : handleBack}
+              disabled={isBackButtonDisabled}
+              aria-disabled={isBackButtonDisabled}
               className={`${APP_HEADER_ROUND_BUTTON_BASE_CLASS} left-4`}
               aria-label="뒤로가기"
-              title="뒤로가기"
+              title={isBackButtonDisabled ? "뒤로가기 비활성화" : "뒤로가기"}
             >
               <ArrowLeft size={20} className="text-[var(--app-header-ticket-btn-icon)]" />
             </button>

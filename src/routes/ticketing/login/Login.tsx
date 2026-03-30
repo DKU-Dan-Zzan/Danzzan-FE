@@ -1,7 +1,7 @@
 // 역할: 티켓팅 사용자 로그인 화면에서 자격 증명 제출과 오류 표시를 처리합니다.
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { CircleAlert, GraduationCap } from "lucide-react";
+import { CircleAlert, Eye, EyeOff, GraduationCap } from "lucide-react";
 import { HttpError } from "@/api/ticketing/httpClient";
 import { Button } from "@/components/common/ui/button";
 import { Input } from "@/components/common/ui/input";
@@ -16,6 +16,7 @@ export default function Login() {
   const { login } = useAuth();
   const [studentId, setStudentId] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const canSubmit = studentId.trim().length > 0 && password.trim().length > 0;
@@ -49,21 +50,21 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-base)]">
-      <div className="mx-auto w-full max-w-[var(--ticketing-mobile-shell-max-width)] px-5 pb-6 sm:px-6">
-        <div className="mt-3">
-          <p className="text-[length:var(--ticketing-text-helper)] font-semibold text-[var(--text-muted)]">
+    <div className="min-h-screen bg-[var(--webapp-main-bg)]">
+      <div className="mx-auto w-full max-w-[var(--ticketing-mobile-shell-max-width)] bg-[var(--webapp-main-bg)] px-5 pb-6 sm:px-6">
+        <section className="pb-3 pt-4">
+          <p className="text-[11px] font-semibold text-[var(--text-muted)]">
             재학생 전용 축제 포털 서비스
           </p>
-          <h1 className="mt-1 leading-[1.12] font-black tracking-tight text-[var(--text)]">
+          <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-bold-emphasis)]">
             축제 포털 로그인
           </h1>
-        </div>
+        </section>
 
-        <main className="mt-6">
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            <section className="space-y-4">
-              <div className="space-y-2">
+        <main className="mt-3">
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <section className="space-y-3">
+              <div className="space-y-1.5">
                 <Label htmlFor="studentId" className="text-sm font-semibold text-[var(--text)]">
                   학번
                 </Label>
@@ -77,19 +78,35 @@ export default function Login() {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label htmlFor="password" className="text-sm font-semibold text-[var(--text)]">
                   축제 포털 비밀번호
                 </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  placeholder="축제 포털용 비밀번호를 입력해 주세요"
-                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    placeholder="축제 포털용 비밀번호를 입력해 주세요"
+                    className={`${TICKETING_AUTH_INPUT_CLASS_NAME} pr-11`}
+                    autoComplete="current-password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] transition-colors hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-subtle)]"
+                    aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+                    title={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+                  >
+                    {showPassword ? (
+                      <Eye className="h-4 w-4" strokeWidth={2.2} />
+                    ) : (
+                      <EyeOff className="h-4 w-4" strokeWidth={2.2} />
+                    )}
+                  </button>
+                </div>
               </div>
 
               <p className="flex items-start gap-1.5 text-[11px] font-medium leading-5 text-[var(--text-muted)]">
@@ -106,7 +123,7 @@ export default function Login() {
 
             <Button
               type="submit"
-              className="h-11 w-full rounded-2xl bg-[var(--accent)] text-white shadow-[0_10px_18px_-12px_var(--shadow-color)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)] disabled:translate-y-0 disabled:opacity-55"
+              className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)] disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
               disabled={submitting || !canSubmit}
             >
               <GraduationCap className="h-4 w-4" strokeWidth={2.3} />
@@ -114,14 +131,14 @@ export default function Login() {
             </Button>
           </form>
 
-          <div className="mt-6 space-y-3 text-center">
+          <div className="mt-5 space-y-2.5 text-center">
             <Link
               to="/ticket/signup"
               state={{ authTabFrom: "login" }}
               className="inline-flex items-center gap-1 text-sm font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
             >
               <span>축제 포털을 처음 이용하시나요?</span>
-              <span className="font-semibold text-[var(--accent)]">회원가입</span>
+              <span className="font-semibold text-[var(--text-emphasis-vivid)]">회원가입</span>
             </Link>
 
             <Link
@@ -129,7 +146,7 @@ export default function Login() {
               className="inline-flex items-center gap-1 text-sm font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
             >
               <span>비밀번호를 잊으셨나요?</span>
-              <span className="font-semibold text-[var(--accent)]">비밀번호 재설정</span>
+              <span className="font-semibold text-[var(--text-emphasis-vivid)]">비밀번호 재설정</span>
             </Link>
           </div>
         </main>

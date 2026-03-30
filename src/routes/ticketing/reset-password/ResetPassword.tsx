@@ -391,10 +391,10 @@ export default function ResetPassword() {
                         <span
                           className={`inline-flex h-8 w-8 items-center justify-center rounded-full border text-[11px] font-bold ${
                             isActive
-                              ? "border-[var(--accent)] bg-[var(--accent)] text-white"
+                              ? "border-[var(--app-circle-border)] bg-[linear-gradient(145deg,var(--app-circle-bg-start)_0%,var(--app-circle-bg-end)_100%)] text-[var(--app-circle-fg)] shadow-[var(--app-circle-shadow)] ring-2 ring-[var(--ring)] ring-offset-1 ring-offset-[var(--bg-base)]"
                               : isDone
-                                ? "border-[var(--border-strong)] bg-[var(--surface-tint-subtle)] text-[var(--accent)]"
-                                : "border-[var(--border-base)] bg-[var(--surface-base)] text-[var(--text-muted)]"
+                                ? "border-[var(--app-circle-border)] bg-[linear-gradient(145deg,var(--app-circle-bg-start)_0%,var(--app-circle-bg-end)_100%)] text-[var(--app-circle-fg)] shadow-[var(--app-circle-shadow)]"
+                                : "border-[var(--app-circle-border)] bg-[linear-gradient(145deg,var(--app-circle-bg-start)_0%,var(--app-circle-bg-end)_100%)] text-[var(--text-muted)] opacity-65"
                           }`}
                         >
                           {isDone ? "✓" : String(current).padStart(2, "0")}
@@ -472,7 +472,7 @@ export default function ResetPassword() {
 
               <Button
                 type="submit"
-                className="h-11 w-full rounded-2xl bg-[var(--accent)] text-white shadow-[0_10px_18px_-12px_var(--shadow-color)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:opacity-55"
+                className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
                 disabled={!isStudentIdValid || requestingCode}
               >
                 <MailCheck className="h-4 w-4" strokeWidth={2.3} />
@@ -550,7 +550,7 @@ export default function ResetPassword() {
                 </Button>
                 <Button
                   type="submit"
-                  className="h-11 rounded-2xl bg-[var(--accent)] text-white shadow-[0_10px_18px_-12px_var(--shadow-color)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:opacity-55"
+                  className="h-11 rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
                   disabled={!isVerificationCodeValid || isCodeExpired || verifyingCode}
                 >
                   <MailCheck className="h-4 w-4" strokeWidth={2.3} />
@@ -612,7 +612,7 @@ export default function ResetPassword() {
 
               <Button
                 type="submit"
-                className="h-11 w-full rounded-2xl bg-[var(--accent)] text-white shadow-[0_10px_18px_-12px_var(--shadow-color)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:opacity-55"
+                className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
                 disabled={!isPasswordFormValid || resettingPassword}
               >
                 <KeyRound className="h-4 w-4" strokeWidth={2.3} />
@@ -632,7 +632,7 @@ export default function ResetPassword() {
 
               <Button
                 asChild
-                className="h-11 w-full rounded-2xl bg-[var(--accent)] text-white shadow-[0_10px_18px_-12px_var(--shadow-color)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95"
+                className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95"
               >
                 <Link to="/ticket/login">로그인 화면으로 이동</Link>
               </Button>
