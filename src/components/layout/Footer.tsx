@@ -12,9 +12,26 @@ const Footer = () => {
         <p className="text-[13px] text-[var(--footer-text-primary)]">
           단국대학교 총학생회 LOU:D X DAN-ZZAN
         </p>
-        <p className="text-[12px] text-[var(--footer-text-secondary)]">
-          © {new Date().getFullYear()} DAN-ZZAN. All rights reserved.
-        </p>
+        <div className="flex items-center justify-center gap-1">
+          <span className="text-[12px] text-[var(--footer-text-secondary)]">총학생회 공식 SNS :</span>
+          <a
+            href="https://www.instagram.com/dku_loud/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[12px] text-[var(--footer-text-secondary)] underline underline-offset-2"
+          >
+            Instagram
+          </a>
+          <span className="text-[12px] text-[var(--footer-text-secondary)]">,</span>
+          <a
+            href="https://www.youtube.com/@2026%EB%9D%BC%EC%9A%B0%EB%93%9C%EC%B4%9D%ED%95%99%EC%83%9D%ED%9A%8C"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[12px] text-[var(--footer-text-secondary)] underline underline-offset-2"
+          >
+            YouTube
+          </a>
+        </div>
       </div>
     </footer>
   )

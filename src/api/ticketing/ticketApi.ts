@@ -379,6 +379,14 @@ export const ticketApi = {
     );
   },
 
+  leaveQueue: async (eventId: string): Promise<void> => {
+    if (env.apiMode === "mock") {
+      return;
+    }
+    const client = getTicketingClient();
+    await client.delete(`/tickets/${eventId}/queue/leave`);
+  },
+
   getMyTickets: async (
     options?: { signal?: AbortSignal },
   ): Promise<Ticket[]> => {
