@@ -10,6 +10,11 @@ import { Checkbox } from "@/components/common/ui/checkbox";
 import { Input } from "@/components/common/ui/input";
 import { Label } from "@/components/common/ui/label";
 import { PasswordPolicyChecklist } from "@/components/ticketing/auth/PasswordPolicyChecklist";
+import {
+  TicketingAuthHeading,
+  TICKETING_AUTH_HEADER_SECTION_CLASS,
+  TICKETING_AUTH_MAIN_CLASS,
+} from "@/components/ticketing/auth/TicketingAuthHeading";
 import { signupApi } from "@/api/ticketing/signupApi";
 import { HttpError } from "@/api/ticketing/httpClient";
 import {
@@ -100,16 +105,11 @@ export default function Signup() {
   return (
     <div className="min-h-screen bg-[var(--bg-base)]">
       <div className="mx-auto w-full max-w-[420px] px-5 pb-6">
-        <div className="mt-3">
-          <p className="text-[length:var(--ticketing-text-helper)] font-semibold text-[var(--text-muted)]">
-            재학생 전용 축제 포털 서비스
-          </p>
-          <h1 className="mt-1 leading-[1.12] font-black tracking-tight text-[var(--text)]">
-            축제 포털 회원가입
-          </h1>
-        </div>
+        <section className={TICKETING_AUTH_HEADER_SECTION_CLASS}>
+          <TicketingAuthHeading title="축제 포털 회원가입" />
+        </section>
 
-        <main className="mt-6">
+        <main className={TICKETING_AUTH_MAIN_CLASS}>
           <form className="space-y-5" onSubmit={handleSubmit}>
             <section className="space-y-4">
               <div className="space-y-2">

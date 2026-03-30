@@ -9,6 +9,11 @@ import { Button } from "@/components/common/ui/button";
 import { Input } from "@/components/common/ui/input";
 import { Label } from "@/components/common/ui/label";
 import {
+  TicketingAuthHeading,
+  TICKETING_AUTH_HEADER_SECTION_CLASS,
+  TICKETING_AUTH_MAIN_CLASS,
+} from "@/components/ticketing/auth/TicketingAuthHeading";
+import {
   getPasswordPolicyErrorMessage,
   getPasswordPolicyState,
   isPasswordPolicyErrorMessage,
@@ -361,16 +366,11 @@ export default function ResetPassword() {
   return (
     <div className="min-h-screen bg-[var(--bg-base)]">
       <div className="mx-auto w-full max-w-[420px] px-5 pb-6">
-        <div className="mt-3">
-          <p className="text-[length:var(--ticketing-text-helper)] font-semibold text-[var(--text-muted)]">
-            재학생 전용 축제 포털 서비스
-          </p>
-          <h1 className="mt-1 leading-[1.12] font-black tracking-tight text-[var(--text)]">
-            비밀번호 재설정
-          </h1>
-        </div>
+        <section className={TICKETING_AUTH_HEADER_SECTION_CLASS}>
+          <TicketingAuthHeading title="비밀번호 재설정" />
+        </section>
 
-        <main className="mt-6">
+        <main className={TICKETING_AUTH_MAIN_CLASS}>
           {!completed && (
             <div className="mb-6 rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 py-3">
               <p className="text-xs font-semibold text-[var(--text-muted)]">

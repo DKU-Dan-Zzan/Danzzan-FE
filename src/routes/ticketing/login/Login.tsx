@@ -6,6 +6,11 @@ import { HttpError } from "@/api/ticketing/httpClient";
 import { Button } from "@/components/common/ui/button";
 import { Input } from "@/components/common/ui/input";
 import { Label } from "@/components/common/ui/label";
+import {
+  TicketingAuthHeading,
+  TICKETING_AUTH_HEADER_SECTION_CLASS,
+  TICKETING_AUTH_MAIN_CLASS,
+} from "@/components/ticketing/auth/TicketingAuthHeading";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { TICKETING_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
 import { resolveTicketingLoginRedirect } from "@/lib/ticketing/navigation/auth-navigation";
@@ -52,16 +57,11 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-[var(--webapp-main-bg)]">
       <div className="mx-auto w-full max-w-[var(--ticketing-mobile-shell-max-width)] bg-[var(--webapp-main-bg)] px-5 pb-6 sm:px-6">
-        <section className="pb-3 pt-4">
-          <p className="text-[11px] font-semibold text-[var(--text-muted)]">
-            재학생 전용 축제 포털 서비스
-          </p>
-          <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-bold-emphasis)]">
-            축제 포털 로그인
-          </h1>
+        <section className={TICKETING_AUTH_HEADER_SECTION_CLASS}>
+          <TicketingAuthHeading title="축제 포털 로그인" />
         </section>
 
-        <main className="mt-3">
+        <main className={TICKETING_AUTH_MAIN_CLASS}>
           <form className="space-y-4" onSubmit={handleSubmit}>
             <section className="space-y-3">
               <div className="space-y-1.5">
