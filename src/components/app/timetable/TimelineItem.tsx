@@ -18,7 +18,7 @@ export default function TimelineItem({
     <li ref={innerRef} className="relative flex gap-4 scroll-mt-24">
       {/* 좌측 시간 */}
       <div className="w-16 flex flex-col items-center">
-        <div className="text-[16px] font-extrabold tabular-nums text-[var(--text)]">
+        <div className="text-[16px] font-extrabold tabular-nums text-[var(--timetable-active-color)]">
           {item.startTime}
         </div>
       </div>
@@ -27,10 +27,10 @@ export default function TimelineItem({
       <div className="relative w-6 flex justify-center">
         {/* NOW 점/라벨 */}
         <div className="relative mt-2">
-          <div className="h-2.5 w-2.5 rounded-full bg-[var(--accent)]" />
+          <div className="h-2.5 w-2.5 rounded-full bg-[var(--timetable-active-color)]" />
 
           {showNow && (
-            <span className="absolute -top-2 left-4 whitespace-nowrap rounded-full bg-[var(--accent)] px-2 py-0.5 text-[11px] font-extrabold text-[var(--text-on-accent)] shadow-sm">
+            <span className="absolute -top-2 left-4 whitespace-nowrap rounded-full bg-[var(--timetable-active-color)] px-2 py-0.5 text-[11px] font-extrabold text-[var(--text-on-accent)] shadow-sm">
               NOW
             </span>
           )}
@@ -38,7 +38,7 @@ export default function TimelineItem({
 
         {/* 항상 그리기 (마지막은 살짝 연하게 하고 싶으면 opacity만 조절) */}
         <div
-          className={`absolute top-4 bottom-0 w-px border-l border-dashed border-[var(--timetable-line)] ${
+          className={`absolute top-4 bottom-0 w-px border-l border-dashed border-[var(--timetable-active-line)] ${
             isLast ? "opacity-40" : "opacity-100"
           }`}
         />
