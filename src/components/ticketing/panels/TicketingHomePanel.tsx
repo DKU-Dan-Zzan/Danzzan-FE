@@ -105,7 +105,7 @@ export function TicketingHomePanel({
               />
               <div className="relative z-10 grid min-h-[84px] grid-cols-[60px_1fr_24px] items-center gap-3.5">
                 <div className={`flex h-[60px] w-[60px] shrink-0 ${TICKETING_CLASSES.badge.iconCircle} rounded-[18px]`}>
-                  <ActionIcon className="h-[30px] w-[30px]" strokeWidth={action.iconStrokeWidth} />
+                  <ActionIcon className="h-[30px] w-[30px] text-[var(--ticketing-quick-action-icon)]" strokeWidth={action.iconStrokeWidth} />
                 </div>
                 <div className="flex min-h-[56px] flex-col justify-center">
                   <h2 className={`${TICKETING_CLASSES.typography.cardTitle} text-[var(--text)]`}>
@@ -144,7 +144,7 @@ export function TicketingHomePanel({
             >
               <div className="flex items-start gap-3">
                 <div
-                  className={`mt-0.5 flex h-8 w-8 shrink-0 ${TICKETING_CLASSES.badge.iconCircle} text-[length:var(--ticketing-text-step-index)] font-bold`}
+                  className={`mt-0.5 flex h-8 w-8 shrink-0 ${TICKETING_CLASSES.badge.iconCircle} text-[length:var(--ticketing-text-step-index)] font-bold text-[var(--text-emphasis-vivid)]`}
                 >
                   {item.step}
                 </div>
