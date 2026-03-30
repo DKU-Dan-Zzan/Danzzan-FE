@@ -48,19 +48,19 @@ const EmergencyNotice = ({ notice }: Props) => {
           aria-controls={contentId}
           aria-label={isExpanded ? "긴급 공지 접기" : "긴급 공지 전문 펼치기"}
         >
-          <div className="flex h-[var(--home-notice-icon-size)] w-[var(--home-notice-icon-size)] shrink-0 items-center justify-center rounded-full border border-[var(--home-notice-icon-border)] bg-[linear-gradient(145deg,var(--home-notice-icon-bg-start)_0%,var(--home-notice-icon-bg-end)_100%)] text-[var(--accent)] shadow-[var(--home-notice-icon-inner-shadow)]">
+          <div className="flex h-[var(--home-notice-icon-size)] w-[var(--home-notice-icon-size)] shrink-0 items-center justify-center rounded-full border border-[var(--home-notice-icon-border)] bg-[linear-gradient(145deg,var(--home-notice-icon-bg-start)_0%,var(--home-notice-icon-bg-end)_100%)] text-[var(--app-circle-fg)] shadow-[var(--home-notice-icon-inner-shadow)]">
             <Megaphone size={14} strokeWidth={2.2} />
           </div>
 
           <div className="min-w-0 flex-1">
             {isExpanded && updatedAtLabel && (
-              <p className="mb-1 text-[length:var(--home-notice-updated-font-size)] leading-none text-[var(--text-muted)]">
+              <p className="mb-1 text-[length:var(--home-notice-updated-font-size)] leading-none text-[var(--text-body-deep)]">
                 업데이트 {updatedAtLabel}
               </p>
             )}
             <p
               id={contentId}
-              className={`min-w-0 text-left text-[length:var(--home-notice-body-font-size)] text-[var(--text)] ${
+              className={`min-w-0 text-left text-[length:var(--home-notice-body-font-size)] text-[var(--text-body-deep)] ${
                 isExpanded
                   ? "whitespace-pre-wrap break-words leading-6"
                   : "overflow-hidden text-ellipsis whitespace-nowrap leading-none"

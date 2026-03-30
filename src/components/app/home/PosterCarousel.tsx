@@ -45,7 +45,7 @@ export default function PosterCarousel({
         <div className="relative overflow-hidden rounded-none bg-[var(--home-poster-placeholder-bg)] shadow-[var(--home-poster-placeholder-shadow)]">
           <div className="flex items-center justify-center" style={{ aspectRatio: aspect }}>
             <div className="text-center">
-              <div className="text-[15px] leading-[1.3] font-semibold text-[var(--text)]">
+              <div className="text-[15px] leading-[1.3] font-semibold text-[var(--text-body-deep)]">
                 2026 단국축제
               </div>
               <div className="mt-1 text-xs leading-[1.3] text-[var(--text-muted)]">

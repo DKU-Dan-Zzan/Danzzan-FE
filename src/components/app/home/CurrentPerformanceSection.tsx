@@ -87,7 +87,7 @@ export default function CurrentPerformanceSection() {
               </div>
 
               <div className="min-w-0 flex-1 text-left">
-                <p className="truncate text-[18px] font-bold leading-tight text-[var(--text)]">
+                <p className="truncate text-[18px] font-bold leading-tight text-[var(--text-body-deep)]">
                   {currentPerformance.artistName}
                 </p>
 
@@ -102,7 +102,7 @@ export default function CurrentPerformanceSection() {
                 NOW
               </div>
               <div className="min-w-0 flex-1 text-left">
-                <p className="text-[16px] font-semibold leading-tight text-[var(--text)]">{helperText}</p>
+                <p className="text-[16px] font-semibold leading-tight text-[var(--text-body-deep)]">{helperText}</p>
                 <p className="mt-1 text-[13px] font-medium text-[var(--text-muted)]">타임테이블에서 다음 공연을 확인해 보세요.</p>
               </div>
             </div>
