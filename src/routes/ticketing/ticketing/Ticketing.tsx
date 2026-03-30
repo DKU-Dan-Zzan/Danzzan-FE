@@ -43,7 +43,7 @@ export default function Ticketing() {
         polling={flow.waitingPolling}
         offline={!flow.isNetworkOnline}
         errorMessage={flow.waitingError}
-        ad={flow.waitingAd}
+        ads={flow.waitingAd ? [{ imageUrl: flow.waitingAd.imageUrl, alt: flow.waitingAd.altText ?? undefined, linkUrl: flow.waitingAd.linkUrl, updatedAt: flow.waitingAd.updatedAt }] : []}
       />
     );
   }

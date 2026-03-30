@@ -1,48 +1,36 @@
-// 역할: Admin Ads 관련 상태와 부수효과를 캡슐화한 훅이다.
+// 역할: Admin 광고 전체 목록 상태와 부수효과를 캡슐화한 훅이다.
 
 import { useCallback, useEffect } from "react";
-import { getPlacementAd } from "@/api/app/notice/noticeApi";
+import { getAllActiveAds } from "@/api/app/ad/adApi";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
+import type { ClientAdDto } from "@/api/app/ad/adApi";
+
+export type { ClientAdDto };
 
 type UseAdminAdsOptions = {
   onError: (message: string) => void;
 };
 
 export const useAdminAds = ({ onError }: UseAdminAdsOptions) => {
-  const homeBottomAdQuery = useAppQuery({
-    queryKey: appQueryKeys.adminPlacementAd("HOME_BOTTOM"),
-    queryFn: ({ signal }) => getPlacementAd("HOME_BOTTOM", { signal }),
-    staleTime: 60_000,
-  });
-
-  const myTicketAdQuery = useAppQuery({
-    queryKey: appQueryKeys.adminPlacementAd("MY_TICKET"),
-    queryFn: ({ signal }) => getPlacementAd("MY_TICKET", { signal }),
+  const allAdsQuery = useAppQuery({
+    queryKey: appQueryKeys.allActiveAds(),
+    queryFn: ({ signal }) => getAllActiveAds({ signal }),
     staleTime: 60_000,
   });
 
   useEffect(() => {
-    if (homeBottomAdQuery.error) {
-      onError(homeBottomAdQuery.error.message || "광고 정보를 불러오지 못했습니다.");
-      return;
+    if (allAdsQuery.error) {
+      onError(allAdsQuery.error.message || "광고 정보를 불러오지 못했습니다.");
     }
-    if (myTicketAdQuery.error) {
-      onError(myTicketAdQuery.error.message || "광고 정보를 불러오지 못했습니다.");
-    }
-  }, [homeBottomAdQuery.error, myTicketAdQuery.error, onError]);
+  }, [allAdsQuery.error, onError]);
 
   const reloadAds = useCallback(async () => {
-    await Promise.all([homeBottomAdQuery.refetch(), myTicketAdQuery.refetch()]);
-  }, [homeBottomAdQuery, myTicketAdQuery]);
+    await allAdsQuery.refetch();
+  }, [allAdsQuery]);
 
   return {
-    adLoading:
-      homeBottomAdQuery.isPending ||
-      myTicketAdQuery.isPending ||
-      homeBottomAdQuery.isFetching ||
-      myTicketAdQuery.isFetching,
-    homeBottomAd: homeBottomAdQuery.data ?? null,
-    myTicketAd: myTicketAdQuery.data ?? null,
+    adLoading: allAdsQuery.isPending || allAdsQuery.isFetching,
+    allAds: allAdsQuery.data ?? [] as ClientAdDto[],
     reloadAds,
   };
 };

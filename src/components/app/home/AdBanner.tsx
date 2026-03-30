@@ -1,20 +1,29 @@
-// 역할: home 화면에서 사용하는 Ad Banner UI 블록을 렌더링합니다.
+// 역할: home 화면에서 광고 배너 캐러셀을 렌더링합니다.
+import { AdCarousel } from "@/components/common/AdCarousel"
+import type { ClientAdDto } from "@/api/app/ad/adApi"
+
+const AD_PLACEHOLDER_IMAGE = "/ads/waiting-room-sample-banner.svg"
+
 type AdBannerProps = {
-  imageUrl?: string
-  alt?: string
+  ads: ClientAdDto[]
 }
 
-export default function AdBanner({
-  imageUrl = "/ads/waiting-room-sample-banner.svg",
-  alt = "광고 배너",
-}: AdBannerProps) {
+export default function AdBanner({ ads }: AdBannerProps) {
+  const slides = ads.length
+    ? ads.map((ad) => ({
+        imageUrl: ad.imageUrl,
+        alt: ad.title,
+        updatedAt: ad.updatedAt,
+        objectPosition: ad.objectPosition,
+      }))
+    : [{ imageUrl: AD_PLACEHOLDER_IMAGE, alt: "광고 배너" }]
+
   return (
     <div className="mt-9">
       <div className="overflow-hidden border border-[var(--timetable-card-border)] bg-[var(--timetable-card-bg)]">
-        <img
-          src={imageUrl}
-          alt={alt}
-          className="block h-[70px] w-full object-cover"
+        <AdCarousel
+          slides={slides}
+          imageClassName="block h-[70px] w-full object-cover"
         />
       </div>
     </div>

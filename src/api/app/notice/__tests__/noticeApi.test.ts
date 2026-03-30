@@ -3,7 +3,8 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { adGateway } from "@/api/common/adGateway";
 import { http } from "@/lib/http";
-import { getNoticeDetail, getNotices, getPlacementAd } from "@/api/app/notice/noticeApi";
+import { getNoticeDetail, getNotices } from "@/api/app/notice/noticeApi";
+import { getPlacementAd } from "@/api/app/ad/adApi";
 
 describe("noticeApi", () => {
   afterEach(() => {

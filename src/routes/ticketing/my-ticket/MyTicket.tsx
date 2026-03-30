@@ -4,9 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { MyTicketListPanel } from "@/components/ticketing/panels/MyTicketListPanel";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
-import type { PlacementAd } from "@/types/ticketing/model/ad.model";
 import { ticketApi } from "@/api/ticketing/ticketApi";
-import { getPlacementAd as getWebPlacementAd } from "@/api/ticketing/noticeApi";
+import { getAllActiveAds } from "@/api/app/ad/adApi";
 
 export default function MyTicket() {
   const navigate = useNavigate();
@@ -18,26 +17,22 @@ export default function MyTicket() {
     staleTime: 30_000,
   });
 
-  const waitingRoomAdQuery = useAppQuery({
-    queryKey: appQueryKeys.myTicketAd(),
-    queryFn: ({ signal }) => getWebPlacementAd("MY_TICKET", { signal }),
+  const allAdsQuery = useAppQuery({
+    queryKey: appQueryKeys.allActiveAds(),
+    queryFn: ({ signal }) => getAllActiveAds({ signal }),
     staleTime: 5 * 60_000,
   });
 
-  const waitingRoomAd = useMemo<PlacementAd | null>(() => {
-    const ad = waitingRoomAdQuery.data;
-    if (!ad) {
-      return null;
-    }
-    return {
-      placement: "WAITING_ROOM_MAIN",
-      imageUrl: ad.imageUrl,
-      linkUrl: null,
-      altText: ad.title,
-      isActive: ad.isActive,
-      updatedAt: ad.updatedAt,
-    };
-  }, [waitingRoomAdQuery.data]);
+  const ads = useMemo(
+    () =>
+      (allAdsQuery.data ?? []).map((ad) => ({
+        imageUrl: ad.imageUrl,
+        alt: ad.title,
+        updatedAt: ad.updatedAt,
+        objectPosition: ad.objectPosition,
+      })),
+    [allAdsQuery.data],
+  );
 
   return (
     <MyTicketListPanel
@@ -48,7 +43,7 @@ export default function MyTicket() {
       }}
       loading={myTicketsQuery.isPending}
       errorMessage={myTicketsQuery.error?.message ?? null}
-      ad={waitingRoomAd}
+      ads={ads}
       onRefresh={() => {
         void myTicketsQuery.refetch();
       }}

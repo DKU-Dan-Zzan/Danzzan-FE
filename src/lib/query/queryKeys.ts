@@ -18,6 +18,7 @@ export const appQueryKeys = {
   homeLineup: () => ["home", "lineup"] as const,
   homeEmergencyNotice: () => ["home", "emergency-notice"] as const,
   homeBottomAd: () => ["home", "ad", "HOME_BOTTOM"] as const,
+  allActiveAds: () => ["ads", "active", "all"] as const,
   adminEmergencyNotice: () => ["admin", "emergency-notice"] as const,
   adminNotices: (params: AdminNoticeListKeyParams) => ["admin", "notices", params] as const,
   adminPlacementAd: (placement: "HOME_BOTTOM" | "MY_TICKET") =>

@@ -3,61 +3,40 @@ import { Megaphone } from "lucide-react";
 import { Card } from "@/components/common/ui/card";
 import { cn } from "@/components/common/ui/utils";
 import { TICKETING_CLASSES } from "@/components/ticketing/panels/TicketingShared";
-import type { PlacementAd } from "@/types/ticketing/model/ad.model";
+import { AdCarousel } from "@/components/common/AdCarousel";
+import type { AdSlide } from "@/components/common/AdCarousel";
 
 const AD_PLACEHOLDER_IMAGE = "/ads/waiting-room-sample-banner.svg";
 
 // 광고 슬롯 크기를 변경하려면 아래 상수만 수정하세요.
 const AD_SLOT_MAX_WIDTH_CLASS = "max-w-[var(--ticketing-ad-slot-max-width)]";
 const AD_SLOT_ASPECT_RATIO_CLASS = "aspect-[16/4.7]";
-const AD_LINK_FOCUS_VISIBLE_CLASS =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]";
 const AD_IMAGE_ONLY_FRAME_CLASS =
   "overflow-hidden border border-[var(--timetable-card-border)] bg-[var(--timetable-card-bg)]";
-const AD_IMAGE_ONLY_IMAGE_CLASS = "block h-[70px] w-full object-cover";
 const AD_IMAGE_ONLY_SLOT_CLASS = "w-full bg-[var(--surface-subtle)]";
 
-const buildVersionedImageUrl = (imageUrl: string, updatedAt: string): string => {
-  if (!imageUrl) {
-    return AD_PLACEHOLDER_IMAGE;
-  }
-  if (!updatedAt) {
-    return imageUrl;
-  }
-
-  const version = encodeURIComponent(updatedAt);
-  return imageUrl.includes("?") ? `${imageUrl}&v=${version}` : `${imageUrl}?v=${version}`;
-};
-
 interface TicketingAdBannerCardProps {
-  ad: PlacementAd | null;
+  ads: AdSlide[];
   variant?: "card" | "imageOnly";
 }
 
-export function TicketingAdBannerCard({ ad, variant = "card" }: TicketingAdBannerCardProps) {
-  const adImageUrl = ad ? buildVersionedImageUrl(ad.imageUrl, ad.updatedAt) : AD_PLACEHOLDER_IMAGE;
-  const adAlt = ad?.altText?.trim() || "단짠 대기열 광고";
-  const adLink = ad?.linkUrl?.trim() || null;
+export function TicketingAdBannerCard({ ads, variant = "card" }: TicketingAdBannerCardProps) {
+  const hasAds = ads.length > 0;
+  const placeholderSlide: AdSlide = {
+    imageUrl: AD_PLACEHOLDER_IMAGE,
+    alt: "단짠 대기열 광고",
+  };
+  const slides = hasAds ? ads : [placeholderSlide];
 
   if (variant === "imageOnly") {
     return (
       <div className={AD_IMAGE_ONLY_FRAME_CLASS}>
-        {adLink ? (
-          <a
-            href={adLink}
-            target="_blank"
-            rel="noreferrer"
-            className={cn("block", AD_LINK_FOCUS_VISIBLE_CLASS)}
-          >
-            <div className={AD_IMAGE_ONLY_SLOT_CLASS}>
-              <img src={adImageUrl} alt={adAlt} className={AD_IMAGE_ONLY_IMAGE_CLASS} loading="lazy" />
-            </div>
-          </a>
-        ) : (
-          <div className={AD_IMAGE_ONLY_SLOT_CLASS}>
-            <img src={adImageUrl} alt={adAlt} className={AD_IMAGE_ONLY_IMAGE_CLASS} loading="lazy" />
-          </div>
-        )}
+        <div className={AD_IMAGE_ONLY_SLOT_CLASS}>
+          <AdCarousel
+            slides={slides}
+            imageClassName="block h-[70px] w-full object-cover"
+          />
+        </div>
       </div>
     );
   }
@@ -75,22 +54,12 @@ export function TicketingAdBannerCard({ ad, variant = "card" }: TicketingAdBanne
       </div>
 
       <div className={cn("mx-auto w-full overflow-hidden rounded-[14px] border border-[var(--border-base)]", AD_SLOT_MAX_WIDTH_CLASS)}>
-        {adLink ? (
-          <a
-            href={adLink}
-            target="_blank"
-            rel="noreferrer"
-            className={cn("block", AD_LINK_FOCUS_VISIBLE_CLASS)}
-          >
-            <div className={cn("w-full bg-[var(--surface-subtle)]", AD_SLOT_ASPECT_RATIO_CLASS)}>
-              <img src={adImageUrl} alt={adAlt} className="h-full w-full object-cover" loading="lazy" />
-            </div>
-          </a>
-        ) : (
-          <div className={cn("w-full bg-[var(--surface-subtle)]", AD_SLOT_ASPECT_RATIO_CLASS)}>
-            <img src={adImageUrl} alt={adAlt} className="h-full w-full object-cover" loading="lazy" />
-          </div>
-        )}
+        <div className={cn("w-full bg-[var(--surface-subtle)]", AD_SLOT_ASPECT_RATIO_CLASS)}>
+          <AdCarousel
+            slides={slides}
+            imageClassName="h-full w-full object-cover"
+          />
+        </div>
       </div>
     </Card>
   );
