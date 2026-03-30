@@ -132,8 +132,8 @@ function Notice() {
       {/* 상단 타이틀 & 검색 */}
       <section className="bg-[var(--surface)] px-4 pb-4 pt-4 shadow-[0_8px_24px_var(--shadow-color)]">
         <div className="mb-3">
-          <p className="text-[11px] font-semibold text-[var(--accent)]">단짠 공지사항</p>
-          <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text)]">
+          <p className="text-[11px] font-semibold text-[var(--text-emphasis-vivid)]">단짠 공지사항</p>
+          <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-bold-emphasis)]">
             축제 소식 한눈에 보기
           </h1>
         </div>
@@ -200,7 +200,7 @@ function Notice() {
               className={cn(NOTICE_LIST_CARD_BASE_CLASS, NOTICE_LIST_CARD_PINNED_CLASS)}
             >
               <div className="flex min-w-0 flex-1 items-center gap-2.5">
-                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[var(--surface-tint-subtle)] text-[11px] font-semibold text-[var(--accent)]">
+                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-[var(--app-circle-border)] bg-[linear-gradient(145deg,var(--app-circle-bg-start)_0%,var(--app-circle-bg-end)_100%)] text-[11px] font-semibold text-[var(--text-emphasis-vivid)] shadow-[var(--app-circle-shadow)]">
                   ★
                 </span>
                 <div className="min-w-0">
@@ -326,7 +326,7 @@ function Notice() {
               {detailNotice && !detailLoading && (
                 <article>
                   <header className="border-b border-[var(--border-subtle)] pb-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--status-warning-text)]">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-bold-emphasis)]">
                       FESTIVAL NOTICE
                     </p>
                     <h2 className="mt-1 text-[15px] font-extrabold leading-snug text-[var(--text)]">
