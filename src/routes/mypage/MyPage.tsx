@@ -113,7 +113,7 @@ function MyPage() {
         <div className={MYPAGE_PORTAL_CARD_CLASS}>
           <div className="relative flex items-start justify-between gap-4 px-5 py-6">
             <div>
-              <p className="text-[11px] font-semibold tracking-[0.18em] text-[var(--mypage-portal-overline)] opacity-85">DANFESTA PORTAL</p>
+              <p className="text-[11px] font-semibold tracking-[0.18em] text-[var(--text-emphasis-vivid)]">DANFESTA PORTAL</p>
               <h1 className="mt-1 text-[length:var(--mypage-portal-name-size)] leading-[1.1] font-extrabold tracking-[-0.02em] text-[var(--mypage-portal-name)]">{user?.name ?? "-"}</h1>
               <p className="mt-2 text-base leading-[1.3] text-[var(--mypage-portal-subtitle)]">단국대학교 재학생</p>
             </div>
@@ -127,7 +127,7 @@ function MyPage() {
       <div className="relative mx-auto max-w-[430px] px-4 pt-5">
         <div className="overflow-hidden rounded-[28px] border border-[var(--mypage-info-card-border)] bg-[var(--mypage-info-card-bg)] shadow-[var(--mypage-info-card-shadow)]">
           <div className="border-b border-[var(--mypage-info-header-border)] bg-[linear-gradient(180deg,var(--mypage-info-header-bg-start)_0%,var(--mypage-info-header-bg-end)_100%)] px-5 py-4">
-            <p className="text-[11px] font-semibold tracking-[0.16em] text-[var(--mypage-info-overline)]">MY INFO</p>
+            <p className="text-[11px] font-semibold tracking-[0.16em] text-[var(--text-emphasis-vivid)]">MY INFO</p>
             <h2 className="mt-1 text-[18px] font-bold tracking-tight text-[var(--mypage-info-title)]">학적 정보</h2>
           </div>
 

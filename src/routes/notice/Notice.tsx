@@ -133,7 +133,7 @@ function Notice() {
       <section className="bg-[var(--surface)] px-4 pb-4 pt-4 shadow-[0_8px_24px_var(--shadow-color)]">
         <div className="mb-3">
           <p className="text-[11px] font-semibold text-[var(--text-emphasis-vivid)]">단짠 공지사항</p>
-          <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-bold-emphasis)]">
+          <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-body-deep)]">
             축제 소식 한눈에 보기
           </h1>
         </div>
