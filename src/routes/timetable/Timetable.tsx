@@ -218,14 +218,14 @@ export default function Timetable() {
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
       >
-        <section className="px-4 pb-4 pt-4">
+        <section className="px-4 pb-2 pt-4">
           <p className="text-[11px] font-semibold text-[var(--text-emphasis-vivid)]">{subtitle}</p>
-          <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-bold-emphasis)]">
+          <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-body-deep)]">
             {title}
           </h1>
         </section>
 
-        <div className="sticky top-0 z-20 bg-[var(--webapp-main-bg)] px-4 py-1">
+        <div className="sticky top-0 z-20 bg-[var(--webapp-main-bg)] px-4 py-0">
           <DayTabs
             days={FESTIVAL_DAYS}
             activeIndex={activeIdx}

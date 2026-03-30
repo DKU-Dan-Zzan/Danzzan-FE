@@ -11,7 +11,7 @@ export default function DayTabs({
   onChange: (idx: number) => void
 }) {
   return (
-    <div className="relative mt-3">
+    <div className="relative mt-1">
       {/* 탭들 */}
       <div className="grid grid-cols-3 items-center pb-3">
         {days.map((d, idx) => {
