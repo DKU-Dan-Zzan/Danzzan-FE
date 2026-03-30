@@ -98,6 +98,40 @@
   --surface-tint: var(--surface-tint-base);
   --border: var(--border-base);
 
+  /* App card system (v1) */
+  --card-surface-base: #f8faff;
+  --card-radius: 20px;
+  --card-border-width: 1px;
+  --card-border-base: #c0cde4;
+  --card-border-tint: #afc0dd;
+  --card-border-active: #8ea8d8;
+  --card-shadow-soft: 0 12px 22px -20px var(--shadow-color);
+  --card-shadow-elevated: 0 18px 30px -24px var(--shadow-color);
+
+  --card-outline-bg: var(--home-card-bg);
+  --card-outline-border: #bdd0f7e6;
+  --card-outline-shadow: var(--home-current-performance-card-shadow);
+
+  --card-soft-tint-bg: #eef3fd;
+  --card-soft-tint-border: var(--card-border-tint);
+  --card-soft-tint-shadow: var(--card-shadow-soft);
+
+  --card-grad-white-start: var(--mypage-info-header-bg-end);
+  --card-grad-white-mid: var(--mypage-info-card-bg);
+  --card-grad-white-end: var(--mypage-info-header-bg-start);
+  --card-grad-white-bg:
+    linear-gradient(180deg, var(--card-grad-white-start) 0%, var(--card-grad-white-mid) 58%, var(--card-grad-white-end) 100%);
+  --card-grad-white-border: var(--mypage-info-card-border);
+  --card-grad-white-shadow: var(--mypage-info-card-shadow);
+
+  --card-grad-tint-start: #dfe5f2;
+  --card-grad-tint-mid: #e7efff;
+  --card-grad-tint-end: #ffffff;
+  --card-grad-tint-bg:
+    linear-gradient(150deg, var(--card-grad-tint-start) 0%, var(--card-grad-tint-mid) 56%, var(--card-grad-tint-end) 100%);
+  --card-grad-tint-border: var(--card-border-tint);
+  --card-grad-tint-shadow: var(--card-shadow-elevated);
+
   --status-success: #2e7d32;
   --status-success-bg: rgba(46, 125, 50, 0.12);
   --status-success-border: rgba(46, 125, 50, 0.28);
@@ -309,10 +343,10 @@
   --home-glow-soft: rgba(47, 86, 199, 0.18);
   --home-notice-bg-start: rgba(143, 153, 170, 0.13);
   --home-notice-bg-end: rgba(143, 153, 170, 0.08);
-  --home-notice-border: rgba(163, 173, 191, 0.2);
+  --home-notice-border: transparent;
   --home-notice-shadow: rgba(33, 66, 171, 0.28);
   --home-notice-depth-shadow: rgba(30, 41, 59, 0.14);
-  --home-notice-icon-border: var(--app-circle-border);
+  --home-notice-icon-border: #bdd0f7e6;
   --home-notice-icon-bg-start: var(--app-circle-bg-start);
   --home-notice-icon-bg-end: var(--app-circle-bg-end);
   --home-notice-card-radius: 0px;
@@ -328,10 +362,11 @@
   --home-lineup-caption-font-size: 14px;
   --home-lineup-caption-color: var(--text-body-deep);
   --home-current-performance-caption-gap: 16px;
-  --home-ad-banner-border: var(--border-base);
+  --home-ad-banner-border: #bdd0f7e6;
+  --home-lineup-card-border: #bdd0f7e6;
   --home-ad-banner-bg: #ffffff;
   --home-card-radius: 16px;
-  --home-card-border: var(--border-base);
+  --home-card-border: #bdd0f7e6;
   --home-card-bg: var(--surface-subtle);
   --home-poster-placeholder-bg:
     linear-gradient(145deg, var(--surface-tint-subtle) 0%, var(--surface-subtle) 100%);
@@ -492,6 +527,34 @@
   --border: var(--border-base);
   --shadow-color: rgba(32, 49, 99, 0.16);
   --ring: rgba(59, 74, 118, 0.42);
+  --card-surface-base: #f8faff;
+  --card-radius: 20px;
+  --card-border-width: 1px;
+  --card-border-base: #c0cde4;
+  --card-border-tint: #afc0dd;
+  --card-border-active: #8ea8d8;
+  --card-shadow-soft: 0 12px 22px -20px var(--shadow-color);
+  --card-shadow-elevated: 0 18px 30px -24px var(--shadow-color);
+  --card-outline-bg: var(--home-card-bg);
+  --card-outline-border: #bdd0f7e6;
+  --card-outline-shadow: var(--home-current-performance-card-shadow);
+  --card-soft-tint-bg: #eef3fd;
+  --card-soft-tint-border: var(--card-border-tint);
+  --card-soft-tint-shadow: var(--card-shadow-soft);
+  --card-grad-white-start: var(--mypage-info-header-bg-end);
+  --card-grad-white-mid: var(--mypage-info-card-bg);
+  --card-grad-white-end: var(--mypage-info-header-bg-start);
+  --card-grad-white-bg:
+    linear-gradient(180deg, var(--card-grad-white-start) 0%, var(--card-grad-white-mid) 58%, var(--card-grad-white-end) 100%);
+  --card-grad-white-border: var(--mypage-info-card-border);
+  --card-grad-white-shadow: var(--mypage-info-card-shadow);
+  --card-grad-tint-start: #dfe5f2;
+  --card-grad-tint-mid: #e7efff;
+  --card-grad-tint-end: #ffffff;
+  --card-grad-tint-bg:
+    linear-gradient(150deg, var(--card-grad-tint-start) 0%, var(--card-grad-tint-mid) 56%, var(--card-grad-tint-end) 100%);
+  --card-grad-tint-border: var(--card-border-tint);
+  --card-grad-tint-shadow: var(--card-shadow-elevated);
   --primary: var(--webapp-button-primary);
   --primary-soft: rgba(59, 74, 118, 0.14);
   --button-disabled-bg: var(--webapp-button-disabled);
@@ -566,11 +629,12 @@
   --home-notice-bg-end: var(--neutral-100);
   --home-notice-border: transparent;
   --home-notice-shadow: rgba(32, 49, 99, 0.14);
-  --home-notice-icon-border: var(--app-circle-border);
+  --home-notice-icon-border: #bdd0f7e6;
   --home-notice-icon-bg-start: var(--app-circle-bg-start);
   --home-notice-icon-bg-end: var(--app-circle-bg-end);
   --home-lineup-caption-color: var(--text-body-deep);
-  --home-ad-banner-border: var(--border-base);
+  --home-ad-banner-border: #bdd0f7e6;
+  --home-lineup-card-border: #bdd0f7e6;
   --home-ad-banner-bg: #ffffff;
 
   --mypage-portal-card-bg-start: rgba(227, 232, 239, 0.92);

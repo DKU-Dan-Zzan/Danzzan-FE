@@ -1,4 +1,5 @@
 // 역할: timetable 화면에서 사용하는 Timeline Item UI 블록을 렌더링합니다.
+import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants"
 import type { Performance } from "@/types/app/timetable/timetable.types"
 
 export default function TimelineItem({
@@ -47,7 +48,7 @@ export default function TimelineItem({
       {/* 콘텐츠 영역 */}
       <div className="flex-1 pb-6">
         {/* 이미지 */}
-        <div className="w-40 overflow-hidden rounded-3xl border border-[var(--timetable-card-border)] bg-[var(--surface-subtle)]">
+        <div className={`w-40 overflow-hidden ${APP_CARD_VARIANTS.outline} rounded-3xl shadow-none`}>
           <img
             src={item.artistImageUrl ?? "/placeholder-artist.png"}
             alt=""
@@ -59,7 +60,7 @@ export default function TimelineItem({
         </div>
 
         {/* 텍스트 영역: 하얀 박스(미니 카드) */}
-        <div className="mt-3 w-full rounded-2xl border border-[var(--timetable-card-border)] bg-[var(--timetable-card-bg)] px-4 py-3 shadow-[0_1px_0_var(--shadow-color)]">
+        <div className={`mt-3 w-full px-4 py-3 ${APP_CARD_VARIANTS.outline} rounded-2xl shadow-none`}>
           <div className="text-[15px] font-extrabold text-[var(--text)]">
             {item.artistName}
           </div>

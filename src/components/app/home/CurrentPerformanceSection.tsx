@@ -8,6 +8,7 @@ import {
   getCurrentPerformance,
 } from "@/utils/app/timetable";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
+import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
 
 const CARD_WIDTH = 314.4;
 const CARD_HEIGHT = 94;
@@ -74,7 +75,7 @@ export default function CurrentPerformanceSection() {
           type="button"
           onClick={() => navigate(`/timetable?date=${today}`)}
           style={{ aspectRatio: CARD_ASPECT_RATIO }}
-          className="w-full rounded-[22px] border border-[var(--home-card-border)] bg-[var(--home-card-bg)] px-5 py-4 shadow-[var(--home-current-performance-card-shadow)] transition active:scale-[0.99]"
+          className={`w-full px-5 py-4 transition active:scale-[0.99] ${APP_CARD_VARIANTS.outline} rounded-[22px]`}
         >
           {status === "active" && currentPerformance ? (
             <div className="flex h-full items-center gap-4">

@@ -23,6 +23,7 @@ import {
   isPasswordPolicyErrorMessage,
 } from "@/lib/ticketing/passwordPolicy";
 import { TICKETING_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
+import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -201,7 +202,7 @@ export default function Signup() {
               </p>
             )}
 
-            <section className="rounded-2xl border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] px-4 py-4">
+            <section className={`px-4 py-4 ${APP_CARD_VARIANTS.gradTint} rounded-2xl`}>
               <div className="flex items-start gap-3">
                 <Checkbox
                   id="privacyConsent"

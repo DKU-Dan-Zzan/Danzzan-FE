@@ -5,13 +5,14 @@ import { authLogout } from "@/api/app/auth/authApi";
 import { studentProfileApi } from "@/api/app/auth/studentProfileApi";
 import { authStore } from "@/store/common/authStore";
 import { GraduationCap, IdCard, User } from "lucide-react";
+import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
 
 const MYPAGE_GUEST_ROOT_CLASS =
   "mypage-root relative flex min-h-full flex-col items-center justify-center overflow-hidden bg-[var(--bg-page-soft)] px-6 py-[100px]";
 const MYPAGE_GUEST_CARD_CLASS =
   "relative flex w-full max-w-sm flex-col items-center gap-5 rounded-[28px] border border-[var(--mypage-guest-card-border)] bg-[var(--mypage-guest-card-bg)] px-6 py-8 text-center shadow-[var(--mypage-guest-card-shadow)] backdrop-blur-[6px]";
 const MYPAGE_PORTAL_CARD_CLASS =
-  "relative overflow-hidden rounded-[30px] border border-[var(--mypage-portal-card-border)] bg-[linear-gradient(145deg,var(--mypage-portal-card-bg-start)_0%,var(--mypage-portal-card-bg-mid)_45%,var(--mypage-portal-card-bg-end)_100%)] shadow-[0_24px_42px_-24px_var(--mypage-portal-card-shadow)] before:pointer-events-none before:absolute before:inset-0 before:rounded-[30px] before:border before:border-[var(--mypage-portal-card-inner-border)] before:content-['']";
+  `relative overflow-hidden ${APP_CARD_VARIANTS.gradTint} rounded-[30px]`;
 
 function MyPage() {
   const navigate = useNavigate();

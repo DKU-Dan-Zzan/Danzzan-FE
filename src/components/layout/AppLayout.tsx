@@ -9,6 +9,16 @@ const Layout = () => {
   const location = useLocation()
   const hideFooter = location.pathname === "/map"
   const isBoothMapPage = location.pathname === "/map"
+  const isTimetablePage = location.pathname === "/timetable"
+  const timetableBorderOverrideClass = isTimetablePage
+    ? "[--border-base:#bdd0f7e6] [--border-subtle:#bdd0f7e6] [--timetable-card-border:#bdd0f7e6] [--timetable-info-border:#bdd0f7e6] [--timetable-active-line:#bdd0f7e6] [--app-header-border:#bdd0f7e6] [--app-nav-border:#bdd0f7e6] [--app-circle-border:#bdd0f7e6] [--app-header-ticket-btn-border:#bdd0f7e6]"
+    : ""
+  const rootClassName = isBoothMapPage
+    ? `h-dvh overflow-hidden bg-white ${timetableBorderOverrideClass}`
+    : `min-h-dvh bg-[var(--bg-page-soft)] ${timetableBorderOverrideClass}`
+  const frameClassName = isBoothMapPage
+    ? "mx-auto flex h-dvh max-w-[430px] flex-col overflow-hidden pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]"
+    : "mx-auto flex min-h-dvh max-w-[430px] flex-col bg-[var(--bg-page-soft)] pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]"
 
   return (
     <AppShell
@@ -16,12 +26,8 @@ const Layout = () => {
       header={<Header />}
       footer={!hideFooter ? <Footer /> : undefined}
       bottomNav={<BottomNav />}
-      rootClassName={isBoothMapPage ? "h-dvh overflow-hidden bg-white" : "min-h-dvh bg-[var(--bg-page-soft)]"}
-      frameClassName={
-        isBoothMapPage
-          ? "mx-auto flex h-dvh max-w-[430px] flex-col overflow-hidden pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]"
-          : "mx-auto flex min-h-dvh max-w-[430px] flex-col bg-[var(--bg-page-soft)] pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]"
-      }
+      rootClassName={rootClassName}
+      frameClassName={frameClassName}
       mainClassName={
         isBoothMapPage
           ? "flex-1 overflow-hidden"
