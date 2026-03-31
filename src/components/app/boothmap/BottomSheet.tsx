@@ -151,7 +151,7 @@ export default function BottomSheet({
         onPointerCancel={endDrag}
         aria-label="bottom-sheet-handle"
       >
-        <div className="mx-auto h-1.5 w-12 rounded-full bg-[var(--boothmap-surface-softer)]" />
+        <div className="mx-auto h-1.5 w-12 rounded-full bg-[var(--boothmap-sheet-handle)]" />
       </div>
 
       {mode === "DETAIL" && (
