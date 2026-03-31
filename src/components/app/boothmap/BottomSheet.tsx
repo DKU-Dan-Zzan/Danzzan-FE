@@ -1,6 +1,3 @@
-// 역할: boothmap 화면에서 사용하는 Bottom Sheet UI 블록을 렌더링합니다.
-// 드래그로 높이를 조절하고(PEEK/HALF/FULL) 스냅되는 BottomSheet 컴포넌트
-
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SheetMode, SheetSnap } from "@/types/app/boothmap/boothmap.types";
 import { BOTTOM_SHEET_HEIGHT_RATIO } from "@/utils/app/boothmap/sheetSnap";
@@ -145,7 +142,6 @@ export default function BottomSheet({
         transition: isDragging ? "none" : "height 180ms ease",
       }}
     >
-      {/* handle */}
       <div
         className="cursor-grab select-none px-0 pb-2 pt-3"
         style={{ touchAction: "none" }}
@@ -159,11 +155,11 @@ export default function BottomSheet({
       </div>
 
       {mode === "DETAIL" && (
-        <div className="px-4 pb-2">
+        <div className="px-4 pb-1">
           <button
             type="button"
             onClick={onBackToList}
-            className="text-m font-extrabold text-[var(--boothmap-accent-text)]"
+            className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--boothmap-text-muted)] transition hover:text-[var(--boothmap-text-subtle)]"
           >
             ← 목록으로
           </button>
