@@ -43,7 +43,6 @@ export default function Ticketing() {
         polling={flow.waitingPolling}
         offline={!flow.isNetworkOnline}
         errorMessage={flow.waitingError}
-        ad={flow.waitingAd}
       />
     );
   }

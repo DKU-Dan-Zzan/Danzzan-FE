@@ -10,7 +10,7 @@ export default function AdBanner({
 }: AdBannerProps) {
   return (
     <div className="mt-9">
-      <div className="overflow-hidden border border-[var(--timetable-card-border)] bg-[var(--timetable-card-bg)]">
+      <div className="overflow-hidden border border-[var(--home-ad-banner-border)] bg-[var(--home-ad-banner-bg)]">
         <img
           src={imageUrl}
           alt={alt}

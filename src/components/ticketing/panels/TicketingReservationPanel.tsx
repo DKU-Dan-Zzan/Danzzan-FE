@@ -3,6 +3,7 @@ import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
 import { Checkbox } from "@/components/common/ui/checkbox";
 import { cn } from "@/components/common/ui/utils";
+import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
 import {
   TICKETING_CLASSES,
   TICKETING_NARROW_PANEL_CLASS,
@@ -161,14 +162,14 @@ export function TicketingReservationPanel({
             <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>
               아래 항목을 체크하면 예매를 진행할 수 있습니다.
             </p>
-            <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 py-3">
+            <label className={`${APP_CARD_VARIANTS.outline} flex cursor-pointer items-center gap-2.5 rounded-xl px-3 py-3`}>
               <Checkbox
                 checked={agreementChecked}
                 disabled={submitting}
                 onCheckedChange={(checked) => onAgreementCheckedChange(Boolean(checked))}
                 className="h-5 w-5 rounded-[6px] border-[var(--border-strong)] data-[state=checked]:border-[var(--accent)] data-[state=checked]:bg-[var(--accent)]"
               />
-              <span className={`${TICKETING_CLASSES.typography.sectionBodySm} font-semibold text-[var(--text)]`}>
+              <span className="text-[length:calc(var(--ticketing-text-section-body-sm)+2pt)] font-semibold text-[var(--text)]">
                 위 사항들을 숙지했습니다.
               </span>
             </label>

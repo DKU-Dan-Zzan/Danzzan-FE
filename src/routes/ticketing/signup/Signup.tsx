@@ -10,6 +10,11 @@ import { Checkbox } from "@/components/common/ui/checkbox";
 import { Input } from "@/components/common/ui/input";
 import { Label } from "@/components/common/ui/label";
 import { PasswordPolicyChecklist } from "@/components/ticketing/auth/PasswordPolicyChecklist";
+import {
+  TicketingAuthHeading,
+  TICKETING_AUTH_HEADER_SECTION_CLASS,
+  TICKETING_AUTH_MAIN_CLASS,
+} from "@/components/ticketing/auth/TicketingAuthHeading";
 import { signupApi } from "@/api/ticketing/signupApi";
 import { HttpError } from "@/api/ticketing/httpClient";
 import {
@@ -18,6 +23,8 @@ import {
   isPasswordPolicyErrorMessage,
 } from "@/lib/ticketing/passwordPolicy";
 import { TICKETING_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
+import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
+import { cn } from "@/components/common/ui/utils";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -100,16 +107,11 @@ export default function Signup() {
   return (
     <div className="min-h-screen bg-[var(--bg-base)]">
       <div className="mx-auto w-full max-w-[420px] px-5 pb-6">
-        <div className="mt-3">
-          <p className="text-[length:var(--ticketing-text-helper)] font-semibold text-[var(--text-muted)]">
-            재학생 전용 축제 포털 서비스
-          </p>
-          <h1 className="mt-1 leading-[1.12] font-black tracking-tight text-[var(--text)]">
-            축제 포털 회원가입
-          </h1>
-        </div>
+        <section className={TICKETING_AUTH_HEADER_SECTION_CLASS}>
+          <TicketingAuthHeading title="축제 포털 회원가입" />
+        </section>
 
-        <main className="mt-6">
+        <main className={TICKETING_AUTH_MAIN_CLASS}>
           <form className="space-y-5" onSubmit={handleSubmit}>
             <section className="space-y-4">
               <div className="space-y-2">
@@ -201,7 +203,7 @@ export default function Signup() {
               </p>
             )}
 
-            <section className="rounded-2xl border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] px-4 py-4">
+            <section className={cn("px-4 py-4 rounded-2xl", APP_CARD_VARIANTS.gradTint)}>
               <div className="flex items-start gap-3">
                 <Checkbox
                   id="privacyConsent"
@@ -226,7 +228,7 @@ export default function Signup() {
 
             <Button
               type="submit"
-              className="h-11 w-full rounded-2xl bg-[var(--accent)] text-white shadow-[0_10px_18px_-12px_var(--shadow-color)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:opacity-55"
+              className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
               disabled={submitting}
             >
               <KeyRound className="h-4 w-4" strokeWidth={2.3} />
@@ -239,7 +241,7 @@ export default function Signup() {
             <Link
               to="/ticket/login"
               state={{ authTabFrom: "signup" }}
-              className="mt-2 inline-block text-sm font-semibold text-[var(--accent)]"
+              className="mt-2 inline-block text-sm font-semibold text-[var(--text-emphasis-vivid)]"
             >
               로그인하러 가기
             </Link>

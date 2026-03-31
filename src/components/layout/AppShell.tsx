@@ -9,6 +9,7 @@ type AppShellProps = {
   rootClassName?: string;
   frameClassName?: string;
   mainClassName?: string;
+  colorScheme?: "webapp";
 };
 
 export function AppShell({
@@ -19,9 +20,10 @@ export function AppShell({
   rootClassName = "min-h-dvh bg-[var(--bg-page-soft)]",
   frameClassName = "mx-auto flex min-h-dvh max-w-[430px] flex-col bg-[var(--bg-page-soft)]",
   mainClassName = "flex-1 overflow-x-hidden [&>*]:min-h-full",
+  colorScheme,
 }: AppShellProps) {
   return (
-    <div className={rootClassName}>
+    <div className={rootClassName} data-color-scheme={colorScheme}>
       <div className={frameClassName}>
         {header}
         <main className={mainClassName}>{children}</main>
