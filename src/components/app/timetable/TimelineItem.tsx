@@ -48,11 +48,11 @@ export default function TimelineItem({
       {/* 콘텐츠 영역 */}
       <div className="flex-1 pb-6">
         {/* 이미지 */}
-        <div className={`w-40 overflow-hidden ${APP_CARD_VARIANTS.outline} rounded-3xl shadow-none`}>
+        <div className={`h-36 w-36 overflow-hidden ${APP_CARD_VARIANTS.outline} rounded-full shadow-none`}>
           <img
             src={item.artistImageUrl ?? "/placeholder-artist.png"}
             alt=""
-            className="h-32 w-40 object-cover"
+            className="h-full w-full object-cover"
             onError={(e) => {
               ;(e.currentTarget as HTMLImageElement).src = "/placeholder-artist.png"
             }}
