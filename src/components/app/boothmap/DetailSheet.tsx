@@ -232,14 +232,31 @@ function DetailSheet({
       <div className="space-y-3">
         <div className="rounded-2xl border border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] p-4 shadow-sm">
           <div className="flex items-start justify-between">
-            <div>
-              <div className="text-lg font-extrabold text-[var(--boothmap-text)]">
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-lg font-extrabold text-[var(--boothmap-text)]">
                 {pubDetail.name}
               </div>
 
-              <div className="text-sm font-bold text-[var(--boothmap-text-subtle)]">
-                {displayCollege}
-                {pubDetail.department ? ` ${pubDetail.department}` : ""}
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                <span className="font-bold text-[var(--boothmap-text-subtle)]">
+                  {displayCollege}
+                  {pubDetail.department ? ` ${pubDetail.department}` : ""}
+                </span>
+
+                {pubDetail.instagram && (
+                  <a
+                    href={
+                      pubDetail.instagram.startsWith("http")
+                        ? pubDetail.instagram
+                        : `https://instagram.com/${pubDetail.instagram.replace("@", "")}`
+                    }
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-semibold text-[var(--boothmap-text-muted)] underline underline-offset-2"
+                  >
+                    {pubDetail.instagram}
+                  </a>
+                )}
               </div>
 
               {operatingTimeText && (
@@ -331,20 +348,6 @@ function DetailSheet({
             </div>
           )}
 
-          {pubDetail.instagram && (
-            <a
-              href={
-                pubDetail.instagram.startsWith("http")
-                  ? pubDetail.instagram
-                  : `https://instagram.com/${pubDetail.instagram.replace("@", "")}`
-              }
-              target="_blank"
-              rel="noreferrer"
-              className="mt-4 block text-sm font-extrabold text-[var(--boothmap-accent)] underline underline-offset-2"
-            >
-              {pubDetail.instagram}
-            </a>
-          )}
         </div>
 
         {imageViewerDialog}
