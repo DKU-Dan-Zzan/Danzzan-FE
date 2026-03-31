@@ -28,8 +28,8 @@ describe("webapp color scheme source", () => {
     expect(content).toContain("--bg-page-soft: var(--webapp-main-bg);");
     expect(content).toContain("--app-overscroll-bg: var(--webapp-main-bg);");
     expect(content).toContain("--text-body-deep: var(--ink-600);");
-    expect(content).toContain("--text-emphasis-vivid: #2853A9;");
-    expect(content).toContain("--text-emphasis-vivid-strong: #2F63F6;");
+    expect(content).toContain("--text-emphasis-vivid: #2853a9;");
+    expect(content).toContain("--text-emphasis-vivid-strong: #2f63f6;");
     expect(content).toContain("--text-bold-emphasis: #374f84;");
     expect(content).toContain("--webapp-text-main: var(--text-body-deep);");
     expect(content).toContain("--webapp-text-emphasis: var(--text-body-deep);");
@@ -48,7 +48,7 @@ describe("webapp color scheme source", () => {
     expect(content).toContain("--home-notice-bg-end: var(--neutral-100);");
     expect(content).toContain("--home-notice-border: transparent;");
     expect(content).toContain("--home-lineup-caption-color: var(--text-body-deep);");
-    expect(content).toContain("--home-ad-banner-border: var(--border-base);");
+    expect(content).toContain("--home-ad-banner-border: #bdd0f7e6;");
     expect(content).toContain("--home-ad-banner-bg: #ffffff;");
     expect(content).toContain("--mypage-portal-card-bg-start: rgba(227, 232, 239, 0.92);");
     expect(content).toContain("--mypage-portal-card-bg-mid: rgba(227, 232, 239, 0.78);");
