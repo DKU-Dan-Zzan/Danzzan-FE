@@ -50,6 +50,20 @@ const FESTIVAL_DATES = [
   { label: "5/13", value: "2026-05-13" },
   { label: "5/14", value: "2026-05-14" },
 ];
+
+const DEFAULT_FESTIVAL_DATE = FESTIVAL_DATES[0].value;
+
+function getInitialFestivalDate() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = `${today.getMonth() + 1}`.padStart(2, "0");
+  const date = `${today.getDate()}`.padStart(2, "0");
+  const todayValue = `${year}-${month}-${date}`;
+
+  return FESTIVAL_DATES.find((festivalDate) => festivalDate.value === todayValue)?.value
+    ?? DEFAULT_FESTIVAL_DATE;
+}
+
 const TOP_PANEL_Z_INDEX_CLASS: Record<SheetSnap, string> = {
   PEEK: "z-[70]",
   HALF: "z-[70]",
@@ -114,7 +128,7 @@ export default function BoothMap() {
   const [pubListCollegeId, setPubListCollegeId] = useState<number | null>(null);
   const [sheetMode, setSheetMode] = useState<SheetMode>("LIST");
   const [sheetSnap, setSheetSnap] = useState<SheetSnap>("PEEK");
-  const [selectedDate, setSelectedDate] = useState("2026-05-12");
+  const [selectedDate, setSelectedDate] = useState(getInitialFestivalDate);
   const [mapViewport, setMapViewport] = useState<MapViewport>(DEFAULT_MAP_VIEWPORT);
   const [bottomNavHeight, setBottomNavHeight] = useState(56);
 
