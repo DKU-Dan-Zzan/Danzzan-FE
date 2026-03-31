@@ -11,13 +11,13 @@ const typeLabel: Record<string, string> = {
 
 const typeBadgeClassName: Record<string, string> = {
   FOOD_TRUCK:
-    "border-[var(--boothmap-marker-food-truck)] bg-[var(--boothmap-marker-food-truck)] text-[var(--boothmap-overlay-badge-text)]",
+    "border-[color:color-mix(in_srgb,var(--boothmap-marker-food-truck)_18%,white)] bg-[color:color-mix(in_srgb,var(--boothmap-marker-food-truck)_10%,white)] text-[var(--boothmap-marker-food-truck)]",
   EXPERIENCE:
-    "border-[var(--boothmap-marker-experience)] bg-[var(--boothmap-marker-experience)] text-[var(--boothmap-overlay-badge-text)]",
+    "border-[color:color-mix(in_srgb,var(--boothmap-marker-experience)_18%,white)] bg-[color:color-mix(in_srgb,var(--boothmap-marker-experience)_10%,white)] text-[var(--boothmap-marker-experience)]",
   EVENT:
-    "border-[var(--boothmap-marker-event)] bg-[var(--boothmap-marker-event)] text-[var(--boothmap-text)]",
+    "border-[color:color-mix(in_srgb,var(--boothmap-marker-event)_24%,white)] bg-[color:color-mix(in_srgb,var(--boothmap-marker-event)_14%,white)] text-[color:color-mix(in_srgb,var(--boothmap-marker-event)_70%,black)]",
   FACILITY:
-    "border-[var(--boothmap-marker-facility)] bg-[var(--boothmap-marker-facility)] text-[var(--boothmap-overlay-badge-text)]",
+    "border-[color:color-mix(in_srgb,var(--boothmap-marker-facility)_18%,white)] bg-[color:color-mix(in_srgb,var(--boothmap-marker-facility)_10%,white)] text-[var(--boothmap-marker-facility)]",
 };
 
 export default function BoothList({
@@ -55,7 +55,7 @@ export default function BoothList({
 
               <div
                 className={[
-                  "inline-flex flex-shrink-0 items-center rounded-full border px-2.5 py-1 text-[11px] font-bold leading-none shadow-[0_1px_2px_var(--boothmap-overlay-shadow)]",
+                  "inline-flex flex-shrink-0 items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold leading-none tracking-[-0.01em]",
                   typeBadgeClassName[booth.type],
                 ].join(" ")}
               >
