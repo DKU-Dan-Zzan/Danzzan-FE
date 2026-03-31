@@ -134,6 +134,27 @@ describe("boothmapContract", () => {
     expect(parsed.thumbnailImageUrls).toHaveLength(1);
   });
 
+  it("주점 상세 응답에서 thumbnailImageUrls가 없어도 파싱한다", () => {
+    const parsed = parsePubDetailContract(
+      {
+        pubId: 4,
+        name: "주점 C",
+        intro: "소개",
+        description: "상세",
+        department: "소프트웨어",
+        collegeName: "SW융합대학",
+        instagram: "@pub_c",
+        imageUrls: ["https://cdn.example.com/c.png"],
+        startTime: "18:00",
+        endTime: "23:00",
+      },
+      "/map/pubs/4",
+    );
+
+    expect(parsed.imageUrls).toHaveLength(1);
+    expect(parsed.thumbnailImageUrls).toBeNull();
+  });
+
   it("facility booth subType을 파싱한다", () => {
     const parsed = parseBoothMapContract(
       {

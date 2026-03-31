@@ -171,7 +171,7 @@ export type ContractPubDetailResponse = {
   collegeName: string | null;
   instagram: string | null;
   imageUrls: string[];
-  thumbnailImageUrls: string[];
+  thumbnailImageUrls: string[] | null;
   startTime: string | null;
   endTime: string | null;
 };
@@ -368,7 +368,6 @@ export const parsePubDetailContract = (payload: unknown, endpoint: string): Cont
     collegeName === undefined ||
     instagram === undefined ||
     !imageUrls ||
-    !thumbnailImageUrls ||
     startTime === undefined ||
     endTime === undefined
   ) {
@@ -384,7 +383,7 @@ export const parsePubDetailContract = (payload: unknown, endpoint: string): Cont
     collegeName,
     instagram,
     imageUrls,
-    thumbnailImageUrls,
+    thumbnailImageUrls: thumbnailImageUrls ?? null,
     startTime,
     endTime,
   };
