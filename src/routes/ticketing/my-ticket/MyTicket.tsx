@@ -2,10 +2,10 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { MyTicketListPanel } from "@/components/ticketing/panels/MyTicketListPanel";
+import { adApi } from "@/api/ticketing/adApi";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
 import { ticketApi } from "@/api/ticketing/ticketApi";
-import { getAllActiveAds } from "@/api/app/ad/adApi";
 
 export default function MyTicket() {
   const navigate = useNavigate();
@@ -17,21 +17,25 @@ export default function MyTicket() {
     staleTime: 30_000,
   });
 
-  const allAdsQuery = useAppQuery({
-    queryKey: appQueryKeys.allActiveAds(),
-    queryFn: ({ signal }) => getAllActiveAds({ signal }),
+  const myTicketAdQuery = useAppQuery({
+    queryKey: appQueryKeys.myTicketAd(),
+    queryFn: ({ signal }) => adApi.getPlacementAd("MY_TICKET", signal),
     staleTime: 5 * 60_000,
   });
 
   const ads = useMemo(
     () =>
-      (allAdsQuery.data ?? []).map((ad) => ({
-        imageUrl: ad.imageUrl,
-        alt: ad.title,
-        updatedAt: ad.updatedAt,
-        objectPosition: ad.objectPosition,
-      })),
-    [allAdsQuery.data],
+      myTicketAdQuery.data
+        ? [
+            {
+              imageUrl: myTicketAdQuery.data.imageUrl,
+              alt: myTicketAdQuery.data.altText,
+              updatedAt: myTicketAdQuery.data.updatedAt,
+              linkUrl: myTicketAdQuery.data.linkUrl,
+            },
+          ]
+        : [],
+    [myTicketAdQuery.data],
   );
 
   return (

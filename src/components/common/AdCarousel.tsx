@@ -1,6 +1,7 @@
 // 역할: 광고 이미지 슬라이딩 캐러셀을 렌더링합니다.
 // 5초마다 랜덤 순서로 자동 전환되며, hover(PC)/touch(모바일) 시 일시정지됩니다.
 import { useState, useEffect, useRef, useCallback } from "react"
+import { cn } from "@/components/common/ui/utils"
 
 export interface AdSlide {
   imageUrl: string
@@ -117,7 +118,7 @@ export function AdCarousel({
       />
     )
     return (
-      <div className={`overflow-hidden ${containerClassName}`}>
+      <div className={cn("overflow-hidden", containerClassName)}>
         {slide.linkUrl ? (
           <a href={slide.linkUrl} target="_blank" rel="noreferrer" className="block">
             {img}
@@ -133,7 +134,7 @@ export function AdCarousel({
 
   return (
     <div
-      className={`overflow-hidden ${containerClassName}`}
+      className={cn("overflow-hidden", containerClassName)}
       onMouseEnter={() => setIsHoverPaused(true)}
       onMouseLeave={() => setIsHoverPaused(false)}
       onTouchStart={() => setIsTouchPaused(true)}
