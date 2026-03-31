@@ -1,5 +1,5 @@
 // 역할: 부스맵 메인 라우트에서 2D 지도, 필터, 상세 시트 상태를 통합 제어합니다.
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   Booth,
   College,
@@ -131,6 +131,7 @@ export default function BoothMap() {
   const [selectedDate, setSelectedDate] = useState(getInitialFestivalDate);
   const [mapViewport, setMapViewport] = useState<MapViewport>(DEFAULT_MAP_VIEWPORT);
   const [bottomNavHeight, setBottomNavHeight] = useState(56);
+  const boothSelectionRequestSeqRef = useRef(0);
 
   const frameWidth = 430;
 
@@ -294,6 +295,8 @@ export default function BoothMap() {
       fallbackSnap: Extract<SheetSnap, "PEEK" | "HALF">;
     },
   ) => {
+    const requestSeq = ++boothSelectionRequestSeqRef.current;
+
     setSelectedMapItem({ kind: "booth", id });
     setSelectedDetailItem(null);
     setSelectedCollegeId(null);
@@ -306,6 +309,10 @@ export default function BoothMap() {
         staleTime: 5 * 60_000,
       });
 
+      if (requestSeq !== boothSelectionRequestSeqRef.current) {
+        return;
+      }
+
       if (hasBoothDetailContent(summary.description)) {
         setBoothDetailAvailabilityOverrides((prev) => ({ ...prev, [id]: true }));
         setSelectedDetailItem({ kind: "booth", id });
@@ -315,6 +322,10 @@ export default function BoothMap() {
       }
     } catch {
       // 상세 조회에 실패해도 목록 흐름은 유지합니다.
+    }
+
+    if (requestSeq !== boothSelectionRequestSeqRef.current) {
+      return;
     }
 
     setBoothDetailAvailabilityOverrides((prev) => ({ ...prev, [id]: false }));
