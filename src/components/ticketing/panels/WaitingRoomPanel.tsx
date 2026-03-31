@@ -2,13 +2,11 @@
 import { Ticket } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/common/ui/card";
-import { TicketingAdBannerCard } from "@/components/ticketing/panels/TicketingAdBannerCard";
 import {
   TICKETING_CLASSES,
   TICKETING_NARROW_PANEL_CLASS,
 } from "@/components/ticketing/panels/TicketingShared";
 import { isRemainingFresh } from "@/hooks/ticketing/queue/flow-utils";
-import type { PlacementAd } from "@/types/ticketing/model/ad.model";
 
 interface WaitingRoomPanelProps {
   eventTitle: string;
@@ -17,7 +15,6 @@ interface WaitingRoomPanelProps {
   polling: boolean;
   offline: boolean;
   errorMessage: string | null;
-  ad: PlacementAd | null;
 }
 
 const formatQueuePosition = (queuePosition: number | null): string => {
@@ -34,7 +31,6 @@ export function WaitingRoomPanel({
   polling,
   offline,
   errorMessage,
-  ad,
 }: WaitingRoomPanelProps) {
   const [now, setNow] = useState(() => Date.now());
 
@@ -101,8 +97,6 @@ export function WaitingRoomPanel({
           </p>
         </Card>
       )}
-
-      <TicketingAdBannerCard ad={ad} />
     </div>
   );
 }

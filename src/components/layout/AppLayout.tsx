@@ -9,18 +9,25 @@ const Layout = () => {
   const location = useLocation()
   const hideFooter = location.pathname === "/map"
   const isBoothMapPage = location.pathname === "/map"
+  const isTimetablePage = location.pathname === "/timetable"
+  const timetableBorderOverrideClass = isTimetablePage
+    ? "[--border-base:var(--home-card-border)] [--border-subtle:var(--home-card-border)] [--timetable-card-border:var(--home-card-border)] [--timetable-info-border:var(--home-card-border)] [--timetable-active-line:var(--home-card-border)] [--app-header-border:var(--home-card-border)] [--app-nav-border:var(--home-card-border)] [--app-circle-border:var(--home-card-border)] [--app-header-ticket-btn-border:var(--home-card-border)]"
+    : ""
+  const rootClassName = isBoothMapPage
+    ? `h-dvh overflow-hidden bg-white ${timetableBorderOverrideClass}`
+    : `min-h-dvh bg-[var(--bg-page-soft)] ${timetableBorderOverrideClass}`
+  const frameClassName = isBoothMapPage
+    ? "mx-auto flex h-dvh max-w-[430px] flex-col overflow-hidden pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]"
+    : "mx-auto flex min-h-dvh max-w-[430px] flex-col bg-[var(--bg-page-soft)] pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]"
 
   return (
     <AppShell
+      colorScheme="webapp"
       header={<Header />}
       footer={!hideFooter ? <Footer /> : undefined}
       bottomNav={<BottomNav />}
-      rootClassName={isBoothMapPage ? "h-dvh overflow-hidden bg-white" : "min-h-dvh bg-[var(--bg-page-soft)]"}
-      frameClassName={
-        isBoothMapPage
-          ? "mx-auto flex h-dvh max-w-[430px] flex-col overflow-hidden pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]"
-          : "mx-auto flex min-h-dvh max-w-[430px] flex-col bg-[var(--bg-page-soft)] pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]"
-      }
+      rootClassName={rootClassName}
+      frameClassName={frameClassName}
       mainClassName={
         isBoothMapPage
           ? "flex-1 overflow-hidden"

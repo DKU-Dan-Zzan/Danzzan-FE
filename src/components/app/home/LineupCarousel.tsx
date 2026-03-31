@@ -72,7 +72,7 @@ export default function LineupCarousel({
   return (
     <section className="mx-auto w-full max-w-[var(--home-content-max-width)]">
       <div
-        className="relative touch-pan-y overflow-hidden rounded-[var(--home-card-radius)] border border-[var(--home-card-border)] bg-[var(--home-card-bg)] shadow-[var(--home-lineup-card-shadow)]"
+        className="relative touch-pan-y overflow-hidden rounded-[var(--home-card-radius)] border border-[var(--home-lineup-card-border)] bg-[var(--home-card-bg)] shadow-[var(--home-lineup-card-shadow)]"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >

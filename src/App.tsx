@@ -103,6 +103,17 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      const prevScrollRestoration = window.history.scrollRestoration;
+      window.history.scrollRestoration = "manual";
+
+      return () => {
+        window.history.scrollRestoration = prevScrollRestoration;
+      };
+    }
+  }, []);
+
+  useEffect(() => {
     registerRoutePreloader("/notice", Notice.preload);
     registerRoutePreloader("/map", BoothMap.preload);
     registerRoutePreloader("/mypage", MyPage.preload);
@@ -135,6 +146,10 @@ function App() {
       window.clearTimeout(timeoutId);
     };
   }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [location.pathname]);
 
   useEffect(() => {
     let cancelled = false;

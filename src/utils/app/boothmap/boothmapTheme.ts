@@ -12,17 +12,17 @@ type BoothmapColorConfig = {
 };
 
 const BOOTHMAP_COLOR_CONFIG = {
-  markerPub: { cssVar: "--boothmap-marker-pub", fallback: "#0a559c" },
+  markerPub: { cssVar: "--boothmap-marker-pub", fallback: "#2853A9" },
   markerFoodTruck: { cssVar: "--boothmap-marker-food-truck", fallback: "#ef4444" },
   markerExperience: { cssVar: "--boothmap-marker-experience", fallback: "#10b981" },
   markerEvent: { cssVar: "--boothmap-marker-event", fallback: "#f6ca3b" },
   markerFacility: { cssVar: "--boothmap-marker-facility", fallback: "#3b82f6" },
-  selectedShadow: { cssVar: "--boothmap-selected-shadow", fallback: "rgba(10, 85, 156, 0.28)" },
+  selectedShadow: { cssVar: "--boothmap-selected-shadow", fallback: "rgba(55, 79, 132, 0.28)" },
   selectedShadowSoft: {
     cssVar: "--boothmap-selected-shadow-soft",
-    fallback: "rgba(10, 85, 156, 0.25)",
+    fallback: "rgba(55, 79, 132, 0.25)",
   },
-  selectedRing: { cssVar: "--boothmap-selected-ring", fallback: "rgba(10, 85, 156, 0.18)" },
+  selectedRing: { cssVar: "--boothmap-selected-ring", fallback: "rgba(55, 79, 132, 0.18)" },
   collegeAccent: { cssVar: "--boothmap-college-accent", fallback: "#2563eb" },
   collegeStrokeDefault: { cssVar: "--boothmap-college-stroke-default", fallback: "#1e40af" },
   collegeStrokeSelected: { cssVar: "--boothmap-college-stroke-selected", fallback: "#1d4ed8" },

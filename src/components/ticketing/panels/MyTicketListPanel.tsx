@@ -2,6 +2,7 @@
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
 import { TicketCheck } from "lucide-react";
+import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
 import { PaperTicketCard } from "@/components/ticketing/panels/PaperTicketCard";
 import { TicketingAdBannerCard } from "@/components/ticketing/panels/TicketingAdBannerCard";
 import {
@@ -39,18 +40,18 @@ export function MyTicketListPanel({
 
   return (
     <div className={panelClassName}>
-      <Card className={`${TICKETING_CLASSES.card.heroInfo} px-3 py-2.5`}>
+      <Card className={`relative overflow-hidden ${APP_CARD_VARIANTS.gradTint} rounded-[26px] px-3 py-2.5`}>
         <div className="flex items-center gap-2.5">
           <span className={`inline-flex h-6 w-6 shrink-0 ${TICKETING_CLASSES.badge.iconCircle}`}>
             <TicketCheck className="h-3.5 w-3.5" />
           </span>
           <div className="min-w-0 flex-1">
-            <h2 className={`${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--text)]`}>
-              단국존 선예매 티켓
-            </h2>
-            <p className={`mt-1 ${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>
+            <p className="text-[11px] font-semibold text-[var(--text-emphasis-vivid)]">
               예매 내역과 팔찌 상태
             </p>
+            <h2 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-body-deep)]">
+              단국존 선예매 티켓
+            </h2>
           </div>
           <TicketingRefreshButton
             onClick={onRefresh}
@@ -62,7 +63,7 @@ export function MyTicketListPanel({
         </div>
       </Card>
 
-      <Card className="rounded-[18px] border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] px-2.5 py-2 shadow-[0_10px_18px_-16px_var(--shadow-color)]">
+      <Card className={`relative overflow-hidden ${APP_CARD_VARIANTS.gradTint} rounded-[18px] px-2.5 py-2`}>
         <div className="relative rounded-xl border border-[var(--border-base)] px-2.5 py-2">
           <div className="relative z-10 flex items-center justify-between gap-2">
             <p className="text-[length:var(--ticketing-text-holder-overline)] font-bold tracking-[0.1em] text-[var(--text-muted)]">

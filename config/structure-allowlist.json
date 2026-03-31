@@ -580,6 +580,209 @@
       "reason": "기존 템플릿 보간 baseline, 단계적 cn/cva 전환 예정",
       "owner": "fe-platform",
       "expiresAt": "2026-09-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#2853a9",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#2f63f6",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#203163",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#374f84",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#163a79",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f8faff",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#c0cde4",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#afc0dd",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#8ea8d8",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#bdd0f7e6",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#eef3fd",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#eef5fff0",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffffffeb",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#e7efff",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#131d3b",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#18254a",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#1d2c59",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#3b4a76",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#5e6b8f",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#8b94ae",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#e3e8ef",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f7f7f7",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fefaf7",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f6f7f9",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f9ece4",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#7b838b",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#939aa1",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#855626",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#8ea0bf",
+      "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
     }
   ]
 }
