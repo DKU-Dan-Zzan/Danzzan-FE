@@ -127,7 +127,7 @@ function DetailSheet({
     return (
       <div className="rounded-2xl border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-surface)] p-6 text-center shadow-sm">
         <div className="text-sm font-semibold text-[var(--boothmap-danger-text)]">
-          상세 정보를 불러오지 못했어요
+          상세 정보를 불러오지 못했어요.
         </div>
         <button
           onClick={onClose}
@@ -142,6 +142,7 @@ function DetailSheet({
   if (selectedItem.kind === "booth" && boothDetail) {
     const booth = booths.find((item) => item.id === selectedItem.id);
     const boothImageUrl = boothDetail.imageUrl ?? null;
+    const boothThumbnailUrl = boothDetail.thumbnailUrl ?? boothImageUrl;
     const operatingTimeText = formatOperatingTime(boothDetail.startTime, boothDetail.endTime);
     const description = formatDescription(boothDetail.description);
 
@@ -177,7 +178,7 @@ function DetailSheet({
             </button>
           </div>
 
-          {boothImageUrl && (
+          {boothThumbnailUrl && boothImageUrl && (
             <div className="mt-3 rounded-xl bg-[var(--boothmap-surface-soft)] p-2">
               <button
                 type="button"
@@ -186,7 +187,7 @@ function DetailSheet({
                 className="mx-auto block max-h-[320px] w-auto max-w-full cursor-pointer rounded-xl"
               >
                 <img
-                  src={boothImageUrl}
+                  src={boothThumbnailUrl}
                   alt={`${boothDetail.name} 이미지`}
                   loading="lazy"
                   decoding="async"
@@ -199,7 +200,7 @@ function DetailSheet({
           )}
 
           <div className="mt-4 whitespace-pre-line text-sm font-medium leading-6 text-[var(--boothmap-text-subtle)]">
-            {description || "등록된 상세 정보가 없어요"}
+            {description || "등록된 상세 정보가 없어요."}
           </div>
         </div>
 
@@ -214,6 +215,7 @@ function DetailSheet({
       colleges.find((college) => college.id === summaryPub?.college_id)?.name ?? "단과대";
     const displayCollege = pubDetail.collegeName || fallbackCollege;
     const imageUrls = pubDetail.imageUrls ?? [];
+    const thumbnailImageUrls = pubDetail.thumbnailImageUrls ?? [];
     const operatingTimeText = formatOperatingTime(pubDetail.startTime, pubDetail.endTime);
     const intro = formatDescription(pubDetail.intro);
     const description = formatDescription(pubDetail.description || summaryPub?.intro);
@@ -260,26 +262,30 @@ function DetailSheet({
                   setCurrentIndex(index);
                 }}
               >
-                {imageUrls.map((imageUrl, index) => (
-                  <div key={index} className="w-[85%] flex-shrink-0 snap-start">
-                    <button
-                      type="button"
-                      onClick={() => openViewer(imageUrl)}
-                      aria-label={`주점 이미지 ${index + 1} 상세 보기`}
-                      className="block w-full cursor-pointer rounded-xl"
-                    >
-                      <img
-                        src={imageUrl}
-                        alt={`${pubDetail.name} 이미지 ${index + 1}`}
-                        loading="lazy"
-                        decoding="async"
-                        width={1200}
-                        height={900}
-                        className="w-full rounded-xl object-contain"
-                      />
-                    </button>
-                  </div>
-                ))}
+                {imageUrls.map((imageUrl, index) => {
+                  const displayImageUrl = thumbnailImageUrls[index] ?? imageUrl;
+
+                  return (
+                    <div key={index} className="w-[85%] flex-shrink-0 snap-start">
+                      <button
+                        type="button"
+                        onClick={() => openViewer(imageUrl)}
+                        aria-label={`주점 이미지 ${index + 1} 상세 보기`}
+                        className="block w-full cursor-pointer rounded-xl"
+                      >
+                        <img
+                          src={displayImageUrl}
+                          alt={`${pubDetail.name} 이미지 ${index + 1}`}
+                          loading="lazy"
+                          decoding="async"
+                          width={1200}
+                          height={900}
+                          className="w-full rounded-xl object-contain"
+                        />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="mt-2 flex justify-center gap-1">

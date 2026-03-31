@@ -171,6 +171,7 @@ export type ContractPubDetailResponse = {
   collegeName: string | null;
   instagram: string | null;
   imageUrls: string[];
+  thumbnailImageUrls: string[];
   startTime: string | null;
   endTime: string | null;
 };
@@ -355,6 +356,7 @@ export const parsePubDetailContract = (payload: unknown, endpoint: string): Cont
   const collegeName = readNullableString(unwrapped, "collegeName");
   const instagram = readNullableString(unwrapped, "instagram");
   const imageUrls = readStringArray(unwrapped, "imageUrls");
+  const thumbnailImageUrls = readStringArray(unwrapped, "thumbnailImageUrls");
   const startTime = readNullableString(unwrapped, "startTime");
   const endTime = readNullableString(unwrapped, "endTime");
   if (
@@ -366,6 +368,7 @@ export const parsePubDetailContract = (payload: unknown, endpoint: string): Cont
     collegeName === undefined ||
     instagram === undefined ||
     !imageUrls ||
+    !thumbnailImageUrls ||
     startTime === undefined ||
     endTime === undefined
   ) {
@@ -381,6 +384,7 @@ export const parsePubDetailContract = (payload: unknown, endpoint: string): Cont
     collegeName,
     instagram,
     imageUrls,
+    thumbnailImageUrls,
     startTime,
     endTime,
   };

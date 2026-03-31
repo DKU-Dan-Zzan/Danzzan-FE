@@ -123,6 +123,7 @@ describe("boothmapContract", () => {
         collegeName: "공과대학",
         instagram: "@pub",
         imageUrls: ["https://cdn.example.com/1.png"],
+        thumbnailImageUrls: ["https://cdn.example.com/thumb/1.webp"],
         startTime: "18:00",
         endTime: "23:00",
       },
@@ -130,6 +131,7 @@ describe("boothmapContract", () => {
     );
 
     expect(parsed.imageUrls).toHaveLength(1);
+    expect(parsed.thumbnailImageUrls).toHaveLength(1);
   });
 
   it("facility booth subType을 파싱한다", () => {
