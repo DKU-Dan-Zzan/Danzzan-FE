@@ -448,9 +448,10 @@ export default function BoothMap() {
 
       <div
         className={cn(
-          "absolute left-1/2 top-3 w-[calc(100%-24px)] max-w-[var(--app-mobile-shell-max-width)] -translate-x-1/2",
+          "absolute left-1/2 w-[calc(100%-24px)] max-w-[var(--app-mobile-shell-max-width)] -translate-x-1/2",
           TOP_PANEL_Z_INDEX_CLASS[sheetSnap],
         )}
+        style={{ top: "calc(env(safe-area-inset-top) + 4rem + 0.75rem)" }}
       >
         <div className="rounded-[28px] border border-[var(--boothmap-panel-border)] bg-[var(--boothmap-panel-bg)] px-3 py-2 shadow-[var(--boothmap-panel-shadow)] backdrop-blur-md">
           <FestivalDateTabs

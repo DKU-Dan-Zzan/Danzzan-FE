@@ -17,7 +17,7 @@ const Layout = () => {
     ? `h-dvh overflow-hidden bg-white ${timetableBorderOverrideClass}`
     : `min-h-dvh bg-[var(--bg-page-soft)] ${timetableBorderOverrideClass}`
   const frameClassName = isBoothMapPage
-    ? "mx-auto flex h-dvh max-w-[430px] flex-col overflow-hidden pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]"
+    ? "relative mx-auto flex h-dvh max-w-[430px] flex-col overflow-hidden pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]"
     : "mx-auto flex min-h-dvh max-w-[430px] flex-col bg-[var(--bg-page-soft)] pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]"
 
   return (
