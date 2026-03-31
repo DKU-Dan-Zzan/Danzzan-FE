@@ -188,11 +188,19 @@ function DetailSheet({
               >
                 <img
                   src={boothThumbnailUrl}
+                  data-fallback-src={boothImageUrl}
                   alt={`${boothDetail.name} 이미지`}
                   loading="lazy"
                   decoding="async"
                   width={1200}
                   height={900}
+                  onError={(event) => {
+                    const fallbackSrc = event.currentTarget.dataset.fallbackSrc;
+                    if (!fallbackSrc || event.currentTarget.src === fallbackSrc) {
+                      return;
+                    }
+                    event.currentTarget.src = fallbackSrc;
+                  }}
                   className="mx-auto max-h-[320px] w-auto max-w-full rounded-xl object-contain"
                 />
               </button>
@@ -275,11 +283,19 @@ function DetailSheet({
                       >
                         <img
                           src={displayImageUrl}
+                          data-fallback-src={imageUrl}
                           alt={`${pubDetail.name} 이미지 ${index + 1}`}
                           loading="lazy"
                           decoding="async"
                           width={1200}
                           height={900}
+                          onError={(event) => {
+                            const fallbackSrc = event.currentTarget.dataset.fallbackSrc;
+                            if (!fallbackSrc || event.currentTarget.src === fallbackSrc) {
+                              return;
+                            }
+                            event.currentTarget.src = fallbackSrc;
+                          }}
                           className="w-full rounded-xl object-contain"
                         />
                       </button>

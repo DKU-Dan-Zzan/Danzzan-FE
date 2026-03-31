@@ -73,11 +73,19 @@ function PubList({
             {(pub.thumbnailUrl || pub.mainImageUrl) && (
               <img
                 src={pub.thumbnailUrl || pub.mainImageUrl}
+                data-fallback-src={pub.mainImageUrl}
                 loading="lazy"
                 decoding="async"
                 alt={pub.name}
                 width={64}
                 height={64}
+                onError={(event) => {
+                  const fallbackSrc = event.currentTarget.dataset.fallbackSrc;
+                  if (!fallbackSrc || event.currentTarget.src === fallbackSrc) {
+                    return;
+                  }
+                  event.currentTarget.src = fallbackSrc;
+                }}
                 className="h-16 w-16 flex-shrink-0 rounded-lg object-cover"
               />
             )}
