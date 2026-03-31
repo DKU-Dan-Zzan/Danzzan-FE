@@ -10,6 +10,14 @@ const FilledYouTubeIcon = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+type SocialLink = {
+  label: string;
+  href: string;
+  Icon: SocialIconComponent;
+  iconClassName: string;
+  iconStrokeWidth?: number;
+};
+
 const SOCIAL_LINKS = [
   {
     label: "Instagram",
@@ -23,8 +31,9 @@ const SOCIAL_LINKS = [
     href: "https://www.youtube.com/@2026%EB%9D%BC%EC%9A%B0%EB%93%9C%EC%B4%9D%ED%95%99%EC%83%9D%ED%9A%8C",
     Icon: FilledYouTubeIcon as SocialIconComponent,
     iconClassName: "h-[22px] w-[22px]",
+    iconStrokeWidth: undefined,
   },
-] as const;
+] as const satisfies ReadonlyArray<SocialLink>;
 
 // 역할: 앱 레이아웃 레이어의 Footer 구성 컴포넌트를 제공합니다.
 const Footer = () => {
