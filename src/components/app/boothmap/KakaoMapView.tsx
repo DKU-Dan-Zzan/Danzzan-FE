@@ -93,10 +93,6 @@ const PIN_BOTTOM_OFFSET_MAP: Record<MarkerType, number> = {
   FACILITY: 0,
 }
 
-function kakaoLevelToMapboxZoom(level: number) {
-  return 20.4 - level * 1.5
-}
-
 function getOverlayKey(kind: "booth" | "college", id: number) {
   return `${kind}:${id}`
 }
@@ -208,9 +204,6 @@ export default function KakaoMapView({
         lat: center.getLat(),
         lng: center.getLng(),
         kakaoLevel: map.getLevel(),
-        mapboxZoom: kakaoLevelToMapboxZoom(map.getLevel()),
-        mapboxPitch: lastViewportRef.current.mapboxPitch,
-        mapboxBearing: lastViewportRef.current.mapboxBearing,
       }
 
       const prevViewport = lastViewportRef.current

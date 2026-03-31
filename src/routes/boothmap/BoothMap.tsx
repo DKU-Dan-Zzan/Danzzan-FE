@@ -1,16 +1,8 @@
-// 역할: 부스맵 메인 라우트에서 2D/3D 지도, 필터, 상세 시트 상태를 통합 제어합니다.
-import {
-  Suspense,
-  lazy,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+// 역할: 부스맵 메인 라우트에서 2D 지도, 필터, 상세 시트 상태를 통합 제어합니다.
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
   Booth,
   College,
-  MapMode,
   MapViewport,
   PrimaryFilter,
   Pub,
@@ -27,7 +19,6 @@ import BottomSheet from "@/components/app/boothmap/BottomSheet";
 import BoothList from "@/components/app/boothmap/BoothList";
 import PubList from "@/components/app/boothmap/PubList";
 import DetailSheet from "@/components/app/boothmap/DetailSheet";
-import MapFloatingToggle from "@/components/app/boothmap/MapFloatingToggle";
 import FestivalDateTabs from "@/components/app/boothmap/FestivalDateTabs";
 
 import {
@@ -46,37 +37,21 @@ import {
 } from "@/routes/boothmap/boothMapSelectors";
 import { cn } from "@/components/common/ui/utils";
 
-const loadMapbox3DView = async () => {
-  await import("mapbox-gl/dist/mapbox-gl.css");
-  return import("@/components/app/boothmap/Mapbox3DView");
-};
-const LazyMapbox3DView = lazy(loadMapbox3DView);
-
 const DEFAULT_MAP_VIEWPORT: MapViewport = {
   lat: 37.3201,
   lng: 127.1276,
   kakaoLevel: 3,
-  mapboxZoom: 17,
-  mapboxPitch: 55,
-  mapboxBearing: -20,
 };
 
 const FESTIVAL_DATES = [
   { label: "1일차", value: "2026-05-12" },
   { label: "2일차", value: "2026-05-13" },
   { label: "3일차", value: "2026-05-14" },
-]
+];
 const TOP_PANEL_Z_INDEX_CLASS: Record<SheetSnap, string> = {
   PEEK: "z-[70]",
   HALF: "z-[70]",
   FULL: "z-[40]",
-}
-const MAP_MODE_TRANSITION_MS = 280;
-const MAPBOX_WARMUP_FALLBACK_DELAY_MS = 900;
-const MAPBOX_WARMUP_IDLE_TIMEOUT_MS = 1800;
-
-const warmupMapbox3DAssets = async () => {
-  await loadMapbox3DView();
 };
 
 function mapCollegeDtoToCollege(dto: CollegeDto): College {
@@ -119,8 +94,6 @@ function mapPubSummaryToPub(dto: PubSummaryResponse): Pub {
 }
 
 export default function BoothMap() {
-  const [mode, setMode] = useState<MapMode>("2D");
-  const [render3DLayer, setRender3DLayer] = useState(mode === "3D");
   const [primaryFilter, setPrimaryFilter] = useState<PrimaryFilter>("ALL");
   const [selectedMapItem, setSelectedMapItem] = useState<SelectedMapItem>(null);
   const [selectedDetailItem, setSelectedDetailItem] = useState<SelectedDetailItem>(null);
@@ -154,61 +127,6 @@ export default function BoothMap() {
     return () => {
       resizeObserver.disconnect();
       window.removeEventListener("resize", updateBottomNavHeight);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (mode === "3D") {
-      const frameId = window.requestAnimationFrame(() => {
-        setRender3DLayer(true);
-      });
-
-      return () => {
-        window.cancelAnimationFrame(frameId);
-      };
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      setRender3DLayer(false);
-    }, MAP_MODE_TRANSITION_MS);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [mode]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    if (typeof window.requestIdleCallback === "function") {
-      const idleId = window.requestIdleCallback(
-        () => {
-          if (cancelled) {
-            return;
-          }
-          void warmupMapbox3DAssets();
-        },
-        { timeout: MAPBOX_WARMUP_IDLE_TIMEOUT_MS },
-      );
-
-      return () => {
-        cancelled = true;
-        if (typeof window.cancelIdleCallback === "function") {
-          window.cancelIdleCallback(idleId);
-        }
-      };
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      if (cancelled) {
-        return;
-      }
-      void warmupMapbox3DAssets();
-    }, MAPBOX_WARMUP_FALLBACK_DELAY_MS);
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timeoutId);
     };
   }, []);
 
@@ -264,9 +182,8 @@ export default function BoothMap() {
   }, [primaryFilter, colleges, selectedCollegeId]);
 
   const visiblePubs = useMemo(() => {
-    const targetCollegeId = primaryFilter === "PUB"
-      ? (selectedCollegeId ?? pubListCollegeId)
-      : pubListCollegeId;
+    const targetCollegeId =
+      primaryFilter === "PUB" ? (selectedCollegeId ?? pubListCollegeId) : pubListCollegeId;
     return getVisiblePubs(pubs, targetCollegeId);
   }, [primaryFilter, pubs, pubListCollegeId, selectedCollegeId]);
 
@@ -336,14 +253,7 @@ export default function BoothMap() {
   return (
     <div className="relative h-screen w-full overflow-hidden bg-[var(--boothmap-surface)]">
       <div className="absolute inset-0">
-        <div
-          className={cn(
-            "absolute inset-0 transition-all duration-300 ease-out",
-            mode === "2D"
-              ? "opacity-100 translate-x-0 scale-100 pointer-events-auto"
-              : "opacity-0 -translate-x-1 scale-[0.985] pointer-events-none",
-          )}
-        >
+        <div className="absolute inset-0">
           <KakaoMapView
             booths={visibleBooths}
             colleges={visibleColleges}
@@ -357,38 +267,6 @@ export default function BoothMap() {
             onPrimaryFilterChange={handlePrimaryChange}
           />
         </div>
-
-        {render3DLayer && (
-          <div
-            className={cn(
-              "absolute inset-0 transition-all duration-300 ease-out",
-              mode === "3D"
-                ? "opacity-100 translate-x-0 scale-100 pointer-events-auto"
-                : "opacity-0 translate-x-1 scale-[0.985] pointer-events-none",
-            )}
-          >
-            <Suspense
-              fallback={
-                <div className="flex h-full w-full items-center justify-center bg-[var(--boothmap-surface)] text-sm font-semibold text-[var(--boothmap-text-subtle)]">
-                  3D 지도를 불러오는 중...
-                </div>
-              }
-            >
-              <LazyMapbox3DView
-                booths={visibleBooths}
-                colleges={visibleColleges}
-                primaryFilter={primaryFilter}
-                selectedMapItem={selectedMapItem}
-                sheetSnap={sheetSnap}
-                viewport={mapViewport}
-                onViewportChange={setMapViewport}
-                onClickBooth={onClickMarkerBooth}
-                onClickCollege={onClickMarkerCollege}
-                onPrimaryFilterChange={handlePrimaryChange}
-              />
-            </Suspense>
-          </div>
-        )}
       </div>
 
       <div
@@ -433,10 +311,6 @@ export default function BoothMap() {
               />
             </div>
           )}
-        </div>
-
-        <div className="mt-3 flex justify-end pr-1">
-          <MapFloatingToggle mode={mode} onChange={setMode} />
         </div>
       </div>
 
