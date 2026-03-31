@@ -44,9 +44,9 @@ const DEFAULT_MAP_VIEWPORT: MapViewport = {
 };
 
 const FESTIVAL_DATES = [
-  { label: "1일차", value: "2026-05-12" },
-  { label: "2일차", value: "2026-05-13" },
-  { label: "3일차", value: "2026-05-14" },
+  { label: "5/12", value: "2026-05-12" },
+  { label: "5/13", value: "2026-05-13" },
+  { label: "5/14", value: "2026-05-14" },
 ];
 const TOP_PANEL_Z_INDEX_CLASS: Record<SheetSnap, string> = {
   PEEK: "z-[70]",
