@@ -6,13 +6,16 @@ import { studentProfileApi } from "@/api/app/auth/studentProfileApi";
 import { authStore } from "@/store/common/authStore";
 import { GraduationCap, IdCard, User } from "lucide-react";
 import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
+import { cn } from "@/components/common/ui/utils";
 
 const MYPAGE_GUEST_ROOT_CLASS =
   "mypage-root relative flex min-h-full flex-col items-center justify-center overflow-hidden bg-[var(--bg-page-soft)] px-6 py-[100px]";
 const MYPAGE_GUEST_CARD_CLASS =
   "relative flex w-full max-w-sm flex-col items-center gap-5 rounded-[28px] border border-[var(--mypage-guest-card-border)] bg-[var(--mypage-guest-card-bg)] px-6 py-8 text-center shadow-[var(--mypage-guest-card-shadow)] backdrop-blur-[6px]";
-const MYPAGE_PORTAL_CARD_CLASS =
-  `relative overflow-hidden ${APP_CARD_VARIANTS.gradTint} rounded-[30px]`;
+const MYPAGE_PORTAL_CARD_CLASS = cn(
+  "relative overflow-hidden rounded-[30px]",
+  APP_CARD_VARIANTS.gradTint,
+);
 
 function MyPage() {
   const navigate = useNavigate();
@@ -126,7 +129,7 @@ function MyPage() {
       </div>
 
       <div className="relative mx-auto max-w-[430px] px-4 pt-5">
-        <div className={`overflow-hidden ${APP_CARD_VARIANTS.gradWhite} rounded-[28px]`}>
+        <div className={cn("overflow-hidden rounded-[28px]", APP_CARD_VARIANTS.gradWhite)}>
           <div className="border-b border-[var(--mypage-info-header-border)] bg-[linear-gradient(180deg,var(--mypage-info-header-bg-start)_0%,var(--mypage-info-header-bg-end)_100%)] px-5 py-4">
             <p className="text-[11px] font-semibold tracking-[0.16em] text-[var(--text-emphasis-vivid)]">MY INFO</p>
             <h2 className="mt-1 text-[18px] font-bold tracking-tight text-[var(--mypage-info-title)]">학적 정보</h2>

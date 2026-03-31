@@ -7,6 +7,7 @@ import Footer from "@/components/layout/Footer";
 import { AppTopBar } from "@/components/layout/AppTopBar";
 import { AppShell } from "@/components/layout/AppShell";
 import { APP_HEADER_ROUND_BUTTON_BASE_CLASS } from "@/components/layout/appHeaderRoundButtonClass";
+import { cn } from "@/components/common/ui/utils";
 import { shouldShowTicketingHeader } from "@/lib/ticketing/navigation/headerVisibility";
 
 export function UserLayout() {
@@ -78,7 +79,7 @@ export function UserLayout() {
               onClick={isBackButtonDisabled ? undefined : handleBack}
               disabled={isBackButtonDisabled}
               aria-disabled={isBackButtonDisabled}
-              className={`${APP_HEADER_ROUND_BUTTON_BASE_CLASS} left-4`}
+              className={cn(APP_HEADER_ROUND_BUTTON_BASE_CLASS, "left-4")}
               aria-label="뒤로가기"
               title={isBackButtonDisabled ? "뒤로가기 비활성화" : "뒤로가기"}
             >
@@ -94,11 +95,11 @@ export function UserLayout() {
       mainClassName={mainClassName}
     >
       <div
-        className={
-          showHeader
-            ? `relative mx-auto min-h-full w-full max-w-md px-4 ${contentTopPaddingClass}`
-            : "relative mx-auto min-h-full w-full max-w-md"
-        }
+        className={cn(
+          "relative mx-auto min-h-full w-full max-w-md",
+          showHeader && "px-4",
+          showHeader && contentTopPaddingClass,
+        )}
       >
         <Outlet />
       </div>

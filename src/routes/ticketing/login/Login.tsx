@@ -14,6 +14,7 @@ import {
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { TICKETING_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
 import { resolveTicketingLoginRedirect } from "@/lib/ticketing/navigation/auth-navigation";
+import { cn } from "@/components/common/ui/utils";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -89,7 +90,7 @@ export default function Login() {
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     placeholder="축제 포털용 비밀번호를 입력해 주세요"
-                    className={`${TICKETING_AUTH_INPUT_CLASS_NAME} pr-11`}
+                    className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, "pr-11")}
                     autoComplete="current-password"
                     required
                   />

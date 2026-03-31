@@ -24,6 +24,7 @@ import {
 } from "@/lib/ticketing/passwordPolicy";
 import { TICKETING_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
 import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
+import { cn } from "@/components/common/ui/utils";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -202,7 +203,7 @@ export default function Signup() {
               </p>
             )}
 
-            <section className={`px-4 py-4 ${APP_CARD_VARIANTS.gradTint} rounded-2xl`}>
+            <section className={cn("px-4 py-4 rounded-2xl", APP_CARD_VARIANTS.gradTint)}>
               <div className="flex items-start gap-3">
                 <Checkbox
                   id="privacyConsent"
