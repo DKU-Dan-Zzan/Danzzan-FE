@@ -116,25 +116,25 @@ function MyPage() {
             <div>
               <p className="text-[11px] font-semibold tracking-[0.18em] text-[var(--text-emphasis-vivid)]">DANFESTA PORTAL</p>
               <h1 className="mt-1 text-[length:var(--mypage-portal-name-size)] leading-[1.1] font-extrabold tracking-[-0.02em] text-[var(--mypage-portal-name)]">{user?.name ?? "-"}</h1>
-              <p className="mt-2 text-base leading-[1.3] text-[var(--mypage-portal-subtitle)]">단국대학교 재학생</p>
+              <p className="mt-0.5 text-base leading-[1.3] text-[var(--mypage-portal-subtitle)]">단국대학교 재학생</p>
             </div>
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] border border-[var(--mypage-portal-icon-border)] bg-[linear-gradient(145deg,var(--mypage-portal-icon-bg-start)_0%,var(--mypage-portal-icon-bg-end)_100%)] shadow-[var(--mypage-portal-icon-shadow)] backdrop-blur-[6px]">
-              <User size={28} className="text-[var(--mypage-portal-icon-color)]" />
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[20px] border border-[var(--mypage-portal-icon-border)] bg-[linear-gradient(145deg,var(--mypage-portal-icon-bg-start)_0%,var(--mypage-portal-icon-bg-end)_100%)] shadow-[var(--mypage-portal-icon-shadow)] backdrop-blur-[6px]">
+              <User size={30} className="text-[var(--mypage-portal-icon-color)]" />
             </div>
           </div>
         </div>
       </div>
 
       <div className="relative mx-auto max-w-[430px] px-4 pt-5">
-        <div className="overflow-hidden rounded-[28px] border border-[var(--mypage-info-card-border)] bg-[var(--mypage-info-card-bg)] shadow-[var(--mypage-info-card-shadow)]">
+        <div className={`overflow-hidden ${APP_CARD_VARIANTS.gradWhite} rounded-[28px]`}>
           <div className="border-b border-[var(--mypage-info-header-border)] bg-[linear-gradient(180deg,var(--mypage-info-header-bg-start)_0%,var(--mypage-info-header-bg-end)_100%)] px-5 py-4">
             <p className="text-[11px] font-semibold tracking-[0.16em] text-[var(--text-emphasis-vivid)]">MY INFO</p>
             <h2 className="mt-1 text-[18px] font-bold tracking-tight text-[var(--mypage-info-title)]">학적 정보</h2>
           </div>
 
-          <div className="divide-y divide-[var(--mypage-info-item-divider)]">
+          <div>
             {infoItems.map(({ label, value, icon: Icon }) => (
-              <div key={label} className="flex items-center gap-4 px-5 py-4">
+              <div key={label} className="flex items-center gap-4 px-5 py-2.5 first:pt-4 last:pb-4">
                 <div className="flex h-[var(--mypage-info-icon-size)] w-[var(--mypage-info-icon-size)] items-center justify-center rounded-full border border-[var(--mypage-info-icon-border)] bg-[linear-gradient(145deg,var(--mypage-info-icon-bg-start)_0%,var(--mypage-info-icon-bg-end)_100%)] shadow-[var(--mypage-info-icon-shadow)] backdrop-blur-[6px]">
                   <Icon size={18} aria-hidden className="text-[var(--mypage-info-icon-symbol)]" />
                 </div>

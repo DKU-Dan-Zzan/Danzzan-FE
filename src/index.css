@@ -116,20 +116,20 @@
   --card-soft-tint-border: var(--card-border-tint);
   --card-soft-tint-shadow: var(--card-shadow-soft);
 
-  --card-grad-white-start: var(--mypage-info-header-bg-end);
-  --card-grad-white-mid: var(--mypage-info-card-bg);
-  --card-grad-white-end: var(--mypage-info-header-bg-start);
+  --card-grad-white-start: #eef5fff0;
+  --card-grad-white-mid: #ffffffeb;
+  --card-grad-white-end: #ffffff;
   --card-grad-white-bg:
-    linear-gradient(180deg, var(--card-grad-white-start) 0%, var(--card-grad-white-mid) 58%, var(--card-grad-white-end) 100%);
+    linear-gradient(180deg, var(--card-grad-white-start) 0%, var(--card-grad-white-mid) 36%, var(--card-grad-white-end) 100%);
   --card-grad-white-border: var(--mypage-info-card-border);
   --card-grad-white-shadow: var(--mypage-info-card-shadow);
 
-  --card-grad-tint-start: #dfe5f2;
+  --card-grad-tint-start: #eef5fff0;
   --card-grad-tint-mid: #e7efff;
   --card-grad-tint-end: #ffffff;
   --card-grad-tint-bg:
     linear-gradient(150deg, var(--card-grad-tint-start) 0%, var(--card-grad-tint-mid) 56%, var(--card-grad-tint-end) 100%);
-  --card-grad-tint-border: var(--card-border-tint);
+  --card-grad-tint-border: var(--card-grad-white-border);
   --card-grad-tint-shadow: var(--card-shadow-elevated);
 
   --status-success: #2e7d32;
@@ -541,19 +541,19 @@
   --card-soft-tint-bg: #eef3fd;
   --card-soft-tint-border: var(--card-border-tint);
   --card-soft-tint-shadow: var(--card-shadow-soft);
-  --card-grad-white-start: var(--mypage-info-header-bg-end);
-  --card-grad-white-mid: var(--mypage-info-card-bg);
-  --card-grad-white-end: var(--mypage-info-header-bg-start);
+  --card-grad-white-start: #eef5fff0;
+  --card-grad-white-mid: #ffffffeb;
+  --card-grad-white-end: #ffffff;
   --card-grad-white-bg:
-    linear-gradient(180deg, var(--card-grad-white-start) 0%, var(--card-grad-white-mid) 58%, var(--card-grad-white-end) 100%);
+    linear-gradient(180deg, var(--card-grad-white-start) 0%, var(--card-grad-white-mid) 36%, var(--card-grad-white-end) 100%);
   --card-grad-white-border: var(--mypage-info-card-border);
   --card-grad-white-shadow: var(--mypage-info-card-shadow);
-  --card-grad-tint-start: #dfe5f2;
+  --card-grad-tint-start: #eef5fff0;
   --card-grad-tint-mid: #e7efff;
   --card-grad-tint-end: #ffffff;
   --card-grad-tint-bg:
     linear-gradient(150deg, var(--card-grad-tint-start) 0%, var(--card-grad-tint-mid) 56%, var(--card-grad-tint-end) 100%);
-  --card-grad-tint-border: var(--card-border-tint);
+  --card-grad-tint-border: var(--card-grad-white-border);
   --card-grad-tint-shadow: var(--card-shadow-elevated);
   --primary: var(--webapp-button-primary);
   --primary-soft: rgba(59, 74, 118, 0.14);

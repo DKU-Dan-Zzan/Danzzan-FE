@@ -8,7 +8,7 @@ export const APP_CARD_VARIANTS = {
   softTint:
     `${APP_CARD_BASE_CLASS} border-[color:var(--card-soft-tint-border)] bg-[var(--card-soft-tint-bg)] shadow-[var(--card-soft-tint-shadow)]`,
   gradWhite:
-    `${APP_CARD_BASE_CLASS} border-[color:var(--card-grad-white-border)] bg-[var(--card-surface-base)] [background-image:var(--card-grad-white-bg)] shadow-[var(--card-grad-white-shadow)]`,
+    `${APP_CARD_BASE_CLASS} !border-[color:var(--card-grad-white-border)] bg-[var(--card-surface-base)] [background-image:var(--card-grad-white-bg)] shadow-[var(--card-grad-white-shadow)]`,
   gradTint:
     `${APP_CARD_BASE_CLASS} !border-[color:var(--card-grad-tint-border)] bg-[var(--card-surface-base)] [background-image:var(--card-grad-tint-bg)] shadow-[var(--card-grad-tint-shadow)]`,
 } as const;

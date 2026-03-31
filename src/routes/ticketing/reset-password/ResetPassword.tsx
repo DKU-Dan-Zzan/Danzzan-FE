@@ -8,6 +8,7 @@ import { PasswordPolicyChecklist } from "@/components/ticketing/auth/PasswordPol
 import { Button } from "@/components/common/ui/button";
 import { Input } from "@/components/common/ui/input";
 import { Label } from "@/components/common/ui/label";
+import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
 import {
   TicketingAuthHeading,
   TICKETING_AUTH_HEADER_SECTION_CLASS,
@@ -372,7 +373,7 @@ export default function ResetPassword() {
 
         <main className={TICKETING_AUTH_MAIN_CLASS}>
           {!completed && (
-            <div className="mb-6 rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 py-3">
+            <div className={`mb-6 px-3 py-3 ${APP_CARD_VARIANTS.gradTint}`}>
               <p className="text-xs font-semibold text-[var(--text-muted)]">
                 <span className="text-[var(--accent)]">{stepIndex}/3 단계</span> · {currentStepLabel}
               </p>
@@ -642,7 +643,7 @@ export default function ResetPassword() {
           {!completed && (
             <div className="mt-6 text-center">
               <p className="text-sm text-[var(--text-muted)]">로그인 화면으로 돌아가시겠어요?</p>
-              <Link to="/ticket/login" className="mt-2 inline-block text-sm font-semibold text-[var(--accent)]">
+              <Link to="/ticket/login" className="mt-2 inline-block text-sm font-semibold text-[var(--text-emphasis-vivid)]">
                 로그인하러 가기
               </Link>
             </div>

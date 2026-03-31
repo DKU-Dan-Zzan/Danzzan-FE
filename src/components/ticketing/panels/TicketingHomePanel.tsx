@@ -1,6 +1,6 @@
 // 역할: 티켓팅 홈의 시작 안내, 유의사항, 진입 CTA를 구성하는 첫 화면 패널입니다.
 import type { LucideIcon } from "lucide-react";
-import { ArrowRight, ClipboardList, Ticket, TicketCheck } from "lucide-react";
+import { ArrowRight, Check, ClipboardList, Ticket } from "lucide-react";
 import { Card } from "@/components/common/ui/card";
 import { TICKETING_CLASSES, TICKETING_MIDDLE_PANEL_CLASS } from "@/components/ticketing/panels/TicketingShared";
 import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
@@ -77,8 +77,8 @@ export function TicketingHomePanel({
       description: "예매한 티켓을 확인하세요",
       cardClassName:
         "relative min-h-[116px] overflow-hidden rounded-[20px] p-4 transition-all duration-200 group-hover:-translate-y-[1px] group-active:translate-y-[1px]",
-      icon: TicketCheck,
-      iconStrokeWidth: 2.2,
+      icon: Check,
+      iconStrokeWidth: 2.8,
       onClick: onOpenMyTickets,
     },
   ];
@@ -118,7 +118,7 @@ export function TicketingHomePanel({
         );
       })}
 
-      <Card className="rounded-[24px] border border-[var(--border-base)] bg-[var(--surface-base)] p-5 shadow-[0_10px_20px_-16px_var(--shadow-color)]">
+      <Card className={`${APP_CARD_VARIANTS.gradWhite} rounded-[24px] p-5`}>
         <h3 className={`flex items-center gap-2 ${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--text)]`}>
           <ClipboardList className="h-[17px] w-[17px] text-[var(--text-muted)]" strokeWidth={2.1} />
           티켓 예매 이용 가이드

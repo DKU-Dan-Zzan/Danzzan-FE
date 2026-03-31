@@ -240,7 +240,7 @@ export default function Signup() {
             <Link
               to="/ticket/login"
               state={{ authTabFrom: "signup" }}
-              className="mt-2 inline-block text-sm font-semibold text-[var(--accent)]"
+              className="mt-2 inline-block text-sm font-semibold text-[var(--text-emphasis-vivid)]"
             >
               로그인하러 가기
             </Link>
