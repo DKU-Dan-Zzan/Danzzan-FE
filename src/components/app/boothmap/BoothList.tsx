@@ -3,10 +3,21 @@ import { formatDescription } from "@/utils/app/boothmap/formatDescription";
 import { formatOperatingTime } from "@/utils/app/boothmap/formatOperatingTime";
 
 const typeLabel: Record<string, string> = {
-  FOOD_TRUCK: "FOOD_TRUCK",
-  EXPERIENCE: "EXPERIENCE",
-  EVENT: "EVENT",
-  FACILITY: "FACILITY",
+  FOOD_TRUCK: "푸드트럭",
+  EXPERIENCE: "부스",
+  EVENT: "이벤트",
+  FACILITY: "편의시설",
+};
+
+const typeBadgeClassName: Record<string, string> = {
+  FOOD_TRUCK:
+    "border-[var(--boothmap-marker-food-truck)] bg-[var(--boothmap-marker-food-truck)] text-[var(--boothmap-overlay-badge-text)]",
+  EXPERIENCE:
+    "border-[var(--boothmap-marker-experience)] bg-[var(--boothmap-marker-experience)] text-[var(--boothmap-overlay-badge-text)]",
+  EVENT:
+    "border-[var(--boothmap-marker-event)] bg-[var(--boothmap-marker-event)] text-[var(--boothmap-text)]",
+  FACILITY:
+    "border-[var(--boothmap-marker-facility)] bg-[var(--boothmap-marker-facility)] text-[var(--boothmap-overlay-badge-text)]",
 };
 
 export default function BoothList({
@@ -37,8 +48,19 @@ export default function BoothList({
             onClick={() => onSelectBooth(booth.id)}
             className="w-full rounded-2xl border border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] p-4 text-left shadow-sm transition hover:shadow-md"
           >
-            <div className="truncate text-base font-extrabold text-[var(--boothmap-text)]">
-              {booth.name}
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 truncate text-base font-extrabold text-[var(--boothmap-text)]">
+                {booth.name}
+              </div>
+
+              <div
+                className={[
+                  "inline-flex flex-shrink-0 items-center rounded-full border px-2.5 py-1 text-[11px] font-bold leading-none shadow-[0_1px_2px_var(--boothmap-overlay-shadow)]",
+                  typeBadgeClassName[booth.type],
+                ].join(" ")}
+              >
+                {typeLabel[booth.type]}
+              </div>
             </div>
 
             {operatingTimeText && (
@@ -52,10 +74,6 @@ export default function BoothList({
                 {description}
               </div>
             )}
-
-            <div className="mt-3 text-xs font-bold text-[var(--boothmap-text-muted)]">
-              {typeLabel[booth.type]}
-            </div>
           </button>
         );
       })}
