@@ -233,6 +233,15 @@ export default function Timetable() {
           />
         </div>
 
+        <div className="px-4 pt-4">
+          <div className="flex items-start gap-2 rounded-2xl border border-[var(--timetable-info-border)] bg-[var(--timetable-info-bg)] px-4 py-3">
+            <InformationCircleIcon className="mt-0.5 h-5 w-5 text-[var(--accent)]" />
+            <p className="text-sm font-medium text-[var(--timetable-info-text)]">
+              일정은 현장 상황에 따라 변경될 수 있습니다.
+            </p>
+          </div>
+        </div>
+
         <div className="px-4 pt-4 pb-6">
           {isDay1 ? (
             <ContentImageSection
@@ -275,7 +284,7 @@ export default function Timetable() {
                 nowTargetId={isTodayTab ? nowTargetId : null}
               />
 
-              <div className="mt-5 flex items-start gap-2 rounded-2xl border border-[var(--timetable-info-border)] bg-[var(--timetable-info-bg)] px-4 py-3">
+              <div className="hidden">
                 <InformationCircleIcon className="mt-0.5 h-5 w-5 text-[var(--accent)]" />
                 <p className="text-sm font-medium text-[var(--timetable-info-text)]">
                   일정은 현장 상황에 따라 변경될 수 있습니다.
