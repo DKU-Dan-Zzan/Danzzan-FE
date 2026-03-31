@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 import type { Booth, College, Pub, SelectedDetailItem } from "@/types/app/boothmap/boothmap.types";
 import {
   useBoothDetailQuery,
@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialo
 import { formatDescription } from "@/utils/app/boothmap/formatDescription";
 import { formatOperatingTime } from "@/utils/app/boothmap/formatOperatingTime";
 
-export default function DetailSheet({
+function DetailSheet({
   selectedItem,
   booths,
   pubs,
@@ -74,6 +74,9 @@ export default function DetailSheet({
           <img
             src={viewerImage}
             alt="상세 이미지"
+            decoding="async"
+            width={1200}
+            height={900}
             className="max-h-[90vh] max-w-[90vw] rounded-xl"
           />
         )}
@@ -84,7 +87,7 @@ export default function DetailSheet({
   if (!selectedItem) {
     return (
       <div className="py-6 text-center text-sm font-semibold text-[var(--boothmap-text-muted)]">
-        선택된 항목이 없어요
+        선택된 항목이 없어요.
       </div>
     );
   }
@@ -186,6 +189,9 @@ export default function DetailSheet({
                   src={boothImageUrl}
                   alt={`${boothDetail.name} 이미지`}
                   loading="lazy"
+                  decoding="async"
+                  width={1200}
+                  height={900}
                   className="mx-auto max-h-[320px] w-auto max-w-full rounded-xl object-contain"
                 />
               </button>
@@ -266,6 +272,9 @@ export default function DetailSheet({
                         src={imageUrl}
                         alt={`${pubDetail.name} 이미지 ${index + 1}`}
                         loading="lazy"
+                        decoding="async"
+                        width={1200}
+                        height={900}
                         className="w-full rounded-xl object-contain"
                       />
                     </button>
@@ -323,7 +332,9 @@ export default function DetailSheet({
 
   return (
     <div className="py-6 text-center text-sm font-semibold text-[var(--boothmap-text-muted)]">
-      표시할 상세 정보가 없어요
+      표시할 상세 정보가 없어요.
     </div>
   );
 }
+
+export default memo(DetailSheet);

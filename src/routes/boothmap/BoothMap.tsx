@@ -91,6 +91,7 @@ function mapPubSummaryToPub(dto: PubSummaryResponse): Pub {
     instagram: undefined,
     images: dto.mainImageUrl ? [dto.mainImageUrl] : [],
     mainImageUrl: dto.mainImageUrl ?? undefined,
+    thumbnailUrl: dto.thumbnailUrl ?? undefined,
     startTime: dto.startTime,
     endTime: dto.endTime,
   };
@@ -358,6 +359,37 @@ export default function BoothMap() {
     setSheetSnap("FULL");
   }, []);
 
+  const handleBottomSheetBackToList = useCallback(() => {
+    const isFoodTruckDetail =
+      selectedDetailItem?.kind === "booth" && isFoodTruckBooth(selectedBooth);
+    const isPubFlow =
+      selectedDetailItem?.kind === "pub" ||
+      selectedMapItem?.kind === "college" ||
+      isFoodTruckDetail;
+
+    setSelectedDetailItem(null);
+    setSheetMode("LIST");
+    setSheetSnap(isPubFlow ? "HALF" : "PEEK");
+
+    if (!isPubFlow) {
+      setSelectedMapItem(null);
+    }
+  }, [selectedBooth, selectedDetailItem, selectedMapItem]);
+
+  const handleDetailClose = useCallback(() => {
+    const isPubDetail = selectedDetailItem?.kind === "pub";
+    const isFoodTruckDetail =
+      selectedDetailItem?.kind === "booth" && isFoodTruckBooth(selectedBooth);
+
+    setSelectedDetailItem(null);
+    setSheetMode("LIST");
+    setSheetSnap(isPubDetail || isFoodTruckDetail ? "HALF" : "PEEK");
+
+    if (!isPubDetail && !isFoodTruckDetail) {
+      setSelectedMapItem(null);
+    }
+  }, [selectedBooth, selectedDetailItem]);
+
   if (mapDataQuery.isPending && !mapDataQuery.data) {
     return (
       <div className="flex h-screen items-center justify-center bg-[var(--boothmap-surface)]">
@@ -455,22 +487,7 @@ export default function BoothMap() {
         mode={sheetMode}
         snap={sheetSnap}
         onSnapChange={setSheetSnap}
-        onBackToList={() => {
-          const isFoodTruckDetail =
-            selectedDetailItem?.kind === "booth" && isFoodTruckBooth(selectedBooth);
-          const isPubFlow =
-            selectedDetailItem?.kind === "pub" ||
-            selectedMapItem?.kind === "college" ||
-            isFoodTruckDetail;
-
-          setSelectedDetailItem(null);
-          setSheetMode("LIST");
-          setSheetSnap(isPubFlow ? "HALF" : "PEEK");
-
-          if (!isPubFlow) {
-            setSelectedMapItem(null);
-          }
-        }}
+        onBackToList={handleBottomSheetBackToList}
         bottomOffset={bottomNavHeight}
         frameWidth={frameWidth}
       >
@@ -501,19 +518,7 @@ export default function BoothMap() {
             booths={booths}
             pubs={pubs}
             colleges={colleges}
-            onClose={() => {
-              const isPubDetail = selectedDetailItem?.kind === "pub";
-              const isFoodTruckDetail =
-                selectedDetailItem?.kind === "booth" && isFoodTruckBooth(selectedBooth);
-
-              setSelectedDetailItem(null);
-              setSheetMode("LIST");
-              setSheetSnap(isPubDetail || isFoodTruckDetail ? "HALF" : "PEEK");
-
-              if (!isPubDetail && !isFoodTruckDetail) {
-                setSelectedMapItem(null);
-              }
-            }}
+            onClose={handleDetailClose}
           />
         )}
       </BottomSheet>

@@ -46,6 +46,7 @@ export type Pub = {
   instagram?: string | null;
   images?: string[];
   mainImageUrl?: string;
+  thumbnailUrl?: string | null;
   startTime?: string | null;
   endTime?: string | null;
 };

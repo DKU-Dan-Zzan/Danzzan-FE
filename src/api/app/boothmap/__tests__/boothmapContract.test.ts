@@ -1,5 +1,3 @@
-// 역할: boothmapContract 모듈의 API 계약과 예외 처리를 검증하는 테스트다.
-
 import { describe, expect, it } from "vitest";
 import {
   BoothmapContractError,
@@ -46,7 +44,7 @@ describe("boothmapContract", () => {
     expect(parsed.booths[0]?.description).toBe("대표 메뉴 안내");
   });
 
-  it("유효하지 않은 booth type은 오류를 던진다", () => {
+  it("유효하지 않은 booth type이면 에러를 던진다", () => {
     expect(() =>
       parseBoothMapContract(
         {
@@ -73,6 +71,7 @@ describe("boothmapContract", () => {
         name: "체험 부스",
         description: "설명",
         imageUrl: null,
+        thumbnailUrl: null,
         startTime: "11:00",
         endTime: "17:00",
       },
@@ -84,6 +83,7 @@ describe("boothmapContract", () => {
       name: "체험 부스",
       description: "설명",
       imageUrl: null,
+      thumbnailUrl: null,
       startTime: "11:00",
       endTime: "17:00",
     });
@@ -100,6 +100,7 @@ describe("boothmapContract", () => {
           collegeId: 2,
           collegeName: "공과대학",
           mainImageUrl: "https://cdn.example.com/pub.png",
+          thumbnailUrl: "https://cdn.example.com/thumb/pub.webp",
           startTime: "18:00",
           endTime: "23:00",
         },
@@ -108,6 +109,7 @@ describe("boothmapContract", () => {
     );
 
     expect(parsed[0]?.collegeName).toBe("공과대학");
+    expect(parsed[0]?.thumbnailUrl).toBe("https://cdn.example.com/thumb/pub.webp");
   });
 
   it("주점 상세 응답을 파싱한다", () => {
@@ -129,6 +131,7 @@ describe("boothmapContract", () => {
 
     expect(parsed.imageUrls).toHaveLength(1);
   });
+
   it("facility booth subType을 파싱한다", () => {
     const parsed = parseBoothMapContract(
       {
