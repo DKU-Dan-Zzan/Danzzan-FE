@@ -136,12 +136,6 @@ function DetailSheet({
               {boothDetail.name}
             </div>
 
-            {booth?.type && (
-              <div className="text-sm font-bold text-[var(--boothmap-text-subtle)]">
-                {booth.type}
-              </div>
-            )}
-
             {operatingTimeText && (
               <div className="mt-1 text-sm font-semibold text-[var(--boothmap-text-subtle)]">
                 {operatingTimeText}
