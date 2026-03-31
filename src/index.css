@@ -323,90 +323,153 @@
   --home-notice-body-font-size: 13px;
   --home-notice-updated-font-size: 11px;
 
-  /* MyPage route tokens */
-  --mypage-info-icon-size: 40px;
-  --mypage-info-icon-border: rgba(162, 186, 236, 0.68);
-  --mypage-info-icon-bg-start: rgba(79, 121, 223, 0.2);
-  --mypage-info-icon-bg-end: rgba(255, 255, 255, 0.8);
-  --mypage-info-icon-symbol: var(--brand-main);
-  --mypage-info-icon-shadow:
-    inset 0 1px 0 rgba(248, 250, 252, 0.92),
-    0 10px 18px -14px rgba(33, 66, 171, 0.48);
-  --mypage-portal-card-border: rgba(168, 190, 236, 0.72);
-  --mypage-portal-card-bg-start: rgba(214, 226, 250, 0.82);
-  --mypage-portal-card-bg-mid: rgba(190, 209, 246, 0.48);
-  --mypage-portal-card-bg-end: rgba(255, 255, 255, 0.96);
-  --mypage-portal-card-shadow: rgba(33, 66, 171, 0.34);
-  --mypage-portal-card-inner-border: rgba(255, 255, 255, 0.52);
-  --mypage-portal-overline: var(--brand-main);
-  --mypage-portal-name: rgb(15 23 42);
-  --mypage-portal-name-size: 28px;
-  --mypage-portal-subtitle: rgb(79 98 132);
-  --mypage-portal-icon-border: rgba(162, 186, 236, 0.66);
-  --mypage-portal-icon-bg-start: rgba(79, 121, 223, 0.2);
-  --mypage-portal-icon-bg-end: rgba(255, 255, 255, 0.84);
-  --mypage-portal-icon-color: var(--brand-main);
-  --mypage-portal-icon-shadow:
-    inset 0 1px 0 rgba(248, 250, 252, 0.94),
-    0 12px 20px -16px rgba(33, 66, 171, 0.5);
-  --mypage-bg-start: rgb(245 249 255);
-  --mypage-bg-mid: rgb(233 240 255);
-  --mypage-bg-low: rgb(226 234 251);
-  --mypage-bg-end: rgb(238 243 252);
-  --mypage-page-gradient:
-    linear-gradient(
-      180deg,
-      var(--mypage-bg-start) 0%,
-      var(--mypage-bg-mid) 48%,
-      var(--mypage-bg-low) 76%,
-      var(--mypage-bg-end) 100%
-    );
-  --mypage-page-gradient-guest:
-    radial-gradient(
-      120% 64% at 50% 36%,
-      rgba(255, 255, 255, 0.44) 0%,
-      rgba(255, 255, 255, 0) 74%
-    ),
-    linear-gradient(
-      180deg,
-      var(--mypage-bg-start) 0%,
-      var(--mypage-bg-mid) 50%,
-      rgb(230 238 252) 76%,
-      rgb(234 241 251) 88%,
-      var(--footer-bg) 100%
-    );
-  --mypage-glow-top: rgba(79, 121, 223, 0.22);
-  --mypage-glow-bottom: rgba(47, 86, 199, 0.18);
-  --mypage-guest-card-border: rgba(189, 208, 247, 0.9);
-  --mypage-guest-card-bg: rgba(255, 255, 255, 0.86);
-  --mypage-guest-card-shadow: 0 20px 45px -24px rgba(33, 66, 171, 0.38);
-  --mypage-guest-icon-border: rgba(255, 255, 255, 0.66);
-  --mypage-guest-icon-bg-start: rgb(91 132 232);
-  --mypage-guest-icon-bg-end: var(--brand-main);
-  --mypage-guest-icon-shadow: 0 14px 24px -16px rgba(33, 66, 171, 0.6);
-  --mypage-guest-overline: rgba(47, 86, 199, 0.86);
-  --mypage-guest-title: rgb(18 29 57);
-  --mypage-guest-description: rgb(100 117 154);
-  --mypage-guest-cta-bg-start: rgb(70 116 221);
-  --mypage-guest-cta-bg-end: var(--brand-main);
-  --mypage-guest-cta-shadow: 0 14px 24px -16px rgba(33, 66, 171, 0.68);
-  --mypage-info-card-border: rgba(184, 205, 245, 0.82);
-  --mypage-info-card-bg: rgba(255, 255, 255, 0.92);
-  --mypage-info-card-shadow: 0 20px 40px -24px rgba(30, 58, 138, 0.28);
-  --mypage-info-header-border: rgba(189, 208, 247, 0.82);
-  --mypage-info-header-bg-start: rgba(238, 245, 255, 0.94);
-  --mypage-info-header-bg-end: rgba(255, 255, 255, 0.78);
-  --mypage-info-overline: rgba(47, 86, 199, 0.82);
-  --mypage-info-title: rgb(19 32 61);
-  --mypage-info-item-divider: rgba(181, 201, 241, 0.9);
-  --mypage-info-item-label: rgb(138 151 175);
-  --mypage-info-item-value: rgb(20 34 62);
-  --mypage-logout-gap: 48px;
-  --mypage-logout-text: rgb(78 95 130);
-  --mypage-logout-text-hover: rgb(63 81 114);
-  --mypage-logout-font-size: 12px;
-  --mypage-logout-underline-thickness: 1px;
-  --mypage-logout-underline-offset: 3px;
+  /* MyPage route tokens — v5: Clean Light (Toss-style) */
+  --mypage-page-bg: #f5f5f5;
+  --mypage-page-bg-gradient: #f5f5f5;
+
+  /* profile */
+  --mypage-profile-avatar-bg: #e8edf2;
+  --mypage-profile-avatar-icon: #9ba8b8;
+  --mypage-profile-name: #111111;
+  --mypage-profile-subtitle: #8e8e93;
+
+  /* section */
+  --mypage-section-title: #111111;
+  --mypage-section-label: #8e8e93;
+  --mypage-section-dot: transparent;
+
+  /* ticket hero card (emphasized) */
+  --mypage-ticket-hero-bg: linear-gradient(140deg, #0a559c 0%, #1472cb 100%);
+  --mypage-ticket-hero-text: #ffffff;
+  --mypage-ticket-hero-muted: rgba(255, 255, 255, 0.58);
+  --mypage-ticket-hero-btn-bg: rgba(255, 255, 255, 0.18);
+  --mypage-ticket-hero-btn-border: rgba(255, 255, 255, 0.32);
+  --mypage-ticket-hero-btn-text: #ffffff;
+  --mypage-ticket-hero-row-divider: rgba(255, 255, 255, 0.12);
+
+  /* list rows */
+  --mypage-list-bg: #ffffff;
+  --mypage-list-divider: #f0f0f0;
+  --mypage-list-item-text: #111111;
+  --mypage-list-item-value: #8e8e93;
+  --mypage-list-item-icon: #8e8e93;
+  --mypage-list-arrow: #c8c8cc;
+
+  /* hero card (kept for guest view) */
+  --mypage-hero-card-bg: #ffffff;
+  --mypage-hero-card-border: transparent;
+  --mypage-hero-card-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  --mypage-hero-overline: #0a559c;
+  --mypage-hero-name: #111111;
+  --mypage-hero-name-size: 24px;
+  --mypage-hero-subtitle: #8e8e93;
+  --mypage-hero-badge-bg: #f0f4fa;
+  --mypage-hero-badge-border: transparent;
+  --mypage-hero-badge-shadow: none;
+  --mypage-hero-icon-color: #9ba8b8;
+  --mypage-hero-divider: #f0f0f0;
+  --mypage-hero-stat-label: #8e8e93;
+  --mypage-hero-stat-value: #111111;
+
+  /* ticket preview rows */
+  --mypage-ticket-card-bg: #ffffff;
+  --mypage-ticket-card-border: #f0f0f0;
+  --mypage-ticket-card-shadow: none;
+  --mypage-ticket-strip: linear-gradient(180deg, #0a559c 0%, #1472cb 100%);
+  --mypage-ticket-event: #111111;
+  --mypage-ticket-meta: #8e8e93;
+  --mypage-ticket-badge-issued-bg: rgba(10, 85, 156, 0.08);
+  --mypage-ticket-badge-issued-border: rgba(10, 85, 156, 0.22);
+  --mypage-ticket-badge-issued-text: #0a559c;
+  --mypage-ticket-badge-used-bg: #f5f5f5;
+  --mypage-ticket-badge-used-border: #e5e5e5;
+  --mypage-ticket-badge-used-text: #8e8e93;
+  --mypage-ticket-empty-icon: #d1d5db;
+  --mypage-ticket-empty-text: #8e8e93;
+  --mypage-ticket-cta-bg: rgba(10, 85, 156, 0.05);
+  --mypage-ticket-cta-border: rgba(10, 85, 156, 0.14);
+  --mypage-ticket-cta-text: #0a559c;
+  --mypage-ticket-icon-bg: rgba(10, 85, 156, 0.09);
+  --mypage-ticket-viewall-text: #8e8e93;
+
+  /* info section */
+  --mypage-info-card-bg: #ffffff;
+  --mypage-info-card-border: transparent;
+  --mypage-info-card-shadow: none;
+  --mypage-info-header-bg-start: #f8fafc;
+  --mypage-info-header-bg-end: #ffffff;
+  --mypage-info-header-border: #f0f0f0;
+  --mypage-info-overline: #0a559c;
+  --mypage-info-title: #111111;
+  --mypage-info-item-divider: #f0f0f0;
+  --mypage-info-item-label: #8e8e93;
+  --mypage-info-item-value: #111111;
+  --mypage-info-icon-size: 36px;
+  --mypage-info-icon-border: transparent;
+  --mypage-info-icon-bg: #f5f5f5;
+  --mypage-info-icon-bg-start: #f5f5f5;
+  --mypage-info-icon-bg-end: #f5f5f5;
+  --mypage-info-icon-symbol: #8e8e93;
+  --mypage-info-icon-shadow: none;
+
+  /* settings rows */
+  --mypage-settings-card-bg: #ffffff;
+  --mypage-settings-card-border: transparent;
+  --mypage-settings-row-label: #111111;
+  --mypage-settings-row-divider: #f0f0f0;
+  --mypage-settings-row-arrow: #c8c8cc;
+  --mypage-settings-icon-bg: #f5f5f5;
+  --mypage-settings-icon-color: #8e8e93;
+
+  /* FAQ */
+  --mypage-faq-question: #111111;
+  --mypage-faq-answer-bg: #fafafa;
+  --mypage-faq-answer: #8e8e93;
+  --mypage-faq-divider: #f0f0f0;
+  --mypage-faq-icon: #c8c8cc;
+  --mypage-faq-icon-open: #0a559c;
+
+  /* guest view */
+  --mypage-guest-card-border: transparent;
+  --mypage-guest-card-bg: #ffffff;
+  --mypage-guest-card-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  --mypage-guest-icon-border: transparent;
+  --mypage-guest-icon-bg-start: #0a559c;
+  --mypage-guest-icon-bg-end: #1472cb;
+  --mypage-guest-icon-shadow: 0 8px 24px -4px rgba(10, 85, 156, 0.32);
+  --mypage-guest-overline: #0a559c;
+  --mypage-guest-title: #111111;
+  --mypage-guest-description: #8e8e93;
+  --mypage-guest-cta-bg-start: #0a559c;
+  --mypage-guest-cta-bg-end: #1472cb;
+  --mypage-guest-cta-shadow: 0 8px 24px -4px rgba(10, 85, 156, 0.35);
+
+  /* cta */
+  --mypage-cta-gradient: linear-gradient(135deg, #0a559c 0%, #1472cb 100%);
+  --mypage-cta-shadow: 0 8px 24px -4px rgba(10, 85, 156, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+  /* avatar */
+  --mypage-avatar-gradient: linear-gradient(135deg, #0a559c 0%, #1472cb 100%);
+  --mypage-avatar-shadow: 0 8px 24px -4px rgba(10, 85, 156, 0.3);
+
+  /* role badge */
+  --mypage-role-badge-bg: rgba(10, 85, 156, 0.07);
+  --mypage-role-badge-border: rgba(10, 85, 156, 0.18);
+  --mypage-role-badge-text: #0a559c;
+
+  /* stats */
+  --mypage-stats-bg: #f8f8f8;
+  --mypage-stats-border: #eeeeee;
+  --mypage-stats-divider: #e8e8e8;
+
+  /* logout */
+  --mypage-logout-gap: 8px;
+  --mypage-logout-border: transparent;
+  --mypage-logout-text: #8e8e93;
+  --mypage-logout-text-hover: #ff3b30;
+  --mypage-logout-font-size: 14px;
+  --mypage-logout-underline-thickness: 0px;
+  --mypage-logout-underline-offset: 0px;
 
   /* Timetable route tokens */
   --timetable-tab-inactive: rgb(143 155 180);
@@ -419,6 +482,37 @@
   --timetable-info-text: rgb(42 79 184);
   --timetable-overlay-bg: rgba(15, 23, 42, 0.8);
   --timetable-close-bg: rgba(255, 255, 255, 0.9);
+}
+
+/* MyPage light shell overrides — applied when .mypage-root is mounted */
+body:has(.mypage-root) {
+  --bg-page-soft: #f5f5f5;
+  --app-header-bg: #f5f5f5;
+  --app-header-bg-gradient: linear-gradient(180deg, #f5f5f5 0%, #f5f5f5 100%);
+  --app-header-border: transparent;
+  --app-header-ticket-btn-bg-start: rgba(255, 255, 255, 0.92);
+  --app-header-ticket-btn-bg-end: rgba(240, 244, 250, 0.9);
+  --app-header-ticket-btn-border: rgba(10, 85, 156, 0.14);
+  --app-header-ticket-btn-icon: #0a559c;
+  --app-header-ticket-btn-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    0 2px 8px rgba(0, 0, 0, 0.06);
+  --app-header-ticket-btn-shadow-hover:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 4px 12px rgba(0, 0, 0, 0.1);
+  --app-overscroll-bg: #f5f5f5;
+  --app-overscroll-bg-gradient: none;
+  --app-nav-bg: rgba(255, 255, 255, 0.97);
+  --app-nav-border: rgba(0, 0, 0, 0.06);
+  --app-nav-shadow: 0 -1px 0 rgba(0, 0, 0, 0.06);
+  --app-nav-text: #8e8e93;
+  --app-nav-text-active: #0a559c;
+  --footer-bg: #f5f5f5;
+  --footer-text-primary: #333333;
+  --footer-text-secondary: #8e8e93;
+  --footer-divider: rgba(0, 0, 0, 0.08);
+  --footer-divider-glow: rgba(0, 0, 0, 0.04);
+  --footer-divider-transparent: rgba(0, 0, 0, 0);
 }
 
 html,
