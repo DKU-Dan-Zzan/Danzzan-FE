@@ -290,12 +290,12 @@ function Notice() {
             showCloseButton={false}
             className="max-h-[90vh] w-full max-w-xl overflow-hidden rounded-3xl bg-white p-0 shadow-[0_18px_45px_var(--shadow-color)]"
           >
-            <div className="flex items-center justify-between border-b border-[#BDD0F7E6] px-5 py-3.5">
+            <div className="flex items-center justify-between border-b border-[var(--home-card-border)] px-5 py-3.5">
               <DialogTitle className="text-[13px] font-semibold text-[var(--text)]">공지 상세</DialogTitle>
               <button
                 type="button"
                 onClick={handleCloseDetail}
-                className="rounded-full border border-[#BDD0F7E6] bg-[var(--surface-subtle)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-muted)]"
+                className="rounded-full border border-[var(--home-card-border)] bg-[var(--surface-subtle)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-muted)]"
               >
                 닫기
               </button>
@@ -325,7 +325,7 @@ function Notice() {
 
               {detailNotice && !detailLoading && (
                 <article>
-                  <header className="border-b border-[#BDD0F7E6] pb-3">
+                  <header className="border-b border-[var(--home-card-border)] pb-3">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-bold-emphasis)]">
                       FESTIVAL NOTICE
                     </p>
@@ -341,7 +341,7 @@ function Notice() {
                   {(detailNotice.imageUrls?.length ?? 0) > 0 ? (
                     <div className="mt-3">
                       <div
-                        className="relative overflow-hidden rounded-2xl border border-[#BDD0F7E6] bg-[var(--surface-subtle)]"
+                        className="relative overflow-hidden rounded-2xl border border-[var(--home-card-border)] bg-[var(--surface-subtle)]"
                         onTouchStart={(e) => {
                           if (e.touches.length === 1) {
                             setDragStartX(e.touches[0].clientX);
@@ -442,7 +442,7 @@ function Notice() {
                       </div>
                     </div>
                   ) : detailNotice.thumbnailImageUrl ? (
-                    <div className="mt-3 overflow-hidden rounded-2xl border border-[#BDD0F7E6]">
+                    <div className="mt-3 overflow-hidden rounded-2xl border border-[var(--home-card-border)]">
                       <img
                         src={detailNotice.thumbnailImageUrl}
                         alt={detailNotice.title}

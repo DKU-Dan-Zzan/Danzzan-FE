@@ -5,7 +5,8 @@ import { useSyncExternalStore } from "react"
 import { authStore } from "@/store/common/authStore"
 import { getMyTicketNavigationTarget } from "@/lib/common/my-ticket-navigation"
 import { AppTopBar } from "@/components/layout/AppTopBar"
-import { APP_HEADER_ROUND_BUTTON_BASE_CLASS } from "@/components/layout/appHeaderRoundButtonClass"
+import { APP_HEADER_ROUND_BUTTON_BASE_CLASS } from "@/components/layout/AppHeaderRoundButtonClass"
+import { cn } from "@/components/common/ui/utils"
 
 const Header = () => {
   const navigate = useNavigate()
@@ -26,7 +27,7 @@ const Header = () => {
           onClick={handleTicketClick}
           aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
           title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
-          className={`${APP_HEADER_ROUND_BUTTON_BASE_CLASS} right-4`}
+          className={cn(APP_HEADER_ROUND_BUTTON_BASE_CLASS, "right-4")}
         >
           <Ticket size={20} className="text-[var(--app-header-ticket-btn-icon)]" />
         </button>

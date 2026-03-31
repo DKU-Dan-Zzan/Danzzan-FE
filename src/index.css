@@ -54,8 +54,8 @@
   --app-circle-border: rgba(160, 180, 220, 0.56);
   --app-circle-bg-start: rgba(252, 254, 255, 0.98);
   --app-circle-bg-end: rgba(228, 236, 252, 0.96);
-  --text-emphasis-vivid: #2853A9;
-  --text-emphasis-vivid-strong: #2F63F6;
+  --text-emphasis-vivid: #2853a9;
+  --text-emphasis-vivid-strong: #2f63f6;
   --text-body-deep: #203163;
   --text-bold-emphasis: #374f84;
   --app-circle-fg: var(--text-bold-emphasis);
@@ -584,8 +584,8 @@
   --app-circle-border: rgba(153, 175, 214, 0.62);
   --app-circle-bg-start: rgba(247, 247, 247, 0.98);
   --app-circle-bg-end: rgba(227, 232, 239, 0.88);
-  --text-emphasis-vivid: #2853A9;
-  --text-emphasis-vivid-strong: #2F63F6;
+  --text-emphasis-vivid: #2853a9;
+  --text-emphasis-vivid-strong: #2f63f6;
   --text-body-deep: var(--ink-600);
   --text-bold-emphasis: #374f84;
   --app-circle-fg: var(--text-bold-emphasis);

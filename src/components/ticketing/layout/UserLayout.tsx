@@ -6,7 +6,7 @@ import BottomNav from "@/components/layout/BottomNav";
 import Footer from "@/components/layout/Footer";
 import { AppTopBar } from "@/components/layout/AppTopBar";
 import { AppShell } from "@/components/layout/AppShell";
-import { APP_HEADER_ROUND_BUTTON_BASE_CLASS } from "@/components/layout/appHeaderRoundButtonClass";
+import { APP_HEADER_ROUND_BUTTON_BASE_CLASS } from "@/components/layout/AppHeaderRoundButtonClass";
 import { cn } from "@/components/common/ui/utils";
 import { shouldShowTicketingHeader } from "@/lib/ticketing/navigation/headerVisibility";
 

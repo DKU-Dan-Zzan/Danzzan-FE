@@ -9,6 +9,7 @@ import {
 } from "@/utils/app/timetable";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
 import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
+import { cn } from "@/components/common/ui/utils";
 
 const CARD_WIDTH = 314.4;
 const CARD_HEIGHT = 94;
@@ -75,7 +76,10 @@ export default function CurrentPerformanceSection() {
           type="button"
           onClick={() => navigate(`/timetable?date=${today}`)}
           style={{ aspectRatio: CARD_ASPECT_RATIO }}
-          className={`w-full px-5 py-4 transition active:scale-[0.99] ${APP_CARD_VARIANTS.outline} rounded-[22px]`}
+          className={cn(
+            "w-full rounded-[22px] px-5 py-4 transition active:scale-[0.99]",
+            APP_CARD_VARIANTS.outline,
+          )}
         >
           {status === "active" && currentPerformance ? (
             <div className="flex h-full items-center gap-4">

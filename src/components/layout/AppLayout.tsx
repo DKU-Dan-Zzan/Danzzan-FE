@@ -11,7 +11,7 @@ const Layout = () => {
   const isBoothMapPage = location.pathname === "/map"
   const isTimetablePage = location.pathname === "/timetable"
   const timetableBorderOverrideClass = isTimetablePage
-    ? "[--border-base:#bdd0f7e6] [--border-subtle:#bdd0f7e6] [--timetable-card-border:#bdd0f7e6] [--timetable-info-border:#bdd0f7e6] [--timetable-active-line:#bdd0f7e6] [--app-header-border:#bdd0f7e6] [--app-nav-border:#bdd0f7e6] [--app-circle-border:#bdd0f7e6] [--app-header-ticket-btn-border:#bdd0f7e6]"
+    ? "[--border-base:var(--home-card-border)] [--border-subtle:var(--home-card-border)] [--timetable-card-border:var(--home-card-border)] [--timetable-info-border:var(--home-card-border)] [--timetable-active-line:var(--home-card-border)] [--app-header-border:var(--home-card-border)] [--app-nav-border:var(--home-card-border)] [--app-circle-border:var(--home-card-border)] [--app-header-ticket-btn-border:var(--home-card-border)]"
     : ""
   const rootClassName = isBoothMapPage
     ? `h-dvh overflow-hidden bg-white ${timetableBorderOverrideClass}`
