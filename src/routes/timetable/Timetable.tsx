@@ -234,9 +234,9 @@ export default function Timetable() {
         </div>
 
         <div className="px-4 pt-4">
-          <div className="flex items-start gap-2 rounded-2xl border border-[var(--timetable-info-border)] bg-[var(--timetable-info-bg)] px-4 py-3">
+          <div className="flex items-start gap-2 rounded-2xl border border-[var(--timetable-notice-border)] bg-[var(--timetable-notice-bg)] px-3 py-2.5">
             <InformationCircleIcon className="mt-0.5 h-5 w-5 text-[var(--accent)]" />
-            <p className="text-sm font-medium text-[var(--timetable-info-text)]">
+            <p className="text-sm font-normal text-[var(--timetable-info-text)]">
               일정은 현장 상황에 따라 변경될 수 있습니다.
             </p>
           </div>
