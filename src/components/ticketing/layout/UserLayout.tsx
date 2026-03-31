@@ -19,7 +19,9 @@ export function UserLayout() {
     location.pathname === "/ticket/signup" ||
     location.pathname.startsWith("/ticket/reset-password");
   const isTicketingPage = location.pathname.startsWith("/ticket/ticketing");
-  const isBackButtonDisabled = isTicketingLoginPage || isTicketingPage;
+  const hasQueueEventId = new URLSearchParams(location.search).has("eventId");
+  const isTicketingMainPage = location.pathname === "/ticket/ticketing" && !hasQueueEventId;
+  const isBackButtonDisabled = isTicketingLoginPage || isTicketingMainPage;
   const isMyTicketPage =
     location.pathname.startsWith("/ticket/my-ticket") ||
     location.pathname.startsWith("/ticket/myticket");
@@ -31,16 +33,16 @@ export function UserLayout() {
   const pageTitle = "축제 포털";
 
   const handleBack = () => {
-    if (isTicketingPage) {
-      navigate("/ticket/ticketing", { replace: true, state: { resetToHome: Date.now() } });
-      return;
-    }
-
     const historyIndex = window.history.state?.idx;
     const canGoBack = typeof historyIndex === "number" && historyIndex > 0;
 
     if (canGoBack) {
       navigate(-1);
+      return;
+    }
+
+    if (isTicketingPage) {
+      navigate("/ticket/ticketing", { replace: true, state: { resetToHome: Date.now() } });
       return;
     }
 
