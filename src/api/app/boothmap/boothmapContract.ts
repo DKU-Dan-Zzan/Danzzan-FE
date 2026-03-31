@@ -127,6 +127,7 @@ export type ContractBoothDto = {
   name: string;
   type: BoothType;
   subType: BoothSubType | null;
+  description: string | null;
   locationX: number;
   locationY: number;
   startTime: string | null;
@@ -217,6 +218,7 @@ export const parseBoothMapContract = (payload: unknown, endpoint: string): Contr
     const name = readString(item, "name");
     const type = parseBoothType(item.type, endpoint, `booths[${index}]`);
     const subType = parseBoothSubType(item.subType, endpoint, `booths[${index}]`);
+    const description = readNullableString(item, "description");
     const locationX = readNumber(item, "locationX");
     const locationY = readNumber(item, "locationY");
     const startTime = readNullableString(item, "startTime");
@@ -235,6 +237,7 @@ export const parseBoothMapContract = (payload: unknown, endpoint: string): Contr
       name,
       type,
       subType,
+      description: description ?? null,
       locationX,
       locationY,
       startTime: startTime ?? null,

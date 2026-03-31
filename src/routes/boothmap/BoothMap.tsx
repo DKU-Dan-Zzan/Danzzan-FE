@@ -23,12 +23,13 @@ import FestivalDateTabs from "@/components/app/boothmap/FestivalDateTabs";
 
 import {
   getBoothMap,
+  getBoothSummary,
   getPubs,
   type BoothDto,
   type CollegeDto,
   type PubSummaryResponse,
 } from "@/api/app/boothmap/boothmapApi";
-import { appQueryKeys, useAppQuery } from "@/lib/query";
+import { appQueryKeys, queryClient, useAppQuery } from "@/lib/query";
 import {
   getShouldShowPubList,
   getVisibleBooths,
@@ -36,6 +37,7 @@ import {
   getVisiblePubs,
 } from "@/routes/boothmap/boothMapSelectors";
 import { cn } from "@/components/common/ui/utils";
+import { formatDescription } from "@/utils/app/boothmap/formatDescription";
 
 const DEFAULT_MAP_VIEWPORT: MapViewport = {
   lat: 37.3201,
@@ -69,6 +71,7 @@ function mapBoothDtoToBooth(dto: BoothDto): Booth {
     name: dto.name,
     type: dto.type,
     subType: dto.subType,
+    description: dto.description,
     location_x: dto.locationX,
     location_y: dto.locationY,
     startTime: dto.startTime,
@@ -93,10 +96,19 @@ function mapPubSummaryToPub(dto: PubSummaryResponse): Pub {
   };
 }
 
+function hasBoothDetailContent(description?: string | null) {
+  return formatDescription(description).trim().length > 0;
+}
+
+function isFoodTruckBooth(booth?: Booth | null) {
+  return booth?.type === "FOOD_TRUCK";
+}
+
 export default function BoothMap() {
   const [primaryFilter, setPrimaryFilter] = useState<PrimaryFilter>("ALL");
   const [selectedMapItem, setSelectedMapItem] = useState<SelectedMapItem>(null);
   const [selectedDetailItem, setSelectedDetailItem] = useState<SelectedDetailItem>(null);
+  const [boothDetailAvailability, setBoothDetailAvailability] = useState<Record<number, boolean>>({});
   const [selectedCollegeId, setSelectedCollegeId] = useState<number | null>(null);
   const [pubListCollegeId, setPubListCollegeId] = useState<number | null>(null);
   const [sheetMode, setSheetMode] = useState<SheetMode>("LIST");
@@ -188,15 +200,125 @@ export default function BoothMap() {
   }, [primaryFilter, pubs, pubListCollegeId, selectedCollegeId]);
 
   const shouldShowPubList = getShouldShowPubList(primaryFilter, selectedMapItem);
+  const selectedBooth = useMemo(() => {
+    if (selectedMapItem?.kind !== "booth") {
+      return null;
+    }
 
-  const onClickMarkerBooth = useCallback((id: number) => {
+    return booths.find((booth) => booth.id === selectedMapItem.id) ?? null;
+  }, [booths, selectedMapItem]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const initialAvailability = visibleBooths.reduce<Record<number, boolean>>((acc, booth) => {
+      acc[booth.id] = hasBoothDetailContent(booth.description);
+      return acc;
+    }, {});
+
+    setBoothDetailAvailability(initialAvailability);
+
+    const foodTruckBoothsToCheck = visibleBooths.filter((booth) => {
+      return booth.type === "FOOD_TRUCK" && !hasBoothDetailContent(booth.description);
+    });
+
+    if (foodTruckBoothsToCheck.length === 0) {
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    void Promise.all(
+      foodTruckBoothsToCheck.map(async (booth) => {
+        try {
+          const summary = await queryClient.fetchQuery({
+            queryKey: appQueryKeys.boothMapBoothDetail(booth.id),
+            queryFn: () => getBoothSummary(booth.id),
+            staleTime: 5 * 60_000,
+          });
+
+          return {
+            id: booth.id,
+            hasDetail: hasBoothDetailContent(summary.description),
+          };
+        } catch {
+          return {
+            id: booth.id,
+            hasDetail: false,
+          };
+        }
+      }),
+    ).then((results) => {
+      if (cancelled) {
+        return;
+      }
+
+      setBoothDetailAvailability((prev) => {
+        const next = { ...prev };
+        results.forEach((result) => {
+          next[result.id] = result.hasDetail;
+        });
+        return next;
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [visibleBooths]);
+
+  const resolveBoothSelection = useCallback(async (
+    id: number,
+    options: {
+      detailSnap: SheetSnap;
+      fallbackSnap: Extract<SheetSnap, "PEEK" | "HALF">;
+    },
+  ) => {
     setSelectedMapItem({ kind: "booth", id });
-    setSelectedDetailItem({ kind: "booth", id });
+    setSelectedDetailItem(null);
     setSelectedCollegeId(null);
     setPubListCollegeId(null);
-    setSheetMode("DETAIL");
-    setSheetSnap("PEEK");
+
+    try {
+      const summary = await queryClient.fetchQuery({
+        queryKey: appQueryKeys.boothMapBoothDetail(id),
+        queryFn: () => getBoothSummary(id),
+        staleTime: 5 * 60_000,
+      });
+
+      if (hasBoothDetailContent(summary.description)) {
+        setBoothDetailAvailability((prev) => ({ ...prev, [id]: true }));
+        setSelectedDetailItem({ kind: "booth", id });
+        setSheetMode("DETAIL");
+        setSheetSnap(options.detailSnap);
+        return;
+      }
+    } catch {
+      // 상세 조회에 실패해도 목록 흐름은 유지합니다.
+    }
+
+    setBoothDetailAvailability((prev) => ({ ...prev, [id]: false }));
+    setSelectedDetailItem(null);
+    setSheetMode("LIST");
+    setSheetSnap(options.fallbackSnap);
   }, []);
+
+  const onClickMarkerBooth = useCallback((id: number) => {
+    const booth = booths.find((item) => item.id === id);
+    if (isFoodTruckBooth(booth)) {
+      void resolveBoothSelection(id, {
+        detailSnap: "HALF",
+        fallbackSnap: "HALF",
+      });
+      return;
+    }
+
+    setSelectedMapItem({ kind: "booth", id });
+    setSelectedDetailItem(null);
+    setSelectedCollegeId(null);
+    setPubListCollegeId(null);
+    setSheetMode("LIST");
+  }, [booths, resolveBoothSelection]);
 
   const onClickMarkerCollege = useCallback((id: number) => {
     setPubListCollegeId(id);
@@ -208,11 +330,26 @@ export default function BoothMap() {
 
   const onSelectBoothFromList = useCallback((id: number) => {
     setSelectedMapItem({ kind: "booth", id });
-    setSelectedDetailItem({ kind: "booth", id });
+    setSelectedDetailItem(null);
     setSelectedCollegeId(null);
     setPubListCollegeId(null);
-    setSheetMode("DETAIL");
+    setSheetMode("LIST");
     setSheetSnap("HALF");
+  }, []);
+
+  const onOpenBoothDetailFromList = useCallback((id: number) => {
+    void resolveBoothSelection(id, {
+      detailSnap: "FULL",
+      fallbackSnap: "HALF",
+    });
+  }, [resolveBoothSelection]);
+
+  const onChangePrimaryFilterFromMap = useCallback((next: PrimaryFilter) => {
+    handlePrimaryChange(next);
+    if (next === "FOOD_TRUCK") {
+      setSheetMode("LIST");
+      setSheetSnap("HALF");
+    }
   }, []);
 
   const onSelectPubFromList = useCallback((id: number) => {
@@ -264,7 +401,7 @@ export default function BoothMap() {
             onViewportChange={setMapViewport}
             onClickBooth={onClickMarkerBooth}
             onClickCollege={onClickMarkerCollege}
-            onPrimaryFilterChange={handlePrimaryChange}
+            onPrimaryFilterChange={onChangePrimaryFilterFromMap}
           />
         </div>
       </div>
@@ -319,8 +456,12 @@ export default function BoothMap() {
         snap={sheetSnap}
         onSnapChange={setSheetSnap}
         onBackToList={() => {
+          const isFoodTruckDetail =
+            selectedDetailItem?.kind === "booth" && isFoodTruckBooth(selectedBooth);
           const isPubFlow =
-            selectedDetailItem?.kind === "pub" || selectedMapItem?.kind === "college";
+            selectedDetailItem?.kind === "pub" ||
+            selectedMapItem?.kind === "college" ||
+            isFoodTruckDetail;
 
           setSelectedDetailItem(null);
           setSheetMode("LIST");
@@ -347,7 +488,12 @@ export default function BoothMap() {
               onSelectPub={onSelectPubFromList}
             />
           ) : (
-            <BoothList booths={visibleBooths} onSelectBooth={onSelectBoothFromList} />
+            <BoothList
+              booths={visibleBooths}
+              boothDetailAvailability={boothDetailAvailability}
+              onSelectBooth={onSelectBoothFromList}
+              onOpenBoothDetail={onOpenBoothDetailFromList}
+            />
           )
         ) : (
           <DetailSheet
@@ -357,12 +503,14 @@ export default function BoothMap() {
             colleges={colleges}
             onClose={() => {
               const isPubDetail = selectedDetailItem?.kind === "pub";
+              const isFoodTruckDetail =
+                selectedDetailItem?.kind === "booth" && isFoodTruckBooth(selectedBooth);
 
               setSelectedDetailItem(null);
               setSheetMode("LIST");
-              setSheetSnap(isPubDetail ? "HALF" : "PEEK");
+              setSheetSnap(isPubDetail || isFoodTruckDetail ? "HALF" : "PEEK");
 
-              if (!isPubDetail) {
+              if (!isPubDetail && !isFoodTruckDetail) {
                 setSelectedMapItem(null);
               }
             }}

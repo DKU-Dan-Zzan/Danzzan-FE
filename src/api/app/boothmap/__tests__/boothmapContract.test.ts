@@ -28,6 +28,7 @@ describe("boothmapContract", () => {
               name: "푸드트럭 A",
               type: "FOOD_TRUCK",
               subType: null,
+              description: "대표 메뉴 안내",
               locationX: 127.12,
               locationY: 37.31,
               startTime: "11:00",
@@ -42,6 +43,7 @@ describe("boothmapContract", () => {
     expect(parsed.colleges).toHaveLength(1);
     expect(parsed.booths[0]?.type).toBe("FOOD_TRUCK");
     expect(parsed.booths[0]?.subType).toBeNull();
+    expect(parsed.booths[0]?.description).toBe("대표 메뉴 안내");
   });
 
   it("유효하지 않은 booth type은 오류를 던진다", () => {
