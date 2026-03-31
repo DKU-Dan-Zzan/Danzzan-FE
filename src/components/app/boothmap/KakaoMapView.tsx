@@ -46,8 +46,8 @@ type Props = {
 };
 
 const DEFAULT_CENTER = {
-  lat: 37.3201,
-  lng: 127.1276,
+  lat: 37.32045,
+  lng: 127.12805,
 }
 
 const DANKOOK_BOUNDS = {

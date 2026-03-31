@@ -40,8 +40,8 @@ import { cn } from "@/components/common/ui/utils";
 import { formatDescription } from "@/utils/app/boothmap/formatDescription";
 
 const DEFAULT_MAP_VIEWPORT: MapViewport = {
-  lat: 37.3201,
-  lng: 127.1276,
+  lat: 37.32085,
+  lng: 127.12805,
   kakaoLevel: 3,
 };
 
