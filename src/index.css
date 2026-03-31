@@ -171,9 +171,9 @@
   --boothmap-marker-event: #f6ca3b;
   --boothmap-marker-facility: #3b82f6;
 
-  --boothmap-selected-shadow: rgba(55, 79, 132, 0.28);
-  --boothmap-selected-shadow-soft: rgba(55, 79, 132, 0.25);
-  --boothmap-selected-ring: rgba(55, 79, 132, 0.18);
+  --boothmap-selected-shadow: color-mix(in srgb, var(--text-bold-emphasis) 28%, transparent);
+  --boothmap-selected-shadow-soft: color-mix(in srgb, var(--text-bold-emphasis) 25%, transparent);
+  --boothmap-selected-ring: color-mix(in srgb, var(--text-bold-emphasis) 18%, transparent);
 
   --boothmap-college-accent: #2563eb;
   --boothmap-college-stroke-default: #1e40af;
@@ -188,36 +188,47 @@
   --boothmap-zone-food-truck-fill: #fca5a5;
   --boothmap-zone-food-truck-dot: #ef4444;
 
-  --boothmap-overlay-label-bg: rgba(255, 255, 255, 0.95);
-  --boothmap-overlay-label-border: #d1d5db;
-  --boothmap-overlay-label-text: #1f2937;
-  --boothmap-overlay-badge-bg: #111827;
+  --boothmap-overlay-label-bg: color-mix(in srgb, var(--card-surface-base) 95%, white);
+  --boothmap-overlay-label-border: var(--card-outline-border);
+  --boothmap-overlay-label-text: var(--text-body-deep);
+  --boothmap-overlay-badge-bg: var(--text-body-deep);
   --boothmap-overlay-badge-text: #ffffff;
-  --boothmap-overlay-shadow: rgba(15, 23, 42, 0.18);
-  --boothmap-overlay-shadow-soft: rgba(0, 0, 0, 0.16);
+  --boothmap-overlay-shadow: color-mix(in srgb, var(--text-body-deep) 18%, transparent);
+  --boothmap-overlay-shadow-soft: color-mix(in srgb, var(--text-body-deep) 16%, transparent);
 
-  --boothmap-surface: #ffffff;
-  --boothmap-surface-soft: #f3f4f6;
-  --boothmap-surface-softer: #e5e7eb;
-  --boothmap-surface-muted: #f8fafc;
-  --boothmap-border: #e5e7eb;
-  --boothmap-text: #111827;
-  --boothmap-text-subtle: #4b5563;
-  --boothmap-text-muted: #9ca3af;
-  --boothmap-accent: var(--accent);
-  --boothmap-accent-soft: rgba(37, 99, 235, 0.1);
-  --boothmap-accent-text: #1d4ed8;
+  --boothmap-page-bg: var(--bg-base);
+  --boothmap-surface: var(--card-surface-base);
+  --boothmap-surface-soft: var(--card-soft-tint-bg);
+  --boothmap-surface-softer: color-mix(in srgb, var(--card-outline-border) 42%, white);
+  --boothmap-surface-muted: color-mix(in srgb, var(--card-soft-tint-bg) 38%, white);
+  --boothmap-border: var(--card-outline-border);
+  --boothmap-text: var(--text-body-deep);
+  --boothmap-text-subtle: var(--text-bold-emphasis);
+  --boothmap-text-muted: color-mix(in srgb, var(--text-body-deep) 52%, white);
+  --boothmap-accent: var(--text-emphasis-vivid);
+  --boothmap-accent-soft: color-mix(in srgb, var(--text-emphasis-vivid) 12%, white);
+  --boothmap-accent-text: var(--text-emphasis-vivid);
   --boothmap-danger-bg: var(--status-danger-bg);
   --boothmap-danger-border: var(--status-danger-border);
   --boothmap-danger-text: var(--status-danger-text);
+  --boothmap-chip-selected-bg: var(--text-bold-emphasis);
+  --boothmap-chip-selected-border: var(--text-bold-emphasis);
+  --boothmap-chip-selected-text: var(--text-on-accent);
+  --boothmap-chip-selected-shadow: 0 10px 18px -16px color-mix(in srgb, var(--text-bold-emphasis) 34%, transparent);
+  --boothmap-chip-bg: var(--surface-subtle);
+  --boothmap-chip-border: var(--border-subtle);
+  --boothmap-chip-text: var(--text-bold-emphasis);
+  --boothmap-chip-hover-bg: color-mix(in srgb, var(--surface-subtle) 86%, white);
+  --boothmap-chip-hover-border: color-mix(in srgb, var(--text-emphasis-vivid) 34%, white);
+  --boothmap-chip-hover-text: var(--text-body-deep);
 
-  --boothmap-panel-border: rgba(255, 255, 255, 0.7);
-  --boothmap-panel-bg: rgba(255, 255, 255, 0.92);
-  --boothmap-panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --boothmap-panel-border: var(--card-grad-white-border);
+  --boothmap-panel-bg: color-mix(in srgb, var(--card-surface-base) 92%, white);
+  --boothmap-panel-shadow: var(--card-grad-white-shadow);
   --boothmap-toggle-active-bg:
-    linear-gradient(145deg, var(--boothmap-marker-pub) 0%, var(--boothmap-accent) 100%);
-  --boothmap-toggle-active-shadow: 0 10px 18px rgba(10, 85, 156, 0.26);
-  --boothmap-bottom-sheet-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
+    linear-gradient(145deg, var(--text-emphasis-vivid) 0%, var(--text-emphasis-vivid-strong) 100%);
+  --boothmap-toggle-active-shadow: 0 10px 18px color-mix(in srgb, var(--text-emphasis-vivid) 26%, transparent);
+  --boothmap-bottom-sheet-shadow: var(--card-grad-white-shadow);
 
   --background: var(--bg-base);
   --foreground: var(--text);

@@ -19,7 +19,7 @@ export default function FestivalDateTabs({
 }: FestivalDateTabsProps) {
   return (
     <div className={className}>
-      <div className="grid grid-cols-3 rounded-2xl bg-[var(--surface-subtle)] p-1">
+      <div className="grid grid-cols-3 rounded-2xl bg-[var(--boothmap-chip-bg)] p-1">
         {dates.map((item) => {
           const isSelected = selectedDate === item.value;
 
@@ -30,8 +30,8 @@ export default function FestivalDateTabs({
               onClick={() => onChange(item.value)}
               className={`rounded-lg px-2 py-1.5 text-sm font-semibold transition-all ${
                 isSelected
-                  ? "bg-[var(--boothmap-marker-pub)] text-[var(--boothmap-overlay-badge-text)] shadow-[0_1px_2px_var(--boothmap-overlay-shadow)]"
-                  : "text-[var(--text-muted)] hover:bg-white/70 hover:text-[var(--text)]"
+                  ? "border border-[var(--boothmap-chip-selected-border)] bg-[var(--boothmap-chip-selected-bg)] text-[var(--boothmap-chip-selected-text)] shadow-[var(--boothmap-chip-selected-shadow)]"
+                  : "border border-transparent text-[var(--boothmap-chip-text)] hover:bg-[var(--boothmap-chip-hover-bg)] hover:text-[var(--boothmap-chip-hover-text)]"
               }`}
             >
               {item.label}

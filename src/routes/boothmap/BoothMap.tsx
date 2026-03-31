@@ -400,7 +400,7 @@ export default function BoothMap() {
 
   if (mapDataQuery.isPending && !mapDataQuery.data) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[var(--boothmap-surface)]">
+      <div className="flex h-screen items-center justify-center bg-[var(--boothmap-page-bg)]">
         <div className="text-sm font-semibold text-[var(--boothmap-text-subtle)]">
           부스맵을 불러오는 중...
         </div>
@@ -410,7 +410,7 @@ export default function BoothMap() {
 
   if (mapDataQuery.error) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[var(--boothmap-surface)]">
+      <div className="flex h-screen items-center justify-center bg-[var(--boothmap-page-bg)]">
         <div className="rounded-xl border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-danger-bg)] px-4 py-3 text-sm font-semibold text-[var(--boothmap-danger-text)]">
           <div>부스맵 정보를 불러오지 못했어요.</div>
           <button
@@ -428,7 +428,7 @@ export default function BoothMap() {
   }
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-[var(--boothmap-surface)]">
+    <div className="relative h-screen w-full overflow-hidden bg-[var(--boothmap-page-bg)]">
       <div className="absolute inset-0">
         <div className="absolute inset-0">
           <KakaoMapView
