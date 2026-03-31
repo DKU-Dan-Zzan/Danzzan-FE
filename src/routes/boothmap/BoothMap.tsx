@@ -554,7 +554,6 @@ export default function BoothMap() {
         ) : (
           <DetailSheet
             selectedItem={selectedDetailItem}
-            booths={booths}
             pubs={pubs}
             colleges={colleges}
             onClose={handleDetailClose}

@@ -1,5 +1,5 @@
 import { memo, useCallback, useRef, useState } from "react";
-import type { Booth, College, Pub, SelectedDetailItem } from "@/types/app/boothmap/boothmap.types";
+import type { College, Pub, SelectedDetailItem } from "@/types/app/boothmap/boothmap.types";
 import {
   useBoothDetailQuery,
   usePubDetailQuery,
@@ -10,12 +10,10 @@ import { formatOperatingTime } from "@/utils/app/boothmap/formatOperatingTime";
 
 function DetailSheet({
   selectedItem,
-  booths,
   pubs,
   colleges,
 }: {
   selectedItem: SelectedDetailItem;
-  booths: Booth[];
   pubs: Pub[];
   colleges: College[];
   onClose: () => void;
