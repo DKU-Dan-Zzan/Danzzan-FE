@@ -122,7 +122,6 @@ function DetailSheet({
   }
 
   if (selectedItem.kind === "booth" && boothDetail) {
-    const booth = booths.find((item) => item.id === selectedItem.id);
     const boothImageUrl = boothDetail.imageUrl ?? null;
     const boothThumbnailUrl = boothDetail.thumbnailUrl ?? boothImageUrl;
     const operatingTimeText = formatOperatingTime(boothDetail.startTime, boothDetail.endTime);

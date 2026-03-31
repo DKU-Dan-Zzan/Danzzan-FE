@@ -123,7 +123,7 @@ export default function BoothMap() {
   const [primaryFilter, setPrimaryFilter] = useState<PrimaryFilter>("ALL");
   const [selectedMapItem, setSelectedMapItem] = useState<SelectedMapItem>(null);
   const [selectedDetailItem, setSelectedDetailItem] = useState<SelectedDetailItem>(null);
-  const [boothDetailAvailability, setBoothDetailAvailability] = useState<Record<number, boolean>>({});
+  const [boothDetailAvailabilityOverrides, setBoothDetailAvailabilityOverrides] = useState<Record<number, boolean>>({});
   const [selectedCollegeId, setSelectedCollegeId] = useState<number | null>(null);
   const [pubListCollegeId, setPubListCollegeId] = useState<number | null>(null);
   const [sheetMode, setSheetMode] = useState<SheetMode>("LIST");
@@ -223,15 +223,20 @@ export default function BoothMap() {
     return booths.find((booth) => booth.id === selectedMapItem.id) ?? null;
   }, [booths, selectedMapItem]);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    const initialAvailability = visibleBooths.reduce<Record<number, boolean>>((acc, booth) => {
+  const boothDetailAvailability = useMemo(() => {
+    const baseAvailability = visibleBooths.reduce<Record<number, boolean>>((acc, booth) => {
       acc[booth.id] = hasBoothDetailContent(booth.description);
       return acc;
     }, {});
 
-    setBoothDetailAvailability(initialAvailability);
+    return {
+      ...baseAvailability,
+      ...boothDetailAvailabilityOverrides,
+    };
+  }, [boothDetailAvailabilityOverrides, visibleBooths]);
+
+  useEffect(() => {
+    let cancelled = false;
 
     const foodTruckBoothsToCheck = visibleBooths.filter((booth) => {
       return booth.type === "FOOD_TRUCK" && !hasBoothDetailContent(booth.description);
@@ -268,7 +273,7 @@ export default function BoothMap() {
         return;
       }
 
-      setBoothDetailAvailability((prev) => {
+      setBoothDetailAvailabilityOverrides((prev) => {
         const next = { ...prev };
         results.forEach((result) => {
           next[result.id] = result.hasDetail;
@@ -302,7 +307,7 @@ export default function BoothMap() {
       });
 
       if (hasBoothDetailContent(summary.description)) {
-        setBoothDetailAvailability((prev) => ({ ...prev, [id]: true }));
+        setBoothDetailAvailabilityOverrides((prev) => ({ ...prev, [id]: true }));
         setSelectedDetailItem({ kind: "booth", id });
         setSheetMode("DETAIL");
         setSheetSnap(options.detailSnap);
@@ -312,7 +317,7 @@ export default function BoothMap() {
       // 상세 조회에 실패해도 목록 흐름은 유지합니다.
     }
 
-    setBoothDetailAvailability((prev) => ({ ...prev, [id]: false }));
+    setBoothDetailAvailabilityOverrides((prev) => ({ ...prev, [id]: false }));
     setSelectedDetailItem(null);
     setSheetMode("LIST");
     setSheetSnap(options.fallbackSnap);
