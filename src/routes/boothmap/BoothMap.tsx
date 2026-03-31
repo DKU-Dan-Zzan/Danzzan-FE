@@ -330,13 +330,21 @@ export default function BoothMap() {
   }, []);
 
   const onSelectBoothFromList = useCallback((id: number) => {
+    const selectedListBooth = booths.find((booth) => booth.id === id) ?? null;
+    const shouldSwitchToFoodTruckFilter =
+      primaryFilter === "ALL" && isFoodTruckBooth(selectedListBooth);
+
+    if (shouldSwitchToFoodTruckFilter) {
+      setPrimaryFilter("FOOD_TRUCK");
+    }
+
     setSelectedMapItem({ kind: "booth", id });
     setSelectedDetailItem(null);
     setSelectedCollegeId(null);
     setPubListCollegeId(null);
     setSheetMode("LIST");
     setSheetSnap("HALF");
-  }, []);
+  }, [booths, primaryFilter]);
 
   const onOpenBoothDetailFromList = useCallback((id: number) => {
     void resolveBoothSelection(id, {
