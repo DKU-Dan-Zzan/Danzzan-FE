@@ -35,25 +35,25 @@ export const TICKETING_CLASSES = {
     refreshLg:
       "h-12 w-12 shrink-0 rounded-[18px] border-[var(--border-base)] bg-[var(--surface-subtle)] p-0 text-[var(--text-muted)] hover:bg-[var(--surface-tint-subtle)]",
     primaryWide:
-      "h-14 w-full max-w-[18rem] rounded-[20px] bg-[var(--accent)] text-[length:var(--ticketing-text-button)] font-bold text-white shadow-[0_12px_20px_-14px_var(--shadow-color)] hover:brightness-95",
+      "h-14 w-full max-w-[18rem] rounded-[20px] bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-[length:var(--ticketing-text-button)] font-bold text-white shadow-[var(--ticketing-action-shadow)] hover:brightness-95",
     primaryFull:
-      "h-14 w-full rounded-[20px] bg-[var(--accent)] text-[length:var(--ticketing-text-button)] font-bold text-white shadow-[0_12px_20px_-14px_var(--shadow-color)] hover:brightness-95",
+      "h-14 w-full rounded-[20px] bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-[length:var(--ticketing-text-button)] font-bold text-white shadow-[var(--ticketing-action-shadow)] hover:brightness-95",
     disabledFull:
-      "h-14 w-full rounded-[20px] border-[var(--status-neutral-border)] bg-[var(--status-neutral-bg)] text-[length:var(--ticketing-text-button)] font-bold text-[var(--status-neutral-text)] hover:bg-[var(--status-neutral-bg)]",
+      "h-14 w-full rounded-[20px] border-[var(--ticketing-action-disabled-border)] bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] text-[length:var(--ticketing-text-button)] font-bold text-[var(--ticketing-action-disabled-text)] hover:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)]",
     disabledCompactFull:
-      "h-14 w-full rounded-[20px] border-[var(--status-neutral-border)] bg-[var(--status-neutral-bg)] text-[length:var(--ticketing-text-button-compact)] font-bold text-[var(--status-neutral-text)] hover:bg-[var(--status-neutral-bg)]",
+      "h-14 w-full rounded-[20px] border-[var(--ticketing-action-disabled-border)] bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] text-[length:var(--ticketing-text-button-compact)] font-bold text-[var(--ticketing-action-disabled-text)] hover:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)]",
     disabledSoldoutFull:
-      "h-14 w-full rounded-[20px] border-[var(--status-neutral-border)] bg-[var(--status-neutral-bg)] text-[length:var(--ticketing-text-button)] font-bold text-[var(--text-muted)] hover:bg-[var(--status-neutral-bg)]",
+      "h-14 w-full rounded-[20px] border-[var(--ticketing-action-disabled-border)] bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] text-[length:var(--ticketing-text-button)] font-bold text-[var(--ticketing-action-disabled-text)] hover:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)]",
     submitEnabled:
-      "h-12 w-full rounded-xl bg-[var(--accent)] text-[length:var(--ticketing-text-button)] font-bold text-white hover:brightness-95 disabled:opacity-100",
+      "h-12 w-full rounded-xl bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-[length:var(--ticketing-text-button)] font-bold text-white shadow-[var(--ticketing-action-shadow)] hover:brightness-95 disabled:opacity-100",
     submitDisabled:
-      "h-12 w-full rounded-xl bg-[var(--status-neutral)] text-[length:var(--ticketing-text-button)] font-bold text-white hover:bg-[var(--status-neutral)] disabled:opacity-100",
+      "h-12 w-full rounded-xl border-[var(--ticketing-action-disabled-border)] bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] text-[length:var(--ticketing-text-button)] font-bold text-[var(--ticketing-action-disabled-text)] hover:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:opacity-100",
   },
   badge: {
     stepIndex:
-      "inline-flex h-5 w-5 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-strong)_100%)] text-[length:var(--ticketing-text-badge)] font-bold text-[var(--accent)]",
+      "inline-flex h-5 w-5 items-center justify-center rounded-full border border-[var(--app-circle-border)] bg-[linear-gradient(145deg,var(--app-circle-bg-start)_0%,var(--app-circle-bg-end)_100%)] text-[length:var(--ticketing-text-badge)] font-bold text-[var(--app-circle-fg)] shadow-[var(--app-circle-shadow)] backdrop-blur-[6px]",
     iconCircle:
-      "inline-flex items-center justify-center rounded-full border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-strong)_100%)] text-[var(--accent)] shadow-[inset_0_1px_0_var(--surface-subtle)]",
+      "inline-flex items-center justify-center rounded-full border border-[var(--app-circle-border)] bg-[linear-gradient(145deg,var(--app-circle-bg-start)_0%,var(--app-circle-bg-end)_100%)] text-[var(--app-circle-fg)] shadow-[var(--app-circle-shadow)] backdrop-blur-[6px]",
     event:
       "rounded-full px-3.5 py-1.5 text-[length:var(--ticketing-text-badge)] font-bold tracking-[-0.01em]",
     paperStatus:

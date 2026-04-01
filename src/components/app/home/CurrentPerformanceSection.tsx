@@ -8,6 +8,8 @@ import {
   getCurrentPerformance,
 } from "@/utils/app/timetable";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
+import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
+import { cn } from "@/components/common/ui/utils";
 
 const CARD_WIDTH = 314.4;
 const CARD_HEIGHT = 94;
@@ -66,7 +68,7 @@ export default function CurrentPerformanceSection() {
   return (
     <section className="px-5">
       <div className="mx-auto w-full max-w-[314px]">
-        <p className="mb-[var(--home-current-performance-caption-gap)] text-center text-[length:var(--home-lineup-caption-font-size)] leading-[1.4] font-semibold text-[var(--home-lineup-caption-color)]">
+        <p className="mb-[var(--home-current-performance-caption-gap)] text-center text-[length:var(--home-lineup-caption-font-size)] leading-[1.4] font-bold text-[var(--home-lineup-caption-color)]">
           현재 진행 중인 공연을 지금 확인하세요
         </p>
 
@@ -74,7 +76,10 @@ export default function CurrentPerformanceSection() {
           type="button"
           onClick={() => navigate(`/timetable?date=${today}`)}
           style={{ aspectRatio: CARD_ASPECT_RATIO }}
-          className="w-full rounded-[22px] border border-[var(--home-card-border)] bg-[var(--home-card-bg)] px-5 py-4 shadow-[var(--home-current-performance-card-shadow)] transition active:scale-[0.99]"
+          className={cn(
+            "w-full rounded-[22px] px-5 py-4 transition active:scale-[0.99]",
+            APP_CARD_VARIANTS.outline,
+          )}
         >
           {status === "active" && currentPerformance ? (
             <div className="flex h-full items-center gap-4">
@@ -87,7 +92,7 @@ export default function CurrentPerformanceSection() {
               </div>
 
               <div className="min-w-0 flex-1 text-left">
-                <p className="truncate text-[18px] font-bold leading-tight text-[var(--text)]">
+                <p className="truncate text-[18px] font-bold leading-tight text-[var(--text-body-deep)]">
                   {currentPerformance.artistName}
                 </p>
 
@@ -102,7 +107,7 @@ export default function CurrentPerformanceSection() {
                 NOW
               </div>
               <div className="min-w-0 flex-1 text-left">
-                <p className="text-[16px] font-semibold leading-tight text-[var(--text)]">{helperText}</p>
+                <p className="text-[16px] font-semibold leading-tight text-[var(--text-body-deep)]">{helperText}</p>
                 <p className="mt-1 text-[13px] font-medium text-[var(--text-muted)]">타임테이블에서 다음 공연을 확인해 보세요.</p>
               </div>
             </div>

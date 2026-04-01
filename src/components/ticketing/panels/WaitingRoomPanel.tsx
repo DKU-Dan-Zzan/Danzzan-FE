@@ -2,11 +2,11 @@
 import { Ticket } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/common/ui/card";
-import { TicketingAdBannerCard } from "@/components/ticketing/panels/TicketingAdBannerCard";
 import {
   TICKETING_CLASSES,
   TICKETING_NARROW_PANEL_CLASS,
 } from "@/components/ticketing/panels/TicketingShared";
+import { TicketingAdBannerCard } from "@/components/ticketing/panels/TicketingAdBannerCard";
 import { isRemainingFresh } from "@/hooks/ticketing/queue/flow-utils";
 import type { AdSlide } from "@/components/common/AdCarousel";
 

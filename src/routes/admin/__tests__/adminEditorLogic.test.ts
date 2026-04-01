@@ -77,13 +77,14 @@ describe("adminEditorLogic", () => {
     const payload = buildAdPayload({
       title: " 배너 ",
       imageUrl: " https://cdn.example.com/banner.png ",
-      placement: "HOME_BOTTOM",
+      objectPosition: "",
     });
 
     expect(payload).toEqual({
       title: "배너",
       imageUrl: "https://cdn.example.com/banner.png",
       placement: "HOME_BOTTOM",
+      objectPosition: "50% 50%",
     });
   });
 
@@ -111,8 +112,9 @@ describe("adminEditorLogic", () => {
         title: "배너",
         imageUrl: "",
         placement: "MY_TICKET",
+        objectPosition: "50% 50%",
       }),
-    ).toBe("제목과 이미지를 모두 입력해 주세요.");
+    ).toBe("이미지를 업로드해 주세요.");
   });
 
   it("이미지 파일 타입과 용량을 검증한다", () => {

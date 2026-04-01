@@ -5,7 +5,7 @@ import { TicketingAdBannerCard } from "@/components/ticketing/panels/TicketingAd
 
 describe("TicketingAdBannerCard", () => {
   it("광고 슬롯 폭을 디자인 토큰으로 고정한다", () => {
-    const markup = renderToStaticMarkup(<TicketingAdBannerCard ad={null} />);
+    const markup = renderToStaticMarkup(<TicketingAdBannerCard ads={[]} />);
 
     expect(markup).toContain("max-w-[var(--ticketing-ad-slot-max-width)]");
     expect(markup).not.toContain("max-w-[18rem]");
@@ -14,24 +14,24 @@ describe("TicketingAdBannerCard", () => {
   it("링크 광고는 키보드 focus-visible 링을 제공한다", () => {
     const markup = renderToStaticMarkup(
       <TicketingAdBannerCard
-        ad={{
-          placement: "WAITING_ROOM_MAIN",
-          imageUrl: "https://example.com/ad.png",
-          linkUrl: "https://example.com",
-          altText: "테스트 광고 배너",
-          updatedAt: "2026-03-22T00:00:00Z",
-          isActive: true,
-        }}
+        ads={[
+          {
+            imageUrl: "https://example.com/ad.png",
+            linkUrl: "https://example.com",
+            alt: "테스트 광고 배너",
+            updatedAt: "2026-03-22T00:00:00Z",
+          },
+        ]}
       />,
     );
 
-    expect(markup).toContain("focus-visible:outline-none");
-    expect(markup).toContain("focus-visible:ring-2");
-    expect(markup).toContain("focus-visible:ring-[var(--ring)]");
+    expect(markup).toContain('href="https://example.com"');
+    expect(markup).toContain("target=\"_blank\"");
+    expect(markup).toContain("rel=\"noreferrer\"");
   });
 
   it("내 티켓용 imageOnly 변형은 이미지 단독 배너 스타일을 사용한다", () => {
-    const markup = renderToStaticMarkup(<TicketingAdBannerCard ad={null} variant="imageOnly" />);
+    const markup = renderToStaticMarkup(<TicketingAdBannerCard ads={[]} variant="imageOnly" />);
 
     expect(markup).toContain("border-[var(--timetable-card-border)]");
     expect(markup).toContain("h-[70px]");

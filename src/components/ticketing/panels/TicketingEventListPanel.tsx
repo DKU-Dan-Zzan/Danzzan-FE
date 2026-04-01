@@ -5,6 +5,7 @@ import { Badge } from "@/components/common/ui/badge";
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
 import { cn } from "@/components/common/ui/utils";
+import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
 import {
   TICKETING_CLASSES,
   TICKETING_WIDE_PANEL_CLASS,
@@ -151,7 +152,7 @@ export function TicketingEventListPanel({
     <div className={TICKETING_WIDE_PANEL_CLASS}>
       <div>
         <h2 className="sr-only">티켓팅</h2>
-        <Card className={`${TICKETING_CLASSES.card.infoBanner} p-4`}>
+        <Card className={`relative overflow-hidden ${APP_CARD_VARIANTS.gradTint} rounded-[28px] p-4`}>
           <div className="flex items-start justify-between gap-3">
             <div className="flex min-w-0 items-start gap-3">
               <div className={`mt-0.5 flex h-8 w-8 shrink-0 ${TICKETING_CLASSES.badge.iconCircle}`}>
@@ -196,7 +197,7 @@ export function TicketingEventListPanel({
         return (
           <Card
             key={event.id}
-            className={`${TICKETING_CLASSES.card.event} px-5 py-4`}
+            className={`relative overflow-hidden ${APP_CARD_VARIANTS.outline} rounded-[28px] px-5 py-4`}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">

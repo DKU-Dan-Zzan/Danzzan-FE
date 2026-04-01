@@ -27,6 +27,7 @@ describe("CurrentPerformanceSection", () => {
       </StaticRouter>,
     );
 
+    expect(markup).toContain("font-bold text-[var(--home-lineup-caption-color)]");
     expect(markup).toContain(">다시 시도<");
     expect(markup).toContain("button");
   });

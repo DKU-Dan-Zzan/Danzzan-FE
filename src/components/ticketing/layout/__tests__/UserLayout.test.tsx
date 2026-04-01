@@ -50,5 +50,6 @@ describe("UserLayout", () => {
     expect(markup).toContain("fixed inset-x-0 top-0 z-40");
     expect(markup).toContain("pt-[calc(env(safe-area-inset-top)+4rem)]");
     expect(markup).not.toContain("sticky top-0 z-40");
+    expect(markup).toContain('data-color-scheme="webapp"');
   });
 });

@@ -11,6 +11,16 @@ import { useTicketingFlow } from "@/routes/ticketing/ticketing/useTicketingFlow"
 
 export default function Ticketing() {
   const flow = useTicketingFlow();
+  const waitingRoomAds = flow.waitingAd
+    ? [
+        {
+          imageUrl: flow.waitingAd.imageUrl,
+          alt: flow.waitingAd.altText,
+          linkUrl: flow.waitingAd.linkUrl,
+          updatedAt: flow.waitingAd.updatedAt,
+        },
+      ]
+    : [];
 
   if (flow.step === "home") {
     return (

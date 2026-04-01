@@ -11,7 +11,7 @@ export default function DayTabs({
   onChange: (idx: number) => void
 }) {
   return (
-    <div className="relative mt-3">
+    <div className="relative mt-1">
       {/* 탭들 */}
       <div className="grid grid-cols-3 items-center pb-3">
         {days.map((d, idx) => {
@@ -25,7 +25,7 @@ export default function DayTabs({
                 "px-3 py-2",
                 "text-xl tracking-wide transition-colors",
                 active
-                  ? "text-[var(--accent)] font-extrabold"
+                  ? "text-[var(--text-body-deep)] font-extrabold"
                   : "text-[var(--timetable-tab-inactive)] hover:text-[var(--text-muted)]",
               ].join(" ")}
             >
@@ -50,7 +50,7 @@ export default function DayTabs({
 
       {/* 밑줄 */}
       <div
-        className="absolute bottom-0 h-[4px] rounded-full bg-[var(--accent)] transition-[left] duration-200"
+        className="absolute bottom-0 h-[4px] rounded-full bg-[var(--text-body-deep)] transition-[left] duration-200"
         style={{
           left: `${(100 / days.length) * activeIndex}%`,
           width: `${100 / days.length}%`,

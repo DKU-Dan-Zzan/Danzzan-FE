@@ -40,7 +40,7 @@ const TICKETING_ROOT_CLASS_NAME = cn(
   "[--ticketing-text-section-body:0.82rem]",
   "[--ticketing-text-section-body-sm:0.74rem]",
   "[--ticketing-text-helper:0.84rem]",
-  "[--ticketing-text-step-title:0.78rem]",
+  "[--ticketing-text-step-title:0.92rem]",
   "[--ticketing-text-info-banner-title:0.85rem]",
   "[--ticketing-text-info-banner-body:0.88rem]",
   "[--ticketing-text-paper-title:0.87rem]",
