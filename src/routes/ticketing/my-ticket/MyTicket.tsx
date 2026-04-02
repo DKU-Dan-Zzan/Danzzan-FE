@@ -1,5 +1,4 @@
 // 역할: 내 티켓 조회 화면의 데이터 로딩과 패널 구성을 담당합니다.
-import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { MyTicketListPanel } from "@/components/ticketing/panels/MyTicketListPanel";
 import { adApi } from "@/api/ticketing/adApi";
@@ -19,20 +18,11 @@ export default function MyTicket() {
 
   const myTicketAdQuery = useAppQuery({
     queryKey: appQueryKeys.placementAds("MY_TICKET"),
-    queryFn: ({ signal }) => adApi.getPlacementAds("MY_TICKET", signal),
+    queryFn: ({ signal }) => adApi.getMyTicketAds(signal),
     staleTime: 5 * 60_000,
   });
 
-  const ads = useMemo(
-    () =>
-      (myTicketAdQuery.data ?? []).map((ad) => ({
-        imageUrl: ad.imageUrl,
-        alt: ad.altText,
-        linkUrl: ad.linkUrl,
-        updatedAt: ad.updatedAt,
-      })),
-    [myTicketAdQuery.data],
-  );
+  const ads = myTicketAdQuery.data ?? [];
 
   return (
     <MyTicketListPanel
