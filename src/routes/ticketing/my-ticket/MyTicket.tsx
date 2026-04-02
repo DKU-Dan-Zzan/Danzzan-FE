@@ -2,7 +2,7 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { MyTicketListPanel } from "@/components/ticketing/panels/MyTicketListPanel";
-import { getPlacementAds } from "@/api/app/ad/adApi";
+import { adApi } from "@/api/ticketing/adApi";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
 import { ticketApi } from "@/api/ticketing/ticketApi";
@@ -19,7 +19,7 @@ export default function MyTicket() {
 
   const myTicketAdQuery = useAppQuery({
     queryKey: appQueryKeys.placementAds("MY_TICKET"),
-    queryFn: ({ signal }) => getPlacementAds("MY_TICKET", { signal }),
+    queryFn: ({ signal }) => adApi.getPlacementAds("MY_TICKET", signal),
     staleTime: 5 * 60_000,
   });
 
@@ -27,9 +27,9 @@ export default function MyTicket() {
     () =>
       (myTicketAdQuery.data ?? []).map((ad) => ({
         imageUrl: ad.imageUrl,
-        alt: ad.title,
+        alt: ad.altText,
+        linkUrl: ad.linkUrl,
         updatedAt: ad.updatedAt,
-        objectPosition: ad.objectPosition,
       })),
     [myTicketAdQuery.data],
   );
