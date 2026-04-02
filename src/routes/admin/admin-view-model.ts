@@ -12,10 +12,13 @@ export type NoticeFormState = {
   images: string[];
 };
 
+export type AdPlacement = "HOME_BOTTOM" | "MY_TICKET";
+
 export type AdFormState = {
   title: string;
   imageUrl: string;
   objectPosition: string;
+  placement: AdPlacement;
 };
 
 export const formatDate = (dateString: string): string => {

@@ -1,11 +1,11 @@
 // 역할: Admin 광고 전체 목록 상태와 부수효과를 캡슐화한 훅이다.
 
 import { useCallback, useEffect } from "react";
-import { getAllActiveAds } from "@/api/app/ad/adApi";
+import { getAdminAds } from "@/api/app/admin/adminApi";
+import type { AdvertisementResponse } from "@/api/app/admin/adminApi";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
-import type { ClientAdDto } from "@/api/app/ad/adApi";
 
-export type { ClientAdDto };
+export type ClientAdDto = AdvertisementResponse & { objectPosition?: string };
 
 type UseAdminAdsOptions = {
   onError: (message: string) => void;
@@ -13,8 +13,8 @@ type UseAdminAdsOptions = {
 
 export const useAdminAds = ({ onError }: UseAdminAdsOptions) => {
   const allAdsQuery = useAppQuery({
-    queryKey: appQueryKeys.allActiveAds(),
-    queryFn: ({ signal }) => getAllActiveAds({ signal }),
+    queryKey: appQueryKeys.adminAds(),
+    queryFn: ({ signal }) => getAdminAds({ signal }),
     staleTime: 60_000,
   });
 
@@ -30,7 +30,7 @@ export const useAdminAds = ({ onError }: UseAdminAdsOptions) => {
 
   return {
     adLoading: allAdsQuery.isPending || allAdsQuery.isFetching,
-    allAds: allAdsQuery.data ?? [] as ClientAdDto[],
+    allAds: (allAdsQuery.data ?? []) as ClientAdDto[],
     reloadAds,
   };
 };

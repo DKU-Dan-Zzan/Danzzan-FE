@@ -59,7 +59,7 @@ export const buildAdPayload = (form: AdFormState): CreateAdvertisementRequest =>
     title: form.title.trim() || "광고 배너",
     imageUrl: form.imageUrl.trim(),
     objectPosition: form.objectPosition || "50% 50%",
-    placement: "HOME_BOTTOM",
+    placement: form.placement,
   };
 };
 

@@ -327,3 +327,13 @@ export async function deleteAdminAdById(id: number): Promise<void> {
     method: "DELETE",
   });
 }
+
+/**
+ * 삭제되지 않은 모든 광고 목록을 반환합니다 (관리자 페이지용).
+ */
+export async function getAdminAds(options?: RequestOptions): Promise<AdvertisementResponse[]> {
+  return fetchWithAuth<AdvertisementResponse[]>("/api/admin/ads", {
+    method: "GET",
+    signal: options?.signal,
+  });
+}

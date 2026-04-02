@@ -33,7 +33,7 @@ export const adApi = {
 
     const ad = await adGateway.getPlacementAd(placement, {
       signal,
-      prefer: "ticketing",
+      prefer: placement === "MY_TICKET" ? "web" : "ticketing",
     });
     if (!ad) {
       return null;

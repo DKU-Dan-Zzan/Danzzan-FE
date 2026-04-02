@@ -9,7 +9,7 @@ import AdBanner from "@/components/app/home/AdBanner";
 import DelayedSpinner from "@/components/common/loading/DelayedSpinner";
 
 import { getEmergencyNotice, getHomeImages, getLineupImages } from "@/api/app/home/homeApi"
-import { getAllActiveAds } from "@/api/app/ad/adApi"
+import { getPlacementAds } from "@/api/app/ad/adApi"
 import { appQueryKeys, useAppQuery } from "@/lib/query"
 
 const dummyPosters: Poster[] = [
@@ -59,8 +59,8 @@ function Home() {
   })
 
   const allAdsQuery = useAppQuery({
-    queryKey: appQueryKeys.allActiveAds(),
-    queryFn: ({ signal }) => getAllActiveAds({ signal }),
+    queryKey: appQueryKeys.placementAds("HOME_BOTTOM"),
+    queryFn: ({ signal }) => getPlacementAds("HOME_BOTTOM", { signal }),
     staleTime: 5 * 60_000,
   })
 
