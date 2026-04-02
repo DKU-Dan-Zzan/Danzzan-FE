@@ -23,16 +23,21 @@ export default function MyTicket() {
     staleTime: 5 * 60_000,
   });
 
-  const ads = useMemo(
-    () =>
-      (myTicketAdQuery.data ?? []).map((ad) => ({
+  const ads = useMemo(() => {
+    const ad = myTicketAdQuery.data;
+    if (!ad) {
+      return [];
+    }
+
+    return [
+      {
         imageUrl: ad.imageUrl,
-        alt: ad.title,
+        alt: ad.altText,
+        linkUrl: ad.linkUrl,
         updatedAt: ad.updatedAt,
-        objectPosition: ad.objectPosition,
-      })),
-    [myTicketAdQuery.data],
-  );
+      },
+    ];
+  }, [myTicketAdQuery.data]);
 
   return (
     <MyTicketListPanel
