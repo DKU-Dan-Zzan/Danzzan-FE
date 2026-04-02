@@ -39,9 +39,12 @@ export const useQueuePolling = ({
 }: UseQueuePollingParams) => {
   const pollBackoffRef = useRef(0);
   const queuePositionRef = useRef(queuePosition);
-  queuePositionRef.current = queuePosition;
   const restoreAttemptedRef = useRef(false);
   const wasOnlineRef = useRef(isNetworkOnline);
+
+  useEffect(() => {
+    queuePositionRef.current = queuePosition;
+  }, [queuePosition]);
 
   useEffect(() => {
     const handleOnline = () => {
