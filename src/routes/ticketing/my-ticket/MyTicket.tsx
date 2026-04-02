@@ -19,25 +19,20 @@ export default function MyTicket() {
 
   const myTicketAdQuery = useAppQuery({
     queryKey: appQueryKeys.placementAds("MY_TICKET"),
-    queryFn: ({ signal }) => adApi.getPlacementAd("MY_TICKET", signal),
+    queryFn: ({ signal }) => adApi.getPlacementAds("MY_TICKET", signal),
     staleTime: 5 * 60_000,
   });
 
-  const ads = useMemo(() => {
-    const ad = myTicketAdQuery.data;
-    if (!ad) {
-      return [];
-    }
-
-    return [
-      {
+  const ads = useMemo(
+    () =>
+      (myTicketAdQuery.data ?? []).map((ad) => ({
         imageUrl: ad.imageUrl,
         alt: ad.altText,
         linkUrl: ad.linkUrl,
         updatedAt: ad.updatedAt,
-      },
-    ];
-  }, [myTicketAdQuery.data]);
+      })),
+    [myTicketAdQuery.data],
+  );
 
   return (
     <MyTicketListPanel

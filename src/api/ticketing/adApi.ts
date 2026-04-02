@@ -1,5 +1,6 @@
 // 역할: 티켓팅 대기실/내티켓 광고 슬롯 데이터를 조회하는 API 어댑터를 제공합니다.
 import { adGateway } from "@/api/common/adGateway";
+import { getPlacementAds as getPlacementAdsFromApp, type ClientAdDto } from "@/api/app/ad/adApi";
 import { mapPlacementAdDtoToModel } from "@/lib/ticketing/mappers/adMapper";
 import type { AdPlacementKey, PlacementAd } from "@/types/ticketing/model/ad.model";
 import { env } from "@/utils/common/env";
@@ -21,6 +22,18 @@ const mockMyTicketAd: PlacementAd = {
   isActive: true,
   updatedAt: "2026-03-04T00:00:00Z",
 };
+
+const mapClientAdDtoToPlacementAd = (
+  placement: AdPlacementKey,
+  ad: ClientAdDto,
+): PlacementAd => ({
+  placement,
+  imageUrl: ad.imageUrl,
+  linkUrl: null,
+  altText: ad.title ?? "단짠 내 티켓 광고 배너",
+  isActive: ad.isActive,
+  updatedAt: ad.updatedAt,
+});
 
 export const adApi = {
   getPlacementAd: async (
@@ -53,5 +66,19 @@ export const adApi = {
     }
 
     return mapped;
+  },
+
+  getPlacementAds: async (
+    placement: Extract<AdPlacementKey, "MY_TICKET">,
+    signal?: AbortSignal,
+  ): Promise<PlacementAd[]> => {
+    if (env.apiMode === "mock") {
+      return [mockMyTicketAd];
+    }
+
+    const ads = await getPlacementAdsFromApp(placement, { signal });
+    return ads
+      .map((ad) => mapClientAdDtoToPlacementAd(placement, ad))
+      .filter((item): item is PlacementAd => item.isActive && Boolean(item.imageUrl));
   },
 };
