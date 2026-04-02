@@ -705,9 +705,6 @@ function Admin() {
                   </div>
                   <div className="px-2 pb-1 pt-0.5">
                     <p className="truncate text-[10px] text-[var(--text-muted)]">{ad.title}</p>
-                    <span className="mt-0.5 inline-block rounded-full bg-[var(--surface-tint-subtle)] px-1.5 py-0.5 text-[9px] font-semibold text-[var(--text-muted)]">
-                      {ad.placement === "MY_TICKET" ? "내 티켓" : "홈화면"}
-                    </span>
                   </div>
                 </div>
               ))}
@@ -968,31 +965,6 @@ function Admin() {
               광고 이미지 추가
             </DialogTitle>
             <form className="mt-4 space-y-4" onSubmit={handleSubmitAd}>
-              {/* 노출 위치 선택 */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[var(--text)]">
-                  노출 위치 <span className="text-[var(--status-danger)]">*</span>
-                </label>
-                <div className="flex gap-2">
-                  {(["HOME_BOTTOM", "MY_TICKET"] as const).map((p) => (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => setEditingAd((prev) => prev ? { ...prev, placement: p } : prev)}
-                      className={cn(
-                        "flex-1 rounded-xl border px-3 py-2 text-xs font-semibold transition-colors",
-                        editingAd.placement === p
-                          ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--text-on-accent)]"
-                          : "border-[var(--border-base)] bg-[var(--surface-subtle)] text-[var(--text-muted)]",
-                        ADMIN_FOCUS_VISIBLE_RING_CLASS,
-                      )}
-                    >
-                      {p === "HOME_BOTTOM" ? "홈화면" : "내 티켓"}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* 제목 입력 */}
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[var(--text)]">

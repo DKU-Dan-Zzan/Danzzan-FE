@@ -31,7 +31,7 @@ export const useAdminAdActions = ({
   const [adImageUploading, setAdImageUploading] = useState(false);
 
   const openAddAdDialog = () => {
-    setEditingAd({ title: "", imageUrl: "", objectPosition: "50% 50%", placement: "HOME_BOTTOM" });
+    setEditingAd({ title: "", imageUrl: "", objectPosition: "50% 50%" });
   };
 
   const handleDeleteAdById = async (id: number) => {

@@ -2,6 +2,7 @@
 import { describe, expect, it, vi } from "vitest";
 import type { NoticeResponse } from "@/api/app/admin/adminApi";
 import {
+  DEFAULT_ADMIN_AD_PLACEMENT,
   MAX_IMAGE_UPLOAD_BYTES,
   MAX_NOTICE_IMAGE_COUNT,
   buildAdPayload,
@@ -83,7 +84,7 @@ describe("adminEditorLogic", () => {
     expect(payload).toEqual({
       title: "배너",
       imageUrl: "https://cdn.example.com/banner.png",
-      placement: "HOME_BOTTOM",
+      placement: DEFAULT_ADMIN_AD_PLACEMENT,
       objectPosition: "50% 50%",
     });
   });
@@ -111,7 +112,7 @@ describe("adminEditorLogic", () => {
       validateAdPayload({
         title: "배너",
         imageUrl: "",
-        placement: "MY_TICKET",
+        placement: DEFAULT_ADMIN_AD_PLACEMENT,
         objectPosition: "50% 50%",
       }),
     ).toBe("이미지를 업로드해 주세요.");

@@ -1,5 +1,6 @@
 // 역할: 관리자 공지/광고 에디터의 payload 생성, 이미지 업로드, 유효성 검증 로직을 제공합니다.
 import type {
+  AdvertisementPlacement,
   CreateAdvertisementRequest,
   CreateNoticeRequest,
   NoticeResponse,
@@ -13,6 +14,7 @@ import type {
 
 export const MAX_NOTICE_IMAGE_COUNT = 10;
 export const MAX_IMAGE_UPLOAD_BYTES = 5 * 1024 * 1024;
+export const DEFAULT_ADMIN_AD_PLACEMENT: AdvertisementPlacement = "HOME_BOTTOM";
 export const ALLOWED_IMAGE_TYPES = [
   "image/jpeg",
   "image/png",
@@ -59,7 +61,7 @@ export const buildAdPayload = (form: AdFormState): CreateAdvertisementRequest =>
     title: form.title.trim() || "광고 배너",
     imageUrl: form.imageUrl.trim(),
     objectPosition: form.objectPosition || "50% 50%",
-    placement: form.placement,
+    placement: DEFAULT_ADMIN_AD_PLACEMENT,
   };
 };
 
