@@ -360,8 +360,9 @@ export function useTicketingFlow() {
   }, [applyQueueEventToUrl, moveToList]);
 
   const openList = useCallback(() => {
+    navigate("/ticket/ticketing?list=1");
     backToList();
-  }, [backToList]);
+  }, [backToList, navigate]);
 
   const refreshList = useCallback(() => {
     setListNotice(null);
