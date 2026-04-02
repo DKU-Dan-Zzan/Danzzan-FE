@@ -1,23 +1,20 @@
 // 역할: 내 정보 조회와 로그아웃 등 마이페이지 사용자 설정 동작을 제공하는 화면입니다.
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useSyncExternalStore, useState } from "react";
-import { authLogout } from "@/api/app/auth/authApi";
-import { studentProfileApi } from "@/api/app/auth/studentProfileApi";
-import { authStore } from "@/store/common/authStore";
-import { ticketApi } from "@/api/ticketing/ticketApi";
-import { appQueryKeys, useAppQuery } from "@/lib/query";
 import {
+  ChevronDown,
+  ChevronRight,
   GraduationCap,
   IdCard,
-  User,
-  Ticket,
-  ChevronRight,
-  ChevronDown,
   Lock,
-  HelpCircle,
+  Ticket,
+  User,
 } from "lucide-react";
-
-// ─── FAQ data ──────────────────────────────────────────────────────────────
+import { authLogout } from "@/api/app/auth/authApi";
+import { studentProfileApi } from "@/api/app/auth/studentProfileApi";
+import { ticketApi } from "@/api/ticketing/ticketApi";
+import { appQueryKeys, useAppQuery } from "@/lib/query";
+import { authStore } from "@/store/common/authStore";
 
 const FAQ_ITEMS = [
   {
@@ -36,18 +33,17 @@ const FAQ_ITEMS = [
     q: "공연 시간이 어떻게 되나요?",
     a: "타임테이블 탭에서 공연 일정과 아티스트 정보를 확인할 수 있습니다.",
   },
-];
-
-// ─── FAQ Accordion ─────────────────────────────────────────────────────────
+] as const;
 
 function FaqAccordion() {
   const [open, setOpen] = useState<number | null>(null);
+
   return (
     <div>
-      {FAQ_ITEMS.map((item, i) => (
-        <div key={i} className="border-t border-[var(--mypage-faq-divider)] first:border-t-0">
+      {FAQ_ITEMS.map((item, index) => (
+        <div key={item.q} className="border-t border-[var(--mypage-faq-divider)] first:border-t-0">
           <button
-            onClick={() => setOpen(open === i ? null : i)}
+            onClick={() => setOpen(open === index ? null : index)}
             className="flex w-full items-center justify-between gap-3 px-5 py-[15px] text-left"
           >
             <span className="text-[14px] leading-[1.4] text-[var(--mypage-faq-question)]">
@@ -57,14 +53,14 @@ function FaqAccordion() {
               size={16}
               aria-hidden
               className={`shrink-0 transition-transform duration-200 ${
-                open === i
+                open === index
                   ? "rotate-180 text-[var(--mypage-faq-icon-open)]"
                   : "text-[var(--mypage-faq-icon)]"
               }`}
             />
           </button>
-          {open === i && (
-            <div className="px-5 pb-4 bg-[var(--mypage-faq-answer-bg)]">
+          {open === index && (
+            <div className="bg-[var(--mypage-faq-answer-bg)] px-5 pb-4">
               <p className="text-[13px] leading-[1.65] text-[var(--mypage-faq-answer)]">
                 {item.a}
               </p>
@@ -76,8 +72,6 @@ function FaqAccordion() {
   );
 }
 
-// ─── Reusable components ───────────────────────────────────────────────────
-
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <p className="px-5 pb-3 pt-6 text-[16px] font-bold text-[var(--mypage-section-title)]">
@@ -88,7 +82,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 function ListSection({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-[var(--mypage-list-bg)] divide-y divide-[var(--mypage-list-divider)]">
+    <div className="divide-y divide-[var(--mypage-list-divider)] bg-[var(--mypage-list-bg)]">
       {children}
     </div>
   );
@@ -109,16 +103,10 @@ function ListRow({
 }) {
   const content = (
     <div className="flex min-h-[54px] items-center gap-3.5 px-5 py-3">
-      {icon && (
-        <span className="shrink-0 text-[var(--mypage-list-item-icon)]">{icon}</span>
-      )}
+      {icon && <span className="shrink-0 text-[var(--mypage-list-item-icon)]">{icon}</span>}
       <span className="flex-1 text-[15px] text-[var(--mypage-list-item-text)]">{label}</span>
-      {value && (
-        <span className="text-[14px] text-[var(--mypage-list-item-value)]">{value}</span>
-      )}
-      {showArrow && (
-        <ChevronRight size={16} className="shrink-0 text-[var(--mypage-list-arrow)]" />
-      )}
+      {value && <span className="text-[14px] text-[var(--mypage-list-item-value)]">{value}</span>}
+      {showArrow && <ChevronRight size={16} className="shrink-0 text-[var(--mypage-list-arrow)]" />}
     </div>
   );
 
@@ -129,10 +117,9 @@ function ListRow({
       </button>
     );
   }
+
   return <div>{content}</div>;
 }
-
-// ─── Main component ────────────────────────────────────────────────────────
 
 function MyPage() {
   const navigate = useNavigate();
@@ -145,13 +132,15 @@ function MyPage() {
   const isLoggedIn = !!session.tokens?.accessToken && session.role === "student";
   const user = session.user;
 
-  // Hydrate profile gaps from /user/me
   useEffect(() => {
     if (!isLoggedIn) return;
+
     const hasProfileGap = !user?.name?.trim() || !user?.college?.trim();
     const tokens = session.tokens;
     if (!hasProfileGap || !tokens) return;
+
     let cancelled = false;
+
     void (async () => {
       try {
         const freshUser = await studentProfileApi.me();
@@ -161,12 +150,12 @@ function MyPage() {
         // keep login payload profile on failure
       }
     })();
+
     return () => {
       cancelled = true;
     };
   }, [isLoggedIn, session.role, session.tokens, user?.college, user?.name]);
 
-  // Ticket query (only when logged in)
   const ticketsQuery = useAppQuery({
     queryKey: appQueryKeys.myTicketList(),
     queryFn: ({ signal }) => ticketApi.getMyTickets({ signal }),
@@ -174,7 +163,6 @@ function MyPage() {
     enabled: isLoggedIn,
   });
 
-  // ── Guest view ─────────────────────────────────────────────────────────
   if (!isLoggedIn) {
     return (
       <div
@@ -191,7 +179,8 @@ function MyPage() {
           <div
             className="mx-auto mb-5 flex h-[72px] w-[72px] items-center justify-center rounded-full"
             style={{
-              background: "linear-gradient(135deg, var(--mypage-guest-icon-bg-start) 0%, var(--mypage-guest-icon-bg-end) 100%)",
+              background:
+                "linear-gradient(135deg, var(--mypage-guest-icon-bg-start) 0%, var(--mypage-guest-icon-bg-end) 100%)",
               boxShadow: "var(--mypage-guest-icon-shadow)",
             }}
           >
@@ -225,7 +214,6 @@ function MyPage() {
     );
   }
 
-  // ── Logged-in view ─────────────────────────────────────────────────────
   const handleLogout = () => {
     void authLogout();
     authStore.clear();
@@ -234,14 +222,10 @@ function MyPage() {
 
   const tickets = ticketsQuery.data ?? [];
   const previewTickets = tickets.slice(0, 3);
-  const usedCount = tickets.filter((t) => t.status === "used").length;
+  const usedCount = tickets.filter((ticket) => ticket.status === "used").length;
 
   return (
-    <div
-      className="mypage-root min-h-full"
-      style={{ background: "var(--mypage-page-bg)" }}
-    >
-      {/* ── Profile row ── */}
+    <div className="mypage-root min-h-full" style={{ background: "var(--mypage-page-bg)" }}>
       <div className="bg-[var(--mypage-list-bg)] px-5 py-5">
         <div className="flex items-center gap-4">
           <div
@@ -250,7 +234,7 @@ function MyPage() {
           >
             <User size={22} strokeWidth={1.8} style={{ color: "var(--mypage-profile-avatar-icon)" }} />
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-[17px] font-bold leading-tight text-[var(--mypage-profile-name)]">
               {user?.name ?? "—"}
             </p>
@@ -262,14 +246,12 @@ function MyPage() {
         </div>
       </div>
 
-      {/* ── Ticket hero card (emphasized) ── */}
       <div className="px-4 pt-4">
         <div
           className="overflow-hidden rounded-[20px]"
           style={{ background: "var(--mypage-ticket-hero-bg)" }}
         >
-          {/* Header row */}
-          <div className="flex items-center justify-between px-5 pt-5 pb-4">
+          <div className="flex items-center justify-between px-5 pb-4 pt-5">
             <div>
               <p className="mb-1 text-[12px] font-medium text-[var(--mypage-ticket-hero-muted)]">
                 내 예매 티켓
@@ -278,7 +260,9 @@ function MyPage() {
                 <span className="text-[38px] font-bold leading-none text-[var(--mypage-ticket-hero-text)]">
                   {ticketsQuery.isPending ? "—" : tickets.length}
                 </span>
-                <span className="text-[16px] font-medium text-[var(--mypage-ticket-hero-muted)]">장</span>
+                <span className="text-[16px] font-medium text-[var(--mypage-ticket-hero-muted)]">
+                  장
+                </span>
               </div>
               {!ticketsQuery.isPending && tickets.length > 0 && (
                 <p className="mt-1 text-[12px] text-[var(--mypage-ticket-hero-muted)]">
@@ -301,29 +285,20 @@ function MyPage() {
             </button>
           </div>
 
-          {/* Ticket rows */}
           {ticketsQuery.isPending ? (
-            <div
-              className="border-t px-5 py-4"
-              style={{ borderColor: "var(--mypage-ticket-hero-row-divider)" }}
-            >
+            <div className="border-t px-5 py-4" style={{ borderColor: "var(--mypage-ticket-hero-row-divider)" }}>
               <p className="text-[13px] text-[var(--mypage-ticket-hero-muted)]">불러오는 중…</p>
             </div>
           ) : tickets.length === 0 ? (
-            <div
-              className="border-t px-5 py-4"
-              style={{ borderColor: "var(--mypage-ticket-hero-row-divider)" }}
-            >
+            <div className="border-t px-5 py-4" style={{ borderColor: "var(--mypage-ticket-hero-row-divider)" }}>
               <p className="text-[13px] text-[var(--mypage-ticket-hero-muted)]">
                 아직 예매된 티켓이 없어요
               </p>
             </div>
           ) : (
             <div
-              className="border-t divide-y"
-              style={{
-                borderColor: "var(--mypage-ticket-hero-row-divider)",
-              }}
+              className="divide-y border-t"
+              style={{ borderColor: "var(--mypage-ticket-hero-row-divider)" }}
             >
               {previewTickets.map((ticket) => (
                 <button
@@ -360,27 +335,13 @@ function MyPage() {
         </div>
       </div>
 
-      {/* ── Academic info ── */}
       <SectionTitle>학적 정보</SectionTitle>
       <ListSection>
-        <ListRow
-          icon={<IdCard size={18} />}
-          label="학번"
-          value={user?.studentId ?? "—"}
-        />
-        <ListRow
-          icon={<GraduationCap size={18} />}
-          label="단과대학"
-          value={user?.college || "—"}
-        />
-        <ListRow
-          icon={<GraduationCap size={18} />}
-          label="학과"
-          value={user?.department || "—"}
-        />
+        <ListRow icon={<IdCard size={18} />} label="학번" value={user?.studentId ?? "—"} />
+        <ListRow icon={<GraduationCap size={18} />} label="단과대학" value={user?.college || "—"} />
+        <ListRow icon={<GraduationCap size={18} />} label="학과" value={user?.department || "—"} />
       </ListSection>
 
-      {/* ── Settings ── */}
       <SectionTitle>설정</SectionTitle>
       <ListSection>
         <ListRow
@@ -391,13 +352,11 @@ function MyPage() {
         />
       </ListSection>
 
-      {/* ── FAQ ── */}
       <SectionTitle>자주 묻는 질문</SectionTitle>
       <div className="bg-[var(--mypage-list-bg)]">
         <FaqAccordion />
       </div>
 
-      {/* ── Logout ── */}
       <div className="flex justify-center py-10">
         <button
           onClick={handleLogout}

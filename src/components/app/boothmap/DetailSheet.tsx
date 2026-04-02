@@ -1,5 +1,5 @@
-import { useCallback, useRef, useState } from "react";
-import type { Booth, College, Pub, SelectedDetailItem } from "@/types/app/boothmap/boothmap.types";
+import { memo, useCallback, useRef, useState } from "react";
+import type { College, Pub, SelectedDetailItem } from "@/types/app/boothmap/boothmap.types";
 import {
   useBoothDetailQuery,
   usePubDetailQuery,
@@ -8,15 +8,12 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialo
 import { formatDescription } from "@/utils/app/boothmap/formatDescription";
 import { formatOperatingTime } from "@/utils/app/boothmap/formatOperatingTime";
 
-export default function DetailSheet({
+function DetailSheet({
   selectedItem,
-  booths,
   pubs,
   colleges,
-  onClose,
 }: {
   selectedItem: SelectedDetailItem;
-  booths: Booth[];
   pubs: Pub[];
   colleges: College[];
   onClose: () => void;
@@ -74,6 +71,9 @@ export default function DetailSheet({
           <img
             src={viewerImage}
             alt="상세 이미지"
+            decoding="async"
+            width={1200}
+            height={900}
             className="max-h-[90vh] max-w-[90vw] rounded-xl"
           />
         )}
@@ -84,7 +84,7 @@ export default function DetailSheet({
   if (!selectedItem) {
     return (
       <div className="py-6 text-center text-sm font-semibold text-[var(--boothmap-text-muted)]">
-        선택된 항목이 없어요
+        선택된 항목이 없어요.
       </div>
     );
   }
@@ -93,20 +93,9 @@ export default function DetailSheet({
     return (
       <div className="space-y-3">
         <div className="rounded-2xl border border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] p-4 shadow-sm">
-          <div className="flex items-start justify-between">
-            <div className="space-y-2">
-              <div className="h-6 w-32 animate-pulse rounded bg-[var(--boothmap-surface-softer)]" />
-              <div className="h-4 w-20 animate-pulse rounded bg-[var(--boothmap-surface-soft)]" />
-            </div>
-
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="닫기"
-              className="text-xl font-bold text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)]"
-            >
-              ×
-            </button>
+          <div className="space-y-2">
+            <div className="h-6 w-32 animate-pulse rounded bg-[var(--boothmap-surface-softer)]" />
+            <div className="h-4 w-20 animate-pulse rounded bg-[var(--boothmap-surface-soft)]" />
           </div>
 
           <div className="mt-4 h-44 w-full animate-pulse rounded-xl bg-[var(--boothmap-surface-softer)]" />
@@ -124,57 +113,34 @@ export default function DetailSheet({
     return (
       <div className="rounded-2xl border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-surface)] p-6 text-center shadow-sm">
         <div className="text-sm font-semibold text-[var(--boothmap-danger-text)]">
-          상세 정보를 불러오지 못했어요
+          상세 정보를 불러오지 못했어요.
         </div>
-        <button
-          onClick={onClose}
-          className="mt-4 rounded-xl bg-[var(--boothmap-surface-soft)] px-4 py-2 text-sm font-bold text-[var(--boothmap-text-subtle)]"
-        >
-          닫기
-        </button>
       </div>
     );
   }
 
   if (selectedItem.kind === "booth" && boothDetail) {
-    const booth = booths.find((item) => item.id === selectedItem.id);
     const boothImageUrl = boothDetail.imageUrl ?? null;
+    const boothThumbnailUrl = boothDetail.thumbnailUrl ?? boothImageUrl;
     const operatingTimeText = formatOperatingTime(boothDetail.startTime, boothDetail.endTime);
     const description = formatDescription(boothDetail.description);
 
     return (
       <div className="space-y-3">
         <div className="rounded-2xl border border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] p-4 shadow-sm">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="text-lg font-extrabold text-[var(--boothmap-text)]">
-                {boothDetail.name}
-              </div>
-
-              {booth?.type && (
-                <div className="text-sm font-bold text-[var(--boothmap-text-subtle)]">
-                  {booth.type}
-                </div>
-              )}
-
-              {operatingTimeText && (
-                <div className="mt-1 text-sm font-semibold text-[var(--boothmap-text-subtle)]">
-                  {operatingTimeText}
-                </div>
-              )}
+          <div>
+            <div className="text-lg font-extrabold text-[var(--boothmap-text)]">
+              {boothDetail.name}
             </div>
 
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="닫기"
-              className="text-xl font-bold text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)]"
-            >
-              ×
-            </button>
+            {operatingTimeText && (
+              <div className="mt-1 text-sm font-semibold text-[var(--boothmap-text-subtle)]">
+                {operatingTimeText}
+              </div>
+            )}
           </div>
 
-          {boothImageUrl && (
+          {boothThumbnailUrl && boothImageUrl && (
             <div className="mt-3 rounded-xl bg-[var(--boothmap-surface-soft)] p-2">
               <button
                 type="button"
@@ -183,9 +149,20 @@ export default function DetailSheet({
                 className="mx-auto block max-h-[320px] w-auto max-w-full cursor-pointer rounded-xl"
               >
                 <img
-                  src={boothImageUrl}
+                  src={boothThumbnailUrl}
+                  data-fallback-src={boothImageUrl}
                   alt={`${boothDetail.name} 이미지`}
                   loading="lazy"
+                  decoding="async"
+                  width={1200}
+                  height={900}
+                  onError={(event) => {
+                    const fallbackSrc = event.currentTarget.dataset.fallbackSrc;
+                    if (!fallbackSrc || event.currentTarget.src === fallbackSrc) {
+                      return;
+                    }
+                    event.currentTarget.src = fallbackSrc;
+                  }}
                   className="mx-auto max-h-[320px] w-auto max-w-full rounded-xl object-contain"
                 />
               </button>
@@ -193,7 +170,7 @@ export default function DetailSheet({
           )}
 
           <div className="mt-4 whitespace-pre-line text-sm font-medium leading-6 text-[var(--boothmap-text-subtle)]">
-            {description || "등록된 상세 정보가 없어요"}
+            {description || "등록된 상세 정보가 없어요."}
           </div>
         </div>
 
@@ -208,6 +185,7 @@ export default function DetailSheet({
       colleges.find((college) => college.id === summaryPub?.college_id)?.name ?? "단과대";
     const displayCollege = pubDetail.collegeName || fallbackCollege;
     const imageUrls = pubDetail.imageUrls ?? [];
+    const thumbnailImageUrls = pubDetail.thumbnailImageUrls ?? [];
     const operatingTimeText = formatOperatingTime(pubDetail.startTime, pubDetail.endTime);
     const intro = formatDescription(pubDetail.intro);
     const description = formatDescription(pubDetail.description || summaryPub?.intro);
@@ -215,32 +193,38 @@ export default function DetailSheet({
     return (
       <div className="space-y-3">
         <div className="rounded-2xl border border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] p-4 shadow-sm">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="text-lg font-extrabold text-[var(--boothmap-text)]">
-                {pubDetail.name}
-              </div>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-lg font-extrabold text-[var(--boothmap-text)]">
+              {pubDetail.name}
+            </div>
 
-              <div className="text-sm font-bold text-[var(--boothmap-text-subtle)]">
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+              <span className="font-bold text-[var(--boothmap-text-subtle)]">
                 {displayCollege}
                 {pubDetail.department ? ` ${pubDetail.department}` : ""}
-              </div>
+              </span>
 
-              {operatingTimeText && (
-                <div className="mt-1 text-sm font-semibold text-[var(--boothmap-text-subtle)]">
-                  {operatingTimeText}
-                </div>
+              {pubDetail.instagram && (
+                <a
+                  href={
+                    pubDetail.instagram.startsWith("http")
+                      ? pubDetail.instagram
+                      : `https://instagram.com/${pubDetail.instagram.replace("@", "")}`
+                  }
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-semibold text-[var(--boothmap-text-muted)] underline underline-offset-2"
+                >
+                  {pubDetail.instagram}
+                </a>
               )}
             </div>
 
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="닫기"
-              className="text-xl font-bold text-[var(--boothmap-text-muted)] hover:text-[var(--boothmap-text-subtle)]"
-            >
-              ×
-            </button>
+            {operatingTimeText && (
+              <div className="mt-1 text-sm font-semibold text-[var(--boothmap-text-subtle)]">
+                {operatingTimeText}
+              </div>
+            )}
           </div>
 
           {imageUrls.length > 0 && (
@@ -254,23 +238,38 @@ export default function DetailSheet({
                   setCurrentIndex(index);
                 }}
               >
-                {imageUrls.map((imageUrl, index) => (
-                  <div key={index} className="w-[85%] flex-shrink-0 snap-start">
-                    <button
-                      type="button"
-                      onClick={() => openViewer(imageUrl)}
-                      aria-label={`주점 이미지 ${index + 1} 상세 보기`}
-                      className="block w-full cursor-pointer rounded-xl"
-                    >
-                      <img
-                        src={imageUrl}
-                        alt={`${pubDetail.name} 이미지 ${index + 1}`}
-                        loading="lazy"
-                        className="w-full rounded-xl object-contain"
-                      />
-                    </button>
-                  </div>
-                ))}
+                {imageUrls.map((imageUrl, index) => {
+                  const displayImageUrl = thumbnailImageUrls[index] ?? imageUrl;
+
+                  return (
+                    <div key={index} className="w-[85%] flex-shrink-0 snap-start">
+                      <button
+                        type="button"
+                        onClick={() => openViewer(imageUrl)}
+                        aria-label={`주점 이미지 ${index + 1} 상세 보기`}
+                        className="block w-full cursor-pointer rounded-xl"
+                      >
+                        <img
+                          src={displayImageUrl}
+                          data-fallback-src={imageUrl}
+                          alt={`${pubDetail.name} 이미지 ${index + 1}`}
+                          loading="lazy"
+                          decoding="async"
+                          width={1200}
+                          height={900}
+                          onError={(event) => {
+                            const fallbackSrc = event.currentTarget.dataset.fallbackSrc;
+                            if (!fallbackSrc || event.currentTarget.src === fallbackSrc) {
+                              return;
+                            }
+                            event.currentTarget.src = fallbackSrc;
+                          }}
+                          className="w-full rounded-xl object-contain"
+                        />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="mt-2 flex justify-center gap-1">
@@ -299,21 +298,6 @@ export default function DetailSheet({
               {description}
             </div>
           )}
-
-          {pubDetail.instagram && (
-            <a
-              href={
-                pubDetail.instagram.startsWith("http")
-                  ? pubDetail.instagram
-                  : `https://instagram.com/${pubDetail.instagram.replace("@", "")}`
-              }
-              target="_blank"
-              rel="noreferrer"
-              className="mt-4 block text-sm font-extrabold text-[var(--boothmap-accent)] underline underline-offset-2"
-            >
-              {pubDetail.instagram}
-            </a>
-          )}
         </div>
 
         {imageViewerDialog}
@@ -323,7 +307,9 @@ export default function DetailSheet({
 
   return (
     <div className="py-6 text-center text-sm font-semibold text-[var(--boothmap-text-muted)]">
-      표시할 상세 정보가 없어요
+      표시할 상세 정보가 없어요.
     </div>
   );
 }
+
+export default memo(DetailSheet);

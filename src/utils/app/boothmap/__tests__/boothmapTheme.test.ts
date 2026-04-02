@@ -22,6 +22,10 @@ describe("boothmapTheme", () => {
       color: "#f6ca3b",
       iconPath: "/markers/booth-event.svg",
     });
+    expect(getBoothmapMarkerTheme("PUB")).toEqual({
+      color: "#2853A9",
+      iconPath: "/markers/booth-pub.svg",
+    });
   });
 
   it("존 팔레트는 타입별 색상을 제공한다", () => {

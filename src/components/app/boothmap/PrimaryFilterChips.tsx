@@ -16,9 +16,9 @@ const chips: Array<{ label: string; value: PrimaryFilter }> = [
 const CHIP_BASE_CLASS =
   "shrink-0 rounded-full border px-3 py-2 text-sm font-extrabold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--boothmap-surface)]";
 const CHIP_ACTIVE_CLASS =
-  "border-[var(--boothmap-marker-pub)] bg-[var(--boothmap-marker-pub)] text-[var(--boothmap-overlay-badge-text)] shadow-[0_1px_2px_var(--boothmap-overlay-shadow)]";
+  "border-[var(--boothmap-chip-selected-border)] bg-[var(--boothmap-chip-selected-bg)] text-[var(--boothmap-chip-selected-text)] shadow-[var(--boothmap-chip-selected-shadow)]";
 const CHIP_INACTIVE_CLASS =
-  "border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] text-[var(--boothmap-text-subtle)] hover:border-[var(--boothmap-marker-pub)] hover:text-[var(--boothmap-text)]";
+  "border-[var(--boothmap-chip-border)] bg-[var(--boothmap-chip-bg)] text-[var(--boothmap-chip-text)] hover:border-[var(--boothmap-chip-hover-border)] hover:bg-[var(--boothmap-chip-hover-bg)] hover:text-[var(--boothmap-chip-hover-text)]";
 
 export default function PrimaryFilterChips({
   value,

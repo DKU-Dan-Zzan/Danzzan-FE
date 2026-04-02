@@ -1,12 +1,10 @@
 // 역할: 내 티켓 조회 화면의 데이터 로딩과 패널 구성을 담당합니다.
-import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { MyTicketListPanel } from "@/components/ticketing/panels/MyTicketListPanel";
+import { adApi } from "@/api/ticketing/adApi";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
-import type { PlacementAd } from "@/types/ticketing/model/ad.model";
 import { ticketApi } from "@/api/ticketing/ticketApi";
-import { getPlacementAd as getWebPlacementAd } from "@/api/ticketing/noticeApi";
 
 export default function MyTicket() {
   const navigate = useNavigate();
@@ -18,26 +16,13 @@ export default function MyTicket() {
     staleTime: 30_000,
   });
 
-  const waitingRoomAdQuery = useAppQuery({
-    queryKey: appQueryKeys.myTicketAd(),
-    queryFn: ({ signal }) => getWebPlacementAd("MY_TICKET", { signal }),
+  const myTicketAdQuery = useAppQuery({
+    queryKey: appQueryKeys.placementAds("MY_TICKET"),
+    queryFn: ({ signal }) => adApi.getMyTicketAds(signal),
     staleTime: 5 * 60_000,
   });
 
-  const waitingRoomAd = useMemo<PlacementAd | null>(() => {
-    const ad = waitingRoomAdQuery.data;
-    if (!ad) {
-      return null;
-    }
-    return {
-      placement: "WAITING_ROOM_MAIN",
-      imageUrl: ad.imageUrl,
-      linkUrl: null,
-      altText: ad.title,
-      isActive: ad.isActive,
-      updatedAt: ad.updatedAt,
-    };
-  }, [waitingRoomAdQuery.data]);
+  const ads = myTicketAdQuery.data ?? [];
 
   return (
     <MyTicketListPanel
@@ -48,7 +33,7 @@ export default function MyTicket() {
       }}
       loading={myTicketsQuery.isPending}
       errorMessage={myTicketsQuery.error?.message ?? null}
-      ad={waitingRoomAd}
+      ads={ads}
       onRefresh={() => {
         void myTicketsQuery.refetch();
       }}

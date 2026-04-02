@@ -1,8 +1,9 @@
+import { memo } from "react";
 import type { Pub } from "@/types/app/boothmap/boothmap.types";
 import { formatOperatingTime } from "@/utils/app/boothmap/formatOperatingTime";
 import { ChevronRight } from "lucide-react";
 
-export default function PubList({
+function PubList({
   pubs,
   selectedCollegeId,
   onSelectPub,
@@ -69,11 +70,22 @@ export default function PubList({
               )}
             </div>
 
-            {pub.mainImageUrl && (
+            {(pub.thumbnailUrl || pub.mainImageUrl) && (
               <img
-                src={pub.mainImageUrl}
+                src={pub.thumbnailUrl || pub.mainImageUrl}
+                data-fallback-src={pub.mainImageUrl}
                 loading="lazy"
+                decoding="async"
                 alt={pub.name}
+                width={64}
+                height={64}
+                onError={(event) => {
+                  const fallbackSrc = event.currentTarget.dataset.fallbackSrc;
+                  if (!fallbackSrc || event.currentTarget.src === fallbackSrc) {
+                    return;
+                  }
+                  event.currentTarget.src = fallbackSrc;
+                }}
                 className="h-16 w-16 flex-shrink-0 rounded-lg object-cover"
               />
             )}
@@ -85,3 +97,5 @@ export default function PubList({
     </div>
   );
 }
+
+export default memo(PubList);

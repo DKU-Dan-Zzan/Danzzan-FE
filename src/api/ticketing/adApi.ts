@@ -1,7 +1,9 @@
 // 역할: 티켓팅 대기실/내티켓 광고 슬롯 데이터를 조회하는 API 어댑터를 제공합니다.
 import { adGateway } from "@/api/common/adGateway";
+import { getPlacementAds as getAppPlacementAds } from "@/api/app/ad/adApi";
 import { mapPlacementAdDtoToModel } from "@/lib/ticketing/mappers/adMapper";
 import type { AdPlacementKey, PlacementAd } from "@/types/ticketing/model/ad.model";
+import type { AdSlide } from "@/components/common/AdCarousel";
 import { env } from "@/utils/common/env";
 
 const mockWaitingRoomAd: PlacementAd = {
@@ -19,7 +21,7 @@ export const adApi = {
     signal?: AbortSignal,
   ): Promise<PlacementAd | null> => {
     if (env.apiMode === "mock") {
-      return placement === "WAITING_ROOM_MAIN" ? mockWaitingRoomAd : null;
+      return mockWaitingRoomAd;
     }
 
     const ad = await adGateway.getPlacementAd(placement, {
@@ -44,5 +46,15 @@ export const adApi = {
     }
 
     return mapped;
+  },
+
+  getMyTicketAds: async (signal?: AbortSignal): Promise<AdSlide[]> => {
+    const ads = await getAppPlacementAds("MY_TICKET", { signal });
+    return ads.map((ad) => ({
+      imageUrl: ad.imageUrl,
+      alt: ad.title,
+      updatedAt: ad.updatedAt,
+      objectPosition: ad.objectPosition,
+    }));
   },
 };

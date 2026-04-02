@@ -56,7 +56,7 @@ export function useTicketingFlow() {
   const [soldOutDescription, setSoldOutDescription] = useState(DEFAULT_SOLD_OUT_DESCRIPTION);
 
   const eventsQuery = useTicketingEventsQuery(step === "list");
-  const waitingRoomAdQuery = useWaitingRoomAdQuery(step === "waiting");
+  const waitingAdQuery = useWaitingRoomAdQuery(step === "waiting");
   const { refetch: refetchQueueStatus } = useQueueStatusQuery(activeEventId, { enabled: false });
 
   const resetQueueFlowState = useCallback(() => {
@@ -386,12 +386,12 @@ export function useTicketingFlow() {
     listErrorMessage,
     now,
     activeEventTitle,
+    waitingAd: waitingAdQuery.data ?? null,
     waitingQueuePosition,
     waitingQueuePositionUpdatedAt,
     waitingPolling,
     isNetworkOnline,
     waitingError,
-    waitingAd: waitingRoomAdQuery.data ?? null,
     agreementChecked,
     reserveProcessing,
     reservationError,

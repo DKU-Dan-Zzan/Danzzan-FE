@@ -32,6 +32,7 @@ vi.mock("@/hooks/app/admin/useAdminNotices", () => ({
 vi.mock("@/hooks/app/admin/useAdminAds", () => ({
   useAdminAds: () => ({
     adLoading: false,
+    allAds: [],
     homeBottomAd: null,
     myTicketAd: null,
     reloadAds: vi.fn(async () => undefined),

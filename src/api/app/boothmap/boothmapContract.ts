@@ -127,6 +127,7 @@ export type ContractBoothDto = {
   name: string;
   type: BoothType;
   subType: BoothSubType | null;
+  description: string | null;
   locationX: number;
   locationY: number;
   startTime: string | null;
@@ -143,6 +144,7 @@ export type ContractBoothSummaryResponse = {
   name: string;
   description: string | null;
   imageUrl: string | null;
+  thumbnailUrl: string | null;
   startTime: string | null;
   endTime: string | null;
 };
@@ -155,6 +157,7 @@ export type ContractPubSummaryResponse = {
   collegeId: number;
   collegeName: string;
   mainImageUrl: string | null;
+  thumbnailUrl: string | null;
   startTime: string | null;
   endTime: string | null;
 };
@@ -168,6 +171,7 @@ export type ContractPubDetailResponse = {
   collegeName: string | null;
   instagram: string | null;
   imageUrls: string[];
+  thumbnailImageUrls: string[] | null;
   startTime: string | null;
   endTime: string | null;
 };
@@ -217,6 +221,7 @@ export const parseBoothMapContract = (payload: unknown, endpoint: string): Contr
     const name = readString(item, "name");
     const type = parseBoothType(item.type, endpoint, `booths[${index}]`);
     const subType = parseBoothSubType(item.subType, endpoint, `booths[${index}]`);
+    const description = readNullableString(item, "description");
     const locationX = readNumber(item, "locationX");
     const locationY = readNumber(item, "locationY");
     const startTime = readNullableString(item, "startTime");
@@ -235,6 +240,7 @@ export const parseBoothMapContract = (payload: unknown, endpoint: string): Contr
       name,
       type,
       subType,
+      description: description ?? null,
       locationX,
       locationY,
       startTime: startTime ?? null,
@@ -261,6 +267,7 @@ export const parseBoothSummaryContract = (
   const name = readString(unwrapped, "name");
   const description = readNullableString(unwrapped, "description");
   const imageUrl = readNullableString(unwrapped, "imageUrl");
+  const thumbnailUrl = readNullableString(unwrapped, "thumbnailUrl");
   const startTime = readNullableString(unwrapped, "startTime");
   const endTime = readNullableString(unwrapped, "endTime");
   if (
@@ -279,6 +286,7 @@ export const parseBoothSummaryContract = (
     name,
     description,
     imageUrl,
+    thumbnailUrl: thumbnailUrl ?? null,
     startTime,
     endTime,
   };
@@ -302,6 +310,7 @@ export const parsePubsContract = (payload: unknown, endpoint: string): ContractP
     const collegeId = readNumber(item, "collegeId");
     const collegeName = readString(item, "collegeName");
     const mainImageUrl = readNullableString(item, "mainImageUrl");
+    const thumbnailUrl = readNullableString(item, "thumbnailUrl");
     const startTime = readNullableString(item, "startTime");
     const endTime = readNullableString(item, "endTime");
     if (
@@ -326,6 +335,7 @@ export const parsePubsContract = (payload: unknown, endpoint: string): ContractP
       collegeId,
       collegeName,
       mainImageUrl,
+      thumbnailUrl: thumbnailUrl ?? null,
       startTime,
       endTime,
     };
@@ -346,6 +356,7 @@ export const parsePubDetailContract = (payload: unknown, endpoint: string): Cont
   const collegeName = readNullableString(unwrapped, "collegeName");
   const instagram = readNullableString(unwrapped, "instagram");
   const imageUrls = readStringArray(unwrapped, "imageUrls");
+  const thumbnailImageUrls = readStringArray(unwrapped, "thumbnailImageUrls");
   const startTime = readNullableString(unwrapped, "startTime");
   const endTime = readNullableString(unwrapped, "endTime");
   if (
@@ -372,6 +383,7 @@ export const parsePubDetailContract = (payload: unknown, endpoint: string): Cont
     collegeName,
     instagram,
     imageUrls,
+    thumbnailImageUrls: thumbnailImageUrls ?? null,
     startTime,
     endTime,
   };

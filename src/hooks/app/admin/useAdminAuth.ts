@@ -6,6 +6,7 @@ import { authStore } from "@/store/common/authStore";
 import type { AuthSession } from "@/types/common/auth.model";
 import { authLogout } from "@/api/app/auth/authApi";
 import { requireAdminRole } from "@/lib/app/admin/admin-auth-session";
+import { isAccessTokenExpired } from "@/api/common/authCore";
 
 const setAdminSession = (session: AuthSession): void => {
   authStore.setSession(session, "admin");
@@ -73,7 +74,11 @@ export function useAdminAuth() {
   /** 페이지 로드 시 저장된 세션/재발급 토큰으로 세션 복구. 성공 시 true, 실패 시 false */
   const tryRestoreSession = useCallback(async (): Promise<boolean> => {
     const current = authStore.getSnapshot();
-    if (current.tokens?.accessToken && current.role === "admin") {
+    const hasValidToken =
+      current.tokens?.accessToken &&
+      current.role === "admin" &&
+      !isAccessTokenExpired(current.tokens.accessToken);
+    if (hasValidToken) {
       return true;
     }
 

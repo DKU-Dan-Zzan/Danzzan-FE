@@ -1,8 +1,9 @@
 // 역할: 티켓팅 홈의 시작 안내, 유의사항, 진입 CTA를 구성하는 첫 화면 패널입니다.
 import type { LucideIcon } from "lucide-react";
-import { ArrowRight, ClipboardList, Ticket, TicketCheck } from "lucide-react";
+import { ArrowRight, Check, ClipboardList, Ticket } from "lucide-react";
 import { Card } from "@/components/common/ui/card";
 import { TICKETING_CLASSES, TICKETING_MIDDLE_PANEL_CLASS } from "@/components/ticketing/panels/TicketingShared";
+import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
 
 interface TicketingHomePanelProps {
   onOpenTicketingList: () => void;
@@ -65,7 +66,7 @@ export function TicketingHomePanel({
       title: "공연 티켓팅 하러가기",
       description: "새로운 공연 티켓을 예매하세요",
       cardClassName:
-        "relative isolate min-h-[116px] overflow-hidden rounded-[20px] p-4 shadow-[0_8px_20px_var(--shadow-color)] transition-all duration-200 group-hover:-translate-y-[1px] group-hover:shadow-[0_10px_24px_var(--shadow-color)] group-active:translate-y-[1px] group-active:shadow-[0_6px_16px_var(--shadow-color)]",
+        "relative min-h-[116px] overflow-hidden rounded-[20px] p-4 transition-all duration-200 group-hover:-translate-y-[1px] group-active:translate-y-[1px]",
       icon: Ticket,
       iconStrokeWidth: 2.1,
       onClick: onOpenTicketingList,
@@ -75,9 +76,9 @@ export function TicketingHomePanel({
       title: "내 티켓 확인하기",
       description: "예매한 티켓을 확인하세요",
       cardClassName:
-        "relative isolate min-h-[116px] overflow-hidden rounded-[20px] p-4 shadow-[0_8px_20px_var(--shadow-color)] transition-all duration-200 group-hover:-translate-y-[1px] group-hover:shadow-[0_10px_24px_var(--shadow-color)] group-active:translate-y-[1px] group-active:shadow-[0_6px_16px_var(--shadow-color)]",
-      icon: TicketCheck,
-      iconStrokeWidth: 2.2,
+        "relative min-h-[116px] overflow-hidden rounded-[20px] p-4 transition-all duration-200 group-hover:-translate-y-[1px] group-active:translate-y-[1px]",
+      icon: Check,
+      iconStrokeWidth: 2.8,
       onClick: onOpenMyTickets,
     },
   ];
@@ -94,18 +95,10 @@ export function TicketingHomePanel({
             aria-label={action.title}
             className="group block w-full text-left focus-visible:outline-none"
           >
-            <Card className={action.cardClassName}>
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 z-0 rounded-[20px] border border-[var(--border-emphasis)] bg-[linear-gradient(145deg,var(--surface-tint-emphasis)_0%,var(--surface-tint-strong)_48%,var(--surface-base)_100%)] shadow-[inset_0_1px_0_var(--surface-subtle)]"
-              />
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 z-0 rounded-[20px] bg-[linear-gradient(180deg,var(--surface-tint-base)_0%,transparent_72%)]"
-              />
-              <div className="relative z-10 grid min-h-[84px] grid-cols-[60px_1fr_24px] items-center gap-3.5">
+            <Card className={`${action.cardClassName} ${APP_CARD_VARIANTS.gradTint}`}>
+              <div className="grid min-h-[84px] grid-cols-[60px_1fr_24px] items-center gap-3.5">
                 <div className={`flex h-[60px] w-[60px] shrink-0 ${TICKETING_CLASSES.badge.iconCircle} rounded-[18px]`}>
-                  <ActionIcon className="h-[30px] w-[30px]" strokeWidth={action.iconStrokeWidth} />
+                  <ActionIcon className="h-[30px] w-[30px] text-[var(--ticketing-quick-action-icon)]" strokeWidth={action.iconStrokeWidth} />
                 </div>
                 <div className="flex min-h-[56px] flex-col justify-center">
                   <h2 className={`${TICKETING_CLASSES.typography.cardTitle} text-[var(--text)]`}>
@@ -125,7 +118,7 @@ export function TicketingHomePanel({
         );
       })}
 
-      <Card className="rounded-[24px] border border-[var(--border-base)] bg-[var(--surface-base)] p-5 shadow-[0_10px_20px_-16px_var(--shadow-color)]">
+      <Card className={`${APP_CARD_VARIANTS.gradWhite} rounded-[24px] p-5`}>
         <h3 className={`flex items-center gap-2 ${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--text)]`}>
           <ClipboardList className="h-[17px] w-[17px] text-[var(--text-muted)]" strokeWidth={2.1} />
           티켓 예매 이용 가이드
@@ -144,7 +137,7 @@ export function TicketingHomePanel({
             >
               <div className="flex items-start gap-3">
                 <div
-                  className={`mt-0.5 flex h-8 w-8 shrink-0 ${TICKETING_CLASSES.badge.iconCircle} text-[length:var(--ticketing-text-step-index)] font-bold`}
+                  className={`mt-0.5 flex h-8 w-8 shrink-0 ${TICKETING_CLASSES.badge.iconCircle} text-[length:var(--ticketing-text-step-index)] font-bold text-[var(--text-emphasis-vivid)]`}
                 >
                   {item.step}
                 </div>

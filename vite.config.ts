@@ -9,10 +9,6 @@ const resolveManualChunk = (id: string) => {
     return undefined
   }
 
-  if (id.includes("/mapbox-gl/")) {
-    return "mapbox"
-  }
-
   if (
     id.includes("/@remix-run/router/") ||
     id.includes("/react-router/") ||
@@ -106,8 +102,6 @@ export default defineConfig(({ mode }) => {
       })
     ],
     build: {
-      // mapbox-gl is intentionally isolated in a lazy-loaded chunk.
-      // Keep warning enabled and align threshold with CI bundle budget.
       chunkSizeWarningLimit: 1750,
       rollupOptions: {
         output: {

@@ -1,8 +1,6 @@
-// 역할: 부스맵 도메인의 필터/아이템/상세 뷰 타입을 정의한다.
+// 역할: 부스맵 화면의 필터/시트/상세 뷰 타입을 정의합니다.
 
 // 부스맵 페이지에서 사용하는 타입 모음
-
-export type MapMode = "2D" | "3D";
 
 export type BoothType = "EXPERIENCE" | "FOOD_TRUCK" | "EVENT" | "FACILITY";
 export type BoothSubType = "TOILET" | "RESTROOM" | "SMOKING_AREA";
@@ -15,16 +13,13 @@ export type MapViewport = {
   lat: number;
   lng: number;
   kakaoLevel: number;
-  mapboxZoom: number;
-  mapboxPitch: number;
-  mapboxBearing: number;
 };
 
 export type College = {
   id: number;
   name: string;
-  location_x: number; // lng
-  location_y: number; // lat
+  location_x: number;
+  location_y: number;
 };
 
 export type Booth = {
@@ -34,8 +29,8 @@ export type Booth = {
   subType?: BoothSubType | null;
   description?: string | null;
   image_url?: string;
-  location_x: number; // lng
-  location_y: number; // lat
+  location_x: number;
+  location_y: number;
   startTime?: string | null;
   endTime?: string | null;
 };
@@ -51,6 +46,7 @@ export type Pub = {
   instagram?: string | null;
   images?: string[];
   mainImageUrl?: string;
+  thumbnailUrl?: string | null;
   startTime?: string | null;
   endTime?: string | null;
 };

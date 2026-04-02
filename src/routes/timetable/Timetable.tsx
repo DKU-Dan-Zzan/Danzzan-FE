@@ -1,6 +1,6 @@
 // 역할: 타임테이블 라우트에서 날짜별 공연 목록과 콘텐츠 이미지를 조회·표시합니다.
 import { InformationCircleIcon } from "@heroicons/react/24/outline"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState, type TouchEvent } from "react"
 import { useSearchParams } from "react-router-dom"
 import {
   getContentImages,
@@ -55,6 +55,9 @@ function findNowOrNextTarget(items: Performance[], nowMinutes: number) {
 }
 
 export default function Timetable() {
+  const SWIPE_MIN_DISTANCE = 48
+  const HORIZONTAL_SWIPE_RATIO = 1.2
+
   const [searchParams] = useSearchParams()
 
   const [activeIdx, setActiveIdx] = useState(() => {
@@ -69,6 +72,7 @@ export default function Timetable() {
   const [selectedImage, setSelectedImage] = useState<ContentImageDto | null>(null)
 
   const didAutoScrollRef = useRef(false)
+  const swipeStartPointRef = useRef<{ x: number; y: number } | null>(null)
 
   const activeDay = FESTIVAL_DAYS[activeIdx]
   const activeDate = activeDay.date
@@ -164,17 +168,64 @@ export default function Timetable() {
     didAutoScrollRef.current = false
   }
 
-  return (
-    <div className="timetable-root flex h-screen min-h-0 flex-col bg-[var(--bg-page-soft)]">
-      <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
-        <div className="px-5 pt-5">
-          <div className="text-[38px] font-extrabold text-[var(--accent)] font-cute">
-            {title}
-          </div>
-          <div className="mt-1 text-sm text-[var(--text-muted)]">{subtitle}</div>
-        </div>
+  const handleTouchStart = (e: TouchEvent<HTMLDivElement>) => {
+    if (selectedImage || e.touches.length !== 1) return
 
-        <div className="sticky top-0 z-20 bg-[var(--bg-page-soft)] px-5 py-1">
+    const touch = e.touches[0]
+    swipeStartPointRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+    }
+  }
+
+  const handleTouchEnd = (e: TouchEvent<HTMLDivElement>) => {
+    if (selectedImage || e.changedTouches.length === 0) return
+
+    const startPoint = swipeStartPointRef.current
+    swipeStartPointRef.current = null
+    if (!startPoint) return
+
+    const touch = e.changedTouches[0]
+    const deltaX = touch.clientX - startPoint.x
+    const deltaY = touch.clientY - startPoint.y
+    const absDeltaX = Math.abs(deltaX)
+    const absDeltaY = Math.abs(deltaY)
+
+    const isHorizontalSwipe =
+      absDeltaX >= SWIPE_MIN_DISTANCE &&
+      absDeltaX > absDeltaY * HORIZONTAL_SWIPE_RATIO
+    if (!isHorizontalSwipe) return
+
+    if (deltaX < 0 && activeIdx < FESTIVAL_DAYS.length - 1) {
+      handleChangeDay(activeIdx + 1)
+      return
+    }
+
+    if (deltaX > 0 && activeIdx > 0) {
+      handleChangeDay(activeIdx - 1)
+    }
+  }
+
+  const handleTouchCancel = () => {
+    swipeStartPointRef.current = null
+  }
+
+  return (
+    <div className="timetable-root flex h-screen min-h-0 flex-col bg-[var(--webapp-main-bg)]">
+      <div
+        className="scrollbar-hide min-h-0 flex-1 overflow-y-auto bg-[var(--webapp-main-bg)]"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
+      >
+        <section className="px-4 pb-2 pt-4">
+          <p className="text-[11px] font-semibold text-[var(--text-emphasis-vivid)]">{subtitle}</p>
+          <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-body-deep)]">
+            {title}
+          </h1>
+        </section>
+
+        <div className="sticky top-0 z-20 bg-[var(--webapp-main-bg)] px-4 py-0">
           <DayTabs
             days={FESTIVAL_DAYS}
             activeIndex={activeIdx}
@@ -182,7 +233,16 @@ export default function Timetable() {
           />
         </div>
 
-        <div className="px-5 pt-4 pb-6">
+        <div className="px-4 pt-4">
+          <div className="flex items-start gap-2 rounded-2xl border border-[var(--timetable-notice-border)] bg-[var(--timetable-notice-bg)] px-3 py-2.5">
+            <InformationCircleIcon className="mt-0.5 h-5 w-5 text-[var(--accent)]" />
+            <p className="text-sm font-normal text-[var(--timetable-info-text)]">
+              일정은 현장 상황에 따라 변경될 수 있습니다.
+            </p>
+          </div>
+        </div>
+
+        <div className="px-4 pt-4 pb-6">
           {isDay1 ? (
             <ContentImageSection
               images={contentImages}
@@ -224,7 +284,7 @@ export default function Timetable() {
                 nowTargetId={isTodayTab ? nowTargetId : null}
               />
 
-              <div className="mt-5 flex items-start gap-2 rounded-2xl border border-[var(--timetable-info-border)] bg-[var(--timetable-info-bg)] px-4 py-3">
+              <div className="hidden">
                 <InformationCircleIcon className="mt-0.5 h-5 w-5 text-[var(--accent)]" />
                 <p className="text-sm font-medium text-[var(--timetable-info-text)]">
                   일정은 현장 상황에 따라 변경될 수 있습니다.

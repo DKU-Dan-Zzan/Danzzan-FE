@@ -1,9 +1,8 @@
 // 역할: noticeApi 모듈의 API 계약과 예외 처리를 검증하는 테스트다.
 
 import { afterEach, describe, expect, it } from "vitest";
-import { adGateway } from "@/api/common/adGateway";
 import { http } from "@/lib/http";
-import { getNoticeDetail, getNotices, getPlacementAd } from "@/api/app/notice/noticeApi";
+import { getNoticeDetail, getNotices } from "@/api/app/notice/noticeApi";
 
 describe("noticeApi", () => {
   afterEach(() => {
@@ -53,15 +52,4 @@ describe("noticeApi", () => {
     expect(spy).toHaveBeenLastCalledWith("/notices/10", { signal });
   });
 
-  it("getPlacementAd는 adGateway에 signal을 전달한다", async () => {
-    const signal = new AbortController().signal;
-    const spy = vi.spyOn(adGateway, "getPlacementAd").mockResolvedValue(null);
-
-    await getPlacementAd("HOME_BOTTOM", { signal });
-
-    expect(spy).toHaveBeenLastCalledWith("HOME_BOTTOM", {
-      prefer: "web",
-      signal,
-    });
-  });
 });

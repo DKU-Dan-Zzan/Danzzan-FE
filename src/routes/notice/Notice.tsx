@@ -132,8 +132,8 @@ function Notice() {
       {/* 상단 타이틀 & 검색 */}
       <section className="bg-[var(--surface)] px-4 pb-4 pt-4 shadow-[0_8px_24px_var(--shadow-color)]">
         <div className="mb-3">
-          <p className="text-[11px] font-semibold text-[var(--accent)]">단짠 공지사항</p>
-          <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text)]">
+          <p className="text-[11px] font-semibold text-[var(--text-emphasis-vivid)]">단짠 공지사항</p>
+          <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-body-deep)]">
             축제 소식 한눈에 보기
           </h1>
         </div>
@@ -200,7 +200,7 @@ function Notice() {
               className={cn(NOTICE_LIST_CARD_BASE_CLASS, NOTICE_LIST_CARD_PINNED_CLASS)}
             >
               <div className="flex min-w-0 flex-1 items-center gap-2.5">
-                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[var(--surface-tint-subtle)] text-[11px] font-semibold text-[var(--accent)]">
+                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-[var(--app-circle-border)] bg-[linear-gradient(145deg,var(--app-circle-bg-start)_0%,var(--app-circle-bg-end)_100%)] text-[11px] font-semibold text-[var(--text-emphasis-vivid)] shadow-[var(--app-circle-shadow)]">
                   ★
                 </span>
                 <div className="min-w-0">
@@ -290,12 +290,12 @@ function Notice() {
             showCloseButton={false}
             className="max-h-[90vh] w-full max-w-xl overflow-hidden rounded-3xl bg-white p-0 shadow-[0_18px_45px_var(--shadow-color)]"
           >
-            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] px-5 py-3.5">
+            <div className="flex items-center justify-between border-b border-[var(--home-card-border)] px-5 py-3.5">
               <DialogTitle className="text-[13px] font-semibold text-[var(--text)]">공지 상세</DialogTitle>
               <button
                 type="button"
                 onClick={handleCloseDetail}
-                className="rounded-full border border-[var(--border-subtle)] bg-[var(--surface-subtle)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-muted)]"
+                className="rounded-full border border-[var(--home-card-border)] bg-[var(--surface-subtle)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-muted)]"
               >
                 닫기
               </button>
@@ -325,8 +325,8 @@ function Notice() {
 
               {detailNotice && !detailLoading && (
                 <article>
-                  <header className="border-b border-[var(--border-subtle)] pb-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--status-warning-text)]">
+                  <header className="border-b border-[var(--home-card-border)] pb-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-bold-emphasis)]">
                       FESTIVAL NOTICE
                     </p>
                     <h2 className="mt-1 text-[15px] font-extrabold leading-snug text-[var(--text)]">
@@ -341,7 +341,7 @@ function Notice() {
                   {(detailNotice.imageUrls?.length ?? 0) > 0 ? (
                     <div className="mt-3">
                       <div
-                        className="relative overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-subtle)]"
+                        className="relative overflow-hidden rounded-2xl border border-[var(--home-card-border)] bg-[var(--surface-subtle)]"
                         onTouchStart={(e) => {
                           if (e.touches.length === 1) {
                             setDragStartX(e.touches[0].clientX);
@@ -442,7 +442,7 @@ function Notice() {
                       </div>
                     </div>
                   ) : detailNotice.thumbnailImageUrl ? (
-                    <div className="mt-3 overflow-hidden rounded-2xl border border-[var(--border-subtle)]">
+                    <div className="mt-3 overflow-hidden rounded-2xl border border-[var(--home-card-border)]">
                       <img
                         src={detailNotice.thumbnailImageUrl}
                         alt={detailNotice.title}
