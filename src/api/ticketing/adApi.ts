@@ -76,7 +76,8 @@ export const adApi = {
       return [mockMyTicketAd];
     }
 
-    const ads = await getPlacementAdsFromApp(placement, { signal });
+    const apiPlacement = placement === "MY_TICKET" ? "HOME_BOTTOM" : placement;
+    const ads = await getPlacementAdsFromApp(apiPlacement, { signal });
     return ads
       .map((ad) => mapClientAdDtoToPlacementAd(placement, ad))
       .filter((item): item is PlacementAd => item.isActive && Boolean(item.imageUrl));
