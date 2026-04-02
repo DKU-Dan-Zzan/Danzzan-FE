@@ -9,7 +9,7 @@ import {
   TICKETING_CLASSES,
   TicketingRefreshButton,
 } from "@/components/ticketing/panels/TicketingShared";
-import type { PlacementAd } from "@/types/ticketing/model/ad.model";
+import type { AdSlide } from "@/components/common/AdCarousel";
 import type { Ticket } from "@/types/ticketing/model/ticket.model";
 
 interface StudentSummary {
@@ -22,7 +22,7 @@ interface MyTicketListPanelProps {
   student: StudentSummary;
   loading: boolean;
   errorMessage: string | null;
-  ad: PlacementAd | null;
+  ads: AdSlide[];
   onRefresh: () => void;
   onGoTicketing: () => void;
 }
@@ -32,7 +32,7 @@ export function MyTicketListPanel({
   student,
   loading,
   errorMessage,
-  ad,
+  ads,
   onRefresh,
   onGoTicketing,
 }: MyTicketListPanelProps) {
@@ -121,7 +121,7 @@ export function MyTicketListPanel({
       )}
 
       <div className="-mx-4 mt-auto">
-        <TicketingAdBannerCard ad={ad} variant="imageOnly" />
+        <TicketingAdBannerCard ads={ads} variant="imageOnly" />
       </div>
     </div>
   );

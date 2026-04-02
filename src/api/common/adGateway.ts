@@ -1,9 +1,7 @@
 // 역할: ad gateway 모듈의 API/계약 기능을 제공한다.
 
-import axios from "axios";
 import { getApiBaseUrl, getTicketingApiBaseUrl } from "@/api/common/baseUrl";
-import { getErrorStatus } from "@/api/common/fetchAuth";
-import { createHttpClient, HttpError } from "@/api/common/httpClient";
+import { createHttpClient } from "@/api/common/httpClient";
 import { http } from "@/lib/http";
 import { authStore } from "@/store/common/authStore";
 
@@ -27,8 +25,6 @@ type GetPlacementAdOptions = {
   signal?: AbortSignal;
   prefer?: Source;
 };
-
-const FALLBACK_STATUSES = new Set([404, 405]);
 
 const asRecord = (value: unknown): Record<string, unknown> | null => {
   if (!value || typeof value !== "object") {
@@ -143,21 +139,6 @@ const requestTicketingAd = async (
   return normalizeAdPayload(payload, placement, "ticketing");
 };
 
-const getErrorHttpStatus = (error: unknown): number | null => {
-  if (error instanceof HttpError) {
-    return error.status;
-  }
-  if (axios.isAxiosError(error)) {
-    return error.response?.status ?? null;
-  }
-  return getErrorStatus(error);
-};
-
-const isCompatibilityFallbackError = (error: unknown): boolean => {
-  const status = getErrorHttpStatus(error);
-  return status !== null && FALLBACK_STATUSES.has(status);
-};
-
 const resolvePreferredSource = (placement: AdGatewayPlacement): Source => {
   return placement === "WAITING_ROOM_MAIN" ? "ticketing" : "web";
 };
@@ -186,19 +167,14 @@ export const adGateway = {
       if (first) {
         return first;
       }
-    } catch (error) {
-      if (!isCompatibilityFallbackError(error)) {
-        throw error;
-      }
+    } catch {
+      // first source 실패 시 무조건 fallback 시도
     }
 
     try {
       return await requestBySource(secondSource, placement, options.signal);
-    } catch (error) {
-      if (isCompatibilityFallbackError(error)) {
-        return null;
-      }
-      throw error;
+    } catch {
+      return null;
     }
   },
 };

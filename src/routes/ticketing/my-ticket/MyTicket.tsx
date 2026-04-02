@@ -2,11 +2,10 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { MyTicketListPanel } from "@/components/ticketing/panels/MyTicketListPanel";
+import { adApi } from "@/api/ticketing/adApi";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
-import type { PlacementAd } from "@/types/ticketing/model/ad.model";
 import { ticketApi } from "@/api/ticketing/ticketApi";
-import { getPlacementAd as getWebPlacementAd } from "@/api/ticketing/noticeApi";
 
 export default function MyTicket() {
   const navigate = useNavigate();
@@ -18,26 +17,27 @@ export default function MyTicket() {
     staleTime: 30_000,
   });
 
-  const waitingRoomAdQuery = useAppQuery({
-    queryKey: appQueryKeys.myTicketAd(),
-    queryFn: ({ signal }) => getWebPlacementAd("MY_TICKET", { signal }),
+  const myTicketAdQuery = useAppQuery({
+    queryKey: appQueryKeys.placementAds("MY_TICKET"),
+    queryFn: ({ signal }) => adApi.getPlacementAd("MY_TICKET", signal),
     staleTime: 5 * 60_000,
   });
 
-  const waitingRoomAd = useMemo<PlacementAd | null>(() => {
-    const ad = waitingRoomAdQuery.data;
+  const ads = useMemo(() => {
+    const ad = myTicketAdQuery.data;
     if (!ad) {
-      return null;
+      return [];
     }
-    return {
-      placement: "WAITING_ROOM_MAIN",
-      imageUrl: ad.imageUrl,
-      linkUrl: null,
-      altText: ad.title,
-      isActive: ad.isActive,
-      updatedAt: ad.updatedAt,
-    };
-  }, [waitingRoomAdQuery.data]);
+
+    return [
+      {
+        imageUrl: ad.imageUrl,
+        alt: ad.altText,
+        linkUrl: ad.linkUrl,
+        updatedAt: ad.updatedAt,
+      },
+    ];
+  }, [myTicketAdQuery.data]);
 
   return (
     <MyTicketListPanel
@@ -48,7 +48,7 @@ export default function MyTicket() {
       }}
       loading={myTicketsQuery.isPending}
       errorMessage={myTicketsQuery.error?.message ?? null}
-      ad={waitingRoomAd}
+      ads={ads}
       onRefresh={() => {
         void myTicketsQuery.refetch();
       }}

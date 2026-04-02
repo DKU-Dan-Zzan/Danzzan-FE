@@ -1,6 +1,6 @@
 // 역할: admin auth api 관련 HTTP 요청 함수를 제공하는 API 어댑터다.
 
-import { getTicketingApiBaseUrl } from "@/api/common/baseUrl";
+import { getApiBaseUrl } from "@/api/common/baseUrl";
 import { createHttpClient } from "@/api/common/httpClient";
 import { hasRequiredRole, resolveRoleFromAccessToken } from "@/api/common/authCore";
 import { authStore } from "@/store/common/authStore";
@@ -9,7 +9,7 @@ import { env } from "@/utils/common/env";
 
 const getClient = () =>
   createHttpClient({
-    baseUrl: getTicketingApiBaseUrl(),
+    baseUrl: getApiBaseUrl(),
     getAccessToken: authStore.getAccessToken,
   });
 
@@ -68,16 +68,16 @@ export const adminAuthApi = {
     }
 
     const client = getClient();
-    const dto = await client.post<{ accessToken: string; refreshToken: string }>(
-      "/user/login",
+    // /auth/login: 관리자 전용 엔드포인트 (AdminEntity 조회, cookie 기반 refresh)
+    const dto = await client.post<{ accessToken: string }>(
+      "/auth/login",
       {
-        studentId: payload.studentId,
+        studentNumber: payload.studentId,
         password: payload.password,
       },
     );
 
     const accessToken = dto?.accessToken ?? "";
-    const refreshToken = dto?.refreshToken ?? "";
     const role = resolveRoleFromAccessToken(accessToken);
     if (!hasRequiredRole("admin", role)) {
       throw new Error("관리자 권한이 없는 계정입니다.");
@@ -86,7 +86,7 @@ export const adminAuthApi = {
     return {
       tokens: {
         accessToken,
-        refreshToken,
+        refreshToken: "", // refresh token은 HTTP-only cookie로 관리
         expiresIn: null,
       },
       user: decodeTokenPayload(accessToken, payload.studentId),

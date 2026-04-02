@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEnterQueueMutation } from "@/hooks/ticketing/useEnterQueueMutation";
 import { useQueueStatusQuery } from "@/hooks/ticketing/useQueueStatusQuery";
 import { useTicketingEventsQuery } from "@/hooks/ticketing/useTicketingEventsQuery";
+import { useWaitingRoomAdQuery } from "@/hooks/ticketing/useWaitingRoomAdQuery";
 import { appQueryKeys } from "@/lib/query";
 import {
   acquireSingleFlight,
@@ -55,6 +56,7 @@ export function useTicketingFlow() {
   const [soldOutDescription, setSoldOutDescription] = useState(DEFAULT_SOLD_OUT_DESCRIPTION);
 
   const eventsQuery = useTicketingEventsQuery(step === "list");
+  const waitingAdQuery = useWaitingRoomAdQuery(step === "waiting");
   const { refetch: refetchQueueStatus } = useQueueStatusQuery(activeEventId, { enabled: false });
 
   const resetQueueFlowState = useCallback(() => {
@@ -384,6 +386,7 @@ export function useTicketingFlow() {
     listErrorMessage,
     now,
     activeEventTitle,
+    waitingAd: waitingAdQuery.data ?? null,
     waitingQueuePosition,
     waitingQueuePositionUpdatedAt,
     waitingPolling,

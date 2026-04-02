@@ -9,7 +9,7 @@ import AdBanner from "@/components/app/home/AdBanner";
 import DelayedSpinner from "@/components/common/loading/DelayedSpinner";
 
 import { getEmergencyNotice, getHomeImages, getLineupImages } from "@/api/app/home/homeApi"
-import { getPlacementAd } from "@/api/app/notice/noticeApi"
+import { getPlacementAds } from "@/api/app/ad/adApi"
 import { appQueryKeys, useAppQuery } from "@/lib/query"
 
 const dummyPosters: Poster[] = [
@@ -58,9 +58,9 @@ function Home() {
     refetchOnMount: "always",
   })
 
-  const homeBottomAdQuery = useAppQuery({
-    queryKey: appQueryKeys.homeBottomAd(),
-    queryFn: ({ signal }) => getPlacementAd("HOME_BOTTOM", { signal }),
+  const allAdsQuery = useAppQuery({
+    queryKey: appQueryKeys.placementAds("HOME_BOTTOM"),
+    queryFn: ({ signal }) => getPlacementAds("HOME_BOTTOM", { signal }),
     staleTime: 5 * 60_000,
   })
 
@@ -108,13 +108,12 @@ function Home() {
     emergencyNoticeQuery.isPending
   const accessoryPending =
     lineupQuery.isPending ||
-    homeBottomAdQuery.isPending
+    allAdsQuery.isPending
   const shouldShowInlineSpinner =
     (corePending || accessoryPending) &&
     !imagesQuery.data?.length &&
     !emergencyNoticeQuery.data
-  const adImageUrl = homeBottomAdQuery.data?.imageUrl
-  const adTitle = homeBottomAdQuery.data?.title
+  const allAds = allAdsQuery.data ?? []
 
   const error =
     imagesQuery.error?.message ??
@@ -126,7 +125,7 @@ function Home() {
     void imagesQuery.refetch()
     void lineupQuery.refetch()
     void emergencyNoticeQuery.refetch()
-    void homeBottomAdQuery.refetch()
+    void allAdsQuery.refetch()
   }
 
   return (
@@ -155,7 +154,7 @@ function Home() {
         </div>
 
         <div>
-          <AdBanner imageUrl={adImageUrl} alt={adTitle} />
+          <AdBanner ads={allAds} />
         </div>
       </div>
 

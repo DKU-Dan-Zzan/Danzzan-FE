@@ -281,6 +281,7 @@ export type CreateAdvertisementRequest = {
   title: string;
   imageUrl: string;
   placement: AdvertisementPlacement;
+  objectPosition?: string;
 };
 
 export async function createAdminAd(
@@ -315,5 +316,24 @@ export async function setAdminAdsActiveByPlacement(
 export async function deleteAdminAd(id: number): Promise<void> {
   await fetchWithAuth<void>(`/api/admin/ads/${id}`, {
     method: "DELETE",
+  });
+}
+
+/**
+ * ID로 특정 광고를 소프트 삭제합니다.
+ */
+export async function deleteAdminAdById(id: number): Promise<void> {
+  await fetchWithAuth<void>(`/api/admin/ads/item/${id}`, {
+    method: "DELETE",
+  });
+}
+
+/**
+ * 삭제되지 않은 모든 광고 목록을 반환합니다 (관리자 페이지용).
+ */
+export async function getAdminAds(options?: RequestOptions): Promise<AdvertisementResponse[]> {
+  return fetchWithAuth<AdvertisementResponse[]>("/api/admin/ads", {
+    method: "GET",
+    signal: options?.signal,
   });
 }

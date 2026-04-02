@@ -5,7 +5,9 @@ import type { AdPlacementKey, PlacementAd } from "@/types/ticketing/model/ad.mod
 const DEFAULT_PLACEMENT: AdPlacementKey = "WAITING_ROOM_MAIN";
 
 const toPlacementKey = (value?: string): AdPlacementKey => {
-  return value === "WAITING_ROOM_MAIN" ? value : DEFAULT_PLACEMENT;
+  return value === "WAITING_ROOM_MAIN" || value === "MY_TICKET"
+    ? value
+    : DEFAULT_PLACEMENT;
 };
 
 export const mapPlacementAdDtoToModel = (dto: PlacementAdDto): PlacementAd => {

@@ -1,7 +1,6 @@
 // 역할: notice api 관련 HTTP 요청 함수를 제공하는 API 어댑터다.
 
 import { http } from "@/lib/http";
-import { adGateway } from "@/api/common/adGateway";
 import {
   parseNoticeDetailContract,
   parseNoticeListContract,
@@ -59,37 +58,3 @@ export async function getNoticeDetail(id: number, options?: RequestOptions): Pro
   return parseNoticeDetailContract(res.data, endpoint);
 }
 
-export type PlacementKey = "HOME_BOTTOM" | "MY_TICKET";
-
-export type ClientAdDto = {
-  id: number;
-  title: string;
-  imageUrl: string;
-  placement: PlacementKey;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export async function getPlacementAd(
-  placement: PlacementKey,
-  options?: RequestOptions,
-): Promise<ClientAdDto | null> {
-  const ad = await adGateway.getPlacementAd(placement, {
-    prefer: "web",
-    signal: options?.signal,
-  });
-  if (!ad) {
-    return null;
-  }
-
-  return {
-    id: ad.id ?? 0,
-    title: ad.title ?? ad.altText ?? "광고 배너",
-    imageUrl: ad.imageUrl,
-    placement,
-    isActive: ad.isActive,
-    createdAt: ad.createdAt ?? "",
-    updatedAt: ad.updatedAt ?? "",
-  };
-}

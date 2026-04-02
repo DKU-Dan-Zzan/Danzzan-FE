@@ -17,7 +17,7 @@ describe("Home loading policy", () => {
     expect(source).toContain("const corePending =");
     expect(source).toContain("const accessoryPending =");
     expect(source).toContain("const shouldShowInlineSpinner =");
-    expect(source).toContain("const adImageUrl =");
+    expect(source).toContain("const allAds = allAdsQuery.data ?? []");
   });
 
   it("Home은 로딩 텍스트 대신 지연 스피너 기반 표시를 사용한다", () => {

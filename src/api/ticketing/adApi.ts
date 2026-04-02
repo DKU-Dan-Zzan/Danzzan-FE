@@ -13,18 +13,27 @@ const mockWaitingRoomAd: PlacementAd = {
   updatedAt: "2026-03-04T00:00:00Z",
 };
 
+const mockMyTicketAd: PlacementAd = {
+  placement: "MY_TICKET",
+  imageUrl: "/ads/waiting-room-sample-banner.svg",
+  linkUrl: "https://danzzan.example.com/notice",
+  altText: "단짠 내 티켓 광고 배너",
+  isActive: true,
+  updatedAt: "2026-03-04T00:00:00Z",
+};
+
 export const adApi = {
   getPlacementAd: async (
     placement: AdPlacementKey,
     signal?: AbortSignal,
   ): Promise<PlacementAd | null> => {
     if (env.apiMode === "mock") {
-      return placement === "WAITING_ROOM_MAIN" ? mockWaitingRoomAd : null;
+      return placement === "MY_TICKET" ? mockMyTicketAd : mockWaitingRoomAd;
     }
 
     const ad = await adGateway.getPlacementAd(placement, {
       signal,
-      prefer: "ticketing",
+      prefer: placement === "MY_TICKET" ? "web" : "ticketing",
     });
     if (!ad) {
       return null;

@@ -6,7 +6,9 @@ import {
   TICKETING_CLASSES,
   TICKETING_NARROW_PANEL_CLASS,
 } from "@/components/ticketing/panels/TicketingShared";
+import { TicketingAdBannerCard } from "@/components/ticketing/panels/TicketingAdBannerCard";
 import { isRemainingFresh } from "@/hooks/ticketing/queue/flow-utils";
+import type { AdSlide } from "@/components/common/AdCarousel";
 
 interface WaitingRoomPanelProps {
   eventTitle: string;
@@ -15,6 +17,7 @@ interface WaitingRoomPanelProps {
   polling: boolean;
   offline: boolean;
   errorMessage: string | null;
+  ads: AdSlide[];
 }
 
 const formatQueuePosition = (queuePosition: number | null): string => {
@@ -31,6 +34,7 @@ export function WaitingRoomPanel({
   polling,
   offline,
   errorMessage,
+  ads,
 }: WaitingRoomPanelProps) {
   const [now, setNow] = useState(() => Date.now());
 
@@ -97,6 +101,8 @@ export function WaitingRoomPanel({
           </p>
         </Card>
       )}
+
+      <TicketingAdBannerCard ads={ads} />
     </div>
   );
 }
