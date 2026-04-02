@@ -25,7 +25,7 @@ describe("PrimaryFilterChips", () => {
       />,
     );
 
-    expect(markup).toContain("border-[var(--boothmap-marker-pub)]");
-    expect(markup).toContain("bg-[var(--boothmap-marker-pub)]");
+    expect(markup).toContain("border-[var(--boothmap-chip-selected-border)]");
+    expect(markup).toContain("bg-[var(--boothmap-chip-selected-bg)]");
   });
 });

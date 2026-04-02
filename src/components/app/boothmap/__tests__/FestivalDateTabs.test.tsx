@@ -17,6 +17,6 @@ describe("FestivalDateTabs", () => {
       />,
     );
 
-    expect(markup).toContain("bg-[var(--boothmap-marker-pub)]");
+    expect(markup).toContain("bg-[var(--boothmap-chip-selected-bg)]");
   });
 });

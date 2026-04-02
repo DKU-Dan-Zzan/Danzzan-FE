@@ -46,8 +46,8 @@ type Props = {
 };
 
 const DEFAULT_CENTER = {
-  lat: 37.3201,
-  lng: 127.1276,
+  lat: 37.32045,
+  lng: 127.12805,
 }
 
 const DANKOOK_BOUNDS = {
@@ -91,10 +91,6 @@ const PIN_BOTTOM_OFFSET_MAP: Record<MarkerType, number> = {
   EXPERIENCE: 1,
   EVENT: 1,
   FACILITY: 0,
-}
-
-function kakaoLevelToMapboxZoom(level: number) {
-  return 20.4 - level * 1.5
 }
 
 function getOverlayKey(kind: "booth" | "college", id: number) {
@@ -208,9 +204,6 @@ export default function KakaoMapView({
         lat: center.getLat(),
         lng: center.getLng(),
         kakaoLevel: map.getLevel(),
-        mapboxZoom: kakaoLevelToMapboxZoom(map.getLevel()),
-        mapboxPitch: lastViewportRef.current.mapboxPitch,
-        mapboxBearing: lastViewportRef.current.mapboxBearing,
       }
 
       const prevViewport = lastViewportRef.current
@@ -280,20 +273,23 @@ export default function KakaoMapView({
     }
 
     const targetLatLng = new kakao.maps.LatLng(lat, lng)
+    const mapWidth = mapRef.current.clientWidth
     const mapHeight = mapRef.current.clientHeight
 
     const coveredHeight = mapHeight * getBottomSheetCoveredRatio(targetSnap)
 
+    const visibleCenterX = mapWidth / 2
     const visibleCenterY = (mapHeight - coveredHeight) / 2 + 65
 
     const markerPoint = projection.containerPointFromCoords(targetLatLng)
     const currentCenter = map.getCenter()
     const currentCenterPoint = projection.containerPointFromCoords(currentCenter)
 
+    const deltaX = markerPoint.x - visibleCenterX
     const deltaY = markerPoint.y - visibleCenterY
 
     const nextCenterPoint = new kakao.maps.Point(
-      currentCenterPoint.x,
+      currentCenterPoint.x + deltaX,
       currentCenterPoint.y + deltaY
     )
 
@@ -797,7 +793,15 @@ export default function KakaoMapView({
 
 
           map.setLevel(2, { anchor: target }) // 클릭한 마커 기준 확대
-          map.panTo(target)
+          if (sheetSnap === "PEEK") {
+            map.panTo(target)
+          } else {
+            panToWithSheetOffset({
+              lat: selectedBooth.location_y,
+              lng: selectedBooth.location_x,
+              targetSnap: sheetSnap,
+            })
+          }
         }
       }
 
@@ -812,11 +816,15 @@ export default function KakaoMapView({
 
           map.setLevel(2, { anchor: target }) // 클릭한 마커 기준 확대
 
-          panToWithSheetOffset({
-            lat: selectedCollege.location_y,
-            lng: selectedCollege.location_x,
-            targetSnap: "HALF",
-          })
+          if (sheetSnap === "PEEK") {
+            map.panTo(target)
+          } else {
+            panToWithSheetOffset({
+              lat: selectedCollege.location_y,
+              lng: selectedCollege.location_x,
+              targetSnap: sheetSnap,
+            })
+          }
         }
       }
     }

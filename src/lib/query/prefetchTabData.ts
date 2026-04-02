@@ -77,6 +77,7 @@ function mapPubSummaryToPub(dto: PubSummaryResponse): Pub {
     instagram: undefined,
     images: dto.mainImageUrl ? [dto.mainImageUrl] : [],
     mainImageUrl: dto.mainImageUrl ?? undefined,
+    thumbnailUrl: dto.thumbnailUrl ?? undefined,
     startTime: dto.startTime,
     endTime: dto.endTime,
   };

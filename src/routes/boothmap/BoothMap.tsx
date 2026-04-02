@@ -1,16 +1,8 @@
-// 역할: 부스맵 메인 라우트에서 2D/3D 지도, 필터, 상세 시트 상태를 통합 제어합니다.
-import {
-  Suspense,
-  lazy,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+// 역할: 부스맵 메인 라우트에서 2D 지도, 필터, 상세 시트 상태를 통합 제어합니다.
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   Booth,
   College,
-  MapMode,
   MapViewport,
   PrimaryFilter,
   Pub,
@@ -27,17 +19,17 @@ import BottomSheet from "@/components/app/boothmap/BottomSheet";
 import BoothList from "@/components/app/boothmap/BoothList";
 import PubList from "@/components/app/boothmap/PubList";
 import DetailSheet from "@/components/app/boothmap/DetailSheet";
-import MapFloatingToggle from "@/components/app/boothmap/MapFloatingToggle";
 import FestivalDateTabs from "@/components/app/boothmap/FestivalDateTabs";
 
 import {
   getBoothMap,
+  getBoothSummary,
   getPubs,
   type BoothDto,
   type CollegeDto,
   type PubSummaryResponse,
 } from "@/api/app/boothmap/boothmapApi";
-import { appQueryKeys, useAppQuery } from "@/lib/query";
+import { appQueryKeys, queryClient, useAppQuery } from "@/lib/query";
 import {
   getShouldShowPubList,
   getVisibleBooths,
@@ -45,38 +37,37 @@ import {
   getVisiblePubs,
 } from "@/routes/boothmap/boothMapSelectors";
 import { cn } from "@/components/common/ui/utils";
-
-const loadMapbox3DView = async () => {
-  await import("mapbox-gl/dist/mapbox-gl.css");
-  return import("@/components/app/boothmap/Mapbox3DView");
-};
-const LazyMapbox3DView = lazy(loadMapbox3DView);
+import { formatDescription } from "@/utils/app/boothmap/formatDescription";
 
 const DEFAULT_MAP_VIEWPORT: MapViewport = {
-  lat: 37.3201,
-  lng: 127.1276,
+  lat: 37.32085,
+  lng: 127.12805,
   kakaoLevel: 3,
-  mapboxZoom: 17,
-  mapboxPitch: 55,
-  mapboxBearing: -20,
 };
 
 const FESTIVAL_DATES = [
-  { label: "1일차", value: "2026-05-12" },
-  { label: "2일차", value: "2026-05-13" },
-  { label: "3일차", value: "2026-05-14" },
-]
+  { label: "5/12", value: "2026-05-12" },
+  { label: "5/13", value: "2026-05-13" },
+  { label: "5/14", value: "2026-05-14" },
+];
+
+const DEFAULT_FESTIVAL_DATE = FESTIVAL_DATES[0].value;
+
+function getInitialFestivalDate() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = `${today.getMonth() + 1}`.padStart(2, "0");
+  const date = `${today.getDate()}`.padStart(2, "0");
+  const todayValue = `${year}-${month}-${date}`;
+
+  return FESTIVAL_DATES.find((festivalDate) => festivalDate.value === todayValue)?.value
+    ?? DEFAULT_FESTIVAL_DATE;
+}
+
 const TOP_PANEL_Z_INDEX_CLASS: Record<SheetSnap, string> = {
   PEEK: "z-[70]",
   HALF: "z-[70]",
   FULL: "z-[40]",
-}
-const MAP_MODE_TRANSITION_MS = 280;
-const MAPBOX_WARMUP_FALLBACK_DELAY_MS = 900;
-const MAPBOX_WARMUP_IDLE_TIMEOUT_MS = 1800;
-
-const warmupMapbox3DAssets = async () => {
-  await loadMapbox3DView();
 };
 
 function mapCollegeDtoToCollege(dto: CollegeDto): College {
@@ -94,6 +85,7 @@ function mapBoothDtoToBooth(dto: BoothDto): Booth {
     name: dto.name,
     type: dto.type,
     subType: dto.subType,
+    description: dto.description,
     location_x: dto.locationX,
     location_y: dto.locationY,
     startTime: dto.startTime,
@@ -113,24 +105,33 @@ function mapPubSummaryToPub(dto: PubSummaryResponse): Pub {
     instagram: undefined,
     images: dto.mainImageUrl ? [dto.mainImageUrl] : [],
     mainImageUrl: dto.mainImageUrl ?? undefined,
+    thumbnailUrl: dto.thumbnailUrl ?? undefined,
     startTime: dto.startTime,
     endTime: dto.endTime,
   };
 }
 
+function hasBoothDetailContent(description?: string | null) {
+  return formatDescription(description).trim().length > 0;
+}
+
+function isFoodTruckBooth(booth?: Booth | null) {
+  return booth?.type === "FOOD_TRUCK";
+}
+
 export default function BoothMap() {
-  const [mode, setMode] = useState<MapMode>("2D");
-  const [render3DLayer, setRender3DLayer] = useState(mode === "3D");
   const [primaryFilter, setPrimaryFilter] = useState<PrimaryFilter>("ALL");
   const [selectedMapItem, setSelectedMapItem] = useState<SelectedMapItem>(null);
   const [selectedDetailItem, setSelectedDetailItem] = useState<SelectedDetailItem>(null);
+  const [boothDetailAvailabilityOverrides, setBoothDetailAvailabilityOverrides] = useState<Record<number, boolean>>({});
   const [selectedCollegeId, setSelectedCollegeId] = useState<number | null>(null);
   const [pubListCollegeId, setPubListCollegeId] = useState<number | null>(null);
   const [sheetMode, setSheetMode] = useState<SheetMode>("LIST");
   const [sheetSnap, setSheetSnap] = useState<SheetSnap>("PEEK");
-  const [selectedDate, setSelectedDate] = useState("2026-05-12");
+  const [selectedDate, setSelectedDate] = useState(getInitialFestivalDate);
   const [mapViewport, setMapViewport] = useState<MapViewport>(DEFAULT_MAP_VIEWPORT);
   const [bottomNavHeight, setBottomNavHeight] = useState(56);
+  const boothSelectionRequestSeqRef = useRef(0);
 
   const frameWidth = 430;
 
@@ -154,61 +155,6 @@ export default function BoothMap() {
     return () => {
       resizeObserver.disconnect();
       window.removeEventListener("resize", updateBottomNavHeight);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (mode === "3D") {
-      const frameId = window.requestAnimationFrame(() => {
-        setRender3DLayer(true);
-      });
-
-      return () => {
-        window.cancelAnimationFrame(frameId);
-      };
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      setRender3DLayer(false);
-    }, MAP_MODE_TRANSITION_MS);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [mode]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    if (typeof window.requestIdleCallback === "function") {
-      const idleId = window.requestIdleCallback(
-        () => {
-          if (cancelled) {
-            return;
-          }
-          void warmupMapbox3DAssets();
-        },
-        { timeout: MAPBOX_WARMUP_IDLE_TIMEOUT_MS },
-      );
-
-      return () => {
-        cancelled = true;
-        if (typeof window.cancelIdleCallback === "function") {
-          window.cancelIdleCallback(idleId);
-        }
-      };
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      if (cancelled) {
-        return;
-      }
-      void warmupMapbox3DAssets();
-    }, MAPBOX_WARMUP_FALLBACK_DELAY_MS);
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timeoutId);
     };
   }, []);
 
@@ -264,22 +210,146 @@ export default function BoothMap() {
   }, [primaryFilter, colleges, selectedCollegeId]);
 
   const visiblePubs = useMemo(() => {
-    const targetCollegeId = primaryFilter === "PUB"
-      ? (selectedCollegeId ?? pubListCollegeId)
-      : pubListCollegeId;
+    const targetCollegeId =
+      primaryFilter === "PUB" ? (selectedCollegeId ?? pubListCollegeId) : pubListCollegeId;
     return getVisiblePubs(pubs, targetCollegeId);
   }, [primaryFilter, pubs, pubListCollegeId, selectedCollegeId]);
 
   const shouldShowPubList = getShouldShowPubList(primaryFilter, selectedMapItem);
+  const selectedBooth = useMemo(() => {
+    if (selectedMapItem?.kind !== "booth") {
+      return null;
+    }
 
-  const onClickMarkerBooth = useCallback((id: number) => {
+    return booths.find((booth) => booth.id === selectedMapItem.id) ?? null;
+  }, [booths, selectedMapItem]);
+
+  const boothDetailAvailability = useMemo(() => {
+    const baseAvailability = visibleBooths.reduce<Record<number, boolean>>((acc, booth) => {
+      acc[booth.id] = hasBoothDetailContent(booth.description);
+      return acc;
+    }, {});
+
+    return {
+      ...baseAvailability,
+      ...boothDetailAvailabilityOverrides,
+    };
+  }, [boothDetailAvailabilityOverrides, visibleBooths]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const foodTruckBoothsToCheck = visibleBooths.filter((booth) => {
+      return booth.type === "FOOD_TRUCK" && !hasBoothDetailContent(booth.description);
+    });
+
+    if (foodTruckBoothsToCheck.length === 0) {
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    void Promise.all(
+      foodTruckBoothsToCheck.map(async (booth) => {
+        try {
+          const summary = await queryClient.fetchQuery({
+            queryKey: appQueryKeys.boothMapBoothDetail(booth.id),
+            queryFn: () => getBoothSummary(booth.id),
+            staleTime: 5 * 60_000,
+          });
+
+          return {
+            id: booth.id,
+            hasDetail: hasBoothDetailContent(summary.description),
+          };
+        } catch {
+          return {
+            id: booth.id,
+            hasDetail: false,
+          };
+        }
+      }),
+    ).then((results) => {
+      if (cancelled) {
+        return;
+      }
+
+      setBoothDetailAvailabilityOverrides((prev) => {
+        const next = { ...prev };
+        results.forEach((result) => {
+          next[result.id] = result.hasDetail;
+        });
+        return next;
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [visibleBooths]);
+
+  const resolveBoothSelection = useCallback(async (
+    id: number,
+    options: {
+      detailSnap: SheetSnap;
+      fallbackSnap: Extract<SheetSnap, "PEEK" | "HALF">;
+    },
+  ) => {
+    const requestSeq = ++boothSelectionRequestSeqRef.current;
+
     setSelectedMapItem({ kind: "booth", id });
-    setSelectedDetailItem({ kind: "booth", id });
+    setSelectedDetailItem(null);
     setSelectedCollegeId(null);
     setPubListCollegeId(null);
-    setSheetMode("DETAIL");
-    setSheetSnap("PEEK");
+
+    try {
+      const summary = await queryClient.fetchQuery({
+        queryKey: appQueryKeys.boothMapBoothDetail(id),
+        queryFn: () => getBoothSummary(id),
+        staleTime: 5 * 60_000,
+      });
+
+      if (requestSeq !== boothSelectionRequestSeqRef.current) {
+        return;
+      }
+
+      if (hasBoothDetailContent(summary.description)) {
+        setBoothDetailAvailabilityOverrides((prev) => ({ ...prev, [id]: true }));
+        setSelectedDetailItem({ kind: "booth", id });
+        setSheetMode("DETAIL");
+        setSheetSnap(options.detailSnap);
+        return;
+      }
+    } catch {
+      // 상세 조회에 실패해도 목록 흐름은 유지합니다.
+    }
+
+    if (requestSeq !== boothSelectionRequestSeqRef.current) {
+      return;
+    }
+
+    setBoothDetailAvailabilityOverrides((prev) => ({ ...prev, [id]: false }));
+    setSelectedDetailItem(null);
+    setSheetMode("LIST");
+    setSheetSnap(options.fallbackSnap);
   }, []);
+
+  const onClickMarkerBooth = useCallback((id: number) => {
+    const booth = booths.find((item) => item.id === id);
+    if (isFoodTruckBooth(booth)) {
+      void resolveBoothSelection(id, {
+        detailSnap: "HALF",
+        fallbackSnap: "HALF",
+      });
+      return;
+    }
+
+    setSelectedMapItem({ kind: "booth", id });
+    setSelectedDetailItem(null);
+    setSelectedCollegeId(null);
+    setPubListCollegeId(null);
+    setSheetMode("LIST");
+  }, [booths, resolveBoothSelection]);
 
   const onClickMarkerCollege = useCallback((id: number) => {
     setPubListCollegeId(id);
@@ -290,12 +360,35 @@ export default function BoothMap() {
   }, []);
 
   const onSelectBoothFromList = useCallback((id: number) => {
+    const selectedListBooth = booths.find((booth) => booth.id === id) ?? null;
+    const shouldSwitchToFoodTruckFilter =
+      primaryFilter === "ALL" && isFoodTruckBooth(selectedListBooth);
+
+    if (shouldSwitchToFoodTruckFilter) {
+      setPrimaryFilter("FOOD_TRUCK");
+    }
+
     setSelectedMapItem({ kind: "booth", id });
-    setSelectedDetailItem({ kind: "booth", id });
+    setSelectedDetailItem(null);
     setSelectedCollegeId(null);
     setPubListCollegeId(null);
-    setSheetMode("DETAIL");
+    setSheetMode("LIST");
     setSheetSnap("HALF");
+  }, [booths, primaryFilter]);
+
+  const onOpenBoothDetailFromList = useCallback((id: number) => {
+    void resolveBoothSelection(id, {
+      detailSnap: "FULL",
+      fallbackSnap: "HALF",
+    });
+  }, [resolveBoothSelection]);
+
+  const onChangePrimaryFilterFromMap = useCallback((next: PrimaryFilter) => {
+    handlePrimaryChange(next);
+    if (next === "FOOD_TRUCK") {
+      setSheetMode("LIST");
+      setSheetSnap("HALF");
+    }
   }, []);
 
   const onSelectPubFromList = useCallback((id: number) => {
@@ -304,9 +397,40 @@ export default function BoothMap() {
     setSheetSnap("FULL");
   }, []);
 
+  const handleBottomSheetBackToList = useCallback(() => {
+    const isFoodTruckDetail =
+      selectedDetailItem?.kind === "booth" && isFoodTruckBooth(selectedBooth);
+    const isPubFlow =
+      selectedDetailItem?.kind === "pub" ||
+      selectedMapItem?.kind === "college" ||
+      isFoodTruckDetail;
+
+    setSelectedDetailItem(null);
+    setSheetMode("LIST");
+    setSheetSnap(isPubFlow ? "HALF" : "PEEK");
+
+    if (!isPubFlow) {
+      setSelectedMapItem(null);
+    }
+  }, [selectedBooth, selectedDetailItem, selectedMapItem]);
+
+  const handleDetailClose = useCallback(() => {
+    const isPubDetail = selectedDetailItem?.kind === "pub";
+    const isFoodTruckDetail =
+      selectedDetailItem?.kind === "booth" && isFoodTruckBooth(selectedBooth);
+
+    setSelectedDetailItem(null);
+    setSheetMode("LIST");
+    setSheetSnap(isPubDetail || isFoodTruckDetail ? "HALF" : "PEEK");
+
+    if (!isPubDetail && !isFoodTruckDetail) {
+      setSelectedMapItem(null);
+    }
+  }, [selectedBooth, selectedDetailItem]);
+
   if (mapDataQuery.isPending && !mapDataQuery.data) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[var(--boothmap-surface)]">
+      <div className="flex h-screen items-center justify-center bg-[var(--boothmap-page-bg)]">
         <div className="text-sm font-semibold text-[var(--boothmap-text-subtle)]">
           부스맵을 불러오는 중...
         </div>
@@ -316,7 +440,7 @@ export default function BoothMap() {
 
   if (mapDataQuery.error) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[var(--boothmap-surface)]">
+      <div className="flex h-screen items-center justify-center bg-[var(--boothmap-page-bg)]">
         <div className="rounded-xl border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-danger-bg)] px-4 py-3 text-sm font-semibold text-[var(--boothmap-danger-text)]">
           <div>부스맵 정보를 불러오지 못했어요.</div>
           <button
@@ -334,16 +458,9 @@ export default function BoothMap() {
   }
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-[var(--boothmap-surface)]">
+    <div className="relative h-screen w-full overflow-hidden bg-[var(--boothmap-page-bg)]">
       <div className="absolute inset-0">
-        <div
-          className={cn(
-            "absolute inset-0 transition-all duration-300 ease-out",
-            mode === "2D"
-              ? "opacity-100 translate-x-0 scale-100 pointer-events-auto"
-              : "opacity-0 -translate-x-1 scale-[0.985] pointer-events-none",
-          )}
-        >
+        <div className="absolute inset-0">
           <KakaoMapView
             booths={visibleBooths}
             colleges={visibleColleges}
@@ -354,48 +471,17 @@ export default function BoothMap() {
             onViewportChange={setMapViewport}
             onClickBooth={onClickMarkerBooth}
             onClickCollege={onClickMarkerCollege}
-            onPrimaryFilterChange={handlePrimaryChange}
+            onPrimaryFilterChange={onChangePrimaryFilterFromMap}
           />
         </div>
-
-        {render3DLayer && (
-          <div
-            className={cn(
-              "absolute inset-0 transition-all duration-300 ease-out",
-              mode === "3D"
-                ? "opacity-100 translate-x-0 scale-100 pointer-events-auto"
-                : "opacity-0 translate-x-1 scale-[0.985] pointer-events-none",
-            )}
-          >
-            <Suspense
-              fallback={
-                <div className="flex h-full w-full items-center justify-center bg-[var(--boothmap-surface)] text-sm font-semibold text-[var(--boothmap-text-subtle)]">
-                  3D 지도를 불러오는 중...
-                </div>
-              }
-            >
-              <LazyMapbox3DView
-                booths={visibleBooths}
-                colleges={visibleColleges}
-                primaryFilter={primaryFilter}
-                selectedMapItem={selectedMapItem}
-                sheetSnap={sheetSnap}
-                viewport={mapViewport}
-                onViewportChange={setMapViewport}
-                onClickBooth={onClickMarkerBooth}
-                onClickCollege={onClickMarkerCollege}
-                onPrimaryFilterChange={handlePrimaryChange}
-              />
-            </Suspense>
-          </div>
-        )}
       </div>
 
       <div
         className={cn(
-          "absolute left-1/2 top-3 w-[calc(100%-24px)] max-w-[var(--app-mobile-shell-max-width)] -translate-x-1/2",
+          "absolute left-1/2 w-[calc(100%-24px)] max-w-[var(--app-mobile-shell-max-width)] -translate-x-1/2",
           TOP_PANEL_Z_INDEX_CLASS[sheetSnap],
         )}
+        style={{ top: "calc(env(safe-area-inset-top) + 4rem + 0.75rem)" }}
       >
         <div className="rounded-[28px] border border-[var(--boothmap-panel-border)] bg-[var(--boothmap-panel-bg)] px-3 py-2 shadow-[var(--boothmap-panel-shadow)] backdrop-blur-md">
           <FestivalDateTabs
@@ -434,28 +520,13 @@ export default function BoothMap() {
             </div>
           )}
         </div>
-
-        <div className="mt-3 flex justify-end pr-1">
-          <MapFloatingToggle mode={mode} onChange={setMode} />
-        </div>
       </div>
 
       <BottomSheet
         mode={sheetMode}
         snap={sheetSnap}
         onSnapChange={setSheetSnap}
-        onBackToList={() => {
-          const isPubFlow =
-            selectedDetailItem?.kind === "pub" || selectedMapItem?.kind === "college";
-
-          setSelectedDetailItem(null);
-          setSheetMode("LIST");
-          setSheetSnap(isPubFlow ? "HALF" : "PEEK");
-
-          if (!isPubFlow) {
-            setSelectedMapItem(null);
-          }
-        }}
+        onBackToList={handleBottomSheetBackToList}
         bottomOffset={bottomNavHeight}
         frameWidth={frameWidth}
       >
@@ -473,25 +544,19 @@ export default function BoothMap() {
               onSelectPub={onSelectPubFromList}
             />
           ) : (
-            <BoothList booths={visibleBooths} onSelectBooth={onSelectBoothFromList} />
+            <BoothList
+              booths={visibleBooths}
+              boothDetailAvailability={boothDetailAvailability}
+              onSelectBooth={onSelectBoothFromList}
+              onOpenBoothDetail={onOpenBoothDetailFromList}
+            />
           )
         ) : (
           <DetailSheet
             selectedItem={selectedDetailItem}
-            booths={booths}
             pubs={pubs}
             colleges={colleges}
-            onClose={() => {
-              const isPubDetail = selectedDetailItem?.kind === "pub";
-
-              setSelectedDetailItem(null);
-              setSheetMode("LIST");
-              setSheetSnap(isPubDetail ? "HALF" : "PEEK");
-
-              if (!isPubDetail) {
-                setSelectedMapItem(null);
-              }
-            }}
+            onClose={handleDetailClose}
           />
         )}
       </BottomSheet>

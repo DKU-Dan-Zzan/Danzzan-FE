@@ -1,5 +1,3 @@
-// 역할: boothmapContract 모듈의 API 계약과 예외 처리를 검증하는 테스트다.
-
 import { describe, expect, it } from "vitest";
 import {
   BoothmapContractError,
@@ -28,6 +26,7 @@ describe("boothmapContract", () => {
               name: "푸드트럭 A",
               type: "FOOD_TRUCK",
               subType: null,
+              description: "대표 메뉴 안내",
               locationX: 127.12,
               locationY: 37.31,
               startTime: "11:00",
@@ -42,9 +41,10 @@ describe("boothmapContract", () => {
     expect(parsed.colleges).toHaveLength(1);
     expect(parsed.booths[0]?.type).toBe("FOOD_TRUCK");
     expect(parsed.booths[0]?.subType).toBeNull();
+    expect(parsed.booths[0]?.description).toBe("대표 메뉴 안내");
   });
 
-  it("유효하지 않은 booth type은 오류를 던진다", () => {
+  it("유효하지 않은 booth type이면 에러를 던진다", () => {
     expect(() =>
       parseBoothMapContract(
         {
@@ -71,6 +71,7 @@ describe("boothmapContract", () => {
         name: "체험 부스",
         description: "설명",
         imageUrl: null,
+        thumbnailUrl: null,
         startTime: "11:00",
         endTime: "17:00",
       },
@@ -82,6 +83,7 @@ describe("boothmapContract", () => {
       name: "체험 부스",
       description: "설명",
       imageUrl: null,
+      thumbnailUrl: null,
       startTime: "11:00",
       endTime: "17:00",
     });
@@ -98,6 +100,7 @@ describe("boothmapContract", () => {
           collegeId: 2,
           collegeName: "공과대학",
           mainImageUrl: "https://cdn.example.com/pub.png",
+          thumbnailUrl: "https://cdn.example.com/thumb/pub.webp",
           startTime: "18:00",
           endTime: "23:00",
         },
@@ -106,6 +109,7 @@ describe("boothmapContract", () => {
     );
 
     expect(parsed[0]?.collegeName).toBe("공과대학");
+    expect(parsed[0]?.thumbnailUrl).toBe("https://cdn.example.com/thumb/pub.webp");
   });
 
   it("주점 상세 응답을 파싱한다", () => {
@@ -119,6 +123,7 @@ describe("boothmapContract", () => {
         collegeName: "공과대학",
         instagram: "@pub",
         imageUrls: ["https://cdn.example.com/1.png"],
+        thumbnailImageUrls: ["https://cdn.example.com/thumb/1.webp"],
         startTime: "18:00",
         endTime: "23:00",
       },
@@ -126,7 +131,30 @@ describe("boothmapContract", () => {
     );
 
     expect(parsed.imageUrls).toHaveLength(1);
+    expect(parsed.thumbnailImageUrls).toHaveLength(1);
   });
+
+  it("주점 상세 응답에서 thumbnailImageUrls가 없어도 파싱한다", () => {
+    const parsed = parsePubDetailContract(
+      {
+        pubId: 4,
+        name: "주점 C",
+        intro: "소개",
+        description: "상세",
+        department: "소프트웨어",
+        collegeName: "SW융합대학",
+        instagram: "@pub_c",
+        imageUrls: ["https://cdn.example.com/c.png"],
+        startTime: "18:00",
+        endTime: "23:00",
+      },
+      "/map/pubs/4",
+    );
+
+    expect(parsed.imageUrls).toHaveLength(1);
+    expect(parsed.thumbnailImageUrls).toBeNull();
+  });
+
   it("facility booth subType을 파싱한다", () => {
     const parsed = parseBoothMapContract(
       {
