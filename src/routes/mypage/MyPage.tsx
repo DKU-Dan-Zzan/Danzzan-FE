@@ -10,10 +10,10 @@ import {
   Ticket,
   User,
 } from "lucide-react";
+import { cn } from "@/components/common/ui/utils";
 import { authLogout } from "@/api/app/auth/authApi";
 import { studentProfileApi } from "@/api/app/auth/studentProfileApi";
-import { ticketApi } from "@/api/ticketing/ticketApi";
-import { appQueryKeys, useAppQuery } from "@/lib/query";
+import { useMyTicketsQuery } from "@/hooks/ticketing/useMyTicketsQuery";
 import { authStore } from "@/store/common/authStore";
 
 const FAQ_ITEMS = [
@@ -52,11 +52,12 @@ function FaqAccordion() {
             <ChevronDown
               size={16}
               aria-hidden
-              className={`shrink-0 transition-transform duration-200 ${
+              className={cn(
+                "shrink-0 transition-transform duration-200",
                 open === index
                   ? "rotate-180 text-[var(--mypage-faq-icon-open)]"
-                  : "text-[var(--mypage-faq-icon)]"
-              }`}
+                  : "text-[var(--mypage-faq-icon)]",
+              )}
             />
           </button>
           {open === index && (
@@ -156,12 +157,7 @@ function MyPage() {
     };
   }, [isLoggedIn, session.role, session.tokens, user?.college, user?.name]);
 
-  const ticketsQuery = useAppQuery({
-    queryKey: appQueryKeys.myTicketList(),
-    queryFn: ({ signal }) => ticketApi.getMyTickets({ signal }),
-    staleTime: 30_000,
-    enabled: isLoggedIn,
-  });
+  const ticketsQuery = useMyTicketsQuery(isLoggedIn);
 
   if (!isLoggedIn) {
     return (
