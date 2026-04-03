@@ -1,5 +1,6 @@
 // 역할: 공지 목록/상세 조회와 검색·페이지네이션·이미지 뷰어 상호작용을 처리하는 공지 라우트 화면입니다.
 import { keepPreviousData } from "@tanstack/react-query";
+import { Pin } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { getNoticeDetail, getNotices } from "@/api/app/notice/noticeApi";
 import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialog";
@@ -61,7 +62,7 @@ function Notice() {
           keyword: debouncedKeyword.trim() || undefined,
           category: category === "ALL" ? undefined : category,
           page,
-          size: 10,
+          size: 5,
         },
         { signal },
       ),
@@ -128,13 +129,12 @@ function Notice() {
   const isDetailOpen = selectedNoticeId !== null;
 
   return (
-    <div className="pb-5">
+    <div className="pb-5 pt-[calc(68px+env(safe-area-inset-top))]">
       {/* 상단 타이틀 & 검색 */}
-      <section className="bg-[var(--surface)] px-4 pb-4 pt-4 shadow-[0_8px_24px_var(--shadow-color)]">
+      <section className="bg-[var(--surface)] px-4 pb-4 pt-3 shadow-[0_8px_24px_var(--shadow-color)]">
         <div className="mb-3">
-          <p className="text-[11px] font-semibold text-[var(--text-emphasis-vivid)]">단짠 공지사항</p>
           <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-body-deep)]">
-            축제 소식 한눈에 보기
+            공지사항
           </h1>
         </div>
         <div className="flex gap-2">
@@ -199,12 +199,12 @@ function Notice() {
               onClick={() => handleOpenDetail(notice.id)}
               className={cn(NOTICE_LIST_CARD_BASE_CLASS, NOTICE_LIST_CARD_PINNED_CLASS)}
             >
-              <div className="flex min-w-0 flex-1 items-center gap-2.5">
-                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-[var(--app-circle-border)] bg-[linear-gradient(145deg,var(--app-circle-bg-start)_0%,var(--app-circle-bg-end)_100%)] text-[11px] font-semibold text-[var(--text-emphasis-vivid)] shadow-[var(--app-circle-shadow)]">
-                  ★
+              <div className="flex min-w-0 flex-1 items-start gap-2.5">
+                <span className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[rgba(239,68,68,0.08)] text-[var(--status-danger)]">
+                  <Pin className="h-3.5 w-3.5 fill-current" strokeWidth={2.2} />
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-[13px] font-semibold text-[var(--text)]">
+                  <p className="truncate text-[13px] font-semibold text-[var(--status-danger)]">
                     {notice.title}
                   </p>
                   <p className="mt-0.5 line-clamp-1 text-[11px] text-[var(--text-muted)]">
@@ -226,15 +226,6 @@ function Notice() {
               className={cn(NOTICE_LIST_CARD_BASE_CLASS, NOTICE_LIST_CARD_DEFAULT_CLASS)}
             >
               <div className="flex min-w-0 flex-1 items-center gap-2.5">
-                {notice.thumbnailImageUrl && (
-                  <div className="flex h-9 w-9 flex-shrink-0 overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-subtle)]">
-                    <img
-                      src={notice.thumbnailImageUrl}
-                      alt={notice.title}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                )}
                 <div className="min-w-0">
                   <p className="truncate text-[13px] font-semibold text-[var(--text)]">
                     {notice.title}
@@ -244,36 +235,57 @@ function Notice() {
                   </p>
                 </div>
               </div>
-              <span className="ml-2 flex-shrink-0 text-[11px] text-[var(--text-muted)]">
-                {formatDate(notice.createdAt)}
-              </span>
+              <div className="ml-2 flex flex-shrink-0 flex-col items-end gap-1">
+                <span className="text-[11px] text-[var(--text-muted)]">
+                  {formatDate(notice.createdAt)}
+                </span>
+                {notice.thumbnailImageUrl && (
+                  <span className="inline-flex items-center gap-0.5 rounded-full bg-[var(--surface-subtle)] px-1.5 py-0.5 text-[9px] text-[var(--text-muted)]">
+                    🖼 사진
+                  </span>
+                )}
+              </div>
             </button>
           ))}
         </div>
 
-        {totalPages > 1 && (
-          <div className="mt-4 flex items-center justify-center gap-3 text-[11px] text-[var(--text-muted)]">
-            <button
-              type="button"
-              disabled={currentPage === 0}
-              onClick={() => handleChangePage(currentPage - 1)}
-              className={NOTICE_PAGINATION_BUTTON_CLASS}
-            >
-              이전
-            </button>
-            <span>
-              {currentPage + 1} / {totalPages}
-            </span>
-            <button
-              type="button"
-              disabled={currentPage + 1 >= totalPages}
-              onClick={() => handleChangePage(currentPage + 1)}
-              className={NOTICE_PAGINATION_BUTTON_CLASS}
-            >
-              다음
-            </button>
-          </div>
-        )}
+        {totalPages > 1 && (() => {
+          const PAGE_GROUP = 5;
+          const groupStart = Math.floor(currentPage / PAGE_GROUP) * PAGE_GROUP;
+          const groupEnd = Math.min(groupStart + PAGE_GROUP, totalPages);
+          const hasNext = groupEnd < totalPages;
+          return (
+            <div className="mt-4 flex items-center justify-center gap-1.5">
+              {Array.from({ length: groupEnd - groupStart }, (_, i) => {
+                const p = groupStart + i;
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => handleChangePage(p)}
+                    className={cn(
+                      "flex h-8 w-8 items-center justify-center rounded-full text-[13px] font-semibold transition-colors",
+                      p === currentPage
+                        ? "bg-[#1c2b6a] text-white"
+                        : "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-muted)]"
+                    )}
+                  >
+                    {p + 1}
+                  </button>
+                );
+              })}
+              {hasNext && (
+                <button
+                  type="button"
+                  onClick={() => handleChangePage(groupEnd)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-subtle)] bg-[var(--surface)] text-[15px] text-[var(--text-muted)]"
+                >
+                  ›
+                </button>
+              )}
+            </div>
+          );
+        })()}
       </section>
 
       {/* 상세 보기 패널 */}
@@ -288,7 +300,7 @@ function Notice() {
         {isDetailOpen && (
           <DialogContent
             showCloseButton={false}
-            className="max-h-[90vh] w-full max-w-xl overflow-hidden rounded-3xl bg-white p-0 shadow-[0_18px_45px_var(--shadow-color)]"
+            className="h-[66.67vh] w-full max-w-xl overflow-hidden rounded-3xl bg-white p-0 shadow-[0_18px_45px_var(--shadow-color)]"
           >
             <div className="flex items-center justify-between border-b border-[var(--home-card-border)] px-5 py-3.5">
               <DialogTitle className="text-[13px] font-semibold text-[var(--text)]">공지 상세</DialogTitle>
@@ -301,7 +313,7 @@ function Notice() {
               </button>
             </div>
 
-            <div className="max-h-[calc(90vh-52px)] overflow-y-auto px-5 py-4">
+            <div className="h-[calc(66.67vh-52px)] overflow-y-auto px-5 py-4">
               {detailLoading && (
                 <p className="py-6 text-center text-[12px] text-[var(--text-muted)]">
                   공지 상세를 불러오는 중입니다...

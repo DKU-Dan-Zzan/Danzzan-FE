@@ -32,7 +32,7 @@ const BOTTOM_NAV_GRID_CLASS =
   "relative grid h-[var(--app-bottom-nav-height)] grid-cols-5 items-end px-3 pb-1";
 const BOTTOM_NAV_ITEM_BASE_CLASS =
   "relative flex h-full flex-col items-center justify-center gap-1 text-[length:var(--app-bottom-nav-label-size)] tracking-[0.08em] transition-[color,transform] duration-150 ease-out active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface_container_lowest)]";
-const BOTTOM_NAV_ITEM_ACTIVE_CLASS = "text-[var(--app-nav-text-active)]";
+const BOTTOM_NAV_ITEM_ACTIVE_CLASS = "text-[var(--app-nav-home-highlight)]";
 const BOTTOM_NAV_ITEM_INACTIVE_CLASS = "text-[var(--app-nav-text)]";
 const BOTTOM_NAV_ICON_BASE_CLASS =
   "h-[var(--app-bottom-nav-icon-size)] w-[var(--app-bottom-nav-icon-size)] transition-transform duration-150 ease-out motion-reduce:transform-none motion-reduce:transition-none";
