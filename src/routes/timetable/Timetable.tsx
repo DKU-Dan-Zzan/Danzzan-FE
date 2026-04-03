@@ -1,4 +1,4 @@
-import { Ticket } from "lucide-react"
+import { Ticket, User } from "lucide-react"
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type TouchEvent } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import {
@@ -10,7 +10,6 @@ import ContentImageSection from "@/components/app/timetable/ContentImage"
 import DayTabs from "@/components/app/timetable/DayTabs"
 import Timeline from "@/components/app/timetable/Timeline"
 import { cn } from "@/components/common/ui/utils"
-import { APP_HEADER_ROUND_BUTTON_BASE_CLASS } from "@/components/layout/AppHeaderRoundButtonClass"
 import { AppHeaderLogo } from "@/components/layout/AppHeaderLogo"
 import { getMyTicketNavigationTarget } from "@/lib/common/my-ticket-navigation"
 import { appQueryKeys, useAppQuery } from "@/lib/query"
@@ -25,6 +24,9 @@ const FESTIVAL_DAYS: FestivalDay[] = [
 
 const EXPANDED_POSTER_SRC = "/posters/timetable-header-banner.png"
 const COMPACT_POSTER_SRC = "/posters/timetable-poster-compact.jpeg"
+
+const HEADER_ICON_BUTTON_CLASS =
+  "absolute top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center text-[color:color-mix(in_srgb,var(--text)_96%,black)] transition-colors duration-150 hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
 
 function todayISODateLocal() {
   const d = new Date()
@@ -340,6 +342,10 @@ export default function Timetable() {
     navigate(getMyTicketNavigationTarget(isLoggedIn))
   }
 
+  const handleMyInfoClick = () => {
+    navigate("/mypage")
+  }
+
   return (
     <div className="timetable-root relative flex h-screen min-h-0 flex-col overflow-hidden bg-white">
       <div
@@ -399,9 +405,18 @@ export default function Timetable() {
                       onClick={handleTicketClick}
                       aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
                       title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
-                      className={cn(APP_HEADER_ROUND_BUTTON_BASE_CLASS, "pointer-events-auto right-4")}
+                      className={cn(HEADER_ICON_BUTTON_CLASS, "pointer-events-auto right-[4.25rem]")}
                     >
-                      <Ticket size={20} className="text-[var(--app-header-ticket-btn-icon)]" />
+                      <Ticket size={22} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleMyInfoClick}
+                      aria-label="내정보"
+                      title="내정보"
+                      className={cn(HEADER_ICON_BUTTON_CLASS, "pointer-events-auto right-4")}
+                    >
+                      <User size={22} />
                     </button>
                   </div>
                 </div>
