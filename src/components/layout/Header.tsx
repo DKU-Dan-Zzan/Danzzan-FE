@@ -1,5 +1,5 @@
 // 역할: 앱 레이아웃 레이어의 Header 구성 컴포넌트를 제공합니다.
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { Ticket, User } from "lucide-react"
 import { useSyncExternalStore } from "react"
 import { authStore } from "@/store/common/authStore"
@@ -12,6 +12,8 @@ const HEADER_ICON_BUTTON_CLASS =
 
 const Header = () => {
   const navigate = useNavigate()
+  const location = useLocation()
+  const isMyPage = location.pathname === "/mypage"
   const session = useSyncExternalStore(
     authStore.subscribe,
     authStore.getSnapshot,
@@ -32,22 +34,26 @@ const Header = () => {
 
   return (
     <AppTopBar headerClassName={headerClassName}>
-      <button
-        onClick={handleTicketClick}
-        aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
-        title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
-        className={cn(HEADER_ICON_BUTTON_CLASS, "right-[4.25rem]")}
-      >
-        <Ticket size={22} />
-      </button>
-      <button
-        onClick={handleMyInfoClick}
-        aria-label="내정보"
-        title="내정보"
-        className={cn(HEADER_ICON_BUTTON_CLASS, "right-4")}
-      >
-        <User size={22} />
-      </button>
+      {!isMyPage && (
+        <>
+          <button
+            onClick={handleTicketClick}
+            aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
+            title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
+            className={cn(HEADER_ICON_BUTTON_CLASS, "right-[4.25rem]")}
+          >
+            <Ticket size={22} />
+          </button>
+          <button
+            onClick={handleMyInfoClick}
+            aria-label="내정보"
+            title="내정보"
+            className={cn(HEADER_ICON_BUTTON_CLASS, "right-4")}
+          >
+            <User size={22} />
+          </button>
+        </>
+      )}
     </AppTopBar>
   )
 }
