@@ -481,7 +481,7 @@ export default function BoothMap() {
           TOP_PANEL_Z_INDEX_CLASS[sheetSnap],
         )}
       >
-        <div className="pointer-events-auto mt-[calc(env(safe-area-inset-top)+4.5rem)] px-4 pb-4">
+        <div className="pointer-events-auto mt-[calc(env(safe-area-inset-top)+4.5rem)] px-3 py-2 sm:px-4 sm:pb-4">
           <FestivalDateTabs
             dates={FESTIVAL_DATES}
             selectedDate={selectedDate}
