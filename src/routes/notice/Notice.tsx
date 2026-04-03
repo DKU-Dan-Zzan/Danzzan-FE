@@ -197,17 +197,18 @@ function Notice() {
               key={notice.id}
               type="button"
               onClick={() => handleOpenDetail(notice.id)}
-              className={cn(NOTICE_LIST_CARD_BASE_CLASS, NOTICE_LIST_CARD_PINNED_CLASS)}
+              className={cn(NOTICE_LIST_CARD_BASE_CLASS, NOTICE_LIST_CARD_PINNED_CLASS, "overflow-hidden")}
             >
-              <div className="flex min-w-0 flex-1 items-start gap-2.5">
-                <span className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[rgba(239,68,68,0.08)] text-[var(--status-danger)]">
+              <span className="absolute left-0 top-0 h-full w-1 rounded-l-[18px]" style={{ background: "#f97316" }} />
+              <div className="flex min-w-0 flex-1 items-start gap-2 pl-2">
+                <span className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(249,115,22,0.1)", color: "#ea580c" }}>
                   <Pin className="h-3.5 w-3.5 fill-current" strokeWidth={2.2} />
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-[13px] font-semibold text-[var(--status-danger)]">
+                  <p className="truncate text-[13px] font-semibold" style={{ color: "#ea580c" }}>
                     {notice.title}
                   </p>
-                  <p className="mt-0.5 line-clamp-1 text-[11px] text-[var(--text-muted)]">
+                  <p className="mt-0.5 line-clamp-1 text-[11px]" style={{ color: "#f97316" }}>
                     {notice.content}
                   </p>
                 </div>
