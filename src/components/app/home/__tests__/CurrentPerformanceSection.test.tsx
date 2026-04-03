@@ -20,14 +20,18 @@ vi.mock("@/lib/query", () => ({
 }));
 
 describe("CurrentPerformanceSection", () => {
-  it("에러 상태에서 재시도 액션을 버튼으로 노출한다", () => {
+  it("에러 상태에서 card-outline(밝은 배경 + 강조 보더) 카드와 재시도 CTA를 버튼으로 노출한다", () => {
     const markup = renderToStaticMarkup(
       <StaticRouter location="/">
         <CurrentPerformanceSection />
       </StaticRouter>,
     );
 
-    expect(markup).toContain("font-bold text-[var(--home-lineup-caption-color)]");
+    expect(markup).toContain("text-[var(--home-lineup-caption-color)]");
+    expect(markup).toContain("bg-[var(--card-outline-bg)]");
+    expect(markup).toContain("border-[var(--card-outline-border)]");
+    expect(markup).toContain("shadow-[var(--card-outline-shadow)]");
+    expect(markup).toContain("bg-[linear-gradient(135deg,var(--primary)_0%,var(--primary_container)_100%)]");
     expect(markup).toContain(">다시 시도<");
     expect(markup).toContain("button");
   });
