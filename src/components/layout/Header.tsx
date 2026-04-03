@@ -13,6 +13,7 @@ const HEADER_ICON_BUTTON_CLASS =
 const Header = () => {
   const navigate = useNavigate()
   const location = useLocation()
+  const isMyPage = location.pathname === "/mypage"
   const session = useSyncExternalStore(
     authStore.subscribe,
     authStore.getSnapshot,
@@ -38,22 +39,26 @@ const Header = () => {
 
   return (
     <AppTopBar headerClassName={headerClassName}>
-      <button
-        onClick={handleTicketClick}
-        aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
-        title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
-        className={cn(HEADER_ICON_BUTTON_CLASS, "right-[4.25rem]")}
-      >
-        <Ticket size={22} />
-      </button>
-      <button
-        onClick={handleMyInfoClick}
-        aria-label="내정보"
-        title="내정보"
-        className={cn(HEADER_ICON_BUTTON_CLASS, "right-4")}
-      >
-        <User size={22} />
-      </button>
+      {!isMyPage && (
+        <>
+          <button
+            onClick={handleTicketClick}
+            aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
+            title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
+            className={cn(HEADER_ICON_BUTTON_CLASS, "right-[4.25rem]")}
+          >
+            <Ticket size={22} />
+          </button>
+          <button
+            onClick={handleMyInfoClick}
+            aria-label="내정보"
+            title="내정보"
+            className={cn(HEADER_ICON_BUTTON_CLASS, "right-4")}
+          >
+            <User size={22} />
+          </button>
+        </>
+      )}
     </AppTopBar>
   )
 }
