@@ -2,9 +2,9 @@
 import { useEffect, useRef, type Dispatch, type SetStateAction } from "react";
 import {
   BACKGROUND_POLL_INTERVAL,
-  FOREGROUND_POLL_INTERVAL,
   MAX_BACKOFF_EXPONENT,
   computePollingDelay,
+  getAdaptiveForegroundInterval,
 } from "@/hooks/ticketing/queue/flow-utils";
 import { OFFLINE_WAITING_MESSAGE } from "@/routes/ticketing/ticketing/ticketing-flow-helpers";
 import type { TicketingStep } from "@/routes/ticketing/ticketing/flow/types";
@@ -15,6 +15,7 @@ type UseQueuePollingParams = {
   activeEventId: string | null;
   isNetworkOnline: boolean;
   waitingError: string | null;
+  queuePosition: number | null;
   setStep: Dispatch<SetStateAction<TicketingStep>>;
   setQueueStatus: (status: QueueRequestStatus) => void;
   setWaitingError: Dispatch<SetStateAction<string | null>>;
@@ -28,6 +29,7 @@ export const useQueuePolling = ({
   activeEventId,
   isNetworkOnline,
   waitingError,
+  queuePosition,
   setStep,
   setQueueStatus,
   setWaitingError,
@@ -36,8 +38,13 @@ export const useQueuePolling = ({
   checkQueueStatus,
 }: UseQueuePollingParams) => {
   const pollBackoffRef = useRef(0);
+  const queuePositionRef = useRef(queuePosition);
   const restoreAttemptedRef = useRef(false);
   const wasOnlineRef = useRef(isNetworkOnline);
+
+  useEffect(() => {
+    queuePositionRef.current = queuePosition;
+  }, [queuePosition]);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -157,7 +164,9 @@ export const useQueuePolling = ({
       }
 
       if (status === "WAITING" || status === null) {
-        const baseDelay = document.hidden ? BACKGROUND_POLL_INTERVAL : FOREGROUND_POLL_INTERVAL;
+        const baseDelay = document.hidden
+          ? BACKGROUND_POLL_INTERVAL
+          : getAdaptiveForegroundInterval(queuePositionRef.current);
         if (status === null) {
           pollBackoffRef.current = Math.min(pollBackoffRef.current + 1, MAX_BACKOFF_EXPONENT);
         } else {
@@ -167,7 +176,7 @@ export const useQueuePolling = ({
       }
     };
 
-    scheduleNextPoll(computePollingDelay(FOREGROUND_POLL_INTERVAL, 0));
+    scheduleNextPoll(computePollingDelay(getAdaptiveForegroundInterval(queuePositionRef.current), 0));
 
     return () => {
       cancelled = true;

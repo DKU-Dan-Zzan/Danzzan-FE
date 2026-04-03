@@ -248,6 +248,7 @@ export function useTicketingFlow() {
     activeEventId,
     isNetworkOnline,
     waitingError,
+    queuePosition: waitingQueuePosition,
     setStep,
     setQueueStatus,
     setWaitingError,

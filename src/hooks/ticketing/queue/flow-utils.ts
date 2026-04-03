@@ -3,6 +3,19 @@ import type { QueueRequestStatus } from "@/types/ticketing/model/ticket.model";
 
 export const FOREGROUND_POLL_INTERVAL = 2000;
 export const BACKGROUND_POLL_INTERVAL = 8000;
+
+/**
+ * 순번 기반 적응형 폴링 간격
+ * - 1~100번:    2s  (곧 내 차례, 빠르게 감지)
+ * - 101~1000번: 5s  (어느 정도 여유)
+ * - 1001번~:    10s (한참 기다려야 함)
+ */
+export const getAdaptiveForegroundInterval = (queuePosition: number | null): number => {
+  if (queuePosition === null) return FOREGROUND_POLL_INTERVAL;
+  if (queuePosition <= 100) return 2000;
+  if (queuePosition <= 1000) return 5000;
+  return 10000;
+};
 export const MAX_BACKOFF_EXPONENT = 4;
 export const MAX_POLL_DELAY_MS = 60_000;
 export const MIN_POLL_DELAY_MS = 700;
