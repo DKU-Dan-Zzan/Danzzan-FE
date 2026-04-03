@@ -3,6 +3,19 @@
 @import "tailwindcss";
 
 :root {
+  --font-display: "Manrope", "Plus Jakarta Sans", "Inter", "Noto Sans KR", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Plus Jakarta Sans", "Inter", "Noto Sans KR", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --type-display-lg-size: 2rem;
+  --type-display-lg-tracking: -0.015em;
+  --type-title-md-size: 1rem;
+  --type-title-md-tracking: 0;
+  --type-label-md-tracking: 0.04em;
+  --spacing-4: 1rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --ec-glass-bg: rgba(248, 250, 251, 0.7);
+  --ec-glass-blur: 28px;
+  --ec-ambient-shadow: 0 20px 50px rgba(44, 52, 54, 0.06);
   --brand-main: #0a559c;
   --bg-base: #f8fbff;
   --bg-page-soft: #f8fbff;
@@ -11,6 +24,7 @@
   --text-on-accent: #ffffff;
   --accent: #2563eb;
   --border-base: rgba(147, 197, 253, 0.56);
+  --outline_variant: rgba(147, 197, 253, 0.22);
   --surface-subtle: rgba(255, 255, 255, 0.9);
   --surface-tint-subtle: rgba(59, 130, 246, 0.1);
   --shadow-color: rgba(15, 23, 42, 0.12);
@@ -36,11 +50,14 @@
   --app-overscroll-bg: #f1f6fd;
   --app-overscroll-bg-gradient: none;
   --app-nav-bg: rgba(251, 253, 255, 0.96);
+  --app-nav-bg-gradient: none;
   --app-nav-border: rgba(138, 157, 198, 0.26);
   --app-nav-shadow: 0 -8px 24px rgba(16, 32, 74, 0.1);
   --app-nav-text: #8b97ad;
   --app-nav-text-active: var(--brand-main);
+  --app-nav-home-highlight: rgb(7 49 97);
   --footer-bg: #f8fbff;
+  --footer-bg-gradient: none;
   --footer-text-primary: #32405f;
   --footer-text-secondary: #61708f;
   --footer-divider: rgba(126, 145, 185, 0.44);
@@ -243,9 +260,12 @@
   --popover: white;
   --popover-foreground: var(--text);
   --primary: var(--accent);
+  --primary_container: color-mix(in srgb, var(--accent) 42%, white);
+  --on-primary: var(--text-on-accent);
   --primary-foreground: var(--text-on-accent);
   --primary-soft: rgba(59, 130, 246, 0.12);
   --secondary: rgba(255, 255, 255, 0.8);
+  --on-secondary-container: var(--text);
   --secondary-foreground: var(--text);
   --muted: rgba(255, 255, 255, 0.72);
   --muted-foreground: var(--text-muted);
@@ -371,6 +391,8 @@
   --home-notice-ring: transparent;
   --home-notice-icon-inner-shadow: var(--app-circle-shadow);
   --home-content-max-width: 314.4px;
+  --home-hero-nav-overlap: 28px;
+  --home-anchor-entry-gap: 44px;
   --home-section-notice-margin-top: 0px;
   --home-section-poster-margin-top: 26.5px;
   --home-lineup-caption-margin-top: 31px;
@@ -403,6 +425,7 @@
   --home-notice-icon-size: 24px;
   --home-notice-body-font-size: 13px;
   --home-notice-updated-font-size: 11px;
+  --home-page-gradient: none;
 
   /* MyPage route tokens */
   --mypage-page-bg: var(--bg-page-soft);
@@ -634,6 +657,7 @@
   --border-subtle: rgba(227, 232, 239, 0.74);
   --border-strong: rgba(227, 232, 239, 0.98);
   --border-emphasis: rgba(153, 175, 214, 0.62);
+  --outline_variant: rgba(179, 191, 209, 0.34);
   --border: var(--border-base);
   --shadow-color: rgba(32, 49, 99, 0.16);
   --ring: rgba(59, 74, 118, 0.42);
@@ -666,6 +690,8 @@
   --card-grad-tint-border: var(--card-grad-white-border);
   --card-grad-tint-shadow: var(--card-shadow-elevated);
   --primary: var(--webapp-button-primary);
+  --primary_container: color-mix(in srgb, var(--webapp-button-primary) 38%, white);
+  --on-primary: var(--text-on-accent);
   --primary-soft: rgba(59, 74, 118, 0.14);
   --button-disabled-bg: var(--webapp-button-disabled);
   --button-disabled-text: var(--paper-50);
@@ -677,8 +703,12 @@
   --app-nav-bg: var(--webapp-bottom-bar);
   --app-nav-border: rgba(32, 49, 99, 0.1);
   --app-nav-shadow: 0 -8px 24px rgba(32, 49, 99, 0.08);
-  --app-nav-text: var(--ink-300);
-  --app-nav-text-active: var(--webapp-text-emphasis);
+  --app-nav-text: rgb(127 143 150);
+  --app-nav-text-active: rgb(143 169 190);
+  --app-nav-home-highlight: rgb(7 49 97);
+  --app-bottom-nav-height: 64px;
+  --app-bottom-nav-icon-size: 22px;
+  --app-bottom-nav-label-size: 10px;
 
   --footer-bg: var(--webapp-footer-bg);
   --footer-text-primary: #7b838b;
@@ -760,6 +790,286 @@
   --timetable-notice-border: rgb(247 235 226 / 45%);
 }
 
+[data-color-scheme="electric-curator"] {
+  --surface: rgb(248 250 251);
+  --surface_container: rgb(232 238 241);
+  --surface_container_low: rgb(240 244 246);
+  --surface_container_lowest: #ffffff;
+  --surface_container_high: rgb(227 235 238);
+  --primary: rgb(143 169 190);
+  --primary_container: rgb(203 230 252);
+  --on-primary: #ffffff;
+  --secondary: rgb(245 176 112);
+  --secondary_container: rgb(252 214 175);
+  --on-secondary-container: rgb(111 76 45);
+  --tertiary: rgb(242 140 130);
+  --tertiary_container: rgb(250 183 154);
+  --on-tertiary-container: rgb(93 59 55);
+  --outline_variant: rgba(172, 179, 182, 0.15);
+  --ec-glass-bg: rgba(248, 250, 251, 0.7);
+  --ec-glass-blur: 28px;
+  --ec-ambient-shadow: 0 20px 50px rgba(44, 52, 54, 0.06);
+  --font-display: "Manrope", "Plus Jakarta Sans", "Inter", "Noto Sans KR", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Plus Jakarta Sans", "Inter", "Noto Sans KR", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --type-display-lg-size: 3.5rem;
+  --type-display-lg-tracking: -0.02em;
+  --type-title-md-size: 1rem;
+  --type-title-md-tracking: 0;
+  --type-label-md-tracking: 0.04em;
+  --spacing-4: 1rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.5rem;
+
+  --bg-base: var(--surface);
+  --bg-page-soft: var(--surface);
+  --text: rgb(44 52 54);
+  --text-muted: rgb(101 114 118);
+  --text-on-accent: var(--on-primary);
+  --accent: var(--primary);
+  --surface-base: var(--surface_container_lowest);
+  --surface-subtle: var(--surface_container_low);
+  --surface-strong: var(--surface_container);
+  --surface-tint-subtle: color-mix(in srgb, var(--primary_container) 36%, transparent);
+  --surface-tint-base: color-mix(in srgb, var(--primary_container) 54%, transparent);
+  --surface-tint-strong: color-mix(in srgb, var(--primary_container) 72%, transparent);
+  --surface-tint-emphasis: color-mix(in srgb, var(--primary_container) 84%, transparent);
+  --surface-tint: var(--surface-tint-base);
+  --border-base: var(--outline_variant);
+  --border-subtle: color-mix(in srgb, var(--outline_variant) 82%, transparent);
+  --border-strong: color-mix(in srgb, var(--primary) 40%, transparent);
+  --border-emphasis: color-mix(in srgb, var(--primary) 62%, transparent);
+  --border: var(--border-base);
+  --shadow-color: rgba(44, 52, 54, 0.12);
+  --ring: color-mix(in srgb, var(--primary) 40%, transparent);
+
+  --background: var(--bg-base);
+  --foreground: var(--text);
+  --card: var(--surface_container_lowest);
+  --card-foreground: var(--text);
+  --popover: var(--surface_container_lowest);
+  --popover-foreground: var(--text);
+  --primary-foreground: var(--on-primary);
+  --primary-soft: color-mix(in srgb, var(--primary) 18%, white);
+  --secondary-foreground: var(--on-secondary-container);
+  --muted: var(--surface_container_low);
+  --muted-foreground: var(--text-muted);
+  --accent-soft: color-mix(in srgb, var(--primary) 14%, white);
+  --accent-foreground: var(--primary);
+  --input: color-mix(in srgb, var(--outline_variant) 90%, transparent);
+  --input-background: var(--surface_container_lowest);
+  --switch-background: color-mix(in srgb, var(--outline_variant) 72%, transparent);
+
+  --app-header-bg: var(--ec-glass-bg);
+  --app-header-bg-gradient:
+    linear-gradient(
+      180deg,
+      rgba(248, 250, 251, 0.88) 0%,
+      rgba(240, 244, 246, 0.78) 100%
+    );
+  --app-header-border: transparent;
+  --app-overscroll-bg: var(--surface);
+  --app-overscroll-bg-gradient:
+    radial-gradient(120% 72% at 16% -12%, color-mix(in srgb, var(--primary_container) 38%, transparent) 0%, transparent 68%),
+    radial-gradient(90% 68% at 84% 2%, color-mix(in srgb, var(--tertiary_container) 26%, transparent) 0%, transparent 64%),
+    linear-gradient(180deg, rgb(248 250 251) 0%, rgb(247 249 250) 100%);
+  --app-nav-bg: var(--ec-glass-bg);
+  --app-nav-bg-gradient:
+    linear-gradient(
+      180deg,
+      rgba(248, 250, 251, 0.84) 0%,
+      rgba(240, 244, 246, 0.82) 100%
+    );
+  --app-nav-border: transparent;
+  --app-nav-shadow: var(--ec-ambient-shadow);
+  --app-nav-text: rgb(127 143 150);
+  --app-nav-text-active: var(--primary);
+  --app-nav-home-highlight: rgb(7 49 97);
+  --app-bottom-nav-height: 64px;
+  --app-bottom-nav-icon-size: 22px;
+  --app-bottom-nav-label-size: 10px;
+
+  --footer-bg: var(--surface_container_low);
+  --footer-bg-gradient:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface_container_low) 90%, white) 0%,
+      var(--surface_container_low) 100%
+    );
+  --footer-text-primary: rgb(60 74 78);
+  --footer-text-secondary: rgb(117 130 134);
+  --footer-divider: transparent;
+  --footer-divider-glow: transparent;
+  --footer-divider-transparent: transparent;
+  --footer-icon-bg: rgba(255, 255, 255, 0.86);
+  --footer-icon-bg-hover: rgba(255, 255, 255, 0.96);
+  --footer-icon-border: transparent;
+  --footer-icon-fg: var(--primary);
+  --footer-icon-shadow: var(--ec-ambient-shadow);
+
+  --app-circle-border: transparent;
+  --app-circle-bg-start: rgba(255, 255, 255, 0.88);
+  --app-circle-bg-end: color-mix(in srgb, var(--primary_container) 42%, white);
+  --text-emphasis-vivid: var(--primary);
+  --text-emphasis-vivid-strong: color-mix(in srgb, var(--primary) 78%, white);
+  --text-body-deep: rgb(44 52 54);
+  --text-bold-emphasis: rgb(53 67 71);
+  --app-circle-fg: var(--primary);
+  --app-circle-shadow: var(--ec-ambient-shadow);
+  --ticketing-action-bg-start: var(--primary);
+  --ticketing-action-bg-end: var(--primary_container);
+  --ticketing-action-shadow: var(--ec-ambient-shadow);
+  --ticketing-action-disabled-bg-start: color-mix(in srgb, var(--primary) 34%, white);
+  --ticketing-action-disabled-bg-end: color-mix(in srgb, var(--primary_container) 58%, white);
+  --ticketing-action-disabled-border: color-mix(in srgb, var(--primary) 24%, white);
+  --ticketing-action-disabled-text: var(--on-primary);
+  --app-header-ticket-btn-size: 48px;
+  --app-header-ticket-btn-border: transparent;
+  --app-header-ticket-btn-bg-start: rgba(255, 255, 255, 0.82);
+  --app-header-ticket-btn-bg-end: color-mix(in srgb, var(--primary_container) 40%, white);
+  --app-header-ticket-btn-icon: var(--primary);
+  --app-header-ticket-btn-shadow: var(--ec-ambient-shadow);
+  --app-header-ticket-btn-shadow-hover:
+    0 24px 42px -30px rgba(44, 52, 54, 0.18);
+
+  --status-info: var(--primary);
+  --status-info-bg: color-mix(in srgb, var(--tertiary_container) 46%, transparent);
+  --status-info-border: color-mix(in srgb, var(--outline_variant) 88%, transparent);
+  --status-info-text: rgb(77 79 78);
+  --status-warning: rgb(201 133 72);
+  --status-warning-bg: color-mix(in srgb, var(--secondary_container) 42%, transparent);
+  --status-warning-border: color-mix(in srgb, var(--secondary) 34%, transparent);
+  --status-warning-text: rgb(130 86 46);
+  --status-neutral: var(--text-muted);
+  --status-neutral-bg: color-mix(in srgb, var(--surface_container_high) 90%, white);
+  --status-neutral-border: var(--outline_variant);
+  --status-neutral-text: var(--text-muted);
+
+  --home-page-gradient:
+    radial-gradient(126% 74% at 88% 4%, color-mix(in srgb, var(--primary_container) 44%, transparent) 0%, transparent 60%),
+    radial-gradient(88% 62% at 12% 0%, color-mix(in srgb, var(--tertiary_container) 28%, transparent) 0%, transparent 60%),
+    linear-gradient(180deg, rgb(248 250 251) 0%, rgb(247 249 250) 100%);
+  --home-notice-bg-start: rgba(248, 250, 251, 0.8);
+  --home-notice-bg-end: rgba(232, 238, 241, 0.7);
+  --home-notice-border: transparent;
+  --home-notice-shadow: var(--ec-ambient-shadow);
+  --home-notice-depth-shadow: rgba(44, 52, 54, 0.08);
+  --home-notice-icon-border: transparent;
+  --home-notice-icon-bg-start: color-mix(in srgb, var(--tertiary_container) 26%, white);
+  --home-notice-icon-bg-end: color-mix(in srgb, var(--surface_container_lowest) 86%, transparent);
+  --home-notice-card-radius: var(--radius-xl);
+  --home-notice-card-shadow: var(--ec-ambient-shadow);
+  --home-notice-ring: transparent;
+  --home-notice-icon-inner-shadow: var(--ec-ambient-shadow);
+  --home-content-max-width: 314.4px;
+  --home-hero-nav-overlap: 28px;
+  --home-anchor-entry-gap: 44px;
+  --home-lineup-caption-font-size: var(--type-title-md-size);
+  --home-lineup-caption-color: var(--text);
+  --home-ad-banner-border: transparent;
+  --home-lineup-card-border: transparent;
+  --home-ad-banner-bg: var(--surface_container_lowest);
+  --home-card-radius: var(--radius-xl);
+  --home-card-border: transparent;
+  --home-card-bg: var(--surface_container_lowest);
+  --home-poster-placeholder-bg:
+    linear-gradient(145deg, color-mix(in srgb, var(--surface_container_low) 86%, white) 0%, var(--surface_container_lowest) 100%);
+  --home-poster-placeholder-shadow: var(--ec-ambient-shadow);
+  --home-elevated-card-shadow:
+    0 20px 50px rgba(44, 52, 54, 0.06);
+  --home-poster-card-shadow: var(--home-elevated-card-shadow);
+  --home-lineup-card-shadow: var(--home-elevated-card-shadow);
+  --home-current-performance-card-shadow: var(--home-elevated-card-shadow);
+  --home-notice-trigger-height: 44px;
+  --home-notice-icon-size: 26px;
+  --home-notice-body-font-size: 13px;
+  --home-notice-updated-font-size: 11px;
+
+  --boothmap-chip-selected-bg: var(--secondary_container);
+  --boothmap-chip-selected-border: transparent;
+  --boothmap-chip-selected-text: var(--on-secondary-container);
+  --boothmap-chip-selected-shadow: 0 10px 20px -16px rgba(44, 52, 54, 0.16);
+  --boothmap-chip-bg: var(--surface_container_lowest);
+  --boothmap-chip-border: transparent;
+  --boothmap-chip-text: var(--text-muted);
+  --boothmap-chip-hover-bg: var(--surface_container_high);
+  --boothmap-chip-hover-border: transparent;
+  --boothmap-chip-hover-text: var(--text);
+
+  --radius: 0.75rem;
+}
+
+@keyframes ec-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ec-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ec-scroll-cue-float {
+  0% {
+    transform: translateY(0);
+    opacity: 0.78;
+  }
+  50% {
+    transform: translateY(9px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0.78;
+  }
+}
+
+.ec-scroll-cue-float {
+  animation: ec-scroll-cue-float 1.5s ease-in-out infinite;
+}
+
+@keyframes ec-scroll-cue-twinkle {
+  0% {
+    opacity: 0.56;
+    filter: brightness(0.92);
+  }
+  50% {
+    opacity: 0.88;
+    filter: brightness(1.08);
+  }
+  100% {
+    opacity: 0.56;
+    filter: brightness(0.92);
+  }
+}
+
+.ec-scroll-cue-twinkle {
+  animation: ec-scroll-cue-twinkle 2.2s ease-in-out infinite;
+  will-change: opacity, filter;
+}
+
+.home-hero-bottom-vignette {
+  background: linear-gradient(
+    180deg,
+    rgba(8, 14, 27, 0) 0%,
+    rgba(8, 14, 27, 0.24) 42%,
+    rgba(7, 12, 23, 0.62) 76%,
+    rgba(5, 9, 18, 0.88) 100%
+  );
+}
+
 html,
 body,
 #root {
@@ -767,6 +1077,8 @@ body,
   background-image: var(--app-overscroll-bg-gradient);
   background-repeat: no-repeat;
   background-size: 100% 100%;
+  font-family: var(--font-body);
+  color: var(--text);
 }
 
 .font-cute {
