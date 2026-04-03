@@ -110,7 +110,7 @@ export default function TimelineItem({
 
             <h3
               className={[
-                "max-w-full text-center text-[1.35rem] font-extrabold leading-snug tracking-[-0.03em] text-neutral-800",
+                "max-w-full text-center font-sans text-[1.2rem] font-semibold leading-snug tracking-normal text-neutral-800",
                 item.artistDescription ? "mt-1" : "mt-0",
               ].join(" ")}
             >

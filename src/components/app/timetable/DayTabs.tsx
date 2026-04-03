@@ -31,8 +31,8 @@ export default function DayTabs({
               <span
                 className={[
                   "tracking-[0.02em]",
-                  compact ? "text-[20px]" : "text-[24px]",
-                  active ? "font-black" : "font-extrabold",
+                  compact ? "text-[22px]" : "text-[27px]",
+                  active ? "font-black" : "font-bold",
                 ].join(" ")}
                 style={{
                   color: active ? "var(--timetable-v2-accent)" : "var(--timetable-tab-inactive)",
@@ -43,7 +43,7 @@ export default function DayTabs({
 
               {active ? (
                 <span
-                  className="absolute bottom-0 left-1/2 h-[3px] w-[42%] min-w-[2.75rem] -translate-x-1/2 rounded-t-full bg-[var(--timetable-v2-accent)]"
+                  className="absolute bottom-0 left-1/2 h-[4.5px] w-[46%] min-w-[2.85rem] -translate-x-1/2 rounded-t-full bg-[var(--timetable-v2-accent)]"
                   style={{
                     boxShadow: "0 -2px 10px color-mix(in srgb, var(--timetable-v2-accent) 30%, transparent)",
                   }}
