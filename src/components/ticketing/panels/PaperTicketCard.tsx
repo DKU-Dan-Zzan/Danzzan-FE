@@ -1,7 +1,5 @@
 // 역할: 종이 티켓 스타일 카드의 시각 표현과 상태별 배지/정보 표시를 담당합니다.
-import { Card } from "@/components/common/ui/card";
 import { cn } from "@/components/common/ui/utils";
-import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
 import { resolveTicketDayLabel } from "@/lib/ticketing/festivalDay";
 import type { Ticket } from "@/types/ticketing/model/ticket.model";
 
@@ -9,163 +7,129 @@ interface PaperTicketCardProps {
   ticket: Ticket;
 }
 
-const statusDisplayMap: Record<
-  Ticket["status"],
-  { label: string; badgeClassName: string }
-> = {
-  issued: {
-    label: "팔찌 미수령 상태",
-    badgeClassName:
-      "border-[var(--status-pending-border)] bg-[var(--status-pending-bg)] text-[var(--status-pending-text)]",
-  },
-  used: {
-    label: "팔찌 수령 완료",
-    badgeClassName:
-      "border-[var(--status-success-border)] bg-[var(--status-success-bg)] text-[var(--status-success-text)]",
-  },
-  cancelled: {
-    label: "예매 취소",
-    badgeClassName:
-      "border-[var(--border-base)] bg-[linear-gradient(180deg,var(--surface-base)_0%,var(--ticket-paper-top)_100%)] text-[var(--text-muted)]",
-  },
-  unknown: {
-    label: "상태 확인 필요",
-    badgeClassName:
-      "border-[var(--border-strong)] bg-[linear-gradient(180deg,var(--surface-tint-strong)_0%,var(--ticket-paper-top)_100%)] text-[var(--accent)]",
-  },
+const statusDisplayMap: Record<Ticket["status"], { label: string; bg: string; text: string }> = {
+  issued:    { label: "팔찌 미수령",   bg: "#dcfce7", text: "#15803d" },
+  used:      { label: "팔찌 수령 완료", bg: "#fee2e2", text: "#b91c1c" },
+  cancelled: { label: "예매 취소",     bg: "#f3f4f6", text: "#6b7280" },
+  unknown:   { label: "상태 확인 필요", bg: "#ede9fe", text: "#6d28d9" },
 };
 
-const stripTimeFromEventDate = (value: string): string => {
-  return value.replace(/\s+\d{1,2}:\d{2}.*$/, "").trim();
-};
+const stripTimeFromEventDate = (value: string): string =>
+  value.replace(/\s+\d{1,2}:\d{2}.*$/, "").trim();
 
 const toCompactEventDate = (value: string): string => {
   const normalized = stripTimeFromEventDate(value);
   const monthDayKorean = normalized.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
-  if (monthDayKorean) {
-    return `${Number(monthDayKorean[1])}/${Number(monthDayKorean[2])}`;
-  }
-
+  if (monthDayKorean) return `${Number(monthDayKorean[1])}/${Number(monthDayKorean[2])}`;
   const isoLike = normalized.match(/(\d{4})[-./](\d{1,2})[-./](\d{1,2})/);
-  if (isoLike) {
-    return `${Number(isoLike[2])}/${Number(isoLike[3])}`;
-  }
-
+  if (isoLike) return `${Number(isoLike[2])}/${Number(isoLike[3])}`;
   return normalized;
 };
 
-const getGuideLines = (
-  ticket: Ticket,
-): {
-  dayLabel: string;
-  dateLabel: string;
-  queueLabel: string;
-  wristbandValue: string;
-} => {
-  const dateLabel = ticket.eventDate ? toCompactEventDate(ticket.eventDate) : "미정";
-  const dayLabel = resolveTicketDayLabel({
-    eventDate: ticket.eventDate,
-    eventName: ticket.eventName,
-  });
-  const queueLabel = ticket.queueNumber != null
-    ? String(ticket.queueNumber)
-    : ticket.id.slice(-4).toUpperCase();
-
-  return {
-    dayLabel,
-    dateLabel,
-    queueLabel,
-    wristbandValue: "10:00~",
-  };
-};
-
-const PAPER_SURFACE_STYLE = {
-  backgroundImage:
-    "linear-gradient(90deg, var(--card-grad-white-start) 0%, var(--card-grad-white-mid) 42%, var(--card-grad-white-end) 100%)",
-} as const;
+const getGuideLines = (ticket: Ticket) => ({
+  dayLabel: resolveTicketDayLabel({ eventDate: ticket.eventDate, eventName: ticket.eventName }),
+  dateLabel: ticket.eventDate ? toCompactEventDate(ticket.eventDate) : "미정",
+  queueLabel: ticket.queueNumber != null ? String(ticket.queueNumber) : ticket.id.slice(-4).toUpperCase(),
+  wristbandValue: "10:00~",
+});
 
 export function PaperTicketCard({ ticket }: PaperTicketCardProps) {
-  const status = statusDisplayMap[ticket.status];
-  const { dayLabel, dateLabel, queueLabel, wristbandValue } =
-    getGuideLines(ticket);
+  const { label, bg, text } = statusDisplayMap[ticket.status];
+  const { dayLabel, dateLabel, queueLabel, wristbandValue } = getGuideLines(ticket);
+
+  // 티켓 외형 SVG 경로 (viewBox 400×180)
+  // 노치 반지름 14, 노치 x위치 280(70%), 모서리 반지름 16
+  const ticketPath = `
+    M 16,0 L 266,0 A 14,14 0 0,0 294,0 L 384,0 Q 400,0 400,16
+    L 400,164 Q 400,180 384,180 L 294,180 A 14,14 0 0,0 266,180
+    L 16,180 Q 0,180 0,164 L 0,16 Q 0,0 16,0 Z
+  `;
 
   return (
-    <Card className={`relative overflow-hidden ${APP_CARD_VARIANTS.gradWhite} !rounded-[24px] px-0 py-0`}>
-      <span
+    <div
+      className="relative w-full"
+      style={{ filter: "drop-shadow(0 8px 28px rgba(28,43,106,0.32))" }}
+    >
+      {/* SVG 티켓 외형 */}
+      <svg
+        viewBox="0 0 400 180"
+        className="w-full"
+        style={{ display: "block" }}
+        preserveAspectRatio="none"
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0"
-        style={PAPER_SURFACE_STYLE}
-      />
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute top-4 bottom-4 left-[70%] z-10 border-l border-dashed border-[var(--ticket-perf)] opacity-90"
-      />
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute left-[70%] top-0 z-20 h-[2px] w-6 -translate-x-1/2 bg-[var(--bg-base)]"
-      />
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute left-[70%] bottom-0 z-20 h-[2px] w-6 -translate-x-1/2 bg-[var(--bg-base)]"
-      />
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute left-[70%] top-0 z-20 h-[10px] w-5 -translate-x-1/2 rounded-b-full border-x border-b border-[var(--card-grad-white-border)] bg-[var(--bg-base)]"
-      />
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute left-[70%] bottom-0 z-20 h-[10px] w-5 -translate-x-1/2 rounded-t-full border-x border-t border-[var(--card-grad-white-border)] bg-[var(--bg-base)]"
-      />
+      >
+        <defs>
+          {/* 흰 오버레이 — 최소화 */}
+          <linearGradient id="ov" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stopColor="rgba(255,255,255,0.08)" />
+            <stop offset="100%" stopColor="rgba(240,238,248,0.06)" />
+          </linearGradient>
+          <clipPath id="tc">
+            <path d={ticketPath} />
+          </clipPath>
+        </defs>
 
-      <div className="relative z-20 px-6 py-4">
-        <div className="grid grid-cols-[minmax(0,21fr)_minmax(0,9fr)] items-start">
-          <div className="min-w-0 pr-4">
-            <div className="flex items-center gap-2">
-              <p className="truncate text-[length:var(--ticketing-text-overline)] font-bold tracking-[0.1em] text-[var(--text-muted)]">
-                DANKOOK ZONE TICKET
-              </p>
-            </div>
-            <p className="mt-2 text-[2.35rem] leading-none font-semibold tracking-[-0.02em] text-[var(--accent)]">
-              {dayLabel}
-            </p>
-            <span
-              className={cn(
-                "mt-2 inline-flex rounded-full border px-2 py-0.5 text-[0.68rem] leading-none font-semibold tracking-[0.01em]",
-                status.badgeClassName,
-              )}
-            >
-              {status.label}
-            </span>
-          </div>
+        {/* 수채화 꽃 배경 */}
+        <image
+          href="/posters/ticket-bg.png"
+          x="0" y="0"
+          width="400" height="180"
+          preserveAspectRatio="xMaxYMid slice"
+          clipPath="url(#tc)"
+        />
 
-          <div className="space-y-3 pl-4">
-            <div>
-              <p className="text-[length:var(--ticketing-text-paper-label)] font-semibold leading-none tracking-[0.03em] text-[var(--text-muted)]">
-                공연 일자
-              </p>
-              <p className="mt-1 text-[length:var(--ticketing-text-paper-value)] leading-none font-bold text-[var(--text)] [font-variant-numeric:tabular-nums]">
-                {dateLabel}
+        {/* 흰 오버레이 — 밝고 부드러운 수채화 톤 */}
+        <path d={ticketPath} fill="url(#ov)" />
+
+        {/* 퍼포레이션 점선 */}
+        <line
+          x1="280" y1="18" x2="280" y2="162"
+          stroke="rgba(28,43,106,0.2)"
+          strokeWidth="1.5"
+          strokeDasharray="5,5"
+        />
+
+        {/* 테두리 */}
+        <path d={ticketPath} fill="none" stroke="rgba(28,43,106,0.1)" strokeWidth="1" />
+      </svg>
+
+      {/* 콘텐츠 오버레이 */}
+      <div className="absolute inset-0 flex items-stretch">
+        {/* 왼쪽 70% */}
+        <div className="flex w-[70%] flex-col justify-center px-6 py-5">
+          <p className="text-[0.58rem] font-bold tracking-[0.22em]" style={{ color: "rgba(28,43,106,0.5)", textShadow: "0 1px 3px rgba(255,255,255,0.8)" }}>
+            DANKOOK ZONE TICKET
+          </p>
+          <p className="mt-1.5 text-[2.1rem] font-bold leading-none tracking-[-0.02em]" style={{ color: "#1c2b6a", textShadow: "0 1px 4px rgba(255,255,255,0.6)" }}>
+            {dayLabel}
+          </p>
+          <span
+            className="mt-2.5 inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[0.62rem] font-semibold"
+            style={{ background: bg, color: text }}
+          >
+            {label}
+          </span>
+        </div>
+
+        {/* 오른쪽 30% */}
+        <div className="flex w-[30%] flex-col justify-center gap-3 py-5 pl-4 pr-5">
+          {[
+            { key: "공연 일자", val: dateLabel },
+            { key: "팔찌 배부", val: wristbandValue },
+            { key: "예매 순번", val: `NO.${queueLabel}` },
+          ].map(({ key, val }) => (
+            <div key={key}>
+              <p className="text-[0.5rem] font-semibold tracking-[0.08em]" style={{ color: "rgba(0,0,0,0.6)" }}>{key}</p>
+              <p className={cn(
+                "mt-0.5 text-[1.05rem] font-extrabold leading-tight [font-variant-numeric:tabular-nums]",
+                key === "예매 순번" ? "font-mono" : ""
+              )} style={{ color: "#1c2b6a" }}>
+                {val}
               </p>
             </div>
-            <div>
-              <p className="text-[length:var(--ticketing-text-paper-label)] font-semibold leading-none tracking-[0.03em] text-[var(--text-muted)]">
-                팔찌 배부 시각
-              </p>
-              <p className="mt-1 text-[length:var(--ticketing-text-paper-time)] leading-none font-bold text-[var(--text)]">
-                {wristbandValue}
-              </p>
-            </div>
-            <div>
-              <p className="text-[length:var(--ticketing-text-paper-label)] font-semibold leading-none tracking-[0.03em] text-[var(--text-muted)]">
-                예매 순번
-              </p>
-              <p className="mt-1 font-mono text-[length:var(--ticketing-text-paper-queue)] leading-none font-extrabold tracking-[0.02em] text-[var(--accent)] [font-variant-numeric:tabular-nums]">
-                NO.{queueLabel}
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

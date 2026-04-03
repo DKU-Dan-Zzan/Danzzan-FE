@@ -2,7 +2,6 @@
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
 import { TicketCheck } from "lucide-react";
-import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
 import { PaperTicketCard } from "@/components/ticketing/panels/PaperTicketCard";
 import { TicketingAdBannerCard } from "@/components/ticketing/panels/TicketingAdBannerCard";
 import {
@@ -36,20 +35,27 @@ export function MyTicketListPanel({
   onRefresh,
   onGoTicketing,
 }: MyTicketListPanelProps) {
-  const panelClassName = "mx-auto flex min-h-full w-full max-w-3xl flex-col gap-2.5";
+  const panelClassName = "mx-auto flex min-h-full w-full max-w-3xl flex-col gap-3";
 
   return (
     <div className={panelClassName}>
-      <Card className={`relative overflow-hidden ${APP_CARD_VARIANTS.gradTint} rounded-[26px] px-3 py-2.5`}>
+      <div
+        className="overflow-hidden rounded-[16px] px-4 py-3"
+        style={{
+          background: "#ffffff",
+          border: "1px solid rgba(28,43,106,0.08)",
+          boxShadow: "0 2px 12px rgba(28,43,106,0.07)",
+        }}
+      >
         <div className="flex items-center gap-2.5">
-          <span className={`inline-flex h-6 w-6 shrink-0 ${TICKETING_CLASSES.badge.iconCircle}`}>
+          <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(28,43,106,0.08)", color: "#1c2b6a" }}>
             <TicketCheck className="h-3.5 w-3.5" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-semibold text-[var(--text-emphasis-vivid)]">
+            <p className="text-[11px] font-semibold" style={{ color: "rgba(28,43,106,0.5)" }}>
               예매 내역과 팔찌 상태
             </p>
-            <h2 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-body-deep)]">
+            <h2 className="mt-0.5 text-[17px] font-extrabold tracking-tight" style={{ color: "#1c2b6a" }}>
               단국존 선예매 티켓
             </h2>
           </div>
@@ -57,35 +63,32 @@ export function MyTicketListPanel({
             onClick={onRefresh}
             loading={loading}
             size="sm"
-            className="h-9 w-9 rounded-lg border-[var(--border-base)] bg-[var(--surface-subtle)] p-0 text-[var(--text-muted)] hover:bg-[var(--surface-tint-subtle)]"
+            className="h-9 w-9 rounded-lg p-0 hover:bg-[rgba(28,43,106,0.05)]"
             iconClassName="h-3.5 w-3.5"
           />
         </div>
-      </Card>
+      </div>
 
-      <Card className={`relative overflow-hidden ${APP_CARD_VARIANTS.gradTint} rounded-[18px] px-2.5 py-2`}>
-        <div className="relative rounded-xl border border-[var(--border-base)] px-2.5 py-2">
-          <div className="relative z-10 flex items-center justify-between gap-2">
-            <p className="text-[length:var(--ticketing-text-holder-overline)] font-bold tracking-[0.1em] text-[var(--text-muted)]">
-              TICKET HOLDER
-            </p>
-            <p className={`${TICKETING_CLASSES.typography.sectionBodySm} font-semibold text-[var(--text-muted)]`}>티켓 소지자 정보</p>
-          </div>
-
-          <div className="relative z-10 mt-1.5 border-t border-[var(--border-subtle)]" />
-
-          <dl className={`relative z-10 mt-1.5 grid grid-cols-[2.1rem_1fr] items-start gap-x-2 gap-y-1.5 ${TICKETING_CLASSES.typography.sectionBodySm}`}>
-            <dt className="font-semibold text-[var(--text-muted)]">학번</dt>
-            <dd className="font-extrabold tracking-tight text-[var(--accent)] [overflow-wrap:anywhere]">
-              {student.studentId}
-            </dd>
-            <dt className="font-semibold text-[var(--text-muted)]">이름</dt>
-            <dd className="font-extrabold tracking-tight text-[var(--text)] [overflow-wrap:anywhere]">
-              {student.name}
-            </dd>
-          </dl>
+      {/* TICKET HOLDER 카드 */}
+      <div
+        className="overflow-hidden rounded-[16px] px-4 py-3"
+        style={{
+          background: "#ffffff",
+          border: "1px solid rgba(28,43,106,0.08)",
+          boxShadow: "0 2px 12px rgba(28,43,106,0.07)",
+        }}
+      >
+        <div className="flex items-center justify-between gap-2 pb-2" style={{ borderBottom: "1px solid rgba(28,43,106,0.08)" }}>
+          <p className="text-[0.6rem] font-bold tracking-[0.15em]" style={{ color: "rgba(28,43,106,0.4)" }}>TICKET HOLDER</p>
+          <p className="text-[11px] font-medium" style={{ color: "rgba(28,43,106,0.4)" }}>티켓 소지자 정보</p>
         </div>
-      </Card>
+        <dl className="mt-2 grid grid-cols-[2.5rem_1fr] gap-x-2 gap-y-1.5 text-[13px]">
+          <dt className="font-medium" style={{ color: "rgba(28,43,106,0.45)" }}>학번</dt>
+          <dd className="font-extrabold tracking-tight" style={{ color: "#1c2b6a" }}>{student.studentId}</dd>
+          <dt className="font-medium" style={{ color: "rgba(28,43,106,0.45)" }}>이름</dt>
+          <dd className="font-extrabold tracking-tight" style={{ color: "#1c2b6a" }}>{student.name}</dd>
+        </dl>
+      </div>
 
       {tickets.map((ticket) => (
         <PaperTicketCard key={ticket.id} ticket={ticket} />
