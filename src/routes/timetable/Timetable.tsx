@@ -352,9 +352,10 @@ export default function Timetable() {
         <div className="sticky top-0 z-30 bg-white">
           <div className="pt-[env(safe-area-inset-top)]">
             <div
-              className={`relative overflow-hidden bg-white transition-all duration-300 ${
-                isPosterCompact ? "h-16" : "h-[244px]"
-              }`}
+              className={cn(
+                "relative overflow-hidden bg-white transition-all duration-300",
+                isPosterCompact ? "h-16" : "h-[244px]",
+              )}
             >
               {!isPosterCompact && (
                 <>
@@ -376,9 +377,10 @@ export default function Timetable() {
                   key={activePosterSrc}
                   src={activePosterSrc}
                   alt={posterImage?.name ?? "2026 단국대학교 대동제 타임테이블"}
-                  className={`h-full w-full origin-center object-cover object-center transition-transform duration-500 ${
-                    isPosterCompact ? "scale-105" : "scale-[1.5]"
-                  }`}
+                  className={cn(
+                    "h-full w-full origin-center object-cover object-center transition-transform duration-500",
+                    isPosterCompact ? "scale-105" : "scale-[1.5]",
+                  )}
                   onError={(e) => {
                     const el = e.currentTarget as HTMLImageElement
                     if (el.src.includes("timetable-header-banner")) {
@@ -408,11 +410,12 @@ export default function Timetable() {
           </div>
 
           <div
-            className={`relative z-20 overflow-hidden bg-white px-4 pb-2 ${
+            className={cn(
+              "relative z-20 overflow-hidden bg-white px-4 pb-2",
               isPosterCompact
                 ? "rounded-t-[28px] pt-2 shadow-[0_-4px_18px_rgba(0,0,0,0.04)]"
-                : "-mt-7 rounded-t-[32px] pt-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05),0_-18px_40px_-28px_rgba(15,23,42,0.18)] sm:-mt-8 sm:rounded-t-[36px]"
-            }`}
+                : "-mt-7 rounded-t-[32px] pt-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05),0_-18px_40px_-28px_rgba(15,23,42,0.18)] sm:-mt-8 sm:rounded-t-[36px]",
+            )}
           >
             <DayTabs
               days={FESTIVAL_DAYS}
