@@ -423,7 +423,7 @@ export default function Timetable() {
           </div>
         </div>
 
-        <div className="mx-3 mt-1 overflow-hidden rounded-2xl bg-white ring-1 ring-neutral-100/90">
+        <div className="mx-3 mt-1 overflow-hidden rounded-2xl bg-white">
           <div ref={contentStartRef} className="px-4 pt-3">
             <p className="text-center text-[11px] font-medium leading-relaxed text-neutral-400">
               * 일정은 현장 상황에 따라 변경될 수 있습니다

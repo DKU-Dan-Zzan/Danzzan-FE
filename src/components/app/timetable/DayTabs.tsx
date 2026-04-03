@@ -12,7 +12,7 @@ export default function DayTabs({
   compact?: boolean
 }) {
   return (
-    <div className="relative border-b border-neutral-100">
+    <div className="relative">
       <div className="flex">
         {days.map((d, idx) => {
           const active = idx === activeIndex

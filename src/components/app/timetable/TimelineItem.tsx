@@ -7,7 +7,7 @@ function hashtagLabel(description: string) {
 }
 
 /** 원형 사진 */
-const AVATAR_PX = "10rem"
+const AVATAR_PX = "9rem"
 
 export default function TimelineItem({
   item,
@@ -73,7 +73,7 @@ export default function TimelineItem({
               src={item.artistImageUrl ?? "/placeholder-artist.png"}
               alt=""
               className={[
-                "rounded-full object-cover shadow-[0_4px_14px_rgba(15,23,42,0.08)]",
+                "rounded-full object-cover shadow-[0_18px_30px_-22px_rgba(29,44,89,0.34)] ring-1 ring-[rgba(255,255,255,0.92)]",
                 showNow
                   ? "ring-[4px] ring-[color:var(--timetable-v2-accent)] ring-offset-[4px] ring-offset-white"
                   : "",
@@ -110,13 +110,11 @@ export default function TimelineItem({
 
             <h3
               className={[
-                "font-timetable-artist max-w-full text-center text-[1.35rem] leading-snug text-neutral-800",
+                "max-w-full text-center text-[1.35rem] font-extrabold leading-snug tracking-[-0.03em] text-neutral-800",
                 item.artistDescription ? "mt-1" : "mt-0",
               ].join(" ")}
             >
-              <span className="text-neutral-300">&#8216;</span>
               {item.artistName}
-              <span className="text-neutral-300">&#8217;</span>
             </h3>
 
             {item.stage ? (

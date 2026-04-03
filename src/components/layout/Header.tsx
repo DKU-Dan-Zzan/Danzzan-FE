@@ -1,5 +1,5 @@
 // 역할: 앱 레이아웃 레이어의 Header 구성 컴포넌트를 제공합니다.
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { Ticket, User } from "lucide-react"
 import { useSyncExternalStore } from "react"
 import { authStore } from "@/store/common/authStore"
@@ -12,12 +12,14 @@ const HEADER_ICON_BUTTON_CLASS =
 
 const Header = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const session = useSyncExternalStore(
     authStore.subscribe,
     authStore.getSnapshot,
     authStore.getSnapshot,
   )
   const isLoggedIn = !!session.tokens?.accessToken && session.role === "student"
+  const isTimetablePage = location.pathname === "/timetable"
 
   const handleTicketClick = () => {
     navigate(getMyTicketNavigationTarget(isLoggedIn))
@@ -25,6 +27,10 @@ const Header = () => {
 
   const handleMyInfoClick = () => {
     navigate("/mypage")
+  }
+
+  if (isTimetablePage) {
+    return null
   }
 
   const headerClassName =
