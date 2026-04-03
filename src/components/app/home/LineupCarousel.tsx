@@ -13,14 +13,15 @@ type Props = {
   aspect?: `${number}/${number}` | string
 }
 
-const LINEUP_CARD_WIDTH_PERCENT = 86
+const LINEUP_CARD_WIDTH_PX = 314.4
+const LINEUP_CARD_HEIGHT_PX = 138
+const LINEUP_CARD_HALF_WIDTH_PX = LINEUP_CARD_WIDTH_PX / 2
 const LINEUP_CARD_GAP_PX = 12
-const LINEUP_CENTER_OFFSET_PERCENT = (100 - LINEUP_CARD_WIDTH_PERCENT) / 2
 
 export default function LineupCarousel({
   banners,
   intervalMs = 4500,
-  aspect = "320/360",
+  aspect = `${LINEUP_CARD_WIDTH_PX}/${LINEUP_CARD_HEIGHT_PX}`,
 }: Props) {
   const count = banners.length
   const [index, setIndex] = useState(0)
@@ -90,7 +91,7 @@ export default function LineupCarousel({
   }, [count, index])
   const translateX = useMemo(
     () =>
-      `calc(${LINEUP_CENTER_OFFSET_PERCENT}% - ${trackIndex} * (${LINEUP_CARD_WIDTH_PERCENT}% + ${LINEUP_CARD_GAP_PX}px))`,
+      `calc(50% - ${LINEUP_CARD_HALF_WIDTH_PX}px - ${trackIndex} * (${LINEUP_CARD_WIDTH_PX}px + ${LINEUP_CARD_GAP_PX}px))`,
     [trackIndex],
   )
 
@@ -168,7 +169,7 @@ export default function LineupCarousel({
                     ? "scale-100 opacity-100 shadow-[var(--home-lineup-card-shadow)]"
                     : `${sideCardOriginClass} scale-[0.67] opacity-82 shadow-[0_14px_24px_-20px_rgba(44,52,54,0.14)]`
                 }`}
-                style={{ width: `${LINEUP_CARD_WIDTH_PERCENT}%` }}
+                style={{ width: `${LINEUP_CARD_WIDTH_PX}px` }}
               >
                 <div style={{ aspectRatio: aspect }}>
                   <img
