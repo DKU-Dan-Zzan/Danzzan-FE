@@ -45,7 +45,7 @@ function FaqAccordion() {
         <div key={item.q} className="border-t border-[var(--mypage-faq-divider)] first:border-t-0">
           <button
             onClick={() => setOpen(open === index ? null : index)}
-            className="flex w-full items-center justify-between gap-3 px-5 py-[15px] text-left"
+            className="flex w-full items-center justify-between gap-3 px-5 py-[10px] text-left"
           >
             <span className="text-[14px] leading-[1.4] text-[var(--mypage-faq-question)]">
               {item.q}
@@ -74,6 +74,23 @@ function FaqAccordion() {
   );
 }
 
+function SectionCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="mx-4 mt-3 overflow-hidden rounded-[16px] bg-white" style={{ boxShadow: "0 1px 8px rgba(28,43,106,0.08)" }}>
+      <p className="px-5 pb-1 pt-4 text-[16px] font-bold" style={{ color: "#1c2b6a" }}>
+        {title}
+      </p>
+      <div className="divide-y divide-[var(--mypage-list-divider)]">{children}</div>
+    </div>
+  );
+}
+
 function ListRow({
   icon,
   label,
@@ -88,7 +105,7 @@ function ListRow({
   showArrow?: boolean;
 }) {
   const content = (
-    <div className="flex min-h-[54px] items-center gap-3.5 px-5 py-3">
+    <div className="flex min-h-[44px] items-center gap-3.5 px-5 py-2">
       {icon && <span className="shrink-0 text-[var(--mypage-list-item-icon)]">{icon}</span>}
       <span className="flex-1 text-[15px] text-[var(--mypage-list-item-text)]">{label}</span>
       {value && <span className="text-[14px] text-[var(--mypage-list-item-value)]">{value}</span>}
@@ -146,46 +163,68 @@ function MyPage() {
 
   if (!isLoggedIn) {
     return (
-      <div
-        className="mypage-root flex min-h-full flex-col items-center justify-center px-6 py-[100px]"
-        style={{ background: "var(--mypage-page-bg)" }}
-      >
+      <div className="mypage-root relative flex min-h-full flex-col items-center justify-center px-6 py-[100px]">
+        {/* 포스터 배경 */}
+        <div className="absolute inset-0 overflow-hidden">
+          <img
+            src="/posters/festival-poster.png"
+            alt=""
+            aria-hidden
+            className="h-full w-full object-cover object-top"
+            style={{ filter: "brightness(0.9) saturate(1.1)" }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(238,241,248,0.6) 0%, rgba(238,241,248,0.88) 100%)",
+            }}
+          />
+        </div>
+
+        {/* 글래스모피즘 카드 */}
         <div
-          className="w-full max-w-sm overflow-hidden rounded-[24px] px-6 py-9 text-center"
+          className="relative w-full max-w-sm overflow-hidden rounded-[24px] px-6 py-9 text-center"
           style={{
-            background: "var(--mypage-guest-card-bg)",
-            boxShadow: "var(--mypage-guest-card-shadow)",
+            background: "rgba(255,255,255,0.75)",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(255,255,255,0.9)",
+            boxShadow: "0 8px 40px rgba(28,43,106,0.1)",
           }}
         >
           <div
             className="mx-auto mb-5 flex h-[72px] w-[72px] items-center justify-center rounded-full"
             style={{
-              background:
-                "linear-gradient(135deg, var(--mypage-guest-icon-bg-start) 0%, var(--mypage-guest-icon-bg-end) 100%)",
-              boxShadow: "var(--mypage-guest-icon-shadow)",
+              background: "rgba(255,255,255,0.55)",
+              backdropFilter: "blur(8px)",
+              border: "1.5px solid rgba(28,43,106,0.15)",
+              boxShadow: "0 2px 12px rgba(28,43,106,0.12)",
             }}
           >
-            <User size={32} className="text-white" strokeWidth={1.8} />
+            <User size={32} strokeWidth={1.8} style={{ color: "#1c2b6a" }} />
           </div>
 
-          <p className="mb-1 text-[10px] font-bold tracking-[0.24em] text-[var(--mypage-guest-overline)]">
+          <p className="mb-1 text-[10px] font-bold tracking-[0.24em]" style={{ color: "rgba(28,43,106,0.5)" }}>
             STUDENT PORTAL
           </p>
-          <h2 className="mb-2 text-[20px] font-bold leading-[1.3] text-[var(--mypage-guest-title)]">
+          <h2 className="mb-2 text-[20px] font-bold leading-[1.3]" style={{ color: "#1c2b6a" }}>
             내 정보를 보려면
             <br />
             로그인해 주세요
           </h2>
-          <p className="mb-7 text-[13px] leading-relaxed text-[var(--mypage-guest-description)]">
+          <p className="mb-7 text-[13px] leading-relaxed" style={{ color: "rgba(28,43,106,0.55)" }}>
             로그인 후 예매 내역과 계정 정보를 확인할 수 있어요.
           </p>
 
           <button
             onClick={() => navigate("/ticket/login")}
-            className="h-[52px] w-full rounded-[14px] text-[15px] font-bold text-white transition active:brightness-95"
+            className="h-[52px] w-full rounded-[14px] text-[15px] font-bold transition active:brightness-95"
             style={{
-              background: "var(--mypage-cta-gradient)",
-              boxShadow: "var(--mypage-cta-shadow)",
+              background: "rgba(28,43,106,0.12)",
+              backdropFilter: "blur(8px)",
+              border: "1.5px solid rgba(28,43,106,0.35)",
+              color: "#1c2b6a",
+              boxShadow: "0 2px 12px rgba(28,43,106,0.08)",
             }}
           >
             로그인 / 회원가입하러 가기
@@ -207,7 +246,7 @@ function MyPage() {
   return (
     <div className="mypage-root min-h-full" style={{ background: "#eef1f8" }}>
       {/* 포스터 히어로 배너 */}
-      <div className="relative overflow-hidden" style={{ height: 300 }}>
+      <div className="relative overflow-hidden" style={{ height: 220 }}>
         <img
           src="/posters/festival-poster.png"
           alt=""
@@ -275,27 +314,18 @@ function MyPage() {
         </button>
       </div>
 
-      {/* 학적·FAQ·설정 — 크림 배경 위 흰 카드 */}
-      <div className="mx-4 overflow-hidden rounded-[16px] bg-white shadow-sm" style={{ boxShadow: "0 1px 8px rgba(28,43,106,0.08)" }}>
-        <div className="px-5 pb-2 pt-5">
-          <p className="text-[13px] font-semibold tracking-wide" style={{ color: "#1c2b6a" }}>학적 정보</p>
-        </div>
+      <SectionCard title="학적 정보">
         <ListRow icon={<IdCard size={18} />} label="학번" value={user?.studentId ?? "—"} />
         <ListRow icon={<GraduationCap size={18} />} label="단과대학" value={user?.college || "—"} />
         <ListRow icon={<GraduationCap size={18} />} label="학과" value={user?.department || "—"} />
-      </div>
+      </SectionCard>
 
       <div className="mx-4 mt-3 overflow-hidden rounded-[16px] bg-white" style={{ boxShadow: "0 1px 8px rgba(28,43,106,0.08)" }}>
-        <div className="px-5 pb-2 pt-5">
-          <p className="text-[13px] font-semibold tracking-wide" style={{ color: "#1c2b6a" }}>자주 묻는 질문</p>
-        </div>
+        <p className="px-5 pb-1 pt-4 text-[16px] font-bold" style={{ color: "#1c2b6a" }}>자주 묻는 질문</p>
         <FaqAccordion />
       </div>
 
-      <div className="mx-4 mt-3 overflow-hidden rounded-[16px] bg-white" style={{ boxShadow: "0 1px 8px rgba(28,43,106,0.08)" }}>
-        <div className="px-5 pb-2 pt-5">
-          <p className="text-[13px] font-semibold tracking-wide" style={{ color: "#1c2b6a" }}>설정</p>
-        </div>
+      <SectionCard title="설정">
         <ListRow
           icon={<Lock size={18} />}
           label="비밀번호 변경"
@@ -308,7 +338,8 @@ function MyPage() {
           onClick={handleLogout}
           showArrow
         />
-      </div>
+      </SectionCard>
+      <div className="h-4" />
     </div>
   );
 }
