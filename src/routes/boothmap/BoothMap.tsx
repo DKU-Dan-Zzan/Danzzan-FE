@@ -1,4 +1,3 @@
-// 역할: 부스맵 메인 라우트에서 2D 지도, 필터, 상세 시트 상태를 통합 제어합니다.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   Booth,
@@ -65,8 +64,8 @@ function getInitialFestivalDate() {
 }
 
 const TOP_PANEL_Z_INDEX_CLASS: Record<SheetSnap, string> = {
-  PEEK: "z-[70]",
-  HALF: "z-[70]",
+  PEEK: "z-40",
+  HALF: "z-40",
   FULL: "z-[40]",
 };
 
@@ -321,7 +320,7 @@ export default function BoothMap() {
         return;
       }
     } catch {
-      // 상세 조회에 실패해도 목록 흐름은 유지합니다.
+      // 상세 조회 실패 시 목록 흐름은 유지한다.
     }
 
     if (requestSeq !== boothSelectionRequestSeqRef.current) {
@@ -478,12 +477,11 @@ export default function BoothMap() {
 
       <div
         className={cn(
-          "absolute left-1/2 w-[calc(100%-24px)] max-w-[var(--app-mobile-shell-max-width)] -translate-x-1/2",
+          "pointer-events-none fixed inset-x-0 top-0 mx-auto w-full max-w-[var(--app-mobile-shell-max-width)] rounded-b-[32px] border-b border-[color:color-mix(in_srgb,var(--boothmap-panel-border)_20%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--boothmap-panel-bg)_80%,transparent)_0%,color-mix(in_srgb,var(--boothmap-panel-bg)_72%,transparent)_22%,color-mix(in_srgb,var(--boothmap-panel-bg)_60%,transparent)_46%,color-mix(in_srgb,var(--boothmap-panel-bg)_46%,transparent)_72%,color-mix(in_srgb,var(--boothmap-panel-bg)_30%,transparent)_100%)] shadow-[var(--boothmap-panel-shadow)] backdrop-blur-xl",
           TOP_PANEL_Z_INDEX_CLASS[sheetSnap],
         )}
-        style={{ top: "calc(env(safe-area-inset-top) + 4rem + 0.75rem)" }}
       >
-        <div className="rounded-[28px] border border-[var(--boothmap-panel-border)] bg-[var(--boothmap-panel-bg)] px-3 py-2 shadow-[var(--boothmap-panel-shadow)] backdrop-blur-md">
+        <div className="pointer-events-auto mt-[calc(env(safe-area-inset-top)+4.5rem)] px-3 py-2 sm:px-4 sm:pb-4">
           <FestivalDateTabs
             dates={FESTIVAL_DATES}
             selectedDate={selectedDate}
@@ -498,7 +496,7 @@ export default function BoothMap() {
             }}
           />
 
-          <div className="mt-2">
+          <div className="mt-2.5 pt-2.5">
             <PrimaryFilterChips value={primaryFilter} onChange={handlePrimaryChange} />
           </div>
 

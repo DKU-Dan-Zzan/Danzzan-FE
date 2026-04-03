@@ -83,8 +83,10 @@ function DetailSheet({
 
   if (!selectedItem) {
     return (
-      <div className="py-6 text-center text-sm font-semibold text-[var(--boothmap-text-muted)]">
-        선택된 항목이 없어요.
+      <div className="rounded-[26px] border border-[var(--boothmap-border)] bg-[color:color-mix(in_srgb,var(--boothmap-surface)_90%,white)] px-5 py-8 text-center shadow-[var(--boothmap-card-shadow)]">
+        <div className="text-sm font-semibold text-[var(--boothmap-text-muted)]">
+          선택된 항목이 없어요.
+        </div>
       </div>
     );
   }
@@ -92,13 +94,13 @@ function DetailSheet({
   if (isLoading) {
     return (
       <div className="space-y-3">
-        <div className="rounded-2xl border border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] p-4 shadow-sm">
+        <div className="rounded-[26px] border border-[var(--boothmap-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--boothmap-surface)_96%,white)_0%,color-mix(in_srgb,var(--boothmap-surface-soft)_86%,white)_100%)] p-5 shadow-[var(--boothmap-card-shadow)]">
           <div className="space-y-2">
             <div className="h-6 w-32 animate-pulse rounded bg-[var(--boothmap-surface-softer)]" />
             <div className="h-4 w-20 animate-pulse rounded bg-[var(--boothmap-surface-soft)]" />
           </div>
 
-          <div className="mt-4 h-44 w-full animate-pulse rounded-xl bg-[var(--boothmap-surface-softer)]" />
+          <div className="mt-4 h-44 w-full animate-pulse rounded-[20px] bg-[var(--boothmap-surface-softer)]" />
           <div className="mt-4 space-y-2">
             <div className="h-4 w-full animate-pulse rounded bg-[var(--boothmap-surface-soft)]" />
             <div className="h-4 w-5/6 animate-pulse rounded bg-[var(--boothmap-surface-soft)]" />
@@ -111,7 +113,7 @@ function DetailSheet({
 
   if (isError) {
     return (
-      <div className="rounded-2xl border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-surface)] p-6 text-center shadow-sm">
+      <div className="rounded-[26px] border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-surface)] p-6 text-center shadow-[var(--boothmap-card-shadow)]">
         <div className="text-sm font-semibold text-[var(--boothmap-danger-text)]">
           상세 정보를 불러오지 못했어요.
         </div>
@@ -127,9 +129,9 @@ function DetailSheet({
 
     return (
       <div className="space-y-3">
-        <div className="rounded-2xl border border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] p-4 shadow-sm">
+        <div className="rounded-[26px] border border-[var(--boothmap-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--boothmap-surface)_96%,white)_0%,color-mix(in_srgb,var(--boothmap-surface-soft)_86%,white)_100%)] p-5 shadow-[var(--boothmap-card-shadow)]">
           <div>
-            <div className="text-lg font-extrabold text-[var(--boothmap-text)]">
+            <div className="text-xl font-extrabold tracking-[-0.02em] text-[var(--boothmap-text)]">
               {boothDetail.name}
             </div>
 
@@ -141,7 +143,7 @@ function DetailSheet({
           </div>
 
           {boothThumbnailUrl && boothImageUrl && (
-            <div className="mt-3 rounded-xl bg-[var(--boothmap-surface-soft)] p-2">
+            <div className="mt-4 rounded-[22px] bg-[color:color-mix(in_srgb,var(--boothmap-surface-soft)_92%,white)] p-2.5">
               <button
                 type="button"
                 onClick={() => openViewer(boothImageUrl)}
@@ -169,7 +171,7 @@ function DetailSheet({
             </div>
           )}
 
-          <div className="mt-4 whitespace-pre-line text-sm font-medium leading-6 text-[var(--boothmap-text-subtle)]">
+          <div className="mt-5 whitespace-pre-line text-sm font-medium leading-7 text-[var(--boothmap-text-subtle)]">
             {description || "등록된 상세 정보가 없어요."}
           </div>
         </div>
@@ -192,9 +194,9 @@ function DetailSheet({
 
     return (
       <div className="space-y-3">
-        <div className="rounded-2xl border border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] p-4 shadow-sm">
+        <div className="rounded-[26px] border border-[var(--boothmap-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--boothmap-surface)_96%,white)_0%,color-mix(in_srgb,var(--boothmap-surface-soft)_86%,white)_100%)] p-5 shadow-[var(--boothmap-card-shadow)]">
           <div className="min-w-0 flex-1">
-            <div className="truncate text-lg font-extrabold text-[var(--boothmap-text)]">
+            <div className="truncate text-xl font-extrabold tracking-[-0.02em] text-[var(--boothmap-text)]">
               {pubDetail.name}
             </div>
 
@@ -228,7 +230,7 @@ function DetailSheet({
           </div>
 
           {imageUrls.length > 0 && (
-            <div className="mt-3">
+            <div className="mt-4">
               <div
                 className="flex snap-x snap-mandatory gap-3 overflow-x-auto scrollbar-hide"
                 onScroll={(event) => {
@@ -247,7 +249,7 @@ function DetailSheet({
                         type="button"
                         onClick={() => openViewer(imageUrl)}
                         aria-label={`주점 이미지 ${index + 1} 상세 보기`}
-                        className="block w-full cursor-pointer rounded-xl"
+                        className="block w-full cursor-pointer rounded-[22px]"
                       >
                         <img
                           src={displayImageUrl}
@@ -264,7 +266,7 @@ function DetailSheet({
                             }
                             event.currentTarget.src = fallbackSrc;
                           }}
-                          className="w-full rounded-xl object-contain"
+                          className="w-full rounded-[22px] object-contain"
                         />
                       </button>
                     </div>
@@ -288,13 +290,13 @@ function DetailSheet({
           )}
 
           {intro && (
-            <div className="mt-4 whitespace-pre-line rounded-xl bg-[var(--boothmap-accent-soft)] px-3 py-2 text-sm font-bold text-[var(--boothmap-accent-text)]">
+            <div className="mt-4 whitespace-pre-line rounded-[20px] bg-[var(--boothmap-accent-soft)] px-4 py-3 text-sm font-bold text-[var(--boothmap-accent-text)]">
               {intro}
             </div>
           )}
 
           {description && (
-            <div className="mt-4 whitespace-pre-line text-sm font-medium leading-6 text-[var(--boothmap-text-subtle)]">
+            <div className="mt-5 whitespace-pre-line text-sm font-medium leading-7 text-[var(--boothmap-text-subtle)]">
               {description}
             </div>
           )}
@@ -306,8 +308,10 @@ function DetailSheet({
   }
 
   return (
-    <div className="py-6 text-center text-sm font-semibold text-[var(--boothmap-text-muted)]">
-      표시할 상세 정보가 없어요.
+    <div className="rounded-[26px] border border-[var(--boothmap-border)] bg-[color:color-mix(in_srgb,var(--boothmap-surface)_90%,white)] px-5 py-8 text-center shadow-[var(--boothmap-card-shadow)]">
+      <div className="text-sm font-semibold text-[var(--boothmap-text-muted)]">
+        표시할 상세 정보가 없어요.
+      </div>
     </div>
   );
 }

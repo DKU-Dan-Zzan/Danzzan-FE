@@ -301,7 +301,7 @@ export default function KakaoMapView({
   const buildLabelBubble = (name: string) => {
     const bubble = document.createElement("div")
     bubble.className =
-      "rounded-full border border-[var(--boothmap-overlay-label-border)] bg-[var(--boothmap-overlay-label-bg)] px-3 py-1.5 text-xs font-bold text-[var(--boothmap-overlay-label-text)] shadow-[0_6px_18px_var(--boothmap-overlay-shadow-soft)] whitespace-nowrap backdrop-blur-sm"
+      "rounded-full border border-[var(--boothmap-overlay-label-border)] bg-[color:color-mix(in_srgb,var(--boothmap-overlay-label-bg)_96%,white)] px-3.5 py-2 text-xs font-bold tracking-[-0.01em] text-[var(--boothmap-overlay-label-text)] shadow-[0_14px_30px_-20px_var(--boothmap-overlay-shadow-soft)] whitespace-nowrap backdrop-blur-md"
     bubble.innerText = name
     bubble.style.position = "absolute"
     bubble.style.left = "50%"
@@ -348,12 +348,12 @@ export default function KakaoMapView({
     wrapper.style.background = "transparent"
     wrapper.style.cursor = "pointer"
     wrapper.style.userSelect = "none"
-    wrapper.style.transition = "transform 0.18s ease"
+    wrapper.style.transition = "transform 0.18s ease, filter 0.18s ease"
     const selectedShadowSoft = getBoothmapColor("selectedShadowSoft")
     const overlayShadow = getBoothmapColor("overlayShadow")
     wrapper.style.filter = isSelected
-      ? `drop-shadow(0 10px 22px ${selectedShadowSoft})`
-      : `drop-shadow(0 8px 18px ${overlayShadow})`
+      ? `drop-shadow(0 16px 24px ${selectedShadowSoft})`
+      : `drop-shadow(0 10px 18px ${overlayShadow})`
 
     const pinBottomOffset = PIN_BOTTOM_OFFSET_MAP[type] ?? 0
 
@@ -394,7 +394,7 @@ export default function KakaoMapView({
     debugDot.style.borderRadius = "9999px"
     debugDot.style.background = getBoothmapColor("overlayBadgeBackground")
     debugDot.style.border = `2px solid ${getBoothmapColor("overlayBadgeText")}`
-    debugDot.style.boxShadow = `0 2px 6px ${getBoothmapColor("overlayShadow")}`
+    debugDot.style.boxShadow = `0 8px 14px ${getBoothmapColor("overlayShadow")}`
     debugDot.style.pointerEvents = "none"
 
     wrapper.appendChild(debugDot)

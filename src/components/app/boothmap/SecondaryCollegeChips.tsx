@@ -1,14 +1,12 @@
-// 역할: boothmap 화면에서 사용하는 Secondary College Chips UI 블록을 렌더링합니다.
-// 주점 선택 시 단과대 secondary filter를 보여주는 칩 컴포넌트
-
+import { cn } from "@/components/common/ui/utils";
 import type { College } from "@/types/app/boothmap/boothmap.types";
 
 const CHIP_BASE_CLASS =
-  "shrink-0 rounded-full border px-3 py-2 text-sm font-extrabold transition";
+  "shrink-0 rounded-full border px-3 py-2 text-sm font-bold tracking-[-0.01em] transition";
 const CHIP_ACTIVE_CLASS =
   "border-[var(--boothmap-chip-selected-border)] bg-[var(--boothmap-chip-selected-bg)] text-[var(--boothmap-chip-selected-text)] shadow-[var(--boothmap-chip-selected-shadow)]";
 const CHIP_INACTIVE_CLASS =
-  "border-[var(--boothmap-chip-border)] bg-[var(--boothmap-chip-bg)] text-[var(--boothmap-chip-text)] hover:border-[var(--boothmap-chip-hover-border)] hover:bg-[var(--boothmap-chip-hover-bg)] hover:text-[var(--boothmap-chip-hover-text)]";
+  "border-[var(--boothmap-chip-border)] bg-[color:color-mix(in_srgb,var(--boothmap-chip-bg)_68%,transparent)] text-[var(--boothmap-chip-text)] hover:border-[var(--boothmap-chip-hover-border)] hover:bg-[color:color-mix(in_srgb,var(--boothmap-chip-hover-bg)_76%,transparent)] hover:text-[var(--boothmap-chip-hover-text)]";
 
 export default function SecondaryCollegeChips({
   visible,
@@ -28,28 +26,28 @@ export default function SecondaryCollegeChips({
       <button
         type="button"
         onClick={() => onSelect(null)}
-        className={[
+        className={cn(
           CHIP_BASE_CLASS,
           selectedCollegeId === null ? CHIP_ACTIVE_CLASS : CHIP_INACTIVE_CLASS,
-        ].join(" ")}
+        )}
       >
         전체
       </button>
 
-      {colleges.map((c) => {
-        const active = selectedCollegeId === c.id;
+      {colleges.map((college) => {
+        const active = selectedCollegeId === college.id;
 
         return (
           <button
-            key={c.id}
+            key={college.id}
             type="button"
-            onClick={() => onSelect(c.id)}
-            className={[
+            onClick={() => onSelect(college.id)}
+            className={cn(
               CHIP_BASE_CLASS,
               active ? CHIP_ACTIVE_CLASS : CHIP_INACTIVE_CLASS,
-            ].join(" ")}
+            )}
           >
-            {c.name}
+            {college.name}
           </button>
         );
       })}
