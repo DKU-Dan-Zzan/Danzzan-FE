@@ -40,7 +40,7 @@ function PubList({
         <div className="rounded-[24px] border border-[var(--boothmap-border)] bg-[linear-gradient(145deg,color-mix(in_srgb,var(--boothmap-surface)_96%,white)_0%,color-mix(in_srgb,var(--boothmap-surface-soft)_92%,white)_100%)] px-4 py-3 shadow-[var(--boothmap-card-shadow)]">
           <div>
             <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--boothmap-text-muted)]">
-              Pub Hours
+              운영시간
             </div>
             <div className="mt-1 inline-flex items-center gap-1.5 text-sm font-bold text-[var(--boothmap-text-subtle)]">
               <Clock3 className="h-3.5 w-3.5" />
