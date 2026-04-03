@@ -23,7 +23,7 @@ const FESTIVAL_DAYS: FestivalDay[] = [
   { key: "DAY-3", label: "3일차", date: "2026-05-14" },
 ]
 
-const EXPANDED_POSTER_SRC = "/posters/timetable-poster-wide.jpeg"
+const EXPANDED_POSTER_SRC = "/posters/timetable-header-banner.png"
 const COMPACT_POSTER_SRC = "/posters/timetable-poster-compact.jpeg"
 
 function todayISODateLocal() {
@@ -359,7 +359,7 @@ export default function Timetable() {
               {!isPosterCompact && (
                 <>
                   <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-24 bg-[linear-gradient(180deg,rgba(19,29,59,0.26),rgba(19,29,59,0))]" />
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-24 bg-[linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,0.28)_38%,rgba(255,255,255,0.88))]" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-24 bg-[linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,0.22)_36%,rgba(255,255,255,0.82))]" />
                 </>
               )}
               <button
@@ -372,24 +372,20 @@ export default function Timetable() {
                 }}
                 className="block h-full w-full"
               >
-                {posterImage ? (
-                  <img
-                    key={activePosterSrc}
-                    src={activePosterSrc}
-                    alt={posterImage.name}
-                    className={`h-full w-full object-cover transition-transform duration-500 ${
-                      isPosterCompact ? "scale-100" : "scale-[1.015]"
-                    }`}
-                    onError={(e) => {
-                      ;(e.currentTarget as HTMLImageElement).src =
-                        posterImage.detailImageUrl || posterImage.previewImageUrl
-                    }}
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,rgba(228,236,255,0.96),rgba(255,241,234,0.94))] text-sm font-semibold tracking-[0.08em] text-[var(--text-muted)]">
-                    POSTER
-                  </div>
-                )}
+                <img
+                  key={activePosterSrc}
+                  src={activePosterSrc}
+                  alt={posterImage?.name ?? "2026 단국대학교 대동제 타임테이블"}
+                  className={`h-full w-full origin-center object-cover object-center transition-transform duration-500 ${
+                    isPosterCompact ? "scale-105" : "scale-[1.5]"
+                  }`}
+                  onError={(e) => {
+                    const el = e.currentTarget as HTMLImageElement
+                    if (el.src.includes("timetable-header-banner")) {
+                      el.src = "/posters/timetable-poster-wide.jpeg"
+                    }
+                  }}
+                />
               </button>
 
               {isPosterCompact && (
@@ -412,11 +408,12 @@ export default function Timetable() {
           </div>
 
           <div
-            className={`relative z-20 bg-white px-4 pb-2 ${
-              isPosterCompact ? "pt-2" : "-mt-6 rounded-t-[24px] pt-3"
+            className={`relative z-20 overflow-hidden bg-white px-4 pb-2 ${
+              isPosterCompact
+                ? "rounded-t-[28px] pt-2 shadow-[0_-4px_18px_rgba(0,0,0,0.04)]"
+                : "-mt-7 rounded-t-[32px] pt-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05),0_-18px_40px_-28px_rgba(15,23,42,0.18)] sm:-mt-8 sm:rounded-t-[36px]"
             }`}
           >
-
             <DayTabs
               days={FESTIVAL_DAYS}
               activeIndex={activeIdx}
@@ -426,13 +423,14 @@ export default function Timetable() {
           </div>
         </div>
 
-        <div ref={contentStartRef} className="bg-white px-4 pt-3">
-          <p className="text-center text-[11px] font-medium leading-relaxed text-neutral-400">
-            * 일정은 현장 상황에 따라 변경될 수 있습니다
-          </p>
-        </div>
+        <div className="mx-3 mt-1 overflow-hidden rounded-2xl bg-white ring-1 ring-neutral-100/90">
+          <div ref={contentStartRef} className="px-4 pt-3">
+            <p className="text-center text-[11px] font-medium leading-relaxed text-neutral-400">
+              * 일정은 현장 상황에 따라 변경될 수 있습니다
+            </p>
+          </div>
 
-        <div className="bg-white px-4 pb-8 pt-5">
+          <div className="px-4 pb-8 pt-5">
           {isDay1 ? (
             <ContentImageSection
               images={contentImages}
@@ -473,6 +471,7 @@ export default function Timetable() {
               nowTargetId={isTodayTab ? nowTargetId : null}
             />
           )}
+          </div>
         </div>
       </div>
     </div>
