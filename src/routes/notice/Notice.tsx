@@ -33,8 +33,6 @@ const NOTICE_LIST_CARD_PINNED_CLASS =
   "border border-[var(--border-base)] bg-[var(--surface)] shadow-[0_8px_18px_var(--shadow-color)]";
 const NOTICE_LIST_CARD_DEFAULT_CLASS =
   "border border-[var(--border-subtle)] bg-[var(--surface)] shadow-[0_4px_12px_var(--shadow-color)]";
-const NOTICE_PAGINATION_BUTTON_CLASS =
-  "rounded-full border border-[var(--border-subtle)] bg-[var(--surface)] px-3 py-1 disabled:opacity-50";
 
 function Notice() {
   const [keyword, setKeyword] = useState("");
