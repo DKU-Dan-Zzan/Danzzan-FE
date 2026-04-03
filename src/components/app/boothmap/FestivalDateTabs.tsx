@@ -19,7 +19,7 @@ export default function FestivalDateTabs({
 }: FestivalDateTabsProps) {
   return (
     <div className={className}>
-      <div className="grid grid-cols-3 rounded-2xl bg-[var(--boothmap-chip-bg)] p-1">
+      <div className="grid grid-cols-3 rounded-full bg-[var(--boothmap-chip-bg)] p-1">
         {dates.map((item) => {
           const isSelected = selectedDate === item.value;
 
@@ -28,10 +28,10 @@ export default function FestivalDateTabs({
               key={item.value}
               type="button"
               onClick={() => onChange(item.value)}
-              className={`rounded-lg px-2 py-1.5 text-sm font-semibold transition-all ${
+              className={`rounded-full px-2 py-1.5 text-sm font-semibold transition-all ${
                 isSelected
-                  ? "border border-[var(--boothmap-chip-selected-border)] bg-[var(--boothmap-chip-selected-bg)] text-[var(--boothmap-chip-selected-text)] shadow-[var(--boothmap-chip-selected-shadow)]"
-                  : "border border-transparent text-[var(--boothmap-chip-text)] hover:bg-[var(--boothmap-chip-hover-bg)] hover:text-[var(--boothmap-chip-hover-text)]"
+                  ? "bg-[var(--boothmap-chip-selected-bg)] text-[var(--boothmap-chip-selected-text)] shadow-[var(--boothmap-chip-selected-shadow)]"
+                  : "text-[var(--boothmap-chip-text)] hover:bg-[var(--boothmap-chip-hover-bg)] hover:text-[var(--boothmap-chip-hover-text)]"
               }`}
             >
               {item.label}
