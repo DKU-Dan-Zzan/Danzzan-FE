@@ -83,6 +83,9 @@ export default function Timetable() {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
   const contentStartRef = useRef<HTMLDivElement | null>(null)
   const posterCompactLockRef = useRef(false)
+  const previousScrollTopRef = useRef(0)
+  const suppressPosterExpandRef = useRef(false)
+  const suppressPosterExpandTimerRef = useRef<number | null>(null)
 
   const activeDay = FESTIVAL_DAYS[activeIdx]
   const activeDate = activeDay.date
@@ -185,24 +188,29 @@ export default function Timetable() {
 
     const syncPosterState = () => {
       const nextScrollTop = scrollContainer.scrollTop
+      const wasScrollingUp = nextScrollTop < previousScrollTopRef.current
 
       if (nextScrollTop > POSTER_COLLAPSE_SCROLL_Y) {
         posterCompactLockRef.current = true
         setIsPosterCompact(true)
+        previousScrollTopRef.current = nextScrollTop
         return
       }
 
       if (posterCompactLockRef.current) {
-        if (nextScrollTop <= 0) {
+        if (!suppressPosterExpandRef.current && wasScrollingUp && nextScrollTop <= 0) {
           posterCompactLockRef.current = false
           setIsPosterCompact(false)
         } else {
           setIsPosterCompact(true)
         }
+
+        previousScrollTopRef.current = nextScrollTop
         return
       }
 
       setIsPosterCompact(false)
+      previousScrollTopRef.current = nextScrollTop
     }
 
     syncPosterState()
@@ -213,8 +221,22 @@ export default function Timetable() {
     }
   }, [])
 
+  useEffect(() => {
+    return () => {
+      if (suppressPosterExpandTimerRef.current !== null) {
+        window.clearTimeout(suppressPosterExpandTimerRef.current)
+      }
+    }
+  }, [])
+
   const handleChangeDay = (idx: number) => {
     const shouldKeepCompact = isPosterCompact || posterCompactLockRef.current
+
+    if (suppressPosterExpandTimerRef.current !== null) {
+      window.clearTimeout(suppressPosterExpandTimerRef.current)
+    }
+
+    suppressPosterExpandRef.current = shouldKeepCompact
 
     setActiveIdx(idx)
     setScrollTargetId(null)
@@ -240,6 +262,15 @@ export default function Timetable() {
         behavior: "smooth",
       })
     })
+
+    if (shouldKeepCompact) {
+      suppressPosterExpandTimerRef.current = window.setTimeout(() => {
+        suppressPosterExpandRef.current = false
+        suppressPosterExpandTimerRef.current = null
+      }, 500)
+    } else {
+      suppressPosterExpandRef.current = false
+    }
   }
 
   const handleTouchStart = (e: TouchEvent<HTMLDivElement>) => {
