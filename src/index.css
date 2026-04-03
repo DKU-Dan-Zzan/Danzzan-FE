@@ -605,8 +605,7 @@
   --poster-bg: #eef1f8;
   --poster-card-white: #ffffff;
   /* 공지사항 중요공지 강조 색상 */
-  --notice-pin-accent: #f97316;
-  --notice-pin-text: #ea580c;
+  --notice-pin-red: #dc2626;
 
   /* Timetable route tokens */
   --timetable-tab-inactive: rgb(143 155 180);

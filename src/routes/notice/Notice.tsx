@@ -199,16 +199,15 @@ function Notice() {
               onClick={() => handleOpenDetail(notice.id)}
               className={cn(NOTICE_LIST_CARD_BASE_CLASS, NOTICE_LIST_CARD_PINNED_CLASS, "overflow-hidden")}
             >
-              <span className="absolute left-0 top-0 h-full w-1 rounded-l-[18px]" style={{ background: "var(--notice-pin-accent)" }} />
-              <div className="flex min-w-0 flex-1 items-start gap-2 pl-2">
-                <span className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(249,115,22,0.1)", color: "var(--notice-pin-text)" }}>
+              <div className="flex min-w-0 flex-1 items-start gap-2">
+                <span className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(220,38,38,0.08)", color: "var(--notice-pin-red)" }}>
                   <Pin className="h-3.5 w-3.5 fill-current" strokeWidth={2.2} />
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-[13px] font-semibold" style={{ color: "var(--notice-pin-text)" }}>
+                  <p className="truncate text-[13px] font-semibold" style={{ color: "var(--notice-pin-red)" }}>
                     {notice.title}
                   </p>
-                  <p className="mt-0.5 line-clamp-1 text-[11px]" style={{ color: "var(--notice-pin-accent)" }}>
+                  <p className="mt-0.5 line-clamp-1 text-[11px] text-[var(--text-muted)]">
                     {notice.content}
                   </p>
                 </div>
