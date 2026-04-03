@@ -37,14 +37,14 @@ describe("BottomNav", () => {
     expect(hasUseLayoutEffectWarning).toBe(false);
   });
 
-  it("5개 탭 구조(MAP/SCHEDULE/HOME/NOTICES/TICKETS)를 렌더링한다", () => {
+  it("5개 탭 구조(부스맵/타임테이블/HOME/공지사항/티켓팅)를 렌더링한다", () => {
     const markup = renderBottomNav("/notice");
 
-    expect(markup).toContain(">MAP<");
-    expect(markup).toContain(">SCHEDULE<");
+    expect(markup).toContain(">부스맵<");
+    expect(markup).toContain(">타임테이블<");
     expect(markup).toContain('aria-label="HOME"');
-    expect(markup).toContain(">NOTICES<");
-    expect(markup).toContain(">TICKETS<");
+    expect(markup).toContain(">공지사항<");
+    expect(markup).toContain(">티켓팅<");
     expect(markup).not.toContain(">내정보<");
   });
 
