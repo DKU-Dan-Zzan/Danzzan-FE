@@ -28,8 +28,16 @@ export default function TimelineItem({
         {/* 시간 */}
         <div className="col-start-1 row-start-1 flex items-start justify-end self-start pr-1">
           <p
-            className="max-w-[9.5rem] text-right text-[14px] font-bold tabular-nums leading-tight tracking-[-0.02em] text-neutral-800 sm:max-w-[10rem] sm:text-[15px]"
-            aria-label={`공연 시간 ${item.startTime}부터 ${item.endTime}까지`}
+            className="max-w-[9.5rem] rounded-full px-2.5 py-2 text-right text-[14px] font-bold tabular-nums leading-tight tracking-[-0.02em] sm:max-w-[10rem] sm:text-[15px]"
+            style={{
+              background: "var(--timetable-v2-time-pill-bg)",
+              color: "var(--timetable-v2-time-pill-fg)",
+            }}
+            aria-label={
+              showNow
+                ? `지금 진행 중인 공연, ${item.startTime}부터 ${item.endTime}까지`
+                : `공연 시간 ${item.startTime}부터 ${item.endTime}까지`
+            }
           >
             {timeLabel}
           </p>
@@ -59,12 +67,17 @@ export default function TimelineItem({
         </div>
 
         {/* 원형 사진 + 장르·가수명·스테이지 — 한 열에 붙여서 바로 아래 */}
-        <div className="col-start-3 row-span-2 flex flex-col items-center self-start pl-2 pr-3 sm:pl-2">
-          <div className="relative shrink-0">
+        <div className="col-start-3 row-span-2 flex flex-col items-center self-start overflow-visible pl-2 pr-3 sm:pl-2">
+          <div className="relative shrink-0 overflow-visible">
             <img
               src={item.artistImageUrl ?? "/placeholder-artist.png"}
               alt=""
-              className="rounded-full object-cover shadow-[0_4px_14px_rgba(15,23,42,0.08)]"
+              className={[
+                "rounded-full object-cover shadow-[0_4px_14px_rgba(15,23,42,0.08)]",
+                showNow
+                  ? "ring-[4px] ring-[color:var(--timetable-v2-accent)] ring-offset-[4px] ring-offset-white"
+                  : "",
+              ].join(" ")}
               style={{ width: AVATAR_PX, height: AVATAR_PX, minWidth: AVATAR_PX, minHeight: AVATAR_PX }}
               onError={(e) => {
                 ;(e.currentTarget as HTMLImageElement).src = "/placeholder-artist.png"
@@ -73,11 +86,12 @@ export default function TimelineItem({
 
             {showNow ? (
               <span
-                className="absolute -right-1 -top-1 whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em] text-[var(--text-on-accent)] shadow-md"
+                className="absolute right-0 top-0 z-[1] inline-flex translate-x-[55%] -translate-y-0 items-center justify-center rounded-full px-3 py-1.5 text-[13px] font-extrabold uppercase leading-none tracking-[0.08em] text-[var(--text-on-accent)] shadow-md"
                 style={{
                   background: "var(--timetable-v2-now-bg)",
                   boxShadow: "var(--timetable-v2-now-shadow)",
                 }}
+                aria-label="지금 진행 중"
               >
                 NOW
               </span>
