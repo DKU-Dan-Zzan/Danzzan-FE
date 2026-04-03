@@ -14,8 +14,8 @@ export default function DayTabs({
   return (
     <div
       className={[
-        "grid grid-cols-3 gap-1.5 rounded-[26px] border border-[color:color-mix(in_srgb,var(--border-base)_68%,white)] bg-[color:color-mix(in_srgb,white_58%,var(--webapp-main-bg))] p-1.5 shadow-[0_18px_34px_-30px_rgba(29,44,89,0.36)] backdrop-blur-md",
-        compact ? "rounded-[22px]" : "",
+        "grid grid-cols-3 gap-2 rounded-[30px] bg-[linear-gradient(180deg,rgba(255,255,255,0.72),rgba(247,248,252,0.88))] p-2 shadow-[0_28px_44px_-34px_rgba(30,41,77,0.42),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl ring-1 ring-[rgba(255,255,255,0.74)]",
+        compact ? "rounded-[24px]" : "",
       ].join(" ")}
     >
       {days.map((d, idx) => {
@@ -27,11 +27,11 @@ export default function DayTabs({
             type="button"
             onClick={() => onChange(idx)}
             className={[
-              "rounded-[20px] px-3 py-3 text-center transition-all duration-200",
-              compact ? "py-2.5" : "py-3.5",
+              "rounded-[24px] px-3 py-3 text-center transition-all duration-200",
+              compact ? "py-2.5" : "py-4",
               active
-                ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(246,248,253,0.92))] text-[var(--text-body-deep)] shadow-[0_14px_24px_-20px_rgba(29,44,89,0.5)]"
-                : "text-[var(--timetable-tab-inactive)]",
+                ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,247,255,0.92))] text-[var(--text-body-deep)] shadow-[0_16px_30px_-22px_rgba(29,44,89,0.44),inset_0_1px_0_rgba(255,255,255,0.95)]"
+                : "text-[var(--timetable-tab-inactive)] hover:bg-[rgba(255,255,255,0.46)]",
             ].join(" ")}
           >
             <div

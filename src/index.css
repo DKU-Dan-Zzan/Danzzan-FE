@@ -753,11 +753,16 @@
 
   --timetable-tab-inactive: #8ea0bf;
   --timetable-empty-text: #8ea0bf;
-  --timetable-info-bg: rgba(217, 227, 252, 0.86);
-  --timetable-info-border: rgba(153, 178, 239, 0.52);
-  --timetable-info-text: var(--webapp-text-emphasis);
+  --timetable-card-bg: rgba(255, 255, 255, 0.92);
+  --timetable-card-border: rgba(255, 255, 255, 0.7);
+  --timetable-line: rgba(90, 116, 211, 0.62);
+  --timetable-info-bg: rgba(236, 241, 255, 0.9);
+  --timetable-info-border: rgba(184, 198, 242, 0.42);
+  --timetable-info-text: #2b3f74;
   --timetable-notice-bg: rgb(247 235 226);
   --timetable-notice-border: rgb(247 235 226 / 45%);
+  --timetable-overlay-bg: rgba(15, 23, 42, 0.72);
+  --timetable-close-bg: rgba(255, 255, 255, 0.92);
 }
 
 html,

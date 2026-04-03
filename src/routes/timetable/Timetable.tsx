@@ -342,21 +342,29 @@ export default function Timetable() {
   }
 
   return (
-    <div className="timetable-root flex h-screen min-h-0 flex-col bg-[var(--webapp-main-bg)]">
+    <div className="timetable-root relative flex h-screen min-h-0 flex-col overflow-hidden bg-[var(--webapp-main-bg)]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-[radial-gradient(circle_at_top,rgba(132,166,255,0.2),transparent_58%),linear-gradient(180deg,rgba(255,255,255,0.7),rgba(255,255,255,0))]" />
+      <div className="pointer-events-none absolute inset-x-0 top-[180px] h-[320px] bg-[radial-gradient(circle_at_20%_0%,rgba(255,214,195,0.16),transparent_42%),radial-gradient(circle_at_80%_10%,rgba(115,150,255,0.1),transparent_44%)]" />
       <div
         ref={scrollContainerRef}
-        className="scrollbar-hide min-h-0 flex-1 overflow-y-auto bg-[var(--webapp-main-bg)]"
+        className="scrollbar-hide relative min-h-0 flex-1 overflow-y-auto bg-transparent"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
       >
-        <div className="sticky top-0 z-30 bg-[linear-gradient(180deg,rgba(254,250,247,0.96),rgba(254,250,247,0.88)_72%,rgba(254,250,247,0))] backdrop-blur-[10px]">
+        <div className="sticky top-0 z-30 bg-white">
           <div className="pt-[env(safe-area-inset-top)]">
             <div
               className={`relative overflow-hidden bg-[var(--surface)] transition-all duration-300 ${
-                isPosterCompact ? "h-16" : "h-[220px]"
+                isPosterCompact ? "h-16" : "h-[244px]"
               }`}
             >
+              {!isPosterCompact && (
+                <>
+                  <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-24 bg-[linear-gradient(180deg,rgba(19,29,59,0.26),rgba(19,29,59,0))]" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-24 bg-[linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,0.28)_38%,rgba(255,255,255,0.88))]" />
+                </>
+              )}
               <button
                 type="button"
                 disabled={!posterImage}
@@ -372,14 +380,16 @@ export default function Timetable() {
                     key={activePosterSrc}
                     src={activePosterSrc}
                     alt={posterImage.name}
-                    className="h-full w-full object-cover"
+                    className={`h-full w-full object-cover transition-transform duration-500 ${
+                      isPosterCompact ? "scale-100" : "scale-[1.015]"
+                    }`}
                     onError={(e) => {
                       ;(e.currentTarget as HTMLImageElement).src =
                         posterImage.detailImageUrl || posterImage.previewImageUrl
                     }}
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,rgba(233,238,247,0.95),rgba(251,244,239,0.92))] text-sm font-semibold tracking-[0.08em] text-[var(--text-muted)]">
+                  <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,rgba(228,236,255,0.96),rgba(255,241,234,0.94))] text-sm font-semibold tracking-[0.08em] text-[var(--text-muted)]">
                     POSTER
                   </div>
                 )}
@@ -404,7 +414,17 @@ export default function Timetable() {
             </div>
           </div>
 
-          <div className="px-4 pb-2 pt-2">
+          <div
+            className={`relative z-20 bg-white px-4 pb-3 ${
+              isPosterCompact
+                ? "pt-2"
+                : "-mt-6 rounded-t-[28px] pt-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05),0_-18px_36px_-28px_rgba(29,44,89,0.16)]"
+            }`}
+          >
+            {!isPosterCompact && (
+              <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-[linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,0.92),rgba(255,255,255,0))]" />
+            )}
+
             <DayTabs
               days={FESTIVAL_DAYS}
               activeIndex={activeIdx}
@@ -414,18 +434,18 @@ export default function Timetable() {
           </div>
         </div>
 
-        <div ref={contentStartRef} className="px-4 pt-3">
-          <div className="flex items-center gap-3 rounded-[22px] border border-[color:color-mix(in_srgb,var(--border-base)_60%,white)] bg-[rgba(255,255,255,0.68)] px-3.5 py-3 shadow-[0_16px_28px_-28px_rgba(29,44,89,0.24)] backdrop-blur-sm">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(57,94,188,0.08)]">
+        <div ref={contentStartRef} className="px-4 pt-4">
+          <div className="flex items-center gap-3 rounded-[28px] bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(249,251,255,0.76))] px-4 py-3.5 shadow-[0_18px_48px_-34px_rgba(35,49,94,0.42),0_10px_18px_-18px_rgba(255,255,255,0.86)_inset] backdrop-blur-md ring-1 ring-[rgba(255,255,255,0.72)]">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(180deg,rgba(100,126,220,0.16),rgba(100,126,220,0.08))] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
               <InformationCircleIcon className="h-4.5 w-4.5 text-[var(--accent)]" />
             </div>
-            <p className="text-[14px] font-medium tracking-[-0.02em] text-[var(--timetable-info-text)]">
+            <p className="text-[14px] font-medium leading-[1.45] tracking-[-0.02em] text-[var(--timetable-info-text)]">
               일정은 현장 상황에 따라 변경될 수 있습니다.
             </p>
           </div>
         </div>
 
-        <div className="px-4 pb-6 pt-5">
+        <div className="px-4 pb-8 pt-6">
           {isDay1 ? (
             <ContentImageSection
               images={contentImages}

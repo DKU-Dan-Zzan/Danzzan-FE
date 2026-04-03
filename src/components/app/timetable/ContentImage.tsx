@@ -61,13 +61,13 @@ export default function ContentImageSection({
           <button
             key={image.id}
             type="button"
-            className="block w-full overflow-hidden rounded-2xl border border-[var(--timetable-card-border)] bg-[var(--timetable-card-bg)]"
+            className="block w-full overflow-hidden rounded-[30px] bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(247,249,255,0.86))] shadow-[0_30px_56px_-38px_rgba(23,34,68,0.46),inset_0_1px_0_rgba(255,255,255,0.92)] ring-1 ring-[rgba(255,255,255,0.76)]"
             onClick={() => onSelectImage(image)}
           >
             <img
               src={image.previewImageUrl}
               alt={image.name}
-              className="h-44 w-full object-cover"
+              className="h-48 w-full object-cover"
               onError={(e) => {
                 ;(e.currentTarget as HTMLImageElement).src = image.detailImageUrl
               }}
