@@ -42,20 +42,20 @@ export function MyTicketListPanel({
       <div
         className="overflow-hidden rounded-[16px] px-4 py-3"
         style={{
-          background: "#ffffff",
+          background: "var(--poster-card-white)",
           border: "1px solid rgba(28,43,106,0.08)",
           boxShadow: "0 2px 12px rgba(28,43,106,0.07)",
         }}
       >
         <div className="flex items-center gap-2.5">
-          <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(28,43,106,0.08)", color: "#1c2b6a" }}>
+          <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(28,43,106,0.08)", color: "var(--poster-navy)" }}>
             <TicketCheck className="h-3.5 w-3.5" />
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-semibold" style={{ color: "rgba(28,43,106,0.5)" }}>
               예매 내역과 팔찌 상태
             </p>
-            <h2 className="mt-0.5 text-[17px] font-extrabold tracking-tight" style={{ color: "#1c2b6a" }}>
+            <h2 className="mt-0.5 text-[17px] font-extrabold tracking-tight" style={{ color: "var(--poster-navy)" }}>
               단국존 선예매 티켓
             </h2>
           </div>
@@ -73,7 +73,7 @@ export function MyTicketListPanel({
       <div
         className="overflow-hidden rounded-[16px] px-4 py-3"
         style={{
-          background: "#ffffff",
+          background: "var(--poster-card-white)",
           border: "1px solid rgba(28,43,106,0.08)",
           boxShadow: "0 2px 12px rgba(28,43,106,0.07)",
         }}
@@ -84,9 +84,9 @@ export function MyTicketListPanel({
         </div>
         <dl className="mt-2 grid grid-cols-[2.5rem_1fr] gap-x-2 gap-y-1.5 text-[13px]">
           <dt className="font-medium" style={{ color: "rgba(28,43,106,0.45)" }}>학번</dt>
-          <dd className="font-extrabold tracking-tight" style={{ color: "#1c2b6a" }}>{student.studentId}</dd>
+          <dd className="font-extrabold tracking-tight" style={{ color: "var(--poster-navy)" }}>{student.studentId}</dd>
           <dt className="font-medium" style={{ color: "rgba(28,43,106,0.45)" }}>이름</dt>
-          <dd className="font-extrabold tracking-tight" style={{ color: "#1c2b6a" }}>{student.name}</dd>
+          <dd className="font-extrabold tracking-tight" style={{ color: "var(--poster-navy)" }}>{student.name}</dd>
         </dl>
       </div>
 

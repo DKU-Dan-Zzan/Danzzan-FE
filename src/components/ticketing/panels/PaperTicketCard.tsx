@@ -8,10 +8,10 @@ interface PaperTicketCardProps {
 }
 
 const statusDisplayMap: Record<Ticket["status"], { label: string; bg: string; text: string }> = {
-  issued:    { label: "팔찌 미수령",   bg: "#dcfce7", text: "#15803d" },
-  used:      { label: "팔찌 수령 완료", bg: "#fee2e2", text: "#b91c1c" },
-  cancelled: { label: "예매 취소",     bg: "#f3f4f6", text: "#6b7280" },
-  unknown:   { label: "상태 확인 필요", bg: "#ede9fe", text: "#6d28d9" },
+  issued:    { label: "팔찌 미수령",   bg: "var(--ticket-badge-issued-bg)",    text: "var(--ticket-badge-issued-text)" },
+  used:      { label: "팔찌 수령 완료", bg: "var(--ticket-badge-used-bg)",      text: "var(--ticket-badge-used-text)" },
+  cancelled: { label: "예매 취소",     bg: "var(--ticket-badge-cancelled-bg)", text: "var(--ticket-badge-cancelled-text)" },
+  unknown:   { label: "상태 확인 필요", bg: "var(--ticket-badge-unknown-bg)",   text: "var(--ticket-badge-unknown-text)" },
 };
 
 const stripTimeFromEventDate = (value: string): string =>
@@ -100,7 +100,7 @@ export function PaperTicketCard({ ticket }: PaperTicketCardProps) {
           <p className="text-[0.58rem] font-bold tracking-[0.22em]" style={{ color: "rgba(28,43,106,0.5)", textShadow: "0 1px 3px rgba(255,255,255,0.8)" }}>
             DANKOOK ZONE TICKET
           </p>
-          <p className="mt-1.5 text-[2.1rem] font-bold leading-none tracking-[-0.02em]" style={{ color: "#1c2b6a", textShadow: "0 1px 4px rgba(255,255,255,0.6)" }}>
+          <p className="mt-1.5 text-[2.1rem] font-bold leading-none tracking-[-0.02em]" style={{ color: "var(--poster-navy)", textShadow: "0 1px 4px rgba(255,255,255,0.6)" }}>
             {dayLabel}
           </p>
           <span
@@ -123,7 +123,7 @@ export function PaperTicketCard({ ticket }: PaperTicketCardProps) {
               <p className={cn(
                 "mt-0.5 text-[1.05rem] font-extrabold leading-tight [font-variant-numeric:tabular-nums]",
                 key === "예매 순번" ? "font-mono" : ""
-              )} style={{ color: "#1c2b6a" }}>
+              )} style={{ color: "var(--poster-navy)" }}>
                 {val}
               </p>
             </div>
