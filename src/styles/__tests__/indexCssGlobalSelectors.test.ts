@@ -17,6 +17,7 @@ describe("index.css global selectors", () => {
 
     expect(selectors).toEqual([
       ".font-cute",
+      ".font-timetable-artist",
       ".scrollbar-hide",
       ".scrollbar-hide::-webkit-scrollbar",
     ]);

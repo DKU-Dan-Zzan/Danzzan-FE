@@ -12,40 +12,48 @@ export default function DayTabs({
   compact?: boolean
 }) {
   return (
-    <div
-      className={[
-        "grid grid-cols-3 gap-2 rounded-[30px] bg-[linear-gradient(180deg,rgba(255,255,255,0.72),rgba(247,248,252,0.88))] p-2 shadow-[0_28px_44px_-34px_rgba(30,41,77,0.42),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl ring-1 ring-[rgba(255,255,255,0.74)]",
-        compact ? "rounded-[24px]" : "",
-      ].join(" ")}
-    >
-      {days.map((d, idx) => {
-        const active = idx === activeIndex
+    <div className="relative border-b border-neutral-100">
+      <div className="flex">
+        {days.map((d, idx) => {
+          const active = idx === activeIndex
 
-        return (
-          <button
-            key={d.key}
-            type="button"
-            onClick={() => onChange(idx)}
-            className={[
-              "rounded-[24px] px-3 py-3 text-center transition-all duration-200",
-              compact ? "py-2.5" : "py-4",
-              active
-                ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,247,255,0.92))] text-[var(--text-body-deep)] shadow-[0_16px_30px_-22px_rgba(29,44,89,0.44),inset_0_1px_0_rgba(255,255,255,0.95)]"
-                : "text-[var(--timetable-tab-inactive)] hover:bg-[rgba(255,255,255,0.46)]",
-            ].join(" ")}
-          >
-            <div
+          return (
+            <button
+              key={d.key}
+              type="button"
+              onClick={() => onChange(idx)}
               className={[
-                "text-[20px] font-semibold tracking-[-0.04em]",
-                compact ? "text-[17px]" : "",
-                active ? "font-extrabold text-[var(--timetable-active-color)]" : "",
+                "relative flex flex-1 flex-col items-center justify-center px-1 transition-opacity duration-200",
+                compact ? "min-h-[2.75rem] py-2" : "min-h-[3.1rem] py-3",
+                active ? "" : "opacity-55 hover:opacity-90",
               ].join(" ")}
             >
-              {d.key}
-            </div>
-          </button>
-        )
-      })}
+              <span
+                className={[
+                  "tracking-[0.02em]",
+                  compact ? "text-[20px]" : "text-[24px]",
+                  active ? "font-black" : "font-extrabold",
+                ].join(" ")}
+                style={{
+                  color: active ? "var(--timetable-v2-accent)" : "var(--timetable-tab-inactive)",
+                }}
+              >
+                {d.key}
+              </span>
+
+              {active ? (
+                <span
+                  className="absolute bottom-0 left-1/2 h-[3px] w-[42%] min-w-[2.75rem] -translate-x-1/2 rounded-t-full bg-[var(--timetable-v2-accent)]"
+                  style={{
+                    boxShadow: "0 -2px 10px color-mix(in srgb, var(--timetable-v2-accent) 30%, transparent)",
+                  }}
+                  aria-hidden
+                />
+              ) : null}
+            </button>
+          )
+        })}
+      </div>
     </div>
   )
 }

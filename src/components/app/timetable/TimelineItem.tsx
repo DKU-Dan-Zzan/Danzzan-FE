@@ -1,5 +1,13 @@
 import type { Performance } from "@/types/app/timetable/timetable.types"
 
+function hashtagLabel(description: string) {
+  const t = description.trim()
+  if (!t) return ""
+  return `#${t.replace(/\s+/g, "")}`
+}
+
+const AVATAR_PX = "7rem"
+
 export default function TimelineItem({
   item,
   isLast,
@@ -11,75 +19,105 @@ export default function TimelineItem({
   innerRef?: (el: HTMLLIElement | null) => void
   showNow?: boolean
 }) {
-  const timeRange = `${item.startTime} ~ ${item.endTime}`
+  const timeLabel = `${item.startTime} ~ ${item.endTime}`
 
   return (
-    <li ref={innerRef} className="relative scroll-mt-24">
-      <div className="mx-auto flex w-full max-w-[380px] gap-4 pb-2">
-        <div className="flex w-[4.85rem] flex-col items-center">
-          <div className="min-w-[4.85rem] rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(245,248,255,0.82))] px-3.5 py-1.5 text-center text-[15px] font-extrabold tabular-nums tracking-[-0.02em] text-[var(--timetable-active-color)] shadow-[0_18px_34px_-24px_rgba(27,38,73,0.44),inset_0_1px_0_rgba(255,255,255,0.96)] ring-1 ring-[rgba(255,255,255,0.78)]">
-            {item.startTime}
-          </div>
-        </div>
-
-        <div className="relative flex w-6 justify-center">
-          <div className="relative mt-3">
-            <div className="h-3 w-3 rounded-full bg-[var(--timetable-active-color)] shadow-[0_0_0_7px_rgba(86,112,205,0.1),0_8px_18px_-10px_rgba(57,94,188,0.55)]" />
-
-            {showNow && (
-              <span className="absolute -top-2 left-5 whitespace-nowrap rounded-full bg-[linear-gradient(135deg,rgba(60,95,203,0.98),rgba(95,127,230,0.94))] px-2.5 py-1 text-[10px] font-extrabold tracking-[0.08em] text-[var(--text-on-accent)] shadow-[0_14px_28px_-16px_rgba(29,44,89,0.65)]">
-                NOW
-              </span>
-            )}
-          </div>
-
+    <li ref={innerRef} className="relative scroll-mt-24 pb-10">
+      <div className="mx-auto flex w-full max-w-[420px] items-stretch pt-3">
+        {/* 왼쪽: 시간 — 원형 사진과 같은 높이 밴드 안에서 세로 중앙 */}
+        <div className="flex min-w-0 flex-1 shrink-0 justify-end self-start pr-2">
           <div
-            className={`absolute top-5 bottom-0 w-px bg-[linear-gradient(180deg,rgba(102,125,210,0.75),rgba(154,173,235,0.18))] ${
-              isLast ? "opacity-40" : "opacity-100"
-            }`}
-          />
+            className="flex items-center justify-end"
+            style={{ height: AVATAR_PX, minHeight: AVATAR_PX }}
+          >
+            <p
+              className="max-w-full text-right text-[19px] font-bold tabular-nums tracking-[-0.02em] text-neutral-800 sm:text-[21px]"
+              aria-label={`공연 시간 ${item.startTime}부터 ${item.endTime}까지`}
+            >
+              {timeLabel}
+            </p>
+          </div>
         </div>
 
-        <div className="min-w-0 flex-1">
-          <div className="relative overflow-hidden rounded-[34px] bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(247,249,255,0.82))] px-4 py-4 shadow-[0_30px_60px_-40px_rgba(23,34,68,0.55),0_18px_28px_-24px_rgba(23,34,68,0.18),inset_0_1px_0_rgba(255,255,255,0.96)] ring-1 ring-[rgba(255,255,255,0.76)]">
-            <div className="pointer-events-none absolute inset-x-4 top-0 h-14 bg-[linear-gradient(180deg,rgba(112,141,233,0.08),rgba(112,141,233,0))]" />
-            <div className="flex items-start gap-4">
-              <div className="h-24 w-24 shrink-0 overflow-hidden rounded-[28px] shadow-[0_18px_32px_-24px_rgba(29,44,89,0.4)] ring-1 ring-[rgba(255,255,255,0.9)]">
-                <img
-                  src={item.artistImageUrl ?? "/placeholder-artist.png"}
-                  alt=""
-                  className="h-full w-full object-cover"
-                  onError={(e) => {
-                    ;(e.currentTarget as HTMLImageElement).src = "/placeholder-artist.png"
+        {/* 가운데: 노드 + 아래로 길게 이어지는 점선(항목 간 여백까지) */}
+        <div className="relative flex w-[32px] shrink-0 flex-col items-center self-stretch">
+          <div
+            className="flex w-full shrink-0 items-center justify-center"
+            style={{ height: AVATAR_PX, minHeight: AVATAR_PX }}
+          >
+            <div
+              className="relative z-[1] h-3.5 w-3.5 rounded-full ring-[3px] ring-[color:color-mix(in_srgb,var(--timetable-v2-accent)_14%,white)]"
+              style={{
+                background: "var(--timetable-v2-accent)",
+                boxShadow: "var(--timetable-v2-timeline-node-shadow)",
+              }}
+            />
+          </div>
+          {!isLast ? (
+            <div
+              className="pointer-events-none absolute left-1/2 w-0 -translate-x-1/2 border-l-2 border-dashed"
+              style={{
+                top: `calc(${AVATAR_PX} / 2 + 10px)`,
+                bottom: "-2.75rem",
+                borderLeftColor: "var(--timetable-v2-timeline-dash)",
+              }}
+              aria-hidden
+            />
+          ) : null}
+        </div>
+
+        {/* 오른쪽: 사진·장르·이름 — 왼쪽·아래로 배치 */}
+        <div className="flex min-w-0 flex-1 flex-col items-start pl-2 pr-3 sm:pl-3">
+          <div className="flex w-full max-w-[15.5rem] flex-col items-center">
+            <div className="relative shrink-0">
+              <img
+                src={item.artistImageUrl ?? "/placeholder-artist.png"}
+                alt=""
+                className="rounded-full object-cover shadow-[0_4px_14px_rgba(15,23,42,0.08)]"
+                style={{ width: AVATAR_PX, height: AVATAR_PX, minWidth: AVATAR_PX, minHeight: AVATAR_PX }}
+                onError={(e) => {
+                  ;(e.currentTarget as HTMLImageElement).src = "/placeholder-artist.png"
+                }}
+              />
+
+              {showNow ? (
+                <span
+                  className="absolute -right-1 -top-1 whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em] text-[var(--text-on-accent)] shadow-md"
+                  style={{
+                    background: "var(--timetable-v2-now-bg)",
+                    boxShadow: "var(--timetable-v2-now-shadow)",
                   }}
-                />
-              </div>
-
-              <div className="min-w-0 flex-1 pt-1">
-                <div className="flex flex-wrap items-start gap-x-2 gap-y-2">
-                  <div className="text-[20px] font-black leading-[1.1] tracking-[-0.04em] text-[var(--text)]">
-                    {item.artistName}
-                  </div>
-
-                  {item.artistDescription && (
-                    <p className="rounded-full bg-[rgba(96,118,190,0.08)] px-2.5 py-1 text-[11px] font-semibold leading-none tracking-[0.02em] text-[color:color-mix(in_srgb,var(--text-muted)_86%,white)]">
-                      {item.artistDescription}
-                    </p>
-                  )}
-                </div>
-
-                <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-2 text-[13px] text-[var(--text-muted)]">
-                  <span className="rounded-full bg-[rgba(255,255,255,0.72)] px-2.5 py-1 font-semibold tabular-nums tracking-[-0.01em] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
-                    {timeRange}
-                  </span>
-                  {item.stage && (
-                    <span className="rounded-full bg-[rgba(96,118,190,0.08)] px-2.5 py-1 font-medium tracking-[-0.01em] text-[var(--text-body-deep)]">
-                      {item.stage}
-                    </span>
-                  )}
-                </div>
-              </div>
+                >
+                  NOW
+                </span>
+              ) : null}
             </div>
+
+            {item.artistDescription ? (
+              <p
+                className="mt-2.5 max-w-full text-center text-[13px] font-semibold leading-snug"
+                style={{ color: "var(--timetable-v2-accent)" }}
+              >
+                {hashtagLabel(item.artistDescription)}
+              </p>
+            ) : null}
+
+            <h3
+              className={[
+                "font-timetable-artist max-w-full text-center text-[1.35rem] leading-snug text-neutral-800",
+                item.artistDescription ? "mt-1.5" : "mt-2.5",
+              ].join(" ")}
+            >
+              <span className="text-neutral-300">&#8216;</span>
+              {item.artistName}
+              <span className="text-neutral-300">&#8217;</span>
+            </h3>
+
+            {item.stage ? (
+              <span className="mt-2.5 inline-flex items-center rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-neutral-500">
+                {item.stage}
+              </span>
+            ) : null}
           </div>
         </div>
       </div>

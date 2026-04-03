@@ -43,7 +43,7 @@ export default function Timeline({
   }, [scrollTargetId, items])
 
   return (
-    <ul className="space-y-6">
+    <ul className="space-y-0">
       {items.map((p, idx) => (
         <TimelineItem
           key={p.performanceId}
