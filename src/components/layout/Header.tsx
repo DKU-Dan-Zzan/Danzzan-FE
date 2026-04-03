@@ -5,6 +5,7 @@ import { useSyncExternalStore } from "react"
 import { authStore } from "@/store/common/authStore"
 import { getMyTicketNavigationTarget } from "@/lib/common/my-ticket-navigation"
 import { AppTopBar } from "@/components/layout/AppTopBar"
+import { cn } from "@/components/common/ui/utils"
 
 const HEADER_ICON_BUTTON_CLASS =
   "absolute top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center text-[color:color-mix(in_srgb,var(--text)_96%,black)] transition-colors duration-150 hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
@@ -35,7 +36,7 @@ const Header = () => {
         onClick={handleTicketClick}
         aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
         title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
-        className={`${HEADER_ICON_BUTTON_CLASS} right-[4.25rem]`}
+        className={cn(HEADER_ICON_BUTTON_CLASS, "right-[4.25rem]")}
       >
         <Ticket size={22} />
       </button>
@@ -43,7 +44,7 @@ const Header = () => {
         onClick={handleMyInfoClick}
         aria-label="내정보"
         title="내정보"
-        className={`${HEADER_ICON_BUTTON_CLASS} right-4`}
+        className={cn(HEADER_ICON_BUTTON_CLASS, "right-4")}
       >
         <User size={22} />
       </button>

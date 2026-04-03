@@ -45,7 +45,7 @@ const BOTTOM_NAV_LABEL_INACTIVE_CLASS = "font-semibold opacity-85";
 const BOTTOM_NAV_HOME_LINK_CLASS =
   "relative flex h-full items-start justify-center pt-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface_container_lowest)]";
 const BOTTOM_NAV_HOME_BUTTON_CLASS =
-  "inline-flex h-14 w-14 -translate-y-3 items-center justify-center rounded-full bg-[#073161] text-[var(--on-primary)] shadow-[var(--ec-ambient-shadow)] transition-transform duration-150 ease-out active:scale-[0.96] motion-reduce:transform-none";
+  "inline-flex h-14 w-14 -translate-y-3 items-center justify-center rounded-full bg-[var(--app-nav-home-highlight)] text-[var(--on-primary)] shadow-[var(--ec-ambient-shadow)] transition-transform duration-150 ease-out active:scale-[0.96] motion-reduce:transform-none";
 const BOTTOM_NAV_HOME_ICON_CLASS = "h-[22px] w-[22px]";
 
 const BottomNav = () => {

@@ -15,9 +15,9 @@ describe("app header round button style source", () => {
     expect(userLayoutSource).toContain("HEADER_ICON_BUTTON_CLASS");
     expect(headerSource).not.toContain("APP_HEADER_ROUND_BUTTON_BASE_CLASS");
     expect(userLayoutSource).not.toContain("APP_HEADER_ROUND_BUTTON_BASE_CLASS");
-    expect(headerSource).toContain('className={`${HEADER_ICON_BUTTON_CLASS} right-[4.25rem]`}');
-    expect(headerSource).toContain('className={`${HEADER_ICON_BUTTON_CLASS} right-4`}');
-    expect(userLayoutSource).toContain('className={`${HEADER_ICON_BUTTON_CLASS} left-4`}');
+    expect(headerSource).toContain('className={cn(HEADER_ICON_BUTTON_CLASS, "right-[4.25rem]")}');
+    expect(headerSource).toContain('className={cn(HEADER_ICON_BUTTON_CLASS, "right-4")}');
+    expect(userLayoutSource).toContain('className={cn(HEADER_ICON_BUTTON_CLASS, "left-4")}');
   });
 
   it("티켓팅 뒤로가기 아이콘 크기를 홈 헤더 액션 버튼과 맞춘다", () => {

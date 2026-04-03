@@ -51,7 +51,7 @@ describe("BottomNav", () => {
   it("중앙 HOME 탭은 원형 하이라이트 스타일을 사용한다", () => {
     const markup = renderBottomNav("/");
 
-    expect(markup).toContain("bg-[#073161]");
+    expect(markup).toContain("bg-[var(--app-nav-home-highlight)]");
     expect(markup).toContain("text-[var(--on-primary)]");
     expect(markup).toContain("h-14 w-14");
     expect(markup).toContain("-translate-y-3");

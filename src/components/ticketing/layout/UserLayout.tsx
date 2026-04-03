@@ -6,6 +6,7 @@ import BottomNav from "@/components/layout/BottomNav";
 import { AppTopBar } from "@/components/layout/AppTopBar";
 import { AppShell } from "@/components/layout/AppShell";
 import { shouldShowTicketingHeader } from "@/lib/ticketing/navigation/headerVisibility";
+import { cn } from "@/components/common/ui/utils";
 
 const HEADER_ICON_BUTTON_CLASS =
   "absolute top-1/2 -translate-y-1/2 inline-flex h-10 w-10 items-center justify-center text-[color:color-mix(in_srgb,var(--text)_96%,black)] transition-colors duration-150 hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent disabled:opacity-40";
@@ -87,7 +88,7 @@ export function UserLayout() {
               onClick={isBackButtonDisabled ? undefined : handleBack}
               disabled={isBackButtonDisabled}
               aria-disabled={isBackButtonDisabled}
-              className={`${HEADER_ICON_BUTTON_CLASS} left-4`}
+              className={cn(HEADER_ICON_BUTTON_CLASS, "left-4")}
               aria-label="뒤로가기"
               title={isBackButtonDisabled ? "뒤로가기 비활성화" : "뒤로가기"}
             >
