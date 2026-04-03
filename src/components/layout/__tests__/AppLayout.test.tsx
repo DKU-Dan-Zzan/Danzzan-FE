@@ -19,9 +19,9 @@ function renderAppLayout(pathname: string) {
 }
 
 describe("AppLayout", () => {
-  it("일반 사용자 레이아웃 루트에 data-color-scheme=webapp를 선언한다", () => {
+  it("일반 사용자 레이아웃 루트에 data-color-scheme=electric-curator를 선언한다", () => {
     const markup = renderAppLayout("/");
 
-    expect(markup).toContain('data-color-scheme="webapp"');
+    expect(markup).toContain('data-color-scheme="electric-curator"');
   });
 });

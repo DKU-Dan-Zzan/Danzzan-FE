@@ -14,6 +14,16 @@ describe("AppShell", () => {
     expect(markup).toContain('data-color-scheme="webapp"');
   });
 
+  it("electric curator 색상 스킴을 지정하면 루트에 data-color-scheme를 설정한다", () => {
+    const markup = renderToStaticMarkup(
+      <AppShell colorScheme="electric-curator">
+        <div>content</div>
+      </AppShell>,
+    );
+
+    expect(markup).toContain('data-color-scheme="electric-curator"');
+  });
+
   it("색상 스킴을 지정하지 않으면 data-color-scheme를 설정하지 않는다", () => {
     const markup = renderToStaticMarkup(
       <AppShell>
