@@ -17,7 +17,7 @@ const CHIP_BASE_CLASS =
 const CHIP_ACTIVE_CLASS =
   "border-[var(--boothmap-chip-selected-border)] bg-[var(--boothmap-chip-selected-bg)] text-[var(--boothmap-chip-selected-text)] shadow-[var(--boothmap-chip-selected-shadow)]";
 const CHIP_INACTIVE_CLASS =
-  "border-[var(--boothmap-chip-border)] bg-[var(--boothmap-chip-bg)] text-[var(--boothmap-chip-text)] hover:border-[var(--boothmap-chip-hover-border)] hover:bg-[var(--boothmap-chip-hover-bg)] hover:text-[var(--boothmap-chip-hover-text)]";
+  "border-[var(--boothmap-chip-border)] bg-[color:color-mix(in_srgb,var(--boothmap-chip-bg)_68%,transparent)] text-[var(--boothmap-chip-text)] hover:border-[var(--boothmap-chip-hover-border)] hover:bg-[color:color-mix(in_srgb,var(--boothmap-chip-hover-bg)_76%,transparent)] hover:text-[var(--boothmap-chip-hover-text)]";
 
 export default function PrimaryFilterChips({
   value,

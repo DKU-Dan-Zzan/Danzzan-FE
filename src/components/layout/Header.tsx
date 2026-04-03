@@ -27,7 +27,7 @@ const Header = () => {
     <AppTopBar
       headerClassName={
         isBoothMapPage
-          ? "absolute inset-x-0 top-0 z-50 border-b border-[var(--boothmap-panel-border)] bg-[var(--boothmap-panel-bg)] [background-image:none] backdrop-blur-md pt-[env(safe-area-inset-top)]"
+          ? "absolute inset-x-0 top-0 z-50 border-b border-[color:color-mix(in_srgb,var(--boothmap-panel-border)_32%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--boothmap-panel-bg)_80%,transparent)_0%,color-mix(in_srgb,var(--boothmap-panel-bg)_72%,transparent)_28%,color-mix(in_srgb,var(--boothmap-panel-bg)_60%,transparent)_100%)] backdrop-blur-xl pt-[env(safe-area-inset-top)]"
           : undefined
       }
     >

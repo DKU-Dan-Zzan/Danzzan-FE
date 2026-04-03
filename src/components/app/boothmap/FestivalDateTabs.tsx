@@ -19,7 +19,7 @@ export default function FestivalDateTabs({
 }: FestivalDateTabsProps) {
   return (
     <div className={className}>
-      <div className="grid grid-cols-3 rounded-[24px] border border-[color:color-mix(in_srgb,var(--boothmap-panel-border)_70%,white)] bg-[color:color-mix(in_srgb,var(--boothmap-chip-bg)_90%,white)] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
+      <div className="grid grid-cols-3 rounded-[24px] border border-[color:color-mix(in_srgb,var(--boothmap-panel-border)_62%,transparent)] bg-[color:color-mix(in_srgb,var(--boothmap-chip-bg)_62%,transparent)] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.4)]">
         {dates.map((item) => {
           const isSelected = selectedDate === item.value;
 

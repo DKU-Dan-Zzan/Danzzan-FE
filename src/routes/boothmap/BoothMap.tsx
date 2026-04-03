@@ -482,7 +482,7 @@ export default function BoothMap() {
         )}
         style={{ top: "calc(env(safe-area-inset-top) + 4rem)" }}
       >
-        <div className="rounded-b-[32px] border-b border-[var(--boothmap-panel-border)] bg-[color:color-mix(in_srgb,var(--boothmap-panel-bg)_94%,white)] px-4 pb-4 pt-2 shadow-[var(--boothmap-panel-shadow)] backdrop-blur-xl">
+        <div className="rounded-b-[32px] border-b border-[color:color-mix(in_srgb,var(--boothmap-panel-border)_20%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--boothmap-panel-bg)_60%,transparent)_0%,color-mix(in_srgb,var(--boothmap-panel-bg)_46%,transparent)_42%,color-mix(in_srgb,var(--boothmap-panel-bg)_30%,transparent)_100%)] px-4 pb-4 pt-2 shadow-[var(--boothmap-panel-shadow)] backdrop-blur-xl">
           <FestivalDateTabs
             dates={FESTIVAL_DATES}
             selectedDate={selectedDate}
