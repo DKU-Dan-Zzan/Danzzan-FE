@@ -1,61 +1,59 @@
-// 역할: timetable 화면에서 사용하는 Day Tabs UI 블록을 렌더링합니다.
 import type { FestivalDay } from "@/types/app/timetable/timetable.types"
 
 export default function DayTabs({
   days,
   activeIndex,
   onChange,
+  compact = false,
 }: {
   days: FestivalDay[]
   activeIndex: number
   onChange: (idx: number) => void
+  compact?: boolean
 }) {
   return (
-    <div className="relative mt-1">
-      {/* 탭들 */}
-      <div className="grid grid-cols-3 items-center pb-3">
+    <div className="relative">
+      <div className="flex">
         {days.map((d, idx) => {
           const active = idx === activeIndex
+
           return (
             <button
               key={d.key}
+              type="button"
               onClick={() => onChange(idx)}
               className={[
-                "relative justify-self-center",
-                "px-3 py-2",
-                "text-xl tracking-wide transition-colors",
-                active
-                  ? "text-[var(--text-body-deep)] font-extrabold"
-                  : "text-[var(--timetable-tab-inactive)] hover:text-[var(--text-muted)]",
+                "relative flex flex-1 flex-col items-center justify-center px-1 transition-opacity duration-200",
+                compact ? "min-h-[2.75rem] py-2" : "min-h-[3.1rem] py-3",
+                active ? "" : "opacity-55 hover:opacity-90",
               ].join(" ")}
             >
-
-              {/* 커진 느낌 scale로 */}
               <span
-                className={
-                  active
-                    ? "inline-block scale-[1.06] transition-transform"
-                    : "inline-block transition-transform"
-                }
+                className={[
+                  "tracking-[0.02em]",
+                  compact ? "text-[22px]" : "text-[27px]",
+                  active ? "font-black" : "font-bold",
+                ].join(" ")}
+                style={{
+                  color: active ? "var(--timetable-v2-accent)" : "var(--timetable-tab-inactive)",
+                }}
               >
                 {d.key}
               </span>
+
+              {active ? (
+                <span
+                  className="absolute bottom-0 left-1/2 h-[4.5px] w-[46%] min-w-[2.85rem] -translate-x-1/2 rounded-t-full bg-[var(--timetable-v2-accent)]"
+                  style={{
+                    boxShadow: "0 -2px 10px color-mix(in srgb, var(--timetable-v2-accent) 30%, transparent)",
+                  }}
+                  aria-hidden
+                />
+              ) : null}
             </button>
           )
         })}
       </div>
-
-      {/* 베이스 라인 */}
-      <div className="absolute inset-x-0 bottom-0 h-px bg-[var(--timetable-card-border)]" />
-
-      {/* 밑줄 */}
-      <div
-        className="absolute bottom-0 h-[4px] rounded-full bg-[var(--text-body-deep)] transition-[left] duration-200"
-        style={{
-          left: `${(100 / days.length) * activeIndex}%`,
-          width: `${100 / days.length}%`,
-        }}
-      />
     </div>
   )
 }

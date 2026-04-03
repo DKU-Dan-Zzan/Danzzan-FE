@@ -16,6 +16,13 @@
     },
     {
       "ruleId": "STYLE_NO_NEW_GLOBAL_SELECTOR",
+      "target": ".font-timetable-artist",
+      "reason": "타임테이블 공연자명 전역 폰트 유틸",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_GLOBAL_SELECTOR",
       "target": ".scrollbar-hide",
       "reason": "크로스브라우저 스크롤바 숨김 유틸",
       "owner": "fe-platform",
