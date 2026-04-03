@@ -19,6 +19,7 @@ const Header = () => {
     authStore.getSnapshot,
   )
   const isLoggedIn = !!session.tokens?.accessToken && session.role === "student"
+  const isTimetablePage = location.pathname === "/timetable"
   const isBoothMapPage = location.pathname === "/map"
 
   const handleTicketClick = () => {
@@ -27,6 +28,10 @@ const Header = () => {
 
   const handleMyInfoClick = () => {
     navigate("/mypage")
+  }
+
+  if (isTimetablePage) {
+    return null
   }
 
   const headerClassName =

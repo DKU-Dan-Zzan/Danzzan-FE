@@ -16,6 +16,13 @@
     },
     {
       "ruleId": "STYLE_NO_NEW_GLOBAL_SELECTOR",
+      "target": ".font-timetable-artist",
+      "reason": "타임테이블 공연자명 전역 폰트 유틸",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_GLOBAL_SELECTOR",
       "target": ".scrollbar-hide",
       "reason": "크로스브라우저 스크롤바 숨김 유틸",
       "owner": "fe-platform",
@@ -802,6 +809,27 @@
       "ruleId": "STYLE_NO_NEW_RAW_HEX",
       "target": "src/index.css::#8ea0bf",
       "reason": "웹앱 디자인 토큰 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#1c2b6a",
+      "reason": "2026 단국대 축제 포스터 팔레트 승인값 (落花流水 ;만개 네이비)",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#3a5fa8",
+      "reason": "2026 단국대 축제 포스터 팔레트 승인값 (落花流水 ;만개 블루)",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#eef1f8",
+      "reason": "2026 단국대 축제 포스터 팔레트 승인값 (落花流水 ;만개 배경)",
       "owner": "fe-platform",
       "expiresAt": "2026-12-31"
     }
