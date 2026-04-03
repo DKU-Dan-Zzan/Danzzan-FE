@@ -41,6 +41,7 @@ export const useQueueUrlSync = ({
     const params = new URLSearchParams(location.search);
     if (eventId) {
       params.set("eventId", eventId);
+      params.delete("list");
     } else {
       params.delete("eventId");
     }
