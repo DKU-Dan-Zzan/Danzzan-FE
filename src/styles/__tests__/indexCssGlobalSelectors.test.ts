@@ -20,6 +20,7 @@ describe("index.css global selectors", () => {
       ".ec-scroll-cue-twinkle",
       ".home-hero-bottom-vignette",
       ".font-cute",
+      ".font-timetable-artist",
       ".scrollbar-hide",
       ".scrollbar-hide::-webkit-scrollbar",
     ]);
