@@ -8,7 +8,6 @@ import {
   getCurrentPerformance,
 } from "@/utils/app/timetable";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
-import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
 import { cn } from "@/components/common/ui/utils";
 
 const CARD_WIDTH = 314.4;
@@ -77,13 +76,12 @@ export default function CurrentPerformanceSection() {
           onClick={() => navigate(`/timetable?date=${today}`)}
           style={{ aspectRatio: CARD_ASPECT_RATIO }}
           className={cn(
-            "w-full rounded-[22px] px-5 py-4 transition active:scale-[0.99]",
-            APP_CARD_VARIANTS.outline,
+            "w-full rounded-[var(--radius-xl)] border border-[var(--card-outline-border)] bg-[var(--card-outline-bg)] px-5 py-4 shadow-[var(--card-outline-shadow)] transition active:scale-[0.99]",
           )}
         >
           {status === "active" && currentPerformance ? (
             <div className="flex h-full items-center gap-4">
-              <div className="h-[68px] w-[68px] shrink-0 overflow-hidden rounded-full border border-[var(--home-card-border)] bg-[var(--surface-subtle)]">
+              <div className="h-[68px] w-[68px] shrink-0 overflow-hidden rounded-full bg-[var(--surface_container_lowest)]">
                 <img
                   src={currentPerformance.artistImageUrl || "/images/default-artist.png"}
                   alt={currentPerformance.artistName}
@@ -96,19 +94,19 @@ export default function CurrentPerformanceSection() {
                   {currentPerformance.artistName}
                 </p>
 
-                <p className="mt-1 text-[14px] font-medium text-[var(--text-muted)]">
+                <p className="mt-1 text-[14px] font-semibold text-[var(--text-body-deep)]">
                   {currentPerformance.startTime} - {currentPerformance.endTime}
                 </p>
               </div>
             </div>
           ) : (
             <div className="flex h-full items-center gap-4">
-              <div className="flex h-[68px] w-[68px] shrink-0 items-center justify-center rounded-full border border-[var(--home-card-border)] bg-[var(--surface-subtle)] text-xs font-semibold text-[var(--text-muted)]">
+              <div className="flex h-[68px] w-[68px] shrink-0 items-center justify-center rounded-full bg-[var(--surface_container_lowest)] text-xs font-semibold text-[var(--text-body-deep)]">
                 NOW
               </div>
               <div className="min-w-0 flex-1 text-left">
                 <p className="text-[16px] font-semibold leading-tight text-[var(--text-body-deep)]">{helperText}</p>
-                <p className="mt-1 text-[13px] font-medium text-[var(--text-muted)]">타임테이블에서 다음 공연을 확인해 보세요.</p>
+                <p className="mt-1 text-[13px] font-semibold text-[var(--text-body-deep)]">타임테이블에서 다음 공연을 확인해 보세요.</p>
               </div>
             </div>
           )}
@@ -118,7 +116,7 @@ export default function CurrentPerformanceSection() {
             <button
               type="button"
               onClick={handleRetry}
-              className="inline-flex text-[12px] font-semibold text-[var(--accent)] underline underline-offset-2"
+              className="inline-flex rounded-[var(--radius-md)] bg-[linear-gradient(135deg,var(--primary)_0%,var(--primary_container)_100%)] px-3 py-1.5 text-[12px] font-semibold text-[var(--text-on-accent)] shadow-[var(--ec-ambient-shadow)]"
             >
               다시 시도
             </button>
