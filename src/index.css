@@ -599,6 +599,14 @@
   --mypage-stats-divider: #e5e7eb;
   --mypage-logout-border: transparent;
 
+  /* 2026 단국대 축제 포스터 팔레트 (落花流水 ;만개) */
+  --poster-navy: #1c2b6a;
+  --poster-blue: #3a5fa8;
+  --poster-bg: #eef1f8;
+  --poster-card-white: #ffffff;
+  /* 공지사항 중요공지 강조 색상 */
+  --notice-pin-red: #dc2626;
+
   /* Timetable route tokens */
   --timetable-tab-inactive: rgb(143 155 180);
   --timetable-empty-text: rgb(143 155 180);
