@@ -12,48 +12,40 @@ export default function DayTabs({
   compact?: boolean
 }) {
   return (
-    <div className={compact ? "relative" : "relative mt-1"}>
-      <div className={`grid grid-cols-3 items-center ${compact ? "pb-2" : "pb-3"}`}>
-        {days.map((d, idx) => {
-          const active = idx === activeIndex
+    <div
+      className={[
+        "grid grid-cols-3 gap-1.5 rounded-[26px] border border-[color:color-mix(in_srgb,var(--border-base)_68%,white)] bg-[color:color-mix(in_srgb,white_58%,var(--webapp-main-bg))] p-1.5 shadow-[0_18px_34px_-30px_rgba(29,44,89,0.36)] backdrop-blur-md",
+        compact ? "rounded-[22px]" : "",
+      ].join(" ")}
+    >
+      {days.map((d, idx) => {
+        const active = idx === activeIndex
 
-          return (
-            <button
-              key={d.key}
-              type="button"
-              onClick={() => onChange(idx)}
+        return (
+          <button
+            key={d.key}
+            type="button"
+            onClick={() => onChange(idx)}
+            className={[
+              "rounded-[20px] px-3 py-3 text-center transition-all duration-200",
+              compact ? "py-2.5" : "py-3.5",
+              active
+                ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(246,248,253,0.92))] text-[var(--text-body-deep)] shadow-[0_14px_24px_-20px_rgba(29,44,89,0.5)]"
+                : "text-[var(--timetable-tab-inactive)]",
+            ].join(" ")}
+          >
+            <div
               className={[
-                "relative justify-self-center transition-colors",
-                compact ? "px-2 py-1.5 text-lg tracking-[0.02em]" : "px-3 py-2 text-xl tracking-wide",
-                active
-                  ? "font-extrabold text-[var(--text-body-deep)]"
-                  : "text-[var(--timetable-tab-inactive)] hover:text-[var(--text-muted)]",
+                "text-[20px] font-semibold tracking-[-0.04em]",
+                compact ? "text-[17px]" : "",
+                active ? "font-extrabold text-[var(--timetable-active-color)]" : "",
               ].join(" ")}
             >
-              <span
-                className={[
-                  "inline-block transition-transform",
-                  active ? (compact ? "scale-[1.03]" : "scale-[1.06]") : "",
-                ].join(" ")}
-              >
-                {d.key}
-              </span>
-            </button>
-          )
-        })}
-      </div>
-
-      <div className="absolute inset-x-0 bottom-0 h-px bg-[var(--timetable-card-border)]" />
-
-      <div
-        className={`absolute bottom-0 rounded-full bg-[var(--text-body-deep)] transition-[left] duration-200 ${
-          compact ? "h-[3px]" : "h-[4px]"
-        }`}
-        style={{
-          left: `${(100 / days.length) * activeIndex}%`,
-          width: `${100 / days.length}%`,
-        }}
-      />
+              {d.key}
+            </div>
+          </button>
+        )
+      })}
     </div>
   )
 }

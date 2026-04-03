@@ -333,7 +333,7 @@ export default function Timetable() {
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
       >
-        <div className="sticky top-0 z-30 bg-[var(--webapp-main-bg)]">
+        <div className="sticky top-0 z-30 bg-[linear-gradient(180deg,rgba(254,250,247,0.96),rgba(254,250,247,0.88)_72%,rgba(254,250,247,0))] backdrop-blur-[10px]">
           <div className="pt-[env(safe-area-inset-top)]">
             <button
               type="button"
@@ -366,7 +366,7 @@ export default function Timetable() {
             </button>
           </div>
 
-          <div className="bg-[var(--webapp-main-bg)] px-4 pb-2 pt-3">
+          <div className="px-4 pb-2 pt-2">
             <DayTabs
               days={FESTIVAL_DAYS}
               activeIndex={activeIdx}
@@ -376,16 +376,18 @@ export default function Timetable() {
           </div>
         </div>
 
-        <div ref={contentStartRef} className="px-4 pt-4">
-          <div className="flex items-start gap-2 rounded-2xl border border-[var(--timetable-notice-border)] bg-[var(--timetable-notice-bg)] px-3 py-2.5">
-            <InformationCircleIcon className="mt-0.5 h-5 w-5 text-[var(--accent)]" />
-            <p className="text-sm font-normal text-[var(--timetable-info-text)]">
+        <div ref={contentStartRef} className="px-4 pt-3">
+          <div className="flex items-center gap-3 rounded-[22px] border border-[color:color-mix(in_srgb,var(--border-base)_60%,white)] bg-[rgba(255,255,255,0.68)] px-3.5 py-3 shadow-[0_16px_28px_-28px_rgba(29,44,89,0.24)] backdrop-blur-sm">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(57,94,188,0.08)]">
+              <InformationCircleIcon className="h-4.5 w-4.5 text-[var(--accent)]" />
+            </div>
+            <p className="text-[14px] font-medium tracking-[-0.02em] text-[var(--timetable-info-text)]">
               일정은 현장 상황에 따라 변경될 수 있습니다.
             </p>
           </div>
         </div>
 
-        <div className="px-4 pb-6 pt-4">
+        <div className="px-4 pb-6 pt-5">
           {isDay1 ? (
             <ContentImageSection
               images={contentImages}
