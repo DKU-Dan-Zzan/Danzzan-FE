@@ -233,10 +233,10 @@
   --boothmap-danger-bg: var(--status-danger-bg);
   --boothmap-danger-border: var(--status-danger-border);
   --boothmap-danger-text: var(--status-danger-text);
-  --boothmap-chip-selected-bg: var(--text-bold-emphasis);
-  --boothmap-chip-selected-border: var(--text-bold-emphasis);
-  --boothmap-chip-selected-text: var(--text-on-accent);
-  --boothmap-chip-selected-shadow: 0 16px 30px -22px color-mix(in srgb, var(--text-bold-emphasis) 38%, transparent);
+  --boothmap-chip-selected-bg: var(--app-nav-home-highlight);
+  --boothmap-chip-selected-border: var(--app-nav-home-highlight);
+  --boothmap-chip-selected-text: #ffffff;
+  --boothmap-chip-selected-shadow: 0 16px 30px -22px color-mix(in srgb, var(--app-nav-home-highlight) 38%, transparent);
   --boothmap-chip-bg: color-mix(in srgb, var(--boothmap-paper-base) 68%, white);
   --boothmap-chip-border: var(--boothmap-border-soft);
   --boothmap-chip-text: var(--text-bold-emphasis);
@@ -989,10 +989,10 @@
   --home-notice-body-font-size: 13px;
   --home-notice-updated-font-size: 11px;
 
-  --boothmap-chip-selected-bg: var(--secondary_container);
-  --boothmap-chip-selected-border: transparent;
-  --boothmap-chip-selected-text: var(--on-secondary-container);
-  --boothmap-chip-selected-shadow: 0 10px 20px -16px rgba(44, 52, 54, 0.16);
+  --boothmap-chip-selected-bg: var(--app-nav-home-highlight);
+  --boothmap-chip-selected-border: var(--app-nav-home-highlight);
+  --boothmap-chip-selected-text: #ffffff;
+  --boothmap-chip-selected-shadow: 0 10px 20px -16px color-mix(in srgb, var(--app-nav-home-highlight) 28%, transparent);
   --boothmap-chip-bg: var(--surface_container_lowest);
   --boothmap-chip-border: transparent;
   --boothmap-chip-text: var(--text-muted);
