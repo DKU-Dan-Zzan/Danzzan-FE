@@ -91,7 +91,7 @@ export default function Signup() {
         } else if (err.status === 409) {
           setError(message || "이미 가입된 학번입니다.");
         } else if (err.status === 403) {
-          setError(message || "재학생만 회원가입이 가능합니다.");
+          setError(message || "재학생 및 수료생만 회원가입이 가능합니다.");
         } else {
           setError(message || "회원가입에 실패했습니다.");
         }
