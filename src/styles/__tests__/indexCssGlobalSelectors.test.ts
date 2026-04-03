@@ -16,6 +16,9 @@ describe("index.css global selectors", () => {
       .map((line) => line.replace(/\s*\{.*$/, ""));
 
     expect(selectors).toEqual([
+      ".ec-scroll-cue-float",
+      ".ec-scroll-cue-twinkle",
+      ".home-hero-bottom-vignette",
       ".font-cute",
       ".scrollbar-hide",
       ".scrollbar-hide::-webkit-scrollbar",

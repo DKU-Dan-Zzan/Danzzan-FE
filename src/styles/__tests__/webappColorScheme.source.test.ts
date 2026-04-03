@@ -43,6 +43,11 @@ describe("webapp color scheme source", () => {
     expect(content).toContain("--app-header-bg-gradient: none;");
     expect(content).toContain("--app-header-border: transparent;");
     expect(content).toContain("--app-nav-bg: var(--webapp-bottom-bar);");
+    expect(content).toContain("--app-nav-text: rgb(127 143 150);");
+    expect(content).toContain("--app-nav-text-active: rgb(143 169 190);");
+    expect(content).toContain("--app-bottom-nav-height: 64px;");
+    expect(content).toContain("--app-bottom-nav-icon-size: 22px;");
+    expect(content).toContain("--app-bottom-nav-label-size: 10px;");
     expect(content).toContain("--footer-bg: var(--webapp-footer-bg);");
     expect(content).toContain("--home-notice-bg-start: var(--neutral-100);");
     expect(content).toContain("--home-notice-bg-end: var(--neutral-100);");
