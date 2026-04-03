@@ -13,6 +13,7 @@ type UseQueueUrlSyncParams = {
   activeEventId: string | null;
   setActiveEventId: SetNullableStringState;
   setActiveEventTitle: SetStringState;
+  setActiveEventDate: SetStringState;
   setListNotice: SetNullableStringState;
   setStep: SetTicketingStepState;
   resetQueueFlowState: () => void;
@@ -23,6 +24,7 @@ export const useQueueUrlSync = ({
   activeEventId,
   setActiveEventId,
   setActiveEventTitle,
+  setActiveEventDate,
   setListNotice,
   setStep,
   resetQueueFlowState,
@@ -89,6 +91,7 @@ export const useQueueUrlSync = ({
     resetQueueFlowState();
     setActiveEventId(null);
     setActiveEventTitle("");
+    setActiveEventDate("");
     setListNotice(null);
     setStep("home");
     clearError();
@@ -105,6 +108,7 @@ export const useQueueUrlSync = ({
     navigate,
     resetQueueFlowState,
     setActiveEventId,
+    setActiveEventDate,
     setActiveEventTitle,
     setListNotice,
     setStep,

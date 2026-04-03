@@ -12,6 +12,7 @@ import {
 
 interface TicketingReservationPanelProps {
   eventTitle: string;
+  eventDate?: string;
   agreementChecked: boolean;
   submitting: boolean;
   errorMessage: string | null;
@@ -26,7 +27,7 @@ const DEFAULT_CAUTION_ITEMS = [
   "신청 후 티켓 양도 및 취소는 불가합니다.",
 ];
 
-const MAY_13_CAUTION_ITEMS = [
+const FESTIVAL_TICKET_COMMON_CAUTION_ITEMS = [
   "단국대학교 죽전캠퍼스 재학생(졸업생, 휴학생 불가)만 신청할 수 있습니다.",
   "이름, 학번, 학과, 전화번호 등 홈페이지 가입 시 입력한 정보가 정확하지 않을 경우 이벤트 참여에 제한이 있을 수 있습니다.",
   "캡쳐 및 양도를 통한 티켓 사용 시 팔찌 배부가 제한됩니다.",
@@ -34,18 +35,6 @@ const MAY_13_CAUTION_ITEMS = [
   "5월 13일, 5월 14일 양일 각각 단국존 신청이 가능하며, 1인당 예매 가능한 티켓 수는 각 일자별로 1인 1매입니다.",
   "티켓 배부 일정 및 세부 운영 방식은 별도 공지를 통해 안내됩니다.",
   "공연 당일 현장 운영 지침에 따라 입장 절차가 진행되며, 안전상의 사유로 입장이 지연되거나 제한될 수 있습니다.",
-  "본 예매는 2026년 05월 13일 단국존 선예매 티켓팅임을 확인했습니다.",
-];
-
-const MAY_14_CAUTION_ITEMS = [
-  "단국대학교 죽전캠퍼스 재학생(졸업생, 휴학생 불가)만 신청할 수 있습니다.",
-  "이름, 학번, 학과, 전화번호 등 홈페이지 가입 시 입력한 정보가 정확하지 않을 경우 이벤트 참여에 제한이 있을 수 있습니다.",
-  "캡쳐 및 양도를 통한 티켓 사용 시 팔찌 배부가 제한됩니다.",
-  "비인가 프로그램(매크로 등)을 사용하여 비정상적인 경로로 티켓팅을 시도한 경우, 사전 고지 없이 이벤트 참여에서 제외됩니다.",
-  "5월 13일, 5월 14일 양일 각각 단국존 신청이 가능하며, 1인당 예매 가능한 티켓 수는 각 일자별로 1인 1매입니다.",
-  "티켓 배부 일정 및 세부 운영 방식은 별도 공지를 통해 안내됩니다.",
-  "공연 당일 현장 운영 지침에 따라 입장 절차가 진행되며, 안전상의 사유로 입장이 지연되거나 제한될 수 있습니다.",
-  "본 예매는 2026년 05월 14일 단국존 선예매 티켓팅임을 확인했습니다.",
 ];
 
 const MAY_13_POLICY_INTRO =
@@ -76,21 +65,29 @@ const DEFAULT_POLICY_ITEMS = [
 
 export function TicketingReservationPanel({
   eventTitle,
+  eventDate = "",
   agreementChecked,
   submitting,
   errorMessage,
   onAgreementCheckedChange,
   onSubmit,
 }: TicketingReservationPanelProps) {
-  const isMay13Ticket = /5\s*월\s*13\s*일/.test(eventTitle);
-  const isMay14Ticket = /5\s*월\s*14\s*일/.test(eventTitle);
+  const ticketDateSource = `${eventDate} ${eventTitle}`;
+  const isMay13Ticket = /5\s*월\s*13\s*일/.test(ticketDateSource);
+  const isMay14Ticket = /5\s*월\s*14\s*일/.test(ticketDateSource);
   const isFestivalTicket = isMay13Ticket || isMay14Ticket;
   const isSubmitEnabled = !submitting && agreementChecked;
-  const cautionItems = isMay13Ticket
-    ? MAY_13_CAUTION_ITEMS
+  const festivalConfirmationLine = isMay13Ticket
+    ? "본 예매는 2026년 05월 13일 단국존 선예매 티켓팅임을 확인했습니다."
     : isMay14Ticket
-      ? MAY_14_CAUTION_ITEMS
-      : DEFAULT_CAUTION_ITEMS;
+      ? "본 예매는 2026년 05월 14일 단국존 선예매 티켓팅임을 확인했습니다."
+      : null;
+  const cautionItems = isFestivalTicket
+    ? [
+        ...FESTIVAL_TICKET_COMMON_CAUTION_ITEMS,
+        ...(festivalConfirmationLine ? [festivalConfirmationLine] : []),
+      ]
+    : DEFAULT_CAUTION_ITEMS;
 
   return (
     <div className={`${TICKETING_NARROW_PANEL_CLASS} space-y-4`}>
