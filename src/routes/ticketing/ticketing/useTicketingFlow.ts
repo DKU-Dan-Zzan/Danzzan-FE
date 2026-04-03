@@ -261,7 +261,7 @@ export function useTicketingFlow() {
     checkQueueStatus,
   });
 
-  const handleEnterQueue = useCallback(async (event: { id: string; title: string }) => {
+  const handleEnterQueue = useCallback(async (event: { id: string; title: string; eventDate?: string }) => {
     if (!acquireSingleFlight(enterLockRef)) {
       return;
     }
@@ -273,7 +273,7 @@ export function useTicketingFlow() {
 
     setActiveEventId(event.id);
     setActiveEventTitle(event.title);
-    setActiveEventDate(event.eventDate);
+    setActiveEventDate(event.eventDate ?? "");
     setListNotice(null);
     setWaitingError(null);
     setWaitingQueuePosition(null);
