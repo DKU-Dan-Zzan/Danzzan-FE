@@ -10,17 +10,17 @@ describe("electric curator color scheme source", () => {
     const content = fs.readFileSync(INDEX_CSS_PATH, "utf8");
 
     expect(content).toContain('[data-color-scheme="electric-curator"]');
-    expect(content).toContain("--surface: #f8fafb;");
-    expect(content).toContain("--surface_container: #e8eef1;");
-    expect(content).toContain("--surface_container_low: #f0f4f6;");
+    expect(content).toContain("--surface: rgb(248 250 251);");
+    expect(content).toContain("--surface_container: rgb(232 238 241);");
+    expect(content).toContain("--surface_container_low: rgb(240 244 246);");
     expect(content).toContain("--surface_container_lowest: #ffffff;");
-    expect(content).toContain("--surface_container_high: #e3ebee;");
-    expect(content).toContain("--primary: #8fa9be;");
-    expect(content).toContain("--primary_container: #cbe6fc;");
-    expect(content).toContain("--secondary: #f5b070;");
-    expect(content).toContain("--secondary_container: #fcd6af;");
-    expect(content).toContain("--tertiary: #f28c82;");
-    expect(content).toContain("--tertiary_container: #fab79a;");
+    expect(content).toContain("--surface_container_high: rgb(227 235 238);");
+    expect(content).toContain("--primary: rgb(143 169 190);");
+    expect(content).toContain("--primary_container: rgb(203 230 252);");
+    expect(content).toContain("--secondary: rgb(245 176 112);");
+    expect(content).toContain("--secondary_container: rgb(252 214 175);");
+    expect(content).toContain("--tertiary: rgb(242 140 130);");
+    expect(content).toContain("--tertiary_container: rgb(250 183 154);");
     expect(content).toContain("--outline_variant: rgba(172, 179, 182, 0.15);");
     expect(content).toContain("--ec-glass-bg: rgba(248, 250, 251, 0.7);");
     expect(content).toContain("--ec-glass-blur: 28px;");
