@@ -832,6 +832,34 @@
       "reason": "2026 단국대 축제 포스터 팔레트 승인값 (落花流水 ;만개 배경)",
       "owner": "fe-platform",
       "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#dcfce7",
+      "reason": "티켓 상태 배지 팔레트 승인값 (팔찌 미수령 배경)",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#6b7280",
+      "reason": "티켓 상태 배지 팔레트 승인값 (예매 취소 텍스트)",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ede9fe",
+      "reason": "티켓 상태 배지 팔레트 승인값 (상태 확인 필요 배경)",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#6d28d9",
+      "reason": "티켓 상태 배지 팔레트 승인값 (상태 확인 필요 텍스트)",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
     }
   ]
 }

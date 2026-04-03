@@ -62,6 +62,7 @@ export default function Ticketing() {
     return (
       <TicketingReservationPanel
         eventTitle={flow.activeEventTitle}
+        eventDate={flow.activeEventDate}
         agreementChecked={flow.agreementChecked}
         submitting={flow.reserveProcessing}
         errorMessage={flow.reservationError}

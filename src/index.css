@@ -604,6 +604,15 @@
   --poster-blue: #3a5fa8;
   --poster-bg: #eef1f8;
   --poster-card-white: #ffffff;
+  /* 티켓 상태 배지 */
+  --ticket-badge-issued-bg: #dcfce7;
+  --ticket-badge-issued-text: #15803d;
+  --ticket-badge-used-bg: #fee2e2;
+  --ticket-badge-used-text: #b91c1c;
+  --ticket-badge-cancelled-bg: #f3f4f6;
+  --ticket-badge-cancelled-text: #6b7280;
+  --ticket-badge-unknown-bg: #ede9fe;
+  --ticket-badge-unknown-text: #6d28d9;
   /* 공지사항 중요공지 강조 색상 */
   --notice-pin-red: #dc2626;
 

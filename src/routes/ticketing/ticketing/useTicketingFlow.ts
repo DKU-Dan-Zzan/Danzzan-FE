@@ -39,6 +39,7 @@ export function useTicketingFlow() {
   const [now, setNow] = useState(() => Date.now());
   const [activeEventId, setActiveEventId] = useState<string | null>(null);
   const [activeEventTitle, setActiveEventTitle] = useState("");
+  const [activeEventDate, setActiveEventDate] = useState("");
 
   const [, setQueueStatus] = useState<QueueRequestStatus>("NONE");
   const [waitingQueuePosition, setWaitingQueuePosition] = useState<number | null>(null);
@@ -81,6 +82,7 @@ export function useTicketingFlow() {
     activeEventId,
     setActiveEventId,
     setActiveEventTitle,
+    setActiveEventDate,
     setListNotice,
     setStep,
     resetQueueFlowState,
@@ -132,11 +134,13 @@ export function useTicketingFlow() {
   useEffect(() => {
     if (!activeEventId) {
       setActiveEventTitle("");
+      setActiveEventDate("");
       return;
     }
     const matched = events.find((event) => event.id === activeEventId);
     if (matched) {
       setActiveEventTitle(matched.title);
+      setActiveEventDate(matched.eventDate);
     }
   }, [activeEventId, events]);
 
@@ -257,7 +261,7 @@ export function useTicketingFlow() {
     checkQueueStatus,
   });
 
-  const handleEnterQueue = useCallback(async (event: { id: string; title: string }) => {
+  const handleEnterQueue = useCallback(async (event: { id: string; title: string; eventDate?: string }) => {
     if (!acquireSingleFlight(enterLockRef)) {
       return;
     }
@@ -269,6 +273,7 @@ export function useTicketingFlow() {
 
     setActiveEventId(event.id);
     setActiveEventTitle(event.title);
+    setActiveEventDate(event.eventDate ?? "");
     setListNotice(null);
     setWaitingError(null);
     setWaitingQueuePosition(null);
@@ -345,6 +350,7 @@ export function useTicketingFlow() {
   const backToList = useCallback(() => {
     setActiveEventId(null);
     setActiveEventTitle("");
+    setActiveEventDate("");
     setQueueStatus("NONE");
     setWaitingQueuePosition(null);
     setWaitingQueuePositionUpdatedAt(null);
@@ -388,6 +394,7 @@ export function useTicketingFlow() {
     listErrorMessage,
     now,
     activeEventTitle,
+    activeEventDate,
     waitingAd: waitingAdQuery.data ?? null,
     waitingQueuePosition,
     waitingQueuePositionUpdatedAt,
