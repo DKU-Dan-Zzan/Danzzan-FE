@@ -37,31 +37,31 @@ describe("BottomNav", () => {
     expect(hasUseLayoutEffectWarning).toBe(false);
   });
 
-  it("활성 탭 인디케이터가 활성 아이콘/텍스트와 같은 토큰을 사용한다", () => {
-    const markup = renderBottomNav("/map");
-
-    expect(markup).toContain("text-[var(--app-nav-text-active)]");
-    expect(markup).toContain("bg-[var(--app-nav-text-active)]");
-    expect(markup).not.toContain("bg-[var(--accent)]");
-  });
-
-  it("활성 상태 전환용 마이크로 애니메이션 클래스를 포함한다", () => {
+  it("5개 탭 구조(부스맵/타임테이블/HOME/공지사항/티켓팅)를 렌더링한다", () => {
     const markup = renderBottomNav("/notice");
 
-    expect(markup).toContain("active:scale-[0.99]");
-    expect(markup).toContain("motion-reduce:transform-none");
-    expect(markup).toContain("scale-[1.01]");
-    expect(markup).not.toContain("-translate-y-[1px] scale-[1.04]");
-    expect(markup).not.toContain("-translate-y-px");
-    expect(markup).toContain("opacity-100 scale-x-100");
-    expect(markup).toContain("opacity-0 scale-x-50");
+    expect(markup).toContain(">부스맵<");
+    expect(markup).toContain(">타임테이블<");
+    expect(markup).toContain('aria-label="HOME"');
+    expect(markup).toContain(">공지사항<");
+    expect(markup).toContain(">티켓팅<");
+    expect(markup).not.toContain(">내정보<");
   });
 
-  it("탭 전환 애니메이션 duration은 120~160ms 구간을 사용한다", () => {
+  it("중앙 HOME 탭은 원형 하이라이트 스타일을 사용한다", () => {
+    const markup = renderBottomNav("/");
+
+    expect(markup).toContain("bg-[var(--app-nav-home-highlight)]");
+    expect(markup).toContain("text-[var(--on-primary)]");
+    expect(markup).toContain("h-14 w-14");
+    expect(markup).toContain("-translate-y-3");
+  });
+
+  it("하단 패널 배경은 좌우 여백 없이 전체 폭을 채운다", () => {
     const markup = renderBottomNav("/notice");
 
-    expect(markup).toContain("duration-140");
-    expect(markup).not.toContain("duration-200");
+    expect(markup).toContain("inset-x-0");
+    expect(markup).not.toContain("inset-x-2");
   });
 
   it("탭 링크에 키보드 포커스 스타일을 제공한다", () => {

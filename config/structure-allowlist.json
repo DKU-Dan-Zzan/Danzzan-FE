@@ -29,6 +29,27 @@
       "expiresAt": "2026-12-31"
     },
     {
+      "ruleId": "STYLE_NO_NEW_GLOBAL_SELECTOR",
+      "target": ".ec-scroll-cue-float",
+      "reason": "홈 히어로 스크롤 유도 화살표 애니메이션 유틸",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_GLOBAL_SELECTOR",
+      "target": ".ec-scroll-cue-twinkle",
+      "reason": "홈 히어로 스크롤 안내 문구 애니메이션 유틸",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_GLOBAL_SELECTOR",
+      "target": ".home-hero-bottom-vignette",
+      "reason": "홈 히어로 하단 비네트 오버레이 유틸",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
       "ruleId": "STYLE_NO_NEW_RAW_HEX",
       "target": "src/components/app/boothmap/KakaoMapView.tsx",
       "reason": "Map SDK 렌더링 제약으로 인한 런타임 색상 지정 최소 허용",

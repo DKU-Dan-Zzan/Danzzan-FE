@@ -13,12 +13,15 @@ type Props = {
   intervalMs?: number
   /** 카드 비율. 기본 4/3 */
   aspect?: `${number}/${number}` | string
+  /** 홈 히어로 영역을 꽉 채우는 풀 블리드 모드 */
+  fillViewport?: boolean
 }
 
 export default function PosterCarousel({
   posters,
   intervalMs = 3500,
   aspect = "4962/7017",
+  fillViewport = false,
 }: Props) {
   const count = posters.length
   const [index, setIndex] = useState(0)
@@ -40,12 +43,20 @@ export default function PosterCarousel({
 
   // 데이터 없을 때 placeholder UI (디자인 유지)
   if (count === 0) {
+    const sectionClassName = fillViewport ? "w-full" : "mx-auto w-full max-w-[430px]"
+    const wrapperClassName = fillViewport
+      ? "relative h-[calc(100dvh-var(--app-bottom-nav-height)-env(safe-area-inset-bottom)+var(--home-hero-nav-overlap))] min-h-[560px] overflow-hidden bg-[var(--home-poster-placeholder-bg)]"
+      : "relative ml-[var(--spacing-8)] mr-[calc(-1*var(--spacing-4))] overflow-hidden rounded-[var(--radius-xl)] bg-[var(--home-poster-placeholder-bg)] shadow-[var(--home-poster-placeholder-shadow)]"
+
     return (
-      <section className="mx-auto w-full max-w-[var(--home-content-max-width)]">
-        <div className="relative overflow-hidden rounded-none bg-[var(--home-poster-placeholder-bg)] shadow-[var(--home-poster-placeholder-shadow)]">
-          <div className="flex items-center justify-center" style={{ aspectRatio: aspect }}>
+      <section className={sectionClassName}>
+        <div className={wrapperClassName}>
+          <div
+            className={fillViewport ? "flex h-full items-center justify-center" : "flex items-center justify-center"}
+            style={fillViewport ? undefined : { aspectRatio: aspect }}
+          >
             <div className="text-center">
-              <div className="text-[15px] leading-[1.3] font-semibold text-[var(--text-body-deep)]">
+              <div className="text-[15px] leading-[1.3] font-semibold text-[var(--text)]">
                 2026 단국축제
               </div>
               <div className="mt-1 text-xs leading-[1.3] text-[var(--text-muted)]">
@@ -58,12 +69,17 @@ export default function PosterCarousel({
     )
   }
 
+  const sectionClassName = fillViewport ? "w-full" : "mx-auto w-full max-w-[430px]"
+  const wrapperClassName = fillViewport
+    ? "relative h-[calc(100dvh-var(--app-bottom-nav-height)-env(safe-area-inset-bottom)+var(--home-hero-nav-overlap))] min-h-[560px] overflow-hidden bg-[var(--surface_container_lowest)]"
+    : "relative ml-[var(--spacing-8)] mr-[calc(-1*var(--spacing-4))] overflow-hidden rounded-[var(--radius-xl)] bg-[var(--surface_container_lowest)] shadow-[var(--home-poster-card-shadow)]"
+
   return (
-    <section className="mx-auto w-full max-w-[var(--home-content-max-width)]">
+    <section className={sectionClassName}>
       {/* 포스터 카드 */}
-      <div className="relative overflow-hidden rounded-none bg-[var(--home-card-bg)] shadow-[var(--home-poster-card-shadow)]">
+      <div className={wrapperClassName}>
         {/* 비율 고정 */}
-        <div style={{ aspectRatio: aspect }}>
+        <div className={fillViewport ? "h-full" : undefined} style={fillViewport ? undefined : { aspectRatio: aspect }}>
           {/* 슬라이드 트랙 */}
           <div
             className="flex h-full w-full transition-transform duration-500 ease-out"
@@ -86,7 +102,7 @@ export default function PosterCarousel({
       </div>
 
       {/* 도트 인디케이터 */}
-      {count > 1 && (
+      {!fillViewport && count > 1 && (
         <div className="mt-[var(--home-dot-margin-top)] flex justify-center gap-[var(--home-dot-gap)]">
           {posters.map((p, i) => {
             const active = i === safeIndex
@@ -96,8 +112,8 @@ export default function PosterCarousel({
                 type="button"
                 onClick={() => setIndex(i)}
                 aria-label={`포스터 ${i + 1}로 이동`}
-                className={`h-[var(--home-dot-height)] rounded-full bg-[var(--home-card-border)] transition-all duration-300 ${
-                  active ? "w-[var(--home-dot-active-width)] bg-[var(--accent)]" : "w-[var(--home-dot-width)]"
+                className={`h-[var(--home-dot-height)] rounded-full bg-[var(--surface_container_high)] transition-all duration-300 ${
+                  active ? "w-[var(--home-dot-active-width)] bg-[linear-gradient(135deg,var(--primary)_0%,var(--primary_container)_100%)]" : "w-[var(--home-dot-width)]"
                 }`}
               />
             )

@@ -38,13 +38,7 @@ const SOCIAL_LINKS = [
 // 역할: 앱 레이아웃 레이어의 Footer 구성 컴포넌트를 제공합니다.
 const Footer = () => {
   return (
-    <footer className="relative w-full bg-[var(--footer-bg)]">
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[var(--footer-divider)]" />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-px h-1.5 bg-[linear-gradient(to_bottom,var(--footer-divider-glow)_0%,var(--footer-divider-transparent)_100%)]"
-      />
-
+    <footer className="relative w-full bg-[var(--footer-bg)] [background-image:var(--footer-bg-gradient)] bg-no-repeat bg-[length:100%_100%]">
       <div className="mx-auto max-w-[430px] px-5 pb-7 pt-6">
         <p className="text-center text-[13px] leading-5 text-[var(--footer-text-primary)]">
           주최 단국대학교 죽전캠퍼스 제58대 LOU:D 총학생회
@@ -62,7 +56,7 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={label}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--footer-icon-border)] bg-[var(--footer-icon-bg)] text-[var(--footer-icon-fg)] shadow-[var(--footer-icon-shadow)] transition-colors duration-150 hover:bg-[var(--footer-icon-bg-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--footer-bg)]"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[var(--footer-icon-bg)] text-[var(--footer-icon-fg)] shadow-[var(--footer-icon-shadow)] transition-colors duration-150 hover:bg-[var(--footer-icon-bg-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--footer-bg)]"
             >
               <Icon className={iconClassName} strokeWidth={iconStrokeWidth} aria-hidden />
             </a>
