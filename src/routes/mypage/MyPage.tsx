@@ -83,7 +83,7 @@ function SectionCard({
 }) {
   return (
     <div className="mx-4 mt-3 overflow-hidden rounded-[16px] bg-white" style={{ boxShadow: "0 1px 8px rgba(28,43,106,0.08)" }}>
-      <p className="px-5 pb-1 pt-4 text-[16px] font-bold" style={{ color: "#1c2b6a" }}>
+      <p className="px-5 pb-1 pt-4 text-[16px] font-bold" style={{ color: "var(--poster-navy)" }}>
         {title}
       </p>
       <div className="divide-y divide-[var(--mypage-list-divider)]">{children}</div>
@@ -201,13 +201,13 @@ function MyPage() {
               boxShadow: "0 2px 12px rgba(28,43,106,0.12)",
             }}
           >
-            <User size={32} strokeWidth={1.8} style={{ color: "#1c2b6a" }} />
+            <User size={32} strokeWidth={1.8} style={{ color: "var(--poster-navy)" }} />
           </div>
 
           <p className="mb-1 text-[10px] font-bold tracking-[0.24em]" style={{ color: "rgba(28,43,106,0.5)" }}>
             STUDENT PORTAL
           </p>
-          <h2 className="mb-2 text-[20px] font-bold leading-[1.3]" style={{ color: "#1c2b6a" }}>
+          <h2 className="mb-2 text-[20px] font-bold leading-[1.3]" style={{ color: "var(--poster-navy)" }}>
             내 정보를 보려면
             <br />
             로그인해 주세요
@@ -223,7 +223,7 @@ function MyPage() {
               background: "rgba(28,43,106,0.12)",
               backdropFilter: "blur(8px)",
               border: "1.5px solid rgba(28,43,106,0.35)",
-              color: "#1c2b6a",
+              color: "var(--poster-navy)",
               boxShadow: "0 2px 12px rgba(28,43,106,0.08)",
             }}
           >
@@ -244,7 +244,7 @@ function MyPage() {
   const usedCount = tickets.filter((ticket) => ticket.status === "used").length;
 
   return (
-    <div className="mypage-root min-h-full" style={{ background: "#eef1f8" }}>
+    <div className="mypage-root min-h-full" style={{ background: "var(--poster-bg)" }}>
       {/* 포스터 배경 — 배너+버튼 전체 영역 커버 */}
       <div className="relative">
         <div className="absolute inset-0 overflow-hidden">
@@ -259,7 +259,7 @@ function MyPage() {
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, rgba(28,43,106,0.3) 0%, rgba(28,43,106,0.55) 50%, #eef1f8 100%)",
+                "linear-gradient(180deg, rgba(28,43,106,0.3) 0%, rgba(28,43,106,0.55) 50%, var(--poster-bg) 100%)",
             }}
           />
         </div>
@@ -301,19 +301,19 @@ function MyPage() {
           }}
         >
           <div className="flex items-center gap-3">
-            <span style={{ color: "#3a5fa8" }}>
+            <span style={{ color: "var(--poster-blue)" }}>
               <Ticket size={20} />
             </span>
-            <span className="text-[15px] font-semibold" style={{ color: "#1c2b6a" }}>내 예매 티켓</span>
+            <span className="text-[15px] font-semibold" style={{ color: "var(--poster-navy)" }}>내 예매 티켓</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[15px] font-bold" style={{ color: "#1c2b6a" }}>
+            <span className="text-[15px] font-bold" style={{ color: "var(--poster-navy)" }}>
               {ticketsQuery.isPending ? "—" : `${tickets.length}장`}
             </span>
             {!ticketsQuery.isPending && tickets.length > 0 && (
-              <span className="text-[12px]" style={{ color: "#3a5fa8", opacity: 0.7 }}>(사용 {usedCount}장)</span>
+              <span className="text-[12px]" style={{ color: "var(--poster-blue)", opacity: 0.7 }}>(사용 {usedCount}장)</span>
             )}
-            <ChevronRight size={16} style={{ color: "#3a5fa8", opacity: 0.6 }} />
+            <ChevronRight size={16} style={{ color: "var(--poster-blue)", opacity: 0.6 }} />
           </div>
         </button>
       </div>
@@ -327,7 +327,7 @@ function MyPage() {
       </SectionCard>
 
       <div className="mx-4 mt-3 overflow-hidden rounded-[16px] bg-white" style={{ boxShadow: "0 1px 8px rgba(28,43,106,0.08)" }}>
-        <p className="px-5 pb-1 pt-4 text-[16px] font-bold" style={{ color: "#1c2b6a" }}>자주 묻는 질문</p>
+        <p className="px-5 pb-1 pt-4 text-[16px] font-bold" style={{ color: "var(--poster-navy)" }}>자주 묻는 질문</p>
         <FaqAccordion />
       </div>
 
