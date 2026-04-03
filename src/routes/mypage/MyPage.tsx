@@ -7,6 +7,7 @@ import {
   GraduationCap,
   IdCard,
   Lock,
+  LogOut,
   Ticket,
   User,
 } from "lucide-react";
@@ -69,22 +70,6 @@ function FaqAccordion() {
           )}
         </div>
       ))}
-    </div>
-  );
-}
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="px-5 pb-3 pt-6 text-[16px] font-bold text-[var(--mypage-section-title)]">
-      {children}
-    </p>
-  );
-}
-
-function ListSection({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="divide-y divide-[var(--mypage-list-divider)] bg-[var(--mypage-list-bg)]">
-      {children}
     </div>
   );
 }
@@ -217,150 +202,112 @@ function MyPage() {
   };
 
   const tickets = ticketsQuery.data ?? [];
-  const previewTickets = tickets.slice(0, 3);
   const usedCount = tickets.filter((ticket) => ticket.status === "used").length;
 
   return (
-    <div className="mypage-root min-h-full" style={{ background: "var(--mypage-page-bg)" }}>
-      <div className="bg-[var(--mypage-list-bg)] px-5 py-5">
-        <div className="flex items-center gap-4">
+    <div className="mypage-root min-h-full" style={{ background: "#eef1f8" }}>
+      {/* 포스터 히어로 배너 */}
+      <div className="relative overflow-hidden" style={{ height: 300 }}>
+        <img
+          src="/posters/festival-poster.png"
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-cover object-top"
+          style={{ filter: "brightness(0.6) saturate(1.1)", transform: "scale(1.04)" }}
+        />
+        {/* 포스터 네이비 → 크림 페이드 */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(28,43,106,0.3) 0%, rgba(28,43,106,0.55) 55%, #eef1f8 100%)",
+          }}
+        />
+        {/* 우상단 축제 타이틀 */}
+        <div className="absolute right-4 top-4 text-right">
+          <p className="text-[10px] font-medium tracking-widest text-white/60">2026 DANFESTA</p>
+          <p className="text-[13px] font-semibold text-white/80">落花流水 ;만개</p>
+        </div>
+        {/* 좌하단 프로필 */}
+        <div className="absolute bottom-5 left-5 flex items-end gap-3">
           <div
-            className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full"
-            style={{ background: "var(--mypage-profile-avatar-bg)" }}
+            className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 border-white/30"
+            style={{ background: "rgba(220,229,240,0.25)", backdropFilter: "blur(8px)" }}
           >
-            <User size={22} strokeWidth={1.8} style={{ color: "var(--mypage-profile-avatar-icon)" }} />
+            <User size={22} strokeWidth={1.8} className="text-white" />
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-[17px] font-bold leading-tight text-[var(--mypage-profile-name)]">
+          <div className="pb-0.5">
+            <p className="text-[18px] font-bold leading-tight text-white drop-shadow">
               {user?.name ?? "—"}
             </p>
-            <p className="mt-0.5 text-[13px] text-[var(--mypage-profile-subtitle)]">
-              단국대학교 재학생
-            </p>
+            <p className="mt-0.5 text-[12px] text-white/70">단국대학교 재학생</p>
           </div>
-          <ChevronRight size={18} style={{ color: "var(--mypage-list-arrow)" }} />
         </div>
       </div>
 
-      <div className="px-4 pt-4">
-        <div
-          className="overflow-hidden rounded-[20px]"
-          style={{ background: "var(--mypage-ticket-hero-bg)" }}
+      {/* 티켓 버튼 — 중앙 기준 방사형 그라디언트 */}
+      <div className="px-4 pb-3 pt-1">
+        <button
+          onClick={() => navigate("/ticket/my-ticket")}
+          className="flex w-full items-center justify-between overflow-hidden rounded-[16px] px-5 py-4 transition active:brightness-90"
+          style={{
+            background: "rgba(255,255,255,0.65)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(58,95,168,0.15)",
+            boxShadow: "0 2px 12px rgba(28,43,106,0.1)",
+          }}
         >
-          <div className="flex items-center justify-between px-5 pb-4 pt-5">
-            <div>
-              <p className="mb-1 text-[12px] font-medium text-[var(--mypage-ticket-hero-muted)]">
-                내 예매 티켓
-              </p>
-              <div className="flex items-baseline gap-1">
-                <span className="text-[38px] font-bold leading-none text-[var(--mypage-ticket-hero-text)]">
-                  {ticketsQuery.isPending ? "—" : tickets.length}
-                </span>
-                <span className="text-[16px] font-medium text-[var(--mypage-ticket-hero-muted)]">
-                  장
-                </span>
-              </div>
-              {!ticketsQuery.isPending && tickets.length > 0 && (
-                <p className="mt-1 text-[12px] text-[var(--mypage-ticket-hero-muted)]">
-                  사용됨 {usedCount}장
-                </p>
-              )}
-            </div>
-
-            <button
-              onClick={() => navigate("/ticket/my-ticket")}
-              className="flex items-center gap-1.5 rounded-full px-4 py-2.5 text-[13px] font-semibold transition active:scale-95"
-              style={{
-                background: "var(--mypage-ticket-hero-btn-bg)",
-                border: "1px solid var(--mypage-ticket-hero-btn-border)",
-                color: "var(--mypage-ticket-hero-btn-text)",
-              }}
-            >
-              <Ticket size={14} />
-              내 티켓 보기
-            </button>
+          <div className="flex items-center gap-3">
+            <span style={{ color: "#3a5fa8" }}>
+              <Ticket size={20} />
+            </span>
+            <span className="text-[15px] font-semibold" style={{ color: "#1c2b6a" }}>내 예매 티켓</span>
           </div>
-
-          {ticketsQuery.isPending ? (
-            <div className="border-t px-5 py-4" style={{ borderColor: "var(--mypage-ticket-hero-row-divider)" }}>
-              <p className="text-[13px] text-[var(--mypage-ticket-hero-muted)]">불러오는 중…</p>
-            </div>
-          ) : tickets.length === 0 ? (
-            <div className="border-t px-5 py-4" style={{ borderColor: "var(--mypage-ticket-hero-row-divider)" }}>
-              <p className="text-[13px] text-[var(--mypage-ticket-hero-muted)]">
-                아직 예매된 티켓이 없어요
-              </p>
-            </div>
-          ) : (
-            <div
-              className="divide-y border-t"
-              style={{ borderColor: "var(--mypage-ticket-hero-row-divider)" }}
-            >
-              {previewTickets.map((ticket) => (
-                <button
-                  key={ticket.id}
-                  onClick={() => navigate("/ticket/my-ticket")}
-                  className="flex w-full items-center justify-between px-5 py-3.5 text-left transition active:brightness-90"
-                  style={{ borderColor: "var(--mypage-ticket-hero-row-divider)" }}
-                >
-                  <div className="min-w-0">
-                    <p className="truncate text-[14px] font-semibold text-[var(--mypage-ticket-hero-text)]">
-                      {ticket.eventName}
-                    </p>
-                    <p className="mt-0.5 text-[12px] text-[var(--mypage-ticket-hero-muted)]">
-                      {ticket.eventDate} · {ticket.seat}
-                    </p>
-                  </div>
-                  <span
-                    className="ml-3 shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold"
-                    style={{
-                      background: "rgba(255,255,255,0.18)",
-                      color: "rgba(255,255,255,0.9)",
-                    }}
-                  >
-                    {ticket.status === "issued"
-                      ? "예매 완료"
-                      : ticket.status === "used"
-                        ? "사용됨"
-                        : ticket.status}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[15px] font-bold" style={{ color: "#1c2b6a" }}>
+              {ticketsQuery.isPending ? "—" : `${tickets.length}장`}
+            </span>
+            {!ticketsQuery.isPending && tickets.length > 0 && (
+              <span className="text-[12px]" style={{ color: "#3a5fa8", opacity: 0.7 }}>(사용 {usedCount}장)</span>
+            )}
+            <ChevronRight size={16} style={{ color: "#3a5fa8", opacity: 0.6 }} />
+          </div>
+        </button>
       </div>
 
-      <SectionTitle>학적 정보</SectionTitle>
-      <ListSection>
+      {/* 학적·FAQ·설정 — 크림 배경 위 흰 카드 */}
+      <div className="mx-4 overflow-hidden rounded-[16px] bg-white shadow-sm" style={{ boxShadow: "0 1px 8px rgba(28,43,106,0.08)" }}>
+        <div className="px-5 pb-2 pt-5">
+          <p className="text-[13px] font-semibold tracking-wide" style={{ color: "#1c2b6a" }}>학적 정보</p>
+        </div>
         <ListRow icon={<IdCard size={18} />} label="학번" value={user?.studentId ?? "—"} />
         <ListRow icon={<GraduationCap size={18} />} label="단과대학" value={user?.college || "—"} />
         <ListRow icon={<GraduationCap size={18} />} label="학과" value={user?.department || "—"} />
-      </ListSection>
+      </div>
 
-      <SectionTitle>설정</SectionTitle>
-      <ListSection>
+      <div className="mx-4 mt-3 overflow-hidden rounded-[16px] bg-white" style={{ boxShadow: "0 1px 8px rgba(28,43,106,0.08)" }}>
+        <div className="px-5 pb-2 pt-5">
+          <p className="text-[13px] font-semibold tracking-wide" style={{ color: "#1c2b6a" }}>자주 묻는 질문</p>
+        </div>
+        <FaqAccordion />
+      </div>
+
+      <div className="mx-4 mt-3 overflow-hidden rounded-[16px] bg-white" style={{ boxShadow: "0 1px 8px rgba(28,43,106,0.08)" }}>
+        <div className="px-5 pb-2 pt-5">
+          <p className="text-[13px] font-semibold tracking-wide" style={{ color: "#1c2b6a" }}>설정</p>
+        </div>
         <ListRow
           icon={<Lock size={18} />}
           label="비밀번호 변경"
           onClick={() => navigate("/ticket/reset-password")}
           showArrow
         />
-      </ListSection>
-
-      <SectionTitle>자주 묻는 질문</SectionTitle>
-      <div className="bg-[var(--mypage-list-bg)]">
-        <FaqAccordion />
-      </div>
-
-      <div className="flex justify-center py-10">
-        <button
+        <ListRow
+          icon={<LogOut size={18} />}
+          label="로그아웃"
           onClick={handleLogout}
-          className="text-[14px] transition"
-          style={{ color: "var(--mypage-logout-text)" }}
-        >
-          로그아웃
-        </button>
+          showArrow
+        />
       </div>
     </div>
   );
