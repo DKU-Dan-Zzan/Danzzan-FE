@@ -18,9 +18,14 @@ const Header = () => {
   )
   const isLoggedIn = !!session.tokens?.accessToken && session.role === "student"
   const isBoothMapPage = location.pathname === "/map"
+  const isTimetablePage = location.pathname === "/timetable"
 
   const handleTicketClick = () => {
     navigate(getMyTicketNavigationTarget(isLoggedIn))
+  }
+
+  if (isTimetablePage) {
+    return null
   }
 
   return (
