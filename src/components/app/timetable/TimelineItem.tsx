@@ -1,6 +1,13 @@
-// 역할: timetable 화면에서 사용하는 Timeline Item UI 블록을 렌더링합니다.
-import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants"
 import type { Performance } from "@/types/app/timetable/timetable.types"
+
+function hashtagLabel(description: string) {
+  const t = description.trim()
+  if (!t) return ""
+  return `#${t.replace(/\s+/g, "")}`
+}
+
+/** 원형 사진 */
+const AVATAR_PX = "9rem"
 
 export default function TimelineItem({
   item,
@@ -13,71 +20,112 @@ export default function TimelineItem({
   innerRef?: (el: HTMLLIElement | null) => void
   showNow?: boolean
 }) {
-  const timeRange = `${item.startTime} ~ ${item.endTime}`
+  const timeLabel = `${item.startTime} ~ ${item.endTime}`
 
   return (
-    <li ref={innerRef} className="relative scroll-mt-24">
-      <div className="mx-auto flex w-fit gap-4 pb-6">
-        <div className="flex w-16 flex-col items-center">
-          <div className="text-[16px] font-extrabold tabular-nums text-[var(--timetable-active-color)]">
-            {item.startTime}
-          </div>
+    <li ref={innerRef} className="relative scroll-mt-24 pb-14">
+      <div className="mx-auto grid w-full max-w-[420px] grid-cols-[auto_24px_minmax(0,1fr)] items-start pt-3">
+        {/* 시간 */}
+        <div className="col-start-1 row-start-1 flex items-start justify-end self-start pr-1">
+          <p
+            className="max-w-[9.5rem] rounded-full px-2.5 py-2 text-right text-[14px] font-bold tabular-nums leading-tight tracking-[-0.02em] sm:max-w-[10rem] sm:text-[15px]"
+            style={{
+              background: "var(--timetable-v2-time-pill-bg)",
+              color: "var(--timetable-v2-time-pill-fg)",
+            }}
+            aria-label={
+              showNow
+                ? `지금 진행 중인 공연, ${item.startTime}부터 ${item.endTime}까지`
+                : `공연 시간 ${item.startTime}부터 ${item.endTime}까지`
+            }
+          >
+            {timeLabel}
+          </p>
         </div>
 
-        <div className="relative flex w-6 justify-center">
-          <div className="relative mt-2">
-            <div className="h-2.5 w-2.5 rounded-full bg-[var(--timetable-active-color)]" />
-
-            {showNow && (
-              <span className="absolute -top-2 left-4 whitespace-nowrap rounded-full bg-[var(--timetable-active-color)] px-2 py-0.5 text-[11px] font-extrabold text-[var(--text-on-accent)] shadow-sm">
-                NOW
-              </span>
-            )}
+        {/* 타임라인: 점 + 긴 점선 */}
+        <div className="col-start-2 row-span-2 row-start-1 flex w-[24px] shrink-0 flex-col items-center self-stretch">
+          <div className="flex w-full shrink-0 justify-center">
+            <div
+              className="relative z-[1] h-3.5 w-3.5 shrink-0 rounded-full ring-[3px] ring-[color:color-mix(in_srgb,var(--timetable-v2-accent)_14%,white)]"
+              style={{
+                background: "var(--timetable-v2-accent)",
+                boxShadow: "var(--timetable-v2-timeline-node-shadow)",
+              }}
+            />
           </div>
-
-          <div
-            className={`absolute top-4 bottom-0 w-px border-l border-dashed border-[var(--timetable-active-line)] ${
-              isLast ? "opacity-40" : "opacity-100"
-            }`}
-          />
+          {!isLast ? (
+            <div
+              className="mx-auto mt-0 min-h-[12rem] w-0 flex-1 border-l-2 border-dashed"
+              style={{
+                borderLeftColor: "var(--timetable-v2-timeline-dash)",
+                marginBottom: "-3rem",
+              }}
+              aria-hidden
+            />
+          ) : null}
         </div>
 
-        <div>
-          <div className={`h-36 w-36 overflow-hidden ${APP_CARD_VARIANTS.outline} rounded-full shadow-none`}>
+        {/* 원형 사진 + 장르·가수명·스테이지 — 한 열에 붙여서 바로 아래 */}
+        <div className="col-start-3 row-span-2 flex flex-col items-center self-start overflow-visible pl-2 pr-3 sm:pl-2">
+          <div className="relative shrink-0 overflow-visible">
             <img
               src={item.artistImageUrl ?? "/placeholder-artist.png"}
               alt=""
-              className="h-full w-full object-cover"
+              className={[
+                "rounded-full object-cover shadow-[0_18px_30px_-22px_rgba(29,44,89,0.34)] ring-1 ring-[rgba(255,255,255,0.92)]",
+                showNow
+                  ? "ring-[4px] ring-[color:var(--timetable-v2-accent)] ring-offset-[4px] ring-offset-white"
+                  : "",
+              ].join(" ")}
+              style={{ width: AVATAR_PX, height: AVATAR_PX, minWidth: AVATAR_PX, minHeight: AVATAR_PX }}
               onError={(e) => {
                 ;(e.currentTarget as HTMLImageElement).src = "/placeholder-artist.png"
               }}
             />
+
+            {showNow ? (
+              <span
+                className="absolute right-0 top-0 z-[1] inline-flex translate-x-[55%] -translate-y-0 items-center justify-center rounded-full px-3 py-1.5 text-[13px] font-extrabold uppercase leading-none tracking-[0.08em] text-[var(--text-on-accent)] shadow-md"
+                style={{
+                  background: "var(--timetable-v2-now-bg)",
+                  boxShadow: "var(--timetable-v2-now-shadow)",
+                }}
+                aria-label="지금 진행 중"
+              >
+                NOW
+              </span>
+            ) : null}
           </div>
 
-          <div className="mt-3 px-1 py-1">
-            <div className="flex flex-wrap items-end gap-x-3 gap-y-1">
-              <div className="text-[17px] font-extrabold tracking-[-0.01em] text-[var(--text)]">
-                {item.artistName}
-              </div>
+          <div className="mt-2 flex w-full max-w-[19rem] flex-col items-center">
+            {item.artistDescription ? (
+              <p
+                className="max-w-full text-center text-[13px] font-semibold leading-snug"
+                style={{ color: "var(--timetable-v2-accent)" }}
+              >
+                {hashtagLabel(item.artistDescription)}
+              </p>
+            ) : null}
 
-              {item.artistDescription && (
-                <p className="relative -top-1 text-[13px] leading-none text-[var(--text-muted)]">
-                  {item.artistDescription}
-                </p>
-              )}
-            </div>
+            <h3
+              className={[
+                "max-w-full text-center font-sans text-[1.2rem] font-semibold leading-snug tracking-normal text-neutral-800",
+                item.artistDescription ? "mt-1" : "mt-0",
+              ].join(" ")}
+            >
+              {item.artistName}
+            </h3>
 
-            <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm tabular-nums text-[var(--text-muted)]">
-              <span>{timeRange}</span>
-              {item.stage && (
-                <>
-                  <span className="h-1 w-1 rounded-full bg-[var(--timetable-active-line)]" aria-hidden="true" />
-                  <span>{item.stage}</span>
-                </>
-              )}
-            </div>
+            {item.stage ? (
+              <span className="mt-2.5 inline-flex items-center rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-neutral-500">
+                {item.stage}
+              </span>
+            ) : null}
           </div>
         </div>
+
+        <div className="col-start-1 row-start-2 min-h-0" aria-hidden />
       </div>
     </li>
   )

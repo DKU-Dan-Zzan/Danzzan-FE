@@ -9,7 +9,7 @@ type AppShellProps = {
   rootClassName?: string;
   frameClassName?: string;
   mainClassName?: string;
-  colorScheme?: "webapp";
+  colorScheme?: "webapp" | "electric-curator";
 };
 
 export function AppShell({
