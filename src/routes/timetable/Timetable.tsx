@@ -1,6 +1,7 @@
 import { InformationCircleIcon } from "@heroicons/react/24/outline"
-import { useEffect, useMemo, useRef, useState, type TouchEvent } from "react"
-import { useSearchParams } from "react-router-dom"
+import { Ticket } from "lucide-react"
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type TouchEvent } from "react"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import {
   getContentImages,
   getPerformances,
@@ -9,7 +10,12 @@ import {
 import ContentImageSection from "@/components/app/timetable/ContentImage"
 import DayTabs from "@/components/app/timetable/DayTabs"
 import Timeline from "@/components/app/timetable/Timeline"
+import { cn } from "@/components/common/ui/utils"
+import { APP_HEADER_ROUND_BUTTON_BASE_CLASS } from "@/components/layout/AppHeaderRoundButtonClass"
+import { AppHeaderLogo } from "@/components/layout/AppHeaderLogo"
+import { getMyTicketNavigationTarget } from "@/lib/common/my-ticket-navigation"
 import { appQueryKeys, useAppQuery } from "@/lib/query"
+import { authStore } from "@/store/common/authStore"
 import type { FestivalDay, Performance } from "@/types/app/timetable/timetable.types"
 
 const FESTIVAL_DAYS: FestivalDay[] = [
@@ -65,6 +71,12 @@ export default function Timetable() {
   const SWIPE_MIN_DISTANCE = 48
   const HORIZONTAL_SWIPE_RATIO = 1.2
   const POSTER_COLLAPSE_SCROLL_Y = 36
+  const navigate = useNavigate()
+  const session = useSyncExternalStore(
+    authStore.subscribe,
+    authStore.getSnapshot,
+    authStore.getSnapshot,
+  )
 
   const [searchParams] = useSearchParams()
   const [activeIdx, setActiveIdx] = useState(() => {
@@ -91,6 +103,7 @@ export default function Timetable() {
   const activeDate = activeDay.date
   const isDay1 = activeDay.key === "DAY-1"
   const isTodayTab = activeDate === todayISODateLocal()
+  const isLoggedIn = !!session.tokens?.accessToken && session.role === "student"
 
   const performancesQuery = useAppQuery({
     queryKey: appQueryKeys.timetablePerformances(activeDate),
@@ -324,6 +337,10 @@ export default function Timetable() {
     swipeStartPointRef.current = null
   }
 
+  const handleTicketClick = () => {
+    navigate(getMyTicketNavigationTarget(isLoggedIn))
+  }
+
   return (
     <div className="timetable-root flex h-screen min-h-0 flex-col bg-[var(--webapp-main-bg)]">
       <div
@@ -335,35 +352,56 @@ export default function Timetable() {
       >
         <div className="sticky top-0 z-30 bg-[linear-gradient(180deg,rgba(254,250,247,0.96),rgba(254,250,247,0.88)_72%,rgba(254,250,247,0))] backdrop-blur-[10px]">
           <div className="pt-[env(safe-area-inset-top)]">
-            <button
-              type="button"
-              disabled={!posterImage}
-              onClick={() => {
-                if (posterImage) {
-                  setSelectedImage(posterImage)
-                }
-              }}
-              className={`block w-full overflow-hidden bg-[var(--surface)] transition-all duration-300 ${
-                isPosterCompact ? "h-[92px]" : "h-[220px]"
+            <div
+              className={`relative overflow-hidden bg-[var(--surface)] transition-all duration-300 ${
+                isPosterCompact ? "h-16" : "h-[220px]"
               }`}
             >
-              {posterImage ? (
-                <img
-                  key={activePosterSrc}
-                  src={activePosterSrc}
-                  alt={posterImage.name}
-                  className="h-full w-full object-cover"
-                  onError={(e) => {
-                    ;(e.currentTarget as HTMLImageElement).src =
-                      posterImage.detailImageUrl || posterImage.previewImageUrl
-                  }}
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,rgba(233,238,247,0.95),rgba(251,244,239,0.92))] text-sm font-semibold tracking-[0.08em] text-[var(--text-muted)]">
-                  POSTER
+              <button
+                type="button"
+                disabled={!posterImage}
+                onClick={() => {
+                  if (posterImage) {
+                    setSelectedImage(posterImage)
+                  }
+                }}
+                className="block h-full w-full"
+              >
+                {posterImage ? (
+                  <img
+                    key={activePosterSrc}
+                    src={activePosterSrc}
+                    alt={posterImage.name}
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      ;(e.currentTarget as HTMLImageElement).src =
+                        posterImage.detailImageUrl || posterImage.previewImageUrl
+                    }}
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,rgba(233,238,247,0.95),rgba(251,244,239,0.92))] text-sm font-semibold tracking-[0.08em] text-[var(--text-muted)]">
+                    POSTER
+                  </div>
+                )}
+              </button>
+
+              {isPosterCompact && (
+                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.02))]">
+                  <div className="relative mx-auto h-16 max-w-[430px] px-4">
+                    <AppHeaderLogo />
+                    <button
+                      type="button"
+                      onClick={handleTicketClick}
+                      aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
+                      title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
+                      className={cn(APP_HEADER_ROUND_BUTTON_BASE_CLASS, "pointer-events-auto right-4")}
+                    >
+                      <Ticket size={20} className="text-[var(--app-header-ticket-btn-icon)]" />
+                    </button>
+                  </div>
                 </div>
               )}
-            </button>
+            </div>
           </div>
 
           <div className="px-4 pb-2 pt-2">
