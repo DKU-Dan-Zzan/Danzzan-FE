@@ -3,7 +3,6 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import BottomNav from "@/components/layout/BottomNav";
-import Footer from "@/components/layout/Footer";
 import { AppTopBar } from "@/components/layout/AppTopBar";
 import { AppShell } from "@/components/layout/AppShell";
 import { shouldShowTicketingHeader } from "@/lib/ticketing/navigation/headerVisibility";
@@ -97,7 +96,6 @@ export function UserLayout() {
           </AppTopBar>
         ) : undefined
       }
-      footer={<Footer />}
       bottomNav={<BottomNav />}
       rootClassName="min-h-dvh overflow-x-hidden bg-[var(--bg-base)]"
       frameClassName="mx-auto flex min-h-dvh w-full max-w-[var(--app-mobile-shell-max-width)] flex-col bg-[var(--bg-base)] pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]"

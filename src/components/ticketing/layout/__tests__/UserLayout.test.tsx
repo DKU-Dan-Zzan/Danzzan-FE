@@ -51,5 +51,6 @@ describe("UserLayout", () => {
     expect(markup).toContain("pt-[calc(env(safe-area-inset-top)+68px)]");
     expect(markup).not.toContain("sticky top-0 z-50");
     expect(markup).toContain('data-color-scheme="webapp"');
+    expect(markup).not.toContain("Developed by DAN-ZZAN");
   });
 });

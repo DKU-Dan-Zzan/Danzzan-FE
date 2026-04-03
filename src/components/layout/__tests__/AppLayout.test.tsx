@@ -12,6 +12,7 @@ function renderAppLayout(pathname: string) {
         <Route element={<AppLayout />}>
           <Route path="/" element={<div>home</div>} />
           <Route path="/notice" element={<div>notice</div>} />
+          <Route path="/mypage" element={<div>mypage</div>} />
         </Route>
       </Routes>
     </StaticRouter>,
@@ -23,5 +24,13 @@ describe("AppLayout", () => {
     const markup = renderAppLayout("/");
 
     expect(markup).toContain('data-color-scheme="electric-curator"');
+  });
+
+  it("footer는 mypage에서만 노출된다", () => {
+    const homeMarkup = renderAppLayout("/");
+    const myPageMarkup = renderAppLayout("/mypage");
+
+    expect(homeMarkup).not.toContain("Developed by DAN-ZZAN");
+    expect(myPageMarkup).toContain("Developed by DAN-ZZAN");
   });
 });

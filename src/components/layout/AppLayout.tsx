@@ -7,7 +7,7 @@ import { AppShell } from "./AppShell"
 
 const Layout = () => {
   const location = useLocation()
-  const hideFooter = location.pathname === "/map"
+  const shouldShowFooter = location.pathname.startsWith("/mypage")
   const isBoothMapPage = location.pathname === "/map"
   const rootClassName = isBoothMapPage
     ? "h-dvh overflow-hidden bg-[var(--bg-page-soft)]"
@@ -20,7 +20,7 @@ const Layout = () => {
     <AppShell
       colorScheme="electric-curator"
       header={<Header />}
-      footer={!hideFooter ? <Footer /> : undefined}
+      footer={shouldShowFooter ? <Footer /> : undefined}
       bottomNav={<BottomNav />}
       rootClassName={rootClassName}
       frameClassName={frameClassName}
