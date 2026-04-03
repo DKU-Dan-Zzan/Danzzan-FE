@@ -35,7 +35,7 @@ const EmergencyNotice = ({ notice }: Props) => {
 
   return (
     <section className="mt-[var(--home-section-notice-margin-top)] w-full">
-      <div className="overflow-hidden rounded-[var(--home-notice-card-radius)] border border-[var(--home-notice-border)] bg-[linear-gradient(145deg,var(--home-notice-bg-start)_0%,var(--home-notice-bg-end)_100%)] shadow-[var(--home-notice-card-shadow)]">
+      <div className="overflow-hidden rounded-[var(--radius-xl)] bg-[linear-gradient(145deg,var(--home-notice-bg-start)_0%,var(--home-notice-bg-end)_100%)] shadow-[var(--home-notice-card-shadow)]">
         <button
           type="button"
           onClick={() => setIsExpanded((prev) => !prev)}
@@ -48,13 +48,13 @@ const EmergencyNotice = ({ notice }: Props) => {
           aria-controls={contentId}
           aria-label={isExpanded ? "긴급 공지 접기" : "긴급 공지 전문 펼치기"}
         >
-          <div className="flex h-[var(--home-notice-icon-size)] w-[var(--home-notice-icon-size)] shrink-0 items-center justify-center rounded-full border border-[var(--home-notice-icon-border)] bg-[linear-gradient(145deg,var(--home-notice-icon-bg-start)_0%,var(--home-notice-icon-bg-end)_100%)] text-[var(--app-circle-fg)] shadow-[var(--home-notice-icon-inner-shadow)]">
+          <div className="flex h-[var(--home-notice-icon-size)] w-[var(--home-notice-icon-size)] shrink-0 items-center justify-center rounded-full bg-[linear-gradient(145deg,var(--home-notice-icon-bg-start)_0%,var(--home-notice-icon-bg-end)_100%)] text-[var(--status-danger)] shadow-[var(--home-notice-icon-inner-shadow)]">
             <Megaphone size={14} strokeWidth={2.2} />
           </div>
 
           <div className="min-w-0 flex-1">
             {isExpanded && updatedAtLabel && (
-              <p className="mb-1 text-[length:var(--home-notice-updated-font-size)] leading-none text-[var(--text-body-deep)]">
+              <p className="mb-1 text-[length:var(--home-notice-updated-font-size)] leading-none tracking-[var(--type-label-md-tracking)] text-[var(--text-body-deep)]">
                 업데이트 {updatedAtLabel}
               </p>
             )}

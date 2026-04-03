@@ -1,5 +1,5 @@
 // 역할: 홈 라우트에서 포스터·라인업·긴급공지·하단광고 서버 상태를 조합해 렌더링합니다.
-import { useMemo } from "react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 
 import PosterCarousel, { type Poster } from "@/components/app/home/PosterCarousel"
 import EmergencyNotice, { type EmergencyNoticeData } from "@/components/app/home/EmergencyNotice"
@@ -10,6 +10,10 @@ import DelayedSpinner from "@/components/common/loading/DelayedSpinner";
 
 import { getEmergencyNotice, getHomeImages, getLineupImages } from "@/api/app/home/homeApi"
 import { getPlacementAds } from "@/api/app/ad/adApi"
+import {
+  shouldReleaseHomeAnchorLock,
+  shouldTriggerHomeAnchor,
+} from "@/lib/home/anchorScroll";
 import { appQueryKeys, useAppQuery } from "@/lib/query"
 
 const dummyPosters: Poster[] = [
@@ -39,6 +43,10 @@ const withImageVersion = (imageUrl: string, version?: string | null) => {
 }
 
 function Home() {
+  const lineupAnchorRef = useRef<HTMLDivElement | null>(null);
+  const anchorLockRef = useRef(false);
+  const touchStartYRef = useRef<number | null>(null);
+
   const imagesQuery = useAppQuery({
     queryKey: appQueryKeys.homeImages(),
     queryFn: ({ signal }) => getHomeImages({ signal }),
@@ -90,6 +98,16 @@ function Home() {
     }))
   }, [lineupQuery.data])
 
+  const hasLineupAnchor = lineups.length > 0;
+
+  const scrollToLineupAnchor = useCallback(() => {
+    if (!hasLineupAnchor) return;
+    if (!lineupAnchorRef.current) return;
+
+    anchorLockRef.current = true;
+    lineupAnchorRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [hasLineupAnchor]);
+
   const notice = useMemo<EmergencyNoticeData | null>(() => {
     if (!emergencyNoticeQuery.data) {
       return null
@@ -128,27 +146,148 @@ function Home() {
     void allAdsQuery.refetch()
   }
 
+  useEffect(() => {
+    if (!hasLineupAnchor) return;
+
+    const getScrollTop = () => window.scrollY || document.documentElement.scrollTop || 0;
+    const releaseLockIfTopReached = () => {
+      const scrollTop = getScrollTop();
+      if (shouldReleaseHomeAnchorLock(scrollTop)) {
+        anchorLockRef.current = false;
+      }
+      return scrollTop;
+    };
+
+    const handleWheel = (event: WheelEvent) => {
+      const scrollTop = releaseLockIfTopReached();
+      if (!shouldTriggerHomeAnchor({
+        deltaY: event.deltaY,
+        scrollTop,
+        isLocked: anchorLockRef.current,
+      })) {
+        return;
+      }
+
+      event.preventDefault();
+      scrollToLineupAnchor();
+    };
+
+    const handleTouchStart = (event: TouchEvent) => {
+      touchStartYRef.current = event.touches[0]?.clientY ?? null;
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      const startY = touchStartYRef.current;
+      const currentY = event.touches[0]?.clientY;
+      if (startY == null || currentY == null) return;
+
+      const deltaY = startY - currentY;
+      const scrollTop = releaseLockIfTopReached();
+      if (!shouldTriggerHomeAnchor({
+        deltaY,
+        scrollTop,
+        isLocked: anchorLockRef.current,
+      })) {
+        return;
+      }
+
+      event.preventDefault();
+      touchStartYRef.current = currentY;
+      scrollToLineupAnchor();
+    };
+
+    const handleTouchEnd = () => {
+      touchStartYRef.current = null;
+    };
+
+    const handleScroll = () => {
+      releaseLockIfTopReached();
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [hasLineupAnchor, scrollToLineupAnchor]);
+
   return (
-    <div className="home-root flow-root min-h-full bg-[var(--bg-page-soft)]">
+    <div className="home-root flow-root min-h-full bg-[var(--bg-page-soft)] [background-image:var(--home-page-gradient)] bg-no-repeat bg-[length:100%_100%] [animation:ec-fade-in_360ms_ease-out_both]">
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-40">
+        <div className="mx-auto w-full max-w-[430px] px-3 pt-[calc(env(safe-area-inset-top)+68px)]">
+          <div className="pointer-events-auto">
+            <EmergencyNotice notice={notice} />
+          </div>
+        </div>
+      </div>
+
       {error && (
-        <div className="mx-auto mt-3 w-full max-w-[var(--home-content-max-width)] rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-xs leading-[1.35] text-[var(--status-danger-text)]">
+        <div className="mx-auto mt-3 w-full max-w-[var(--home-content-max-width)] rounded-[var(--radius-lg)] border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-xs leading-[1.35] text-[var(--status-danger-text)]">
           <div>{error}</div>
           <button
             type="button"
             onClick={handleRetryAll}
-            className="mt-2 rounded-md border border-[var(--status-danger-border)] bg-[var(--surface)] px-2 py-1 text-[11px] font-semibold text-[var(--status-danger-text)]"
+            className="mt-2 rounded-[var(--radius-md)] bg-[linear-gradient(135deg,var(--primary)_0%,var(--primary_container)_100%)] px-3 py-1.5 text-[11px] font-semibold text-[var(--text-on-accent)] shadow-[var(--ec-ambient-shadow)]"
           >
             다시 시도
           </button>
         </div>
       )}
 
-      <div>
-        <EmergencyNotice notice={notice} />
-        <div className="mt-[var(--home-section-poster-margin-top)]">
-          <PosterCarousel posters={posters} />
+      <div className="[&>*:nth-child(1)]:[animation:ec-fade-up_380ms_ease-out_both] [&>*:nth-child(2)]:[animation:ec-fade-up_440ms_ease-out_both] [&>*:nth-child(3)]:[animation:ec-fade-up_500ms_ease-out_both] [&>*:nth-child(4)]:[animation:ec-fade-up_560ms_ease-out_both]">
+        <div className="relative">
+          <PosterCarousel posters={posters} fillViewport />
+          <div
+            aria-hidden="true"
+            className="home-hero-bottom-vignette pointer-events-none absolute inset-x-0 bottom-0 z-[15] h-[46%]"
+          />
+          {hasLineupAnchor && (
+            <div className="pointer-events-none absolute inset-x-0 bottom-12 z-20 flex flex-col items-center gap-2 px-5">
+              <p className="ec-scroll-cue-twinkle text-center text-[15px] font-medium tracking-[0.02em] text-[rgba(255,255,255,0.78)]">
+                스크롤하여 올해의 아티스트를 확인해보세요
+              </p>
+              <button
+                type="button"
+                onClick={scrollToLineupAnchor}
+                aria-label="아티스트 섹션으로 이동"
+                className="ec-scroll-cue-float pointer-events-auto inline-flex h-12 w-16 items-center justify-center text-[rgba(214,230,255,0.94)] drop-shadow-[0_7px_16px_rgba(0,0,0,0.42)] transition-opacity duration-200 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--on-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              >
+                <svg
+                  viewBox="0 0 64 24"
+                  className="home-scroll-cue-arrow h-5 w-14"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M6 6 L32 18 L58 6"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="4.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
-        <LineupSection banners={lineups} />
+        <div
+          ref={lineupAnchorRef}
+          className="scroll-mt-0"
+        >
+          <div
+            aria-hidden="true"
+            className="h-[calc(env(safe-area-inset-top)+68px+var(--home-anchor-entry-gap))] bg-[var(--surface)]"
+          />
+          <LineupSection banners={lineups} />
+        </div>
         <div className="mt-[var(--home-section-performance-margin-top)]">
           <CurrentPerformanceSection />
         </div>

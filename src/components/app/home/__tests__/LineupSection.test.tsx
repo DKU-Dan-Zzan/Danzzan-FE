@@ -4,12 +4,13 @@ import { renderToStaticMarkup } from "react-dom/server";
 import LineupSection from "@/components/app/home/LineupSection";
 
 describe("LineupSection", () => {
-  it("기본 캡션을 bold 스타일로 렌더링한다", () => {
+  it("기본 캡션을 electric curator title 토큰으로 렌더링한다", () => {
     const markup = renderToStaticMarkup(
       <LineupSection banners={[{ id: "b1", imageUrl: "/lineup-1.jpg", alt: "lineup 1" }]} />,
     );
 
     expect(markup).toContain("올해 축제를 빛낼 아티스트들을 지금 확인하세요");
-    expect(markup).toContain("font-bold text-[var(--home-lineup-caption-color)]");
+    expect(markup).toContain("text-[length:var(--type-title-md-size)]");
+    expect(markup).toContain("tracking-[var(--type-title-md-tracking)]");
   });
 });
