@@ -31,7 +31,7 @@ const Header = () => {
 
   const headerClassName =
     isBoothMapPage
-      ? "fixed inset-x-0 top-0 z-50 border-b border-[color:color-mix(in_srgb,var(--boothmap-panel-border)_12%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--boothmap-panel-bg)_80%,transparent)_0%,color-mix(in_srgb,var(--boothmap-panel-bg)_72%,transparent)_42%,color-mix(in_srgb,var(--boothmap-panel-bg)_60%,transparent)_100%)] shadow-none backdrop-blur-xl pt-[env(safe-area-inset-top)]"
+      ? "fixed inset-x-0 top-0 z-50 bg-transparent shadow-none pt-[env(safe-area-inset-top)]"
       : "fixed inset-x-0 top-0 z-50 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_56%,transparent)_0%,color-mix(in_srgb,var(--surface)_44%,transparent)_16%,color-mix(in_srgb,var(--surface)_32%,transparent)_34%,color-mix(in_srgb,var(--surface)_22%,transparent)_52%,color-mix(in_srgb,var(--surface)_12%,transparent)_70%,color-mix(in_srgb,var(--surface)_5%,transparent)_86%,color-mix(in_srgb,var(--surface)_0%,transparent)_100%)] shadow-none pt-[env(safe-area-inset-top)]"
 
   return (
