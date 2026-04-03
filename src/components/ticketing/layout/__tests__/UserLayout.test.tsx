@@ -32,7 +32,7 @@ describe("UserLayout", () => {
     authStore.clear();
   });
 
-  it("학생 인증 상태 티켓팅 페이지에서는 헤더를 상단 fixed로 고정한다", () => {
+  it("학생 인증 상태 티켓팅 페이지에서는 헤더를 전역 스타일(top fixed, z-50)로 고정한다", () => {
     authStore.setSession(
       {
         tokens: {
@@ -47,9 +47,9 @@ describe("UserLayout", () => {
 
     const markup = renderUserLayout("/ticket/ticketing");
 
-    expect(markup).toContain("fixed inset-x-0 top-0 z-40");
-    expect(markup).toContain("pt-[calc(env(safe-area-inset-top)+4rem)]");
-    expect(markup).not.toContain("sticky top-0 z-40");
+    expect(markup).toContain("fixed inset-x-0 top-0 z-50");
+    expect(markup).toContain("pt-[calc(env(safe-area-inset-top)+68px)]");
+    expect(markup).not.toContain("sticky top-0 z-50");
     expect(markup).toContain('data-color-scheme="webapp"');
   });
 });

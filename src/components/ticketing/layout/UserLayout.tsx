@@ -6,9 +6,10 @@ import BottomNav from "@/components/layout/BottomNav";
 import Footer from "@/components/layout/Footer";
 import { AppTopBar } from "@/components/layout/AppTopBar";
 import { AppShell } from "@/components/layout/AppShell";
-import { APP_HEADER_ROUND_BUTTON_BASE_CLASS } from "@/components/layout/AppHeaderRoundButtonClass";
-import { cn } from "@/components/common/ui/utils";
 import { shouldShowTicketingHeader } from "@/lib/ticketing/navigation/headerVisibility";
+
+const HEADER_ICON_BUTTON_CLASS =
+  "absolute top-1/2 -translate-y-1/2 inline-flex h-10 w-10 items-center justify-center text-[color:color-mix(in_srgb,var(--text)_96%,black)] transition-colors duration-150 hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent disabled:opacity-40";
 
 export function UserLayout() {
   const location = useLocation();
@@ -68,7 +69,7 @@ export function UserLayout() {
       ? "pt-1"
       : "pt-[var(--app-header-first-card-gap)]";
   const mainClassName = showHeader
-    ? "flex-1 overflow-x-hidden pt-[calc(env(safe-area-inset-top)+4rem)]"
+    ? "flex-1 overflow-x-hidden pt-[calc(env(safe-area-inset-top)+68px)]"
     : "flex-1 overflow-x-hidden";
 
   return (
@@ -79,18 +80,19 @@ export function UserLayout() {
           <AppTopBar
             title={pageTitle}
             showSafeAreaOverlay
-            headerClassName="fixed inset-x-0 top-0 z-40 border-b border-[var(--app-header-border)] bg-[var(--app-header-bg)] [background-image:var(--app-header-bg-gradient)] bg-no-repeat bg-[length:100%_100%] pt-[env(safe-area-inset-top)]"
+            showLogo={false}
+            headerClassName="fixed inset-x-0 top-0 z-50 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_56%,transparent)_0%,color-mix(in_srgb,var(--surface)_44%,transparent)_16%,color-mix(in_srgb,var(--surface)_32%,transparent)_34%,color-mix(in_srgb,var(--surface)_22%,transparent)_52%,color-mix(in_srgb,var(--surface)_12%,transparent)_70%,color-mix(in_srgb,var(--surface)_5%,transparent)_86%,color-mix(in_srgb,var(--surface)_0%,transparent)_100%)] shadow-none pt-[env(safe-area-inset-top)]"
             containerClassName="relative mx-auto h-16 w-full max-w-md px-4"
           >
             <button
               onClick={isBackButtonDisabled ? undefined : handleBack}
               disabled={isBackButtonDisabled}
               aria-disabled={isBackButtonDisabled}
-              className={cn(APP_HEADER_ROUND_BUTTON_BASE_CLASS, "left-4")}
+              className={`${HEADER_ICON_BUTTON_CLASS} left-4`}
               aria-label="뒤로가기"
               title={isBackButtonDisabled ? "뒤로가기 비활성화" : "뒤로가기"}
             >
-              <ArrowLeft size={20} className="text-[var(--app-header-ticket-btn-icon)]" />
+              <ArrowLeft size={20} />
             </button>
           </AppTopBar>
         ) : undefined
@@ -102,11 +104,11 @@ export function UserLayout() {
       mainClassName={mainClassName}
     >
       <div
-        className={cn(
+        className={[
           "relative mx-auto min-h-full w-full max-w-md",
           showHeader && "px-4",
           showHeader && contentTopPaddingClass,
-        )}
+        ].filter(Boolean).join(" ")}
       >
         <Outlet />
       </div>
