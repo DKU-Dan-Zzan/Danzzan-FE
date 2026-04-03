@@ -35,10 +35,12 @@ export default function BottomSheet({
   bottomOffset?: number;
   frameWidth?: number;
 }) {
+  const bottomSheetOverlap = 2;
+
   const buildSnaps = useCallback(() => {
     const usable = window.innerHeight - bottomOffset;
     return {
-      PEEK: 40,
+      PEEK: 42,
       HALF: Math.round(usable * BOTTOM_SHEET_HEIGHT_RATIO.HALF),
       FULL: Math.round(usable * BOTTOM_SHEET_HEIGHT_RATIO.FULL),
     } satisfies SnapPx;
@@ -136,7 +138,7 @@ export default function BottomSheet({
         left: "50%",
         transform: "translateX(-50%)",
         width: `min(${frameWidth}px, 100vw)`,
-        bottom: bottomOffset,
+        bottom: Math.max(bottomOffset - bottomSheetOverlap, 0),
         height,
         transition: isDragging ? "none" : "height 180ms ease",
       }}
