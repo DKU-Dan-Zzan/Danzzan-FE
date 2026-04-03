@@ -130,8 +130,7 @@ export default function BottomSheet({
   return (
     <div
       className={[
-        "fixed z-50 flex flex-col overflow-hidden border-t border-[var(--boothmap-border)] bg-[var(--boothmap-surface)] shadow-[var(--boothmap-bottom-sheet-shadow)]",
-        "rounded-t-2xl",
+        "fixed z-50 flex flex-col overflow-hidden rounded-t-[30px] border border-b-0 border-[var(--boothmap-panel-border)] bg-[color:color-mix(in_srgb,var(--boothmap-surface)_94%,white)] shadow-[var(--boothmap-bottom-sheet-shadow)] backdrop-blur-xl",
       ].join(" ")}
       style={{
         left: "50%",
@@ -151,24 +150,26 @@ export default function BottomSheet({
         onPointerCancel={endDrag}
         aria-label="bottom-sheet-handle"
       >
-        <div className="mx-auto h-1.5 w-12 rounded-full bg-[var(--boothmap-sheet-handle)]" />
+        <div className="mx-auto flex w-fit items-center gap-2 rounded-full bg-transparent px-3 py-1">
+          <div className="h-1.5 w-28 rounded-full bg-[var(--boothmap-sheet-handle)]" />
+        </div>
       </div>
 
       {mode === "DETAIL" && (
-        <div className="px-4 pb-1">
+        <div className="px-5 pb-1">
           <button
             type="button"
             onClick={onBackToList}
-            className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--boothmap-text-muted)] transition hover:text-[var(--boothmap-text-subtle)]"
+            className="inline-flex items-center gap-1 rounded-full border border-[color:color-mix(in_srgb,var(--boothmap-panel-border)_72%,white)] bg-[color:color-mix(in_srgb,var(--boothmap-surface-soft)_78%,white)] px-3 py-1.5 text-sm font-semibold text-[var(--boothmap-text-muted)] transition hover:text-[var(--boothmap-text-subtle)]"
           >
-            ← 목록으로
+            목록으로
           </button>
         </div>
       )}
 
       <div
         className={[
-          "px-4 pb-4",
+          "px-5 pb-5",
           contentScrollable ? "overflow-y-auto" : "overflow-hidden",
           "overflow-x-hidden",
         ].join(" ")}

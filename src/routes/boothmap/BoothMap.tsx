@@ -1,4 +1,3 @@
-// 역할: 부스맵 메인 라우트에서 2D 지도, 필터, 상세 시트 상태를 통합 제어합니다.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   Booth,
@@ -321,7 +320,7 @@ export default function BoothMap() {
         return;
       }
     } catch {
-      // 상세 조회에 실패해도 목록 흐름은 유지합니다.
+      // 상세 조회 실패 시 목록 흐름은 유지한다.
     }
 
     if (requestSeq !== boothSelectionRequestSeqRef.current) {
@@ -483,7 +482,7 @@ export default function BoothMap() {
         )}
         style={{ top: "calc(env(safe-area-inset-top) + 4rem)" }}
       >
-        <div className="rounded-b-[30px] border-b border-[var(--boothmap-panel-border)] bg-[color:color-mix(in_srgb,var(--boothmap-panel-bg)_92%,white)] px-4 pb-3 pt-2 shadow-[0_18px_30px_-26px_rgba(15,23,42,0.42)] backdrop-blur-xl">
+        <div className="rounded-b-[32px] border-b border-[var(--boothmap-panel-border)] bg-[color:color-mix(in_srgb,var(--boothmap-panel-bg)_94%,white)] px-4 pb-4 pt-2 shadow-[var(--boothmap-panel-shadow)] backdrop-blur-xl">
           <FestivalDateTabs
             dates={FESTIVAL_DATES}
             selectedDate={selectedDate}
@@ -498,7 +497,7 @@ export default function BoothMap() {
             }}
           />
 
-          <div className="mt-2 border-t border-[color:color-mix(in_srgb,var(--boothmap-panel-border)_72%,transparent)] pt-2.5">
+          <div className="mt-2.5 pt-2.5">
             <PrimaryFilterChips value={primaryFilter} onChange={handlePrimaryChange} />
           </div>
 

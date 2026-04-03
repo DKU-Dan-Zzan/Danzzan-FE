@@ -1,6 +1,3 @@
-// 역할: boothmap 화면에서 사용하는 Secondary College Chips UI 블록을 렌더링합니다.
-// 주점 선택 시 단과대 secondary filter를 보여주는 칩 컴포넌트
-
 import type { College } from "@/types/app/boothmap/boothmap.types";
 
 const CHIP_BASE_CLASS =
@@ -36,20 +33,20 @@ export default function SecondaryCollegeChips({
         전체
       </button>
 
-      {colleges.map((c) => {
-        const active = selectedCollegeId === c.id;
+      {colleges.map((college) => {
+        const active = selectedCollegeId === college.id;
 
         return (
           <button
-            key={c.id}
+            key={college.id}
             type="button"
-            onClick={() => onSelect(c.id)}
+            onClick={() => onSelect(college.id)}
             className={[
               CHIP_BASE_CLASS,
               active ? CHIP_ACTIVE_CLASS : CHIP_INACTIVE_CLASS,
             ].join(" ")}
           >
-            {c.name}
+            {college.name}
           </button>
         );
       })}
