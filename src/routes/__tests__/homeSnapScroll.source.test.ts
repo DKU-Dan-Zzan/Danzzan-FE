@@ -53,6 +53,10 @@ describe("Home snap scroll source", () => {
     expect(source).toContain("html.home-snap-mode");
     expect(source).toContain("body.home-snap-mode");
     expect(source).toContain("scroll-snap-type: y mandatory;");
+    expect(source).toContain("html.home-snap-mode::-webkit-scrollbar");
+    expect(source).toContain("body.home-snap-mode::-webkit-scrollbar");
+    expect(source).toContain("-ms-overflow-style: none;");
+    expect(source).toContain("scrollbar-width: none;");
     expect(source).toContain(".home-snap-section");
     expect(source).toContain("scroll-snap-align: start;");
   });

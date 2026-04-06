@@ -1,7 +1,7 @@
 // 역할: 앱 하단 고정 탭 내비게이션을 렌더링하고 인증 상태에 따라 티켓팅 탭 경로를 결정합니다.
 import { NavLink } from "react-router-dom";
 import { Clock3, Home, Map, Megaphone, Ticket } from "lucide-react";
-import { useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { cn } from "@/components/common/ui/utils";
 import { hasAuthenticatedRole } from "@/lib/common/auth-access";
 import { getTicketingNavigationTarget } from "@/lib/common/ticketing-navigation";
@@ -47,8 +47,10 @@ const BOTTOM_NAV_HOME_LINK_CLASS =
 const BOTTOM_NAV_HOME_BUTTON_CLASS =
   "inline-flex h-14 w-14 -translate-y-3 items-center justify-center rounded-full bg-[var(--app-nav-home-highlight)] text-[var(--on-primary)] shadow-[var(--ec-ambient-shadow)] transition-transform duration-150 ease-out active:scale-[0.96] motion-reduce:transform-none group-focus-visible:ring-2 group-focus-visible:ring-[var(--ring)] group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[var(--app-bottom-nav-surface)]";
 const BOTTOM_NAV_HOME_ICON_CLASS = "h-[22px] w-[22px]";
+const APP_BOTTOM_NAV_RUNTIME_OFFSET_VAR = "--app-bottom-nav-runtime-offset";
 
 const BottomNav = () => {
+  const navRef = useRef<HTMLElement | null>(null);
   const session = useSyncExternalStore(
     authStore.subscribe,
     authStore.getSnapshot,
@@ -70,9 +72,42 @@ const BottomNav = () => {
     void prefetchTabDataByPath(routePath);
   };
 
+  useEffect(() => {
+    const navElement = navRef.current;
+    if (!navElement) return;
+
+    const rootStyle = document.documentElement.style;
+    const updateBottomOffset = () => {
+      const navTop = navElement.getBoundingClientRect().top;
+      const bottomOffset = Math.max(0, Math.round(window.innerHeight - navTop));
+      rootStyle.setProperty(APP_BOTTOM_NAV_RUNTIME_OFFSET_VAR, `${bottomOffset}px`);
+    };
+
+    updateBottomOffset();
+
+    window.addEventListener("resize", updateBottomOffset);
+    window.addEventListener("orientationchange", updateBottomOffset);
+    window.visualViewport?.addEventListener("resize", updateBottomOffset);
+
+    const resizeObserver =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(updateBottomOffset);
+    resizeObserver?.observe(navElement);
+
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", updateBottomOffset);
+      window.removeEventListener("orientationchange", updateBottomOffset);
+      window.visualViewport?.removeEventListener("resize", updateBottomOffset);
+      rootStyle.removeProperty(APP_BOTTOM_NAV_RUNTIME_OFFSET_VAR);
+    };
+  }, []);
+
   return (
     <nav
       data-app-bottom-nav
+      ref={navRef}
       className={BOTTOM_NAV_WRAPPER_CLASS}
     >
       <div className={BOTTOM_NAV_PANEL_CLASS} />

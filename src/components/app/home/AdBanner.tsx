@@ -19,7 +19,7 @@ export default function AdBanner({ ads }: AdBannerProps) {
     : [{ imageUrl: AD_PLACEHOLDER_IMAGE, alt: "광고 배너" }]
 
   return (
-    <div className="fixed inset-x-0 bottom-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))] z-40 mx-auto w-full max-w-[var(--app-mobile-shell-max-width)]">
+    <div className="fixed inset-x-0 bottom-[calc(var(--app-bottom-nav-runtime-offset)-1px)] z-40 mx-auto w-full max-w-[var(--app-mobile-shell-max-width)]">
       <div className="overflow-hidden rounded-none bg-[var(--home-ad-banner-bg)] shadow-[var(--home-elevated-card-shadow)]">
         <AdCarousel
           slides={slides}

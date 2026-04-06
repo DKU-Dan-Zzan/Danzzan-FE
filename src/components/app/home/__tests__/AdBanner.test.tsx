@@ -8,7 +8,7 @@ describe("AdBanner", () => {
     const markup = renderToStaticMarkup(<AdBanner ads={[]} />);
 
     expect(markup).toContain("fixed");
-    expect(markup).toContain("bottom-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]");
+    expect(markup).toContain("bottom-[calc(var(--app-bottom-nav-runtime-offset)-1px)]");
     expect(markup).toContain("max-w-[var(--app-mobile-shell-max-width)]");
     expect(markup).toContain("rounded-none");
     expect(markup).not.toContain("rounded-[var(--radius-xl)]");
