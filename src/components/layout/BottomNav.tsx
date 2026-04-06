@@ -27,11 +27,11 @@ const STATIC_ITEMS: BottomNavItem[] = [
 const BOTTOM_NAV_WRAPPER_CLASS =
   "fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-[var(--app-mobile-shell-max-width)] h-[calc(var(--app-bottom-nav-height,64px)_+_env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] [animation:ec-fade-up_320ms_ease-out_both]";
 const BOTTOM_NAV_PANEL_CLASS =
-  "absolute inset-x-0 bottom-0 h-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))] rounded-t-[1.75rem] bg-[var(--surface_container_lowest)] shadow-[0_-6px_18px_rgba(44,52,54,0.09)]";
+  "absolute inset-x-0 bottom-0 h-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))] rounded-t-[1.75rem] bg-[var(--app-bottom-nav-surface)] shadow-[0_-6px_18px_rgba(44,52,54,0.09)]";
 const BOTTOM_NAV_GRID_CLASS =
   "relative grid h-[var(--app-bottom-nav-height)] grid-cols-5 items-end px-3 pb-1";
 const BOTTOM_NAV_ITEM_BASE_CLASS =
-  "relative flex h-full flex-col items-center justify-center gap-1 text-[length:var(--app-bottom-nav-label-size)] tracking-[0.08em] transition-[color,transform] duration-150 ease-out active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface_container_lowest)]";
+  "relative flex h-full flex-col items-center justify-center gap-1 text-[length:var(--app-bottom-nav-label-size)] tracking-[0.08em] transition-[color,transform] duration-150 ease-out active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--app-bottom-nav-surface)]";
 const BOTTOM_NAV_ITEM_ACTIVE_CLASS = "text-[var(--app-nav-home-highlight)]";
 const BOTTOM_NAV_ITEM_INACTIVE_CLASS = "text-[var(--app-nav-text)]";
 const BOTTOM_NAV_ICON_BASE_CLASS =
@@ -43,9 +43,9 @@ const BOTTOM_NAV_LABEL_BASE_CLASS =
 const BOTTOM_NAV_LABEL_ACTIVE_CLASS = "translate-y-0 font-semibold";
 const BOTTOM_NAV_LABEL_INACTIVE_CLASS = "font-semibold opacity-85";
 const BOTTOM_NAV_HOME_LINK_CLASS =
-  "relative flex h-full items-start justify-center pt-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface_container_lowest)]";
+  "group relative flex h-full items-start justify-center pt-0 focus-visible:outline-none";
 const BOTTOM_NAV_HOME_BUTTON_CLASS =
-  "inline-flex h-14 w-14 -translate-y-3 items-center justify-center rounded-full bg-[var(--app-nav-home-highlight)] text-[var(--on-primary)] shadow-[var(--ec-ambient-shadow)] transition-transform duration-150 ease-out active:scale-[0.96] motion-reduce:transform-none";
+  "inline-flex h-14 w-14 -translate-y-3 items-center justify-center rounded-full bg-[var(--app-nav-home-highlight)] text-[var(--on-primary)] shadow-[var(--ec-ambient-shadow)] transition-transform duration-150 ease-out active:scale-[0.96] motion-reduce:transform-none group-focus-visible:ring-2 group-focus-visible:ring-[var(--ring)] group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[var(--app-bottom-nav-surface)]";
 const BOTTOM_NAV_HOME_ICON_CLASS = "h-[22px] w-[22px]";
 
 const BottomNav = () => {
