@@ -1,4 +1,3 @@
-// 역할: 티켓팅 사용자 화면 공통 상단바와 본문 레이아웃을 제공합니다.
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, User } from "lucide-react";
 import { useAuth } from "@/hooks/ticketing/useAuth";
@@ -34,7 +33,7 @@ export function UserLayout() {
     accessToken: session.tokens?.accessToken,
     role,
   });
-  const showBackButton = !isTicketingAuthPage && !isTicketingMainPage;
+  const showBackButton = !isTicketingMainPage && !isTicketingLoginPage;
   const pageTitle = "축제 서비스";
 
   const handleBack = () => {
@@ -67,10 +66,12 @@ export function UserLayout() {
   const contentTopPaddingClass = isMyTicketPage
     ? "pt-3"
     : isTicketingAuthPage
-      ? "pt-1"
+      ? "pt-0"
       : "pt-[var(--app-header-first-card-gap)]";
   const mainClassName = showHeader
-    ? "flex-1 overflow-x-hidden pt-[calc(env(safe-area-inset-top)+68px)]"
+    ? isTicketingAuthPage
+      ? "flex-1 overflow-x-hidden"
+      : "flex-1 overflow-x-hidden pt-[calc(env(safe-area-inset-top)+68px)]"
     : "flex-1 overflow-x-hidden";
 
   return (
@@ -82,36 +83,33 @@ export function UserLayout() {
             title={pageTitle}
             showSafeAreaOverlay
             showLogo={false}
-            headerClassName="fixed inset-x-0 top-0 z-50 bg-[color-mix(in_srgb,var(--surface)_70%,transparent)] backdrop-blur-[24px] shadow-none pt-[env(safe-area-inset-top)]"
+            headerClassName="fixed inset-x-0 top-0 z-50 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_62%,transparent)_0%,color-mix(in_srgb,var(--surface)_40%,transparent)_36%,color-mix(in_srgb,var(--surface)_18%,transparent)_72%,color-mix(in_srgb,var(--surface)_0%,transparent)_100%)] backdrop-blur-[24px] shadow-none pt-[env(safe-area-inset-top)]"
             containerClassName="relative mx-auto h-16 w-full max-w-md px-4"
           >
-            {/* 로고 - 로그인 후 가운데 정렬 */}
-            {!isTicketingAuthPage && (
-              <img
-                src="/DAN-ZZAN.png"
-                alt="DAN-ZZAN"
-                className="pointer-events-none absolute left-1/2 top-1/2 h-8 w-[136px] -translate-x-1/2 -translate-y-1/2 object-contain select-none"
-                draggable={false}
-              />
-            )}
+            <img
+              src="/DAN-ZZAN.png"
+              alt="DAN-ZZAN"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-8 w-[136px] -translate-x-1/2 -translate-y-1/2 object-contain select-none"
+              draggable={false}
+            />
 
-            {/* 뒤로가기 - 메인 페이지 제외 */}
             {showBackButton && (
               <button
                 onClick={handleBack}
                 className={cn(HEADER_ICON_BUTTON_CLASS, "left-4")}
                 aria-label="뒤로가기"
+                title="뒤로가기"
               >
                 <ArrowLeft size={20} />
               </button>
             )}
 
-            {/* 내 정보 - 마이페이지로 이동 */}
             {!isTicketingAuthPage && (
               <button
                 onClick={() => navigate("/mypage")}
                 className={cn(HEADER_ICON_BUTTON_CLASS, "right-4")}
-                aria-label="내 정보"
+                aria-label="내정보"
+                title="내정보"
               >
                 <User size={20} />
               </button>
@@ -129,7 +127,9 @@ export function UserLayout() {
           "relative mx-auto min-h-full w-full max-w-md",
           showHeader && "px-4",
           showHeader && contentTopPaddingClass,
-        ].filter(Boolean).join(" ")}
+        ]
+          .filter(Boolean)
+          .join(" ")}
       >
         <Outlet />
       </div>

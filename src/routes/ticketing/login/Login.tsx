@@ -34,7 +34,7 @@ const SIGNUP_PROMPT = "축제 서비스가 처음 이용이신가요?";
 const SIGNUP_ACTION = "회원가입";
 const RESET_PROMPT = "비밀번호를 잊으셨나요?";
 const RESET_ACTION = "비밀번호 재설정";
-const FESTIVAL_EYEBROW = "2026 DANZZAN FESTIVAL";
+const FESTIVAL_EYEBROW = "2026 LOU:D X DANZZAN";
 const LOGIN_PLACEHOLDER_CLASS =
   "text-[0.96rem] sm:text-[0.98rem] placeholder:text-[0.8rem] sm:placeholder:text-[0.84rem] placeholder:tracking-[-0.01em]";
 

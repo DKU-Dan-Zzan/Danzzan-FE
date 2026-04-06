@@ -386,19 +386,19 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="relative -mx-4 min-h-screen overflow-hidden bg-[var(--bg-page-soft)] px-4">
+    <div className="fixed inset-0 -mx-4 overflow-hidden bg-[var(--bg-page-soft)] px-4">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-20 top-0 h-56 w-56 rounded-full bg-[color:color-mix(in_srgb,var(--primary_container)_62%,white)] opacity-80 blur-3xl" />
         <div className="absolute right-[-5rem] top-1/4 h-72 w-72 rounded-full bg-[color:color-mix(in_srgb,var(--primary)_22%,white)] opacity-90 blur-3xl" />
         <div className="absolute bottom-[-4rem] left-1/4 h-64 w-64 rounded-full bg-[color:color-mix(in_srgb,var(--tertiary_container)_32%,white)] opacity-70 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto w-full pb-8 pt-6">
-        <div className="rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_rgba(44,52,54,0.06)] backdrop-blur-[24px]">
+      <div className="relative mx-auto flex h-full w-full max-w-[var(--ticketing-mobile-shell-max-width)] items-center justify-center px-5 py-[calc(env(safe-area-inset-top)+1.25rem)] sm:px-6">
+        <div className="w-full rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_rgba(44,52,54,0.06)] backdrop-blur-[24px]">
           <div className="rounded-[26px] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface_container_low)_92%,white)_0%,color-mix(in_srgb,var(--surface_container_lowest)_96%,white)_100%)] px-5 py-6">
             <section className={TICKETING_AUTH_HEADER_SECTION_CLASS}>
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-emphasis-vivid)]">
-                2026 DANZZAN FESTIVAL
+                2026 LOU:D X DANZZAN
               </p>
           <TicketingAuthHeading title="비밀번호 재설정" />
             </section>
@@ -681,7 +681,7 @@ export default function ResetPassword() {
             </section>
           )}
 
-          {!completed && (
+          {false && !completed && (
             <div className="mt-6 text-center">
               <p className="text-sm text-[var(--text-muted)]">로그인 화면으로 돌아가시겠어요?</p>
               <Link to="/ticket/login" className="mt-2 inline-block text-sm font-semibold text-[var(--text-emphasis-vivid)]">
