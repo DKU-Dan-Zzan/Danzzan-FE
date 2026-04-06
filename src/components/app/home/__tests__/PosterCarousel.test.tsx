@@ -17,4 +17,19 @@ describe("PosterCarousel", () => {
 
     expect(markup).not.toContain("rounded-none border border-[var(--home-card-border)]");
   });
+
+  it("fillViewport 모드에서는 iOS safe-area 상단까지 포스터가 보이도록 래퍼를 위로 확장한다", () => {
+    const markup = renderToStaticMarkup(
+      <PosterCarousel
+        posters={[{ id: "p1", imageUrl: "/poster-1.jpg", alt: "poster 1" }]}
+        fillViewport
+      />,
+    );
+
+    expect(markup).toContain("-mt-[env(safe-area-inset-top)]");
+    expect(markup).toContain("+env(safe-area-inset-top)");
+    expect(markup).toContain("+var(--home-hero-nav-overlap)");
+    expect(markup).toContain("100svh");
+    expect(markup).not.toContain("-var(--app-bottom-nav-height)");
+  });
 });

@@ -32,5 +32,7 @@ describe("Home anchor scroll source", () => {
     expect(source).toContain("aria-label=\"아티스트 섹션으로 이동\"");
     expect(source).toContain("onClick={scrollToLineupAnchor}");
     expect(source).toContain("ec-scroll-cue-float");
+    expect(source).toContain("bottom-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom)+12px)]");
+    expect(source).toContain("scrollMarginTop: \"-3px\"");
   });
 });

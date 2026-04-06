@@ -19,6 +19,7 @@ import { appQueryKeys, useAppQuery } from "@/lib/query"
 const dummyPosters: Poster[] = [
   { id: "p1", imageUrl: "/posters/festival-poster.png", alt: "2026 단국축제 포스터" },
 ]
+const HOME_SNAP_MODE_CLASS = "home-snap-mode"
 
 const getVersionFromImageUrl = (imageUrl: string) => {
   const match = imageUrl.match(/[?&]v=([^&#]+)/)
@@ -147,6 +148,16 @@ function Home() {
   }
 
   useEffect(() => {
+    document.documentElement.classList.add(HOME_SNAP_MODE_CLASS)
+    document.body.classList.add(HOME_SNAP_MODE_CLASS)
+
+    return () => {
+      document.documentElement.classList.remove(HOME_SNAP_MODE_CLASS)
+      document.body.classList.remove(HOME_SNAP_MODE_CLASS)
+    }
+  }, [])
+
+  useEffect(() => {
     if (!hasLineupAnchor) return;
 
     const getScrollTop = () => window.scrollY || document.documentElement.scrollTop || 0;
@@ -243,14 +254,14 @@ function Home() {
       )}
 
       <div className="[&>*:nth-child(1)]:[animation:ec-fade-up_380ms_ease-out_both] [&>*:nth-child(2)]:[animation:ec-fade-up_440ms_ease-out_both] [&>*:nth-child(3)]:[animation:ec-fade-up_500ms_ease-out_both] [&>*:nth-child(4)]:[animation:ec-fade-up_560ms_ease-out_both]">
-        <div className="relative">
+        <div className="home-snap-section relative h-[100svh] overflow-hidden">
           <PosterCarousel posters={posters} fillViewport />
           <div
             aria-hidden="true"
             className="home-hero-bottom-vignette pointer-events-none absolute inset-x-0 bottom-0 z-[15] h-[46%]"
           />
           {hasLineupAnchor && (
-            <div className="pointer-events-none absolute inset-x-0 bottom-12 z-20 flex flex-col items-center gap-2 px-5">
+            <div className="pointer-events-none absolute inset-x-0 bottom-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom)+12px)] z-20 flex flex-col items-center gap-2 px-5">
               <p className="ec-scroll-cue-twinkle text-center text-[15px] font-medium tracking-[0.02em] text-[rgba(255,255,255,0.78)]">
                 스크롤하여 올해의 아티스트를 확인해보세요
               </p>
@@ -280,20 +291,21 @@ function Home() {
         </div>
         <div
           ref={lineupAnchorRef}
-          className="scroll-mt-0"
+          className="home-snap-section min-h-[100svh] scroll-mt-0 bg-[var(--surface)]"
+          style={{ scrollMarginTop: "-3px" }}
         >
           <div
             aria-hidden="true"
             className="h-[calc(env(safe-area-inset-top)+68px+var(--home-anchor-entry-gap))] bg-[var(--surface)]"
           />
           <LineupSection banners={lineups} />
-        </div>
-        <div className="mt-[var(--home-section-performance-margin-top)]">
-          <CurrentPerformanceSection />
-        </div>
+          <div className="mt-[var(--home-section-performance-margin-top)]">
+            <CurrentPerformanceSection />
+          </div>
 
-        <div>
-          <AdBanner ads={allAds} />
+          <div>
+            <AdBanner ads={allAds} />
+          </div>
         </div>
       </div>
 

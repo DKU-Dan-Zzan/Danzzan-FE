@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import LineupCarousel from "@/components/app/home/LineupCarousel";
 
 describe("LineupCarousel", () => {
-  it("라인업 카드는 314.4x138 비율과 peeking 배치를 사용한다", () => {
+  it("라인업 카드는 314.4x210 비율과 peeking 배치를 사용한다", () => {
     const markup = renderToStaticMarkup(
       <LineupCarousel
         banners={[
@@ -24,7 +24,7 @@ describe("LineupCarousel", () => {
     expect(markup).toContain("transition-[transform,opacity] duration-500");
     expect(markup).toContain("radial-gradient(118%_94%_at_50%_42%");
     expect(markup).toContain("inset_0_0_0_1px_rgba(255,255,255,0.24)");
-    expect(markup).toContain("aspect-ratio:314.4/138");
+    expect(markup).toContain("aspect-ratio:314.4/210");
     expect(markup).toContain("width:314.4px");
     expect(markup).toContain("transform:translateX(calc(50% - 157.2px - 1 * (314.4px + 12px)))");
   });
