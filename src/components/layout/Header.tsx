@@ -22,6 +22,7 @@ const Header = () => {
   const isLoggedIn = !!session.tokens?.accessToken && session.role === "student"
   const isTimetablePage = location.pathname === "/timetable"
   const isBoothMapPage = location.pathname === "/map"
+  const isHomePage = location.pathname === "/"
 
   const handleTicketClick = () => {
     navigate(getMyTicketNavigationTarget(isLoggedIn))
@@ -36,7 +37,7 @@ const Header = () => {
   }
 
   const headerClassName =
-    isBoothMapPage
+    isBoothMapPage || isHomePage
       ? "fixed inset-x-0 top-0 z-50 bg-transparent shadow-none pt-[env(safe-area-inset-top)]"
       : "fixed inset-x-0 top-0 z-50 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_56%,transparent)_0%,color-mix(in_srgb,var(--surface)_44%,transparent)_16%,color-mix(in_srgb,var(--surface)_32%,transparent)_34%,color-mix(in_srgb,var(--surface)_22%,transparent)_52%,color-mix(in_srgb,var(--surface)_12%,transparent)_70%,color-mix(in_srgb,var(--surface)_5%,transparent)_86%,color-mix(in_srgb,var(--surface)_0%,transparent)_100%)] shadow-none pt-[env(safe-area-inset-top)]"
 
