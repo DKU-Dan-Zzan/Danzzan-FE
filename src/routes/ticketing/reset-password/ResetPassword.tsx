@@ -20,6 +20,7 @@ import {
   isPasswordPolicyErrorMessage,
 } from "@/lib/ticketing/passwordPolicy";
 import { TICKETING_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
+import { cn } from "@/components/common/ui/utils";
 
 type ResetStep = "request" | "verify" | "password";
 type ResetStepItem = {
@@ -44,6 +45,9 @@ const RESET_STEPS: ResetStepItem[] = [
 const RESET_PASSWORD_STORAGE_KEY = "ticketing-reset-password-state-v1";
 const RESET_PASSWORD_SESSION_ERROR_MESSAGE =
   "비밀번호 재설정 정보를 확인할 수 없습니다. 인증번호를 다시 요청해 주세요.";
+
+const AUTH_PLACEHOLDER_CLASS =
+  "text-[0.96rem] sm:text-[0.98rem] placeholder:text-[0.8rem] sm:placeholder:text-[0.84rem] placeholder:tracking-[-0.01em]";
 
 type ResetPasswordPersistedState = {
   step?: ResetStep;
@@ -382,14 +386,14 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--bg-page-soft)]">
+    <div className="relative -mx-4 min-h-screen overflow-hidden bg-[var(--bg-page-soft)] px-4">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-20 top-0 h-56 w-56 rounded-full bg-[color:color-mix(in_srgb,var(--primary_container)_62%,white)] opacity-80 blur-3xl" />
         <div className="absolute right-[-5rem] top-1/4 h-72 w-72 rounded-full bg-[color:color-mix(in_srgb,var(--primary)_22%,white)] opacity-90 blur-3xl" />
         <div className="absolute bottom-[-4rem] left-1/4 h-64 w-64 rounded-full bg-[color:color-mix(in_srgb,var(--tertiary_container)_32%,white)] opacity-70 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto w-full max-w-[420px] px-5 pb-8 pt-6">
+      <div className="relative mx-auto w-full pb-8 pt-6">
         <div className="rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_rgba(44,52,54,0.06)] backdrop-blur-[24px]">
           <div className="rounded-[26px] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface_container_low)_92%,white)_0%,color-mix(in_srgb,var(--surface_container_lowest)_96%,white)_100%)] px-5 py-6">
             <section className={TICKETING_AUTH_HEADER_SECTION_CLASS}>
@@ -406,7 +410,7 @@ export default function ResetPassword() {
                 <span className="text-[var(--accent)]">{stepIndex}/3 단계</span> · {currentStepLabel}
               </p>
 
-              <div className="mt-3" aria-label="비밀번호 재설정 단계">
+              <div className="mt-3 px-3 sm:px-4" aria-label="비밀번호 재설정 단계">
                 <div className="grid grid-cols-[2rem_1fr_2rem_1fr_2rem] items-center">
                   {RESET_STEPS.map(({ key }, index) => {
                     const current = index + 1;
@@ -483,7 +487,7 @@ export default function ResetPassword() {
                   inputMode="numeric"
                   maxLength={8}
                   placeholder="학번 8자리를 입력해 주세요"
-                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
+                  className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS)}
                   disabled={requestingCode}
                   required
                 />
@@ -532,7 +536,7 @@ export default function ResetPassword() {
                   inputMode="numeric"
                   maxLength={6}
                   placeholder="인증번호 6자리를 입력해 주세요"
-                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
+                  className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS)}
                   disabled={verifyingCode}
                   required
                 />
@@ -613,7 +617,7 @@ export default function ResetPassword() {
                     setPassword(event.target.value);
                   }}
                   placeholder="새 비밀번호를 입력해 주세요"
-                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
+                  className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS)}
                   autoComplete="new-password"
                   disabled={resettingPassword}
                   required
@@ -633,7 +637,7 @@ export default function ResetPassword() {
                     setPasswordConfirm(event.target.value);
                   }}
                   placeholder="새 비밀번호를 다시 입력해 주세요"
-                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
+                  className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS)}
                   autoComplete="new-password"
                   disabled={resettingPassword}
                   required

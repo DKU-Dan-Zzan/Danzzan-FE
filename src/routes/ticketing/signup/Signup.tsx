@@ -55,6 +55,8 @@ const ERROR_401 =
 const ERROR_409 = "이미 가입한 학번입니다.";
 const ERROR_403 = "학생 및 재학생만 회원가입이 가능합니다.";
 const ERROR_SIGNUP = "회원가입에 실패했습니다.";
+const AUTH_PLACEHOLDER_CLASS =
+  "text-[0.96rem] sm:text-[0.98rem] placeholder:text-[0.8rem] sm:placeholder:text-[0.84rem] placeholder:tracking-[-0.01em]";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -133,14 +135,14 @@ export default function Signup() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--bg-page-soft)]">
+    <div className="relative -mx-4 min-h-screen overflow-hidden bg-[var(--bg-page-soft)] px-4">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-20 top-0 h-56 w-56 rounded-full bg-[color:color-mix(in_srgb,var(--primary_container)_62%,white)] opacity-80 blur-3xl" />
         <div className="absolute right-[-5rem] top-1/4 h-72 w-72 rounded-full bg-[color:color-mix(in_srgb,var(--primary)_22%,white)] opacity-90 blur-3xl" />
         <div className="absolute bottom-[-4rem] left-1/4 h-64 w-64 rounded-full bg-[color:color-mix(in_srgb,var(--tertiary_container)_32%,white)] opacity-70 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto w-full max-w-[420px] px-5 pb-8 pt-6">
+      <div className="relative mx-auto w-full pb-8 pt-6">
         <div className="rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_rgba(44,52,54,0.06)] backdrop-blur-[24px]">
           <div className="rounded-[26px] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface_container_low)_92%,white)_0%,color-mix(in_srgb,var(--surface_container_lowest)_96%,white)_100%)] px-5 py-6">
             <section className={TICKETING_AUTH_HEADER_SECTION_CLASS}>
@@ -163,7 +165,7 @@ export default function Signup() {
                         value={dkuStudentId}
                         onChange={(event) => setDkuStudentId(event.target.value)}
                         placeholder={STUDENT_ID_PLACEHOLDER}
-                        className={TICKETING_AUTH_INPUT_CLASS_NAME}
+                        className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS)}
                         required
                         disabled={submitting}
                       />
@@ -179,7 +181,7 @@ export default function Signup() {
                         value={dkuPassword}
                         onChange={(event) => setDkuPassword(event.target.value)}
                         placeholder={DKU_PASSWORD_PLACEHOLDER}
-                        className={TICKETING_AUTH_INPUT_CLASS_NAME}
+                        className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS)}
                         required
                         disabled={submitting}
                       />
@@ -207,7 +209,7 @@ export default function Signup() {
                           setPassword(event.target.value);
                         }}
                         placeholder={SERVICE_PASSWORD_PLACEHOLDER}
-                        className={TICKETING_AUTH_INPUT_CLASS_NAME}
+                        className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS)}
                         autoComplete="new-password"
                         required
                         disabled={submitting}
@@ -227,7 +229,7 @@ export default function Signup() {
                           setPasswordConfirm(event.target.value);
                         }}
                         placeholder={SERVICE_PASSWORD_CONFIRM_PLACEHOLDER}
-                        className={TICKETING_AUTH_INPUT_CLASS_NAME}
+                        className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS)}
                         autoComplete="new-password"
                         required
                         disabled={submitting}
