@@ -37,7 +37,7 @@ export function AdCarousel({
   slides,
   intervalMs = 5000,
   containerClassName = "",
-  imageClassName = "block h-[70px] w-full object-cover",
+  imageClassName = "block h-full w-full object-cover",
 }: AdCarouselProps) {
   const [shuffled, setShuffled] = useState<AdSlide[]>(() =>
     slides.length ? shuffleArray(slides) : [],
@@ -46,7 +46,6 @@ export function AdCarousel({
   const [displayIndex, setDisplayIndex] = useState(1)
   const [animated, setAnimated] = useState(false)
   const [isHoverPaused, setIsHoverPaused] = useState(false)
-  const [isTouchPaused, setIsTouchPaused] = useState(false)
   const displayIndexRef = useRef(1)
 
   // Reshuffle whenever slide URLs change
@@ -65,7 +64,7 @@ export function AdCarousel({
   }, [slidesKey])
 
   const n = shuffled.length
-  const isPaused = isHoverPaused || isTouchPaused
+  const isPaused = isHoverPaused
 
   // Extended slides for seamless infinite loop: [last, ...real, first]
   const extended = n > 1 ? [shuffled[n - 1], ...shuffled, shuffled[0]] : shuffled
@@ -118,9 +117,9 @@ export function AdCarousel({
       />
     )
     return (
-      <div className={cn("overflow-hidden", containerClassName)}>
+      <div className={cn("relative w-full overflow-hidden", containerClassName)}>
         {slide.linkUrl ? (
-          <a href={slide.linkUrl} target="_blank" rel="noreferrer" className="block">
+          <a href={slide.linkUrl} target="_blank" rel="noreferrer" className="block h-full w-full">
             {img}
           </a>
         ) : (
@@ -134,14 +133,13 @@ export function AdCarousel({
 
   return (
     <div
-      className={cn("overflow-hidden", containerClassName)}
+      className={cn("relative w-full overflow-hidden", containerClassName)}
       onMouseEnter={() => setIsHoverPaused(true)}
       onMouseLeave={() => setIsHoverPaused(false)}
-      onTouchStart={() => setIsTouchPaused(true)}
       aria-label="광고 배너 슬라이드"
     >
       <div
-        className="flex"
+        className="flex h-full w-full"
         style={{
           transform: `translateX(${translateX}%)`,
           transition: animated
@@ -166,11 +164,11 @@ export function AdCarousel({
           return (
             <div
               key={`${slide.imageUrl}-${idx}`}
-              className="min-w-full shrink-0"
+              className="basis-full shrink-0 grow-0 max-w-full overflow-hidden"
               aria-hidden={!isCurrent}
             >
               {slide.linkUrl ? (
-                <a href={slide.linkUrl} target="_blank" rel="noreferrer" className="block">
+                <a href={slide.linkUrl} target="_blank" rel="noreferrer" className="block h-full w-full">
                   {img}
                 </a>
               ) : (

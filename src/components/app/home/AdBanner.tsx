@@ -20,10 +20,11 @@ export default function AdBanner({ ads }: AdBannerProps) {
 
   return (
     <div className="mt-9">
-      <div className="overflow-hidden rounded-none bg-[var(--home-ad-banner-bg)] shadow-[var(--home-elevated-card-shadow)]">
+      <div className="relative aspect-[9/2] overflow-hidden rounded-none bg-[var(--home-ad-banner-bg)] shadow-[var(--home-elevated-card-shadow)]">
         <AdCarousel
           slides={slides}
-          imageClassName="block h-[70px] w-full object-cover"
+          containerClassName="h-full w-full"
+          imageClassName="block h-full w-full object-cover"
         />
       </div>
     </div>
