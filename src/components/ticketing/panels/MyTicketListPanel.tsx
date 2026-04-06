@@ -124,7 +124,11 @@ export function MyTicketListPanel({
         </Card>
       )}
 
-      <div className="-mx-4 mt-auto -mb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom)-1.25rem)]">
+      {/* 고정 배너 높이(70px) 만큼 하단 여백 확보 */}
+      <div className="h-[70px] shrink-0" />
+
+      {/* 네비바 바로 위 고정 광고 배너 — 기기 무관 */}
+      <div className="fixed inset-x-0 bottom-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))] z-40 mx-auto max-w-[var(--app-mobile-shell-max-width)]">
         <TicketingAdBannerCard ads={ads} variant="imageOnly" />
       </div>
     </div>
