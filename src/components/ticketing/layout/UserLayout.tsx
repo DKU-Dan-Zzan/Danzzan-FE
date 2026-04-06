@@ -34,7 +34,7 @@ export function UserLayout() {
     accessToken: session.tokens?.accessToken,
     role,
   });
-  const pageTitle = "축제 포털";
+  const pageTitle = "축제 서비스";
 
   const handleBack = () => {
     if (isTicketingListPage || hasQueueEventId) {
