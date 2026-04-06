@@ -1,6 +1,6 @@
 // 역할: 비밀번호 재설정 단계(인증/입력/완료)를 관리하는 화면입니다.
 import { useEffect, useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ArrowLeft, CircleAlert, Clock3, KeyRound, MailCheck, RotateCcw } from "lucide-react";
 import { HttpError } from "@/api/ticketing/httpClient";
 import { passwordResetApi } from "@/api/ticketing/passwordResetApi";
@@ -48,6 +48,7 @@ const RESET_PASSWORD_SESSION_ERROR_MESSAGE =
 
 const AUTH_PLACEHOLDER_CLASS =
   "text-[0.96rem] sm:text-[0.98rem] placeholder:text-[0.8rem] sm:placeholder:text-[0.84rem] placeholder:tracking-[-0.01em]";
+const SHOW_LOGIN_RETURN_PROMPT = false;
 
 type ResetPasswordPersistedState = {
   step?: ResetStep;
@@ -108,7 +109,6 @@ const hasResetSession = (requestId?: string, verificationToken?: string) =>
   Boolean(requestId?.trim() && verificationToken?.trim());
 
 export default function ResetPassword() {
-  const navigate = useNavigate();
   const [step, setStep] = useState<ResetStep>("request");
   const [studentId, setStudentId] = useState("");
   const [requestId, setRequestId] = useState<string>();
@@ -678,7 +678,7 @@ export default function ResetPassword() {
             </section>
           )}
 
-          {false && !completed && (
+          {SHOW_LOGIN_RETURN_PROMPT && !completed && (
             <div className="mt-6 text-center">
               <p className="text-sm text-[var(--text-muted)]">로그인 화면으로 돌아가시겠어요?</p>
               <Link to="/ticket/login" className="mt-2 inline-block text-sm font-semibold text-[var(--text-emphasis-vivid)]">
