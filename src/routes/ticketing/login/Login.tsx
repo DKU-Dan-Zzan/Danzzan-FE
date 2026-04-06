@@ -159,11 +159,11 @@ export default function Login() {
                 </form>
               </div>
 
-              <div className="mt-4 space-y-2 text-center">
+              <div className="relative z-10 mt-4 space-y-1.5 text-center">
                 <Link
                   to="/ticket/signup"
                   state={{ authTabFrom: "login" }}
-                  className="inline-flex items-center gap-1 text-[13px] font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
+                  className="inline-flex min-h-9 items-center justify-center gap-1 rounded-xl px-2 py-1 text-[13px] font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
                 >
                   <span>{SIGNUP_PROMPT}</span>
                   <span className="font-semibold text-[var(--text-emphasis-vivid)]">{SIGNUP_ACTION}</span>
@@ -171,7 +171,7 @@ export default function Login() {
 
                 <Link
                   to="/ticket/reset-password"
-                  className="inline-flex items-center gap-1 text-[13px] font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
+                  className="inline-flex min-h-9 items-center justify-center gap-1 rounded-xl px-2 py-1 text-[13px] font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
                 >
                   <span>{RESET_PROMPT}</span>
                   <span className="font-semibold text-[var(--text-emphasis-vivid)]">{RESET_ACTION}</span>
