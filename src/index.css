@@ -681,6 +681,10 @@
   --brand-main: var(--webapp-text-emphasis);
   --bg-base: var(--webapp-main-bg);
   --bg-page-soft: var(--webapp-main-bg);
+  --surface_container_lowest: var(--neutral-100);
+  --surface_container_low: color-mix(in srgb, var(--neutral-100) 84%, var(--neutral-300));
+  --surface_container: color-mix(in srgb, var(--neutral-100) 64%, var(--neutral-300));
+  --surface_container_high: color-mix(in srgb, var(--neutral-100) 48%, var(--neutral-300));
   --text: var(--webapp-text-main);
   --text-muted: var(--ink-400);
   --accent: var(--webapp-button-primary);
@@ -740,6 +744,7 @@
   --app-header-border: transparent;
   --app-overscroll-bg: var(--webapp-main-bg);
   --app-nav-bg: var(--webapp-bottom-bar);
+  --app-bottom-nav-surface: var(--surface_container_lowest);
   --app-nav-border: rgba(32, 49, 99, 0.1);
   --app-nav-shadow: 0 -8px 24px rgba(32, 49, 99, 0.08);
   --app-nav-text: rgb(127 143 150);
@@ -967,6 +972,7 @@
     radial-gradient(90% 68% at 84% 2%, color-mix(in srgb, var(--tertiary_container) 26%, transparent) 0%, transparent 64%),
     linear-gradient(180deg, rgb(248 250 251) 0%, rgb(247 249 250) 100%);
   --app-nav-bg: var(--ec-glass-bg);
+  --app-bottom-nav-surface: var(--surface_container_lowest);
   --app-nav-bg-gradient:
     linear-gradient(
       180deg,
