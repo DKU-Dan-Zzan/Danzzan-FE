@@ -136,10 +136,10 @@ export default function Login() {
                       </div>
                     </div>
 
-                    <p className="flex items-start gap-1.5 rounded-[20px] bg-[linear-gradient(145deg,color-mix(in_srgb,var(--surface_container_low)_86%,white)_0%,color-mix(in_srgb,var(--primary_container)_18%,white)_100%)] px-3 py-2.5 text-[10.5px] font-medium leading-5 text-[var(--text-muted)]">
+                    <div className="-mx-1 flex items-start gap-1.5 rounded-[20px] bg-[linear-gradient(145deg,color-mix(in_srgb,var(--surface_container_low)_86%,white)_0%,color-mix(in_srgb,var(--primary_container)_18%,white)_100%)] px-4 py-2.5 text-[10.5px] font-medium leading-[1.55] text-[var(--text-muted)]">
                       <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--text-emphasis-vivid)]" strokeWidth={2.3} />
-                      {LOGIN_HELP}
-                    </p>
+                      <span className="min-w-0 flex-1 break-keep">{LOGIN_HELP}</span>
+                    </div>
                   </section>
 
                   {error && (
