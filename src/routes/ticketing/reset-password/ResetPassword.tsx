@@ -167,6 +167,11 @@ export default function ResetPassword() {
     }
 
     const nextStep = sanitizePersistedStep(persisted.step);
+    if (nextStep === "request") {
+      sessionStorage.removeItem(RESET_PASSWORD_STORAGE_KEY);
+      return;
+    }
+
     const nextStudentId = sanitizeDigitInput(persisted.studentId ?? "", 8);
     const nextVerificationCode = sanitizeDigitInput(persisted.verificationCode ?? "", 6);
     const nextExpiresAt = typeof persisted.timerExpiresAt === "number" ? persisted.timerExpiresAt : null;
@@ -236,6 +241,11 @@ export default function ResetPassword() {
       return;
     }
 
+    if (step === "request") {
+      sessionStorage.removeItem(RESET_PASSWORD_STORAGE_KEY);
+      return;
+    }
+
     const payload: ResetPasswordPersistedState = {
       step,
       studentId,
@@ -246,11 +256,7 @@ export default function ResetPassword() {
     };
 
     const hasMeaningfulState = Boolean(
-      payload.studentId ||
-        payload.requestId ||
-        payload.verificationCode ||
-        payload.verificationToken ||
-        payload.step !== "request",
+      payload.studentId || payload.requestId || payload.verificationCode || payload.verificationToken,
     );
 
     if (!hasMeaningfulState) {
