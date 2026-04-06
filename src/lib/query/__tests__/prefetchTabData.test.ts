@@ -86,7 +86,7 @@ describe("prefetchTabData", () => {
         keyword: undefined,
         category: undefined,
         page: 0,
-        size: 10,
+        size: 6,
       },
       { signal: undefined },
     );

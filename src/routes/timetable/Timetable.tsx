@@ -71,7 +71,7 @@ function findNowOrNextTarget(items: Performance[], nowMinutes: number) {
 export default function Timetable() {
   const SWIPE_MIN_DISTANCE = 48
   const HORIZONTAL_SWIPE_RATIO = 1.2
-  const POSTER_COLLAPSE_SCROLL_Y = 36
+  const POSTER_COLLAPSE_SCROLL_Y = 30
   const navigate = useNavigate()
   const session = useSyncExternalStore(
     authStore.subscribe,
@@ -244,7 +244,11 @@ export default function Timetable() {
   }, [])
 
   const handleChangeDay = (idx: number) => {
-    const shouldKeepCompact = isPosterCompact || posterCompactLockRef.current
+    const isTabChange = idx !== activeIdx
+    const nextScrollTop = scrollContainerRef.current?.scrollTop ?? 0
+    const shouldKeepCompact = isTabChange
+      ? true
+      : (nextScrollTop > 0 ? true : (isPosterCompact || posterCompactLockRef.current))
 
     if (suppressPosterExpandTimerRef.current !== null) {
       window.clearTimeout(suppressPosterExpandTimerRef.current)

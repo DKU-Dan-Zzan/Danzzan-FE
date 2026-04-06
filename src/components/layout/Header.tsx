@@ -23,6 +23,7 @@ const Header = () => {
   const isTimetablePage = location.pathname === "/timetable"
   const isBoothMapPage = location.pathname === "/map"
   const isHomePage = location.pathname === "/"
+  const isNoticePage = location.pathname === "/notice"
 
   const handleTicketClick = () => {
     navigate(getMyTicketNavigationTarget(isLoggedIn))
@@ -39,31 +40,41 @@ const Header = () => {
   const headerClassName =
     isBoothMapPage || isHomePage
       ? "fixed inset-x-0 top-0 z-50 bg-transparent shadow-none pt-[env(safe-area-inset-top)]"
-      : "fixed inset-x-0 top-0 z-50 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_56%,transparent)_0%,color-mix(in_srgb,var(--surface)_44%,transparent)_16%,color-mix(in_srgb,var(--surface)_32%,transparent)_34%,color-mix(in_srgb,var(--surface)_22%,transparent)_52%,color-mix(in_srgb,var(--surface)_12%,transparent)_70%,color-mix(in_srgb,var(--surface)_5%,transparent)_86%,color-mix(in_srgb,var(--surface)_0%,transparent)_100%)] shadow-none pt-[env(safe-area-inset-top)]"
+      : isNoticePage
+        ? "fixed inset-x-0 top-0 z-50 bg-transparent shadow-none pt-[env(safe-area-inset-top)]"
+        : "fixed inset-x-0 top-0 z-50 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_56%,transparent)_0%,color-mix(in_srgb,var(--surface)_44%,transparent)_16%,color-mix(in_srgb,var(--surface)_32%,transparent)_34%,color-mix(in_srgb,var(--surface)_22%,transparent)_52%,color-mix(in_srgb,var(--surface)_12%,transparent)_70%,color-mix(in_srgb,var(--surface)_5%,transparent)_86%,color-mix(in_srgb,var(--surface)_0%,transparent)_100%)] shadow-none pt-[env(safe-area-inset-top)]"
 
   return (
-    <AppTopBar headerClassName={headerClassName}>
-      {!isMyPage && (
-        <>
-          <button
-            onClick={handleTicketClick}
-            aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
-            title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
-            className={cn(HEADER_ICON_BUTTON_CLASS, "right-[4.25rem]")}
-          >
-            <Ticket size={22} />
-          </button>
-          <button
-            onClick={handleMyInfoClick}
-            aria-label="내정보"
-            title="내정보"
-            className={cn(HEADER_ICON_BUTTON_CLASS, "right-4")}
-          >
-            <User size={22} />
-          </button>
-        </>
+    <>
+      {isNoticePage && (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed left-1/2 top-0 z-[45] h-[calc(68px+env(safe-area-inset-top))] w-full max-w-[430px] -translate-x-1/2 bg-[color-mix(in_srgb,var(--surface)_78%,transparent)] shadow-[inset_0_-1px_0_color-mix(in_srgb,var(--border-base)_35%,transparent)] backdrop-blur-md"
+        />
       )}
-    </AppTopBar>
+      <AppTopBar headerClassName={headerClassName}>
+        {!isMyPage && (
+          <>
+            <button
+              onClick={handleTicketClick}
+              aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
+              title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
+              className={cn(HEADER_ICON_BUTTON_CLASS, "right-[4.25rem]")}
+            >
+              <Ticket size={22} />
+            </button>
+            <button
+              onClick={handleMyInfoClick}
+              aria-label="내정보"
+              title="내정보"
+              className={cn(HEADER_ICON_BUTTON_CLASS, "right-4")}
+            >
+              <User size={22} />
+            </button>
+          </>
+        )}
+      </AppTopBar>
+    </>
   )
 }
 

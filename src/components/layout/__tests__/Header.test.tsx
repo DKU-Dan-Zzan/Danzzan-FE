@@ -24,10 +24,18 @@ describe("Header", () => {
     expect(mapMarkup).toContain("bg-transparent shadow-none pt-[env(safe-area-inset-top)]");
   });
 
-  it("일반 페이지에서는 기존 상단 그라디언트 헤더를 유지한다", () => {
+  it("공지 페이지에서는 투명 헤더 + 상단 오버레이를 렌더링한다", () => {
     const noticeMarkup = renderHeader("/notice");
 
-    expect(noticeMarkup).toContain(
+    expect(noticeMarkup).toContain("bg-transparent shadow-none pt-[env(safe-area-inset-top)]");
+    expect(noticeMarkup).toContain("z-[45]");
+    expect(noticeMarkup).toContain("backdrop-blur-md");
+  });
+
+  it("일반 페이지에서는 기존 상단 그라디언트 헤더를 유지한다", () => {
+    const myPageMarkup = renderHeader("/mypage");
+
+    expect(myPageMarkup).toContain(
       "bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_56%,transparent)_0%,color-mix(in_srgb,var(--surface)_44%,transparent)_16%",
     );
   });
@@ -38,4 +46,3 @@ describe("Header", () => {
     expect(timetableMarkup).toBe("");
   });
 });
-
