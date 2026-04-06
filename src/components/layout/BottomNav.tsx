@@ -88,6 +88,7 @@ const BottomNav = () => {
     window.addEventListener("resize", updateBottomOffset);
     window.addEventListener("orientationchange", updateBottomOffset);
     window.visualViewport?.addEventListener("resize", updateBottomOffset);
+    navElement.addEventListener("animationend", updateBottomOffset);
 
     const resizeObserver =
       typeof ResizeObserver === "undefined"
@@ -100,6 +101,7 @@ const BottomNav = () => {
       window.removeEventListener("resize", updateBottomOffset);
       window.removeEventListener("orientationchange", updateBottomOffset);
       window.visualViewport?.removeEventListener("resize", updateBottomOffset);
+      navElement.removeEventListener("animationend", updateBottomOffset);
       rootStyle.removeProperty(APP_BOTTOM_NAV_RUNTIME_OFFSET_VAR);
     };
   }, []);
