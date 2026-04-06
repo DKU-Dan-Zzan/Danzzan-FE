@@ -35,6 +35,8 @@ const SIGNUP_ACTION = "회원가입";
 const RESET_PROMPT = "비밀번호를 잊으셨나요?";
 const RESET_ACTION = "비밀번호 재설정";
 const FESTIVAL_EYEBROW = "2026 DANZZAN FESTIVAL";
+const LOGIN_PLACEHOLDER_CLASS =
+  "text-[0.96rem] sm:text-[0.98rem] placeholder:text-[0.8rem] sm:placeholder:text-[0.84rem] placeholder:tracking-[-0.01em]";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -71,16 +73,16 @@ export default function Login() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--bg-page-soft)]">
+    <div className="fixed inset-0 overflow-hidden bg-[var(--bg-page-soft)]">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-20 top-0 h-56 w-56 rounded-full bg-[color:color-mix(in_srgb,var(--primary_container)_62%,white)] opacity-80 blur-3xl" />
         <div className="absolute right-[-5rem] top-1/4 h-72 w-72 rounded-full bg-[color:color-mix(in_srgb,var(--primary)_22%,white)] opacity-90 blur-3xl" />
         <div className="absolute bottom-[-4rem] left-1/4 h-64 w-64 rounded-full bg-[color:color-mix(in_srgb,var(--tertiary_container)_32%,white)] opacity-70 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto w-full max-w-[var(--ticketing-mobile-shell-max-width)] px-5 pb-8 pt-6 sm:px-6">
-        <div className="rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_rgba(44,52,54,0.06)] backdrop-blur-[24px]">
-          <div className="rounded-[26px] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface_container_low)_92%,white)_0%,color-mix(in_srgb,var(--surface_container_lowest)_96%,white)_100%)] px-5 py-6">
+      <div className="relative mx-auto flex h-full w-full max-w-[var(--ticketing-mobile-shell-max-width)] items-center justify-center px-5 py-3 sm:px-6 sm:py-4">
+        <div className="w-full rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_rgba(44,52,54,0.06)] backdrop-blur-[24px]">
+          <div className="rounded-[26px] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface_container_low)_92%,white)_0%,color-mix(in_srgb,var(--surface_container_lowest)_96%,white)_100%)] px-5 py-5">
             <section className={TICKETING_AUTH_HEADER_SECTION_CLASS}>
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-emphasis-vivid)]">
                 {FESTIVAL_EYEBROW}
@@ -89,7 +91,7 @@ export default function Login() {
             </section>
 
             <main className={TICKETING_AUTH_MAIN_CLASS}>
-              <div className="rounded-[24px] bg-[var(--surface_container_lowest)] px-4 py-4 shadow-[0_12px_30px_rgba(44,52,54,0.04)]">
+              <div className="rounded-[24px] bg-[var(--surface_container_lowest)] px-4 py-3.5 shadow-[0_12px_30px_rgba(44,52,54,0.04)]">
                 <form className="space-y-4" onSubmit={handleSubmit}>
                   <section className="space-y-3">
                     <div className="space-y-1.5">
@@ -101,7 +103,7 @@ export default function Login() {
                         value={studentId}
                         onChange={(event) => setStudentId(event.target.value)}
                         placeholder={STUDENT_ID_PLACEHOLDER}
-                        className={TICKETING_AUTH_INPUT_CLASS_NAME}
+                        className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, LOGIN_PLACEHOLDER_CLASS)}
                         required
                       />
                     </div>
@@ -117,7 +119,7 @@ export default function Login() {
                           value={password}
                           onChange={(event) => setPassword(event.target.value)}
                           placeholder={PASSWORD_PLACEHOLDER}
-                          className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, "pr-11")}
+                          className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, "pr-11", LOGIN_PLACEHOLDER_CLASS)}
                           autoComplete="current-password"
                           required
                         />
@@ -160,7 +162,7 @@ export default function Login() {
                 </form>
               </div>
 
-              <div className="mt-5 space-y-2.5 text-center">
+              <div className="mt-4 space-y-2 text-center">
                 <Link
                   to="/ticket/signup"
                   state={{ authTabFrom: "login" }}
