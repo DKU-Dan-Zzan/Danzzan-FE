@@ -45,7 +45,7 @@ export default function PosterCarousel({
   if (count === 0) {
     const sectionClassName = fillViewport ? "w-full" : "mx-auto w-full max-w-[430px]"
     const wrapperClassName = fillViewport
-      ? "relative h-[calc(100dvh-var(--app-bottom-nav-height)-env(safe-area-inset-bottom)+var(--home-hero-nav-overlap))] min-h-[560px] overflow-hidden bg-[var(--home-poster-placeholder-bg)]"
+      ? "relative -mt-[env(safe-area-inset-top)] h-[calc(100svh+var(--home-hero-nav-overlap)+env(safe-area-inset-top))] min-h-[560px] overflow-hidden bg-[var(--home-poster-placeholder-bg)]"
       : "relative ml-[var(--spacing-8)] mr-[calc(-1*var(--spacing-4))] overflow-hidden rounded-[var(--radius-xl)] bg-[var(--home-poster-placeholder-bg)] shadow-[var(--home-poster-placeholder-shadow)]"
 
     return (
@@ -71,7 +71,7 @@ export default function PosterCarousel({
 
   const sectionClassName = fillViewport ? "w-full" : "mx-auto w-full max-w-[430px]"
   const wrapperClassName = fillViewport
-    ? "relative h-[calc(100dvh-var(--app-bottom-nav-height)-env(safe-area-inset-bottom)+var(--home-hero-nav-overlap))] min-h-[560px] overflow-hidden bg-[var(--surface_container_lowest)]"
+    ? "relative -mt-[env(safe-area-inset-top)] h-[calc(100svh+var(--home-hero-nav-overlap)+env(safe-area-inset-top))] min-h-[560px] overflow-hidden bg-[var(--surface_container_lowest)]"
     : "relative ml-[var(--spacing-8)] mr-[calc(-1*var(--spacing-4))] overflow-hidden rounded-[var(--radius-xl)] bg-[var(--surface_container_lowest)] shadow-[var(--home-poster-card-shadow)]"
 
   return (

@@ -52,6 +52,7 @@ describe("webapp color scheme source", () => {
     expect(content).toContain("--home-notice-bg-start: var(--neutral-100);");
     expect(content).toContain("--home-notice-bg-end: var(--neutral-100);");
     expect(content).toContain("--home-notice-border: transparent;");
+    expect(content).toContain("--home-lineup-caption-margin-top: 26px;");
     expect(content).toContain("--home-lineup-caption-color: var(--text-body-deep);");
     expect(content).toContain("--home-ad-banner-border: #bdd0f7e6;");
     expect(content).toContain("--home-ad-banner-bg: #ffffff;");
