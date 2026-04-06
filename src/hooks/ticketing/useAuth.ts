@@ -2,7 +2,7 @@
 import { useCallback, useSyncExternalStore } from "react";
 import { authApi } from "@/api/ticketing/authApi";
 import { adminAuthApi } from "@/api/ticketing/adminAuthApi";
-import { authLogout, userLogout } from "@/api/app/auth/authApi";
+import { authLogout, userLogout } from "@/api/ticketing/authLogoutApi";
 import { authStore } from "@/store/common/authStore";
 import type { AuthCredentials, UserRole } from "@/types/ticketing/model/auth.model";
 
