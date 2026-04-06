@@ -33,7 +33,8 @@ describe("TicketingAdBannerCard", () => {
   it("내 티켓용 imageOnly 변형은 이미지 단독 배너 스타일을 사용한다", () => {
     const markup = renderToStaticMarkup(<TicketingAdBannerCard ads={[]} variant="imageOnly" />);
 
-    expect(markup).toContain("border-[var(--timetable-card-border)]");
+    expect(markup).toContain("bg-[var(--home-ad-banner-bg)]");
+    expect(markup).toContain("shadow-[var(--home-elevated-card-shadow)]");
     expect(markup).toContain("h-[70px]");
     expect(markup).not.toContain("max-w-[var(--ticketing-ad-slot-max-width)]");
   });
