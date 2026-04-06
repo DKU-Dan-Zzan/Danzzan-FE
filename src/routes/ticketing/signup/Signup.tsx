@@ -23,7 +23,7 @@ import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
 import { cn } from "@/components/common/ui/utils";
 
 const PAGE_TITLE = "축제 서비스 회원가입";
-const EYEBROW = "2026 LOU:D X DANZZAN";
+const EYEBROW = "2026 DANFESTA";
 const STUDENT_ID_LABEL = "학번";
 const STUDENT_ID_PLACEHOLDER = "학번 8자리를 입력해 주세요";
 const DKU_PASSWORD_LABEL = "포털 비밀번호";
@@ -144,16 +144,13 @@ export default function Signup() {
 
       <div className="relative mx-auto w-full max-w-[var(--ticketing-mobile-shell-max-width)] px-5 pb-8 pt-[calc(env(safe-area-inset-top)+5.25rem)] sm:px-6">
         <div className="w-full rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_rgba(44,52,54,0.06)] backdrop-blur-[24px]">
-          <div className="rounded-[26px] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface_container_low)_92%,white)_0%,color-mix(in_srgb,var(--surface_container_lowest)_96%,white)_100%)] px-5 py-6">
+          <div className="rounded-[26px] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface_container_low)_92%,white)_0%,color-mix(in_srgb,var(--surface_container_lowest)_96%,white)_100%)] px-4 py-6">
             <section className={TICKETING_AUTH_HEADER_SECTION_CLASS}>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-emphasis-vivid)]">
-                {EYEBROW}
-              </p>
-              <TicketingAuthHeading title={PAGE_TITLE} />
+              <TicketingAuthHeading eyebrow={EYEBROW} title={PAGE_TITLE} />
             </section>
 
             <main className={TICKETING_AUTH_MAIN_CLASS}>
-              <div className="rounded-[24px] bg-[var(--surface_container_lowest)] px-4 py-4 shadow-[0_12px_30px_rgba(44,52,54,0.04)]">
+              <div className="rounded-[24px] bg-[var(--surface_container_lowest)] px-3 py-4 shadow-[0_12px_30px_rgba(44,52,54,0.04)]">
                 <form className="space-y-5" onSubmit={handleSubmit}>
                   <section className="space-y-4">
                     <div className="space-y-2">
@@ -268,7 +265,7 @@ export default function Signup() {
 
                   <Button
                     type="submit"
-                    className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
+                    className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
                     disabled={submitting}
                   >
                     <KeyRound className="h-4 w-4" strokeWidth={2.3} />
