@@ -24,9 +24,13 @@ export default function MyTicket() {
 
   const ads = myTicketAdQuery.data ?? [];
 
+  const tickets = [...(myTicketsQuery.data ?? [])].sort((a, b) =>
+    a.eventDate.localeCompare(b.eventDate),
+  );
+
   return (
     <MyTicketListPanel
-      tickets={myTicketsQuery.data ?? []}
+      tickets={tickets}
       student={{
         studentId: session.user?.studentId || "-",
         name: session.user?.name || "학생",

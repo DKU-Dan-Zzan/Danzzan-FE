@@ -11,17 +11,6 @@ import { useTicketingFlow } from "@/routes/ticketing/ticketing/useTicketingFlow"
 
 export default function Ticketing() {
   const flow = useTicketingFlow();
-  const waitingRoomAds = flow.waitingAd
-    ? [
-        {
-          imageUrl: flow.waitingAd.imageUrl,
-          alt: flow.waitingAd.altText ?? undefined,
-          linkUrl: flow.waitingAd.linkUrl,
-          updatedAt: flow.waitingAd.updatedAt,
-        },
-      ]
-    : [];
-
   if (flow.step === "home") {
     return (
       <TicketingHomePanel
@@ -53,7 +42,6 @@ export default function Ticketing() {
         polling={flow.waitingPolling}
         offline={!flow.isNetworkOnline}
         errorMessage={flow.waitingError}
-        ads={waitingRoomAds}
       />
     );
   }

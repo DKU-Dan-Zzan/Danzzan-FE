@@ -30,6 +30,7 @@
   --shadow-color: rgba(15, 23, 42, 0.12);
   --admin-header-bg: #f8fbff;
   --app-bottom-nav-height: 56px;
+  --app-bottom-nav-runtime-offset: calc(var(--app-bottom-nav-height) + env(safe-area-inset-bottom));
   --app-mobile-shell-max-width: 430px;
   --ticketing-mobile-shell-max-width: 420px;
   --ticketing-ad-slot-max-width: 18rem;
@@ -397,7 +398,7 @@
   --home-anchor-entry-gap: 44px;
   --home-section-notice-margin-top: 0px;
   --home-section-poster-margin-top: 26.5px;
-  --home-lineup-caption-margin-top: 31px;
+  --home-lineup-caption-margin-top: 26px;
   --home-section-lineup-margin-top: 16px;
   --home-section-performance-margin-top: 31px;
   --home-lineup-caption-font-size: 14px;
@@ -1165,6 +1166,23 @@
     rgba(7, 12, 23, 0.62) 76%,
     rgba(5, 9, 18, 0.88) 100%
   );
+}
+
+html.home-snap-mode,
+body.home-snap-mode {
+  scroll-snap-type: y mandatory;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+html.home-snap-mode::-webkit-scrollbar,
+body.home-snap-mode::-webkit-scrollbar {
+  display: none;
+}
+
+.home-snap-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 html,

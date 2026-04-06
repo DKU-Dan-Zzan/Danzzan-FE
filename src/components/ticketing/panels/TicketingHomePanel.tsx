@@ -135,17 +135,17 @@ export function TicketingHomePanel({
                     : "border-b border-[var(--border-subtle)] py-3"
               }
             >
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-3.5">
                 <div
-                  className={`mt-0.5 flex h-8 w-8 shrink-0 ${TICKETING_CLASSES.badge.iconCircle} text-[length:var(--ticketing-text-step-index)] font-bold text-[var(--text-emphasis-vivid)]`}
+                  className={`mt-0.5 flex h-10 w-10 shrink-0 ${TICKETING_CLASSES.badge.iconCircle} text-[15px] font-bold text-[var(--text-emphasis-vivid)]`}
                 >
                   {item.step}
                 </div>
                 <div>
-                  <p className={`${TICKETING_CLASSES.typography.heroDescription} text-[17px] leading-7 font-bold text-[var(--text)] md:text-[18px]`}>
+                  <p className={`${TICKETING_CLASSES.typography.heroDescription} text-[20px] leading-7 font-bold text-[var(--text)] md:text-[21px]`}>
                     {item.title}
                   </p>
-                  <p className={`mt-1 ${TICKETING_CLASSES.typography.sectionBody} text-[var(--text-muted)] opacity-65`}>
+                  <p className={`mt-1 ${TICKETING_CLASSES.typography.sectionBody} text-[var(--text-muted)] opacity-60`}>
                     {item.description}
                   </p>
                 </div>
