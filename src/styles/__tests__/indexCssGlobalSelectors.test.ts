@@ -19,6 +19,7 @@ describe("index.css global selectors", () => {
       ".ec-scroll-cue-float",
       ".ec-scroll-cue-twinkle",
       ".home-hero-bottom-vignette",
+      ".home-snap-section",
       ".font-cute",
       ".font-timetable-artist",
       ".scrollbar-hide",
