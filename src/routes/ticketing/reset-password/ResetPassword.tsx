@@ -1,7 +1,7 @@
 // 역할: 비밀번호 재설정 단계(인증/입력/완료)를 관리하는 화면입니다.
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { CircleAlert, Clock3, KeyRound, MailCheck, RotateCcw } from "lucide-react";
+import { ArrowLeft, CircleAlert, Clock3, KeyRound, MailCheck, RotateCcw } from "lucide-react";
 import { HttpError } from "@/api/ticketing/httpClient";
 import { passwordResetApi } from "@/api/ticketing/passwordResetApi";
 import { PasswordPolicyChecklist } from "@/components/ticketing/auth/PasswordPolicyChecklist";
@@ -20,6 +20,7 @@ import {
   isPasswordPolicyErrorMessage,
 } from "@/lib/ticketing/passwordPolicy";
 import { TICKETING_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
+import { cn } from "@/components/common/ui/utils";
 
 type ResetStep = "request" | "verify" | "password";
 type ResetStepItem = {
@@ -44,6 +45,9 @@ const RESET_STEPS: ResetStepItem[] = [
 const RESET_PASSWORD_STORAGE_KEY = "ticketing-reset-password-state-v1";
 const RESET_PASSWORD_SESSION_ERROR_MESSAGE =
   "비밀번호 재설정 정보를 확인할 수 없습니다. 인증번호를 다시 요청해 주세요.";
+
+const AUTH_PLACEHOLDER_CLASS =
+  "text-[0.96rem] sm:text-[0.98rem] placeholder:text-[0.8rem] sm:placeholder:text-[0.84rem] placeholder:tracking-[-0.01em]";
 
 type ResetPasswordPersistedState = {
   step?: ResetStep;
@@ -149,6 +153,16 @@ export default function ResetPassword() {
     }
   };
 
+  const handleBackFromVerifyStep = () => {
+    setError(null);
+    setStep("request");
+    setRequestId(undefined);
+    setVerificationCode("");
+    setVerificationToken(undefined);
+    setTimerExpiresAt(null);
+    setTimerSecondsLeft(DEFAULT_TIMER_SECONDS);
+  };
+
   useEffect(() => {
     const persisted = safeParsePersistedState(sessionStorage.getItem(RESET_PASSWORD_STORAGE_KEY));
     if (!persisted) {
@@ -156,6 +170,11 @@ export default function ResetPassword() {
     }
 
     const nextStep = sanitizePersistedStep(persisted.step);
+    if (nextStep === "request") {
+      sessionStorage.removeItem(RESET_PASSWORD_STORAGE_KEY);
+      return;
+    }
+
     const nextStudentId = sanitizeDigitInput(persisted.studentId ?? "", 8);
     const nextVerificationCode = sanitizeDigitInput(persisted.verificationCode ?? "", 6);
     const nextExpiresAt = typeof persisted.timerExpiresAt === "number" ? persisted.timerExpiresAt : null;
@@ -225,6 +244,11 @@ export default function ResetPassword() {
       return;
     }
 
+    if (step === "request") {
+      sessionStorage.removeItem(RESET_PASSWORD_STORAGE_KEY);
+      return;
+    }
+
     const payload: ResetPasswordPersistedState = {
       step,
       studentId,
@@ -235,11 +259,7 @@ export default function ResetPassword() {
     };
 
     const hasMeaningfulState = Boolean(
-      payload.studentId ||
-        payload.requestId ||
-        payload.verificationCode ||
-        payload.verificationToken ||
-        payload.step !== "request",
+      payload.studentId || payload.requestId || payload.verificationCode || payload.verificationToken,
     );
 
     if (!hasMeaningfulState) {
@@ -365,20 +385,28 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-base)]">
-      <div className="mx-auto w-full max-w-[420px] px-5 pb-6">
-        <section className={TICKETING_AUTH_HEADER_SECTION_CLASS}>
-          <TicketingAuthHeading title="비밀번호 재설정" />
-        </section>
+    <div className="relative left-1/2 min-h-dvh w-screen -translate-x-1/2 overflow-y-auto overflow-x-hidden bg-[var(--bg-page-soft)]">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-20 top-0 h-56 w-56 rounded-full bg-[color:color-mix(in_srgb,var(--primary_container)_62%,white)] opacity-80 blur-3xl" />
+        <div className="absolute right-[-5rem] top-1/4 h-72 w-72 rounded-full bg-[color:color-mix(in_srgb,var(--primary)_22%,white)] opacity-90 blur-3xl" />
+        <div className="absolute bottom-[-4rem] left-1/4 h-64 w-64 rounded-full bg-[color:color-mix(in_srgb,var(--tertiary_container)_32%,white)] opacity-70 blur-3xl" />
+      </div>
 
-        <main className={TICKETING_AUTH_MAIN_CLASS}>
+      <div className="relative mx-auto flex min-h-dvh w-full max-w-[var(--ticketing-mobile-shell-max-width)] items-start justify-center px-5 pt-[calc(env(safe-area-inset-top)+4.75rem)] pb-[calc(env(safe-area-inset-bottom)+1.25rem)] sm:items-center sm:px-6">
+        <div className="w-full rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_rgba(44,52,54,0.06)] backdrop-blur-[24px]">
+          <div className="rounded-[26px] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface_container_low)_92%,white)_0%,color-mix(in_srgb,var(--surface_container_lowest)_96%,white)_100%)] px-4 py-6">
+            <section className={TICKETING_AUTH_HEADER_SECTION_CLASS}>
+          <TicketingAuthHeading eyebrow="2026 DANFESTA" title="비밀번호 재설정" />
+            </section>
+
+            <main className={TICKETING_AUTH_MAIN_CLASS}>
           {!completed && (
             <div className={`mb-6 px-3 py-3 ${APP_CARD_VARIANTS.gradTint}`}>
               <p className="text-xs font-semibold text-[var(--text-muted)]">
                 <span className="text-[var(--accent)]">{stepIndex}/3 단계</span> · {currentStepLabel}
               </p>
 
-              <div className="mt-3" aria-label="비밀번호 재설정 단계">
+              <div className="mt-3 px-3 sm:px-4" aria-label="비밀번호 재설정 단계">
                 <div className="grid grid-cols-[2rem_1fr_2rem_1fr_2rem] items-center">
                   {RESET_STEPS.map(({ key }, index) => {
                     const current = index + 1;
@@ -455,14 +483,14 @@ export default function ResetPassword() {
                   inputMode="numeric"
                   maxLength={8}
                   placeholder="학번 8자리를 입력해 주세요"
-                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
+                  className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS)}
                   disabled={requestingCode}
                   required
                 />
               </div>
 
               <p className="rounded-2xl border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-base)_100%)] px-4 py-3 text-sm leading-6 text-[var(--text)]">
-                축제 포털에 기존에 가입된 학생에게, 입력한 학번의 학교 이메일(학번@dankook.ac.kr)로 인증번호가 발송됩니다.
+                축제 서비스에 기존에 가입된 학생에게, 입력한 학번의 학교 이메일(학번@dankook.ac.kr)로 인증번호가 발송됩니다.
               </p>
 
               {error && (
@@ -473,7 +501,7 @@ export default function ResetPassword() {
 
               <Button
                 type="submit"
-                className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
+                className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
                 disabled={!isStudentIdValid || requestingCode}
               >
                 <MailCheck className="h-4 w-4" strokeWidth={2.3} />
@@ -484,6 +512,15 @@ export default function ResetPassword() {
 
           {step === "verify" && !completed && (
             <form className="space-y-5" onSubmit={handleVerifyCode}>
+              <button
+                type="button"
+                onClick={handleBackFromVerifyStep}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--text-emphasis-vivid)] transition-colors hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
+              >
+                <ArrowLeft className="h-4 w-4" strokeWidth={2.3} />
+                <span>이전 단계로</span>
+              </button>
+
               <div className="space-y-2">
                 <Label htmlFor="verificationCode" className="text-sm font-semibold text-[var(--text)]">
                   인증번호
@@ -495,7 +532,7 @@ export default function ResetPassword() {
                   inputMode="numeric"
                   maxLength={6}
                   placeholder="인증번호 6자리를 입력해 주세요"
-                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
+                  className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS)}
                   disabled={verifyingCode}
                   required
                 />
@@ -576,7 +613,7 @@ export default function ResetPassword() {
                     setPassword(event.target.value);
                   }}
                   placeholder="새 비밀번호를 입력해 주세요"
-                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
+                  className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS)}
                   autoComplete="new-password"
                   disabled={resettingPassword}
                   required
@@ -596,7 +633,7 @@ export default function ResetPassword() {
                     setPasswordConfirm(event.target.value);
                   }}
                   placeholder="새 비밀번호를 다시 입력해 주세요"
-                  className={TICKETING_AUTH_INPUT_CLASS_NAME}
+                  className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS)}
                   autoComplete="new-password"
                   disabled={resettingPassword}
                   required
@@ -613,7 +650,7 @@ export default function ResetPassword() {
 
               <Button
                 type="submit"
-                className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
+                className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
                 disabled={!isPasswordFormValid || resettingPassword}
               >
                 <KeyRound className="h-4 w-4" strokeWidth={2.3} />
@@ -633,22 +670,16 @@ export default function ResetPassword() {
 
               <Button
                 asChild
-                className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95"
+                className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95"
               >
                 <Link to="/ticket/login">로그인 화면으로 이동</Link>
               </Button>
             </section>
           )}
 
-          {!completed && (
-            <div className="mt-6 text-center">
-              <p className="text-sm text-[var(--text-muted)]">로그인 화면으로 돌아가시겠어요?</p>
-              <Link to="/ticket/login" className="mt-2 inline-block text-sm font-semibold text-[var(--text-emphasis-vivid)]">
-                로그인하러 가기
-              </Link>
-            </div>
-          )}
-        </main>
+            </main>
+          </div>
+        </div>
       </div>
     </div>
   );

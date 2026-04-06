@@ -1,9 +1,9 @@
-// 역할: 일반 사용자 AppLayout 루트가 웹앱 색상 스킴을 선언하는지 검증합니다.
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Route, Routes } from "react-router-dom";
 import { StaticRouter } from "react-router-dom/server";
 import AppLayout from "@/components/layout/AppLayout";
+import { authStore } from "@/store/common/authStore";
 
 function renderAppLayout(pathname: string) {
   return renderToStaticMarkup(
@@ -20,17 +20,44 @@ function renderAppLayout(pathname: string) {
 }
 
 describe("AppLayout", () => {
+  afterEach(() => {
+    authStore.clear();
+  });
+
   it("일반 사용자 레이아웃 루트에 data-color-scheme=electric-curator를 선언한다", () => {
     const markup = renderAppLayout("/");
 
     expect(markup).toContain('data-color-scheme="electric-curator"');
   });
 
-  it("footer는 mypage에서만 노출된다", () => {
+  it("footer는 로그인된 mypage에서만 노출된다", () => {
     const homeMarkup = renderAppLayout("/");
-    const myPageMarkup = renderAppLayout("/mypage");
+    const guestMyPageMarkup = renderAppLayout("/mypage");
+
+    authStore.setSession(
+      {
+        tokens: {
+          accessToken: "student-access-token",
+          refreshToken: "",
+          expiresIn: null,
+        },
+        user: {
+          id: "student-1",
+          studentId: "32200000",
+          name: "테스트 사용자",
+          role: "student",
+          department: "컴퓨터공학과",
+          college: "소프트웨어융합대학",
+        },
+      },
+      "student",
+      { persist: false },
+    );
+
+    const authenticatedMyPageMarkup = renderAppLayout("/mypage");
 
     expect(homeMarkup).not.toContain("Developed by DAN-ZZAN");
-    expect(myPageMarkup).toContain("Developed by DAN-ZZAN");
+    expect(guestMyPageMarkup).not.toContain("Developed by DAN-ZZAN");
+    expect(authenticatedMyPageMarkup).toContain("Developed by DAN-ZZAN");
   });
 });

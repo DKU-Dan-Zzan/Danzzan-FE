@@ -179,15 +179,15 @@ function MyPage() {
 
   if (!isLoggedIn) {
     return (
-      <div className="mypage-root relative flex min-h-full flex-col items-center justify-center px-6 py-[100px]">
+      <div className="mypage-root relative flex h-[100dvh] w-full flex-col items-center justify-center overflow-hidden px-6 pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.5rem)]">
         {/* 포스터 배경 */}
         <div className="absolute inset-0 overflow-hidden">
           <img
             src="/posters/festival-poster.png"
             alt=""
             aria-hidden
-            className="h-full w-full object-cover object-top"
-            style={{ filter: "brightness(0.9) saturate(1.1)" }}
+            className="h-full w-full object-fill"
+            style={{ filter: "brightness(0.9) saturate(1.08)" }}
           />
           <div
             className="absolute inset-0"
