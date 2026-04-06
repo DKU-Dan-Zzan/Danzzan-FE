@@ -481,7 +481,7 @@ export default function BoothMap() {
           TOP_PANEL_Z_INDEX_CLASS[sheetSnap],
         )}
       >
-        <div className="pointer-events-auto mt-[calc(env(safe-area-inset-top)+4.5rem)] px-3 py-2 sm:px-4 sm:pb-4">
+        <div className="pointer-events-auto mt-[calc(env(safe-area-inset-top)+3.4rem)] px-3 py-2 sm:px-4 sm:pb-4">
           <FestivalDateTabs
             dates={FESTIVAL_DATES}
             selectedDate={selectedDate}
@@ -496,7 +496,7 @@ export default function BoothMap() {
             }}
           />
 
-          <div className="mt-2.5 pt-2.5">
+          <div className="mt-1 pt-1">
             <PrimaryFilterChips value={primaryFilter} onChange={handlePrimaryChange} />
           </div>
 
