@@ -2,7 +2,7 @@
 import { useCallback, useSyncExternalStore } from "react";
 import { authApi } from "@/api/ticketing/authApi";
 import { adminAuthApi } from "@/api/ticketing/adminAuthApi";
-import { authLogout } from "@/api/ticketing/authLogoutApi";
+import { authLogout, userLogout } from "@/api/app/auth/authApi";
 import { authStore } from "@/store/common/authStore";
 import type { AuthCredentials, UserRole } from "@/types/ticketing/model/auth.model";
 
@@ -39,7 +39,13 @@ export const useAuth = () => {
   }, []);
 
   const logout = useCallback(() => {
-    void authLogout();
+    const currentState = authStore.getSnapshot();
+    if (currentState.role === "student") {
+      const accessToken = currentState.tokens?.accessToken ?? "";
+      void userLogout(accessToken);
+    } else {
+      void authLogout();
+    }
     authStore.clear();
   }, []);
 
