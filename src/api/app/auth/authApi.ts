@@ -33,6 +33,24 @@ export async function authLogin(body: LoginRequest): Promise<LoginResponse> {
   return parseFetchResponse<LoginResponse>(res);
 }
 
+/** 학생 로그아웃 — tokenVersion 무효화 (Authorization 헤더로 accessToken 전송 필요) */
+export async function userLogout(accessToken: string): Promise<void> {
+  const base = getBaseUrl();
+  if (!base) return;
+
+  try {
+    await fetch(`${base}/user/logout`, {
+      method: "POST",
+      headers: {
+        ...JSON_HEADERS,
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  } catch {
+    // 로그아웃 실패해도 클라이언트 세션은 제거
+  }
+}
+
 /** Body 없음. 쿠키(refreshToken)만 credentials: 'include'로 전송. 서버가 Set-Cookie로 쿠키 삭제 */
 export async function authLogout(): Promise<void> {
   const base = getBaseUrl();
