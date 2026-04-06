@@ -1,4 +1,3 @@
-// 역할: 비밀번호 정책 충족 여부를 항목별로 표시하는 체크리스트 UI를 렌더링합니다.
 import { CheckCircle2, Circle } from "lucide-react";
 import { cn } from "@/components/common/ui/utils";
 import type { PasswordPolicyState } from "@/lib/ticketing/passwordPolicy";
@@ -21,27 +20,34 @@ export function PasswordPolicyChecklist({ state, className }: PasswordPolicyChec
   return (
     <div
       className={cn(
-        "space-y-2 rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-3",
+        "space-y-3 rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-5 py-4",
         className,
       )}
     >
       <p className="text-sm font-semibold text-[var(--text)]">비밀번호 조건</p>
-      {CHECKLIST_ITEMS.map(({ key, label }) => {
-        const checked = state[key];
 
-        return (
-          <p
-            key={key}
-            className={cn(
-              "inline-flex items-center gap-1.5 text-sm",
-              checked ? "text-[var(--status-success-text)]" : "text-[var(--text-muted)]",
-            )}
-          >
-            {checked ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
-            {label}
-          </p>
-        );
-      })}
+      <div className="space-y-2.5">
+        {CHECKLIST_ITEMS.map(({ key, label }) => {
+          const checked = state[key];
+
+          return (
+            <p
+              key={key}
+              className={cn(
+                "flex items-center gap-2 text-sm leading-6",
+                checked ? "text-[var(--status-success-text)]" : "text-[var(--text-muted)]",
+              )}
+            >
+              {checked ? (
+                <CheckCircle2 className="h-4 w-4 shrink-0" />
+              ) : (
+                <Circle className="h-4 w-4 shrink-0" />
+              )}
+              <span>{label}</span>
+            </p>
+          );
+        })}
+      </div>
     </div>
   );
 }
