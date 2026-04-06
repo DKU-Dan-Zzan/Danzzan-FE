@@ -33,6 +33,8 @@ const shuffleArray = <T,>(arr: T[]): T[] => {
   return copy
 }
 
+const HOVER_POINTER_MEDIA_QUERY = "(hover: hover) and (pointer: fine)"
+
 export function AdCarousel({
   slides,
   intervalMs = 5000,
@@ -46,6 +48,7 @@ export function AdCarousel({
   const [displayIndex, setDisplayIndex] = useState(1)
   const [animated, setAnimated] = useState(false)
   const [isHoverPaused, setIsHoverPaused] = useState(false)
+  const [supportsHoverPause, setSupportsHoverPause] = useState(false)
   const displayIndexRef = useRef(1)
 
   // Reshuffle whenever slide URLs change
@@ -63,8 +66,26 @@ export function AdCarousel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slidesKey])
 
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return
+    const mediaQuery = window.matchMedia(HOVER_POINTER_MEDIA_QUERY)
+    const syncHoverSupport = () => {
+      setSupportsHoverPause(mediaQuery.matches)
+      if (!mediaQuery.matches) {
+        setIsHoverPaused(false)
+      }
+    }
+
+    syncHoverSupport()
+    mediaQuery.addEventListener("change", syncHoverSupport)
+
+    return () => {
+      mediaQuery.removeEventListener("change", syncHoverSupport)
+    }
+  }, [])
+
   const n = shuffled.length
-  const isPaused = isHoverPaused
+  const isPaused = supportsHoverPause && isHoverPaused
 
   // Extended slides for seamless infinite loop: [last, ...real, first]
   const extended = n > 1 ? [shuffled[n - 1], ...shuffled, shuffled[0]] : shuffled
@@ -134,8 +155,16 @@ export function AdCarousel({
   return (
     <div
       className={cn("relative w-full overflow-hidden", containerClassName)}
-      onMouseEnter={() => setIsHoverPaused(true)}
-      onMouseLeave={() => setIsHoverPaused(false)}
+      onMouseEnter={() => {
+        if (supportsHoverPause) {
+          setIsHoverPaused(true)
+        }
+      }}
+      onMouseLeave={() => {
+        if (supportsHoverPause) {
+          setIsHoverPaused(false)
+        }
+      }}
       aria-label="광고 배너 슬라이드"
     >
       <div
