@@ -154,6 +154,12 @@ const BottomNav = () => {
                   >
                     {label}
                   </span>
+                  <span
+                    className={cn(
+                      "mt-0.5 block h-[2px] rounded-full bg-[var(--app-nav-home-highlight)] transition-all duration-150",
+                      isActive ? "w-4 opacity-100" : "w-0 opacity-0",
+                    )}
+                  />
                 </>
               )}
             </NavLink>

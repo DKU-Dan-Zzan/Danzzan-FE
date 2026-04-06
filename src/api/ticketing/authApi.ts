@@ -15,6 +15,15 @@ const getAuthClient = () =>
     getAccessToken: authStore.getAccessToken,
   });
 
+// 로그인은 저장된 토큰을 헤더에 붙이면 안 되므로 토큰 없는 클라이언트 사용
+const getPublicClient = () =>
+  createHttpClient({
+    baseUrl: requireEnv(
+      env.apiBaseUrl || env.ticketingApiBaseUrl,
+      "VITE_API_BASE_URL (or VITE_API_URL)",
+    ),
+  });
+
 export const authApi = {
   login: async (payload: AuthCredentials): Promise<AuthSession> => {
     if (env.apiMode === "mock") {
@@ -36,7 +45,7 @@ export const authApi = {
       });
     }
 
-    const client = getAuthClient();
+    const client = getPublicClient();
     const dto = await client.post<AuthLoginResponseDto>("/user/login", {
       studentId: payload.studentId,
       password: payload.password,
