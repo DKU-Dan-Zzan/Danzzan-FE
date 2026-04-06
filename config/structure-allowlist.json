@@ -50,6 +50,13 @@
       "expiresAt": "2026-12-31"
     },
     {
+      "ruleId": "STYLE_NO_NEW_GLOBAL_SELECTOR",
+      "target": ".home-snap-section",
+      "reason": "홈 2섹션 스냅 정렬 유틸",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
       "ruleId": "STYLE_NO_NEW_RAW_HEX",
       "target": "src/components/app/boothmap/KakaoMapView.tsx",
       "reason": "Map SDK 렌더링 제약으로 인한 런타임 색상 지정 최소 허용",
@@ -69,6 +76,20 @@
       "reason": "지도 SDK marker theme 상수의 최소 허용",
       "owner": "fe-platform",
       "expiresAt": "2026-06-30"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/routes/__tests__/iosStatusBarMeta.source.test.ts::#e2e8f0",
+      "reason": "iOS/PWA 상태바 테마 회귀 테스트 기대값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/routes/__tests__/pwaManifestTheme.source.test.ts::#e2e8f0",
+      "reason": "PWA manifest theme 회귀 테스트 기대값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
     },
     {
       "ruleId": "STYLE_NO_NEW_RAW_HEX",
