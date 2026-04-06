@@ -1,7 +1,7 @@
 // 역할: 비밀번호 재설정 단계(인증/입력/완료)를 관리하는 화면입니다.
 import { useEffect, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
-import { CircleAlert, Clock3, KeyRound, MailCheck, RotateCcw } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, CircleAlert, Clock3, KeyRound, MailCheck, RotateCcw } from "lucide-react";
 import { HttpError } from "@/api/ticketing/httpClient";
 import { passwordResetApi } from "@/api/ticketing/passwordResetApi";
 import { PasswordPolicyChecklist } from "@/components/ticketing/auth/PasswordPolicyChecklist";
@@ -104,6 +104,7 @@ const hasResetSession = (requestId?: string, verificationToken?: string) =>
   Boolean(requestId?.trim() && verificationToken?.trim());
 
 export default function ResetPassword() {
+  const navigate = useNavigate();
   const [step, setStep] = useState<ResetStep>("request");
   const [studentId, setStudentId] = useState("");
   const [requestId, setRequestId] = useState<string>();
@@ -147,6 +148,16 @@ export default function ResetPassword() {
     if (nextError) {
       setError(nextError);
     }
+  };
+
+  const handleBackFromVerifyStep = () => {
+    setError(null);
+    setStep("request");
+    setRequestId(undefined);
+    setVerificationCode("");
+    setVerificationToken(undefined);
+    setTimerExpiresAt(null);
+    setTimerSecondsLeft(DEFAULT_TIMER_SECONDS);
   };
 
   useEffect(() => {
@@ -495,6 +506,15 @@ export default function ResetPassword() {
 
           {step === "verify" && !completed && (
             <form className="space-y-5" onSubmit={handleVerifyCode}>
+              <button
+                type="button"
+                onClick={handleBackFromVerifyStep}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--text-emphasis-vivid)] transition-colors hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
+              >
+                <ArrowLeft className="h-4 w-4" strokeWidth={2.3} />
+                <span>이전 단계로</span>
+              </button>
+
               <div className="space-y-2">
                 <Label htmlFor="verificationCode" className="text-sm font-semibold text-[var(--text)]">
                   인증번호

@@ -84,7 +84,7 @@ export function UserLayout() {
             headerClassName="fixed inset-x-0 top-0 z-50 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_56%,transparent)_0%,color-mix(in_srgb,var(--surface)_44%,transparent)_16%,color-mix(in_srgb,var(--surface)_32%,transparent)_34%,color-mix(in_srgb,var(--surface)_22%,transparent)_52%,color-mix(in_srgb,var(--surface)_12%,transparent)_70%,color-mix(in_srgb,var(--surface)_5%,transparent)_86%,color-mix(in_srgb,var(--surface)_0%,transparent)_100%)] shadow-none pt-[env(safe-area-inset-top)]"
             containerClassName="relative mx-auto h-16 w-full max-w-md px-4"
           >
-            <button
+            {!isTicketingLoginPage && <button
               onClick={isBackButtonDisabled ? undefined : handleBack}
               disabled={isBackButtonDisabled}
               aria-disabled={isBackButtonDisabled}
@@ -93,7 +93,7 @@ export function UserLayout() {
               title={isBackButtonDisabled ? "뒤로가기 비활성화" : "뒤로가기"}
             >
               <ArrowLeft size={20} />
-            </button>
+            </button>}
           </AppTopBar>
         ) : undefined
       }
