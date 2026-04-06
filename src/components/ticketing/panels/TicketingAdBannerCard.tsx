@@ -12,8 +12,8 @@ const AD_PLACEHOLDER_IMAGE = "/ads/waiting-room-sample-banner.svg";
 const AD_SLOT_MAX_WIDTH_CLASS = "max-w-[var(--ticketing-ad-slot-max-width)]";
 const AD_SLOT_ASPECT_RATIO_CLASS = "aspect-[16/4.7]";
 const AD_IMAGE_ONLY_FRAME_CLASS =
-  "overflow-hidden border border-[var(--timetable-card-border)] bg-[var(--timetable-card-bg)]";
-const AD_IMAGE_ONLY_SLOT_CLASS = "w-full bg-[var(--surface-subtle)]";
+  "overflow-hidden rounded-none bg-[var(--home-ad-banner-bg)] shadow-[var(--home-elevated-card-shadow)]";
+const AD_IMAGE_ONLY_SLOT_CLASS = "w-full bg-[var(--home-ad-banner-bg)]";
 
 interface TicketingAdBannerCardProps {
   ads: AdSlide[];

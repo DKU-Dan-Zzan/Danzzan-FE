@@ -27,7 +27,7 @@ const STATIC_ITEMS: BottomNavItem[] = [
 const BOTTOM_NAV_WRAPPER_CLASS =
   "fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-[var(--app-mobile-shell-max-width)] h-[calc(var(--app-bottom-nav-height,64px)_+_env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] [animation:ec-fade-up_320ms_ease-out_both]";
 const BOTTOM_NAV_PANEL_CLASS =
-  "absolute inset-x-0 bottom-0 h-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))] rounded-t-[1.75rem] bg-[var(--surface_container_lowest)] shadow-[0_-6px_18px_rgba(44,52,54,0.09)]";
+  "absolute inset-x-0 bottom-0 h-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))] rounded-t-[1.75rem] bg-[var(--surface_container_lowest,#ffffff)] shadow-[0_-6px_18px_rgba(44,52,54,0.09)]";
 const BOTTOM_NAV_GRID_CLASS =
   "relative grid h-[var(--app-bottom-nav-height)] grid-cols-5 items-end px-3 pb-1";
 const BOTTOM_NAV_ITEM_BASE_CLASS =
@@ -154,6 +154,12 @@ const BottomNav = () => {
                   >
                     {label}
                   </span>
+                  <span
+                    className={cn(
+                      "mt-0.5 block h-[2px] rounded-full bg-[var(--app-nav-home-highlight)] transition-all duration-150",
+                      isActive ? "w-4 opacity-100" : "w-0 opacity-0",
+                    )}
+                  />
                 </>
               )}
             </NavLink>
