@@ -42,9 +42,12 @@ describe("AppLayout", () => {
           expiresIn: null,
         },
         user: {
+          id: "student-1",
           studentId: "32200000",
           name: "테스트 사용자",
           role: "student",
+          department: "컴퓨터공학과",
+          college: "소프트웨어융합대학",
         },
       },
       "student",
