@@ -48,7 +48,6 @@ const RESET_PASSWORD_SESSION_ERROR_MESSAGE =
 
 const AUTH_PLACEHOLDER_CLASS =
   "text-[0.96rem] sm:text-[0.98rem] placeholder:text-[0.8rem] sm:placeholder:text-[0.84rem] placeholder:tracking-[-0.01em]";
-const SHOW_LOGIN_RETURN_PROMPT = false;
 
 type ResetPasswordPersistedState = {
   step?: ResetStep;
@@ -386,7 +385,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="fixed inset-0 -mx-4 overflow-hidden bg-[var(--bg-page-soft)] px-4">
+    <div className="fixed inset-0 overflow-hidden bg-[var(--bg-page-soft)] px-4">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-20 top-0 h-56 w-56 rounded-full bg-[color:color-mix(in_srgb,var(--primary_container)_62%,white)] opacity-80 blur-3xl" />
         <div className="absolute right-[-5rem] top-1/4 h-72 w-72 rounded-full bg-[color:color-mix(in_srgb,var(--primary)_22%,white)] opacity-90 blur-3xl" />
@@ -678,14 +677,6 @@ export default function ResetPassword() {
             </section>
           )}
 
-          {SHOW_LOGIN_RETURN_PROMPT && !completed && (
-            <div className="mt-6 text-center">
-              <p className="text-sm text-[var(--text-muted)]">로그인 화면으로 돌아가시겠어요?</p>
-              <Link to="/ticket/login" className="mt-2 inline-block text-sm font-semibold text-[var(--text-emphasis-vivid)]">
-                로그인하러 가기
-              </Link>
-            </div>
-          )}
             </main>
           </div>
         </div>
