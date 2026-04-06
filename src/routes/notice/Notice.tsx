@@ -52,7 +52,7 @@ function Notice() {
       keyword: debouncedKeyword.trim(),
       category,
       page,
-      size: 10,
+      size: 7,
     }),
     queryFn: ({ signal }) =>
       getNotices(
@@ -60,7 +60,7 @@ function Notice() {
           keyword: debouncedKeyword.trim() || undefined,
           category: category === "ALL" ? undefined : category,
           page,
-          size: 5,
+          size: 6,
         },
         { signal },
       ),

@@ -15,7 +15,7 @@ import type { Booth, College, Pub } from "@/types/app/boothmap/boothmap.types";
 import { queryClient } from "@/lib/query/queryClient";
 import { appQueryKeys } from "@/lib/query/queryKeys";
 
-const NOTICE_PREFETCH_PAGE_SIZE = 10;
+const NOTICE_PREFETCH_PAGE_SIZE = 6;
 export const DEFAULT_BOOTHMAP_PREFETCH_DATE = "2026-05-12";
 const BOTTOM_NAV_DATA_PREFETCH_PATHS = ["/notice", "/map", "/mypage"] as const;
 type BottomNavDataPrefetchPath = (typeof BOTTOM_NAV_DATA_PREFETCH_PATHS)[number];
