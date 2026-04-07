@@ -16,6 +16,16 @@ import { authLogout } from "@/api/app/auth/authApi";
 import { studentProfileApi } from "@/api/app/auth/studentProfileApi";
 import { useMyTicketsQuery } from "@/hooks/ticketing/useMyTicketsQuery";
 import { authStore } from "@/store/common/authStore";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/common/ui/alert-dialog";
 
 const FAQ_ITEMS = [
   {
@@ -150,6 +160,7 @@ function MyPage() {
 
   const isLoggedIn = !!session.tokens?.accessToken && session.role === "student";
   const user = session.user;
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -250,7 +261,8 @@ function MyPage() {
     );
   }
 
-  const handleLogout = () => {
+  const handleLogoutConfirm = () => {
+    setLogoutConfirmOpen(false);
     void authLogout();
     authStore.clear();
     navigate("/ticket/login", { replace: true });
@@ -357,11 +369,24 @@ function MyPage() {
         <ListRow
           icon={<LogOut size={18} />}
           label="로그아웃"
-          onClick={handleLogout}
+          onClick={() => setLogoutConfirmOpen(true)}
           showArrow
         />
       </SectionCard>
       <div className="h-4" />
+
+      <AlertDialog open={logoutConfirmOpen} onOpenChange={setLogoutConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>로그아웃 확인</AlertDialogTitle>
+            <AlertDialogDescription>정말 로그아웃하시겠어요?</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>취소</AlertDialogCancel>
+            <AlertDialogAction onClick={handleLogoutConfirm}>로그아웃</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
