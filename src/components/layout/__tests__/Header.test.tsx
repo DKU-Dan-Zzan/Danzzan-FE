@@ -16,11 +16,9 @@ function renderHeader(pathname: string) {
 }
 
 describe("Header", () => {
-  it("홈과 부스맵에서는 safe-area 상단을 투명 헤더로 렌더링한다", () => {
-    const homeMarkup = renderHeader("/");
+  it("부스맵에서는 safe-area 상단을 투명 헤더로 렌더링한다", () => {
     const mapMarkup = renderHeader("/map");
 
-    expect(homeMarkup).toContain("bg-transparent shadow-none pt-[env(safe-area-inset-top)]");
     expect(mapMarkup).toContain("bg-transparent shadow-none pt-[env(safe-area-inset-top)]");
   });
 
@@ -32,9 +30,13 @@ describe("Header", () => {
     expect(noticeMarkup).toContain("backdrop-blur-md");
   });
 
-  it("일반 페이지에서는 기존 상단 그라디언트 헤더를 유지한다", () => {
+  it("홈과 일반 페이지에서는 상단 그라디언트 헤더를 렌더링한다", () => {
+    const homeMarkup = renderHeader("/");
     const myPageMarkup = renderHeader("/mypage");
 
+    expect(homeMarkup).toContain(
+      "bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_56%,transparent)_0%,color-mix(in_srgb,var(--surface)_44%,transparent)_16%",
+    );
     expect(myPageMarkup).toContain(
       "bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_56%,transparent)_0%,color-mix(in_srgb,var(--surface)_44%,transparent)_16%",
     );

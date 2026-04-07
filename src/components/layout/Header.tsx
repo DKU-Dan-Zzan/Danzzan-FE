@@ -22,7 +22,6 @@ const Header = () => {
   const isLoggedIn = !!session.tokens?.accessToken && session.role === "student"
   const isTimetablePage = location.pathname === "/timetable"
   const isBoothMapPage = location.pathname === "/map"
-  const isHomePage = location.pathname === "/"
   const isNoticePage = location.pathname === "/notice"
 
   const handleTicketClick = () => {
@@ -38,7 +37,7 @@ const Header = () => {
   }
 
   const headerClassName =
-    isBoothMapPage || isHomePage
+    isBoothMapPage
       ? "fixed inset-x-0 top-0 z-50 bg-transparent shadow-none pt-[env(safe-area-inset-top)]"
       : isNoticePage
         ? "fixed inset-x-0 top-0 z-50 bg-transparent shadow-none pt-[env(safe-area-inset-top)]"
