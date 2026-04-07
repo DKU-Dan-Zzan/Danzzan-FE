@@ -21,4 +21,12 @@ describe("MyPage logout confirm source", () => {
     expect(source).toContain("AlertDialogCancel");
     expect(source).toContain("AlertDialogAction");
   });
+
+  it("로그아웃 확인 액션은 과한 그라데이션 대신 단색 톤 버튼 클래스를 유지한다", () => {
+    const source = readSource("src/routes/mypage/MyPage.tsx");
+
+    expect(source).toContain("backgroundImage: \"none\"");
+    expect(source).toContain("backgroundColor: \"var(--primary)\"");
+    expect(source).toContain("boxShadow: \"none\"");
+  });
 });

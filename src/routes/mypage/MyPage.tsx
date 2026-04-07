@@ -383,7 +383,17 @@ function MyPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>취소</AlertDialogCancel>
-            <AlertDialogAction onClick={handleLogoutConfirm}>로그아웃</AlertDialogAction>
+            <AlertDialogAction
+              className="text-[var(--text-on-accent)] hover:brightness-95"
+              style={{
+                backgroundColor: "var(--primary)",
+                backgroundImage: "none",
+                boxShadow: "none",
+              }}
+              onClick={handleLogoutConfirm}
+            >
+              로그아웃
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
