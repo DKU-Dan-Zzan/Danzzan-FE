@@ -13,6 +13,7 @@ import {
 } from "@/components/ticketing/auth/TicketingAuthHeading";
 import { signupApi } from "@/api/ticketing/signupApi";
 import { HttpError } from "@/api/ticketing/httpClient";
+import { isAuthBoundaryError } from "@/api/common/authCore";
 import {
   getPasswordPolicyState,
   getPasswordPolicyErrorMessage,
@@ -125,6 +126,8 @@ export default function Signup() {
         } else {
           setError(message || ERROR_SIGNUP);
         }
+      } else if (isAuthBoundaryError(err) && err.status === 403) {
+        setError(ERROR_403);
       } else {
         setError(ERROR_SIGNUP);
       }
