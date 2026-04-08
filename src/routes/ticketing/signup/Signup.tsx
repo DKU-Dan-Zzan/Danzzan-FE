@@ -53,7 +53,7 @@ const LOADING_CREATE = "계정 생성 중...";
 const ERROR_401 =
   "단국대 포털 학번 또는 비밀번호가 올바르지 않습니다.";
 const ERROR_409 = "이미 가입한 학번입니다.";
-const ERROR_403 = "학생 및 재학생만 회원가입이 가능합니다.";
+const ERROR_403 = "죽전캠퍼스 재학생·수료생·대학원생만 회원가입이 가능합니다.";
 const ERROR_SIGNUP = "회원가입에 실패했습니다.";
 const AUTH_PLACEHOLDER_CLASS =
   "text-[0.96rem] sm:text-[0.98rem] placeholder:text-[0.8rem] sm:placeholder:text-[0.84rem] placeholder:tracking-[-0.01em]";
