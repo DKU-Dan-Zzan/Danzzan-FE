@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, type FormEvent } from "react";
+import { useState, useEffect, useCallback, useMemo, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   CircleAlert,
@@ -9,6 +9,7 @@ import {
   Check,
   RefreshCw,
   CheckCircle2,
+  Send,
 } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { Checkbox } from "@/components/common/ui/checkbox";
@@ -415,6 +416,23 @@ export default function Signup() {
     }
   };
 
+  // ── 모바일 감지 & SMS 딥링크
+  // navigator.userAgent는 렌더 중 변하지 않으므로 useMemo로 한 번만 계산한다.
+  const isMobile = useMemo(
+    () =>
+      typeof navigator !== "undefined" &&
+      /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+    [],
+  );
+
+  // iOS는 '&' 구분자, Android/기타는 RFC 5724 표준인 '?' 구분자를 사용한다.
+  const smsHref = useMemo(() => {
+    const isIOS =
+      typeof navigator !== "undefined" && /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const sep = isIOS ? "&" : "?";
+    return `sms:${octomoReceiveNumber}${sep}body=${encodeURIComponent(messageBody)}`;
+  }, [octomoReceiveNumber, messageBody]);
+
   // ── 공통 래퍼
   const isSessionExpired = sessionId !== "" && secondsLeft === 0;
   const needsResend =
@@ -582,10 +600,23 @@ export default function Signup() {
                             </button>
                           </div>
 
+                          {/* SMS 딥링크 버튼 — 모바일 환경에서만 노출 */}
+                          {isMobile && (
+                            <a
+                              href={smsHref}
+                              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] py-2.5 text-sm font-bold text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 active:scale-[0.97] active:brightness-90"
+                            >
+                              <Send className="h-4 w-4" strokeWidth={2.2} />
+                              문자 앱으로 바로 전송
+                            </a>
+                          )}
+
                           {/* 타이머 */}
                           <div className="flex items-center justify-between">
                             <p className="text-[11px] text-[var(--text-muted)]">
-                              문자 전송 후 인증 확인 버튼을 눌러주세요
+                              {isMobile
+                                ? "전송 후 인증 확인 버튼을 눌러주세요"
+                                : "문자 전송 후 인증 확인 버튼을 눌러주세요"}
                             </p>
                             <span
                               className={cn(
