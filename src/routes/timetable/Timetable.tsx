@@ -210,8 +210,8 @@ export default function Timetable() {
           <div className="h-[calc(env(safe-area-inset-top)+68px)]" />
 
           {/* 타이틀 + DAY 탭 */}
-          <div className="bg-white px-5 pb-1 pt-1">
-            <p className="text-[22px] font-bold text-[var(--text)]">타임테이블</p>
+          <div className="bg-white px-4 pb-1 pt-3">
+            <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-body-deep)]">타임테이블</h1>
           </div>
           <div className="bg-white px-4 pb-1">
             <DayTabs
