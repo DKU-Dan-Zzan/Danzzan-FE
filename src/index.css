@@ -3,8 +3,8 @@
 @import "tailwindcss";
 
 :root {
-  --font-display: "Manrope", "Plus Jakarta Sans", "Inter", "Noto Sans KR", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-body: "Plus Jakarta Sans", "Inter", "Noto Sans KR", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-body: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --type-display-lg-size: 2rem;
   --type-display-lg-tracking: -0.015em;
   --type-title-md-size: 1rem;
@@ -906,8 +906,8 @@
   --ec-glass-bg: rgba(248, 250, 251, 0.7);
   --ec-glass-blur: 28px;
   --ec-ambient-shadow: 0 20px 50px rgba(44, 52, 54, 0.06);
-  --font-display: "Manrope", "Plus Jakarta Sans", "Inter", "Noto Sans KR", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-body: "Plus Jakarta Sans", "Inter", "Noto Sans KR", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-body: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --type-display-lg-size: 3.5rem;
   --type-display-lg-tracking: -0.02em;
   --type-title-md-size: 1rem;
@@ -1202,13 +1202,7 @@ body,
 
 /* 타임테이블 공연자명 — 일반 산세리프 굵게 */
 .font-timetable-artist {
-  font-family:
-    system-ui,
-    -apple-system,
-    "Apple SD Gothic Neo",
-    "Malgun Gothic",
-    "Noto Sans KR",
-    sans-serif;
+  font-family: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   font-weight: 700;
 }
 
@@ -1225,6 +1219,7 @@ body,
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-sans: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --color-bg-base: var(--bg-base);
   --color-surface-subtle: var(--surface-subtle);
   --color-surface: var(--surface);
