@@ -205,22 +205,22 @@ export default function Timetable() {
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
       >
-        <div className="sticky top-0 z-30 bg-white">
-          {/* 헤더 spacer */}
-          <div className="h-[calc(env(safe-area-inset-top)+68px)]" />
+        {/* 글로벌 헤더 spacer */}
+        <div className="h-[calc(env(safe-area-inset-top)+68px)]" />
 
-          {/* 타이틀 + DAY 탭 */}
-          <div className="bg-white px-4 pb-1 pt-3">
-            <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-body-deep)]">타임테이블</h1>
-          </div>
-          <div className="bg-white px-4 pb-1">
-            <DayTabs
-              days={FESTIVAL_DAYS}
-              activeIndex={activeIdx}
-              onChange={handleChangeDay}
-              compact={false}
-            />
-          </div>
+        {/* 타이틀 - 스크롤 시 사라짐 */}
+        <div className="bg-white px-4 pb-1 pt-3">
+          <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-body-deep)]">타임테이블</h1>
+        </div>
+
+        {/* DAY 탭만 sticky - 글로벌 헤더 바로 아래 고정 */}
+        <div className="sticky top-[calc(env(safe-area-inset-top)+68px)] z-30 bg-white px-4 pb-1">
+          <DayTabs
+            days={FESTIVAL_DAYS}
+            activeIndex={activeIdx}
+            onChange={handleChangeDay}
+            compact={false}
+          />
         </div>
 
         <div ref={contentStartRef} className="mx-3 mt-1 overflow-hidden rounded-2xl bg-white">
