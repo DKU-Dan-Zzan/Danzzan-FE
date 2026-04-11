@@ -273,6 +273,7 @@ function MyPage() {
 
   return (
     <div className="mypage-root min-h-full" style={{ background: "var(--poster-bg)" }}>
+      <div className="h-[calc(env(safe-area-inset-top)+68px)]" />
       {/* 포스터 배경 — 배너+버튼 전체 영역 커버 */}
       <div className="relative">
         <div className="absolute inset-0 overflow-hidden">
