@@ -88,7 +88,7 @@ function FaqAccordion() {
             />
           </button>
           {open === index && (
-            <div className="bg-[var(--mypage-faq-answer-bg)] px-5 pb-4">
+            <div className="bg-[var(--mypage-faq-answer-bg)] px-5 pb-4 pt-3">
               <p className="whitespace-pre-line text-[13px] leading-[1.65] text-[var(--mypage-faq-answer)]">
                 {item.a}
               </p>
