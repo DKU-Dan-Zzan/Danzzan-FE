@@ -1,6 +1,5 @@
-import { Ticket, User } from "lucide-react"
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type TouchEvent } from "react"
-import { useNavigate, useSearchParams } from "react-router-dom"
+import { useEffect, useMemo, useRef, useState, type TouchEvent } from "react"
+import { useSearchParams } from "react-router-dom"
 import {
   getContentImages,
   getPerformances,
@@ -9,11 +8,7 @@ import {
 import ContentImageSection from "@/components/app/timetable/ContentImage"
 import DayTabs from "@/components/app/timetable/DayTabs"
 import Timeline from "@/components/app/timetable/Timeline"
-import { cn } from "@/components/common/ui/utils"
-import { AppHeaderLogo } from "@/components/layout/AppHeaderLogo"
-import { getMyTicketNavigationTarget } from "@/lib/common/my-ticket-navigation"
 import { appQueryKeys, useAppQuery } from "@/lib/query"
-import { authStore } from "@/store/common/authStore"
 import type { FestivalDay, Performance } from "@/types/app/timetable/timetable.types"
 
 const FESTIVAL_DAYS: FestivalDay[] = [
@@ -21,12 +16,6 @@ const FESTIVAL_DAYS: FestivalDay[] = [
   { key: "DAY-2", label: "2일차", date: "2026-05-13" },
   { key: "DAY-3", label: "3일차", date: "2026-05-14" },
 ]
-
-const EXPANDED_POSTER_SRC = "/posters/timetable-header-banner.png"
-const COMPACT_POSTER_SRC = "/posters/timetable-poster-compact.jpeg"
-
-const HEADER_ICON_BUTTON_CLASS =
-  "absolute top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center text-[color:color-mix(in_srgb,var(--text)_96%,black)] transition-colors duration-150 hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
 
 function todayISODateLocal() {
   const d = new Date()
@@ -71,13 +60,6 @@ function findNowOrNextTarget(items: Performance[], nowMinutes: number) {
 export default function Timetable() {
   const SWIPE_MIN_DISTANCE = 48
   const HORIZONTAL_SWIPE_RATIO = 1.2
-  const POSTER_COLLAPSE_SCROLL_Y = 30
-  const navigate = useNavigate()
-  const session = useSyncExternalStore(
-    authStore.subscribe,
-    authStore.getSnapshot,
-    authStore.getSnapshot,
-  )
 
   const [searchParams] = useSearchParams()
   const [activeIdx, setActiveIdx] = useState(() => {
@@ -89,22 +71,16 @@ export default function Timetable() {
   const [scrollTargetId, setScrollTargetId] = useState<number | null>(null)
   const [clockTick, setClockTick] = useState(() => Date.now())
   const [selectedImage, setSelectedImage] = useState<ContentImageDto | null>(null)
-  const [isPosterCompact, setIsPosterCompact] = useState(false)
 
   const didAutoScrollRef = useRef(false)
   const swipeStartPointRef = useRef<{ x: number; y: number } | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
   const contentStartRef = useRef<HTMLDivElement | null>(null)
-  const posterCompactLockRef = useRef(false)
-  const previousScrollTopRef = useRef(0)
-  const suppressPosterExpandRef = useRef(false)
-  const suppressPosterExpandTimerRef = useRef<number | null>(null)
 
   const activeDay = FESTIVAL_DAYS[activeIdx]
   const activeDate = activeDay.date
   const isDay1 = activeDay.key === "DAY-1"
   const isTodayTab = activeDate === todayISODateLocal()
-  const isLoggedIn = !!session.tokens?.accessToken && session.role === "student"
 
   const performancesQuery = useAppQuery({
     queryKey: appQueryKeys.timetablePerformances(activeDate),
@@ -130,14 +106,11 @@ export default function Timetable() {
   const contentImages = contentImagesQuery.data ?? []
   const isImageLoading = contentImagesQuery.isPending
   const imageLoadError = contentImagesQuery.error?.message ?? null
-  const posterImage = contentImages[0] ?? null
-  const activePosterSrc = isPosterCompact ? COMPACT_POSTER_SRC : EXPANDED_POSTER_SRC
 
   const nowTargetId = useMemo(() => {
     if (!isTodayTab || items.length === 0) {
       return null
     }
-
     const now = new Date(clockTick)
     const nowMinutes = now.getHours() * 60 + now.getMinutes()
     const { nowId } = findNowOrNextTarget(items, nowMinutes)
@@ -145,19 +118,12 @@ export default function Timetable() {
   }, [clockTick, isTodayTab, items])
 
   useEffect(() => {
-    if (!selectedImage) {
-      return
-    }
-
+    if (!selectedImage) return
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setSelectedImage(null)
-      }
+      if (e.key === "Escape") setSelectedImage(null)
     }
-
     document.body.style.overflow = "hidden"
     window.addEventListener("keydown", onKeyDown)
-
     return () => {
       document.body.style.overflow = ""
       window.removeEventListener("keydown", onKeyDown)
@@ -165,14 +131,10 @@ export default function Timetable() {
   }, [selectedImage])
 
   useEffect(() => {
-    if (!isTodayTab || items.length === 0) {
-      return
-    }
-
+    if (!isTodayTab || items.length === 0) return
     const now = new Date()
     const nowMinutes = now.getHours() * 60 + now.getMinutes()
     const { scrollId } = findNowOrNextTarget(items, nowMinutes)
-
     if (!didAutoScrollRef.current) {
       didAutoScrollRef.current = true
       requestAnimationFrame(() => {
@@ -183,136 +145,34 @@ export default function Timetable() {
   }, [isTodayTab, items])
 
   useEffect(() => {
-    if (!isTodayTab || items.length === 0) {
-      return
-    }
-
-    const id = window.setInterval(() => {
-      setClockTick(Date.now())
-    }, 60_000)
-
+    if (!isTodayTab || items.length === 0) return
+    const id = window.setInterval(() => setClockTick(Date.now()), 60_000)
     return () => window.clearInterval(id)
   }, [isTodayTab, items])
 
-  useEffect(() => {
-    const scrollContainer = scrollContainerRef.current
-    if (!scrollContainer) {
-      return
-    }
-
-    const syncPosterState = () => {
-      const nextScrollTop = scrollContainer.scrollTop
-      const wasScrollingUp = nextScrollTop < previousScrollTopRef.current
-
-      if (nextScrollTop > POSTER_COLLAPSE_SCROLL_Y) {
-        posterCompactLockRef.current = true
-        setIsPosterCompact(true)
-        previousScrollTopRef.current = nextScrollTop
-        return
-      }
-
-      if (posterCompactLockRef.current) {
-        if (!suppressPosterExpandRef.current && wasScrollingUp && nextScrollTop <= 0) {
-          posterCompactLockRef.current = false
-          setIsPosterCompact(false)
-        } else {
-          setIsPosterCompact(true)
-        }
-
-        previousScrollTopRef.current = nextScrollTop
-        return
-      }
-
-      setIsPosterCompact(false)
-      previousScrollTopRef.current = nextScrollTop
-    }
-
-    syncPosterState()
-    scrollContainer.addEventListener("scroll", syncPosterState, { passive: true })
-
-    return () => {
-      scrollContainer.removeEventListener("scroll", syncPosterState)
-    }
-  }, [])
-
-  useEffect(() => {
-    return () => {
-      if (suppressPosterExpandTimerRef.current !== null) {
-        window.clearTimeout(suppressPosterExpandTimerRef.current)
-      }
-    }
-  }, [])
-
   const handleChangeDay = (idx: number) => {
-    const isTabChange = idx !== activeIdx
-    const nextScrollTop = scrollContainerRef.current?.scrollTop ?? 0
-    const shouldKeepCompact = isTabChange
-      ? true
-      : (nextScrollTop > 0 ? true : (isPosterCompact || posterCompactLockRef.current))
-
-    if (suppressPosterExpandTimerRef.current !== null) {
-      window.clearTimeout(suppressPosterExpandTimerRef.current)
-    }
-
-    suppressPosterExpandRef.current = shouldKeepCompact
-
     setActiveIdx(idx)
     setScrollTargetId(null)
     setClockTick(Date.now())
     setSelectedImage(null)
-    setIsPosterCompact(shouldKeepCompact)
     didAutoScrollRef.current = false
 
-    if (shouldKeepCompact) {
-      posterCompactLockRef.current = true
-    }
-
     requestAnimationFrame(() => {
-      const scrollContainer = scrollContainerRef.current
-      const contentStart = contentStartRef.current
-      if (!scrollContainer || !contentStart) {
-        return
-      }
-
-      const targetTop = Math.max(contentStart.offsetTop - 140, 0)
-      scrollContainer.scrollTo({
-        top: targetTop,
-        behavior: "smooth",
-      })
+      scrollContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" })
     })
-
-    if (shouldKeepCompact) {
-      suppressPosterExpandTimerRef.current = window.setTimeout(() => {
-        suppressPosterExpandRef.current = false
-        suppressPosterExpandTimerRef.current = null
-      }, 500)
-    } else {
-      suppressPosterExpandRef.current = false
-    }
   }
 
   const handleTouchStart = (e: TouchEvent<HTMLDivElement>) => {
-    if (selectedImage || e.touches.length !== 1) {
-      return
-    }
-
+    if (selectedImage || e.touches.length !== 1) return
     const touch = e.touches[0]
-    swipeStartPointRef.current = {
-      x: touch.clientX,
-      y: touch.clientY,
-    }
+    swipeStartPointRef.current = { x: touch.clientX, y: touch.clientY }
   }
 
   const handleTouchEnd = (e: TouchEvent<HTMLDivElement>) => {
-    if (selectedImage || e.changedTouches.length === 0) {
-      return
-    }
-
+    if (selectedImage || e.changedTouches.length === 0) return
     const startPoint = swipeStartPointRef.current
     swipeStartPointRef.current = null
-    if (!startPoint) {
-      return
-    }
+    if (!startPoint) return
 
     const touch = e.changedTouches[0]
     const deltaX = touch.clientX - startPoint.x
@@ -321,33 +181,19 @@ export default function Timetable() {
     const absDeltaY = Math.abs(deltaY)
 
     const isHorizontalSwipe =
-      absDeltaX >= SWIPE_MIN_DISTANCE &&
-      absDeltaX > absDeltaY * HORIZONTAL_SWIPE_RATIO
+      absDeltaX >= SWIPE_MIN_DISTANCE && absDeltaX > absDeltaY * HORIZONTAL_SWIPE_RATIO
 
-    if (!isHorizontalSwipe) {
-      return
-    }
+    if (!isHorizontalSwipe) return
 
     if (deltaX < 0 && activeIdx < FESTIVAL_DAYS.length - 1) {
       handleChangeDay(activeIdx + 1)
-      return
-    }
-
-    if (deltaX > 0 && activeIdx > 0) {
+    } else if (deltaX > 0 && activeIdx > 0) {
       handleChangeDay(activeIdx - 1)
     }
   }
 
   const handleTouchCancel = () => {
     swipeStartPointRef.current = null
-  }
-
-  const handleTicketClick = () => {
-    navigate(getMyTicketNavigationTarget(isLoggedIn))
-  }
-
-  const handleMyInfoClick = () => {
-    navigate("/mypage")
   }
 
   return (
@@ -360,139 +206,69 @@ export default function Timetable() {
         onTouchCancel={handleTouchCancel}
       >
         <div className="sticky top-0 z-30 bg-white">
-          <div className="pt-[env(safe-area-inset-top)]">
-            <div
-              className={cn(
-                "relative overflow-hidden bg-white transition-all duration-300",
-                isPosterCompact ? "h-16" : "h-[244px]",
-              )}
-            >
-              {!isPosterCompact && (
-                <>
-                  <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-24 bg-[linear-gradient(180deg,rgba(19,29,59,0.26),rgba(19,29,59,0))]" />
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-24 bg-[linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,0.22)_36%,rgba(255,255,255,0.82))]" />
-                </>
-              )}
-              <button
-                type="button"
-                disabled={!posterImage}
-                onClick={() => {
-                  if (posterImage) {
-                    setSelectedImage(posterImage)
-                  }
-                }}
-                className="block h-full w-full"
-              >
-                <img
-                  key={activePosterSrc}
-                  src={activePosterSrc}
-                  alt={posterImage?.name ?? "2026 단국대학교 대동제 타임테이블"}
-                  className={cn(
-                    "h-full w-full origin-center object-cover object-center transition-transform duration-500",
-                    isPosterCompact ? "scale-105" : "scale-[1.5]",
-                  )}
-                  onError={(e) => {
-                    const el = e.currentTarget as HTMLImageElement
-                    if (el.src.includes("timetable-header-banner")) {
-                      el.src = "/posters/timetable-poster-wide.jpeg"
-                    }
-                  }}
-                />
-              </button>
+          {/* 헤더 spacer */}
+          <div className="h-[calc(env(safe-area-inset-top)+68px)]" />
 
-              {isPosterCompact && (
-                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.02))]">
-                  <div className="relative mx-auto h-16 max-w-[430px] px-4">
-                    <AppHeaderLogo />
-                    <button
-                      type="button"
-                      onClick={handleTicketClick}
-                      aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
-                      title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
-                      className={cn(HEADER_ICON_BUTTON_CLASS, "pointer-events-auto right-[4.25rem]")}
-                    >
-                      <Ticket size={22} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleMyInfoClick}
-                      aria-label="내정보"
-                      title="내정보"
-                      className={cn(HEADER_ICON_BUTTON_CLASS, "pointer-events-auto right-4")}
-                    >
-                      <User size={22} />
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+          {/* 타이틀 + DAY 탭 */}
+          <div className="bg-white px-5 pb-2 pt-4">
+            <p className="text-[22px] font-bold text-[var(--text)]">타임테이블</p>
           </div>
-
-          <div
-            className={cn(
-              "relative z-20 overflow-hidden bg-white px-4 pb-2",
-              isPosterCompact
-                ? "rounded-t-[28px] pt-2 shadow-[0_-4px_18px_rgba(0,0,0,0.04)]"
-                : "-mt-7 rounded-t-[32px] pt-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05),0_-18px_40px_-28px_rgba(15,23,42,0.18)] sm:-mt-8 sm:rounded-t-[36px]",
-            )}
-          >
+          <div className="bg-white px-4 pb-2">
             <DayTabs
               days={FESTIVAL_DAYS}
               activeIndex={activeIdx}
               onChange={handleChangeDay}
-              compact={isPosterCompact}
+              compact={false}
             />
           </div>
         </div>
 
-        <div className="mx-3 mt-1 overflow-hidden rounded-2xl bg-white">
-          <div ref={contentStartRef} className="px-4 pt-3">
+        <div ref={contentStartRef} className="mx-3 mt-1 overflow-hidden rounded-2xl bg-white">
+          <div className="px-4 pt-3">
             <p className="text-center text-[11px] font-medium leading-relaxed text-neutral-400">
               * 일정은 현장 상황에 따라 변경될 수 있습니다
             </p>
           </div>
 
           <div className="px-4 pb-8 pt-5">
-          {isDay1 ? (
-            <ContentImageSection
-              images={contentImages}
-              isLoading={isImageLoading}
-              error={imageLoadError}
-              selectedImage={selectedImage}
-              onSelectImage={setSelectedImage}
-              onCloseImage={() => setSelectedImage(null)}
-              onRetry={() => {
-                void contentImagesQuery.refetch()
-              }}
-            />
-          ) : isLoading ? (
-            <div className="py-12 text-center text-[var(--timetable-empty-text)]">
-              공연 정보를 불러오는 중입니다...
-            </div>
-          ) : loadError ? (
-            <div className="py-12 text-center text-[var(--timetable-empty-text)]">
-              <p>{loadError}</p>
-              <button
-                type="button"
-                onClick={() => {
-                  void performancesQuery.refetch()
+            {isDay1 ? (
+              <ContentImageSection
+                images={contentImages}
+                isLoading={isImageLoading}
+                error={imageLoadError}
+                selectedImage={selectedImage}
+                onSelectImage={setSelectedImage}
+                onCloseImage={() => setSelectedImage(null)}
+                onRetry={() => {
+                  void contentImagesQuery.refetch()
                 }}
-                className="mt-2 rounded-md border border-[var(--border-subtle)] bg-[var(--surface)] px-2 py-1 text-xs font-semibold text-[var(--text)]"
-              >
-                다시 시도
-              </button>
-            </div>
-          ) : items.length === 0 ? (
-            <div className="py-12 text-center text-[var(--timetable-empty-text)]">
-              등록된 공연이 없습니다.
-            </div>
-          ) : (
-            <Timeline
-              items={items}
-              scrollTargetId={scrollTargetId}
-              nowTargetId={isTodayTab ? nowTargetId : null}
-            />
-          )}
+              />
+            ) : isLoading ? (
+              <div className="py-12 text-center text-[var(--timetable-empty-text)]">
+                공연 정보를 불러오는 중입니다...
+              </div>
+            ) : loadError ? (
+              <div className="py-12 text-center text-[var(--timetable-empty-text)]">
+                <p>{loadError}</p>
+                <button
+                  type="button"
+                  onClick={() => void performancesQuery.refetch()}
+                  className="mt-2 rounded-md border border-[var(--border-subtle)] bg-[var(--surface)] px-2 py-1 text-xs font-semibold text-[var(--text)]"
+                >
+                  다시 시도
+                </button>
+              </div>
+            ) : items.length === 0 ? (
+              <div className="py-12 text-center text-[var(--timetable-empty-text)]">
+                등록된 공연이 없습니다.
+              </div>
+            ) : (
+              <Timeline
+                items={items}
+                scrollTargetId={scrollTargetId}
+                nowTargetId={isTodayTab ? nowTargetId : null}
+              />
+            )}
           </div>
         </div>
       </div>
