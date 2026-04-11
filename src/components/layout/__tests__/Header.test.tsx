@@ -30,21 +30,24 @@ describe("Header", () => {
     expect(noticeMarkup).toContain("backdrop-blur-md");
   });
 
-  it("홈과 일반 페이지에서는 상단 그라디언트 헤더를 렌더링한다", () => {
+  it("홈에서는 상단 그라디언트 헤더를 렌더링하고, 마이페이지에서는 투명 헤더 + 오버레이를 렌더링한다", () => {
     const homeMarkup = renderHeader("/");
     const myPageMarkup = renderHeader("/mypage");
 
     expect(homeMarkup).toContain(
       "bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_56%,transparent)_0%,color-mix(in_srgb,var(--surface)_44%,transparent)_16%",
     );
-    expect(myPageMarkup).toContain(
-      "bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_56%,transparent)_0%,color-mix(in_srgb,var(--surface)_44%,transparent)_16%",
-    );
+    expect(myPageMarkup).toContain("bg-transparent shadow-none pt-[env(safe-area-inset-top)]");
+    expect(myPageMarkup).toContain("z-[45]");
+    expect(myPageMarkup).toContain("backdrop-blur-md");
   });
 
-  it("타임테이블에서는 Header를 렌더링하지 않는다", () => {
+  it("타임테이블에서는 frosted glass 헤더 오버레이를 렌더링한다", () => {
     const timetableMarkup = renderHeader("/timetable");
 
-    expect(timetableMarkup).toBe("");
+    expect(timetableMarkup).toContain("bg-transparent shadow-none pt-[env(safe-area-inset-top)]");
+    expect(timetableMarkup).toContain("z-[45]");
+    expect(timetableMarkup).toContain("backdrop-blur-md");
+    expect(timetableMarkup).toContain("bg-white/85");
   });
 });
