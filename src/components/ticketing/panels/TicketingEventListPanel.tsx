@@ -201,7 +201,7 @@ export function TicketingEventListPanel({
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h3 className={`truncate ${TICKETING_CLASSES.typography.cardTitle} text-[var(--text)]`}>
+                <h3 className={`truncate ${TICKETING_CLASSES.typography.cardTitle} text-[var(--text)] !text-[0.95rem]`}>
                   {normalizeKoreanMonthDay(event.title || "공연 티켓팅")}
                 </h3>
                 <p className={`mt-1 ${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--accent)]`}>
