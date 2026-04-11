@@ -200,7 +200,7 @@ export default function Timetable() {
     <div className="timetable-root relative flex h-screen min-h-0 flex-col overflow-hidden bg-white">
       <div
         ref={scrollContainerRef}
-        className="scrollbar-hide relative min-h-0 flex-1 overflow-y-auto bg-white"
+        className="scrollbar-hide relative min-h-0 flex-1 overflow-y-auto bg-white [overscroll-behavior:none]"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
@@ -230,7 +230,7 @@ export default function Timetable() {
             </p>
           </div>
 
-          <div className="px-4 pb-8 pt-5">
+          <div className="px-4 pb-[calc(var(--app-bottom-nav-height,64px)+env(safe-area-inset-bottom)+2rem)] pt-5">
             {isDay1 ? (
               <ContentImageSection
                 images={contentImages}
