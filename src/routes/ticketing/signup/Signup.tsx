@@ -23,6 +23,7 @@ import {
 } from "@/components/ticketing/auth/TicketingAuthHeading";
 import { signupApi } from "@/api/ticketing/signupApi";
 import { HttpError } from "@/api/ticketing/httpClient";
+import { isAuthBoundaryError } from "@/api/common/authCore";
 import {
   getPasswordPolicyState,
   getPasswordPolicyErrorMessage,
@@ -36,7 +37,37 @@ import { cn } from "@/components/common/ui/utils";
 
 const PAGE_TITLE = "축제 서비스 회원가입";
 const EYEBROW = "2026 DANFESTA";
-
+const STUDENT_ID_LABEL = "학번";
+const STUDENT_ID_PLACEHOLDER = "학번 8자리를 입력해 주세요";
+const DKU_PASSWORD_LABEL = "포털 비밀번호";
+const DKU_PASSWORD_PLACEHOLDER = "단국대 포털 비밀번호를 입력해 주세요";
+const SERVICE_PASSWORD_LABEL = "축제 서비스 비밀번호";
+const SERVICE_PASSWORD_PLACEHOLDER = "새로운 비밀번호를 입력해 주세요";
+const SERVICE_PASSWORD_CONFIRM_LABEL = "축제 서비스 비밀번호 확인";
+const SERVICE_PASSWORD_CONFIRM_PLACEHOLDER =
+  "새로운 비밀번호를 다시 입력해 주세요";
+const STUDENT_VERIFY_HELP =
+  "학생 인증을 위해 1회성으로만 사용하며 저장되지 않습니다.";
+const PRIVACY_TITLE = "개인정보 이용 동의 (필수)";
+const PRIVACY_BODY =
+  "축제 서비스 및 대학 서비스 이용을 위해 학번, 연락처, 학적정보, 소속 등 최소 항목 정보의 수집 및 이용에 동의합니다.";
+const SUBMIT_IDLE = "학생 인증 및 서비스 시작";
+const SUBMIT_LOADING = "처리 중...";
+const LOGIN_PROMPT = "이미 계정이 있으신가요?";
+const LOGIN_ACTION = "로그인하러 가기";
+const ERROR_REQUIRED_PORTAL =
+  "학번과 단국대 포털 비밀번호를 입력해 주세요.";
+const ERROR_REQUIRED_SERVICE_PASSWORD =
+  "축제 서비스 전용 비밀번호를 입력해 주세요.";
+const ERROR_PRIVACY_REQUIRED =
+  "개인정보 이용 동의(필수)를 체크해주세요.";
+const LOADING_VERIFY = "단국대 포털 인증 중...";
+const LOADING_CREATE = "계정 생성 중...";
+const ERROR_401 =
+  "단국대 포털 학번 또는 비밀번호가 올바르지 않습니다.";
+const ERROR_409 = "이미 가입한 학번입니다.";
+const ERROR_403 = "죽전캠퍼스 재학생·수료생·대학원생만 회원가입이 가능합니다.";
+const ERROR_SIGNUP = "회원가입에 실패했습니다.";
 const AUTH_PLACEHOLDER_CLASS =
   "text-[0.96rem] sm:text-[0.98rem] placeholder:text-[0.8rem] sm:placeholder:text-[0.84rem] placeholder:tracking-[-0.01em]";
 
@@ -407,7 +438,19 @@ export default function Signup() {
     } catch (err) {
       if (err instanceof HttpError) {
         const payload = err.payload as { error?: string } | undefined;
-        setStep3Error(payload?.error ?? "회원가입에 실패했습니다.");
+        const message = payload?.error;
+
+        if (err.status === 401) {
+          setStep3Error(message || ERROR_401);
+        } else if (err.status === 409) {
+          setStep3Error(message || ERROR_409);
+        } else if (err.status === 403) {
+          setStep3Error(message || ERROR_403);
+        } else {
+          setStep3Error(message || ERROR_SIGNUP);
+        }
+      } else if (isAuthBoundaryError(err) && err.status === 403) {
+        setStep3Error(ERROR_403);
       } else {
         setStep3Error("회원가입에 실패했습니다.");
       }

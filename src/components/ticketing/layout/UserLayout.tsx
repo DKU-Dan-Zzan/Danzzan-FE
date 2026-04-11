@@ -8,7 +8,7 @@ import { shouldShowTicketingHeader } from "@/lib/ticketing/navigation/headerVisi
 import { cn } from "@/components/common/ui/utils";
 
 const HEADER_ICON_BUTTON_CLASS =
-  "absolute top-1/2 -translate-y-1/2 inline-flex h-10 w-10 items-center justify-center text-[color:color-mix(in_srgb,var(--text)_96%,black)] transition-colors duration-150 hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent";
+  "absolute top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center text-[color:color-mix(in_srgb,var(--text)_96%,black)] transition-colors duration-150 hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent";
 
 export function UserLayout() {
   const location = useLocation();
@@ -84,7 +84,7 @@ export function UserLayout() {
             showSafeAreaOverlay
             showLogo={false}
             headerClassName="fixed inset-x-0 top-0 z-50 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_62%,transparent)_0%,color-mix(in_srgb,var(--surface)_40%,transparent)_36%,color-mix(in_srgb,var(--surface)_18%,transparent)_72%,color-mix(in_srgb,var(--surface)_0%,transparent)_100%)] backdrop-blur-[24px] shadow-none pt-[env(safe-area-inset-top)]"
-            containerClassName="relative mx-auto h-16 w-full max-w-md px-4"
+            containerClassName="relative mx-auto h-[68px] w-full max-w-[430px] px-4"
           >
             <img
               src="/DAN-ZZAN.png"
@@ -111,7 +111,7 @@ export function UserLayout() {
                 aria-label="내정보"
                 title="내정보"
               >
-                <User size={20} />
+                <User size={22} />
               </button>
             )}
           </AppTopBar>

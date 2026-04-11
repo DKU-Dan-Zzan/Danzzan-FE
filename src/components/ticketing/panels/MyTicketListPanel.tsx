@@ -36,7 +36,7 @@ export function MyTicketListPanel({
   onGoTicketing,
 }: MyTicketListPanelProps) {
   const panelClassName =
-    "mx-auto flex min-h-[calc(100dvh-calc(env(safe-area-inset-top)+68px)-var(--app-bottom-nav-height)-env(safe-area-inset-bottom))] w-full max-w-3xl flex-col gap-3";
+    "mx-auto flex w-full max-w-3xl flex-col gap-3";
 
   return (
     <div className={panelClassName}>
