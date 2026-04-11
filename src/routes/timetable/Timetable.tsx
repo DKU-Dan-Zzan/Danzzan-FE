@@ -210,10 +210,10 @@ export default function Timetable() {
           <div className="h-[calc(env(safe-area-inset-top)+68px)]" />
 
           {/* 타이틀 + DAY 탭 */}
-          <div className="bg-white px-5 pb-2 pt-4">
+          <div className="bg-white px-5 pb-1 pt-1">
             <p className="text-[22px] font-bold text-[var(--text)]">타임테이블</p>
           </div>
-          <div className="bg-white px-4 pb-2">
+          <div className="bg-white px-4 pb-1">
             <DayTabs
               days={FESTIVAL_DAYS}
               activeIndex={activeIdx}
