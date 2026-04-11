@@ -214,7 +214,7 @@ export default function Timetable() {
         </div>
 
         {/* DAY 탭만 sticky - 글로벌 헤더 바로 아래 고정 */}
-        <div className="sticky top-[calc(env(safe-area-inset-top)+68px)] z-30 bg-white px-4 pb-1">
+        <div className="sticky top-[calc(env(safe-area-inset-top)+68px)] z-30 bg-white/85 px-4 pb-1 backdrop-blur-md">
           <DayTabs
             days={FESTIVAL_DAYS}
             activeIndex={activeIdx}

@@ -45,10 +45,10 @@ const Header = () => {
         <div
           aria-hidden
           className={cn(
-            "pointer-events-none fixed left-1/2 top-0 z-[45] h-[calc(68px+env(safe-area-inset-top))] w-full max-w-[430px] -translate-x-1/2 shadow-[inset_0_-1px_0_color-mix(in_srgb,var(--border-base)_35%,transparent)] backdrop-blur-md",
+            "pointer-events-none fixed left-1/2 top-0 z-[45] h-[calc(68px+env(safe-area-inset-top))] w-full max-w-[430px] -translate-x-1/2 backdrop-blur-md",
             isTimetablePage
               ? "bg-white/85"
-              : "bg-[color-mix(in_srgb,var(--surface)_78%,transparent)]",
+              : "bg-[color-mix(in_srgb,var(--surface)_78%,transparent)] shadow-[inset_0_-1px_0_color-mix(in_srgb,var(--border-base)_35%,transparent)]",
           )}
         />
       )}
