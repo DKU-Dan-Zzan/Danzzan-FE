@@ -73,7 +73,7 @@ export const TICKETING_CLASSES = {
   typography: {
     heroTitle: "text-[length:var(--ticketing-text-hero-title)] leading-[1.2] font-extrabold tracking-tight",
     heroDescription: "text-[length:var(--ticketing-text-hero-description)] leading-[1.35]",
-    cardTitle: "text-[length:var(--ticketing-text-card-title)] leading-[1.16] font-black tracking-tight",
+    cardTitle: "text-[length:var(--ticketing-text-card-title)] leading-[1.2] font-black tracking-tight [word-spacing:0.12em]",
     cardSubtitle: "text-[length:var(--ticketing-text-card-subtitle)] leading-[1.2] font-bold",
     sectionTitle: "text-[length:var(--ticketing-text-section-title)] leading-[1.2] font-bold",
     sectionBody: "text-[length:var(--ticketing-text-section-body)] leading-[1.42]",
