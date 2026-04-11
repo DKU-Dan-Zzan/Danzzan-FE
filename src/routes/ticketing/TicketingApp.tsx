@@ -34,7 +34,7 @@ const TICKETING_ROOT_CLASS_NAME = cn(
   "[--ticketing-text-badge:0.82rem]",
   "[--ticketing-text-hero-title:1.2rem]",
   "[--ticketing-text-hero-description:0.88rem]",
-  "[--ticketing-text-card-title:1.2rem]",
+  "[--ticketing-text-card-title:0.5rem]",
   "[--ticketing-text-card-subtitle:0.9rem]",
   "[--ticketing-text-section-title:0.8rem]",
   "[--ticketing-text-section-body:0.82rem]",

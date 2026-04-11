@@ -97,7 +97,7 @@ const resolveViewStatus = (
 };
 
 const formatEventDateTime = (event: TicketingEvent, openAtMs: number | null): string => {
-  const eventDateTime = [event.eventDate, event.eventTime].filter(Boolean).join(" ");
+  const eventDateTime = [event.eventDate, event.eventTime].filter(Boolean).join(" ").replace(/예매\s*오픈/g, "").trim();
   if (eventDateTime) {
     return normalizeKoreanMonthDay(eventDateTime);
   }
