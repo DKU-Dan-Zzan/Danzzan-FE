@@ -26,9 +26,9 @@ export default function TimelineItem({
     <li ref={innerRef} className="relative scroll-mt-24 pb-14">
       <div className="mx-auto grid w-full max-w-[420px] grid-cols-[auto_24px_minmax(0,1fr)] items-start pt-3">
         {/* 시간 */}
-        <div className="col-start-1 row-start-1 flex items-start justify-end self-start pr-1">
+        <div className="col-start-1 row-start-1 flex items-center justify-end self-start pr-1">
           <p
-            className="max-w-[9.5rem] rounded-full px-2.5 py-2 text-right text-[14px] font-bold tabular-nums leading-tight tracking-[-0.02em] sm:max-w-[10rem] sm:text-[15px]"
+            className="inline-flex h-11 max-w-[9.5rem] items-center rounded-full px-2.5 text-right text-[14px] font-bold tabular-nums leading-none tracking-[-0.02em] sm:max-w-[10rem] sm:text-[15px]"
             style={{
               background: "var(--timetable-v2-time-pill-bg)",
               color: "var(--timetable-v2-time-pill-fg)",
@@ -45,7 +45,7 @@ export default function TimelineItem({
 
         {/* 타임라인: 점 + 긴 점선 */}
         <div className="col-start-2 row-span-2 row-start-1 flex w-[24px] shrink-0 flex-col items-center self-stretch">
-          <div className="flex w-full shrink-0 justify-center pt-[8px]">
+          <div className="flex h-11 w-full shrink-0 items-center justify-center">
             <div
               className="relative z-[1] h-3.5 w-3.5 shrink-0 rounded-full ring-[3px] ring-[color:color-mix(in_srgb,var(--timetable-v2-accent)_14%,white)]"
               style={{

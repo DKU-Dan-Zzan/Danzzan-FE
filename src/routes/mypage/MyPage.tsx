@@ -192,19 +192,19 @@ function MyPage() {
     return (
       <div className="mypage-root relative flex h-[100dvh] w-full flex-col items-center justify-center overflow-hidden px-6 pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.5rem)]">
         {/* 포스터 배경 */}
-        <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-x-0 bottom-0 top-[calc(env(safe-area-inset-top)+68px)] overflow-hidden">
           <img
-            src="/posters/festival-poster.png"
+            src="/posters/main-poster-final-vertical.jpeg"
             alt=""
             aria-hidden
-            className="h-full w-full object-fill"
-            style={{ filter: "brightness(0.9) saturate(1.08)" }}
+            className="absolute inset-0 h-full w-full object-cover object-top"
+            style={{ filter: "brightness(0.82) saturate(1.08)", transform: "scale(1.03)" }}
           />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, rgba(238,241,248,0.6) 0%, rgba(238,241,248,0.88) 100%)",
+                "linear-gradient(180deg, rgba(238,241,248,0.4) 0%, rgba(238,241,248,0.68) 38%, rgba(238,241,248,0.86) 100%)",
             }}
           />
         </div>
@@ -278,7 +278,7 @@ function MyPage() {
       <div className="relative">
         <div className="absolute inset-0 overflow-hidden">
           <img
-            src="/posters/festival-poster.png"
+            src="/posters/main-poster-final-vertical.jpeg"
             alt=""
             aria-hidden
             className="h-full w-full object-cover object-top"

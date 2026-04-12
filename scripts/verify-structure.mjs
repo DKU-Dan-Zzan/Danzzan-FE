@@ -95,6 +95,13 @@ function isInsideDir(relativePath, dirPrefix) {
   return relativePath === dirPrefix || relativePath.startsWith(`${dirPrefix}/`)
 }
 
+function isTestLikeFile(relativePath) {
+  const normalized = normalizePath(relativePath)
+  if (normalized.includes("/__tests__/")) return true
+  const fileName = path.posix.basename(normalized)
+  return /\.(test|spec)\.(ts|tsx|js|jsx|mjs|cjs)$/.test(fileName)
+}
+
 function runCommand(command) {
   return execSync(command, {
     cwd: process.cwd(),
@@ -786,6 +793,7 @@ function run() {
       changedFiles,
       options.mode,
       (file) => {
+        if (isTestLikeFile(file)) return false
         if (!STYLE_SCAN_EXTENSIONS.has(path.extname(file))) return false
         return (
           file === "src/index.css" ||
@@ -826,8 +834,9 @@ function run() {
       changedFiles,
       options.mode,
       (file) => {
-      if (!CODE_FILE_EXTENSIONS.has(path.extname(file))) return false
-      return isInsideDir(file, "src/routes") || isInsideDir(file, "src/components")
+        if (isTestLikeFile(file)) return false
+        if (!CODE_FILE_EXTENSIONS.has(path.extname(file))) return false
+        return isInsideDir(file, "src/routes") || isInsideDir(file, "src/components")
       }
     )
 

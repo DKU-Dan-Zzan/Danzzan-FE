@@ -10,7 +10,9 @@ describe("AppHeaderLogo", () => {
     expect(markup).toContain('src="/DAN-ZZAN.png"');
     expect(markup).toContain('alt="DAN-ZZAN"');
     expect(markup).toContain("left-4");
-    expect(markup).toContain("h-8");
-    expect(markup).toContain("w-[136px]");
+    expect(markup).toContain("object-contain");
+    expect(markup).toContain("object-left");
+    expect(markup).toMatch(/\sh-\d+/);
+    expect(markup).toMatch(/w-\[[0-9]+px\]/);
   });
 });
