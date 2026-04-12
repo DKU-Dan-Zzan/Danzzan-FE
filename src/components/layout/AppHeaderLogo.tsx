@@ -4,7 +4,7 @@ type AppHeaderLogoProps = {
 };
 
 const BASE_CLASS_NAME =
-  "pointer-events-none absolute left-4 top-1/2 h-9 w-[152px] -translate-y-1/2 object-contain object-left select-none";
+  "pointer-events-none absolute left-4 top-1/2 h-12 w-[172px] -translate-y-1/2 object-contain object-left select-none";
 
 export function AppHeaderLogo({ className }: AppHeaderLogoProps) {
   return (
