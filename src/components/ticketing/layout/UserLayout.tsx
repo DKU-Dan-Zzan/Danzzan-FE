@@ -89,7 +89,7 @@ export function UserLayout() {
             <img
               src="/DAN-ZZAN.png"
               alt="DAN-ZZAN"
-              className="pointer-events-none absolute left-1/2 top-1/2 h-8 w-[136px] -translate-x-1/2 -translate-y-1/2 object-contain select-none"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-9 w-[152px] -translate-x-1/2 -translate-y-1/2 object-contain select-none"
               draggable={false}
             />
 
