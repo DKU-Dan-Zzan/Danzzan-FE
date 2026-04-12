@@ -32,23 +32,24 @@ const Header = () => {
     navigate("/mypage")
   }
 
-  if (isTimetablePage) {
-    return null
-  }
-
   const headerClassName =
     isBoothMapPage
       ? "fixed inset-x-0 top-0 z-50 bg-transparent shadow-none pt-[env(safe-area-inset-top)]"
-      : isNoticePage
+      : isNoticePage || isMyPage || isTimetablePage
         ? "fixed inset-x-0 top-0 z-50 bg-transparent shadow-none pt-[env(safe-area-inset-top)]"
         : "fixed inset-x-0 top-0 z-50 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_56%,transparent)_0%,color-mix(in_srgb,var(--surface)_44%,transparent)_16%,color-mix(in_srgb,var(--surface)_32%,transparent)_34%,color-mix(in_srgb,var(--surface)_22%,transparent)_52%,color-mix(in_srgb,var(--surface)_12%,transparent)_70%,color-mix(in_srgb,var(--surface)_5%,transparent)_86%,color-mix(in_srgb,var(--surface)_0%,transparent)_100%)] shadow-none pt-[env(safe-area-inset-top)]"
 
   return (
     <>
-      {isNoticePage && (
+      {(isNoticePage || isMyPage || isTimetablePage) && (
         <div
           aria-hidden
-          className="pointer-events-none fixed left-1/2 top-0 z-[45] h-[calc(68px+env(safe-area-inset-top))] w-full max-w-[430px] -translate-x-1/2 bg-[color-mix(in_srgb,var(--surface)_78%,transparent)] shadow-[inset_0_-1px_0_color-mix(in_srgb,var(--border-base)_35%,transparent)] backdrop-blur-md"
+          className={cn(
+            "pointer-events-none fixed left-1/2 top-0 z-[45] h-[calc(68px+env(safe-area-inset-top))] w-full max-w-[430px] -translate-x-1/2 backdrop-blur-md",
+            isTimetablePage
+              ? "bg-white/85"
+              : "bg-[color-mix(in_srgb,var(--surface)_78%,transparent)] shadow-[inset_0_-1px_0_color-mix(in_srgb,var(--border-base)_35%,transparent)]",
+          )}
         />
       )}
       <AppTopBar headerClassName={headerClassName}>

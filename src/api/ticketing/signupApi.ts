@@ -1,4 +1,4 @@
-﻿// 역할: 티켓팅 회원가입 요청과 응답 변환 로직을 제공합니다.
+// 역할: 티켓팅 회원가입 요청과 응답 변환 로직을 제공합니다.
 import { createHttpClient } from "@/api/ticketing/httpClient";
 import { env, requireEnv } from "@/utils/common/env";
 
@@ -21,6 +21,26 @@ interface VerifyStudentResponse {
   };
 }
 
+export interface PhoneVerificationCreateResponse {
+  sessionId: string;
+  status: string;
+  octomoReceiveNumber: string;
+  messageBody: string;
+  expiresInSec: number;
+  statusPollHintSec: number;
+  expiresAt: string;
+}
+
+export interface PhoneVerificationStatusResponse {
+  sessionId: string;
+  status: string;
+  attemptCount: number;
+  expiresInSec: number;
+  expiresAt: string;
+  verifiedAt: string | null;
+  verifiedPhoneNumberMasked: string | null;
+}
+
 export const signupApi = {
   verifyStudent: async (
     dkuStudentId: string,
@@ -33,12 +53,37 @@ export const signupApi = {
     });
   },
 
+  createPhoneVerificationSession: async (
+    signupToken: string,
+  ): Promise<PhoneVerificationCreateResponse> => {
+    const client = getClient();
+    return client.post<PhoneVerificationCreateResponse>(
+      `/user/phone-verifications/${signupToken}/sessions`,
+    );
+  },
+
+  verifyPhoneSession: async (
+    sessionId: string,
+    phoneNumber: string,
+  ): Promise<PhoneVerificationStatusResponse> => {
+    const client = getClient();
+    return client.post<PhoneVerificationStatusResponse>(
+      `/user/phone-verifications/sessions/${sessionId}/verify`,
+      { phoneNumber },
+    );
+  },
+
   completeSignup: async (
     signupToken: string,
     password: string,
     confirmPassword: string,
+    phoneVerificationSessionId: string,
   ): Promise<void> => {
     const client = getClient();
-    await client.post(`/user/${signupToken}`, { password, confirmPassword });
+    await client.post(`/user/${signupToken}`, {
+      password,
+      confirmPassword,
+      phoneVerificationSessionId,
+    });
   },
 };

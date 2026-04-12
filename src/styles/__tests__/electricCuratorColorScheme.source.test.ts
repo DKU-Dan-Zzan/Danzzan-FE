@@ -25,8 +25,8 @@ describe("electric curator color scheme source", () => {
     expect(content).toContain("--ec-glass-bg: rgba(248, 250, 251, 0.7);");
     expect(content).toContain("--ec-glass-blur: 28px;");
     expect(content).toContain("--ec-ambient-shadow: 0 20px 50px rgba(44, 52, 54, 0.06);");
-    expect(content).toContain("--font-display: \"Manrope\", \"Plus Jakarta Sans\", \"Inter\", \"Noto Sans KR\", system-ui, -apple-system, \"Segoe UI\", sans-serif;");
-    expect(content).toContain("--font-body: \"Plus Jakarta Sans\", \"Inter\", \"Noto Sans KR\", system-ui, -apple-system, \"Segoe UI\", sans-serif;");
+    expect(content).toContain("--font-display: \"Pretendard Variable\", \"Pretendard\", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;");
+    expect(content).toContain("--font-body: \"Pretendard Variable\", \"Pretendard\", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;");
     expect(content).toContain("--type-display-lg-size: 3.5rem;");
     expect(content).toContain("--type-display-lg-tracking: -0.02em;");
     expect(content).toContain("--type-label-md-tracking: 0.04em;");
