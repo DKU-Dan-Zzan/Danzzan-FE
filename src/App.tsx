@@ -23,6 +23,7 @@ import AppLayout from "./components/layout/AppLayout";
 import Home from "./routes/home/Home";
 import Timetable from "./routes/timetable/Timetable";
 import TicketingApp from "./routes/ticketing/TicketingApp";
+import LegalDocument from "./routes/legal/LegalDocument";
 
 type LazyWithPreload<T extends ComponentType<unknown>> = LazyExoticComponent<T> & {
   preload: () => Promise<{ default: T }>;
@@ -196,6 +197,8 @@ function App() {
       </Route>
 
       <Route path="/ticket/*" element={<TicketingApp />} />
+      <Route path="/legal/privacy" element={<LegalDocument documentType="privacy" />} />
+      <Route path="/legal/terms" element={<LegalDocument documentType="terms" />} />
 
       <Route path="/login" element={<Navigate to="/ticket/login" replace />} />
       <Route path="/signup" element={<Navigate to="/ticket/signup" replace />} />

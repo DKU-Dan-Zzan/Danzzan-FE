@@ -1,5 +1,6 @@
 import { Instagram } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
+import { Link } from "react-router-dom";
 
 type SocialIconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -35,6 +36,22 @@ const SOCIAL_LINKS = [
   },
 ] as const satisfies ReadonlyArray<SocialLink>;
 
+type PolicyLink = {
+  label: string;
+  to: string;
+};
+
+const POLICY_LINKS = [
+  {
+    label: "개인정보처리방침",
+    to: "/legal/privacy",
+  },
+  {
+    label: "이용약관",
+    to: "/legal/terms",
+  },
+] as const satisfies ReadonlyArray<PolicyLink>;
+
 // 역할: 앱 레이아웃 레이어의 Footer 구성 컴포넌트를 제공합니다.
 const Footer = () => {
   return (
@@ -60,6 +77,21 @@ const Footer = () => {
             >
               <Icon className={iconClassName} strokeWidth={iconStrokeWidth} aria-hidden />
             </a>
+          ))}
+        </div>
+
+        <div className="mt-4 flex items-center justify-center text-[13px] text-[var(--footer-text-secondary)]">
+          {POLICY_LINKS.map(({ label, to }, index) => (
+            <div key={to} className="flex items-center">
+              {index > 0 && <span className="mx-2 text-[var(--footer-text-secondary)]">|</span>}
+              <Link
+                to={to}
+                state={{ returnTo: "/mypage" }}
+                className="underline-offset-2 transition-colors duration-150 hover:text-[var(--footer-text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--footer-bg)]"
+              >
+                {label}
+              </Link>
+            </div>
           ))}
         </div>
 
