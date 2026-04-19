@@ -239,7 +239,7 @@ export default function Timetable() {
             </p>
           </div>
 
-          <div className="px-4 pb-[calc(var(--app-bottom-nav-height,64px)+env(safe-area-inset-bottom)+2rem)] pt-5">
+          <div className="px-4 pt-5">
             {isDay1 ? (
               <ContentImageSection
                 images={contentImages}
@@ -281,7 +281,11 @@ export default function Timetable() {
           </div>
         </div>
 
-        <AdBanner ads={allAds} />
+        <AdBanner ads={allAds} marginTopClassName="mt-4" />
+        <div
+          aria-hidden="true"
+          className="h-[var(--app-bottom-nav-runtime-offset)]"
+        />
       </div>
     </div>
   )

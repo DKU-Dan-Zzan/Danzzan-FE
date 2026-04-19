@@ -6,9 +6,10 @@ const AD_PLACEHOLDER_IMAGE = "/ads/waiting-room-sample-banner.svg"
 
 type AdBannerProps = {
   ads: ClientAdDto[]
+  marginTopClassName?: string
 }
 
-export default function AdBanner({ ads }: AdBannerProps) {
+export default function AdBanner({ ads, marginTopClassName = "mt-9" }: AdBannerProps) {
   const slides = ads.length
     ? ads.map((ad) => ({
         imageUrl: ad.imageUrl,
@@ -19,7 +20,7 @@ export default function AdBanner({ ads }: AdBannerProps) {
     : [{ imageUrl: AD_PLACEHOLDER_IMAGE, alt: "광고 배너" }]
 
   return (
-    <div className="mt-9">
+    <div className={marginTopClassName}>
       <div className="relative aspect-[9/2] overflow-hidden rounded-none bg-[var(--home-ad-banner-bg)] shadow-[var(--home-elevated-card-shadow)]">
         <AdCarousel
           slides={slides}

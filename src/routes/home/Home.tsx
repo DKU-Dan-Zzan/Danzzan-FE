@@ -292,7 +292,10 @@ function Home() {
         <div
           ref={lineupAnchorRef}
           className="home-snap-section min-h-[100svh] scroll-mt-0 bg-[var(--surface)]"
-          style={{ scrollMarginTop: "-3px" }}
+          style={{
+            minHeight: "calc(100svh - var(--app-bottom-nav-runtime-offset))",
+            scrollMarginTop: "-3px",
+          }}
         >
           <div
             aria-hidden="true"
