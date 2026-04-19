@@ -3,6 +3,8 @@ import { keepPreviousData } from "@tanstack/react-query";
 import { Pin } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { getNoticeDetail, getNotices } from "@/api/app/notice/noticeApi";
+import { getPlacementAds } from "@/api/app/ad/adApi";
+import AdBanner from "@/components/app/home/AdBanner";
 import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialog";
 import { cn } from "@/components/common/ui/utils";
 import { useDebouncedValue } from "@/hooks/app/useDebouncedValue";
@@ -80,10 +82,17 @@ function Notice() {
     staleTime: 5 * 60_000,
   });
 
+  const allAdsQuery = useAppQuery({
+    queryKey: appQueryKeys.placementAds("HOME_BOTTOM"),
+    queryFn: ({ signal }) => getPlacementAds("HOME_BOTTOM", { signal }),
+    staleTime: 5 * 60_000,
+  });
+
   const notices = useMemo(
     () => noticeListQuery.data?.content ?? [],
     [noticeListQuery.data],
   );
+  const allAds = allAdsQuery.data ?? [];
   const currentPage = noticeListQuery.data?.number ?? page;
   const totalPages = noticeListQuery.data?.totalPages ?? 0;
   const listError = noticeListQuery.error?.message ?? null;
@@ -285,6 +294,8 @@ function Notice() {
           );
         })()}
       </section>
+
+      <AdBanner ads={allAds} />
 
       {/* 상세 보기 패널 */}
       <Dialog

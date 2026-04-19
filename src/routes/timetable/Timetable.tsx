@@ -5,6 +5,8 @@ import {
   getPerformances,
   type ContentImageDto,
 } from "@/api/app/timetable/timetableApi"
+import { getPlacementAds } from "@/api/app/ad/adApi"
+import AdBanner from "@/components/app/home/AdBanner"
 import ContentImageSection from "@/components/app/timetable/ContentImage"
 import DayTabs from "@/components/app/timetable/DayTabs"
 import Timeline from "@/components/app/timetable/Timeline"
@@ -96,6 +98,12 @@ export default function Timetable() {
     staleTime: 10 * 60_000,
   })
 
+  const allAdsQuery = useAppQuery({
+    queryKey: appQueryKeys.placementAds("HOME_BOTTOM"),
+    queryFn: ({ signal }) => getPlacementAds("HOME_BOTTOM", { signal }),
+    staleTime: 5 * 60_000,
+  })
+
   const items: Performance[] = useMemo(
     () => performancesQuery.data?.performances ?? [],
     [performancesQuery.data],
@@ -106,6 +114,7 @@ export default function Timetable() {
   const contentImages = contentImagesQuery.data ?? []
   const isImageLoading = contentImagesQuery.isPending
   const imageLoadError = contentImagesQuery.error?.message ?? null
+  const allAds = allAdsQuery.data ?? []
 
   const nowTargetId = useMemo(() => {
     if (!isTodayTab || items.length === 0) {
@@ -271,6 +280,8 @@ export default function Timetable() {
             )}
           </div>
         </div>
+
+        <AdBanner ads={allAds} />
       </div>
     </div>
   )
