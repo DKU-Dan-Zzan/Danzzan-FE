@@ -23,7 +23,13 @@ export default function TimelineItem({
   const timeLabel = `${item.startTime} ~ ${item.endTime}`
 
   return (
-    <li ref={innerRef} className="relative scroll-mt-24 pb-14">
+    <li
+      ref={innerRef}
+      className={[
+        "relative scroll-mt-24",
+        isLast ? "pb-6" : "pb-14",
+      ].join(" ")}
+    >
       <div className="mx-auto grid w-full max-w-[420px] grid-cols-[auto_24px_minmax(0,1fr)] items-start pt-3">
         {/* 시간 */}
         <div className="col-start-1 row-start-1 flex items-center justify-end self-start pr-1">

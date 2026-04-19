@@ -56,8 +56,8 @@ export default function CurrentPerformanceSection() {
       ? "현재 진행 중인 공연을 확인하고 있어요."
       : status === "error"
         ? performancesQuery.error?.message ?? "공연 정보를 불러오지 못했어요. 잠시 후 다시 확인해 주세요."
-        : status === "empty"
-          ? "현재 진행 중인 공연이 없습니다."
+      : status === "empty"
+          ? "진행중인 공연이 없습니다"
           : null;
 
   const handleRetry = () => {
@@ -106,7 +106,7 @@ export default function CurrentPerformanceSection() {
               </div>
               <div className="min-w-0 flex-1 text-left">
                 <p className="text-[16px] font-semibold leading-tight text-[var(--text-body-deep)]">{helperText}</p>
-                <p className="mt-1 text-[13px] font-semibold text-[var(--text-body-deep)]">타임테이블에서 다음 공연을 확인해 보세요.</p>
+                <p className="mt-1 text-[13px] font-semibold text-[var(--text-body-deep)]">타임테이블에서 다음 공연을 확인해보세요</p>
               </div>
             </div>
           )}

@@ -1,11 +1,20 @@
 // 역할: 앱 Footer가 웹앱 시안에 맞는 구조와 SNS 아이콘 링크를 노출하는지 검증합니다.
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
+import { StaticRouter } from "react-router-dom/server";
 import Footer from "@/components/layout/Footer";
+
+function renderFooter() {
+  return renderToStaticMarkup(
+    <StaticRouter location="/mypage">
+      <Footer />
+    </StaticRouter>,
+  );
+}
 
 describe("Footer", () => {
   it("브랜드/카피와 Instagram, YouTube 아이콘 링크를 노출한다", () => {
-    const markup = renderToStaticMarkup(<Footer />);
+    const markup = renderFooter();
 
     expect(markup).toContain("주최 단국대학교 죽전캠퍼스 제58대 LOU:D 총학생회");
     expect(markup).toContain("Developed by DAN-ZZAN | © 2026 All rights reserved.");
@@ -33,5 +42,9 @@ describe("Footer", () => {
     expect(markup).toContain('<rect x="1.75" y="5" width="20.5" height="14" rx="4.8" fill="currentColor"');
     expect(markup).toContain('class="h-[22px] w-[22px]"');
     expect(markup).toContain("© 2026 All rights reserved.");
+    expect(markup).toContain(">개인정보처리방침<");
+    expect(markup).toContain('href="/legal/privacy"');
+    expect(markup).toContain(">이용약관<");
+    expect(markup).toContain('href="/legal/terms"');
   });
 });

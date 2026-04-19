@@ -3,6 +3,8 @@ import { keepPreviousData } from "@tanstack/react-query";
 import { Pin } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { getNoticeDetail, getNotices } from "@/api/app/notice/noticeApi";
+import { getPlacementAds } from "@/api/app/ad/adApi";
+import AdBanner from "@/components/app/home/AdBanner";
 import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialog";
 import { cn } from "@/components/common/ui/utils";
 import { useDebouncedValue } from "@/hooks/app/useDebouncedValue";
@@ -52,7 +54,7 @@ function Notice() {
       keyword: debouncedKeyword.trim(),
       category,
       page,
-      size: 7,
+      size: 5,
     }),
     queryFn: ({ signal }) =>
       getNotices(
@@ -60,7 +62,7 @@ function Notice() {
           keyword: debouncedKeyword.trim() || undefined,
           category: category === "ALL" ? undefined : category,
           page,
-          size: 6,
+          size: 5,
         },
         { signal },
       ),
@@ -80,10 +82,17 @@ function Notice() {
     staleTime: 5 * 60_000,
   });
 
+  const allAdsQuery = useAppQuery({
+    queryKey: appQueryKeys.placementAds("HOME_BOTTOM"),
+    queryFn: ({ signal }) => getPlacementAds("HOME_BOTTOM", { signal }),
+    staleTime: 5 * 60_000,
+  });
+
   const notices = useMemo(
     () => noticeListQuery.data?.content ?? [],
     [noticeListQuery.data],
   );
+  const allAds = allAdsQuery.data ?? [];
   const currentPage = noticeListQuery.data?.number ?? page;
   const totalPages = noticeListQuery.data?.totalPages ?? 0;
   const listError = noticeListQuery.error?.message ?? null;
@@ -127,7 +136,7 @@ function Notice() {
   const isDetailOpen = selectedNoticeId !== null;
 
   return (
-    <div className="pb-5 pt-[calc(68px+env(safe-area-inset-top))]">
+    <div className="pt-[calc(68px+env(safe-area-inset-top))]">
       {/* 상단 타이틀 & 검색 */}
       <section className="bg-[var(--surface)] px-4 pb-4 pt-3 shadow-[0_8px_24px_var(--shadow-color)]">
         <div className="mb-3">
@@ -285,6 +294,8 @@ function Notice() {
           );
         })()}
       </section>
+
+      <AdBanner ads={allAds} marginTopClassName="mt-4" />
 
       {/* 상세 보기 패널 */}
       <Dialog
