@@ -96,6 +96,14 @@ const toLegalBlocks = (lines: readonly string[]): LegalBlock[] => {
   return blocks;
 };
 
+const isChapterHeadingLine = (line: string): boolean => {
+  return /^제\d+장/.test(line.trim());
+};
+
+const isArticleHeadingLine = (line: string): boolean => {
+  return line.startsWith("제") && line.includes("조");
+};
+
 const LegalDocument = ({ documentType }: LegalDocumentProps) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -173,13 +181,16 @@ const LegalDocument = ({ documentType }: LegalDocumentProps) => {
 
           const line = block.text;
           const isEffectiveDateLine = line.startsWith("시행일자:");
-          const isArticleHeading = line.startsWith("제") && line.includes("조");
+          const isChapterHeading = isChapterHeadingLine(line);
+          const isArticleHeading = isArticleHeadingLine(line);
           return (
             <p
               key={`paragraph-${index}-${line.slice(0, 24)}`}
               className={
                 isEffectiveDateLine
                   ? "pt-1 text-[1.25rem] font-semibold leading-[1.6] text-[var(--text)]"
+                  : isChapterHeading
+                    ? "pt-3 text-[1.35rem] font-bold leading-[1.55] text-[var(--text)]"
                   : isArticleHeading
                     ? "pt-2 text-[1.125rem] font-semibold leading-[1.6] text-[var(--text)]"
                     : "text-[0.95rem] leading-[1.75] text-[var(--text-muted)]"
