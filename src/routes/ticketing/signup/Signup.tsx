@@ -527,6 +527,11 @@ export default function Signup() {
       return;
     }
 
+    if (!requiredConsentsMet) {
+      setStep1Error("필수 동의 항목을 모두 체크해주세요.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const { signupToken: token } = await signupApi.verifyStudent(dkuStudentId, dkuPassword);
@@ -540,11 +545,12 @@ export default function Signup() {
           setStep1Error(message ?? "단국대 포털 학번 또는 비밀번호가 올바르지 않습니다.");
         } else if (err.status === 409) {
           setStep1Error(message ?? "이미 가입한 학번입니다.");
-        } else if (err.status === 403) {
-          setStep1Error(message ?? "학생 및 재학생만 회원가입이 가능합니다.");
         } else {
           setStep1Error(message ?? "단국대 인증에 실패했습니다.");
         }
+      } else if (isAuthBoundaryError(err) && err.status === 403) {
+        const cause = err.cause as { response?: { data?: { error?: string } } } | undefined;
+        setStep1Error(cause?.response?.data?.error ?? ERROR_403);
       } else {
         setStep1Error("단국대 인증에 실패했습니다.");
       }
