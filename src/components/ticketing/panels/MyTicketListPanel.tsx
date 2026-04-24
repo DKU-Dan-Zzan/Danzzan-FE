@@ -1,7 +1,7 @@
 // 역할: 발급된 티켓 목록과 빈 상태/오류 상태를 보여주는 내 티켓 패널을 렌더링합니다.
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
-import { TicketCheck } from "lucide-react";
+import { Megaphone, TicketCheck } from "lucide-react";
 import { PaperTicketCard } from "@/components/ticketing/panels/PaperTicketCard";
 import { TicketingAdBannerCard } from "@/components/ticketing/panels/TicketingAdBannerCard";
 import {
@@ -89,6 +89,32 @@ export function MyTicketListPanel({
           <dt className="font-medium" style={{ color: "rgba(28,43,106,0.45)" }}>이름</dt>
           <dd className="font-extrabold tracking-tight" style={{ color: "var(--poster-navy)" }}>{student.name}</dd>
         </dl>
+      </div>
+
+      <div
+        className="overflow-hidden rounded-[16px] px-4 py-3"
+        style={{
+          background: "var(--poster-card-white)",
+          border: "1px solid rgba(28,43,106,0.08)",
+          boxShadow: "0 2px 12px rgba(28,43,106,0.07)",
+        }}
+      >
+        <div className="flex items-center gap-3">
+          <span
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+            style={{ background: "rgba(240,68,56,0.1)", color: "#f04438" }}
+          >
+            <Megaphone className="h-5 w-5" strokeWidth={2.2} />
+          </span>
+          <p
+            className="text-[10.5px] font-semibold leading-[1.65] tracking-[-0.01em]"
+            style={{ color: "rgba(17,24,39,0.92)" }}
+          >
+            빠른 단국존 입장을 위해 네이버 Face Sign을 사전에 등록해주세요.
+            <br />
+            미등록 시, 팔찌 배부 후 단국존 입장이 지연될 수 있습니다.
+          </p>
+        </div>
       </div>
 
       {tickets.map((ticket) => (
