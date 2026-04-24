@@ -211,9 +211,9 @@ const AUTH_PLACEHOLDER_CLASS =
 
 const STEP_LABELS = ["단국대 인증", "전화번호 인증", "가입 완료"] as const;
 const NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE = "네이버 아이디가 서로 일치하지 않습니다.";
-const NAVER_ID_LABEL_CLASS_NAME = "text-[#03C75A]";
+const NAVER_ID_LABEL_CLASS_NAME = "text-[var(--naver-green)]";
 const NAVER_ID_INPUT_CLASS_NAME =
-  "border-[#03C75A] focus-visible:border-[#03C75A] focus-visible:shadow-[0_0_0_4px_rgba(3,199,90,0.18)]";
+  "border-[var(--naver-green)] focus-visible:border-[var(--naver-green)] focus-visible:shadow-[0_0_0_4px_rgba(3,199,90,0.18)]";
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
@@ -1148,7 +1148,7 @@ export default function Signup() {
                       <div className="space-y-3 rounded-xl border border-[rgba(3,199,90,0.22)] bg-[rgba(3,199,90,0.03)] p-3.5">
                         {/* 헤더 */}
                         <div className="flex items-center gap-2.5">
-                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] bg-[#03C75A] text-[13px] font-black text-white">
+                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] bg-[var(--naver-green)] text-[13px] font-black text-white">
                             N
                           </div>
                           <span className="text-[13px] font-bold text-[var(--text)]">입장 확인용 네이버 아이디 등록</span>
@@ -1156,7 +1156,7 @@ export default function Signup() {
 
                         {/* 안내 박스 */}
                         <div className="flex items-start gap-2 rounded-lg bg-[rgba(3,199,90,0.08)] px-3 py-2.5">
-                          <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#03C75A]" strokeWidth={2.2} />
+                          <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--naver-green)]" strokeWidth={2.2} />
                           <p className="text-[11.5px] leading-[1.6] text-[var(--text-muted)]">
                             얼굴인식 입장(FaceSign)에 사용할 네이버 아이디를 정확히 확인해 주세요.<br />
                             오입력을 방지하기 위해 동일한 아이디를 한 번 더 입력합니다.
@@ -1183,14 +1183,14 @@ export default function Signup() {
                               disabled={submitting}
                             />
                             {naverId.trim().length > 0 && (
-                              <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#03C75A]" strokeWidth={2} />
+                              <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--naver-green)]" strokeWidth={2} />
                             )}
                           </div>
                         </div>
 
                         {/* 화살표 */}
                         <div className="flex justify-center">
-                          <ArrowDown className="h-4 w-4 text-[#03C75A]" strokeWidth={2.2} />
+                          <ArrowDown className="h-4 w-4 text-[var(--naver-green)]" strokeWidth={2.2} />
                         </div>
 
                         {/* 네이버 아이디 재입력 */}
@@ -1213,15 +1213,15 @@ export default function Signup() {
                               disabled={submitting}
                             />
                             {naverIdConfirm.trim().length > 0 && (
-                              <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#03C75A]" strokeWidth={2} />
+                              <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--naver-green)]" strokeWidth={2} />
                             )}
                           </div>
 
                           {/* 일치 확인 */}
                           {isNaverIdMatched && (
                             <div className="flex items-center gap-1.5 pl-0.5">
-                              <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[#03C75A]" strokeWidth={2.2} />
-                              <span className="text-[11.5px] font-medium text-[#03C75A]">입력한 네이버 아이디가 일치합니다.</span>
+                              <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[var(--naver-green)]" strokeWidth={2.2} />
+                              <span className="text-[11.5px] font-medium text-[var(--naver-green)]">입력한 네이버 아이디가 일치합니다.</span>
                             </div>
                           )}
                         </div>
@@ -1240,7 +1240,7 @@ export default function Signup() {
 
                     <Button
                       type="submit"
-                      className="h-11 w-full rounded-2xl border border-transparent bg-[#03C75A] text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[0_4px_16px_rgba(3,199,90,0.35)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
+                      className="h-11 w-full rounded-2xl border border-transparent bg-[var(--naver-green)] text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[0_4px_16px_rgba(3,199,90,0.35)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
                       disabled={submitting}
                     >
                       <KeyRound className="h-4 w-4" strokeWidth={2.3} />
