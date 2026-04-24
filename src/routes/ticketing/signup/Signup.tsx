@@ -472,9 +472,9 @@ export default function Signup() {
   const [step3Error, setStep3Error] = useState<string | null>(null);
 
   // ── 비밀번호 표시 토글
-  const [showPortalPw, setShowPortalPw] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [showPortalPw, setShowPortalPw] = useState(true);
+  const [showPassword, setShowPassword] = useState(true);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(true);
 
   const passwordPolicy = getPasswordPolicyState(password, passwordConfirm);
   const isNaverIdMatched = naverId.trim().length > 0 && naverId.trim() === naverIdConfirm.trim();
@@ -766,7 +766,7 @@ export default function Signup() {
                         <div className="relative">
                           <Input
                             id="dkuPassword"
-                            type={showPortalPw ? "text" : "password"}
+                            type={showPortalPw ? "password" : "text"}
                             value={dkuPassword}
                             onChange={(e) => setDkuPassword(e.target.value)}
                             placeholder="단국대 포털 비밀번호를 입력해 주세요"
@@ -1046,7 +1046,7 @@ export default function Signup() {
                         <div className="relative">
                           <Input
                             id="password"
-                            type={showPassword ? "text" : "password"}
+                            type={showPassword ? "password" : "text"}
                             value={password}
                             onChange={(e) => {
                               if (step3Error === PASSWORD_POLICY_ERROR_MESSAGE) setStep3Error(null);
@@ -1079,7 +1079,7 @@ export default function Signup() {
                         <div className="relative">
                           <Input
                             id="passwordConfirm"
-                            type={showPasswordConfirm ? "text" : "password"}
+                            type={showPasswordConfirm ? "password" : "text"}
                             value={passwordConfirm}
                             onChange={(e) => {
                               if (
