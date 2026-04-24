@@ -10,6 +10,9 @@ import {
   RefreshCw,
   CheckCircle2,
   Send,
+  X,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { Checkbox } from "@/components/common/ui/checkbox";
@@ -32,6 +35,165 @@ import {
 import { TICKETING_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
 import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
 import { cn } from "@/components/common/ui/utils";
+
+// ─── 동의 항목 데이터 ──────────────────────────────────────────────────────────
+
+const CONSENT_ITEMS: { id: number; title: string; required: boolean; content: React.ReactNode }[] = [
+  {
+    id: 1,
+    title: "개인정보의 제3자 제공에 대한 동의",
+    required: true,
+    content: (
+      <div className="space-y-3 text-[13px] leading-6 text-[var(--text-muted)]">
+        <p>
+          총학생회는 개인정보를 개인정보 수집·이용 목적에서 명시한 범위 내에서 사용하며, 이용자의
+          사전 동의 없이 목적 범위를 초과하여 이용하거나 원칙적으로 이용자의 개인정보를 제공하지
+          않습니다. 다만, 아래와 같이 양질의 서비스 제공을 위해 이용자의 개인정보를 공유할 필요가
+          있는 경우에는 필요한 범위 내에서 개인정보를 제3자에게 제공하고 있습니다.
+        </p>
+        <table className="w-full border-collapse border border-[var(--border-base)] text-[12px]">
+          <thead>
+            <tr className="bg-[var(--surface_container)]">
+              {["제공받는 자", "제공 목적", "제공 항목", "보유 및 이용 기간"].map((h) => (
+                <th key={h} className="border border-[var(--border-base)] px-2 py-1.5 text-left font-bold text-[var(--text)]">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="border border-[var(--border-base)] px-2 py-1.5">네이버 주식회사</td>
+              <td className="border border-[var(--border-base)] px-2 py-1.5">축제 행사장(단국존) 입장 관리 및 팔찌 배부 시 본인인증(Face ID) 서비스 연계</td>
+              <td className="border border-[var(--border-base)] px-2 py-1.5">학번, 네이버 아이디</td>
+              <td className="border border-[var(--border-base)] px-2 py-1.5">축제 종료 후 2026년 12월 31일까지</td>
+            </tr>
+          </tbody>
+        </table>
+        <p className="text-[11.5px]">
+          ※ 네이버 주식회사가 제공하는 본인인증(Face ID) 서비스 이용 과정에서 얼굴 생체정보 등의
+          추가 정보는 네이버 주식회사가 정보주체로부터 직접 수집·처리하며, 이에 관한 사항은
+          네이버 주식회사의 개인정보처리방침 및 이용약관이 적용됩니다.
+        </p>
+        <p className="font-bold text-[var(--text)]">
+          동의를 거부할 권리가 있으며, 거부 시 축제 행사장 입장 및 팔찌 배부가 불가하여 본 서비스
+          중 축제 입출입 관련 기능 이용이 제한됩니다.
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: 2,
+    title: "개인정보 처리위탁에 대한 동의",
+    required: true,
+    content: (
+      <div className="space-y-3 text-[13px] leading-6 text-[var(--text-muted)]">
+        <p>
+          총학생회는 원활하고 향상된 서비스를 제공하기 위해 개인정보 처리업무를 다른 회사에 위탁할
+          수 있습니다. 총학생회는 아래와 같이 개인정보처리업무를 위탁하고 있고, 「개인정보 보호법」
+          제26조 제6항에 따라 수탁자가 총학생회의 개인정보 처리 업무를 재위탁하는 경우 동의를 받고
+          있습니다. 이용자는 동의를 거부할 수 있으나, 동의 거부 시 본 서비스 이용이 제한될 수
+          있습니다.
+        </p>
+        <table className="w-full border-collapse border border-[var(--border-base)] text-[12px]">
+          <thead>
+            <tr className="bg-[var(--surface_container)]">
+              {["수탁 업체", "위탁 업무"].map((h) => (
+                <th key={h} className="border border-[var(--border-base)] px-2 py-1.5 text-left font-bold text-[var(--text)]">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="border border-[var(--border-base)] px-2 py-1.5">엔에이치엔클라우드(주)</td>
+              <td className="border border-[var(--border-base)] px-2 py-1.5">클라우드 인프라 제공</td>
+            </tr>
+            <tr>
+              <td className="border border-[var(--border-base)] px-2 py-1.5">주식회사 파마링커</td>
+              <td className="border border-[var(--border-base)] px-2 py-1.5">클라우드 제공</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    ),
+  },
+  {
+    id: 3,
+    title: "필수 수집·이용 동의",
+    required: true,
+    content: (
+      <div className="space-y-3 text-[13px] leading-6 text-[var(--text-muted)]">
+        <div>
+          <p className="font-bold text-[var(--text)]">가. 수집 및 이용 목적</p>
+          <p className="mt-1">
+            총학생회는 서비스사에서의 본인의 확인을 위해, 본 서비스를 제공하기 위해(축제정보 제공,
+            축제 티켓팅 서비스 제공, 축제 행사장 입출입 확인 및 본인인증 연계, 축제 내 타임테이블
+            제공), 본 서비스와 관련된 정보를 제공하기 위해, 앱 데이터 다운 개선 서비스 제공을 위해,
+            문의에 대한 대응을 위해, 또한 최소한의 범위 내에서 개인정보를 수집합니다.
+          </p>
+        </div>
+        <div>
+          <p className="font-bold text-[var(--text)]">나. 수집 및 이용 항목</p>
+          <ul className="mt-1 space-y-1">
+            <li>• 이용자 본인 확인 및 서비스 제공에 관한 정보: 학번, 본 서비스 비밀번호(암호화 저장), 학적정보/소속(대학교/학교/전공/학년), 소속, 네이버 아이디</li>
+            <li>• 회원가입 과정에서 일시적으로 수집 후 완료 시 즉시 삭제되는 정보: 단국대학교 포털 비밀번호</li>
+          </ul>
+          <p className="mt-1 text-[11.5px]">※ 서비스 이용 과정에서 자동으로 생성·수집되는 정보: 접속 로그, IP 주소, 쿠키, 브라우저 정보, OS 정보, 기기 정보(Device ID), 서비스 이용 기록(축제 정보 조회 이력, 공지 열람 이력, 티켓팅 이력 등)</p>
+          <p className="text-[11.5px]">※ 이용자가 직접 작성한 정보: 문의, 의견, 텍스트 등</p>
+        </div>
+        <div>
+          <p className="font-bold text-[var(--text)]">다. 보유 및 이용 기간</p>
+          <p className="mt-1">
+            서비스 탈퇴 시 또는 2026년 12월 31일 중 이른 시점까지 보유·이용하며, 이후 지체없이
+            파기합니다. 다만, 관련 법령에 따라 일정 기간 보존해야 하는 경우에는 해당 법령에서 정한
+            기간 동안 보관합니다.
+          </p>
+          <ul className="mt-1 space-y-0.5">
+            <li>• 정보통신망법 본인확인에 관한 기록: 6개월</li>
+            <li>• 통신비밀보호법 서비스 이용 관련 로그기록: 3개월</li>
+          </ul>
+        </div>
+        <p className="font-bold text-[var(--text)]">
+          동의를 거부할 권리가 있으며, 필수 항목에 대한 동의를 거부할 경우 회원가입 및 본 서비스
+          이용이 불가능합니다.
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: 4,
+    title: "선택 수집·이용 동의 (광고 관련)",
+    required: false,
+    content: (
+      <div className="space-y-3 text-[13px] leading-6 text-[var(--text-muted)]">
+        <div>
+          <p className="font-bold text-[var(--text)]">가. 수집 및 이용 목적</p>
+          <p className="mt-1">
+            본 서비스 내 광고 노출 최적화 및 광고 효과 분석을 위하여, 이용자의 이용 성향 및 관심사를
+            분석하여 맞춤형 광고를 제공하기 위해 개인정보를 수집·이용합니다.
+          </p>
+        </div>
+        <div>
+          <p className="font-bold text-[var(--text)]">나. 수집 및 이용 항목</p>
+          <ul className="mt-1 space-y-1">
+            <li>• 광고식별자(ADID/IDFA)</li>
+            <li>• 이용자의 광고 조회 이력 및 서비스 이용 기록(어떤 광고를 조회하였는지 등)</li>
+          </ul>
+        </div>
+        <div>
+          <p className="font-bold text-[var(--text)]">다. 보유 및 이용 기간</p>
+          <p className="mt-1">수집일로부터 6개월</p>
+        </div>
+        <p>
+          본 동의는 선택 사항이며, 동의를 거부하시더라도 본 서비스 이용에는 제한이 없습니다. 다만,
+          맞춤형 광고가 제공되지 않을 수 있습니다.
+        </p>
+      </div>
+    ),
+  },
+];
 
 // ─── 상수 ────────────────────────────────────────────────────────────────────
 
@@ -203,6 +365,59 @@ function ErrorBox({ message }: { message: string }) {
     <p className="rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-sm text-[var(--status-danger-text)]">
       {message}
     </p>
+  );
+}
+
+// ─── 동의 팝업 ────────────────────────────────────────────────────────────────
+
+function ConsentModal({
+  item,
+  onClose,
+}: {
+  item: (typeof CONSENT_ITEMS)[number];
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="flex h-[70vh] w-full max-w-[var(--ticketing-mobile-shell-max-width)] flex-col rounded-t-[28px] bg-[var(--surface_container_lowest)] pt-3 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_40px_rgba(0,0,0,0.18)]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* 헤더 */}
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[color:color-mix(in_srgb,var(--border-base)_60%,transparent)]">
+          <p className="text-[15px] font-bold text-[var(--text)] leading-tight pr-4">
+            {item.title}
+            <span className="ml-2 text-xs font-semibold text-[var(--text-emphasis-vivid)]">
+              ({item.required ? "필수" : "선택"})
+            </span>
+          </p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="shrink-0 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--surface_container)] text-[var(--text-muted)]"
+          >
+            <X className="h-4 w-4" strokeWidth={2.2} />
+          </button>
+        </div>
+        {/* 본문 */}
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          {item.content}
+        </div>
+        {/* 닫기 버튼 */}
+        <div className="px-5 py-4">
+          <button
+            type="button"
+            onClick={onClose}
+            className="h-11 w-full rounded-2xl bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-[15px] font-semibold text-white"
+          >
+            확인
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
