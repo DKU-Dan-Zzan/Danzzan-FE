@@ -138,7 +138,7 @@ function Notice() {
   return (
     <div className="pt-[calc(68px+env(safe-area-inset-top))]">
       {/* 상단 타이틀 & 검색 */}
-      <section className="bg-[var(--surface)] px-4 pb-4 pt-3 shadow-[0_8px_24px_var(--shadow-color)]">
+      <section className="bg-[var(--surface)] pb-4 pl-[28px] pr-4 pt-3 shadow-[0_8px_24px_var(--shadow-color)]">
         <div className="mb-3">
           <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-body-deep)]">
             공지사항
