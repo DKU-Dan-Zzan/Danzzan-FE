@@ -18,7 +18,6 @@ import { Button } from "@/components/common/ui/button";
 import { Checkbox } from "@/components/common/ui/checkbox";
 import { Input } from "@/components/common/ui/input";
 import { Label } from "@/components/common/ui/label";
-import { PasswordPolicyChecklist } from "@/components/ticketing/auth/PasswordPolicyChecklist";
 import {
   TicketingAuthHeading,
   TICKETING_AUTH_HEADER_SECTION_CLASS,
@@ -30,7 +29,8 @@ import { isAuthBoundaryError } from "@/api/common/authCore";
 import {
   getPasswordPolicyState,
   getPasswordPolicyErrorMessage,
-  isPasswordPolicyErrorMessage,
+  PASSWORD_CONFIRM_MISMATCH_ERROR_MESSAGE,
+  PASSWORD_POLICY_ERROR_MESSAGE,
 } from "@/lib/ticketing/passwordPolicy";
 import { TICKETING_AUTH_INPUT_CLASS_NAME } from "@/lib/ticketing/authInputClassNames";
 import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
@@ -208,6 +208,10 @@ const AUTH_PLACEHOLDER_CLASS =
   "text-[0.96rem] sm:text-[0.98rem] placeholder:text-[0.8rem] sm:placeholder:text-[0.84rem] placeholder:tracking-[-0.01em]";
 
 const STEP_LABELS = ["단국대 인증", "전화번호 인증", "가입 완료"] as const;
+const NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE = "네이버 아이디가 서로 일치하지 않습니다.";
+const NAVER_ID_LABEL_CLASS_NAME = "text-[#03C75A]";
+const NAVER_ID_INPUT_CLASS_NAME =
+  "border-[#03C75A] focus-visible:border-[#03C75A] focus-visible:shadow-[0_0_0_4px_rgba(3,199,90,0.18)]";
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
@@ -463,7 +467,8 @@ export default function Signup() {
   // ── Step 3 상태
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [privacyConsent, setPrivacyConsent] = useState(false);
+  const [naverId, setNaverId] = useState("");
+  const [naverIdConfirm, setNaverIdConfirm] = useState("");
   const [step3Error, setStep3Error] = useState<string | null>(null);
 
   // ── 비밀번호 표시 토글
@@ -472,6 +477,7 @@ export default function Signup() {
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
   const passwordPolicy = getPasswordPolicyState(password, passwordConfirm);
+  const isNaverIdMatched = naverId.trim().length > 0 && naverId.trim() === naverIdConfirm.trim();
 
   // ── 타이머
   useEffect(() => {
@@ -631,8 +637,13 @@ export default function Signup() {
       return;
     }
 
-    if (!privacyConsent) {
-      setStep3Error("개인정보 이용 동의(필수)를 체크해주세요.");
+    if (!naverId.trim() || !naverIdConfirm.trim()) {
+      setStep3Error("네이버 아이디를 입력해 주세요.");
+      return;
+    }
+
+    if (!isNaverIdMatched) {
+      setStep3Error(NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE);
       return;
     }
 
@@ -642,6 +653,8 @@ export default function Signup() {
         signupToken,
         password,
         passwordConfirm,
+        naverId.trim(),
+        naverIdConfirm.trim(),
         phoneVerificationSessionId,
       );
       navigate("/ticket/login");
@@ -1036,7 +1049,7 @@ export default function Signup() {
                             type={showPassword ? "text" : "password"}
                             value={password}
                             onChange={(e) => {
-                              if (isPasswordPolicyErrorMessage(step3Error)) setStep3Error(null);
+                              if (step3Error === PASSWORD_POLICY_ERROR_MESSAGE) setStep3Error(null);
                               setPassword(e.target.value);
                             }}
                             placeholder="새로운 비밀번호를 입력해 주세요"
@@ -1069,7 +1082,12 @@ export default function Signup() {
                             type={showPasswordConfirm ? "text" : "password"}
                             value={passwordConfirm}
                             onChange={(e) => {
-                              if (isPasswordPolicyErrorMessage(step3Error)) setStep3Error(null);
+                              if (
+                                step3Error === PASSWORD_CONFIRM_MISMATCH_ERROR_MESSAGE ||
+                                step3Error === PASSWORD_POLICY_ERROR_MESSAGE
+                              ) {
+                                setStep3Error(null);
+                              }
                               setPasswordConfirm(e.target.value);
                             }}
                             placeholder="새로운 비밀번호를 다시 입력해 주세요"
@@ -1089,34 +1107,81 @@ export default function Signup() {
                         </div>
                       </div>
 
-                      <PasswordPolicyChecklist state={passwordPolicy} />
-                    </section>
+                      <div className="space-y-1 pl-1">
+                        <p className="text-[11px] leading-5 text-[var(--text-muted)]">
+                          • 8자 이상으로 입력해 주세요.
+                        </p>
+                        <p className="text-[11px] leading-5 text-[var(--text-muted)]">
+                          • 특수문자를 최소 1개 포함해 주세요.
+                        </p>
+                      </div>
 
-                    {step3Error && <ErrorBox message={step3Error} />}
+                      <div className="py-2">
+                        <div className="h-px w-full bg-[linear-gradient(90deg,transparent_0%,rgba(55,65,81,0.22)_10%,rgba(55,65,81,0.45)_50%,rgba(55,65,81,0.22)_90%,transparent_100%)]" />
+                      </div>
 
-                    <section className={cn("rounded-2xl px-4 py-4", APP_CARD_VARIANTS.gradTint)}>
-                      <div className="flex items-start gap-3">
-                        <Checkbox
-                          id="privacyConsent"
-                          checked={privacyConsent}
-                          onCheckedChange={(checked) => setPrivacyConsent(checked === true)}
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="naverId"
+                          className={cn("text-sm font-semibold", NAVER_ID_LABEL_CLASS_NAME)}
+                        >
+                          네이버 아이디
+                        </Label>
+                        <Input
+                          id="naverId"
+                          value={naverId}
+                          onChange={(e) => {
+                            if (step3Error === NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE) {
+                              setStep3Error(null);
+                            }
+                            setNaverId(e.target.value);
+                          }}
+                          placeholder="네이버 아이디를 입력해 주세요"
+                          className={cn(
+                            TICKETING_AUTH_INPUT_CLASS_NAME,
+                            AUTH_PLACEHOLDER_CLASS,
+                            NAVER_ID_INPUT_CLASS_NAME,
+                          )}
+                          autoComplete="username"
+                          required
                           disabled={submitting}
-                          className="mt-0.5 size-6 rounded-full border-[var(--border-base)] data-[state=checked]:border-[var(--accent)] data-[state=checked]:bg-[var(--accent)]"
                         />
-                        <div>
-                          <Label
-                            htmlFor="privacyConsent"
-                            className="cursor-pointer text-base font-semibold text-[var(--text)]"
-                          >
-                            개인정보 이용 동의 (필수)
-                          </Label>
-                          <p className="mt-1 text-sm leading-6 text-[var(--text-muted)]">
-                            축제 서비스 및 대학 서비스 이용을 위해 학번, 연락처, 학적정보, 소속 등
-                            최소 항목 정보의 수집 및 이용에 동의합니다.
-                          </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="naverIdConfirm"
+                          className={cn("text-sm font-semibold", NAVER_ID_LABEL_CLASS_NAME)}
+                        >
+                          네이버 아이디 확인
+                        </Label>
+                        <Input
+                          id="naverIdConfirm"
+                          value={naverIdConfirm}
+                          onChange={(e) => {
+                            if (step3Error === NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE) {
+                              setStep3Error(null);
+                            }
+                            setNaverIdConfirm(e.target.value);
+                          }}
+                          placeholder="네이버 아이디를 다시 입력해 주세요"
+                          className={cn(
+                            TICKETING_AUTH_INPUT_CLASS_NAME,
+                            AUTH_PLACEHOLDER_CLASS,
+                            NAVER_ID_INPUT_CLASS_NAME,
+                          )}
+                          autoComplete="off"
+                          required
+                          disabled={submitting}
+                        />
+                        <div className="space-y-0.5 pl-1 text-[11px] leading-5 text-[var(--status-danger-text)]">
+                          <p>• 네이버 FaceSign 입장 패스트트랙에 사용되는 정보입니다.</p>
+                          <p>• 오입력 시 이용에 불이익이 있을 수 있습니다.</p>
                         </div>
                       </div>
                     </section>
+
+                    {step3Error && <ErrorBox message={step3Error} />}
 
                     <Button
                       type="submit"
