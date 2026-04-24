@@ -53,6 +53,7 @@ export function useTicketingFlow() {
   const [reserveErrorMessage, setReserveErrorMessage] = useState<string | null>(null);
   const [reserveMessage, setReserveMessage] = useState("입장 상태가 확인되어 예매를 진행하고 있습니다.");
   const [agreementChecked, setAgreementChecked] = useState(false);
+  const [thirdPartyPrivacyConsentChecked, setThirdPartyPrivacyConsentChecked] = useState(false);
   const [reservationError, setReservationError] = useState<string | null>(null);
   const [soldOutDescription, setSoldOutDescription] = useState(DEFAULT_SOLD_OUT_DESCRIPTION);
 
@@ -71,6 +72,7 @@ export function useTicketingFlow() {
     setReserveErrorMessage(null);
     setReserveMessage("입장 상태가 확인되어 예매를 진행하고 있습니다.");
     setAgreementChecked(false);
+    setThirdPartyPrivacyConsentChecked(false);
     setReservationError(null);
   }, []);
 
@@ -105,6 +107,7 @@ export function useTicketingFlow() {
     setReserveErrorMessage,
     setReserveMessage,
     setAgreementChecked,
+    setThirdPartyPrivacyConsentChecked,
     setReservationError,
     setSoldOutDescription,
     setListNotice,
@@ -321,6 +324,13 @@ export function useTicketingFlow() {
     }
   }, [reservationError]);
 
+  const handleThirdPartyPrivacyConsentCheckedChange = useCallback((checked: boolean) => {
+    setThirdPartyPrivacyConsentChecked(checked);
+    if (reservationError) {
+      setReservationError(null);
+    }
+  }, [reservationError]);
+
   const handleSubmitReservation = useCallback(() => {
     if (!activeEventId) {
       return;
@@ -331,9 +341,14 @@ export function useTicketingFlow() {
       return;
     }
 
+    if (!thirdPartyPrivacyConsentChecked) {
+      setReservationError("개인정보 제3자 제공 동의(필수)를 체크해주세요.");
+      return;
+    }
+
     setReservationError(null);
     void executeReserve(activeEventId);
-  }, [activeEventId, agreementChecked, executeReserve]);
+  }, [activeEventId, agreementChecked, executeReserve, thirdPartyPrivacyConsentChecked]);
 
   useEffect(() => {
     if (step !== "list") {
@@ -361,6 +376,7 @@ export function useTicketingFlow() {
     setReserveErrorMessage(null);
     setReserveMessage("입장 상태가 확인되어 예매를 진행하고 있습니다.");
     setAgreementChecked(false);
+    setThirdPartyPrivacyConsentChecked(false);
     setReservationError(null);
     applyQueueEventToUrl(null);
     void moveToList();
@@ -402,6 +418,7 @@ export function useTicketingFlow() {
     isNetworkOnline,
     waitingError,
     agreementChecked,
+    thirdPartyPrivacyConsentChecked,
     reserveProcessing,
     reservationError,
     reserveMessage,
@@ -412,6 +429,7 @@ export function useTicketingFlow() {
     openMyTickets,
     selectEvent: handleEnterQueue,
     changeAgreement: handleAgreementCheckedChange,
+    changeThirdPartyPrivacyConsent: handleThirdPartyPrivacyConsentCheckedChange,
     submitReservation: handleSubmitReservation,
     retryReserve,
     backToList,
