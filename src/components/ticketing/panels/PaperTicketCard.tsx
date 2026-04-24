@@ -71,7 +71,7 @@ export function PaperTicketCard({ ticket }: PaperTicketCardProps) {
 
         {/* 수채화 꽃 배경 */}
         <image
-          href="/posters/ticket-bg.png"
+          href="/posters/ticket_bg.png"
           x="0" y="0"
           width="400" height="180"
           preserveAspectRatio="xMaxYMid slice"
