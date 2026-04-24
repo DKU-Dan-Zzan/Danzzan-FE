@@ -13,6 +13,8 @@ import {
   X,
   Eye,
   EyeOff,
+  ArrowDown,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { Checkbox } from "@/components/common/ui/checkbox";
@@ -377,25 +379,27 @@ function ErrorBox({ message }: { message: string }) {
 function ConsentModal({
   item,
   onClose,
+  onAgree,
 }: {
   item: (typeof CONSENT_ITEMS)[number];
   onClose: () => void;
+  onAgree: () => void;
 }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-end justify-center bg-black/40 backdrop-blur-sm"
       role="button"
       tabIndex={-1}
       onClick={onClose}
       onKeyDown={(e) => e.key === "Escape" && onClose()}
     >
       <div
-        className="flex h-[70vh] w-full max-w-[var(--ticketing-mobile-shell-max-width)] flex-col rounded-t-[28px] bg-[var(--surface_container_lowest)] pt-3 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_40px_rgba(0,0,0,0.18)]"
+        className="flex h-[70vh] w-full max-w-[var(--ticketing-mobile-shell-max-width)] flex-col rounded-t-[28px] bg-[var(--surface_container_lowest)] pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_40px_rgba(0,0,0,0.18)]"
         role="presentation"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 헤더 */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-[color:color-mix(in_srgb,var(--border-base)_60%,transparent)]">
+        <div className="flex shrink-0 items-center justify-between border-b border-[color:color-mix(in_srgb,var(--border-base)_60%,transparent)] px-5 py-3">
           <p className="text-[15px] font-bold text-[var(--text)] leading-tight pr-4">
             {item.title}
             <span className="ml-2 text-xs font-semibold text-[var(--text-emphasis-vivid)]">
@@ -414,14 +418,14 @@ function ConsentModal({
         <div className="flex-1 overflow-y-auto px-5 py-4">
           {item.content}
         </div>
-        {/* 닫기 버튼 */}
-        <div className="px-5 py-4">
+        {/* 하단 버튼 */}
+        <div className="shrink-0 px-5 py-4">
           <button
             type="button"
-            onClick={onClose}
+            onClick={onAgree}
             className="h-11 w-full rounded-2xl bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-[15px] font-semibold text-white"
           >
-            확인
+            동의
           </button>
         </div>
       </div>
@@ -449,6 +453,8 @@ export default function Signup() {
   const toggleConsent = (idx: number) =>
     setConsents((prev) => prev.map((v, i) => (i === idx ? !v : v)));
   const requiredConsentsMet = consents[0] && consents[1] && consents[2];
+  const allConsented = consents.every(Boolean);
+  const toggleAll = () => setConsents(allConsented ? [false, false, false, false] : [true, true, true, true]);
 
   // ── Step 2 상태
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -713,6 +719,10 @@ export default function Signup() {
       <ConsentModal
         item={CONSENT_ITEMS[activeConsentIdx]}
         onClose={() => setActiveConsentIdx(null)}
+        onAgree={() => {
+          setConsents((prev) => prev.map((v, i) => (i === activeConsentIdx ? true : v)));
+          setActiveConsentIdx(null);
+        }}
       />
     )}
     <div className="relative left-1/2 min-h-screen w-screen -translate-x-1/2 overflow-hidden bg-[var(--bg-page-soft)]">
@@ -795,7 +805,25 @@ export default function Signup() {
                     </section>
 
                     {/* ── 개인정보 동의 항목 ── */}
-                    <section className="space-y-0.5 rounded-xl border border-[color:color-mix(in_srgb,var(--border-base)_50%,transparent)] bg-[var(--surface_container)] px-2.5 py-2">
+                    <section className="space-y-0 rounded-xl border border-[color:color-mix(in_srgb,var(--border-base)_50%,transparent)] bg-[var(--surface_container)] px-2.5 py-1.5">
+                      {/* 전체 동의 */}
+                      <div className="flex items-center gap-2 rounded-lg px-1 py-1.5">
+                        <Checkbox
+                          id="consent-all"
+                          checked={allConsented}
+                          onCheckedChange={toggleAll}
+                          disabled={submitting}
+                          className="size-4 shrink-0 rounded-sm border-[var(--border-base)] data-[state=checked]:border-[var(--accent)] data-[state=checked]:bg-[var(--accent)]"
+                        />
+                        <label
+                          htmlFor="consent-all"
+                          className="flex-1 cursor-pointer font-bold leading-tight text-[var(--text)]"
+                          style={{ fontSize: "11px" }}
+                        >
+                          전체 동의
+                        </label>
+                      </div>
+                      <div className="mx-1 h-px bg-[color:color-mix(in_srgb,var(--border-base)_60%,transparent)]" />
                       {CONSENT_ITEMS.map((item, idx) => (
                         <div
                           key={item.id}
@@ -806,7 +834,7 @@ export default function Signup() {
                             checked={consents[idx]}
                             onCheckedChange={() => toggleConsent(idx)}
                             disabled={submitting}
-                            className="size-4 shrink-0 rounded-full border-[var(--border-base)] data-[state=checked]:border-[var(--accent)] data-[state=checked]:bg-[var(--accent)]"
+                            className="size-4 shrink-0 rounded-sm border-[var(--border-base)] data-[state=checked]:border-[var(--accent)] data-[state=checked]:bg-[var(--accent)]"
                           />
                           <label
                             htmlFor={`consent-${item.id}`}
@@ -1116,67 +1144,94 @@ export default function Signup() {
                         </p>
                       </div>
 
-                      <div className="py-2">
-                        <div className="h-px w-full bg-[linear-gradient(90deg,transparent_0%,rgba(55,65,81,0.22)_10%,rgba(55,65,81,0.45)_50%,rgba(55,65,81,0.22)_90%,transparent_100%)]" />
-                      </div>
+                      {/* ── 네이버 아이디 섹션 ── */}
+                      <div className="space-y-3 rounded-xl border border-[rgba(3,199,90,0.22)] bg-[rgba(3,199,90,0.03)] p-3.5">
+                        {/* 헤더 */}
+                        <div className="flex items-center gap-2.5">
+                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] bg-[#03C75A] text-[13px] font-black text-white">
+                            N
+                          </div>
+                          <span className="text-[13px] font-bold text-[var(--text)]">입장 확인용 네이버 아이디 등록</span>
+                        </div>
 
-                      <div className="space-y-2">
-                        <Label
-                          htmlFor="naverId"
-                          className={cn("text-sm font-semibold", NAVER_ID_LABEL_CLASS_NAME)}
-                        >
-                          네이버 아이디
-                        </Label>
-                        <Input
-                          id="naverId"
-                          value={naverId}
-                          onChange={(e) => {
-                            if (step3Error === NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE) {
-                              setStep3Error(null);
-                            }
-                            setNaverId(e.target.value);
-                          }}
-                          placeholder="네이버 아이디를 입력해 주세요"
-                          className={cn(
-                            TICKETING_AUTH_INPUT_CLASS_NAME,
-                            AUTH_PLACEHOLDER_CLASS,
-                            NAVER_ID_INPUT_CLASS_NAME,
-                          )}
-                          autoComplete="username"
-                          required
-                          disabled={submitting}
-                        />
-                      </div>
+                        {/* 안내 박스 */}
+                        <div className="flex items-start gap-2 rounded-lg bg-[rgba(3,199,90,0.08)] px-3 py-2.5">
+                          <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#03C75A]" strokeWidth={2.2} />
+                          <p className="text-[11.5px] leading-[1.6] text-[var(--text-muted)]">
+                            얼굴인식 입장(FaceSign)에 사용할 네이버 아이디를 정확히 확인해 주세요.<br />
+                            오입력을 방지하기 위해 동일한 아이디를 한 번 더 입력합니다.
+                          </p>
+                        </div>
 
-                      <div className="space-y-2">
-                        <Label
-                          htmlFor="naverIdConfirm"
-                          className={cn("text-sm font-semibold", NAVER_ID_LABEL_CLASS_NAME)}
-                        >
-                          네이버 아이디 확인
-                        </Label>
-                        <Input
-                          id="naverIdConfirm"
-                          value={naverIdConfirm}
-                          onChange={(e) => {
-                            if (step3Error === NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE) {
-                              setStep3Error(null);
-                            }
-                            setNaverIdConfirm(e.target.value);
-                          }}
-                          placeholder="네이버 아이디를 다시 입력해 주세요"
-                          className={cn(
-                            TICKETING_AUTH_INPUT_CLASS_NAME,
-                            AUTH_PLACEHOLDER_CLASS,
-                            NAVER_ID_INPUT_CLASS_NAME,
+                        {/* 네이버 아이디 */}
+                        <div className="space-y-2">
+                          <Label htmlFor="naverId" className={cn("text-sm font-semibold", NAVER_ID_LABEL_CLASS_NAME)}>
+                            네이버 아이디
+                          </Label>
+                          <div className="relative">
+                            <Input
+                              id="naverId"
+                              value={naverId}
+                              onChange={(e) => {
+                                if (step3Error === NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE) setStep3Error(null);
+                                setNaverId(e.target.value);
+                              }}
+                              placeholder="네이버 아이디를 입력해 주세요"
+                              className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS, NAVER_ID_INPUT_CLASS_NAME, "pr-10")}
+                              autoComplete="username"
+                              required
+                              disabled={submitting}
+                            />
+                            {naverId.trim().length > 0 && (
+                              <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#03C75A]" strokeWidth={2} />
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 화살표 */}
+                        <div className="flex justify-center">
+                          <ArrowDown className="h-4 w-4 text-[#03C75A]" strokeWidth={2.2} />
+                        </div>
+
+                        {/* 네이버 아이디 재입력 */}
+                        <div className="space-y-2">
+                          <Label htmlFor="naverIdConfirm" className={cn("text-sm font-semibold", NAVER_ID_LABEL_CLASS_NAME)}>
+                            네이버 아이디 재입력
+                          </Label>
+                          <div className="relative">
+                            <Input
+                              id="naverIdConfirm"
+                              value={naverIdConfirm}
+                              onChange={(e) => {
+                                if (step3Error === NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE) setStep3Error(null);
+                                setNaverIdConfirm(e.target.value);
+                              }}
+                              placeholder="네이버 아이디를 다시 입력해 주세요"
+                              className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS, NAVER_ID_INPUT_CLASS_NAME, "pr-10")}
+                              autoComplete="off"
+                              required
+                              disabled={submitting}
+                            />
+                            {naverIdConfirm.trim().length > 0 && (
+                              <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#03C75A]" strokeWidth={2} />
+                            )}
+                          </div>
+
+                          {/* 일치 확인 */}
+                          {isNaverIdMatched && (
+                            <div className="flex items-center gap-1.5 pl-0.5">
+                              <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[#03C75A]" strokeWidth={2.2} />
+                              <span className="text-[11.5px] font-medium text-[#03C75A]">입력한 네이버 아이디가 일치합니다.</span>
+                            </div>
                           )}
-                          autoComplete="off"
-                          required
-                          disabled={submitting}
-                        />
-                        <div className="space-y-0.5 pl-1 text-[11px] leading-5 text-[var(--status-danger-text)]">
-                          <p>• 네이버 FaceSign 입장 패스트트랙에 사용되는 정보입니다.</p>
-                          <p>• 오입력 시 이용에 불이익이 있을 수 있습니다.</p>
+                        </div>
+
+                        {/* 하단 안내 */}
+                        <div className="flex items-start gap-2 rounded-lg bg-[var(--status-danger-bg)] px-3 py-2.5">
+                          <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--status-danger-text)]" strokeWidth={2} />
+                          <p className="text-[11.5px] leading-[1.6] text-[var(--status-danger-text)]">
+                            빠른 단국존 입장을 위해서는 네이버 Face Sign 사전 인증이 필요합니다.
+                          </p>
                         </div>
                       </div>
                     </section>
@@ -1185,7 +1240,7 @@ export default function Signup() {
 
                     <Button
                       type="submit"
-                      className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
+                      className="h-11 w-full rounded-2xl border border-transparent bg-[#03C75A] text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[0_4px_16px_rgba(3,199,90,0.35)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
                       disabled={submitting}
                     >
                       <KeyRound className="h-4 w-4" strokeWidth={2.3} />
