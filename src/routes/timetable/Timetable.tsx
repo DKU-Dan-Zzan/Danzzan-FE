@@ -218,7 +218,7 @@ export default function Timetable() {
         <div className="h-[calc(env(safe-area-inset-top)+68px)]" />
 
         {/* 타이틀 - 스크롤 시 사라짐 */}
-        <div className="bg-white px-4 pb-1 pt-3">
+        <div className="bg-white pb-1 pl-[28px] pr-4 pt-3">
           <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-body-deep)]">타임테이블</h1>
         </div>
 
