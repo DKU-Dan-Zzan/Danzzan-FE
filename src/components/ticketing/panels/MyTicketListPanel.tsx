@@ -102,7 +102,7 @@ export function MyTicketListPanel({
         <div className="flex items-center gap-3">
           <span
             className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
-            style={{ background: "rgba(240,68,56,0.1)", color: "#f04438" }}
+            style={{ background: "var(--status-danger-bg)", color: "var(--status-danger)" }}
           >
             <Megaphone className="h-5 w-5" strokeWidth={2.2} />
           </span>

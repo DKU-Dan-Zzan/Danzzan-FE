@@ -181,11 +181,7 @@ export function TicketingHomePanel({
             {noticeItems.map((notice) => (
               <li
                 key={notice.text}
-                className={
-                  notice.tone === "warning"
-                    ? "text-[#f04438]"
-                    : undefined
-                }
+                className={notice.tone === "warning" ? "text-[var(--status-danger)]" : undefined}
               >
                 {notice.text}
               </li>
