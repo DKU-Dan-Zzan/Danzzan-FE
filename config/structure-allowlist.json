@@ -881,6 +881,13 @@
       "reason": "티켓 상태 배지 팔레트 승인값 (상태 확인 필요 텍스트)",
       "owner": "fe-platform",
       "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#03C75A",
+      "reason": "네이버 브랜드 공식 색상 (Face Sign 연동 UI 토큰)",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
     }
   ]
 }

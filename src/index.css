@@ -33,6 +33,9 @@
   --app-bottom-nav-runtime-offset: calc(var(--app-bottom-nav-height) + env(safe-area-inset-bottom));
   --app-mobile-shell-max-width: 430px;
   --ticketing-mobile-shell-max-width: 420px;
+  --naver-green: #03C75A;
+  --naver-green-bg: rgba(3, 199, 90, 0.08);
+  --naver-green-border: rgba(3, 199, 90, 0.22);
   --ticketing-ad-slot-max-width: 18rem;
   --app-bottom-nav-icon-size: 20px;
   --app-bottom-nav-label-size: 10px;
