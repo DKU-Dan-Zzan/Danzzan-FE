@@ -462,6 +462,11 @@ export default function Signup() {
   const [privacyConsent, setPrivacyConsent] = useState(false);
   const [step3Error, setStep3Error] = useState<string | null>(null);
 
+  // ── 비밀번호 표시 토글
+  const [showPortalPw, setShowPortalPw] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+
   const passwordPolicy = getPasswordPolicyState(password, passwordConfirm);
 
   // ── 타이머
@@ -741,16 +746,26 @@ export default function Signup() {
                         >
                           포털 비밀번호
                         </Label>
-                        <Input
-                          id="dkuPassword"
-                          type="password"
-                          value={dkuPassword}
-                          onChange={(e) => setDkuPassword(e.target.value)}
-                          placeholder="단국대 포털 비밀번호를 입력해 주세요"
-                          className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS)}
-                          required
-                          disabled={submitting}
-                        />
+                        <div className="relative">
+                          <Input
+                            id="dkuPassword"
+                            type={showPortalPw ? "text" : "password"}
+                            value={dkuPassword}
+                            onChange={(e) => setDkuPassword(e.target.value)}
+                            placeholder="단국대 포털 비밀번호를 입력해 주세요"
+                            className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS, "pr-10")}
+                            required
+                            disabled={submitting}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPortalPw((v) => !v)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text)]"
+                            tabIndex={-1}
+                          >
+                            {showPortalPw ? <EyeOff className="h-4 w-4" strokeWidth={2} /> : <Eye className="h-4 w-4" strokeWidth={2} />}
+                          </button>
+                        </div>
                       </div>
 
                       <p className="flex items-start gap-1.5 rounded-[20px] bg-[linear-gradient(145deg,color-mix(in_srgb,var(--surface_container_low)_86%,white)_0%,color-mix(in_srgb,var(--primary_container)_18%,white)_100%)] px-3 py-2.5 text-[11px] font-medium leading-5 text-[var(--text-muted)]">
