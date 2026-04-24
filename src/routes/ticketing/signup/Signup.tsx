@@ -380,10 +380,14 @@ function ConsentModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm"
+      role="button"
+      tabIndex={-1}
       onClick={onClose}
+      onKeyDown={(e) => e.key === "Escape" && onClose()}
     >
       <div
         className="flex h-[70vh] w-full max-w-[var(--ticketing-mobile-shell-max-width)] flex-col rounded-t-[28px] bg-[var(--surface_container_lowest)] pt-3 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_40px_rgba(0,0,0,0.18)]"
+        role="presentation"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 헤더 */}
