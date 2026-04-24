@@ -435,6 +435,12 @@ export default function Signup() {
   const [dkuPassword, setDkuPassword] = useState("");
   const [step1Error, setStep1Error] = useState<string | null>(null);
   const [signupToken, setSignupToken] = useState("");
+  const [consents, setConsents] = useState([false, false, false, false]);
+  const [activeConsentIdx, setActiveConsentIdx] = useState<number | null>(null);
+
+  const toggleConsent = (idx: number) =>
+    setConsents((prev) => prev.map((v, i) => (i === idx ? !v : v)));
+  const requiredConsentsMet = consents[0] && consents[1] && consents[2];
 
   // ── Step 2 상태
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -674,6 +680,13 @@ export default function Signup() {
     (verifyError?.includes("사용된") ?? false);
 
   return (
+    <>
+    {activeConsentIdx !== null && (
+      <ConsentModal
+        item={CONSENT_ITEMS[activeConsentIdx]}
+        onClose={() => setActiveConsentIdx(null)}
+      />
+    )}
     <div className="relative left-1/2 min-h-screen w-screen -translate-x-1/2 overflow-hidden bg-[var(--bg-page-soft)]">
       {/* 배경 장식 */}
       <div className="pointer-events-none absolute inset-0">
@@ -741,6 +754,49 @@ export default function Signup() {
                         />
                         학생 인증을 위해 1회성으로만 사용하며 저장되지 않습니다.
                       </p>
+                    </section>
+
+                    {/* ── 개인정보 동의 항목 ── */}
+                    <section className="space-y-0.5 rounded-xl border border-[color:color-mix(in_srgb,var(--border-base)_50%,transparent)] bg-[var(--surface_container)] px-2.5 py-2">
+                      {CONSENT_ITEMS.map((item, idx) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center gap-2 rounded-lg px-1 py-1"
+                        >
+                          <Checkbox
+                            id={`consent-${item.id}`}
+                            checked={consents[idx]}
+                            onCheckedChange={() => toggleConsent(idx)}
+                            disabled={submitting}
+                            className="size-4 shrink-0 rounded-full border-[var(--border-base)] data-[state=checked]:border-[var(--accent)] data-[state=checked]:bg-[var(--accent)]"
+                          />
+                          <label
+                            htmlFor={`consent-${item.id}`}
+                            className="flex-1 cursor-pointer font-medium leading-tight text-[var(--text)]"
+                            style={{ fontSize: "11px" }}
+                          >
+                            <span
+                              className={cn(
+                                "mr-1 font-semibold",
+                                item.required
+                                  ? "text-[var(--text-emphasis-vivid)]"
+                                  : "text-[var(--text-muted)]",
+                              )}
+                            >
+                              ({item.required ? "필수" : "선택"})
+                            </span>
+                            {item.title}
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setActiveConsentIdx(idx)}
+                            className="shrink-0 font-normal text-[color:color-mix(in_srgb,var(--text-muted)_40%,transparent)] hover:text-[var(--text-muted)]"
+                            style={{ fontSize: "11px" }}
+                          >
+                            &gt;
+                          </button>
+                        </div>
+                      ))}
                     </section>
 
                     {step1Error && <ErrorBox message={step1Error} />}
@@ -1044,5 +1100,6 @@ export default function Signup() {
         </div>
       </div>
     </div>
+    </>
   );
 }
