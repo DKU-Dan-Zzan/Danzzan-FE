@@ -1026,20 +1026,30 @@ export default function Signup() {
                         >
                           축제 서비스 비밀번호
                         </Label>
-                        <Input
-                          id="password"
-                          type="password"
-                          value={password}
-                          onChange={(e) => {
-                            if (isPasswordPolicyErrorMessage(step3Error)) setStep3Error(null);
-                            setPassword(e.target.value);
-                          }}
-                          placeholder="새로운 비밀번호를 입력해 주세요"
-                          className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS)}
-                          autoComplete="new-password"
-                          required
-                          disabled={submitting}
-                        />
+                        <div className="relative">
+                          <Input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            value={password}
+                            onChange={(e) => {
+                              if (isPasswordPolicyErrorMessage(step3Error)) setStep3Error(null);
+                              setPassword(e.target.value);
+                            }}
+                            placeholder="새로운 비밀번호를 입력해 주세요"
+                            className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS, "pr-10")}
+                            autoComplete="new-password"
+                            required
+                            disabled={submitting}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword((v) => !v)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text)]"
+                            tabIndex={-1}
+                          >
+                            {showPassword ? <EyeOff className="h-4 w-4" strokeWidth={2} /> : <Eye className="h-4 w-4" strokeWidth={2} />}
+                          </button>
+                        </div>
                       </div>
 
                       <div className="space-y-2">
@@ -1049,20 +1059,30 @@ export default function Signup() {
                         >
                           축제 서비스 비밀번호 확인
                         </Label>
-                        <Input
-                          id="passwordConfirm"
-                          type="password"
-                          value={passwordConfirm}
-                          onChange={(e) => {
-                            if (isPasswordPolicyErrorMessage(step3Error)) setStep3Error(null);
-                            setPasswordConfirm(e.target.value);
-                          }}
-                          placeholder="새로운 비밀번호를 다시 입력해 주세요"
-                          className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS)}
-                          autoComplete="new-password"
-                          required
-                          disabled={submitting}
-                        />
+                        <div className="relative">
+                          <Input
+                            id="passwordConfirm"
+                            type={showPasswordConfirm ? "text" : "password"}
+                            value={passwordConfirm}
+                            onChange={(e) => {
+                              if (isPasswordPolicyErrorMessage(step3Error)) setStep3Error(null);
+                              setPasswordConfirm(e.target.value);
+                            }}
+                            placeholder="새로운 비밀번호를 다시 입력해 주세요"
+                            className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS, "pr-10")}
+                            autoComplete="new-password"
+                            required
+                            disabled={submitting}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPasswordConfirm((v) => !v)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text)]"
+                            tabIndex={-1}
+                          >
+                            {showPasswordConfirm ? <EyeOff className="h-4 w-4" strokeWidth={2} /> : <Eye className="h-4 w-4" strokeWidth={2} />}
+                          </button>
+                        </div>
                       </div>
 
                       <PasswordPolicyChecklist state={passwordPolicy} />
