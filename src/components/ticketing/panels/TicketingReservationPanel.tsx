@@ -49,7 +49,6 @@ const MAY_13_POLICY_RISK_INTRO =
 
 const MAY_13_POLICY_RISK_ITEMS = [
   "위·변조 티켓 사용으로 인한 입장 거부",
-  "동일 QR코드 중복 사용으로 인한 무효 처리",
   "개인정보 유출 및 금전적 피해 발생",
 ];
 
@@ -265,6 +264,9 @@ export function TicketingReservationPanel({
           <section className="mt-5 space-y-2 border-t border-[var(--border-subtle)] pt-4">
             <TicketingStepTitle step={2} title="부정거래 관련 방침 안내" />
             <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-subtle)] px-4 py-3">
+              <p className={`mb-2 font-semibold ${TICKETING_CLASSES.typography.helper} text-[var(--text-muted)]`}>
+                스크롤하여 전체 방침을 확인하세요.
+              </p>
               <div
                 className={cn(
                   `max-h-44 space-y-2 overflow-y-scroll pr-2 ${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`,
@@ -299,7 +301,6 @@ export function TicketingReservationPanel({
                   </ul>
                 )}
               </div>
-              <p className={`mt-2 ${TICKETING_CLASSES.typography.helper} text-[var(--text-muted)]`}>스크롤하여 전체 방침을 확인하세요.</p>
             </div>
           </section>
 
