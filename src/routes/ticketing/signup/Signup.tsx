@@ -1191,6 +1191,11 @@ export default function Signup() {
                             {showPasswordConfirm ? <EyeOff className="h-4 w-4" strokeWidth={2} /> : <Eye className="h-4 w-4" strokeWidth={2} />}
                           </button>
                         </div>
+                        {passwordConfirm.length > 0 && password !== passwordConfirm && (
+                          <p className="pl-0.5 text-[11.5px] font-medium text-[var(--status-danger-text)]">
+                            비밀번호가 일치하지 않습니다.
+                          </p>
+                        )}
                       </div>
 
                       <div className="space-y-1 pl-1">
