@@ -9,6 +9,7 @@ import {
   Check,
   RefreshCw,
   CheckCircle2,
+  XCircle,
   Send,
   X,
   Eye,
@@ -441,6 +442,7 @@ export default function Signup() {
   // ── 공통 상태
   const [step, setStep] = useState<Step>(1);
   const [submitting, setSubmitting] = useState(false);
+  const [signupComplete, setSignupComplete] = useState(false);
 
   // ── Step 1 상태
   const [dkuStudentId, setDkuStudentId] = useState("");
@@ -502,7 +504,6 @@ export default function Signup() {
     setSessionCreating(true);
     setSessionError(null);
     setVerifyError(null);
-    setPhoneNumber("");
 
     try {
       const res = await signupApi.createPhoneVerificationSession(token);
@@ -531,12 +532,16 @@ export default function Signup() {
     }
   }, []);
 
-  // ── Step 2 진입 시 세션 자동 생성
-  useEffect(() => {
-    if (step === 2 && signupToken && !sessionId) {
-      createPhoneSession(signupToken);
+  // ── Step 2 인증번호 요청
+  const handleRequestCode = () => {
+    const digits = stripPhoneDashes(phoneNumber);
+    if (!digits || digits.length < 10) {
+      setSessionError("올바른 전화번호를 입력해 주세요.");
+      return;
     }
-  }, [step, signupToken, sessionId, createPhoneSession]);
+    setSessionError(null);
+    createPhoneSession(signupToken);
+  };
 
   // ── Step 1 제출
   const handleStep1Submit = async (event: FormEvent<HTMLFormElement>) => {
@@ -600,6 +605,11 @@ export default function Signup() {
       const res = await signupApi.verifyPhoneSession(sessionId, digits);
       if (res.status === "VERIFIED") {
         setPhoneVerificationSessionId(res.sessionId);
+        setSessionId("");
+        setExpiresAt(null);
+        setSecondsLeft(0);
+        setMessageBody("");
+        setOctomoReceiveNumber("");
         setStep(3);
       }
     } catch (err) {
@@ -663,7 +673,7 @@ export default function Signup() {
         naverIdConfirm.trim(),
         phoneVerificationSessionId,
       );
-      navigate("/ticket/login");
+      setSignupComplete(true);
     } catch (err) {
       if (err instanceof HttpError) {
         const payload = err.payload as { error?: string } | undefined;
@@ -712,6 +722,38 @@ export default function Signup() {
     (verifyError?.includes("만료") ?? false) ||
     (verifyError?.includes("초과") ?? false) ||
     (verifyError?.includes("사용된") ?? false);
+
+  if (signupComplete) {
+    return (
+      <div className="relative left-1/2 min-h-screen w-screen -translate-x-1/2 overflow-hidden bg-[var(--bg-page-soft)]">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -left-20 top-0 h-56 w-56 rounded-full bg-[color:color-mix(in_srgb,var(--primary_container)_62%,white)] opacity-80 blur-3xl" />
+          <div className="absolute right-[-5rem] top-1/4 h-72 w-72 rounded-full bg-[color:color-mix(in_srgb,var(--primary)_22%,white)] opacity-90 blur-3xl" />
+          <div className="absolute bottom-[-4rem] left-1/4 h-64 w-64 rounded-full bg-[color:color-mix(in_srgb,var(--tertiary_container)_32%,white)] opacity-70 blur-3xl" />
+        </div>
+        <div className="relative mx-auto flex min-h-screen w-full max-w-[var(--ticketing-mobile-shell-max-width)] flex-col items-center justify-center px-5 pb-8 sm:px-6">
+          <div className="w-full rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_rgba(44,52,54,0.06)] backdrop-blur-[24px]">
+            <div className="flex flex-col items-center gap-6 rounded-[26px] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface_container_low)_92%,white)_0%,color-mix(in_srgb,var(--surface_container_lowest)_96%,white)_100%)] px-6 py-10">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] shadow-[var(--ticketing-action-shadow)]">
+                <CheckCircle2 className="h-8 w-8 text-white" strokeWidth={2.2} />
+              </div>
+              <div className="space-y-1.5 text-center">
+                <p className="text-xl font-bold text-[var(--text)]">회원가입이 완료되었습니다</p>
+                <p className="text-sm text-[var(--text-muted)]">이제 로그인하여 서비스를 이용해 주세요.</p>
+              </div>
+              <Button
+                type="button"
+                className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95"
+                onClick={() => navigate("/ticket/login")}
+              >
+                로그인 화면으로 이동
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -870,7 +912,7 @@ export default function Signup() {
                     <Button
                       type="submit"
                       className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
-                      disabled={submitting}
+                      disabled={submitting || !requiredConsentsMet}
                     >
                       <KeyRound className="h-4 w-4" strokeWidth={2.3} />
                       {submitting ? "단국대 포털 인증 중..." : "단국대 인증하기"}
@@ -881,7 +923,52 @@ export default function Signup() {
                 {/* ── Step 2: 전화번호 인증 ── */}
                 {step === 2 && (
                   <div className="space-y-5">
-                    {/* 인증코드 발급 카드 */}
+                    {/* 전화번호 입력 — 항상 최상단 */}
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="phoneNumber"
+                        className="text-sm font-semibold text-[var(--text)]"
+                      >
+                        전화번호
+                      </Label>
+                      <div className="relative">
+                        <Phone
+                          className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]"
+                          strokeWidth={2}
+                        />
+                        <Input
+                          id="phoneNumber"
+                          type="tel"
+                          inputMode="numeric"
+                          value={phoneNumber}
+                          onChange={(e) =>
+                            setPhoneNumber(formatPhoneDisplay(e.target.value))
+                          }
+                          placeholder="010-0000-0000"
+                          className={cn(
+                            TICKETING_AUTH_INPUT_CLASS_NAME,
+                            AUTH_PLACEHOLDER_CLASS,
+                            "pl-9",
+                          )}
+                          disabled={submitting || sessionCreating || (!!sessionId && !sessionError)}
+                        />
+                      </div>
+                    </div>
+
+                    {/* 인증번호 받기 버튼 — 세션 없을 때 */}
+                    {!sessionId && !sessionCreating && (
+                      <Button
+                        type="button"
+                        className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
+                        onClick={handleRequestCode}
+                        disabled={sessionCreating}
+                      >
+                        <Send className="h-4 w-4" strokeWidth={2.2} />
+                        인증번호 받기
+                      </Button>
+                    )}
+
+                    {/* 로딩 */}
                     {sessionCreating && (
                       <div className="flex items-center justify-center gap-2 rounded-2xl border border-[color:color-mix(in_srgb,var(--border-base)_60%,transparent)] bg-[var(--surface-subtle)] px-4 py-6">
                         <RefreshCw className="h-4 w-4 animate-spin text-[var(--text-muted)]" />
@@ -889,6 +976,7 @@ export default function Signup() {
                       </div>
                     )}
 
+                    {/* 세션 에러 */}
                     {sessionError && !sessionCreating && (
                       <div className="space-y-3">
                         <ErrorBox message={sessionError} />
@@ -896,7 +984,7 @@ export default function Signup() {
                           type="button"
                           variant="outline"
                           className="h-10 w-full rounded-2xl text-sm font-semibold"
-                          onClick={() => createPhoneSession(signupToken)}
+                          onClick={handleRequestCode}
                           disabled={sessionCreating}
                         >
                           <RefreshCw className="h-3.5 w-3.5" />
@@ -905,6 +993,7 @@ export default function Signup() {
                       </div>
                     )}
 
+                    {/* 인증코드 카드 + 인증 확인 */}
                     {sessionId && !sessionCreating && (
                       <>
                         {/* 인증코드 안내 카드 */}
@@ -993,39 +1082,8 @@ export default function Signup() {
 
                         <div className="h-px bg-[linear-gradient(90deg,transparent_0%,color-mix(in_srgb,var(--primary)_18%,white)_18%,color-mix(in_srgb,var(--primary)_18%,white)_82%,transparent_100%)]" />
 
-                        {/* 전화번호 입력 */}
+                        {/* 인증 확인 영역 */}
                         <div className="space-y-3">
-                          <div className="space-y-2">
-                            <Label
-                              htmlFor="phoneNumber"
-                              className="text-sm font-semibold text-[var(--text)]"
-                            >
-                              전화번호
-                            </Label>
-                            <div className="relative">
-                              <Phone
-                                className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]"
-                                strokeWidth={2}
-                              />
-                              <Input
-                                id="phoneNumber"
-                                type="tel"
-                                inputMode="numeric"
-                                value={phoneNumber}
-                                onChange={(e) =>
-                                  setPhoneNumber(formatPhoneDisplay(e.target.value))
-                                }
-                                placeholder="010-0000-0000"
-                                className={cn(
-                                  TICKETING_AUTH_INPUT_CLASS_NAME,
-                                  AUTH_PLACEHOLDER_CLASS,
-                                  "pl-9",
-                                )}
-                                disabled={submitting || isSessionExpired}
-                              />
-                            </div>
-                          </div>
-
                           {verifyError && <ErrorBox message={verifyError} />}
 
                           {/* 재발급 안내 */}
@@ -1035,7 +1093,7 @@ export default function Signup() {
                               onClick={() => {
                                 setSessionId("");
                                 setVerifyError(null);
-                                createPhoneSession(signupToken);
+                                setPhoneNumber("");
                               }}
                               className="flex w-full items-center justify-center gap-1.5 rounded-xl py-2 text-sm font-semibold text-[var(--text-emphasis-vivid)] hover:underline"
                               disabled={sessionCreating}
@@ -1183,7 +1241,9 @@ export default function Signup() {
                               disabled={submitting}
                             />
                             {naverId.trim().length > 0 && (
-                              <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--naver-green)]" strokeWidth={2} />
+                              naverIdConfirm.trim().length > 0 && !isNaverIdMatched
+                                ? <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--status-danger-text)]" strokeWidth={2} />
+                                : <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--naver-green)]" strokeWidth={2} />
                             )}
                           </div>
                         </div>
@@ -1213,7 +1273,9 @@ export default function Signup() {
                               disabled={submitting}
                             />
                             {naverIdConfirm.trim().length > 0 && (
-                              <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--naver-green)]" strokeWidth={2} />
+                              !isNaverIdMatched
+                                ? <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--status-danger-text)]" strokeWidth={2} />
+                                : <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--naver-green)]" strokeWidth={2} />
                             )}
                           </div>
 
@@ -1240,7 +1302,7 @@ export default function Signup() {
 
                     <Button
                       type="submit"
-                      className="h-11 w-full rounded-2xl border border-transparent bg-[var(--naver-green)] text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[0_4px_16px_rgba(3,199,90,0.35)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
+                      className="h-11 w-full rounded-2xl border border-transparent bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[var(--ticketing-action-shadow)] transition-all duration-200 hover:translate-y-[-1px] hover:brightness-95 disabled:translate-y-0 disabled:border-[var(--ticketing-action-disabled-border)] disabled:bg-[linear-gradient(145deg,var(--ticketing-action-disabled-bg-start)_0%,var(--ticketing-action-disabled-bg-end)_100%)] disabled:text-[var(--ticketing-action-disabled-text)] disabled:shadow-none disabled:opacity-100"
                       disabled={submitting}
                     >
                       <KeyRound className="h-4 w-4" strokeWidth={2.3} />
