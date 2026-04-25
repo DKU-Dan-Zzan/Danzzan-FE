@@ -1211,9 +1211,11 @@ export default function Signup() {
                       <div className="space-y-3 rounded-xl border border-[rgba(3,199,90,0.22)] bg-[rgba(3,199,90,0.03)] p-3.5">
                         {/* 헤더 */}
                         <div className="flex items-center gap-2.5">
-                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] bg-[var(--naver-green)] text-[13px] font-black text-white">
-                            N
-                          </div>
+                          <img
+                            src="/symbol_cr_npaygr_large.svg"
+                            alt="Naver"
+                            className="h-7 w-7 shrink-0"
+                          />
                           <span className="text-[13px] font-bold text-[var(--text)]">입장 확인용 네이버 아이디 등록</span>
                         </div>
 
