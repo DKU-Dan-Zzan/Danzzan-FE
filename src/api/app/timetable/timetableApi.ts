@@ -12,6 +12,10 @@ type RequestOptions = {
   signal?: AbortSignal
 }
 
+export type TimetableDisplayConfig = {
+  comingSoonOverlayEnabled: boolean
+}
+
 export async function getPerformances(date: string, options?: RequestOptions) {
   const endpoint = "/timetable/performances"
   const res = await http.get<unknown>(
@@ -30,4 +34,12 @@ export async function getContentImages(options?: RequestOptions) {
     signal: options?.signal,
   })
   return parseContentImagesContract(res.data, endpoint)
+}
+
+export async function getTimetableDisplayConfig(options?: RequestOptions) {
+  const endpoint = "/timetable/display-config"
+  const res = await http.get<TimetableDisplayConfig>(endpoint, {
+    signal: options?.signal,
+  })
+  return res.data
 }

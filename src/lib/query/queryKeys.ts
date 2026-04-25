@@ -36,4 +36,5 @@ export const appQueryKeys = {
   noticeDetail: (id: number) => ["notice", "detail", { id }] as const,
   timetablePerformances: (date: string) => ["timetable", "performances", { date }] as const,
   timetableContentImages: () => ["timetable", "content-images"] as const,
+  timetableDisplayConfig: () => ["timetable", "display-config"] as const,
 };
