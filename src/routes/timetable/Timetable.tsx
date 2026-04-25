@@ -300,12 +300,20 @@ export default function Timetable() {
           )}
         </div>
 
-        <AdBanner ads={allAds} marginTopClassName="mt-4" />
+        {!comingSoonOverlayEnabled && (
+          <AdBanner ads={allAds} marginTopClassName="mt-4" />
+        )}
         <div
           aria-hidden="true"
           className="h-[var(--app-bottom-nav-runtime-offset)]"
         />
       </div>
+
+      {comingSoonOverlayEnabled && (
+        <div className="fixed inset-x-0 bottom-[calc(var(--app-bottom-nav-runtime-offset))] z-30">
+          <AdBanner ads={allAds} marginTopClassName="mt-0" />
+        </div>
+      )}
 
       {comingSoonOverlayEnabled && (
         <div className="pointer-events-none fixed inset-x-0 top-[42%] z-40 flex -translate-y-1/2 justify-center px-6">
