@@ -731,7 +731,7 @@ export default function Signup() {
           <div className="absolute right-[-5rem] top-1/4 h-72 w-72 rounded-full bg-[color:color-mix(in_srgb,var(--primary)_22%,white)] opacity-90 blur-3xl" />
           <div className="absolute bottom-[-4rem] left-1/4 h-64 w-64 rounded-full bg-[color:color-mix(in_srgb,var(--tertiary_container)_32%,white)] opacity-70 blur-3xl" />
         </div>
-        <div className="relative mx-auto flex min-h-screen w-full max-w-[var(--ticketing-mobile-shell-max-width)] flex-col items-center justify-center px-5 pb-8 sm:px-6">
+        <div className="relative mx-auto flex min-h-screen w-full max-w-[var(--ticketing-mobile-shell-max-width)] flex-col items-center justify-center px-5 pb-[calc(env(safe-area-inset-bottom)+5rem)] pt-[calc(env(safe-area-inset-top)+5rem)] sm:px-6">
           <div className="w-full rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_rgba(44,52,54,0.06)] backdrop-blur-[24px]">
             <div className="flex flex-col items-center gap-6 rounded-[26px] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface_container_low)_92%,white)_0%,color-mix(in_srgb,var(--surface_container_lowest)_96%,white)_100%)] px-6 py-10">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] shadow-[var(--ticketing-action-shadow)]">
