@@ -807,18 +807,18 @@ export default function Signup() {
                     {/* ── 개인정보 동의 항목 ── */}
                     <section className="space-y-0 rounded-xl border border-[color:color-mix(in_srgb,var(--border-base)_50%,transparent)] bg-[var(--surface_container)] px-2.5 py-1.5">
                       {/* 전체 동의 */}
-                      <div className="flex items-center gap-2 rounded-lg px-1 py-1.5">
+                      <div className="flex items-center gap-2.5 rounded-lg px-1 py-0.5">
                         <Checkbox
                           id="consent-all"
                           checked={allConsented}
                           onCheckedChange={toggleAll}
                           disabled={submitting}
-                          className="size-4 shrink-0 rounded-sm border-[var(--border-base)] data-[state=checked]:border-[var(--accent)] data-[state=checked]:bg-[var(--accent)]"
+                          className="size-5 shrink-0 rounded-sm border-[var(--border-base)] data-[state=checked]:border-[var(--accent)] data-[state=checked]:bg-[var(--accent)]"
                         />
                         <label
                           htmlFor="consent-all"
                           className="flex-1 cursor-pointer font-bold leading-tight text-[var(--text)]"
-                          style={{ fontSize: "11px" }}
+                          style={{ fontSize: "12px" }}
                         >
                           전체 동의
                         </label>
@@ -827,19 +827,19 @@ export default function Signup() {
                       {CONSENT_ITEMS.map((item, idx) => (
                         <div
                           key={item.id}
-                          className="flex items-center gap-2 rounded-lg px-1 py-1"
+                          className="relative flex items-center gap-1.5 rounded-lg pl-1 pr-0 py-0.5"
                         >
                           <Checkbox
                             id={`consent-${item.id}`}
                             checked={consents[idx]}
                             onCheckedChange={() => toggleConsent(idx)}
                             disabled={submitting}
-                            className="size-4 shrink-0 rounded-sm border-[var(--border-base)] data-[state=checked]:border-[var(--accent)] data-[state=checked]:bg-[var(--accent)]"
+                            className="size-5 shrink-0 rounded-sm border-[var(--border-base)] data-[state=checked]:border-[var(--accent)] data-[state=checked]:bg-[var(--accent)]"
                           />
                           <label
                             htmlFor={`consent-${item.id}`}
-                            className="flex-1 cursor-pointer font-medium leading-tight text-[var(--text)]"
-                            style={{ fontSize: "11px" }}
+                            className="min-w-0 flex-1 cursor-pointer pr-8 font-medium leading-snug text-[var(--text)]"
+                            style={{ fontSize: "12px" }}
                           >
                             <span
                               className={cn(
@@ -856,7 +856,7 @@ export default function Signup() {
                           <button
                             type="button"
                             onClick={() => setActiveConsentIdx(idx)}
-                            className="shrink-0 font-normal text-[color:color-mix(in_srgb,var(--text-muted)_40%,transparent)] hover:text-[var(--text-muted)]"
+                            className="absolute right-0 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-end pr-0.5 font-normal text-[color:color-mix(in_srgb,var(--text-muted)_40%,transparent)] hover:text-[var(--text-muted)]"
                             style={{ fontSize: "11px" }}
                           >
                             &gt;

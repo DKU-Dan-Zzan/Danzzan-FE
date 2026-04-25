@@ -135,6 +135,21 @@ describe("useTicketingFlow integration", () => {
       latestFlow?.submitReservation();
     });
 
+    expect(mockExecuteReserve).not.toHaveBeenCalled();
+    expect(latestFlow?.reservationError).toBe("개인정보 제3자 제공 동의(필수)를 체크해주세요.");
+
+    await act(async () => {
+      (
+        latestFlow as ReturnType<typeof useTicketingFlow> & {
+          changeThirdPartyPrivacyConsent: (checked: boolean) => void;
+        }
+      ).changeThirdPartyPrivacyConsent(true);
+    });
+
+    await act(async () => {
+      latestFlow?.submitReservation();
+    });
+
     expect(mockExecuteReserve).toHaveBeenCalledWith("event-1");
 
     await act(async () => {

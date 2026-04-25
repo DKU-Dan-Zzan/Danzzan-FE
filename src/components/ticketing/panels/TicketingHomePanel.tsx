@@ -40,10 +40,30 @@ const guideItems = [
 ];
 
 const noticeItems = [
-  "티켓은 예매 시간 순으로 선착순 배정됩니다.",
-  "1인당 공연별 최대 1매까지 예매 가능합니다.",
-  "예매한 티켓은 취소가 불가능합니다.",
-  "팔찌 미수령 시 단국존 입장이 불가하오니, 수령 시간에 맞추어 입장 팔찌를 수령해가시길 바랍니다.",
+  {
+    text: "빠른 단국존 입장을 위해 네이버 Face Sign을 사전에 등록해 주세요.",
+    tone: "warning" as const,
+  },
+  {
+    text: "Face Sign 미등록 시 팔찌 배부 후 단국존 입장이 지연될 수 있습니다.",
+    tone: "warning" as const,
+  },
+  {
+    text: "티켓은 예매 시간 순으로 선착순 배정됩니다.",
+    tone: "default" as const,
+  },
+  {
+    text: "1인당 공연별 최대 1매까지 예매 가능합니다.",
+    tone: "default" as const,
+  },
+  {
+    text: "예매한 티켓은 취소가 불가능합니다.",
+    tone: "default" as const,
+  },
+  {
+    text: "팔찌 미수령 시 단국존 입장이 불가하오니, 수령 시간에 맞추어 입장 팔찌를 수령해가시길 바랍니다.",
+    tone: "default" as const,
+  },
 ];
 
 interface HomeQuickAction {
@@ -159,7 +179,12 @@ export function TicketingHomePanel({
           </h4>
           <ul className={`mt-3 list-disc space-y-2 pl-5 ${TICKETING_CLASSES.typography.sectionBody} text-[var(--accent)]`}>
             {noticeItems.map((notice) => (
-              <li key={notice}>{notice}</li>
+              <li
+                key={notice.text}
+                className={notice.tone === "warning" ? "text-[var(--status-danger)]" : undefined}
+              >
+                {notice.text}
+              </li>
             ))}
           </ul>
         </section>

@@ -1,4 +1,6 @@
 // 역할: 약관 동의/입력 검증/예매 요청 전송을 처리하는 예매 진행 패널입니다.
+import { useState } from "react";
+import { X } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
 import { Checkbox } from "@/components/common/ui/checkbox";
@@ -14,9 +16,11 @@ interface TicketingReservationPanelProps {
   eventTitle: string;
   eventDate?: string;
   agreementChecked: boolean;
+  thirdPartyPrivacyConsentChecked: boolean;
   submitting: boolean;
   errorMessage: string | null;
   onAgreementCheckedChange: (checked: boolean) => void;
+  onThirdPartyPrivacyConsentCheckedChange: (checked: boolean) => void;
   onSubmit: () => void;
 }
 
@@ -63,20 +67,165 @@ const DEFAULT_POLICY_ITEMS = [
   "공식 절차 외 부정한 방법으로 확인된 티켓은 예고 없이 취소될 수 있습니다.",
 ];
 
+const AGREEMENT_LABEL_TEXT_CLASS = "text-[var(--text)]";
+const AGREEMENT_LABEL_TEXT_STYLE = { fontSize: "14px", fontWeight: 700, lineHeight: "1.45" } as const;
+const AGREEMENT_CARD_CLASS = `${APP_CARD_VARIANTS.outline} flex min-h-[56px] items-center gap-2.5 rounded-xl px-3 py-3`;
+
+const THIRD_PARTY_PRIVACY_CONSENT_TITLE = "[필수] 개인정보의 제3자 제공에 대한 동의";
+const THIRD_PARTY_PRIVACY_CONSENT_DETAIL_TITLE = "개인정보의 제3자 제공에 대한 동의";
+
+const THIRD_PARTY_PRIVACY_CONSENT_BODY =
+  "총학생회는 개인정보를 개인정보 수집·이용 목적에서 명시한 범위 내에서 사용하며, 이용자의 사전 동의 없이 목적 범위를 초과하여 이용하거나 원칙적으로 이용자의 개인정보를 제공하지 않습니다. 다만, 아래와 같이 양질의 서비스 제공을 위해 이용자의 개인정보를 공유할 필요가 있는 경우에는 필요한 범위 내에서 개인정보를 제3자에게 제공하고 있습니다.";
+
+const THIRD_PARTY_PRIVACY_TABLE_ROWS = [
+  {
+    recipient: "네이버 주식회사",
+    purpose: "축제 행사장(단국존) 입장 관리 및 팔찌 배부 시 본인인증(Face ID) 서비스 연계",
+    items: "학번, 네이버 아이디",
+    retention: "축제 종료 후 2026년 12월 31일까지",
+  },
+];
+
+const THIRD_PARTY_PRIVACY_NAVER_NOTICE =
+  "※ 네이버 주식회사가 제공하는 본인인증(Face ID) 서비스 이용 과정에서 얼굴 생체정보 등의 추가 정보는 네이버 주식회사가 정보주체로부터 직접 수집·처리하며, 이에 관한 사항은 네이버 주식회사의 개인정보처리방침 및 이용약관이 적용됩니다.";
+
+const THIRD_PARTY_PRIVACY_REFUSAL_NOTICE =
+  "동의를 거부할 권리가 있으며, 거부 시 축제 행사장 입장 및 팔찌 배부가 불가하여 본 서비스 중 축제 입출입 관련 기능 이용이 제한됩니다.";
+
+function ThirdPartyPrivacyConsentDetail({ onAgree }: { onAgree: () => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const closeDetail = () => setIsOpen(false);
+  const agreeAndClose = () => {
+    onAgree();
+    closeDetail();
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setIsOpen(true)}
+        aria-label="개인정보 제3자 제공 동의 상세 열기"
+        className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-[16px] font-normal text-[color:color-mix(in_srgb,var(--text-muted)_48%,transparent)] transition-colors hover:bg-[var(--surface_container)] hover:text-[var(--text-muted)]"
+      >
+        &gt;
+      </button>
+
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 backdrop-blur-sm"
+          role="button"
+          tabIndex={-1}
+          aria-label="개인정보 제3자 제공 동의 상세 닫기"
+          onClick={closeDetail}
+          onKeyDown={(event) => event.key === "Escape" && closeDetail()}
+        >
+          <div
+            className="flex h-[70vh] w-full max-w-[var(--ticketing-mobile-shell-max-width)] flex-col rounded-t-[28px] bg-[var(--surface_container_lowest)] pt-3 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_40px_rgba(0,0,0,0.18)]"
+            role="presentation"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-[color:color-mix(in_srgb,var(--border-base)_60%,transparent)] px-5 py-3">
+              <p className="pr-4 text-[15px] font-bold leading-tight text-[var(--text)]">
+                {THIRD_PARTY_PRIVACY_CONSENT_DETAIL_TITLE}
+              </p>
+              <button
+                type="button"
+                onClick={closeDetail}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--surface_container)] text-[var(--text-muted)]"
+                aria-label="개인정보 제3자 제공 동의 상세 닫기"
+              >
+                <X className="h-4 w-4" strokeWidth={2.2} aria-hidden="true" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-5 py-4">
+              <div className={`space-y-4 ${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>
+                <p>{THIRD_PARTY_PRIVACY_CONSENT_BODY}</p>
+
+                <div className="overflow-hidden rounded-xl border border-[var(--border-subtle)]">
+                  <table className="w-full table-fixed border-collapse text-left text-[0.72rem] leading-[1.42] sm:text-[0.76rem]">
+                    <colgroup>
+                      <col className="w-[18%]" />
+                      <col className="w-[36%]" />
+                      <col className="w-[20%]" />
+                      <col className="w-[26%]" />
+                    </colgroup>
+                    <thead className="bg-[var(--surface-subtle)] text-[var(--text)]">
+                      <tr>
+                        <th scope="col" className="border-r border-[var(--border-subtle)] px-1 py-2.5 font-bold break-words">
+                          제공받는 자
+                        </th>
+                        <th scope="col" className="border-r border-[var(--border-subtle)] px-1 py-2.5 font-bold break-words">
+                          제공 목적
+                        </th>
+                        <th scope="col" className="border-r border-[var(--border-subtle)] px-1 py-2.5 font-bold break-words">
+                          제공 항목
+                        </th>
+                        <th scope="col" className="px-1 py-2.5 font-bold break-words">
+                          보유 및 이용 기간
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {THIRD_PARTY_PRIVACY_TABLE_ROWS.map((row) => (
+                        <tr key={row.recipient} className="bg-[var(--surface-base)]">
+                          <td className="border-t border-r border-[var(--border-subtle)] px-1 py-2.5 align-top break-words text-[var(--text-muted)]">
+                            {row.recipient}
+                          </td>
+                          <td className="border-t border-r border-[var(--border-subtle)] px-1 py-2.5 align-top break-words text-[var(--text-muted)]">
+                            {row.purpose}
+                          </td>
+                          <td className="border-t border-r border-[var(--border-subtle)] px-1 py-2.5 align-top break-words text-[var(--text-muted)]">
+                            {row.items}
+                          </td>
+                          <td className="border-t border-[var(--border-subtle)] px-1 py-2.5 align-top break-words text-[var(--text-muted)]">
+                            {row.retention}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <p>{THIRD_PARTY_PRIVACY_NAVER_NOTICE}</p>
+                <p className="font-semibold text-[var(--status-danger-text)]">
+                  {THIRD_PARTY_PRIVACY_REFUSAL_NOTICE}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={agreeAndClose}
+              className="mx-5 my-4 h-11 rounded-2xl bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] text-[15px] font-semibold text-white"
+            >
+              동의
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 export function TicketingReservationPanel({
   eventTitle,
   eventDate = "",
   agreementChecked,
+  thirdPartyPrivacyConsentChecked,
   submitting,
   errorMessage,
   onAgreementCheckedChange,
+  onThirdPartyPrivacyConsentCheckedChange,
   onSubmit,
 }: TicketingReservationPanelProps) {
   const ticketDateSource = `${eventDate} ${eventTitle}`;
   const isMay13Ticket = /5\s*월\s*13\s*일/.test(ticketDateSource);
   const isMay14Ticket = /5\s*월\s*14\s*일/.test(ticketDateSource);
   const isFestivalTicket = isMay13Ticket || isMay14Ticket;
-  const isSubmitEnabled = !submitting && agreementChecked;
+  const isSubmitEnabled = !submitting && agreementChecked && thirdPartyPrivacyConsentChecked;
   const festivalConfirmationLine = isMay13Ticket
     ? "본 예매는 2026년 05월 13일 단국존 선예매 티켓팅임을 확인했습니다."
     : isMay14Ticket
@@ -157,19 +306,46 @@ export function TicketingReservationPanel({
           <section className="mt-5 space-y-3 border-t border-[var(--border-subtle)] pt-4">
             <TicketingStepTitle step={3} title="동의 확인" />
             <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>
-              아래 항목을 체크하면 예매를 진행할 수 있습니다.
+              주의사항과 부정거래 관련 방침을 확인한 뒤 체크해주세요.
             </p>
-            <label className={`${APP_CARD_VARIANTS.outline} flex cursor-pointer items-center gap-2.5 rounded-xl px-3 py-3`}>
+            <label className={cn(AGREEMENT_CARD_CLASS, "cursor-pointer")}>
               <Checkbox
                 checked={agreementChecked}
                 disabled={submitting}
                 onCheckedChange={(checked) => onAgreementCheckedChange(Boolean(checked))}
                 className="h-5 w-5 rounded-[6px] border-[var(--border-strong)] data-[state=checked]:border-[var(--accent)] data-[state=checked]:bg-[var(--accent)]"
               />
-              <span className="text-[length:calc(var(--ticketing-text-section-body-sm)+2pt)] font-semibold text-[var(--text)]">
-                위 사항들을 숙지했습니다.
+              <span className={AGREEMENT_LABEL_TEXT_CLASS} style={AGREEMENT_LABEL_TEXT_STYLE}>
+                [필수] 위 사항들을 숙지했습니다.
               </span>
             </label>
+          </section>
+
+          <section className="mt-5 space-y-3 border-t border-[var(--border-subtle)] pt-4">
+            <TicketingStepTitle step={4} title="개인정보 제3자 제공 동의" />
+            <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>
+              축제 행사장 입장 관리 및 팔찌 배부를 위해 아래 필수 동의를 확인해주세요.
+            </p>
+            <div className={cn(AGREEMENT_CARD_CLASS, "relative pr-12")}>
+              <Checkbox
+                id="thirdPartyPrivacyConsent"
+                checked={thirdPartyPrivacyConsentChecked}
+                disabled={submitting}
+                onCheckedChange={(checked) => onThirdPartyPrivacyConsentCheckedChange(Boolean(checked))}
+                className="h-5 w-5 rounded-[6px] border-[var(--border-strong)] data-[state=checked]:border-[var(--accent)] data-[state=checked]:bg-[var(--accent)]"
+              />
+              <label
+                htmlFor="thirdPartyPrivacyConsent"
+                className="min-w-0 flex-1 cursor-pointer"
+              >
+                <span className={AGREEMENT_LABEL_TEXT_CLASS} style={AGREEMENT_LABEL_TEXT_STYLE}>
+                  {THIRD_PARTY_PRIVACY_CONSENT_TITLE}
+                </span>
+              </label>
+              <ThirdPartyPrivacyConsentDetail
+                onAgree={() => onThirdPartyPrivacyConsentCheckedChange(true)}
+              />
+            </div>
 
             {errorMessage && <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--status-danger-text)]`}>{errorMessage}</p>}
 

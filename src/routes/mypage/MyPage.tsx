@@ -360,7 +360,7 @@ function MyPage() {
         <FaqAccordion />
       </div>
 
-      <SectionCard title="설정">
+      <SectionCard title="계정 관리">
         <ListRow
           icon={<Lock size={18} />}
           label="비밀번호 변경"

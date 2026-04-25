@@ -20,6 +20,7 @@ type UseReservationActionParams = {
   setReserveErrorMessage: Dispatch<SetStateAction<string | null>>;
   setReserveMessage: Dispatch<SetStateAction<string>>;
   setAgreementChecked: Dispatch<SetStateAction<boolean>>;
+  setThirdPartyPrivacyConsentChecked: Dispatch<SetStateAction<boolean>>;
   setReservationError: Dispatch<SetStateAction<string | null>>;
   setSoldOutDescription: Dispatch<SetStateAction<string>>;
   setListNotice: Dispatch<SetStateAction<string | null>>;
@@ -36,6 +37,7 @@ export const useReservationAction = ({
   setReserveErrorMessage,
   setReserveMessage,
   setAgreementChecked,
+  setThirdPartyPrivacyConsentChecked,
   setReservationError,
   setSoldOutDescription,
   setListNotice,
@@ -166,8 +168,9 @@ export const useReservationAction = ({
 
   const resetReservationAgreement = useCallback(() => {
     setAgreementChecked(false);
+    setThirdPartyPrivacyConsentChecked(false);
     setReservationError(null);
-  }, [setAgreementChecked, setReservationError]);
+  }, [setAgreementChecked, setReservationError, setThirdPartyPrivacyConsentChecked]);
 
   return {
     executeReserve,

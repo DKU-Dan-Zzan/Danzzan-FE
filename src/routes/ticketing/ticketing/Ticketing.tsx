@@ -52,9 +52,11 @@ export default function Ticketing() {
         eventTitle={flow.activeEventTitle}
         eventDate={flow.activeEventDate}
         agreementChecked={flow.agreementChecked}
+        thirdPartyPrivacyConsentChecked={flow.thirdPartyPrivacyConsentChecked}
         submitting={flow.reserveProcessing}
         errorMessage={flow.reservationError}
         onAgreementCheckedChange={flow.changeAgreement}
+        onThirdPartyPrivacyConsentCheckedChange={flow.changeThirdPartyPrivacyConsent}
         onSubmit={flow.submitReservation}
       />
     );
