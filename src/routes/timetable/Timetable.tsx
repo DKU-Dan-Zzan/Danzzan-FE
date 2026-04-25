@@ -310,13 +310,13 @@ export default function Timetable() {
       </div>
 
       {comingSoonOverlayEnabled && (
-        <div className="fixed inset-x-0 bottom-[calc(var(--app-bottom-nav-runtime-offset))] z-30">
+        <div className="fixed bottom-[calc(var(--app-bottom-nav-runtime-offset))] left-1/2 z-30 w-full max-w-[430px] -translate-x-1/2">
           <AdBanner ads={allAds} marginTopClassName="mt-0" />
         </div>
       )}
 
       {comingSoonOverlayEnabled && (
-        <div className="pointer-events-none fixed inset-x-0 top-[42%] z-40 flex -translate-y-1/2 justify-center px-6">
+        <div className="pointer-events-none fixed left-1/2 top-[42%] z-40 flex w-full max-w-[430px] -translate-x-1/2 -translate-y-1/2 justify-center px-6">
           <div className="rounded-full bg-white/28 px-6 py-3 shadow-[0_0_26px_rgba(255,255,255,0.42)] backdrop-blur-[1.5px]">
             <p
               className="text-[clamp(1.5rem,4vw,2.25rem)] font-black tracking-[0.14em]"
