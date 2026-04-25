@@ -827,7 +827,7 @@ export default function Signup() {
                       {CONSENT_ITEMS.map((item, idx) => (
                         <div
                           key={item.id}
-                          className="flex items-center gap-2.5 rounded-lg px-1 py-0.5"
+                          className="relative flex items-center gap-1.5 rounded-lg pl-1 pr-0 py-0.5"
                         >
                           <Checkbox
                             id={`consent-${item.id}`}
@@ -838,7 +838,7 @@ export default function Signup() {
                           />
                           <label
                             htmlFor={`consent-${item.id}`}
-                            className="flex-1 cursor-pointer font-medium leading-tight text-[var(--text)]"
+                            className="min-w-0 flex-1 cursor-pointer pr-8 font-medium leading-snug text-[var(--text)]"
                             style={{ fontSize: "12px" }}
                           >
                             <span
@@ -856,7 +856,7 @@ export default function Signup() {
                           <button
                             type="button"
                             onClick={() => setActiveConsentIdx(idx)}
-                            className="flex h-9 w-9 shrink-0 items-center justify-center font-normal text-[color:color-mix(in_srgb,var(--text-muted)_40%,transparent)] hover:text-[var(--text-muted)]"
+                            className="absolute right-0 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-end pr-0.5 font-normal text-[color:color-mix(in_srgb,var(--text-muted)_40%,transparent)] hover:text-[var(--text-muted)]"
                             style={{ fontSize: "11px" }}
                           >
                             &gt;
