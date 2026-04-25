@@ -1,5 +1,5 @@
 // 역할: 예매 성공 결과와 후속 안내 정보를 제공하는 완료 패널입니다.
-import { ArrowRight, CheckCircle2, ShieldCheck, Ticket } from "lucide-react";
+import { ArrowRight, CheckCircle2, ScanFace, ShieldCheck, Ticket } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
 import { TICKETING_CLASSES, TICKETING_NARROW_PANEL_CLASS } from "@/components/ticketing/panels/TicketingShared";
@@ -17,7 +17,7 @@ export function ReservationSuccessPanel({
         <div className="relative">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border-strong)] bg-[linear-gradient(145deg,var(--surface-tint-strong)_0%,var(--surface-strong)_100%)] px-3 py-1 text-[length:var(--ticketing-text-badge)] font-semibold tracking-[0.01em] text-[var(--accent)]">
             <CheckCircle2 className="h-3.5 w-3.5" />
-            예약 완료
+            예매 완료
           </span>
         </div>
 
@@ -45,6 +45,10 @@ export function ReservationSuccessPanel({
             <li className="flex items-start gap-2.5">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
               <span>공연 당일 단국대학교 어플의 웹정보 확인이 필요합니다.</span>
+            </li>
+            <li className="flex items-start gap-2.5 font-semibold text-[var(--text)]">
+              <ScanFace className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
+              <span>빠른 단국존 입장을 위해 네이버 Face Sign을 사전에 등록해 주세요.</span>
             </li>
           </ul>
         </div>
