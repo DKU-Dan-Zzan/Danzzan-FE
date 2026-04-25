@@ -8,7 +8,6 @@ export interface AdSlide {
   alt?: string
   linkUrl?: string | null
   updatedAt?: string
-  objectPosition?: string
 }
 
 interface AdCarouselProps {
@@ -133,7 +132,6 @@ export function AdCarousel({
         src={url}
         alt={slide.alt ?? "광고 배너"}
         className={imageClassName}
-        style={slide.objectPosition ? { objectPosition: slide.objectPosition } : undefined}
         loading="eager"
       />
     )
@@ -186,7 +184,6 @@ export function AdCarousel({
               src={url}
               alt={slide.alt ?? "광고 배너"}
               className={imageClassName}
-              style={slide.objectPosition ? { objectPosition: slide.objectPosition } : undefined}
               loading={isCurrent ? "eager" : "lazy"}
             />
           )

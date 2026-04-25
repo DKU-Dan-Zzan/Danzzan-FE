@@ -306,7 +306,7 @@ function MyPage() {
               className="h-[80px] w-[80px] shrink-0 overflow-hidden rounded-full border-2 border-white/30"
               style={{ background: "rgba(220,229,240,0.25)", backdropFilter: "blur(8px)" }}
             >
-              <img src="/latte.png" alt="마스코트" className="h-full w-full object-cover object-top" />
+              <img src={`/profiles/latte-${(parseInt(user?.id ?? "0", 10) % 8) + 1}.png`} alt="프로필" className="h-full w-full object-cover object-top" />
             </div>
             <div className="pb-0.5">
               <p className="text-[26px] font-bold leading-tight text-white drop-shadow">
