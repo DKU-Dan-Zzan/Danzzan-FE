@@ -12,6 +12,7 @@ import {
   getAdminMap,
   type AdminMapBooth,
   type AdminMapCollege,
+  updateComingSoonOverlayEnabled,
   updateBoothLocation,
   updateCollegeLocation,
 } from "@/api/app/admin/adminMapApi";
@@ -73,6 +74,7 @@ export default function AdminMap() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [comingSoonOverlaySaving, setComingSoonOverlaySaving] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [pendingClearBooth, setPendingClearBooth] = useState<{ id: number; name: string } | null>(null);
   const [statusMessage, setStatusMessage] = useState<string>(
@@ -81,6 +83,7 @@ export default function AdminMap() {
 
   const FESTIVAL_DATES = ["2026-05-12", "2026-05-13", "2026-05-14"];
   const [selectedDate, setSelectedDate] = useState<string>("2026-05-12");
+  const [comingSoonOverlayEnabled, setComingSoonOverlayEnabled] = useState(false);
 
   const placedBooths = useMemo(
     () => booths.filter((booth) => booth.placed && booth.locationX != null && booth.locationY != null),
@@ -110,7 +113,7 @@ export default function AdminMap() {
       const data = await getAdminMap(date);
       setColleges(data.colleges ?? []);
       setBooths(data.booths ?? []);
-      // setSelectedDate(data.activeOperationDate ?? date ?? "2026-05-12");
+      setComingSoonOverlayEnabled(Boolean(data.comingSoonOverlayEnabled));
     } catch (error) {
       setGlobalError(
         error instanceof Error
@@ -123,8 +126,8 @@ export default function AdminMap() {
   }, []);
 
   useEffect(() => {
-    void loadMapData();
-  }, [loadMapData]);
+    void loadMapData(selectedDate);
+  }, [loadMapData, selectedDate]);
 
   const updateBoothState = useCallback((boothId: number, locationX: number | null, locationY: number | null) => {
     setBooths((prev) =>
@@ -529,6 +532,29 @@ export default function AdminMap() {
     setPendingClearBooth({ id: selectedBooth.id, name: selectedBooth.name });
   };
 
+  const handleToggleComingSoonOverlay = useCallback(async (enabled: boolean) => {
+    const previous = comingSoonOverlayEnabled;
+    setComingSoonOverlayEnabled(enabled);
+
+    try {
+      setComingSoonOverlaySaving(true);
+      setGlobalError(null);
+      await updateComingSoonOverlayEnabled(enabled);
+      setStatusMessage(
+        enabled
+          ? "타임테이블 Coming Soon 오버레이를 표시하도록 변경했습니다."
+          : "타임테이블 Coming Soon 오버레이를 숨기도록 변경했습니다.",
+      );
+    } catch (error) {
+      setComingSoonOverlayEnabled(previous);
+      setGlobalError(
+        error instanceof Error ? error.message : "타임테이블 오버레이 설정을 저장하지 못했습니다.",
+      );
+    } finally {
+      setComingSoonOverlaySaving(false);
+    }
+  }, [comingSoonOverlayEnabled]);
+
   const confirmClearBoothLocation = async () => {
     if (!pendingClearBooth) {
       return;
@@ -571,7 +597,7 @@ export default function AdminMap() {
 
           <button
             type="button"
-            onClick={() => void loadMapData()}
+            onClick={() => void loadMapData(selectedDate)}
             className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
           >
             <RefreshCcw className="h-4 w-4" strokeWidth={2.3} />
@@ -595,6 +621,8 @@ export default function AdminMap() {
           selectedDate={selectedDate}
           editorMode={editorMode}
           statusMessage={statusMessage}
+          comingSoonOverlayEnabled={comingSoonOverlayEnabled}
+          comingSoonOverlaySaving={comingSoonOverlaySaving}
           unplacedBooths={unplacedBooths}
           colleges={colleges}
           selectedItem={selectedItem}
@@ -606,6 +634,9 @@ export default function AdminMap() {
           onActivateBoothMode={activateBoothMode}
           onActivateCollegeMode={activateCollegeMode}
           onClearSelection={handleClearSelection}
+          onToggleComingSoonOverlay={(enabled) => {
+            void handleToggleComingSoonOverlay(enabled);
+          }}
           onSelectBooth={handleSelectBooth}
           onSelectCollege={handleSelectCollege}
           onClearBoothLocation={handleClearBoothLocation}

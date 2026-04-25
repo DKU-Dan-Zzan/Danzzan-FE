@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom"
 import {
   getContentImages,
   getPerformances,
+  getTimetableDisplayConfig,
   type ContentImageDto,
 } from "@/api/app/timetable/timetableApi"
 import { getPlacementAds } from "@/api/app/ad/adApi"
@@ -98,6 +99,13 @@ export default function Timetable() {
     staleTime: 10 * 60_000,
   })
 
+  const displayConfigQuery = useAppQuery({
+    queryKey: appQueryKeys.timetableDisplayConfig(),
+    enabled: true,
+    queryFn: ({ signal }) => getTimetableDisplayConfig({ signal }),
+    staleTime: 60_000,
+  })
+
   const allAdsQuery = useAppQuery({
     queryKey: appQueryKeys.placementAds("HOME_BOTTOM"),
     queryFn: ({ signal }) => getPlacementAds("HOME_BOTTOM", { signal }),
@@ -115,6 +123,9 @@ export default function Timetable() {
   const isImageLoading = contentImagesQuery.isPending
   const imageLoadError = contentImagesQuery.error?.message ?? null
   const allAds = allAdsQuery.data ?? []
+  const comingSoonOverlayEnabled = Boolean(
+    displayConfigQuery.data?.comingSoonOverlayEnabled,
+  )
 
   const nowTargetId = useMemo(() => {
     if (!isTodayTab || items.length === 0) {
@@ -209,7 +220,9 @@ export default function Timetable() {
     <div className="timetable-root relative flex h-screen min-h-0 flex-col overflow-hidden bg-white">
       <div
         ref={scrollContainerRef}
-        className="scrollbar-hide relative min-h-0 flex-1 overflow-y-auto bg-white [overscroll-behavior:none]"
+        className={`scrollbar-hide relative min-h-0 flex-1 bg-white [overscroll-behavior:none] ${
+          comingSoonOverlayEnabled ? "overflow-hidden" : "overflow-y-auto"
+        }`}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
@@ -232,14 +245,14 @@ export default function Timetable() {
           />
         </div>
 
-        <div ref={contentStartRef} className="mx-3 mt-1 overflow-hidden rounded-2xl bg-white">
+        <div ref={contentStartRef} className="relative mx-3 mt-1 overflow-hidden rounded-2xl bg-white">
           <div className="px-4 pt-3">
             <p className="text-center text-[11px] font-medium leading-relaxed text-neutral-400">
               * 일정은 현장 상황에 따라 변경될 수 있습니다
             </p>
           </div>
 
-          <div className="px-4 pt-5">
+          <div className="px-4 pb-4 pt-5">
             {isDay1 ? (
               <ContentImageSection
                 images={contentImages}
@@ -279,6 +292,10 @@ export default function Timetable() {
               />
             )}
           </div>
+
+          {comingSoonOverlayEnabled && (
+            <div className="absolute inset-0 z-20 bg-[rgba(241,243,245,0.86)] backdrop-blur-[4px]" />
+          )}
         </div>
 
         <AdBanner ads={allAds} marginTopClassName="mt-4" />
@@ -287,6 +304,22 @@ export default function Timetable() {
           className="h-[var(--app-bottom-nav-runtime-offset)]"
         />
       </div>
+
+      {comingSoonOverlayEnabled && (
+        <div className="pointer-events-none fixed inset-x-0 top-[42%] z-40 flex -translate-y-1/2 justify-center px-6">
+          <div className="rounded-full bg-white/28 px-6 py-3 shadow-[0_0_26px_rgba(255,255,255,0.42)] backdrop-blur-[1.5px]">
+            <p
+              className="text-[clamp(1.5rem,4vw,2.25rem)] font-black tracking-[0.14em]"
+              style={{
+                color: "var(--timetable-v2-accent)",
+                textShadow: "0 1px 10px rgba(255,255,255,0.45)",
+              }}
+            >
+              Coming Soon!
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -35,7 +35,7 @@ export type AdminMapBooth = {
 };
 
 export type AdminMapResponse = {
-  activeOperationDate: string;
+  comingSoonOverlayEnabled: boolean;
   colleges: AdminMapCollege[];
   booths: AdminMapBooth[];
 };
@@ -48,10 +48,12 @@ export async function getAdminMap(date?: string): Promise<AdminMapResponse> {
   });
 }
 
-export async function updateActiveOperationDate(operationDate: string): Promise<void> {
-  await fetchWithAuth<void>("/admin/map/active-date", {
+export async function updateComingSoonOverlayEnabled(
+  comingSoonOverlayEnabled: boolean,
+): Promise<void> {
+  await fetchWithAuth<void>("/admin/timetable/display-settings/coming-soon-overlay", {
     method: "PUT",
-    body: JSON.stringify({ operationDate }),
+    body: JSON.stringify({ comingSoonOverlayEnabled }),
   });
 }
 
