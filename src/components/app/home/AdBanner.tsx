@@ -15,7 +15,6 @@ export default function AdBanner({ ads, marginTopClassName = "mt-9" }: AdBannerP
         imageUrl: ad.imageUrl,
         alt: ad.title,
         updatedAt: ad.updatedAt,
-        objectPosition: ad.objectPosition,
       }))
     : [{ imageUrl: AD_PLACEHOLDER_IMAGE, alt: "광고 배너" }]
 

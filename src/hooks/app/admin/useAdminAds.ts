@@ -5,7 +5,7 @@ import { getAdminAds } from "@/api/app/admin/adminApi";
 import type { AdvertisementResponse } from "@/api/app/admin/adminApi";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
 
-export type ClientAdDto = AdvertisementResponse & { objectPosition?: string };
+export type ClientAdDto = AdvertisementResponse;
 
 type UseAdminAdsOptions = {
   onError: (message: string) => void;

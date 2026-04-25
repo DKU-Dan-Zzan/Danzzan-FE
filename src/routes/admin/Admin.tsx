@@ -1,5 +1,5 @@
 // 역할: 관리자 공지/광고 운영 화면을 렌더링하고 편집 액션 훅을 조합합니다.
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AlertCircle,
@@ -55,82 +55,6 @@ const ADMIN_PINNED_NOTICE_ROW_CLASS = "bg-[var(--status-pending-bg)]";
 const ADMIN_PINNED_NOTICE_BADGE_CLASS =
   "inline-flex items-center gap-1 rounded-full bg-[var(--status-pending)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-on-accent)]";
 
-function parsePosition(pos: string): { x: number; y: number } {
-  const parts = pos.split(" ");
-  return {
-    x: parseFloat(parts[0] ?? "50"),
-    y: parseFloat(parts[1] ?? "50"),
-  };
-}
-
-function AdPositionPicker({
-  imageUrl,
-  objectPosition,
-  onChange,
-}: {
-  imageUrl: string;
-  objectPosition: string;
-  onChange: (pos: string) => void;
-}) {
-  const dragRef = useRef<{ startX: number; startY: number; startPosX: number; startPosY: number } | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    e.currentTarget.setPointerCapture(e.pointerId);
-    const { x, y } = parsePosition(objectPosition);
-    dragRef.current = { startX: e.clientX, startY: e.clientY, startPosX: x, startPosY: y };
-  };
-
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current || !containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const deltaXPct = ((e.clientX - dragRef.current.startX) / rect.width) * 100;
-    const deltaYPct = ((e.clientY - dragRef.current.startY) / rect.height) * 100;
-    const newX = Math.round(Math.min(100, Math.max(0, dragRef.current.startPosX - deltaXPct)));
-    const newY = Math.round(Math.min(100, Math.max(0, dragRef.current.startPosY - deltaYPct)));
-    onChange(`${newX}% ${newY}%`);
-  };
-
-  const handlePointerUp = () => {
-    dragRef.current = null;
-  };
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <p className="text-[10px] font-semibold text-[var(--text-muted)]">
-          이미지 위치 조정 (드래그)
-        </p>
-        <button
-          type="button"
-          onClick={() => onChange("50% 50%")}
-          className="text-[10px] text-[var(--accent)] underline underline-offset-2"
-        >
-          가운데로 초기화
-        </button>
-      </div>
-      <div
-        ref={containerRef}
-        className="mx-auto w-full max-w-[360px] cursor-grab overflow-hidden rounded-xl border border-[var(--accent)] bg-[var(--surface)] select-none active:cursor-grabbing"
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
-      >
-        <img
-          src={imageUrl}
-          alt="위치 조정 미리보기"
-          className="pointer-events-none h-[70px] w-full object-cover"
-          style={{ objectPosition }}
-          draggable={false}
-        />
-      </div>
-      <p className="text-center text-[10px] text-[var(--text-muted)]">
-        현재 위치: {objectPosition} · 드래그하여 보이는 영역을 조정하세요
-      </p>
-    </div>
-  );
-}
 
 function Admin() {
   const navigate = useNavigate();
@@ -691,7 +615,6 @@ function Admin() {
                     src={ad.imageUrl}
                     alt={ad.title}
                     className="h-[70px] w-full object-cover"
-                    style={{ objectPosition: ad.objectPosition ?? "50% 50%" }}
                   />
                   <div className="absolute inset-0 flex items-start justify-end bg-gradient-to-b from-black/30 to-transparent p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
                     <button
@@ -1034,31 +957,42 @@ function Admin() {
                 </div>
 
                 {editingAd.imageUrl && (
-                  <AdPositionPicker
-                    imageUrl={editingAd.imageUrl}
-                    objectPosition={editingAd.objectPosition}
-                    onChange={(pos) =>
-                      setEditingAd((prev) => prev ? { ...prev, objectPosition: pos } : prev)
-                    }
-                  />
+                  <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-xl border border-[var(--border-base)]">
+                    <img
+                      src={editingAd.imageUrl}
+                      alt="업로드된 광고 미리보기"
+                      className="h-[70px] w-full object-cover"
+                    />
+                  </div>
                 )}
               </div>
 
-              <div className="flex justify-end gap-2 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setEditingAd(null)}
-                  className={ADMIN_SECONDARY_ACTION_BUTTON_CLASS}
-                >
-                  취소
-                </button>
-                <button
-                  type="submit"
-                  disabled={adImageUploading || !editingAd.imageUrl || !editingAd.title.trim()}
-                  className={ADMIN_PRIMARY_ACTION_BUTTON_CLASS}
-                >
-                  등록하기
-                </button>
+              <div className="space-y-2">
+                {(!editingAd.title.trim() || !editingAd.imageUrl) && (
+                  <p className="text-right text-[11px] text-[var(--text-muted)]">
+                    {!editingAd.title.trim() && !editingAd.imageUrl
+                      ? "제목과 이미지를 모두 입력해 주세요."
+                      : !editingAd.title.trim()
+                        ? "광고 제목을 입력해 주세요."
+                        : "이미지를 업로드해 주세요."}
+                  </p>
+                )}
+                <div className="flex justify-end gap-2 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setEditingAd(null)}
+                    className={ADMIN_SECONDARY_ACTION_BUTTON_CLASS}
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={adImageUploading || !editingAd.imageUrl || !editingAd.title.trim()}
+                    className={ADMIN_PRIMARY_ACTION_BUTTON_CLASS}
+                  >
+                    {adImageUploading ? "업로드 중..." : "등록하기"}
+                  </button>
+                </div>
               </div>
             </form>
           </DialogContent>

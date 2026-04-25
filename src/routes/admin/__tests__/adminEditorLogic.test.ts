@@ -78,14 +78,12 @@ describe("adminEditorLogic", () => {
     const payload = buildAdPayload({
       title: " 배너 ",
       imageUrl: " https://cdn.example.com/banner.png ",
-      objectPosition: "",
     });
 
     expect(payload).toEqual({
       title: "배너",
       imageUrl: "https://cdn.example.com/banner.png",
       placement: DEFAULT_ADMIN_AD_PLACEMENT,
-      objectPosition: "50% 50%",
     });
   });
 
@@ -113,7 +111,6 @@ describe("adminEditorLogic", () => {
         title: "배너",
         imageUrl: "",
         placement: DEFAULT_ADMIN_AD_PLACEMENT,
-        objectPosition: "50% 50%",
       }),
     ).toBe("이미지를 업로드해 주세요.");
   });

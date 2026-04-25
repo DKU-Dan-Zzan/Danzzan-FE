@@ -15,7 +15,6 @@ export type NoticeFormState = {
 export type AdFormState = {
   title: string;
   imageUrl: string;
-  objectPosition: string;
 };
 
 export const formatDate = (dateString: string): string => {

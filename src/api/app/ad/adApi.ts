@@ -12,7 +12,6 @@ export type ClientAdDto = {
   id: number;
   title: string;
   imageUrl: string;
-  objectPosition?: string;
   placement: PlacementKey;
   isActive: boolean;
   createdAt: string;
@@ -26,7 +25,6 @@ const parseAdList = (data: unknown): ClientAdDto[] => {
       id: Number(item.id ?? 0),
       title: String(item.title ?? "광고 배너"),
       imageUrl: String(item.imageUrl ?? ""),
-      objectPosition: item.objectPosition ? String(item.objectPosition) : undefined,
       placement: (item.placement as PlacementKey) ?? "HOME_BOTTOM",
       isActive: Boolean(item.isActive ?? true),
       createdAt: String(item.createdAt ?? ""),
