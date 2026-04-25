@@ -1,20 +1,19 @@
-<svg width="1200" height="375" viewBox="0 0 1200 375" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="900" height="200" viewBox="0 0 900 200" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="375" gradientUnits="userSpaceOnUse">
+    <linearGradient id="bg" x1="0" y1="0" x2="900" y2="200" gradientUnits="userSpaceOnUse">
       <stop stop-color="#1E40AF"/>
       <stop offset="1" stop-color="#3B82F6"/>
     </linearGradient>
-    <linearGradient id="chip" x1="0" y1="0" x2="220" y2="0" gradientUnits="userSpaceOnUse">
+    <linearGradient id="chip" x1="0" y1="0" x2="120" y2="0" gradientUnits="userSpaceOnUse">
       <stop stop-color="#DBEAFE"/>
       <stop offset="1" stop-color="#EFF6FF"/>
     </linearGradient>
   </defs>
-  <rect width="1200" height="375" rx="28" fill="url(#bg)"/>
-  <circle cx="1030" cy="85" r="165" fill="#60A5FA" fill-opacity="0.22"/>
-  <circle cx="1115" cy="305" r="140" fill="#93C5FD" fill-opacity="0.24"/>
-  <rect x="74" y="70" width="220" height="52" rx="26" fill="url(#chip)"/>
-  <text x="184" y="104" text-anchor="middle" font-family="Pretendard, Noto Sans KR, sans-serif" font-size="24" font-weight="700" fill="#1D4ED8">단짠 광고</text>
-  <text x="74" y="190" font-family="Pretendard, Noto Sans KR, sans-serif" font-size="56" font-weight="800" fill="#FFFFFF">2026 LOU:D 광고 슬롯</text>
-  <text x="74" y="258" font-family="Pretendard, Noto Sans KR, sans-serif" font-size="56" font-weight="800" fill="#FFFFFF">관리자용 광고 업로드페이지를 사용하면 반영됩니다</text>
-  <text x="74" y="314" font-family="Pretendard, Noto Sans KR, sans-serif" font-size="28" font-weight="500" fill="#DBEAFE">관리자 업로드 이미지가 이 슬롯에 자동 반영됩니다.</text>
+  <rect width="900" height="200" fill="url(#bg)"/>
+  <circle cx="810" cy="40" r="110" fill="#60A5FA" fill-opacity="0.18"/>
+  <circle cx="860" cy="170" r="90" fill="#93C5FD" fill-opacity="0.18"/>
+  <rect x="390" y="52" width="120" height="30" rx="15" fill="url(#chip)"/>
+  <text x="450" y="73" text-anchor="middle" font-family="Pretendard, Noto Sans KR, sans-serif" font-size="14" font-weight="700" fill="#1D4ED8">단짠 광고</text>
+  <text x="450" y="116" text-anchor="middle" font-family="Pretendard, Noto Sans KR, sans-serif" font-size="30" font-weight="800" fill="#FFFFFF">광고 슬롯</text>
+  <text x="450" y="152" text-anchor="middle" font-family="Pretendard, Noto Sans KR, sans-serif" font-size="14" font-weight="500" fill="#DBEAFE">관리자 페이지에서 광고를 등록하면 여기에 표시됩니다</text>
 </svg>

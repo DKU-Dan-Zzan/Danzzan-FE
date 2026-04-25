@@ -54,7 +54,6 @@ export const adApi = {
       imageUrl: ad.imageUrl,
       alt: ad.title,
       updatedAt: ad.updatedAt,
-      objectPosition: ad.objectPosition,
     }));
   },
 };

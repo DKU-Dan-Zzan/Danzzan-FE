@@ -281,7 +281,6 @@ export type CreateAdvertisementRequest = {
   title: string;
   imageUrl: string;
   placement: AdvertisementPlacement;
-  objectPosition?: string;
 };
 
 export async function createAdminAd(
