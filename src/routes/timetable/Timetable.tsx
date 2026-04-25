@@ -11,6 +11,7 @@ import AdBanner from "@/components/app/home/AdBanner"
 import ContentImageSection from "@/components/app/timetable/ContentImage"
 import DayTabs from "@/components/app/timetable/DayTabs"
 import Timeline from "@/components/app/timetable/Timeline"
+import { cn } from "@/components/common/ui/utils"
 import { appQueryKeys, useAppQuery } from "@/lib/query"
 import type { FestivalDay, Performance } from "@/types/app/timetable/timetable.types"
 
@@ -220,9 +221,10 @@ export default function Timetable() {
     <div className="timetable-root relative flex h-screen min-h-0 flex-col overflow-hidden bg-white">
       <div
         ref={scrollContainerRef}
-        className={`scrollbar-hide relative min-h-0 flex-1 bg-white [overscroll-behavior:none] ${
-          comingSoonOverlayEnabled ? "overflow-hidden" : "overflow-y-auto"
-        }`}
+        className={cn(
+          "scrollbar-hide relative min-h-0 flex-1 bg-white [overscroll-behavior:none]",
+          comingSoonOverlayEnabled ? "overflow-hidden" : "overflow-y-auto",
+        )}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
