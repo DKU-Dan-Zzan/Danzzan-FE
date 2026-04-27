@@ -17,6 +17,7 @@ export interface AuthUserDto {
   department?: string;
   studentId?: string;
   college?: string;
+  naverId?: string;
 }
 
 export interface AuthLoginResponseDto {
