@@ -44,49 +44,6 @@ import { cn } from "@/components/common/ui/utils";
 const CONSENT_ITEMS: { id: number; title: string; required: boolean; content: React.ReactNode }[] = [
   {
     id: 1,
-    title: "개인정보의 제3자 제공에 대한 동의",
-    required: true,
-    content: (
-      <div className="space-y-3 text-[13px] leading-6 text-[var(--text-muted)]">
-        <p>
-          총학생회는 개인정보를 개인정보 수집·이용 목적에서 명시한 범위 내에서 사용하며, 이용자의
-          사전 동의 없이 목적 범위를 초과하여 이용하거나 원칙적으로 이용자의 개인정보를 제공하지
-          않습니다. 다만, 아래와 같이 양질의 서비스 제공을 위해 이용자의 개인정보를 공유할 필요가
-          있는 경우에는 필요한 범위 내에서 개인정보를 제3자에게 제공하고 있습니다.
-        </p>
-        <table className="w-full border-collapse border border-[var(--border-base)] text-[12px]">
-          <thead>
-            <tr className="bg-[var(--surface_container)]">
-              {["제공받는 자", "제공 목적", "제공 항목", "보유 및 이용 기간"].map((h) => (
-                <th key={h} className="border border-[var(--border-base)] px-2 py-1.5 text-left font-bold text-[var(--text)]">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border border-[var(--border-base)] px-2 py-1.5">네이버 주식회사</td>
-              <td className="border border-[var(--border-base)] px-2 py-1.5">축제 행사장(단국존) 입장 관리 및 팔찌 배부 시 본인인증(Face ID) 서비스 연계</td>
-              <td className="border border-[var(--border-base)] px-2 py-1.5">학번, 네이버 아이디</td>
-              <td className="border border-[var(--border-base)] px-2 py-1.5">축제 종료 후 2026년 12월 31일까지</td>
-            </tr>
-          </tbody>
-        </table>
-        <p className="text-[11.5px]">
-          ※ 네이버 주식회사가 제공하는 본인인증(Face ID) 서비스 이용 과정에서 얼굴 생체정보 등의
-          추가 정보는 네이버 주식회사가 정보주체로부터 직접 수집·처리하며, 이에 관한 사항은
-          네이버 주식회사의 개인정보처리방침 및 이용약관이 적용됩니다.
-        </p>
-        <p className="font-bold text-[var(--text)]">
-          동의를 거부할 권리가 있으며, 거부 시 축제 행사장 입장 및 팔찌 배부가 불가하여 본 서비스
-          중 축제 입출입 관련 기능 이용이 제한됩니다.
-        </p>
-      </div>
-    ),
-  },
-  {
-    id: 2,
     title: "개인정보 처리위탁에 대한 동의",
     required: true,
     content: (
@@ -123,51 +80,80 @@ const CONSENT_ITEMS: { id: number; title: string; required: boolean; content: Re
     ),
   },
   {
-    id: 3,
+    id: 2,
     title: "필수 수집·이용 동의",
     required: true,
     content: (
       <div className="space-y-3 text-[13px] leading-6 text-[var(--text-muted)]">
         <div>
-          <p className="font-bold text-[var(--text)]">가. 수집 및 이용 목적</p>
+          <p className="font-bold text-[var(--text)]">개인정보 수집 및 이용에 관한 동의서</p>
+          <p className="mt-1">시행일자: 2026년 5월 1일</p>
           <p className="mt-1">
-            총학생회는 서비스사에서의 본인의 확인을 위해, 본 서비스를 제공하기 위해(축제정보 제공,
-            축제 티켓팅 서비스 제공, 축제 행사장 입출입 확인 및 본인인증 연계, 축제 내 타임테이블
-            제공), 본 서비스와 관련된 정보를 제공하기 위해, 앱 데이터 다운 개선 서비스 제공을 위해,
-            문의에 대한 대응을 위해, 또한 최소한의 범위 내에서 개인정보를 수집합니다.
+            단국대학교 죽전캠퍼스 총학생회(이하 &quot;총학생회&quot;)는 「개인정보 보호법」 제15조 및
+            제22조에 따라 아래와 같이 이용자의 개인정보를 수집·이용합니다. 이용자는 동의를 거부할
+            권리가 있으며, 필수 항목의 동의를 거부할 경우 본 서비스 이용이 제한되거나 불가능할 수
+            있습니다.
+          </p>
+        </div>
+        <div>
+          <p className="font-bold text-[var(--text)]">1. 필수 수집·이용 동의</p>
+          <p className="mt-1 font-bold text-[var(--text)]">가. 수집 및 이용 목적</p>
+          <p className="mt-1">
+            총학생회는 본 서비스에서의 본인 확인을 위해, 본 서비스를 제공하기 위해(축제 정보 제공,
+            총학생회 공지 제공, 축제 티켓팅 서비스 제공, 축제 행사장 입출입 확인 및 본인인증 연계,
+            축제 연예인 타임테이블 제공), 본 서비스에 관한 정보를 제공하기 위해, 통계 데이터 등
+            개인을 특정할 수 없는 데이터를 작성하기 위해, 본 서비스를 개선하기 위해, 새로운 서비스
+            연구개발을 위해, 이용약관 등에서 금지된 행위에 대한 조사·대응을 위해, 문의 대응을 위해
+            필요한 최소한의 범위 내에서 개인정보를 수집하고 있습니다.
           </p>
         </div>
         <div>
           <p className="font-bold text-[var(--text)]">나. 수집 및 이용 항목</p>
           <ul className="mt-1 space-y-1">
-            <li>• 이용자 본인 확인 및 서비스 제공에 관한 정보: 학번, 본 서비스 비밀번호(암호화 저장), 학적정보/소속(대학교/학교/전공/학년), 소속, 네이버 아이디</li>
-            <li>• 회원가입 과정에서 일시적으로 수집 후 완료 시 즉시 삭제되는 정보: 단국대학교 포털 비밀번호</li>
+            <li>
+              - 이용자 본인 확인 및 서비스 제공에 관한 정보: 학번, 본 서비스 비밀번호(암호화 저장),
+              연락처(휴대전화번호), 학적정보(재학·수료·졸업 구분), 소속(전공), 네이버 아이디
+            </li>
+            <li>
+              - 회원가입 과정에서 일시적으로 수집 후 즉시 폐기되는 정보: 단국대학교 포털 비밀번호
+            </li>
           </ul>
-          <p className="mt-1 text-[11.5px]">※ 서비스 이용 과정에서 자동으로 생성·수집되는 정보: 접속 로그, IP 주소, 쿠키, 브라우저 정보, OS 정보, 기기 정보(Device ID), 서비스 이용 기록(축제 정보 조회 이력, 공지 열람 이력, 티켓팅 이력 등)</p>
-          <p className="text-[11.5px]">※ 이용자가 직접 작성한 정보: 문의, 의견, 텍스트 등</p>
+          <p className="mt-1 text-[11.5px]">
+            ※ 해당 정보는 회원가입 시 단국대학교 통합정보시스템으로부터 연락처·학적정보·소속을
+            연동하여 가져오는 용도로만 일회성 이용되며, 연동 절차 완료 직후 즉시 폐기됩니다.
+            총학생회의 서버에 저장되지 않습니다.
+          </p>
+          <ul className="mt-1 space-y-1">
+            <li>
+              - 서비스 이용 과정에서 자동으로 생성·수집되는 정보: 접속 로그, IP 주소, 쿠키,
+              브라우저 정보, OS 정보, 기기 정보(Device ID), 서비스 이용 기록(축제 정보 조회 이력,
+              공지 열람 이력, 티켓팅 이력 등)
+            </li>
+            <li>- 이용자가 게시·발신한 정보: 문의, 의견, 텍스트 등</li>
+          </ul>
         </div>
         <div>
           <p className="font-bold text-[var(--text)]">다. 보유 및 이용 기간</p>
           <p className="mt-1">
-            서비스 탈퇴 시 또는 2026년 12월 31일 중 이른 시점까지 보유·이용하며, 이후 지체없이
-            파기합니다. 다만, 관련 법령에 따라 일정 기간 보존해야 하는 경우에는 해당 법령에서 정한
+            회원 탈퇴 시 또는 2026년 12월 31일 중 이른 시점까지 보유·이용하며, 이후 지체없이
+            파기합니다. 다만, 관련 법령에 따라 일정 기간 보존하여야 하는 경우에는 해당 법령에서 정한
             기간 동안 보관합니다.
           </p>
           <ul className="mt-1 space-y-0.5">
-            <li>• 정보통신망법 본인확인에 관한 기록: 6개월</li>
-            <li>• 통신비밀보호법 서비스 이용 관련 로그기록: 3개월</li>
+            <li>- (정보통신망법) 본인확인에 관한 기록: 6개월</li>
+            <li>- (통신비밀보호법) 서비스 이용 관련 로그기록: 3개월</li>
           </ul>
         </div>
         <p className="font-bold text-[var(--text)]">
-          동의를 거부할 권리가 있으며, 필수 항목에 대한 동의를 거부할 경우 회원가입 및 본 서비스
+          동의를 거부할 권리가 있으나, 필수 항목에 대한 동의를 거부할 경우 회원가입 및 본 서비스
           이용이 불가능합니다.
         </p>
       </div>
     ),
   },
   {
-    id: 4,
-    title: "선택 수집·이용 동의 (광고 관련)",
+    id: 3,
+    title: "마케팅 이용 수집 이용 동의",
     required: false,
     content: (
       <div className="space-y-3 text-[13px] leading-6 text-[var(--text-muted)]">
@@ -449,14 +435,14 @@ export default function Signup() {
   const [dkuPassword, setDkuPassword] = useState("");
   const [step1Error, setStep1Error] = useState<string | null>(null);
   const [signupToken, setSignupToken] = useState("");
-  const [consents, setConsents] = useState([false, false, false, false]);
+  const [consents, setConsents] = useState(() => CONSENT_ITEMS.map(() => false));
   const [activeConsentIdx, setActiveConsentIdx] = useState<number | null>(null);
 
   const toggleConsent = (idx: number) =>
     setConsents((prev) => prev.map((v, i) => (i === idx ? !v : v)));
-  const requiredConsentsMet = consents[0] && consents[1] && consents[2];
+  const requiredConsentsMet = CONSENT_ITEMS.every((item, idx) => !item.required || consents[idx]);
   const allConsented = consents.every(Boolean);
-  const toggleAll = () => setConsents(allConsented ? [false, false, false, false] : [true, true, true, true]);
+  const toggleAll = () => setConsents(CONSENT_ITEMS.map(() => !allConsented));
 
   // ── Step 2 상태
   const [phoneNumber, setPhoneNumber] = useState("");
