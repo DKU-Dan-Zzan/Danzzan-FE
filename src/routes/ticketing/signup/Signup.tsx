@@ -1227,7 +1227,7 @@ export default function Signup() {
                                 if (step3Error === NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE) setStep3Error(null);
                                 setNaverId(e.target.value);
                               }}
-                              placeholder="네이버 아이디를 입력해 주세요"
+                              placeholder="네이버 아이디 입력 (@naver.com 제외)"
                               className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS, NAVER_ID_INPUT_CLASS_NAME, "pr-10")}
                               autoComplete="username"
                               required
