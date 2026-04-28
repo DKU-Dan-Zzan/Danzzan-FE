@@ -24,13 +24,16 @@ describe("Common not-found route", () => {
     expect(source).toContain('export { default } from "@/routes/not-found/NotFoundPage";');
   });
 
-  it("The shared page keeps a festival-app tone and useful recovery actions", () => {
+  it("The shared page keeps a concise 404 tone and only the home recovery action", () => {
     const source = readSource("src/routes/not-found/NotFoundPage.tsx");
 
-    expect(source).toContain("축제길을 잠깐 놓쳤어요");
-    expect(source).toContain("DANFESTA / 404");
-    expect(source).toContain('src="/DAN-ZZAN.png"');
+    expect(source).toContain("페이지를 찾을 수 없어요");
+    expect(source).toContain("주소가 바뀌었거나 접근할 수 없는 페이지예요.");
     expect(source).toContain('to="/"');
+    expect(source).not.toContain("LOST GATE");
+    expect(source).not.toContain("NO ROUTE");
+    expect(source).not.toContain("FESTIVAL PASS");
+    expect(source).not.toContain('src="/DAN-ZZAN.png"');
     expect(source).not.toContain('to: "/map"');
     expect(source).not.toContain('to: "/ticket/ticketing"');
     expect(source).not.toContain("navigate(-1)");
