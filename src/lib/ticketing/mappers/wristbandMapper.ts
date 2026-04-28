@@ -36,7 +36,7 @@ export const mapEventSummaryToSession = (
 export const mapEventStatsToWristbandStats = (
   dto: EventStatsResponseDto,
 ): WristbandStats => ({
-  totalTickets: dto.totalTickets,
+  totalTickets: dto.ticketsConfirmed + dto.ticketsIssued,
   issuedCount: dto.ticketsIssued,
   pendingCount: dto.ticketsConfirmed,
 });

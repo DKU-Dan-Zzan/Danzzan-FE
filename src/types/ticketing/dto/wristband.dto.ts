@@ -35,6 +35,7 @@ export interface EventStatsResponseDto {
   totalTickets: number;
   ticketsConfirmed: number;
   ticketsIssued: number;
+  ticketsCancelledByWithdrawal?: number;
   issueRate: number;
   remainingCapacity: number;
 }
