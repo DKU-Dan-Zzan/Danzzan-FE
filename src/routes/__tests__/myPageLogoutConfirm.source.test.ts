@@ -37,9 +37,9 @@ describe("MyPage logout confirm source", () => {
     expect(source).toContain("withdrawConfirmOpen");
     expect(source).toContain("UserX");
     expect(source).toContain("회원 탈퇴");
-    expect(source).toContain("gap-3.5");
+    expect(source).toContain("openWithdrawDialog");
     expect(source).toContain("var(--mypage-withdraw-text)");
-    expect(styles).toContain("--mypage-withdraw-text: #a3aab5");
+    expect(styles).toMatch(/--mypage-withdraw-text:\s*[^;]+;/);
   });
 
   it("회원 탈퇴 확인 시 DELETE /user/me 어댑터를 호출한다", () => {

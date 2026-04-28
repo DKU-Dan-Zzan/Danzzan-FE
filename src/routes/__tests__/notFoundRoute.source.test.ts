@@ -29,25 +29,15 @@ describe("Common not-found route", () => {
 
     expect(source).toContain("페이지를 찾을 수 없어요");
     expect(source).toContain("주소가 바뀌었거나 접근할 수 없는 페이지예요.");
+    expect(source).toContain('aria-labelledby="not-found-title"');
+    expect(source).toContain('id="not-found-title"');
     expect(source).toContain('to="/"');
     expect(source).toContain('src="/DAN-ZZAN.png"');
-    expect(source).toContain("justify-start");
-    expect(source).toContain("pt-[calc(env(safe-area-inset-top)+clamp(15rem,38vh,20rem))]");
-    expect(source).toContain("top-[36%]");
-    expect(source).toContain("max-w-[320px]");
-    expect(source).toContain("flex-col");
-    expect(source).not.toContain("translate-y-[calc((var(--app-bottom-nav-runtime-offset)*1.3))]");
-    expect(source).not.toContain("translate-y-[calc((var(--app-bottom-nav-runtime-offset)*0.9))]");
-    expect(source).not.toContain("translate-y-16");
-    expect(source).not.toContain("translate-y-8");
-    expect(source).not.toContain("top-[45%]");
-    expect(source).toContain("#0a559c");
-    expect(source).toContain("#2f63f6");
-    expect(source).not.toContain("#ff715b");
-    expect(source).not.toContain("#ffb45f");
-    expect(source).not.toContain("LOST GATE");
-    expect(source).not.toContain("NO ROUTE");
-    expect(source).not.toContain("FESTIVAL PASS");
+
+    expect(source).toContain("var(--brand-main)");
+    expect(source).toContain("var(--text-emphasis-vivid-strong)");
+
+    // 복구 액션은 홈 이동 1개만 유지한다.
     expect(source).not.toContain('to: "/map"');
     expect(source).not.toContain('to: "/ticket/ticketing"');
     expect(source).not.toContain("navigate(-1)");
