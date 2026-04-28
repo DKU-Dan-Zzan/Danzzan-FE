@@ -181,6 +181,7 @@ export default function TicketingApp() {
               <Route path="my-ticket" element={<MyTicket />} />
               <Route path="myticket" element={<LegacyMyTicketRedirect />} />
             </Route>
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
 
           <Route path="admin" element={<AdminLogin />} />
@@ -190,8 +191,6 @@ export default function TicketingApp() {
               <Route path="wristband" element={<WristbandPage />} />
             </Route>
           </Route>
-
-          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </div>
