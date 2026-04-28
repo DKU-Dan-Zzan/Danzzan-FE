@@ -10,7 +10,6 @@ import {
   getAdminPubImagePresign,
   getAdminPubImages,
   type AdminBoothManagementBooth,
-  type AdminBoothManagementPub,
   type AdminBoothManagementResponse,
   type AdminPubImage,
   type AdminPubOperation,
@@ -777,6 +776,7 @@ export default function AdminBoothManagerPanel({
                   <button
                     key={`${item.kind}-${item.id}`}
                     type="button"
+                    aria-label={`${item.name} ${item.kind === "pub" ? "주점" : "부스"} 선택`}
                     onClick={() => handleSelectItem(item)}
                     className={cn(
                       "w-full rounded-2xl border px-4 py-4 text-left transition-colors",
@@ -1123,7 +1123,7 @@ export default function AdminBoothManagerPanel({
                                       : "border-[var(--border-base)] bg-white text-[var(--text)]",
                                   )}
                                 >
-                                  <Star className="h-3.5 w-3.5 fill-current text-[#ffd84d]" strokeWidth={2.3} />
+                                  <Star className="h-3.5 w-3.5 fill-current text-[var(--status-warning)]" strokeWidth={2.3} />
                                   {isMainCandidate ? "대표 이미지 선택됨" : "대표 이미지로 선택"}
                                 </button>
                               </div>
@@ -1143,7 +1143,7 @@ export default function AdminBoothManagerPanel({
                     </div>
 
                     {!pubImagesLoading && pubImages.length > 0 && !hasMainPubImage && (
-                      <div className="mb-3 rounded-2xl border border-[#f4d06f] bg-[#fff7db] px-4 py-3 text-xs font-semibold text-[#9a6b00]">
+                      <div className="mb-3 rounded-2xl border border-[var(--status-warning-border)] bg-[var(--status-warning-bg)] px-4 py-3 text-xs font-semibold text-[var(--status-warning-text)]">
                         대표 이미지가 아직 지정되지 않았습니다. 아래에서 한 장을 대표로 지정해 주세요.
                       </div>
                     )}
@@ -1162,7 +1162,7 @@ export default function AdminBoothManagerPanel({
                             className={cn(
                               "overflow-hidden rounded-2xl border bg-white transition-all",
                               image.isMain
-                                ? "border-[#f1d48a] bg-[#fffdf8] ring-2 ring-[#ffe9b5]/70"
+                                ? "border-[var(--status-warning-border)] bg-[var(--status-warning-bg)] ring-2 ring-[var(--status-warning-border)]/70"
                                 : "border-[var(--border-base)]",
                             )}
                           >
@@ -1174,7 +1174,7 @@ export default function AdminBoothManagerPanel({
                               />
                               {image.isMain && (
                                 <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-[var(--accent)] px-2.5 py-1 text-[11px] font-semibold text-white">
-                                  <Star className="h-3.5 w-3.5 fill-current text-[#ffd84d]" strokeWidth={2.3} />
+                                  <Star className="h-3.5 w-3.5 fill-current text-[var(--status-warning)]" strokeWidth={2.3} />
                                   현재 대표
                                 </span>
                               )}
@@ -1190,14 +1190,14 @@ export default function AdminBoothManagerPanel({
                                   className={cn(
                                     "inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl border text-xs font-semibold disabled:opacity-50",
                                     image.isMain
-                                      ? "border-[#ead39d] bg-[#fffaf0] text-[#8d6a00]"
+                                      ? "border-[var(--status-warning-border)] bg-[var(--status-warning-bg)] text-[var(--status-warning-text)]"
                                       : "border-[var(--border-base)] bg-white text-[var(--text)]",
                                   )}
                                 >
                                   <Star
                                     className={cn(
                                       "h-3.5 w-3.5",
-                                      image.isMain && "fill-current text-[#f4b400]",
+                                      image.isMain && "fill-current text-[var(--status-warning)]",
                                     )}
                                     strokeWidth={2.3}
                                   />

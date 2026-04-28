@@ -483,7 +483,7 @@ export default function AdminTimetableManagerPanel({
               className={cn(
                 "rounded-xl border px-4 py-2 text-sm font-semibold transition",
                 activeDayKey === day.key
-                  ? "border-[var(--admin-accent,_#3b82f6)] bg-[var(--admin-accent,_#3b82f6)] text-white"
+                  ? "border-[var(--accent)] bg-[var(--accent)] text-white"
                   : "border-[var(--border-base)] bg-white text-[var(--text)] hover:bg-[var(--surface-subtle)]",
               )}
             >
@@ -544,7 +544,7 @@ export default function AdminTimetableManagerPanel({
                           </td>
                           <td className="px-3 py-2 font-medium">{performance.artistName}</td>
                           <td className="px-3 py-2 text-xs">{performance.stage ?? "-"}</td>
-                          <td className="px-3 py-2 text-right">
+                          <td aria-label="공연 관리" className="px-3 py-2 text-right">
                             <div className="flex justify-end gap-1.5">
                               <button
                                 type="button"
@@ -602,7 +602,7 @@ export default function AdminTimetableManagerPanel({
                     artistId: event.target.value === "" ? "" : Number(event.target.value),
                   }))
                 }
-                className="rounded-md border border-[var(--border-base)] bg-white px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--admin-accent,_#3b82f6)]"
+                className="rounded-md border border-[var(--border-base)] bg-white px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               >
                 <option value="">아티스트를 선택해 주세요</option>
                 {artists.map((artist) => (
@@ -629,7 +629,7 @@ export default function AdminTimetableManagerPanel({
                     performanceDate: event.target.value,
                   }))
                 }
-                className="rounded-md border border-[var(--border-base)] bg-white px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--admin-accent,_#3b82f6)]"
+                className="rounded-md border border-[var(--border-base)] bg-white px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               />
               <span className="text-[11px] font-normal text-[var(--text-soft)]">
                 현재 선택된 {activeDay.label}({activeDay.date})에 자동으로 맞춰집니다.
@@ -648,7 +648,7 @@ export default function AdminTimetableManagerPanel({
                       startTime: event.target.value,
                     }))
                   }
-                  className="rounded-md border border-[var(--border-base)] bg-white px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--admin-accent,_#3b82f6)]"
+                  className="rounded-md border border-[var(--border-base)] bg-white px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                 />
               </label>
               <label className="flex flex-col gap-1 text-xs font-semibold text-[var(--text-soft)]">
@@ -662,7 +662,7 @@ export default function AdminTimetableManagerPanel({
                       endTime: event.target.value,
                     }))
                   }
-                  className="rounded-md border border-[var(--border-base)] bg-white px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--admin-accent,_#3b82f6)]"
+                  className="rounded-md border border-[var(--border-base)] bg-white px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                 />
               </label>
             </div>
@@ -676,14 +676,14 @@ export default function AdminTimetableManagerPanel({
                   setPerformanceForm((prev) => ({ ...prev, stage: event.target.value }))
                 }
                 placeholder="예: MAIN_STAGE"
-                className="rounded-md border border-[var(--border-base)] bg-white px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--admin-accent,_#3b82f6)]"
+                className="rounded-md border border-[var(--border-base)] bg-white px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               />
             </label>
 
             <button
               type="submit"
               disabled={savingPerformance}
-              className="inline-flex items-center justify-center gap-1.5 rounded-md bg-[var(--admin-accent,_#3b82f6)] px-3 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-1.5 rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isEditingPerformance ? <Save className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
               {savingPerformance
@@ -761,7 +761,7 @@ export default function AdminTimetableManagerPanel({
                           <td className="px-3 py-2 text-xs text-[var(--text-soft)]">
                             {artist.description ?? "-"}
                           </td>
-                          <td className="px-3 py-2 text-right">
+                          <td aria-label="아티스트 관리" className="px-3 py-2 text-right">
                             <div className="flex justify-end gap-1.5">
                               <button
                                 type="button"
@@ -818,7 +818,7 @@ export default function AdminTimetableManagerPanel({
                   setArtistForm((prev) => ({ ...prev, name: event.target.value }))
                 }
                 placeholder="아티스트 이름"
-                className="rounded-md border border-[var(--border-base)] bg-white px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--admin-accent,_#3b82f6)]"
+                className="rounded-md border border-[var(--border-base)] bg-white px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               />
             </label>
 
@@ -831,7 +831,7 @@ export default function AdminTimetableManagerPanel({
                 }
                 placeholder="아티스트 한 줄 소개 등"
                 rows={3}
-                className="rounded-md border border-[var(--border-base)] bg-white px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--admin-accent,_#3b82f6)]"
+                className="rounded-md border border-[var(--border-base)] bg-white px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               />
             </label>
 
@@ -889,7 +889,7 @@ export default function AdminTimetableManagerPanel({
             <button
               type="submit"
               disabled={savingArtist}
-              className="inline-flex items-center justify-center gap-1.5 rounded-md bg-[var(--admin-accent,_#3b82f6)] px-3 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-1.5 rounded-md bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isEditingArtist ? <Save className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
               {savingArtist

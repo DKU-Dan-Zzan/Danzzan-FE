@@ -10,7 +10,7 @@ type AdminTab = "MAP" | "BOOTH" | "TIMETABLE";
 
 export default function AdminMap() {
   const [activeTab, setActiveTab] = useState<AdminTab>("MAP");
-  const tabNavigation = <AdminTabNavigation activeTab={activeTab} onChange={setActiveTab} />;
+  const tabNavigation = <AdminTabNavigation onChange={setActiveTab} />;
 
   return (
     <>
@@ -33,10 +33,8 @@ export default function AdminMap() {
 }
 
 function AdminTabNavigation({
-  activeTab,
   onChange,
 }: {
-  activeTab: AdminTab;
   onChange: (tab: AdminTab) => void;
 }) {
   return (

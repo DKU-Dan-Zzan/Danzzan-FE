@@ -7,7 +7,6 @@ import {
   getAdminMap,
   type AdminMapBooth,
   type AdminMapCollege,
-  updateComingSoonOverlayEnabled,
   updateBoothLocation,
   updateCollegeLocation,
 } from "@/api/app/admin/adminMapApi";
@@ -73,7 +72,6 @@ export default function AdminMapEditorPanel({
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [comingSoonOverlaySaving, setComingSoonOverlaySaving] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [pendingClearBooth, setPendingClearBooth] = useState<{ id: number; name: string } | null>(null);
   const [statusMessage, setStatusMessage] = useState<string>(
@@ -82,7 +80,6 @@ export default function AdminMapEditorPanel({
 
   const FESTIVAL_DATES = ["2026-05-12", "2026-05-13", "2026-05-14"];
   const [selectedDate, setSelectedDate] = useState<string>("2026-05-12");
-  const [comingSoonOverlayEnabled, setComingSoonOverlayEnabled] = useState(false);
 
   const editableBooths = useMemo(
     () => booths.filter((booth) => booth.type !== "FOOD_TRUCK"),
@@ -115,7 +112,6 @@ export default function AdminMapEditorPanel({
       const data = await getAdminMap(date);
       setColleges(data.colleges ?? []);
       setBooths(data.booths ?? []);
-      setComingSoonOverlayEnabled(Boolean(data.comingSoonOverlayEnabled));
     } catch (error) {
       setGlobalError(
         error instanceof Error
@@ -492,18 +488,6 @@ export default function AdminMapEditorPanel({
     setStatusMessage("학과 편집 모드입니다. 학과만 선택/드래그할 수 있습니다.");
   };
 
-  const handleSelectBooth = (boothId: number) => {
-    const booth = editableBooths.find((item) => item.id === boothId);
-    if (!booth) {
-      setStatusMessage("푸드트럭은 관리자 지도에서 개별 좌표를 수정하지 않습니다.");
-      return;
-    }
-
-    setEditorMode("booth");
-    setSelectedItem({ kind: "booth", id: booth.id });
-    setStatusMessage("부스가 선택되었습니다. 지도를 클릭하거나 해당 마커를 드래그해 위치를 지정해 주세요.");
-  };
-
   const handleSelectCollege = (collegeId: number) => {
     setEditorMode("college");
     setSelectedItem({ kind: "college", id: collegeId });
@@ -539,29 +523,6 @@ export default function AdminMapEditorPanel({
     if (!selectedBooth) return;
     setPendingClearBooth({ id: selectedBooth.id, name: selectedBooth.name });
   };
-
-  const handleToggleComingSoonOverlay = useCallback(async (enabled: boolean) => {
-    const previous = comingSoonOverlayEnabled;
-    setComingSoonOverlayEnabled(enabled);
-
-    try {
-      setComingSoonOverlaySaving(true);
-      setGlobalError(null);
-      await updateComingSoonOverlayEnabled(enabled);
-      setStatusMessage(
-        enabled
-          ? "푸드테이블 Coming Soon 오버레이를 표시하도록 변경했습니다."
-          : "푸드테이블 Coming Soon 오버레이를 숨기도록 변경했습니다.",
-      );
-    } catch (error) {
-      setComingSoonOverlayEnabled(previous);
-      setGlobalError(
-        error instanceof Error ? error.message : "푸드테이블 오버레이 설정을 저장하지 못했습니다.",
-      );
-    } finally {
-      setComingSoonOverlaySaving(false);
-    }
-  }, [comingSoonOverlayEnabled]);
 
   const confirmClearBoothLocation = async () => {
     if (!pendingClearBooth) {

@@ -78,16 +78,6 @@ function getMarkerConfig(params: { type: MarkerType; subType?: Booth["subType"] 
   return getBoothmapBoothMarkerTheme(params)
 }
 
-// 물방울 핀 모양 SVG를 data url로 생성
-function createPinDataUrl(color: string) {
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="60" viewBox="0 0 48 60" fill="none">
-      <path d="M24 59C24 59 45 38.5 45 24C45 12.402 35.598 3 24 3C12.402 3 3 12.402 3 24C3 38.5 24 59 24 59Z" fill="${color}"/>
-    </svg>
-  `
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`
-}
-
 function createMarkerDataUrl(params: {
   color: string
   selected: boolean
@@ -200,29 +190,8 @@ function createRawMarkerIconMarkup(params: {
   `
 }
 
-const PIN_BOTTOM_OFFSET_MAP: Record<MarkerType, number> = {
-  PUB: 2,
-  FOOD_TRUCK: 1,
-  EXPERIENCE: 1,
-  EVENT: 1,
-  FACILITY: 0,
-}
-
 function getOverlayKey(kind: "booth" | "college", id: number) {
   return `${kind}:${id}`
-}
-
-function getMarkerScaleByLevel(level: number, isSelected: boolean) {
-  const baseScale =
-    level <= 2 ? 0.9 :
-    level === 3 ? 0.8 :
-    0.68
-
-  if (isSelected) {
-    return Math.max(0.84, baseScale)
-  }
-
-  return baseScale
 }
 
 export default function KakaoMapView({
@@ -549,126 +518,6 @@ export default function KakaoMapView({
       yAnchor: 1,
       zIndex: 11,
     })
-  }
-
-  // 마커 DOM 생성
-  const createMarkerElement = ({
-    type,
-    subType,
-    isSelected,
-    title,
-    selectedLabel,
-    level,
-    onClick,
-  }: {
-    type: MarkerType
-    subType?: Booth["subType"]
-    isSelected: boolean
-    title: string
-    selectedLabel?: string
-    level: number
-    onClick: () => void
-  }) => {
-    const { iconPath, color } = getMarkerConfig({ type, subType })
-    const pinUrl = createPinDataUrl(color)
-    const scale = getMarkerScaleByLevel(level, isSelected)
-    const width = Math.round((isSelected ? 46 : 40) * scale)
-    const height = Math.round((isSelected ? 56 : 50) * scale)
-    const iconSize = Math.round((isSelected ? 20 : 18) * scale)
-    const ringSize = Math.round(24 * scale)
-
-    const wrapper = document.createElement("button")
-    wrapper.type = "button"
-    wrapper.title = title
-    wrapper.setAttribute("aria-label", title)
-    wrapper.style.position = "relative"
-    wrapper.style.width = `${width}px`
-    wrapper.style.height = `${height}px`
-    wrapper.style.padding = "0"
-    wrapper.style.border = "0"
-    wrapper.style.background = "transparent"
-    wrapper.style.cursor = "pointer"
-    wrapper.style.userSelect = "none"
-    wrapper.style.transition = "transform 0.18s ease, filter 0.18s ease"
-    const selectedShadowSoft = getBoothmapColor("selectedShadowSoft")
-    const overlayShadow = getBoothmapColor("overlayShadow")
-    wrapper.style.filter = isSelected
-      ? `drop-shadow(0 16px 24px ${selectedShadowSoft})`
-      : `drop-shadow(0 10px 18px ${overlayShadow})`
-
-    const pinBottomOffset = PIN_BOTTOM_OFFSET_MAP[type] ?? 0
-
-    const pin = document.createElement("img")
-    pin.src = pinUrl
-    pin.alt = `${title} 핀`
-    pin.style.position = "absolute"
-    pin.style.left = "50%"
-    pin.style.bottom = `${pinBottomOffset}px`
-    pin.style.width = `${width}px`
-    pin.style.height = `${height}px`
-    pin.style.transform = "translateX(-50%)"
-    pin.style.objectFit = "contain"
-    pin.draggable = false
-    pin.style.pointerEvents = "none"
-
-    const icon = document.createElement("img")
-    icon.src = iconPath
-    icon.alt = `${title} 아이콘`
-    icon.style.position = "absolute"
-    icon.style.left = "50%"
-    icon.style.top = "36%"
-    icon.style.width = `${iconSize}px`
-    icon.style.height = `${iconSize}px`
-    icon.style.transform = "translate(-50%, -50%)"
-    icon.style.objectFit = "contain"
-    icon.style.pointerEvents = "none"
-    icon.style.filter = "brightness(0) invert(1)"
-    icon.draggable = false
-
-    const debugDot = document.createElement("div")
-    debugDot.style.position = "absolute"
-    debugDot.style.left = "50%"
-    debugDot.style.bottom = "0"
-    debugDot.style.width = "8px"
-    debugDot.style.height = "8px"
-    debugDot.style.transform = "translate(-50%, 50%)"
-    debugDot.style.borderRadius = "9999px"
-    debugDot.style.background = getBoothmapColor("overlayBadgeBackground")
-    debugDot.style.border = `2px solid ${getBoothmapColor("overlayBadgeText")}`
-    debugDot.style.boxShadow = `0 8px 14px ${getBoothmapColor("overlayShadow")}`
-    debugDot.style.pointerEvents = "none"
-
-    wrapper.appendChild(debugDot)
-
-    wrapper.appendChild(pin)
-    wrapper.appendChild(icon)
-
-    if (isSelected) {
-      if (selectedLabel) {
-        const bubble = buildLabelBubble(selectedLabel)
-        bubble.style.bottom = `${height + 6}px`
-        wrapper.appendChild(bubble)
-      }
-
-      const ring = document.createElement("div")
-      ring.style.position = "absolute"
-      ring.style.left = "50%"
-      ring.style.top = "36%"
-      ring.style.width = `${ringSize}px`
-      ring.style.height = `${ringSize}px`
-      ring.style.transform = "translate(-50%, -50%)"
-      ring.style.borderRadius = "9999px"
-      ring.style.boxShadow = `0 0 0 5px ${getBoothmapColor("selectedRing")}`
-      ring.style.pointerEvents = "none"
-      wrapper.appendChild(ring)
-    }
-
-    wrapper.onclick = (e) => {
-      e.stopPropagation()
-      onClick()
-    }
-
-    return wrapper
   }
 
   // 개별 overlay 생성
