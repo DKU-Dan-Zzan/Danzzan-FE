@@ -32,7 +32,8 @@ describe("Common not-found route", () => {
     expect(source).toContain('to="/"');
     expect(source).toContain('src="/DAN-ZZAN.png"');
     expect(source).toContain("top-[30%]");
-    expect(source).toContain("translate-y-8");
+    expect(source).toContain("translate-y-16");
+    expect(source).not.toContain("translate-y-8");
     expect(source).not.toContain("top-[45%]");
     expect(source).toContain("#0a559c");
     expect(source).toContain("#2f63f6");
