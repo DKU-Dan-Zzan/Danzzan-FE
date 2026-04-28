@@ -7,7 +7,7 @@ export default function NotFoundPage() {
   return (
     <section
       aria-labelledby="not-found-title"
-      className="relative flex min-h-full justify-start bg-[var(--bg-page-soft)] px-6 pb-[calc(var(--app-bottom-nav-runtime-offset)+1.25rem)] pt-[calc(env(safe-area-inset-top)+13rem)] text-[var(--text)]"
+      className="relative flex min-h-full justify-start bg-[var(--bg-page-soft)] px-6 pb-[calc(var(--app-bottom-nav-runtime-offset)+1.25rem)] pt-[calc(env(safe-area-inset-top)+clamp(15rem,38vh,20rem))] text-[var(--text)]"
     >
       <img
         src="/DAN-ZZAN.png"
