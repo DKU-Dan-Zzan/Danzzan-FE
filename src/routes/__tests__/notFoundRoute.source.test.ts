@@ -31,6 +31,9 @@ describe("Common not-found route", () => {
     expect(source).toContain("주소가 바뀌었거나 접근할 수 없는 페이지예요.");
     expect(source).toContain('to="/"');
     expect(source).toContain('src="/DAN-ZZAN.png"');
+    expect(source).toContain("top-[30%]");
+    expect(source).toContain("translate-y-8");
+    expect(source).not.toContain("top-[45%]");
     expect(source).toContain("#0a559c");
     expect(source).toContain("#2f63f6");
     expect(source).not.toContain("#ff715b");
