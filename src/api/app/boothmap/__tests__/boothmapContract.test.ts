@@ -177,4 +177,22 @@ describe("boothmapContract", () => {
 
     expect(parsed.booths[0]?.subType).toBe("SMOKING_AREA");
   });
+  it("food truck booth??醫뚰몴媛 ?놁뼱??0?쇰줈 蹂댁젙?쒕떎", () => {
+    const parsed = parseBoothMapContract(
+      {
+        colleges: [],
+        booths: [
+          {
+            boothId: 12,
+            name: "?몃뱶?몃윮 B",
+            type: "FOOD_TRUCK",
+          },
+        ],
+      },
+      "/map/booth-map",
+    );
+
+    expect(parsed.booths[0]?.locationX).toBe(0);
+    expect(parsed.booths[0]?.locationY).toBe(0);
+  });
 });

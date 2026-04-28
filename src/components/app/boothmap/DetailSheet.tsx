@@ -5,6 +5,7 @@ import {
   usePubDetailQuery,
 } from "@/hooks/app/boothmap/useBoothDetailQuery";
 import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialog";
+import { formatBoothOperatingLabel } from "@/utils/app/boothmap/formatBoothOperatingLabel";
 import { formatDescription } from "@/utils/app/boothmap/formatDescription";
 import { formatOperatingTime } from "@/utils/app/boothmap/formatOperatingTime";
 
@@ -124,7 +125,11 @@ function DetailSheet({
   if (selectedItem.kind === "booth" && boothDetail) {
     const boothImageUrl = boothDetail.imageUrl ?? null;
     const boothThumbnailUrl = boothDetail.thumbnailUrl ?? boothImageUrl;
-    const operatingTimeText = formatOperatingTime(boothDetail.startTime, boothDetail.endTime);
+    const operatingTimeText = formatBoothOperatingLabel(
+      boothDetail.startTime,
+      boothDetail.endTime,
+      boothDetail.operationStatus,
+    );
     const description = formatDescription(boothDetail.description);
 
     return (
@@ -135,11 +140,9 @@ function DetailSheet({
               {boothDetail.name}
             </div>
 
-            {operatingTimeText && (
-              <div className="mt-1 text-sm font-semibold text-[var(--boothmap-text-subtle)]">
-                {operatingTimeText}
-              </div>
-            )}
+            <div className="mt-1 text-sm font-semibold text-[var(--boothmap-text-subtle)]">
+              {operatingTimeText}
+            </div>
           </div>
 
           {boothThumbnailUrl && boothImageUrl && (

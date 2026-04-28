@@ -622,6 +622,8 @@ export default function KakaoMapView({
   const shouldShowPubZoneDetail = primaryFilter === "PUB" && pubZone
   const shouldShowFoodTruckZoneDetail =
     primaryFilter === "FOOD_TRUCK" && foodTruckZone
+  const shouldShowPersistentFoodTruckZoneMarker =
+    primaryFilter === "FOOD_TRUCK" && foodTruckZone
 
   // 현재 필터 기준으로 보여줄 데이터 계산
   const visibleItems = useMemo(() => {
@@ -670,6 +672,8 @@ export default function KakaoMapView({
       booths
         .filter((booth) => booth.type !== "FOOD_TRUCK")
         .forEach(addBooth)
+    } else if (primaryFilter === "FOOD_TRUCK") {
+      // Food trucks stay grouped under the shared zone marker.
     } else {
       booths.forEach(addBooth)
     }
@@ -785,7 +789,7 @@ export default function KakaoMapView({
 
       if (selectedMapItem?.kind === "booth") {
         const selectedBooth = boothMap.get(selectedMapItem.id)
-        if (selectedBooth) {
+        if (selectedBooth && selectedBooth.type !== "FOOD_TRUCK") {
           const target = new kakao.maps.LatLng(
             selectedBooth.location_y,
             selectedBooth.location_x
@@ -904,6 +908,18 @@ export default function KakaoMapView({
       })
     }
 
+    if (shouldShowPersistentFoodTruckZoneMarker && foodTruckZone) {
+      foodTruckZone.markers.forEach((marker) => {
+        createZoneMarkerRecord({
+          lat: marker.lat,
+          lng: marker.lng,
+          label: "?몃뱶?몃윮 援ъ뿭",
+          type: "FOOD_TRUCK",
+          onClick: () => onPrimaryFilterChange("FOOD_TRUCK"),
+        })
+      })
+    }
+
     return () => {
       clearZoneOverlays()
     }
@@ -915,6 +931,7 @@ export default function KakaoMapView({
     shouldShowFoodTruckZoneSummary,
     shouldShowPubZoneDetail,
     shouldShowFoodTruckZoneDetail,
+    shouldShowPersistentFoodTruckZoneMarker,
     pubZone,
     foodTruckZone,
     onPrimaryFilterChange,

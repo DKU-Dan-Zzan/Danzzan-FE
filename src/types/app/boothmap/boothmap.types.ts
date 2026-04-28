@@ -4,6 +4,7 @@
 
 export type BoothType = "EXPERIENCE" | "FOOD_TRUCK" | "EVENT" | "FACILITY";
 export type BoothSubType = "TOILET" | "RESTROOM" | "SMOKING_AREA";
+export type BoothOperationStatus = "OPEN" | "CLOSED" | "UNKNOWN";
 export type PrimaryFilter = "ALL" | "PUB" | BoothType;
 
 export type SheetMode = "LIST" | "DETAIL";
@@ -31,6 +32,7 @@ export type Booth = {
   image_url?: string;
   location_x: number;
   location_y: number;
+  operationStatus?: BoothOperationStatus | null;
   startTime?: string | null;
   endTime?: string | null;
 };

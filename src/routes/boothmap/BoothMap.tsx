@@ -87,6 +87,7 @@ function mapBoothDtoToBooth(dto: BoothDto): Booth {
     description: dto.description,
     location_x: dto.locationX,
     location_y: dto.locationY,
+    operationStatus: dto.operationStatus,
     startTime: dto.startTime,
     endTime: dto.endTime,
   };
@@ -192,7 +193,7 @@ export default function BoothMap() {
     setSelectedMapItem(null);
     setSelectedDetailItem(null);
     setSheetMode("LIST");
-    setSheetSnap("PEEK");
+    setSheetSnap(next === "FOOD_TRUCK" ? "HALF" : "PEEK");
     setPubListCollegeId(null);
 
     if (next !== "PUB") {
@@ -216,12 +217,19 @@ export default function BoothMap() {
 
   const shouldShowPubList = getShouldShowPubList(primaryFilter, selectedMapItem);
   const selectedBooth = useMemo(() => {
-    if (selectedMapItem?.kind !== "booth") {
+    const boothId =
+      selectedMapItem?.kind === "booth"
+        ? selectedMapItem.id
+        : selectedDetailItem?.kind === "booth"
+          ? selectedDetailItem.id
+          : null;
+
+    if (boothId === null) {
       return null;
     }
 
-    return booths.find((booth) => booth.id === selectedMapItem.id) ?? null;
-  }, [booths, selectedMapItem]);
+    return booths.find((booth) => booth.id === boothId) ?? null;
+  }, [booths, selectedDetailItem, selectedMapItem]);
 
   const boothDetailAvailability = useMemo(() => {
     const baseAvailability = visibleBooths.reduce<Record<number, boolean>>((acc, booth) => {
@@ -358,6 +366,15 @@ export default function BoothMap() {
     setSheetSnap("HALF");
   }, []);
 
+  const openFoodTruckDetail = useCallback((id: number) => {
+    setSelectedMapItem(null);
+    setSelectedDetailItem({ kind: "booth", id });
+    setSelectedCollegeId(null);
+    setPubListCollegeId(null);
+    setSheetMode("DETAIL");
+    setSheetSnap("FULL");
+  }, []);
+
   const onSelectBoothFromList = useCallback((id: number) => {
     const selectedListBooth = booths.find((booth) => booth.id === id) ?? null;
     const shouldSwitchToFoodTruckFilter =
@@ -367,20 +384,31 @@ export default function BoothMap() {
       setPrimaryFilter("FOOD_TRUCK");
     }
 
+    if (isFoodTruckBooth(selectedListBooth)) {
+      openFoodTruckDetail(id);
+      return;
+    }
+
     setSelectedMapItem({ kind: "booth", id });
     setSelectedDetailItem(null);
     setSelectedCollegeId(null);
     setPubListCollegeId(null);
     setSheetMode("LIST");
     setSheetSnap("HALF");
-  }, [booths, primaryFilter]);
+  }, [booths, openFoodTruckDetail, primaryFilter]);
 
   const onOpenBoothDetailFromList = useCallback((id: number) => {
+    const selectedListBooth = booths.find((booth) => booth.id === id) ?? null;
+    if (isFoodTruckBooth(selectedListBooth)) {
+      openFoodTruckDetail(id);
+      return;
+    }
+
     void resolveBoothSelection(id, {
       detailSnap: "FULL",
       fallbackSnap: "HALF",
     });
-  }, [resolveBoothSelection]);
+  }, [booths, openFoodTruckDetail, resolveBoothSelection]);
 
   const onChangePrimaryFilterFromMap = useCallback((next: PrimaryFilter) => {
     handlePrimaryChange(next);
