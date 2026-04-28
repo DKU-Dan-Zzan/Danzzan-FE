@@ -37,4 +37,6 @@ export const appQueryKeys = {
   timetablePerformances: (date: string) => ["timetable", "performances", { date }] as const,
   timetableContentImages: () => ["timetable", "content-images"] as const,
   timetableDisplayConfig: () => ["timetable", "display-config"] as const,
+  adminTimetablePerformances: (date: string) => ["admin", "timetable", "performances", { date }] as const,
+  adminTimetableArtists: () => ["admin", "timetable", "artists"] as const,
 };

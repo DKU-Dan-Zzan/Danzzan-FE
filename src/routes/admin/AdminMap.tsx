@@ -4,8 +4,9 @@ import { Toaster } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/common/ui/tabs";
 import AdminBoothManagerPanel from "@/routes/admin/components/AdminBoothManagerPanel";
 import AdminMapEditorPanel from "@/routes/admin/components/AdminMapEditorPanel";
+import AdminTimetableManagerPanel from "@/routes/admin/components/AdminTimetableManagerPanel";
 
-type AdminTab = "MAP" | "BOOTH";
+type AdminTab = "MAP" | "BOOTH" | "TIMETABLE";
 
 export default function AdminMap() {
   const [activeTab, setActiveTab] = useState<AdminTab>("MAP");
@@ -21,6 +22,10 @@ export default function AdminMap() {
 
         <TabsContent value="BOOTH" className="m-0">
           <AdminBoothManagerPanel topSlot={tabNavigation} />
+        </TabsContent>
+
+        <TabsContent value="TIMETABLE" className="m-0">
+          <AdminTimetableManagerPanel topSlot={tabNavigation} />
         </TabsContent>
       </Tabs>
     </>
@@ -50,6 +55,13 @@ function AdminTabNavigation({
           className="min-w-[112px] rounded-xl px-4 py-2 text-sm font-semibold data-[state=active]:border-[var(--border-base)] data-[state=active]:bg-[var(--surface-subtle)]"
         >
           Booth
+        </TabsTrigger>
+        <TabsTrigger
+          value="TIMETABLE"
+          onClick={() => onChange("TIMETABLE")}
+          className="min-w-[112px] rounded-xl px-4 py-2 text-sm font-semibold data-[state=active]:border-[var(--border-base)] data-[state=active]:bg-[var(--surface-subtle)]"
+        >
+          Timetable
         </TabsTrigger>
       </TabsList>
     </div>
