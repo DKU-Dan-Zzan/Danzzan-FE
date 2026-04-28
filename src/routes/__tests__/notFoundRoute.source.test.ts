@@ -33,7 +33,7 @@ describe("Common not-found route", () => {
     expect(source).toContain('src="/DAN-ZZAN.png"');
     expect(source).toContain("justify-start");
     expect(source).toContain("pt-[calc(env(safe-area-inset-top)+clamp(15rem,38vh,20rem))]");
-    expect(source).toContain("top-[30%]");
+    expect(source).toContain("top-[36%]");
     expect(source).toContain("max-w-[320px]");
     expect(source).toContain("flex-col");
     expect(source).not.toContain("translate-y-[calc((var(--app-bottom-nav-runtime-offset)*1.3))]");

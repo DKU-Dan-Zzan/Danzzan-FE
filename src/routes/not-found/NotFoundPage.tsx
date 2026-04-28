@@ -13,7 +13,7 @@ export default function NotFoundPage() {
         src="/DAN-ZZAN.png"
         alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-[30%] w-[18rem] max-w-[78%] -translate-x-1/2 -translate-y-1/2 object-contain opacity-[0.06] saturate-150 select-none"
+        className="pointer-events-none absolute left-1/2 top-[36%] w-[22rem] max-w-[92%] -translate-x-1/2 -translate-y-1/2 object-contain opacity-[0.06] saturate-150 select-none"
         draggable={false}
       />
 
