@@ -84,19 +84,30 @@ export default function AdminMapEditorPanel({
   const [selectedDate, setSelectedDate] = useState<string>("2026-05-12");
   const [comingSoonOverlayEnabled, setComingSoonOverlayEnabled] = useState(false);
 
-  const placedBooths = useMemo(
-    () => booths.filter((booth) => booth.placed && booth.locationX != null && booth.locationY != null),
+  const editableBooths = useMemo(
+    () => booths.filter((booth) => booth.type !== "FOOD_TRUCK"),
     [booths],
   );
 
+  const placedBooths = useMemo(
+    () =>
+      editableBooths.filter(
+        (booth) => booth.placed && booth.locationX != null && booth.locationY != null,
+      ),
+    [editableBooths],
+  );
+
   const unplacedBooths = useMemo(
-    () => booths.filter((booth) => !booth.placed || booth.locationX == null || booth.locationY == null),
-    [booths],
+    () =>
+      editableBooths.filter(
+        (booth) => !booth.placed || booth.locationX == null || booth.locationY == null,
+      ),
+    [editableBooths],
   );
 
   const selectedBooth =
     selectedItem?.kind === "booth"
-      ? booths.find((booth) => booth.id === selectedItem.id) ?? null
+      ? editableBooths.find((booth) => booth.id === selectedItem.id) ?? null
       : null;
 
   const selectedCollege =
@@ -490,8 +501,14 @@ export default function AdminMapEditorPanel({
   };
 
   const handleSelectBooth = (boothId: number) => {
+    const booth = editableBooths.find((item) => item.id === boothId);
+    if (!booth) {
+      setStatusMessage("푸드트럭은 관리자 지도에서 개별 좌표를 수정하지 않습니다.");
+      return;
+    }
+
     setEditorMode("booth");
-    setSelectedItem({ kind: "booth", id: boothId });
+    setSelectedItem({ kind: "booth", id: booth.id });
     setStatusMessage("부스가 선택되었습니다. 지도를 클릭하거나 해당 마커를 드래그해 위치를 지정해 주세요.");
   };
 
