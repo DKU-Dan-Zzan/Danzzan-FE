@@ -17,7 +17,7 @@ export default function NotFoundPage() {
         draggable={false}
       />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[320px] translate-y-[calc((var(--app-bottom-nav-runtime-offset)*0.5))] flex-col items-center text-center">
+      <div className="relative z-10 mx-auto flex w-full max-w-[320px] translate-y-[calc((var(--app-bottom-nav-runtime-offset)*1.3))] flex-col items-center text-center">
         <div
           aria-hidden
           className="relative mb-7 inline-flex h-12 min-w-[104px] items-center justify-center overflow-hidden rounded-[8px] border border-[rgba(10,85,156,0.26)] bg-[linear-gradient(145deg,rgba(255,255,255,0.96)_0%,rgba(230,240,255,0.98)_100%)] px-7 text-[0.82rem] font-extrabold tracking-[0] text-[#0a559c] shadow-[0_16px_30px_-24px_rgba(10,85,156,0.52)] before:absolute before:left-[-10px] before:top-1/2 before:size-5 before:-translate-y-1/2 before:rounded-full before:border before:border-[rgba(10,85,156,0.18)] before:bg-[var(--bg-page-soft)] after:absolute after:right-[-10px] after:top-1/2 after:size-5 after:-translate-y-1/2 after:rounded-full after:border after:border-[rgba(10,85,156,0.18)] after:bg-[var(--bg-page-soft)]"
