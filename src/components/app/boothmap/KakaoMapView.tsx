@@ -1,9 +1,10 @@
 // 역할: boothmap 화면에서 사용하는 Kakao Map View UI 블록을 렌더링합니다.
 // 카카오맵 2D 지도를 렌더링하고, 커스텀 오버레이 핀 마커와 이름 말풍선을 표시하는 컴포넌트
 
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import useKakaoMapLoader from "@/hooks/app/boothmap/useKakaoMapLoader"
 import {
+  BOOTHMAP_MARKER_THEME,
   getBoothmapColor,
   getBoothmapBoothMarkerTheme,
   getBoothmapZonePalette,
@@ -23,6 +24,7 @@ import type {
   KakaoCustomOverlay,
   KakaoGlobal,
   KakaoMap,
+  KakaoMarker,
   KakaoPolygon,
 } from "@/types/app/boothmap/kakao-map"
 
@@ -60,7 +62,8 @@ const DANKOOK_BOUNDS = {
 type MarkerType = BoothmapMarkerType
 
 type OverlayRecord = {
-  overlay: KakaoCustomOverlay
+  marker: KakaoMarker
+  labelOverlay: KakaoCustomOverlay | null
   kind: "booth" | "college"
   id: number
   lat: number
@@ -83,6 +86,118 @@ function createPinDataUrl(color: string) {
     </svg>
   `
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`
+}
+
+function createMarkerDataUrl(params: {
+  color: string
+  selected: boolean
+  iconMarkup: string
+}) {
+  const stroke = params.selected ? params.color : "rgba(255,255,255,0.92)"
+  const fill = params.selected ? getBoothmapColor("overlayBadgeText") : params.color
+
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="60" viewBox="0 0 48 60" fill="none">
+      <path d="M24 59C24 59 45 38.5 45 24C45 12.402 35.598 3 24 3C12.402 3 3 12.402 3 24C3 38.5 24 59 24 59Z" fill="${fill}" stroke="${stroke}" stroke-width="${params.selected ? 3.5 : 2.5}"/>
+      ${params.iconMarkup}
+    </svg>
+  `
+
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`
+}
+
+const RAW_MARKER_ICON_PATHS = Array.from(
+  new Set([
+    ...Object.values(BOOTHMAP_MARKER_THEME).map((theme) => theme.iconPath),
+    "/markers/facility-smoking.svg",
+  ]),
+)
+
+function extractSvgInnerMarkup(raw: string) {
+  const trimmed = raw.trim().replace(/^\uFEFF/, "")
+  const match = trimmed.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i)
+  const inner = match?.[1] ?? trimmed
+
+  return inner
+    .replace(/fill="[^"]*"/gi, 'fill="currentColor"')
+    .replace(/stroke="[^"]*"/gi, 'stroke="currentColor"')
+}
+
+function createInlineMarkerIconMarkup(params: {
+  type: MarkerType
+  subType?: Booth["subType"]
+  color: string
+  x: number
+  y: number
+  size: number
+}) {
+  const strokeWidth = Math.max(1.7, params.size * 0.13)
+  const half = params.size / 2
+  const centerX = params.x + half
+  const centerY = params.y + half
+  const left = params.x
+  const top = params.y
+  const right = params.x + params.size
+  const bottom = params.y + params.size
+  const color = params.color
+
+  if (params.type === "PUB") {
+    return `
+      <path d="M ${left + params.size * 0.22} ${top + params.size * 0.18} H ${centerX - params.size * 0.02} V ${top + params.size * 0.62} Q ${centerX - params.size * 0.02} ${bottom - params.size * 0.08} ${centerX - params.size * 0.12} ${bottom - params.size * 0.08} H ${centerX + params.size * 0.04}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M ${centerX + params.size * 0.12} ${top + params.size * 0.18} V ${top + params.size * 0.54} Q ${centerX + params.size * 0.12} ${top + params.size * 0.68} ${right - params.size * 0.16} ${top + params.size * 0.68} V ${top + params.size * 0.18}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round"/>
+    `
+  }
+
+  if (params.type === "FOOD_TRUCK") {
+    return `
+      <rect x="${left + params.size * 0.12}" y="${top + params.size * 0.34}" width="${params.size * 0.48}" height="${params.size * 0.26}" rx="${params.size * 0.04}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" />
+      <path d="M ${left + params.size * 0.6} ${top + params.size * 0.4} H ${right - params.size * 0.18} V ${top + params.size * 0.6} H ${left + params.size * 0.6} Z" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linejoin="round"/>
+      <circle cx="${left + params.size * 0.3}" cy="${bottom - params.size * 0.15}" r="${params.size * 0.08}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" />
+      <circle cx="${right - params.size * 0.24}" cy="${bottom - params.size * 0.15}" r="${params.size * 0.08}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" />
+    `
+  }
+
+  if (params.type === "EXPERIENCE") {
+    return `
+      <path d="M ${left + params.size * 0.22} ${top + params.size * 0.2} L ${right - params.size * 0.18} ${centerY} L ${left + params.size * 0.22} ${bottom - params.size * 0.12} Z" fill="${color}" />
+    `
+  }
+
+  if (params.type === "FACILITY") {
+    if (typeof params.subType === "string" && params.subType.trim().toUpperCase() === "SMOKING_AREA") {
+      return `
+        <path d="M ${left + params.size * 0.18} ${centerY} H ${right - params.size * 0.22}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round"/>
+        <path d="M ${right - params.size * 0.22} ${centerY} V ${top + params.size * 0.22} Q ${right - params.size * 0.22} ${top + params.size * 0.12} ${right - params.size * 0.32} ${top + params.size * 0.12}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round"/>
+        <path d="M ${left + params.size * 0.3} ${top + params.size * 0.22} C ${left + params.size * 0.18} ${top + params.size * 0.1}, ${left + params.size * 0.34} ${top + params.size * 0.06}, ${left + params.size * 0.24} ${top - params.size * 0.02}" fill="none" stroke="${color}" stroke-width="${strokeWidth * 0.85}" stroke-linecap="round"/>
+      `
+    }
+
+    return `
+      <circle cx="${centerX}" cy="${top + params.size * 0.22}" r="${params.size * 0.09}" fill="${color}" />
+      <path d="M ${centerX} ${top + params.size * 0.34} V ${bottom - params.size * 0.16}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round"/>
+      <path d="M ${left + params.size * 0.24} ${top + params.size * 0.48} H ${right - params.size * 0.24}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round"/>
+      <path d="M ${centerX} ${bottom - params.size * 0.16} L ${left + params.size * 0.26} ${bottom - params.size * 0.02}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round"/>
+      <path d="M ${centerX} ${bottom - params.size * 0.16} L ${right - params.size * 0.26} ${bottom - params.size * 0.02}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round"/>
+    `
+  }
+
+  return `
+    <path d="M ${centerX} ${top + params.size * 0.12} L ${centerX + params.size * 0.16} ${centerY - params.size * 0.02} L ${right - params.size * 0.1} ${centerY - params.size * 0.02} L ${centerX + params.size * 0.22} ${centerY + params.size * 0.1} L ${centerX + params.size * 0.32} ${bottom - params.size * 0.04} L ${centerX} ${centerY + params.size * 0.18} L ${centerX - params.size * 0.32} ${bottom - params.size * 0.04} L ${centerX - params.size * 0.22} ${centerY + params.size * 0.1} L ${left + params.size * 0.1} ${centerY - params.size * 0.02} L ${centerX - params.size * 0.16} ${centerY - params.size * 0.02} Z" fill="${color}"/>
+  `
+}
+
+function createRawMarkerIconMarkup(params: {
+  rawSvgContent: string
+  color: string
+  x: number
+  y: number
+  size: number
+}) {
+  return `
+    <svg x="${params.x}" y="${params.y}" width="${params.size}" height="${params.size}" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet" color="${params.color}">
+      ${params.rawSvgContent}
+    </svg>
+  `
 }
 
 const PIN_BOTTOM_OFFSET_MAP: Record<MarkerType, number> = {
@@ -131,8 +246,11 @@ export default function KakaoMapView({
   // 전체 오버레이를 배열 대신 Map으로 관리
   const overlayMapRef = useRef<Map<string, OverlayRecord>>(new Map())
 
-  const zoneOverlaysRef = useRef<Array<KakaoCustomOverlay | KakaoPolygon>>([])
+  const zoneOverlaysRef = useRef<Array<KakaoMarker | KakaoCustomOverlay | KakaoPolygon>>([])
   const prevPrimaryFilterRef = useRef<PrimaryFilter>(primaryFilter)
+  const selectedMapItemRef = useRef<SelectedMapItem>(selectedMapItem)
+  const markerIconMarkupRef = useRef<Map<string, string>>(new Map())
+  const [markerAssetVersion, setMarkerAssetVersion] = useState(0)
 
   // 이름 말풍선
 
@@ -140,6 +258,65 @@ export default function KakaoMapView({
   const prevSelectedKeyRef = useRef<string | null>(null)
 
   const { isLoaded, isError } = useKakaoMapLoader()
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return
+    }
+
+    let cancelled = false
+
+    const missingPaths = RAW_MARKER_ICON_PATHS.filter((iconPath) => {
+      return !markerIconMarkupRef.current.has(iconPath)
+    })
+
+    if (missingPaths.length === 0) {
+      return () => {
+        cancelled = true
+      }
+    }
+
+    void Promise.all(
+      missingPaths.map(async (iconPath) => {
+        try {
+          const response = await fetch(iconPath)
+          if (!response.ok) {
+            throw new Error(`Failed to load marker asset: ${iconPath}`)
+          }
+
+          const raw = await response.text()
+          return [iconPath, extractSvgInnerMarkup(raw)] as const
+        } catch {
+          return [iconPath, ""] as const
+        }
+      }),
+    ).then((entries) => {
+      if (cancelled) {
+        return
+      }
+
+      let didChange = false
+
+      entries.forEach(([iconPath, markup]) => {
+        if (markup && !markerIconMarkupRef.current.has(iconPath)) {
+          markerIconMarkupRef.current.set(iconPath, markup)
+          didChange = true
+        }
+      })
+
+      if (didChange) {
+        setMarkerAssetVersion((version) => version + 1)
+      }
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    selectedMapItemRef.current = selectedMapItem
+  }, [selectedMapItem])
 
   // 선택된 booth/college 빠르게 찾기 위한 맵
   const boothMap = useMemo(() => {
@@ -297,6 +474,46 @@ export default function KakaoMapView({
     map.panTo(nextCenterLatLng)
   }
 
+  const createMarkerImage = ({
+    type,
+    subType,
+    selected,
+  }: {
+    type: MarkerType
+    subType?: Booth["subType"]
+    selected: boolean
+  }) => {
+    const { kakao } = window
+    const { color, iconPath } = getMarkerConfig({ type, subType })
+    const width = selected ? 44 : 34
+    const height = selected ? 54 : 42
+    const size = new kakao.maps.Size(width, height)
+    const offset = new kakao.maps.Point(width / 2, height)
+    const iconSize = selected ? 17 : 15
+    const iconX = 24 - iconSize / 2
+    const iconY = selected ? 15.5 : 16.5
+    const iconColor = selected ? color : getBoothmapColor("overlayBadgeText")
+    const rawSvgContent = markerIconMarkupRef.current.get(iconPath)
+    const iconMarkup = rawSvgContent
+      ? createRawMarkerIconMarkup({
+        rawSvgContent,
+        color: iconColor,
+        x: iconX,
+        y: iconY,
+        size: iconSize,
+      })
+      : createInlineMarkerIconMarkup({
+        type,
+        subType,
+        color: iconColor,
+        x: iconX,
+        y: iconY,
+        size: iconSize,
+      })
+    const src = createMarkerDataUrl({ color, selected, iconMarkup })
+    return new kakao.maps.MarkerImage(src, size, { offset })
+  }
+
   // 이름 말풍선 생성
   const buildLabelBubble = (name: string) => {
     const bubble = document.createElement("div")
@@ -308,6 +525,30 @@ export default function KakaoMapView({
     bubble.style.transform = "translateX(-50%)"
     bubble.style.pointerEvents = "none"
     return bubble
+  }
+
+  const createLabelOverlay = ({
+    lat,
+    lng,
+    name,
+  }: {
+    lat: number
+    lng: number
+    name: string
+  }) => {
+    const { kakao } = window
+    const wrapper = document.createElement("div")
+    wrapper.style.transform = "translateY(-92px)"
+    wrapper.style.pointerEvents = "none"
+    wrapper.appendChild(buildLabelBubble(name))
+
+    return new kakao.maps.CustomOverlay({
+      position: new kakao.maps.LatLng(lat, lng),
+      content: wrapper,
+      xAnchor: 0.5,
+      yAnchor: 1,
+      zIndex: 11,
+    })
   }
 
   // 마커 DOM 생성
@@ -456,29 +697,25 @@ export default function KakaoMapView({
     const map = mapInstanceRef.current
 
     const position = new kakao.maps.LatLng(lat, lng)
-    const level = map?.getLevel?.() ?? 3
-    const content = createMarkerElement({
-      type,
-      subType,
-      isSelected,
-      title: name,
-      selectedLabel: isSelected ? name : undefined,
-      level,
-      onClick,
-    })
-
-    const overlay = new kakao.maps.CustomOverlay({
+    const marker = new kakao.maps.Marker({
       position,
-      content,
-      xAnchor: 0.5,
-      yAnchor: 1,
+      image: createMarkerImage({ type, subType, selected: isSelected }),
       zIndex: isSelected ? 10 : 1,
     })
 
-    overlay.setMap(map)
+    marker.setMap(map)
+    marker.setZIndex?.(isSelected ? 10 : 1)
+    kakao.maps.event.addListener(marker, "click", onClick)
+
+    const labelOverlay = isSelected
+      ? createLabelOverlay({ lat, lng, name })
+      : null
+
+    labelOverlay?.setMap(map)
 
     return {
-      overlay,
+      marker,
+      labelOverlay,
       kind,
       id,
       lat,
@@ -507,25 +744,19 @@ export default function KakaoMapView({
     const map = mapInstanceRef.current
     const position = new kakao.maps.LatLng(lat, lng)
 
-    const content = createMarkerElement({
-      type,
-      isSelected: false,
-      title: label,
-      level: map?.getLevel?.() ?? 3,
-      onClick,
-    })
-
-    const overlay = new kakao.maps.CustomOverlay({
+    const marker = new kakao.maps.Marker({
       position,
-      content,
-      xAnchor: 0.5,
-      yAnchor: 1,
+      image: createMarkerImage({ type, selected: false }),
+      title: label,
       zIndex: 7,
     })
 
-    overlay.setMap(map)
-    zoneOverlaysRef.current.push(overlay)
-    return overlay
+    marker.setMap(map)
+    marker.setZIndex?.(7)
+    kakao.maps.event.addListener(marker, "click", onClick)
+
+    zoneOverlaysRef.current.push(marker)
+    return marker
   }
 
   const clearZoneOverlays = () => {
@@ -599,18 +830,29 @@ export default function KakaoMapView({
     const map = mapInstanceRef.current
     if (!record) return
 
-    const content = createMarkerElement({
-      type: record.type,
-      subType: record.subType,
-      isSelected,
-      title: record.name,
-      selectedLabel: isSelected ? record.name : undefined,
-      level: map?.getLevel?.() ?? 3,
-      onClick: record.onClick,
-    })
+    record.marker.setImage?.(
+      createMarkerImage({
+        type: record.type,
+        subType: record.subType,
+        selected: isSelected,
+      }),
+    )
+    record.marker.setZIndex?.(isSelected ? 10 : 1)
 
-    record.overlay.setContent(content)
-    record.overlay.setZIndex(isSelected ? 10 : 1)
+    if (isSelected) {
+      if (!record.labelOverlay) {
+        record.labelOverlay = createLabelOverlay({
+          lat: record.lat,
+          lng: record.lng,
+          name: record.name,
+        })
+      }
+      record.labelOverlay.setMap(map)
+      record.labelOverlay.setZIndex(11)
+      return
+    }
+
+    record.labelOverlay?.setMap(null)
   }
 
   const pubZone = MAP_ZONES.find((zone) => zone.type === "PUB") ?? null
@@ -687,20 +929,21 @@ export default function KakaoMapView({
 
     const { kakao } = window
     const map = mapInstanceRef.current
-    const bounds = new kakao.maps.LatLngBounds()
     const nextKeys = new Set(visibleItems.map((item) => item.key))
     let hasMarker = false
 
     overlayMapRef.current.forEach((record, key) => {
       if (nextKeys.has(key)) return
-      record.overlay.setMap(null)
+      record.marker.setMap(null)
+      record.labelOverlay?.setMap(null)
       overlayMapRef.current.delete(key)
     })
 
     visibleItems.forEach((item) => {
       const existing = overlayMapRef.current.get(item.key)
+      const selectedItem = selectedMapItemRef.current
       const isSelected =
-        selectedMapItem?.kind === item.kind && selectedMapItem.id === item.id
+        selectedItem?.kind === item.kind && selectedItem.id === item.id
 
       if (!existing) {
         const record = createOverlayRecord({
@@ -723,7 +966,8 @@ export default function KakaoMapView({
           existing.type !== item.type
 
         if (hasChanged) {
-          existing.overlay.setMap(null)
+          existing.marker.setMap(null)
+          existing.labelOverlay?.setMap(null)
           const record = createOverlayRecord({
             kind: item.kind,
             id: item.id,
@@ -738,8 +982,6 @@ export default function KakaoMapView({
           overlayMapRef.current.set(item.key, record)
         }
       }
-
-      bounds.extend(new kakao.maps.LatLng(item.lat, item.lng))
       hasMarker = true
     })
 
@@ -761,7 +1003,7 @@ export default function KakaoMapView({
   }, [
     isLoaded,
     visibleItems,
-    selectedMapItem,
+    markerAssetVersion,
   ])
 
   // 2) 선택 상태만 바뀔 때는 필요한 overlay만 교체
@@ -835,7 +1077,7 @@ export default function KakaoMapView({
 
     prevSelectedKeyRef.current = nextKey
     // eslint-disable-next-line react-hooks/exhaustive-deps -- 선택 상태 effect는 현재 선택 key 전이만 추적
-  }, [isLoaded, selectedMapItem, boothMap, collegeMap, sheetSnap, onClickBooth, onClickCollege, visibleItems])
+  }, [isLoaded, selectedMapItem, boothMap, collegeMap, sheetSnap])
 
   useEffect(() => {
     if (!isLoaded || !mapInstanceRef.current) return

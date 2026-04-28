@@ -71,6 +71,7 @@ export default function BoothList({
             key={booth.id}
             type="button"
             onClick={handlePrimaryAction}
+            style={{ contentVisibility: "auto", containIntrinsicSize: "120px" }}
             aria-label={
               booth.type === "FOOD_TRUCK"
                 ? `${booth.name} 상세보기`

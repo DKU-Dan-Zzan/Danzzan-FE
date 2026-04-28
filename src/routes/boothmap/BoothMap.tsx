@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { startTransition, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import type {
   Booth,
   College,
@@ -189,16 +189,18 @@ export default function BoothMap() {
   );
 
   const handlePrimaryChange = (next: PrimaryFilter) => {
-    setPrimaryFilter(next);
-    setSelectedMapItem(null);
-    setSelectedDetailItem(null);
-    setSheetMode("LIST");
-    setSheetSnap(next === "FOOD_TRUCK" ? "HALF" : "PEEK");
-    setPubListCollegeId(null);
+    startTransition(() => {
+      setPrimaryFilter(next);
+      setSelectedMapItem(null);
+      setSelectedDetailItem(null);
+      setSheetMode("LIST");
+      setSheetSnap(next === "FOOD_TRUCK" ? "HALF" : "PEEK");
+      setPubListCollegeId(null);
 
-    if (next !== "PUB") {
-      setSelectedCollegeId(null);
-    }
+      if (next !== "PUB") {
+        setSelectedCollegeId(null);
+      }
+    });
   };
 
   const visibleBooths = useMemo(() => {
@@ -214,6 +216,10 @@ export default function BoothMap() {
       primaryFilter === "PUB" ? (selectedCollegeId ?? pubListCollegeId) : pubListCollegeId;
     return getVisiblePubs(pubs, targetCollegeId);
   }, [primaryFilter, pubs, pubListCollegeId, selectedCollegeId]);
+
+  const deferredVisibleBooths = useDeferredValue(visibleBooths);
+  const deferredVisibleColleges = useDeferredValue(visibleColleges);
+  const deferredVisiblePubs = useDeferredValue(visiblePubs);
 
   const shouldShowPubList = getShouldShowPubList(primaryFilter, selectedMapItem);
   const selectedBooth = useMemo(() => {
@@ -498,8 +504,8 @@ export default function BoothMap() {
       <div className="absolute inset-0">
         <div className="absolute inset-0">
           <KakaoMapView
-            booths={visibleBooths}
-            colleges={visibleColleges}
+            booths={deferredVisibleBooths}
+            colleges={deferredVisibleColleges}
             primaryFilter={primaryFilter}
             selectedMapItem={selectedMapItem}
             sheetSnap={sheetSnap}
@@ -523,13 +529,15 @@ export default function BoothMap() {
             dates={FESTIVAL_DATES}
             selectedDate={selectedDate}
             onChange={(date) => {
-              setSelectedDate(date);
-              setSelectedMapItem(null);
-              setSelectedDetailItem(null);
-              setSelectedCollegeId(null);
-              setPubListCollegeId(null);
-              setSheetMode("LIST");
-              setSheetSnap("PEEK");
+              startTransition(() => {
+                setSelectedDate(date);
+                setSelectedMapItem(null);
+                setSelectedDetailItem(null);
+                setSelectedCollegeId(null);
+                setPubListCollegeId(null);
+                setSheetMode("LIST");
+                setSheetSnap("PEEK");
+              });
             }}
           />
 
@@ -544,12 +552,14 @@ export default function BoothMap() {
                 colleges={colleges}
                 selectedCollegeId={selectedCollegeId}
                 onSelect={(idOrNull) => {
-                  setSelectedCollegeId(idOrNull);
-                  setPubListCollegeId(idOrNull);
-                  setSelectedMapItem(idOrNull ? { kind: "college", id: idOrNull } : null);
-                  setSelectedDetailItem(null);
-                  setSheetMode("LIST");
-                  setSheetSnap(idOrNull ? "HALF" : "PEEK");
+                  startTransition(() => {
+                    setSelectedCollegeId(idOrNull);
+                    setPubListCollegeId(idOrNull);
+                    setSelectedMapItem(idOrNull ? { kind: "college", id: idOrNull } : null);
+                    setSelectedDetailItem(null);
+                    setSheetMode("LIST");
+                    setSheetSnap(idOrNull ? "HALF" : "PEEK");
+                  });
                 }}
               />
             </div>
@@ -570,7 +580,7 @@ export default function BoothMap() {
         ) : sheetMode === "LIST" ? (
           shouldShowPubList ? (
             <PubList
-              pubs={visiblePubs}
+              pubs={deferredVisiblePubs}
               selectedCollegeId={
                 primaryFilter === "PUB"
                   ? (selectedCollegeId ?? pubListCollegeId)
@@ -580,7 +590,7 @@ export default function BoothMap() {
             />
           ) : (
             <BoothList
-              booths={visibleBooths}
+              booths={deferredVisibleBooths}
               boothDetailAvailability={boothDetailAvailability}
               onSelectBooth={onSelectBoothFromList}
               onOpenBoothDetail={onOpenBoothDetailFromList}

@@ -55,6 +55,7 @@ function PubList({
           key={pub.id}
           type="button"
           onClick={() => onSelectPub(pub.id)}
+          style={{ contentVisibility: "auto", containIntrinsicSize: "120px" }}
           className="w-full rounded-[26px] border border-[var(--boothmap-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--boothmap-surface)_96%,white)_0%,color-mix(in_srgb,var(--boothmap-surface-soft)_86%,white)_100%)] p-4 text-left shadow-[var(--boothmap-card-shadow)] transition hover:-translate-y-0.5 hover:shadow-[var(--boothmap-card-shadow-strong)]"
         >
           <div className="flex items-center gap-3">
@@ -88,6 +89,7 @@ function PubList({
                 data-fallback-src={pub.mainImageUrl}
                 loading="lazy"
                 decoding="async"
+                fetchPriority="low"
                 alt={pub.name}
                 width={64}
                 height={64}
