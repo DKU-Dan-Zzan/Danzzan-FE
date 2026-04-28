@@ -16,6 +16,7 @@ import {
 } from "@/api/app/admin/adminBoothApi";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { cn } from "@/components/common/ui/utils";
+import { formatDescription } from "@/utils/app/boothmap/formatDescription";
 
 const FESTIVAL_DATES = ["2026-05-12", "2026-05-13", "2026-05-14"] as const;
 const FILTER_OPTIONS = [
@@ -52,6 +53,10 @@ type PubOperationDraft = {
   startTime: string;
   endTime: string;
 };
+
+function normalizeMultilineField(value?: string | null) {
+  return formatDescription(value).replace(/\r\n/g, "\n");
+}
 
 type ManagementListItem =
   | {
@@ -139,7 +144,7 @@ export default function AdminBoothManagerPanel({
     }
 
     setBoothForm({
-      description: selectedBooth.description ?? "",
+      description: normalizeMultilineField(selectedBooth.description),
       operationStatus: selectedBooth.operationStatus,
       startTime: selectedBooth.startTime ?? "",
       endTime: selectedBooth.endTime ?? "",
@@ -153,8 +158,8 @@ export default function AdminBoothManagerPanel({
     }
 
     setPubForm({
-      intro: selectedPub.intro ?? "",
-      description: selectedPub.description ?? "",
+      intro: normalizeMultilineField(selectedPub.intro),
+      description: normalizeMultilineField(selectedPub.description),
       instagram: selectedPub.instagram ?? "",
     });
   }, [selectedPub]);
@@ -258,15 +263,18 @@ export default function AdminBoothManagerPanel({
         await updateAdminBooth(selectedBooth.id, {
           operationDate: selectedDate,
           operationStatus: boothForm.operationStatus,
-          description: selectedBooth.type === "FOOD_TRUCK" ? boothForm.description : null,
+          description:
+            selectedBooth.type === "FOOD_TRUCK"
+              ? normalizeMultilineField(boothForm.description)
+              : null,
           startTime: boothForm.startTime || null,
           endTime: boothForm.endTime || null,
         });
         toast.success(`${selectedBooth.name} 저장이 완료되었습니다.`);
       } else if (selectedPub && pubForm) {
         await updateAdminPub(selectedPub.id, {
-          intro: pubForm.intro || null,
-          description: pubForm.description || null,
+          intro: normalizeMultilineField(pubForm.intro) || null,
+          description: normalizeMultilineField(pubForm.description) || null,
           instagram: pubForm.instagram || null,
         });
         toast.success(`${selectedPub.name} 저장이 완료되었습니다.`);
