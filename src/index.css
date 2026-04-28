@@ -580,6 +580,8 @@
   --mypage-logout-font-size: 14px;
   --mypage-logout-underline-thickness: 0px;
   --mypage-logout-underline-offset: 0px;
+  --mypage-withdraw-text: #a3aab5;
+  --mypage-withdraw-text-hover: #b26b6b;
   --mypage-settings-card-bg: #ffffff;
   --mypage-settings-card-border: transparent;
   --mypage-settings-row-label: #0f172a;
