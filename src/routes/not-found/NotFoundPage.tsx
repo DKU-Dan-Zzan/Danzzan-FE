@@ -7,12 +7,20 @@ export default function NotFoundPage() {
   return (
     <section
       aria-labelledby="not-found-title"
-      className="flex min-h-full items-center justify-center bg-[var(--bg-page-soft)] px-6 py-[calc(env(safe-area-inset-top)+4.5rem)] text-[var(--text)]"
+      className="relative flex min-h-full items-center justify-center overflow-hidden bg-[var(--bg-page-soft)] px-6 py-[calc(env(safe-area-inset-top)+4.5rem)] text-[var(--text)]"
     >
-      <div className="mx-auto flex w-full max-w-[320px] flex-col items-center text-center">
+      <img
+        src="/DAN-ZZAN.png"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-[45%] w-[19rem] max-w-[82%] -translate-x-1/2 -translate-y-1/2 object-contain opacity-[0.065] saturate-150 select-none"
+        draggable={false}
+      />
+
+      <div className="relative z-10 mx-auto flex w-full max-w-[320px] flex-col items-center text-center">
         <div
           aria-hidden
-          className="mb-6 inline-flex h-10 items-center justify-center rounded-[8px] border border-[color:color-mix(in_srgb,var(--border-base)_62%,transparent)] bg-white/70 px-4 text-[0.8rem] font-extrabold tracking-[0] text-[var(--text-muted)] shadow-[0_10px_24px_-22px_rgba(15,23,42,0.42)]"
+          className="relative mb-7 inline-flex h-12 min-w-[104px] items-center justify-center overflow-hidden rounded-[8px] border border-[rgba(10,85,156,0.26)] bg-[linear-gradient(145deg,rgba(255,255,255,0.96)_0%,rgba(230,240,255,0.98)_100%)] px-7 text-[0.82rem] font-extrabold tracking-[0] text-[#0a559c] shadow-[0_16px_30px_-24px_rgba(10,85,156,0.52)] before:absolute before:left-[-10px] before:top-1/2 before:size-5 before:-translate-y-1/2 before:rounded-full before:border before:border-[rgba(10,85,156,0.18)] before:bg-[var(--bg-page-soft)] after:absolute after:right-[-10px] after:top-1/2 after:size-5 after:-translate-y-1/2 after:rounded-full after:border after:border-[rgba(10,85,156,0.18)] after:bg-[var(--bg-page-soft)]"
         >
           404
         </div>
@@ -30,7 +38,7 @@ export default function NotFoundPage() {
         <div className="mt-8 w-full max-w-[220px]">
           <Button
             asChild
-            className="h-11 w-full rounded-[8px] border border-[rgba(255,113,91,0.22)] bg-[linear-gradient(135deg,#ff715b_0%,#ffb45f_100%)] text-[0.9rem] tracking-[0] text-white shadow-[0_18px_32px_-20px_rgba(255,113,91,0.66)] hover:brightness-[1.03] focus-visible:ring-[rgba(255,113,91,0.45)] active:translate-y-px"
+            className="h-11 w-full rounded-[8px] border border-[rgba(10,85,156,0.2)] bg-[linear-gradient(135deg,#0a559c_0%,#2f63f6_100%)] text-[0.9rem] tracking-[0] text-white shadow-[0_18px_32px_-20px_rgba(10,85,156,0.68)] hover:brightness-[1.03] focus-visible:ring-[rgba(10,85,156,0.38)] active:translate-y-px"
           >
             <Link to="/">
               <Home size={17} aria-hidden />

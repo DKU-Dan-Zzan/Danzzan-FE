@@ -24,7 +24,7 @@ async function renderNotFound(pathname: string) {
 }
 
 describe("Common NotFoundPage", () => {
-  it("차분한 404 문구와 홈 복구 액션만 렌더링한다", async () => {
+  it("브랜드 워터마크와 차분한 404 문구, 홈 복구 액션만 렌더링한다", async () => {
     const { container, root } = await renderNotFound("/missing-festival-path");
 
     expect(container.textContent).toContain("404");
@@ -34,7 +34,7 @@ describe("Common NotFoundPage", () => {
     expect(container.textContent).not.toContain("LOST GATE");
     expect(container.textContent).not.toContain("NO ROUTE");
     expect(container.textContent).not.toContain("FESTIVAL PASS");
-    expect(container.querySelector('img[src="/DAN-ZZAN.png"]')).toBeNull();
+    expect(container.querySelector('img[src="/DAN-ZZAN.png"][aria-hidden="true"]')).not.toBeNull();
     expect(container.querySelector('a[href="/"]')).not.toBeNull();
     expect(container.querySelectorAll("a")).toHaveLength(1);
 
