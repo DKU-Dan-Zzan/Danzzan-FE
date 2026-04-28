@@ -1,49 +1,11 @@
 // 역할: 앱 전체에서 공통으로 사용하는 축제 톤의 404 화면을 제공합니다.
-import type { LucideIcon } from "lucide-react";
-import { ArrowLeft, CalendarDays, Home, Map, MapPin, Ticket } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Home, MapPin } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/common/ui/button";
-
-type QuickLink = {
-  to: string;
-  label: string;
-  Icon: LucideIcon;
-};
 
 const FESTIVAL_STOPS = ["MAIN", "BOOTH", "STAGE"];
 
-const quickLinks: QuickLink[] = [
-  { to: "/map", label: "부스맵", Icon: Map },
-  { to: "/timetable", label: "타임테이블", Icon: CalendarDays },
-  { to: "/ticket/ticketing", label: "티켓팅", Icon: Ticket },
-];
-
-function getSecondaryAction(pathname: string): QuickLink {
-  if (pathname.startsWith("/ticket")) {
-    return quickLinks[2];
-  }
-
-  return quickLinks[0];
-}
-
 export default function NotFoundPage() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const secondaryAction = getSecondaryAction(location.pathname);
-  const SecondaryIcon = secondaryAction.Icon;
-
-  const handleBack = () => {
-    const historyIndex = window.history.state?.idx;
-    const canGoBack = typeof historyIndex === "number" && historyIndex > 0;
-
-    if (canGoBack) {
-      navigate(-1);
-      return;
-    }
-
-    navigate("/", { replace: true });
-  };
-
   return (
     <section
       aria-labelledby="not-found-title"
@@ -106,41 +68,22 @@ export default function NotFoundPage() {
               축제길을 잠깐 놓쳤어요
             </h1>
             <p className="mx-auto max-w-[19rem] text-[0.93rem] leading-6 tracking-[0] text-[var(--text-muted)]">
-              주소가 바뀌었거나 사라진 페이지예요. 홈에서 다시 시작하거나 필요한 축제 메뉴로 바로 이동할 수 있어요.
+              주소가 바뀌었거나 사라진 페이지예요. 홈에서 축제 정보를 다시 찾아볼 수 있어요.
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="mx-auto w-full max-w-[240px]">
           <Button
             asChild
-            className="h-11 rounded-[8px] text-[0.9rem] tracking-[0] shadow-[0_14px_24px_-18px_rgba(37,99,235,0.58)]"
+            className="h-11 w-full rounded-[8px] text-[0.9rem] tracking-[0] shadow-[0_14px_24px_-18px_rgba(37,99,235,0.58)]"
           >
             <Link to="/">
               <Home size={17} aria-hidden />
               홈으로
             </Link>
           </Button>
-          <Button
-            asChild
-            variant="outline"
-            className="h-11 rounded-[8px] border-[color:color-mix(in_srgb,var(--border-base)_82%,transparent)] bg-white/72 text-[0.9rem] tracking-[0]"
-          >
-            <Link to={secondaryAction.to}>
-              <SecondaryIcon size={17} aria-hidden />
-              {secondaryAction.label}
-            </Link>
-          </Button>
         </div>
-
-        <button
-          type="button"
-          onClick={handleBack}
-          className="mx-auto inline-flex h-9 items-center justify-center gap-2 rounded-[8px] px-3 text-[0.86rem] font-semibold tracking-[0] text-[var(--text-muted)] transition-colors hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-page-soft)]"
-        >
-          <ArrowLeft size={16} aria-hidden />
-          이전 페이지
-        </button>
       </div>
     </section>
   );

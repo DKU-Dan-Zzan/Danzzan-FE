@@ -24,14 +24,15 @@ async function renderNotFound(pathname: string) {
 }
 
 describe("Common NotFoundPage", () => {
-  it("일반 앱 경로에서는 축제 톤 문구와 부스맵 복구 액션을 렌더링한다", async () => {
+  it("축제 톤 문구와 홈 복구 액션만 렌더링한다", async () => {
     const { container, root } = await renderNotFound("/missing-festival-path");
 
     expect(container.textContent).toContain("DANFESTA / 404");
     expect(container.textContent).toContain("축제길을 잠깐 놓쳤어요");
+    expect(container.textContent).toContain("홈에서 축제 정보를 다시 찾아볼 수 있어요.");
     expect(container.querySelector('img[src="/DAN-ZZAN.png"]')).not.toBeNull();
     expect(container.querySelector('a[href="/"]')).not.toBeNull();
-    expect(container.querySelector('a[href="/map"]')).not.toBeNull();
+    expect(container.querySelectorAll("a")).toHaveLength(1);
 
     await act(async () => {
       root.unmount();
@@ -39,10 +40,12 @@ describe("Common NotFoundPage", () => {
     container.remove();
   });
 
-  it("티켓팅 경로에서는 티켓팅 복구 액션을 우선 노출한다", async () => {
+  it("티켓팅 경로에서도 별도 보조 액션 없이 홈 복구 액션만 렌더링한다", async () => {
     const { container, root } = await renderNotFound("/ticket/missing-ticket-path");
 
-    expect(container.querySelector('a[href="/ticket/ticketing"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/ticket/ticketing"]')).toBeNull();
+    expect(container.querySelectorAll("a")).toHaveLength(1);
 
     await act(async () => {
       root.unmount();

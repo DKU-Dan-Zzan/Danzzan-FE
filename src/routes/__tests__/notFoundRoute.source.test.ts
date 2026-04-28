@@ -31,8 +31,8 @@ describe("Common not-found route", () => {
     expect(source).toContain("DANFESTA / 404");
     expect(source).toContain('src="/DAN-ZZAN.png"');
     expect(source).toContain('to="/"');
-    expect(source).toContain('to: "/map"');
-    expect(source).toContain('to: "/ticket/ticketing"');
-    expect(source).toContain("navigate(-1)");
+    expect(source).not.toContain('to: "/map"');
+    expect(source).not.toContain('to: "/ticket/ticketing"');
+    expect(source).not.toContain("navigate(-1)");
   });
 });
