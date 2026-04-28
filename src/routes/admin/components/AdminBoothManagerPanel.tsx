@@ -46,6 +46,7 @@ type SelectedManagementItem =
   | null;
 
 type BoothFormState = {
+  name: string;
   description: string;
   operationStatus: "OPEN" | "CLOSED" | "UNKNOWN";
   startTime: string;
@@ -53,6 +54,7 @@ type BoothFormState = {
 };
 
 type PubFormState = {
+  name: string;
   intro: string;
   description: string;
   instagram: string;
@@ -105,6 +107,7 @@ export default function AdminBoothManagerPanel({
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<string>(FESTIVAL_DATES[0]);
   const [filter, setFilter] = useState<AdminBoothFilter>("ALL");
+  const [pubCollegeFilter, setPubCollegeFilter] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
   const [managementData, setManagementData] = useState<AdminBoothManagementResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -166,6 +169,7 @@ export default function AdminBoothManagerPanel({
     }
 
     setBoothForm({
+      name: selectedBooth.name,
       description: normalizeMultilineField(selectedBooth.description),
       operationStatus: selectedBooth.operationStatus,
       startTime: selectedBooth.startTime ?? "",
@@ -181,6 +185,7 @@ export default function AdminBoothManagerPanel({
     }
 
     setPubForm({
+      name: selectedPub.name,
       intro: normalizeMultilineField(selectedPub.intro),
       description: normalizeMultilineField(selectedPub.description),
       instagram: selectedPub.instagram ?? "",
@@ -271,11 +276,31 @@ export default function AdminBoothManagerPanel({
     });
   }, [managementData]);
 
+  const pubCollegeOptions = useMemo(() => {
+    if (!managementData) {
+      return [];
+    }
+
+    return Array.from(
+      new Set(
+        managementData.pubs
+          .map((pub) => pub.collegeName.trim())
+          .filter((collegeName) => collegeName.length > 0),
+      ),
+    ).sort((left, right) => left.localeCompare(right, "ko"));
+  }, [managementData]);
+
   const filteredItems = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
     return listItems.filter((item) => {
       if (filter !== "ALL" && item.type !== filter) {
         return false;
+      }
+
+      if (filter === "PUB" && pubCollegeFilter !== "ALL") {
+        if (item.type !== "PUB" || item.collegeName !== pubCollegeFilter) {
+          return false;
+        }
       }
 
       if (!keyword) {
@@ -294,7 +319,7 @@ export default function AdminBoothManagerPanel({
 
       return haystack.includes(keyword);
     });
-  }, [filter, listItems, searchTerm]);
+  }, [filter, listItems, pubCollegeFilter, searchTerm]);
 
   const selectedPubOperation = useMemo(() => {
     if (!managementData) {
@@ -319,6 +344,7 @@ export default function AdminBoothManagerPanel({
         await updateAdminBooth(selectedBooth.id, {
           operationDate: selectedDate,
           operationStatus: boothForm.operationStatus,
+          name: boothForm.name || null,
           description:
             selectedBooth.type === "FOOD_TRUCK"
               ? normalizeMultilineField(boothForm.description)
@@ -329,6 +355,7 @@ export default function AdminBoothManagerPanel({
         toast.success(`${selectedBooth.name} 저장이 완료되었습니다.`);
       } else if (selectedPub && pubForm) {
         await updateAdminPub(selectedPub.id, {
+          name: pubForm.name || null,
           intro: normalizeMultilineField(pubForm.intro) || null,
           description: normalizeMultilineField(pubForm.description) || null,
           instagram: pubForm.instagram || null,
@@ -611,22 +638,61 @@ export default function AdminBoothManagerPanel({
         </div>
 
         <div className="mt-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap gap-2">
-            {FILTER_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => setFilter(option.value)}
-                className={cn(
-                  "rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
-                  filter === option.value
-                    ? "bg-[var(--accent)] text-white"
-                    : "border border-[var(--border-base)] bg-white text-[var(--text-muted)] hover:bg-[var(--surface-subtle)]",
-                )}
-              >
-                {option.label}
-              </button>
-            ))}
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap gap-2">
+              {FILTER_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => {
+                    setFilter(option.value);
+                    if (option.value !== "PUB") {
+                      setPubCollegeFilter("ALL");
+                    }
+                  }}
+                  className={cn(
+                    "rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
+                    filter === option.value
+                      ? "bg-[var(--accent)] text-white"
+                      : "border border-[var(--border-base)] bg-white text-[var(--text-muted)] hover:bg-[var(--surface-subtle)]",
+                  )}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+
+            {filter === "PUB" && pubCollegeOptions.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPubCollegeFilter("ALL")}
+                  className={cn(
+                    "rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
+                    pubCollegeFilter === "ALL"
+                      ? "bg-[var(--text)] text-white"
+                      : "border border-[var(--border-base)] bg-white text-[var(--text-muted)] hover:bg-[var(--surface-subtle)]",
+                  )}
+                >
+                  전체 단과대
+                </button>
+                {pubCollegeOptions.map((collegeName) => (
+                  <button
+                    key={collegeName}
+                    type="button"
+                    onClick={() => setPubCollegeFilter(collegeName)}
+                    className={cn(
+                      "rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
+                      pubCollegeFilter === collegeName
+                        ? "bg-[var(--text)] text-white"
+                        : "border border-[var(--border-base)] bg-white text-[var(--text-muted)] hover:bg-[var(--surface-subtle)]",
+                    )}
+                  >
+                    {collegeName}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <label className="relative block w-full max-w-sm">
@@ -684,7 +750,7 @@ export default function AdminBoothManagerPanel({
                         : "border-[var(--border-base)] bg-white hover:bg-[var(--surface-subtle)]",
                     )}
                   >
-                    <div className="flex items-start justify-between gap-3">
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="rounded-full bg-[var(--surface-subtle)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-muted)]">
@@ -694,7 +760,7 @@ export default function AdminBoothManagerPanel({
                             {item.name}
                           </span>
                         </div>
-                        <p className="mt-2 line-clamp-2 text-xs leading-5 text-[var(--text-muted)]">
+                        <p className="mt-2 line-clamp-1 pr-2 text-xs leading-5 text-[var(--text-muted)]">
                           {item.summary || "소개/설명 없음"}
                         </p>
                         <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-[var(--text-muted)]">
@@ -705,7 +771,7 @@ export default function AdminBoothManagerPanel({
 
                       <span
                         className={cn(
-                          "rounded-full px-2.5 py-1 text-[10px] font-semibold",
+                          "shrink-0 self-start whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-semibold",
                           item.operationInfoExists
                             ? "bg-[var(--status-success-bg)] text-[var(--status-success)]"
                             : "bg-[var(--surface-subtle)] text-[var(--text-muted)]",
@@ -760,6 +826,18 @@ export default function AdminBoothManagerPanel({
                     운영정보 기준 날짜: {selectedDate}
                   </p>
                 </div>
+
+                <label className="block space-y-2">
+                  <span className="text-sm font-semibold text-[var(--text)]">name</span>
+                  <input
+                    type="text"
+                    value={boothForm.name}
+                    onChange={(event) =>
+                      setBoothForm((prev) => (prev ? { ...prev, name: event.target.value } : prev))
+                    }
+                    className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 text-sm text-[var(--text)]"
+                  />
+                </label>
 
                 {selectedBooth.type === "FOOD_TRUCK" && (
                   <label className="block space-y-2">
@@ -839,6 +917,18 @@ export default function AdminBoothManagerPanel({
                     <span>학과: {selectedPub.department}</span>
                   </div>
                 </div>
+
+                <label className="block space-y-2">
+                  <span className="text-sm font-semibold text-[var(--text)]">name</span>
+                  <input
+                    type="text"
+                    value={pubForm.name}
+                    onChange={(event) =>
+                      setPubForm((prev) => (prev ? { ...prev, name: event.target.value } : prev))
+                    }
+                    className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 text-sm text-[var(--text)]"
+                  />
+                </label>
 
                 <label className="block space-y-2">
                   <span className="text-sm font-semibold text-[var(--text)]">intro</span>

@@ -63,12 +63,14 @@ export type AdminBoothManagementResponse = {
 export type UpdateAdminBoothPayload = {
   operationDate: string;
   operationStatus: "OPEN" | "CLOSED" | "UNKNOWN";
+  name?: string | null;
   description?: string | null;
   startTime?: string | null;
   endTime?: string | null;
 };
 
 export type UpdateAdminPubPayload = {
+  name?: string | null;
   intro?: string | null;
   description?: string | null;
   instagram?: string | null;
