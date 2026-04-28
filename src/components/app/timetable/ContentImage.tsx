@@ -1,6 +1,12 @@
 // 역할: timetable 화면에서 사용하는 Content Image UI 블록을 렌더링합니다.
+import { X } from "lucide-react"
 import type { ContentImageDto } from "@/api/app/timetable/timetableApi"
-import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialog"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+} from "@/components/common/ui/dialog"
 
 type ContentImageSectionProps = {
   images: ContentImageDto[]
@@ -85,10 +91,13 @@ export default function ContentImageSection({
             }
           }}
         >
-          <DialogContent className="h-[100dvh] max-h-[100dvh] w-screen max-w-none border-0 bg-transparent p-0 shadow-none sm:h-auto sm:max-h-[92vh] sm:w-fit sm:max-w-[92vw]">
+          <DialogContent
+            showCloseButton={false}
+            className="h-[100dvh] max-h-[100dvh] w-screen max-w-none border-0 bg-transparent p-0 shadow-none sm:h-auto sm:max-h-[92vh] sm:w-fit sm:max-w-[92vw]"
+          >
             <DialogTitle className="sr-only">{selectedImage.name}</DialogTitle>
             <div className="h-full overflow-y-auto overscroll-contain px-3 py-[max(env(safe-area-inset-top),0.75rem)] sm:max-h-[90vh] sm:px-4 sm:py-3">
-              <div className="mx-auto flex min-h-full w-full max-w-none items-start justify-center sm:max-w-[430px]">
+              <div className="mx-auto flex min-h-full w-full max-w-none items-center justify-center sm:max-w-[430px]">
                 <img
                   src={selectedImage.detailImageUrl}
                   alt={selectedImage.name}
@@ -96,6 +105,13 @@ export default function ContentImageSection({
                 />
               </div>
             </div>
+            <DialogClose
+              aria-label="닫기"
+              className="absolute right-4 top-[max(env(safe-area-inset-top),1rem)] inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white shadow-lg backdrop-blur-sm transition hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white/70 sm:top-4"
+            >
+              <X className="h-6 w-6" />
+              <span className="sr-only">닫기</span>
+            </DialogClose>
           </DialogContent>
         </Dialog>
       )}
