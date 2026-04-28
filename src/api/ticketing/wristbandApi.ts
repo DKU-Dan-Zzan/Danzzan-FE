@@ -1,5 +1,5 @@
 // 역할: 티켓팅 관리자 팔찌 운영(조회·지급·통계) API를 제공합니다.
-import { createHttpClient } from "@/api/ticketing/httpClient";
+import { createHttpClient, HttpError } from "@/api/ticketing/httpClient";
 import { wristbandMock } from "@/mocks/ticketing/wristband.mock";
 import {
   mapEventSummaryToSession,
@@ -88,10 +88,20 @@ export const wristbandApi = {
       return wristbandMock.findAttendee(studentId, eventId);
     }
     const client = getClient();
-    const raw = await client.get<ApiResponse<TicketSearchResponseDto>>(
-      `/api/admin/events/${eventId}/tickets/search`,
-      { params: { studentId } },
-    );
+    const raw = await client
+      .get<ApiResponse<TicketSearchResponseDto>>(
+        `/api/admin/events/${eventId}/tickets/search`,
+        { params: { studentId } },
+      )
+      .catch((error) => {
+        if (error instanceof HttpError && error.status === 404) {
+          return null;
+        }
+        throw error;
+      });
+    if (raw === null) {
+      return null;
+    }
     const data = unwrap(raw);
     const results = data.results ?? [];
     if (results.length === 0) {
