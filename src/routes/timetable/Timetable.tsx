@@ -88,7 +88,6 @@ export default function Timetable() {
 
   const performancesQuery = useAppQuery({
     queryKey: appQueryKeys.timetablePerformances(activeDate),
-    enabled: !isDay1,
     queryFn: ({ signal }) => getPerformances(activeDate, { signal }),
     staleTime: 60_000,
   })
@@ -255,7 +254,7 @@ export default function Timetable() {
           </div>
 
           <div className="px-4 pb-4 pt-5">
-            {isDay1 ? (
+            {isDay1 && (
               <ContentImageSection
                 images={contentImages}
                 isLoading={isImageLoading}
@@ -267,7 +266,9 @@ export default function Timetable() {
                   void contentImagesQuery.refetch()
                 }}
               />
-            ) : isLoading ? (
+            )}
+            {isDay1 && <div className="h-4" />}
+            {isLoading ? (
               <div className="py-12 text-center text-[var(--timetable-empty-text)]">
                 공연 정보를 불러오는 중입니다...
               </div>

@@ -67,7 +67,7 @@ export default function ContentImageSection({
             <img
               src={image.previewImageUrl}
               alt={image.name}
-              className="h-48 w-full object-cover"
+              className="h-100 w-full object-cover"
               onError={(e) => {
                 ;(e.currentTarget as HTMLImageElement).src = image.detailImageUrl
               }}
