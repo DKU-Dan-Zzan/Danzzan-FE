@@ -7,13 +7,72 @@ import type {
   SelectedMapItem,
 } from "@/types/app/boothmap/boothmap.types";
 
+const BOOTH_TYPE_ORDER = ["EXPERIENCE", "EVENT", "FACILITY", "FOOD_TRUCK"] as const;
+const boothNameCollator = new Intl.Collator("ko", {
+  numeric: true,
+  sensitivity: "base",
+});
+
+function getBoothTypeOrder(type: Booth["type"]) {
+  const index = BOOTH_TYPE_ORDER.indexOf(type);
+  return index === -1 ? Number.MAX_SAFE_INTEGER : index;
+}
+
+function compareBoothName(a: Booth, b: Booth) {
+  const nameCompare = boothNameCollator.compare(a.name, b.name);
+  if (nameCompare !== 0) {
+    return nameCompare;
+  }
+
+  return a.id - b.id;
+}
+
+function compareFoodTruckClosedLast(a: Booth, b: Booth) {
+  const isAClosedFoodTruck = a.type === "FOOD_TRUCK" && a.operationStatus === "CLOSED";
+  const isBClosedFoodTruck = b.type === "FOOD_TRUCK" && b.operationStatus === "CLOSED";
+
+  if (isAClosedFoodTruck !== isBClosedFoodTruck) {
+    return isAClosedFoodTruck ? 1 : -1;
+  }
+
+  return compareBoothName(a, b);
+}
+
+function sortBooths(primaryFilter: PrimaryFilter, booths: Booth[]) {
+  const sorted = [...booths];
+
+  if (primaryFilter === "ALL") {
+    sorted.sort((a, b) => {
+      const typeOrderCompare = getBoothTypeOrder(a.type) - getBoothTypeOrder(b.type);
+      if (typeOrderCompare !== 0) {
+        return typeOrderCompare;
+      }
+
+      return compareFoodTruckClosedLast(a, b);
+    });
+
+    return sorted;
+  }
+
+  if (primaryFilter === "FOOD_TRUCK") {
+    sorted.sort(compareFoodTruckClosedLast);
+    return sorted;
+  }
+
+  sorted.sort(compareBoothName);
+  return sorted;
+}
+
 export const getVisibleBooths = (
   primaryFilter: PrimaryFilter,
   booths: Booth[],
 ): Booth[] => {
-  if (primaryFilter === "ALL") return booths;
+  if (primaryFilter === "ALL") return sortBooths(primaryFilter, booths);
   if (primaryFilter === "PUB") return [];
-  return booths.filter((booth) => booth.type === primaryFilter);
+  return sortBooths(
+    primaryFilter,
+    booths.filter((booth) => booth.type === primaryFilter),
+  );
 };
 
 export const getVisibleColleges = (

@@ -377,8 +377,13 @@ export default function BoothMap() {
 
   const onSelectBoothFromList = useCallback((id: number) => {
     const selectedListBooth = booths.find((booth) => booth.id === id) ?? null;
+    const canOpenFoodTruckDetail = Boolean(boothDetailAvailability[id]);
     const shouldSwitchToFoodTruckFilter =
       primaryFilter === "ALL" && isFoodTruckBooth(selectedListBooth);
+
+    if (isFoodTruckBooth(selectedListBooth) && !canOpenFoodTruckDetail) {
+      return;
+    }
 
     if (shouldSwitchToFoodTruckFilter) {
       setPrimaryFilter("FOOD_TRUCK");
@@ -395,11 +400,15 @@ export default function BoothMap() {
     setPubListCollegeId(null);
     setSheetMode("LIST");
     setSheetSnap("HALF");
-  }, [booths, openFoodTruckDetail, primaryFilter]);
+  }, [boothDetailAvailability, booths, openFoodTruckDetail, primaryFilter]);
 
   const onOpenBoothDetailFromList = useCallback((id: number) => {
     const selectedListBooth = booths.find((booth) => booth.id === id) ?? null;
     if (isFoodTruckBooth(selectedListBooth)) {
+      if (!boothDetailAvailability[id]) {
+        return;
+      }
+
       openFoodTruckDetail(id);
       return;
     }
@@ -408,7 +417,7 @@ export default function BoothMap() {
       detailSnap: "FULL",
       fallbackSnap: "HALF",
     });
-  }, [booths, openFoodTruckDetail, resolveBoothSelection]);
+  }, [boothDetailAvailability, booths, openFoodTruckDetail, resolveBoothSelection]);
 
   const onChangePrimaryFilterFromMap = useCallback((next: PrimaryFilter) => {
     handlePrimaryChange(next);

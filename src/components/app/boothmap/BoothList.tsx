@@ -55,6 +55,10 @@ export default function BoothList({
         const hasDetail = booth.type === "FOOD_TRUCK" && Boolean(boothDetailAvailability[booth.id]);
         const handlePrimaryAction = () => {
           if (booth.type === "FOOD_TRUCK") {
+            if (!hasDetail) {
+              return;
+            }
+
             onOpenBoothDetail(booth.id);
             return;
           }
