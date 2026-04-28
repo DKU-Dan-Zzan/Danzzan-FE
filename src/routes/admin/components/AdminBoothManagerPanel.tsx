@@ -1,21 +1,32 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { ArrowLeft, Search, Save, Plus, Trash2, RefreshCcw } from "lucide-react";
+import { useEffect, useMemo, useState, type ChangeEvent, type ReactNode } from "react";
+import { ArrowLeft, CheckCircle2, ImagePlus, Plus, RefreshCcw, Save, Search, Star, Trash2, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
   createAdminPubOperation,
+  deleteAdminPubImage,
   deleteAdminPubOperation,
   getAdminBoothManagement,
+  getAdminPubImagePresign,
+  getAdminPubImages,
   type AdminBoothManagementBooth,
   type AdminBoothManagementPub,
   type AdminBoothManagementResponse,
+  type AdminPubImage,
   type AdminPubOperation,
+  registerAdminPubImages,
   updateAdminBooth,
+  updateAdminPubMainImage,
   updateAdminPub,
   updateAdminPubOperation,
 } from "@/api/app/admin/adminBoothApi";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { cn } from "@/components/common/ui/utils";
+import {
+  createUploadFailureMessage,
+  uploadToPresignedUrl,
+  validateImageFile,
+} from "@/routes/admin/adminEditorLogic";
 import { formatDescription } from "@/utils/app/boothmap/formatDescription";
 
 const FESTIVAL_DATES = ["2026-05-12", "2026-05-13", "2026-05-14"] as const;
@@ -52,6 +63,12 @@ type PubOperationDraft = {
   operationDate: string;
   startTime: string;
   endTime: string;
+};
+
+type PendingPubImage = {
+  id: string;
+  file: File;
+  previewUrl: string;
 };
 
 function normalizeMultilineField(value?: string | null) {
@@ -96,6 +113,11 @@ export default function AdminBoothManagerPanel({
   const [boothForm, setBoothForm] = useState<BoothFormState | null>(null);
   const [pubForm, setPubForm] = useState<PubFormState | null>(null);
   const [savingItem, setSavingItem] = useState(false);
+  const [pubImages, setPubImages] = useState<AdminPubImage[]>([]);
+  const [pubImagesLoading, setPubImagesLoading] = useState(false);
+  const [pubImageSubmitting, setPubImageSubmitting] = useState(false);
+  const [pendingPubImages, setPendingPubImages] = useState<PendingPubImage[]>([]);
+  const [selectedPendingMainId, setSelectedPendingMainId] = useState<string | null>(null);
   const [pubOperationDraft, setPubOperationDraft] = useState<PubOperationDraft>({
     id: null,
     operationDate: selectedDate,
@@ -154,6 +176,7 @@ export default function AdminBoothManagerPanel({
   useEffect(() => {
     if (!selectedPub) {
       setPubForm(null);
+      setPubImages([]);
       return;
     }
 
@@ -162,6 +185,37 @@ export default function AdminBoothManagerPanel({
       description: normalizeMultilineField(selectedPub.description),
       instagram: selectedPub.instagram ?? "",
     });
+  }, [selectedPub]);
+
+  const clearPendingPubImages = () => {
+    setPendingPubImages((previous) => {
+      previous.forEach((image) => URL.revokeObjectURL(image.previewUrl));
+      return [];
+    });
+    setSelectedPendingMainId(null);
+  };
+
+  const loadPubImages = async (pubId: number) => {
+    try {
+      setPubImagesLoading(true);
+      const response = await getAdminPubImages(pubId);
+      setPubImages(response);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "주점 이미지 목록을 불러오지 못했습니다.";
+      setGlobalError(message);
+      toast.error(message);
+    } finally {
+      setPubImagesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!selectedPub) {
+      return;
+    }
+
+    clearPendingPubImages();
+    void loadPubImages(selectedPub.id);
   }, [selectedPub]);
 
   useEffect(() => {
@@ -249,6 +303,8 @@ export default function AdminBoothManagerPanel({
 
     return managementData.pubOperations.find((operation) => operation.operationDate === selectedDate) ?? null;
   }, [managementData, selectedDate]);
+
+  const hasMainPubImage = useMemo(() => pubImages.some((image) => image.isMain), [pubImages]);
 
   const handleSelectItem = (item: ManagementListItem) => {
     setSelectedItem({ kind: item.kind, id: item.id });
@@ -353,6 +409,149 @@ export default function AdminBoothManagerPanel({
       toast.error(message);
     } finally {
       setSavingPubOperation(false);
+    }
+  };
+
+  const handlePendingPubImagesChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []);
+    if (files.length === 0) {
+      return;
+    }
+
+    const validImages: PendingPubImage[] = [];
+
+    for (const file of files) {
+      const validationMessage = validateImageFile(file);
+      if (validationMessage) {
+        toast.warning(validationMessage);
+        continue;
+      }
+
+      validImages.push({
+        id: `${file.name}-${file.size}-${file.lastModified}-${crypto.randomUUID()}`,
+        file,
+        previewUrl: URL.createObjectURL(file),
+      });
+    }
+
+    if (validImages.length === 0) {
+      event.target.value = "";
+      return;
+    }
+
+    setPendingPubImages((previous) => [...previous, ...validImages]);
+    setSelectedPendingMainId((previous) => previous ?? validImages[0].id);
+    event.target.value = "";
+  };
+
+  const handleRemovePendingPubImage = (pendingImageId: string) => {
+    setPendingPubImages((previous) => {
+      const target = previous.find((image) => image.id === pendingImageId);
+      if (target) {
+        URL.revokeObjectURL(target.previewUrl);
+      }
+
+      const next = previous.filter((image) => image.id !== pendingImageId);
+      setSelectedPendingMainId((current) => {
+        if (current !== pendingImageId) {
+          return current;
+        }
+        return next[0]?.id ?? null;
+      });
+      return next;
+    });
+  };
+
+  const handleRegisterPubImages = async () => {
+    if (!selectedPub || pendingPubImages.length === 0) {
+      return;
+    }
+
+    try {
+      setPubImageSubmitting(true);
+      setGlobalError(null);
+
+      const uploadedImages: Array<{ id: string; imageUrl: string }> = [];
+
+      for (const pendingImage of pendingPubImages) {
+        const presign = await getAdminPubImagePresign(selectedPub.id, {
+          fileName: pendingImage.file.name,
+          contentType: pendingImage.file.type,
+          fileSize: pendingImage.file.size,
+        });
+
+        const putResponse = await uploadToPresignedUrl(presign, pendingImage.file);
+        if (!putResponse.ok) {
+          throw new Error(await createUploadFailureMessage("주점 이미지 업로드 실패", putResponse));
+        }
+
+        uploadedImages.push({
+          id: pendingImage.id,
+          imageUrl: presign.imageUrl ?? presign.fileUrl,
+        });
+      }
+
+      const selectedMainImageUrl =
+        uploadedImages.find((image) => image.id === selectedPendingMainId)?.imageUrl ?? null;
+
+      await registerAdminPubImages(selectedPub.id, {
+        imageUrls: uploadedImages.map((image) => image.imageUrl),
+        mainImageUrl: selectedMainImageUrl,
+      });
+
+      toast.success("주점 이미지를 등록했습니다.");
+      clearPendingPubImages();
+      await loadPubImages(selectedPub.id);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "주점 이미지 등록에 실패했습니다.";
+      setGlobalError(message);
+      toast.error(message);
+    } finally {
+      setPubImageSubmitting(false);
+    }
+  };
+
+  const handleSetMainPubImage = async (imageId: number) => {
+    if (!selectedPub) {
+      return;
+    }
+
+    try {
+      setPubImageSubmitting(true);
+      setGlobalError(null);
+      await updateAdminPubMainImage(selectedPub.id, imageId);
+      toast.success("대표 이미지를 변경했습니다.");
+      await loadPubImages(selectedPub.id);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "대표 이미지 변경에 실패했습니다.";
+      setGlobalError(message);
+      toast.error(message);
+    } finally {
+      setPubImageSubmitting(false);
+    }
+  };
+
+  const handleDeletePubImage = async (imageId: number) => {
+    if (!selectedPub) {
+      return;
+    }
+
+    if (!window.confirm("이 주점 이미지를 삭제할까요?")) {
+      return;
+    }
+
+    try {
+      setPubImageSubmitting(true);
+      setGlobalError(null);
+      await deleteAdminPubImage(selectedPub.id, imageId);
+      toast.success("주점 이미지를 삭제했습니다.");
+      await loadPubImages(selectedPub.id);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "주점 이미지 삭제에 실패했습니다.";
+      setGlobalError(message);
+      toast.error(message);
+    } finally {
+      setPubImageSubmitting(false);
     }
   };
 
@@ -676,6 +875,197 @@ export default function AdminBoothManagerPanel({
                     className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 text-sm text-[var(--text)]"
                   />
                 </label>
+
+                <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] p-4">
+                  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <h4 className="text-sm font-semibold text-[var(--text)]">주점 이미지 관리</h4>
+                      <p className="mt-1 text-xs text-[var(--text-muted)]">
+                        썸네일 이미지 목록만 관리하며, 대표 이미지는 한 장만 유지됩니다.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-2xl border border-[var(--border-base)] bg-white px-4 py-2 text-sm font-semibold text-[var(--text)]">
+                        <ImagePlus className="h-4 w-4" strokeWidth={2.3} />
+                        이미지 선택
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,image/jpg"
+                          multiple
+                          onChange={handlePendingPubImagesChange}
+                          className="hidden"
+                        />
+                      </label>
+
+                      <button
+                        type="button"
+                        disabled={pubImageSubmitting || pendingPubImages.length === 0}
+                        onClick={() => void handleRegisterPubImages()}
+                        className="inline-flex h-10 items-center justify-center gap-1.5 rounded-2xl bg-[var(--accent)] px-4 text-sm font-semibold text-white disabled:opacity-60"
+                      >
+                        <Save className="h-4 w-4" strokeWidth={2.3} />
+                        {pubImageSubmitting ? "등록 중..." : "이미지 등록"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {pendingPubImages.length > 0 && (
+                    <div className="mt-4">
+                      <div className="mb-3 flex items-center justify-between gap-3">
+                        <p className="text-xs font-semibold text-[var(--text-muted)]">
+                          업로드 예정 이미지
+                        </p>
+                        <p className="text-xs text-[var(--text-muted)]">
+                          대표로 쓸 이미지를 한 장 선택하세요.
+                        </p>
+                      </div>
+
+                      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                        {pendingPubImages.map((image) => {
+                          const isMainCandidate = selectedPendingMainId === image.id;
+                          return (
+                            <div
+                              key={image.id}
+                              className={cn(
+                                "overflow-hidden rounded-2xl border bg-white",
+                                isMainCandidate
+                                  ? "border-[var(--accent)] ring-2 ring-[var(--accent)]/15"
+                                  : "border-[var(--border-base)]",
+                              )}
+                            >
+                              <div className="relative aspect-[4/3] bg-[var(--surface-subtle)]">
+                                <img
+                                  src={image.previewUrl}
+                                  alt={image.file.name}
+                                  className="h-full w-full object-cover"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemovePendingPubImage(image.id)}
+                                  className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white"
+                                >
+                                  <X className="h-4 w-4" strokeWidth={2.4} />
+                                </button>
+                                {isMainCandidate && (
+                                  <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-[var(--accent)] px-2.5 py-1 text-[11px] font-semibold text-white">
+                                    <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={2.4} />
+                                    대표 예정
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="space-y-3 p-3">
+                                <p className="truncate text-xs font-medium text-[var(--text-muted)]">
+                                  {image.file.name}
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedPendingMainId(image.id)}
+                                  className={cn(
+                                    "inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-xl border text-xs font-semibold",
+                                    isMainCandidate
+                                      ? "border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)]"
+                                      : "border-[var(--border-base)] bg-white text-[var(--text)]",
+                                  )}
+                                >
+                                  <Star className="h-3.5 w-3.5 fill-current text-[#ffd84d]" strokeWidth={2.3} />
+                                  {isMainCandidate ? "대표 이미지 선택됨" : "대표 이미지로 선택"}
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mt-5">
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <p className="text-xs font-semibold text-[var(--text-muted)]">등록된 이미지</p>
+                      {pubImagesLoading && (
+                        <p className="text-xs text-[var(--text-muted)]">이미지를 불러오는 중입니다...</p>
+                      )}
+                    </div>
+
+                    {!pubImagesLoading && pubImages.length > 0 && !hasMainPubImage && (
+                      <div className="mb-3 rounded-2xl border border-[#f4d06f] bg-[#fff7db] px-4 py-3 text-xs font-semibold text-[#9a6b00]">
+                        대표 이미지가 아직 지정되지 않았습니다. 아래에서 한 장을 대표로 지정해 주세요.
+                      </div>
+                    )}
+
+                    {!pubImagesLoading && pubImages.length === 0 && (
+                      <div className="rounded-2xl border border-dashed border-[var(--border-base)] bg-white px-4 py-8 text-center text-sm text-[var(--text-muted)]">
+                        등록된 주점 이미지가 없습니다.
+                      </div>
+                    )}
+
+                    {pubImages.length > 0 && (
+                      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                        {pubImages.map((image) => (
+                          <div
+                            key={image.id}
+                            className={cn(
+                              "overflow-hidden rounded-2xl border bg-white transition-all",
+                              image.isMain
+                                ? "border-[#f1d48a] bg-[#fffdf8] ring-2 ring-[#ffe9b5]/70"
+                                : "border-[var(--border-base)]",
+                            )}
+                          >
+                            <div className="relative aspect-[4/3] bg-[var(--surface-subtle)]">
+                              <img
+                                src={image.imageUrl}
+                                alt={`${selectedPub.name} 이미지 ${image.id}`}
+                                className="h-full w-full object-cover"
+                              />
+                              {image.isMain && (
+                                <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-[var(--accent)] px-2.5 py-1 text-[11px] font-semibold text-white">
+                                  <Star className="h-3.5 w-3.5 fill-current text-[#ffd84d]" strokeWidth={2.3} />
+                                  현재 대표
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="space-y-2 p-3">
+                              <p className="truncate text-xs text-[var(--text-muted)]">{image.imageUrl}</p>
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  disabled={pubImageSubmitting || image.isMain}
+                                  onClick={() => void handleSetMainPubImage(image.id)}
+                                  className={cn(
+                                    "inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl border text-xs font-semibold disabled:opacity-50",
+                                    image.isMain
+                                      ? "border-[#ead39d] bg-[#fffaf0] text-[#8d6a00]"
+                                      : "border-[var(--border-base)] bg-white text-[var(--text)]",
+                                  )}
+                                >
+                                  <Star
+                                    className={cn(
+                                      "h-3.5 w-3.5",
+                                      image.isMain && "fill-current text-[#f4b400]",
+                                    )}
+                                    strokeWidth={2.3}
+                                  />
+                                  {image.isMain ? "대표 이미지" : "대표로 지정"}
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={pubImageSubmitting}
+                                  onClick={() => void handleDeletePubImage(image.id)}
+                                  className="inline-flex h-9 items-center justify-center gap-1 rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 text-xs font-semibold text-[var(--status-danger-text)] disabled:opacity-50"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
+                                  삭제
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </section>

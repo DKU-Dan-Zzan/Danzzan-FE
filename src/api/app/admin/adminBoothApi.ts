@@ -1,5 +1,6 @@
 import { getApiBaseUrl } from "@/api/common/baseUrl";
 import { createFetchWithAuth } from "@/api/common/fetchAuth";
+import { parseNoticeImagePresignContract } from "@/api/app/admin/adminContract";
 import {
   clearAdminSession,
   getAdminAccessToken,
@@ -46,6 +47,13 @@ export type AdminPubOperation = {
   endTime: string;
 };
 
+export type AdminPubImage = {
+  id: number;
+  imageUrl: string;
+  isMain: boolean;
+  createdAt: string;
+};
+
 export type AdminBoothManagementResponse = {
   booths: AdminBoothManagementBooth[];
   pubs: AdminBoothManagementPub[];
@@ -70,6 +78,25 @@ export type UpsertAdminPubOperationPayload = {
   operationDate: string;
   startTime: string;
   endTime: string;
+};
+
+export type AdminPubImagePresignRequest = {
+  fileName: string;
+  contentType: string;
+  fileSize?: number;
+};
+
+export type AdminPubImagePresignResponse = {
+  presignedUrl: string;
+  fileUrl: string;
+  imageUrl?: string;
+  expiresAt?: string;
+  method: "PUT";
+};
+
+export type RegisterAdminPubImagesPayload = {
+  imageUrls: string[];
+  mainImageUrl?: string | null;
 };
 
 export async function getAdminBoothManagement(date?: string): Promise<AdminBoothManagementResponse> {
@@ -120,6 +147,46 @@ export async function updateAdminPubOperation(
 
 export async function deleteAdminPubOperation(pubOperationId: number): Promise<void> {
   await fetchWithAuth<void>(`/admin/map/pub-operations/${pubOperationId}`, {
+    method: "DELETE",
+  });
+}
+
+export async function getAdminPubImages(pubId: number): Promise<AdminPubImage[]> {
+  return fetchWithAuth<AdminPubImage[]>(`/admin/map/pubs/${pubId}/images`, {
+    method: "GET",
+  });
+}
+
+export async function getAdminPubImagePresign(
+  pubId: number,
+  payload: AdminPubImagePresignRequest,
+): Promise<AdminPubImagePresignResponse> {
+  const endpoint = `/admin/map/pubs/${pubId}/images/presign`;
+  const raw = await fetchWithAuth<unknown>(endpoint, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  return parseNoticeImagePresignContract(raw, endpoint);
+}
+
+export async function registerAdminPubImages(
+  pubId: number,
+  payload: RegisterAdminPubImagesPayload,
+): Promise<void> {
+  await fetchWithAuth<void>(`/admin/map/pubs/${pubId}/images`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateAdminPubMainImage(pubId: number, imageId: number): Promise<void> {
+  await fetchWithAuth<void>(`/admin/map/pubs/${pubId}/images/${imageId}/main`, {
+    method: "PATCH",
+  });
+}
+
+export async function deleteAdminPubImage(pubId: number, imageId: number): Promise<void> {
+  await fetchWithAuth<void>(`/admin/map/pubs/${pubId}/images/${imageId}`, {
     method: "DELETE",
   });
 }
