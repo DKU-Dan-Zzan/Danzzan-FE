@@ -21,6 +21,7 @@ export const mapAuthUserDto = (dto?: AuthLoginResponseDto["user"]): AuthUser | n
     department: dto.department ?? "",
     studentId: dto.studentId ?? "",
     college: dto.college ?? "",
+    naverId: dto.naverId ?? undefined,
   };
 };
 

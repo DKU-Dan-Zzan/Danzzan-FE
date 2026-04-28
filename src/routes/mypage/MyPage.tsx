@@ -302,7 +302,7 @@ function MyPage() {
               className="h-[80px] w-[80px] shrink-0 overflow-hidden rounded-full border-2 border-white/30"
               style={{ background: "rgba(220,229,240,0.25)", backdropFilter: "blur(8px)" }}
             >
-              <img src={`/profiles/latte-${(parseInt(user?.id ?? "0", 10) % 8) + 1}.png`} alt="프로필" className="h-full w-full object-cover object-top" />
+              <img src={`/profiles/latte-${(parseInt(user?.id ?? "0", 10) % 8) + 1}.jpeg`} alt="프로필" className="h-full w-full object-cover object-top" />
             </div>
             <div className="pb-0.5">
               <p className="text-[26px] font-bold leading-tight text-white drop-shadow">
@@ -345,10 +345,11 @@ function MyPage() {
       </div>
 
       <div className="mt-2" />
-      <SectionCard title="학적 정보">
+      <SectionCard title="내 정보">
         <ListRow icon={<IdCard size={18} />} label="학번" value={user?.studentId ?? "—"} />
         <ListRow icon={<GraduationCap size={18} />} label="단과대학" value={user?.college || "—"} />
         <ListRow icon={<GraduationCap size={18} />} label="학과" value={user?.department || "—"} />
+        <ListRow icon={<IdCard size={18} />} label="네이버 아이디" value={user?.naverId ? user.naverId.split("@")[0] : undefined} />
       </SectionCard>
 
       <div className="mx-4 mt-3 overflow-hidden rounded-[16px] bg-white" style={{ boxShadow: "0 1px 8px rgba(28,43,106,0.08)" }}>
