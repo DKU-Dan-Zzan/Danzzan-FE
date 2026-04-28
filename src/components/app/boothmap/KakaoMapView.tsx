@@ -1004,7 +1004,7 @@ export default function KakaoMapView({
         createZoneMarkerRecord({
           lat: marker.lat,
           lng: marker.lng,
-          label: "?몃뱶?몃윮 援ъ뿭",
+          label: "푸드트럭 구역",
           type: "FOOD_TRUCK",
           onClick: () => onPrimaryFilterChange("FOOD_TRUCK"),
         })
