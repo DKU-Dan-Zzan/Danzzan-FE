@@ -30,6 +30,8 @@ describe("Common not-found route", () => {
     expect(source).toContain("페이지를 찾을 수 없어요");
     expect(source).toContain("주소가 바뀌었거나 접근할 수 없는 페이지예요.");
     expect(source).toContain('to="/"');
+    expect(source).toContain("#ff715b");
+    expect(source).toContain("#ffb45f");
     expect(source).not.toContain("LOST GATE");
     expect(source).not.toContain("NO ROUTE");
     expect(source).not.toContain("FESTIVAL PASS");

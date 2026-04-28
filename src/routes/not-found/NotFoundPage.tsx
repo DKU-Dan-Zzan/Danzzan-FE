@@ -30,7 +30,7 @@ export default function NotFoundPage() {
         <div className="mt-8 w-full max-w-[220px]">
           <Button
             asChild
-            className="h-11 w-full rounded-[8px] text-[0.9rem] tracking-[0] shadow-[0_14px_24px_-18px_rgba(37,99,235,0.58)]"
+            className="h-11 w-full rounded-[8px] border border-[rgba(255,113,91,0.22)] bg-[linear-gradient(135deg,#ff715b_0%,#ffb45f_100%)] text-[0.9rem] tracking-[0] text-white shadow-[0_18px_32px_-20px_rgba(255,113,91,0.66)] hover:brightness-[1.03] focus-visible:ring-[rgba(255,113,91,0.45)] active:translate-y-px"
           >
             <Link to="/">
               <Home size={17} aria-hidden />
