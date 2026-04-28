@@ -97,14 +97,6 @@ export default function AdminMapEditorPanel({
     [editableBooths],
   );
 
-  const unplacedBooths = useMemo(
-    () =>
-      editableBooths.filter(
-        (booth) => !booth.placed || booth.locationX == null || booth.locationY == null,
-      ),
-    [editableBooths],
-  );
-
   const selectedBooth =
     selectedItem?.kind === "booth"
       ? editableBooths.find((booth) => booth.id === selectedItem.id) ?? null
@@ -640,9 +632,6 @@ export default function AdminMapEditorPanel({
           selectedDate={selectedDate}
           editorMode={editorMode}
           statusMessage={statusMessage}
-          comingSoonOverlayEnabled={comingSoonOverlayEnabled}
-          comingSoonOverlaySaving={comingSoonOverlaySaving}
-          unplacedBooths={unplacedBooths}
           colleges={colleges}
           selectedItem={selectedItem}
           selectedBooth={selectedBooth}
@@ -653,10 +642,6 @@ export default function AdminMapEditorPanel({
           onActivateBoothMode={activateBoothMode}
           onActivateCollegeMode={activateCollegeMode}
           onClearSelection={handleClearSelection}
-          onToggleComingSoonOverlay={(enabled) => {
-            void handleToggleComingSoonOverlay(enabled);
-          }}
-          onSelectBooth={handleSelectBooth}
           onSelectCollege={handleSelectCollege}
           onClearBoothLocation={handleClearBoothLocation}
         />
