@@ -27,6 +27,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/common/ui/alert-dialog";
+import { Checkbox } from "@/components/common/ui/checkbox";
+
+type WithdrawStep = "ticket-waiver" | "final";
 
 const FAQ_ITEMS = [
   {
@@ -169,6 +172,8 @@ function MyPage() {
   const user = session.user;
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const [withdrawConfirmOpen, setWithdrawConfirmOpen] = useState(false);
+  const [withdrawStep, setWithdrawStep] = useState<WithdrawStep>("ticket-waiver");
+  const [withdrawTicketWaiverAgreed, setWithdrawTicketWaiverAgreed] = useState(false);
   const [withdrawError, setWithdrawError] = useState<string | null>(null);
   const [withdrawing, setWithdrawing] = useState(false);
 
@@ -278,6 +283,25 @@ function MyPage() {
     navigate("/ticket/login", { replace: true });
   };
 
+  const resetWithdrawDialog = () => {
+    setWithdrawStep("ticket-waiver");
+    setWithdrawTicketWaiverAgreed(false);
+    setWithdrawError(null);
+  };
+
+  const openWithdrawDialog = () => {
+    resetWithdrawDialog();
+    setWithdrawConfirmOpen(true);
+  };
+
+  const handleWithdrawOpenChange = (open: boolean) => {
+    if (withdrawing) return;
+    setWithdrawConfirmOpen(open);
+    if (!open) {
+      resetWithdrawDialog();
+    }
+  };
+
   const handleWithdrawConfirm = async () => {
     const accessToken = session.tokens?.accessToken;
     if (!accessToken || withdrawing) return;
@@ -288,6 +312,7 @@ function MyPage() {
     try {
       await withdrawUser(accessToken);
       setWithdrawConfirmOpen(false);
+      resetWithdrawDialog();
       authStore.clear();
       navigate("/ticket/login", { replace: true });
     } catch {
@@ -406,10 +431,7 @@ function MyPage() {
         <ListRow
           icon={<UserX size={18} />}
           label="회원 탈퇴"
-          onClick={() => {
-            setWithdrawError(null);
-            setWithdrawConfirmOpen(true);
-          }}
+          onClick={openWithdrawDialog}
           iconClassName="text-[var(--mypage-withdraw-text)]"
           labelClassName="text-[var(--mypage-withdraw-text)]"
         />
@@ -439,15 +461,40 @@ function MyPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={withdrawConfirmOpen} onOpenChange={setWithdrawConfirmOpen}>
+      <AlertDialog open={withdrawConfirmOpen} onOpenChange={handleWithdrawOpenChange}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>회원 탈퇴 전 확인해 주세요</AlertDialogTitle>
-            <AlertDialogDescription>
-              탈퇴 즉시 보유 티켓 권한이 사라지고 복구할 수 없어요.
-              그래도 탈퇴할까요?
-            </AlertDialogDescription>
+            {withdrawStep === "final" ? (
+              <>
+                <AlertDialogTitle>정말 탈퇴할까요?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  계정 정보가 삭제되고 다시 로그인할 수 없어요.
+                </AlertDialogDescription>
+              </>
+            ) : (
+              <>
+                <AlertDialogTitle>보유 티켓 권한 포기 동의</AlertDialogTitle>
+                <AlertDialogDescription>
+                  탈퇴하면 보유 중인 미사용 티켓은 즉시 권리포기 처리돼요.
+                  권리포기된 티켓은 사용할 수 없고 복구되지 않아요.
+                </AlertDialogDescription>
+              </>
+            )}
           </AlertDialogHeader>
+          {withdrawStep === "ticket-waiver" && (
+            <label
+              htmlFor="withdraw-ticket-waiver"
+              className="flex items-start gap-3 rounded-[10px] border border-red-100 bg-red-50/70 px-3 py-3 text-[13px] leading-[1.5] text-red-700"
+            >
+              <Checkbox
+                id="withdraw-ticket-waiver"
+                checked={withdrawTicketWaiverAgreed}
+                onCheckedChange={(checked) => setWithdrawTicketWaiverAgreed(checked === true)}
+                className="mt-0.5 shrink-0 border-red-300 data-[state=checked]:border-red-600 data-[state=checked]:bg-red-600"
+              />
+              <span>보유 티켓이 사라지는 것에 동의합니다.</span>
+            </label>
+          )}
           {withdrawError && (
             <p className="rounded-[8px] bg-red-50 px-3 py-2 text-[13px] leading-[1.5] text-red-600">
               {withdrawError}
@@ -455,20 +502,37 @@ function MyPage() {
           )}
           <AlertDialogFooter>
             <AlertDialogCancel disabled={withdrawing}>취소</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={withdrawing}
-              className="bg-red-600 text-white hover:bg-red-600 hover:brightness-95 disabled:opacity-60"
-              style={{
-                backgroundImage: "none",
-                boxShadow: "none",
-              }}
-              onClick={(event) => {
-                event.preventDefault();
-                void handleWithdrawConfirm();
-              }}
-            >
-              {withdrawing ? "처리 중" : "탈퇴하기"}
-            </AlertDialogAction>
+            {withdrawStep === "final" ? (
+              <AlertDialogAction
+                disabled={withdrawing}
+                className="bg-red-600 text-white hover:bg-red-600 hover:brightness-95 disabled:opacity-60"
+                style={{
+                  backgroundImage: "none",
+                  boxShadow: "none",
+                }}
+                onClick={(event) => {
+                  event.preventDefault();
+                  void handleWithdrawConfirm();
+                }}
+              >
+                {withdrawing ? "처리 중" : "탈퇴하기"}
+              </AlertDialogAction>
+            ) : (
+              <AlertDialogAction
+                disabled={!withdrawTicketWaiverAgreed || withdrawing}
+                className="bg-red-600 text-white hover:bg-red-600 hover:brightness-95 disabled:opacity-60"
+                style={{
+                  backgroundImage: "none",
+                  boxShadow: "none",
+                }}
+                onClick={(event) => {
+                  event.preventDefault();
+                  setWithdrawStep("final");
+                }}
+              >
+                다음
+              </AlertDialogAction>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

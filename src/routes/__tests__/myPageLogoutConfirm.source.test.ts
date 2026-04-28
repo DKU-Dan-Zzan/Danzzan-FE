@@ -48,10 +48,24 @@ describe("MyPage logout confirm source", () => {
 
     expect(source).toContain("withdrawUser(accessToken)");
     expect(source).toContain("탈퇴하기");
-    expect(source).toContain("회원 탈퇴 전 확인해 주세요");
-    expect(source).toContain("탈퇴 즉시 보유 티켓 권한이 사라지고 복구할 수 없어요");
+    expect(source).toContain("정말 탈퇴할까요?");
+    expect(source).toContain("계정 정보가 삭제되고 다시 로그인할 수 없어요.");
     expect(apiSource).toContain("export async function withdrawUser");
     expect(apiSource).toContain("method: \"DELETE\"");
     expect(apiSource).toContain("`${base}/user/me`");
+  });
+
+  it("회원 탈퇴는 티켓 권리포기 동의 후 최종 확인 단계에서만 실행한다", () => {
+    const source = readSource("src/routes/mypage/MyPage.tsx");
+
+    expect(source).toContain("type WithdrawStep");
+    expect(source).toContain("ticket-waiver");
+    expect(source).toContain("final");
+    expect(source).toContain("withdrawTicketWaiverAgreed");
+    expect(source).toContain("보유 티켓 권한 포기 동의");
+    expect(source).toContain("보유 티켓이 사라지는 것에 동의합니다.");
+    expect(source).toContain("setWithdrawStep(\"final\")");
+    expect(source).toContain("withdrawStep === \"final\"");
+    expect(source).toContain("disabled={!withdrawTicketWaiverAgreed || withdrawing}");
   });
 });
