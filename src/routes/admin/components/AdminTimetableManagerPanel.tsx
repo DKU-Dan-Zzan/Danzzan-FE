@@ -23,7 +23,9 @@ import {
   type AdminArtist,
   type AdminPerformance,
 } from "@/api/app/admin/adminTimetableApi";
+import { getAdminMap, updateComingSoonOverlayEnabled } from "@/api/app/admin/adminMapApi";
 import { AdminShell } from "@/components/layout/AdminShell";
+import { Switch } from "@/components/common/ui/switch";
 import { cn } from "@/components/common/ui/utils";
 import { FESTIVAL_DAYS } from "@/config/festivalDays";
 import {
@@ -104,6 +106,8 @@ export default function AdminTimetableManagerPanel({
   const [performances, setPerformances] = useState<AdminPerformance[]>([]);
   const [performancesLoading, setPerformancesLoading] = useState(true);
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [comingSoonOverlayEnabled, setComingSoonOverlayEnabled] = useState(false);
+  const [comingSoonOverlaySaving, setComingSoonOverlaySaving] = useState(false);
 
   const [artists, setArtists] = useState<AdminArtist[]>([]);
   const [artistsLoading, setArtistsLoading] = useState(true);
@@ -175,6 +179,22 @@ export default function AdminTimetableManagerPanel({
   useEffect(() => {
     void loadArtists();
   }, []);
+
+  const loadComingSoonOverlayState = async (date: string) => {
+    try {
+      const response = await getAdminMap(date);
+      setComingSoonOverlayEnabled(Boolean(response.comingSoonOverlayEnabled));
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "타임테이블 Coming Soon 설정을 불러오지 못했습니다.";
+      setGlobalError(message);
+      toast.error(message);
+    }
+  };
+
+  useEffect(() => {
+    void loadComingSoonOverlayState(activeDay.date);
+  }, [activeDay.date]);
 
   const handleChangeDay = (dayKey: string) => {
     setActiveDayKey(dayKey);
@@ -414,6 +434,32 @@ export default function AdminTimetableManagerPanel({
     setArtistForm(buildEmptyArtistForm());
   };
 
+  const handleToggleComingSoonOverlay = async (enabled: boolean) => {
+    const previous = comingSoonOverlayEnabled;
+    setComingSoonOverlayEnabled(enabled);
+
+    try {
+      setComingSoonOverlaySaving(true);
+      setGlobalError(null);
+      await updateComingSoonOverlayEnabled(enabled);
+      toast.success(
+        enabled
+          ? "타임테이블 Coming Soon 오버레이를 표시하도록 변경했습니다."
+          : "타임테이블 Coming Soon 오버레이를 숨기도록 변경했습니다.",
+      );
+    } catch (error) {
+      setComingSoonOverlayEnabled(previous);
+      const message =
+        error instanceof Error
+          ? error.message
+          : "타임테이블 Coming Soon 오버레이 설정을 저장하지 못했습니다.";
+      setGlobalError(message);
+      toast.error(message);
+    } finally {
+      setComingSoonOverlaySaving(false);
+    }
+  };
+
   const handleDeleteArtist = async (artist: AdminArtist) => {
     if (!window.confirm(`'${artist.name}' 아티스트를 삭제하시겠습니까?`)) {
       return;
@@ -460,6 +506,34 @@ export default function AdminTimetableManagerPanel({
           {globalError}
         </div>
       )}
+
+      <section className="rounded-3xl border border-[var(--border-base)] bg-white p-5 shadow-sm">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-base font-semibold text-[var(--text)]">타임테이블 Coming Soon</h2>
+            <p className="mt-1 text-xs leading-5 text-[var(--text-muted)]">
+              타임테이블 날짜 3개 영역 전체를 반투명 레이어로 덮고 중앙 문구를 노출합니다.
+            </p>
+          </div>
+
+          <Switch
+            checked={comingSoonOverlayEnabled}
+            disabled={comingSoonOverlaySaving}
+            aria-label="타임테이블 Coming Soon 오버레이 토글"
+            onCheckedChange={(enabled) => {
+              void handleToggleComingSoonOverlay(enabled);
+            }}
+          />
+        </div>
+
+        <div className="mt-3 rounded-2xl bg-[var(--surface-subtle)] px-3 py-3 text-xs leading-5 text-[var(--text-muted)]">
+          {comingSoonOverlaySaving
+            ? "설정을 저장하는 중입니다."
+            : comingSoonOverlayEnabled
+              ? "현재 사용자 타임테이블 화면에 Coming Soon 오버레이가 표시됩니다."
+              : "현재 사용자 타임테이블 화면에는 Coming Soon 오버레이가 꺼져 있습니다."}
+        </div>
+      </section>
 
       <section className="flex flex-col gap-4 rounded-2xl border border-[var(--border-base)] bg-white p-5 shadow-sm">
         <div className="flex items-center justify-between gap-3">
