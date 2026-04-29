@@ -45,4 +45,24 @@ describe("authMapper", () => {
     expect(session.tokens.refreshToken).toBe("wrapped-refresh");
     expect(session.user?.studentId).toBe("20204567");
   });
+
+  it("백엔드 ROLE_USER/user 역할 응답은 student로 정규화한다", () => {
+    expect(
+      mapAuthLoginResponse({
+        accessToken: "role-user-access",
+        user: {
+          role: "ROLE_USER",
+        },
+      }).user?.role,
+    ).toBe("student");
+
+    expect(
+      mapAuthLoginResponse({
+        accessToken: "user-access",
+        user: {
+          role: "user",
+        },
+      }).user?.role,
+    ).toBe("student");
+  });
 });

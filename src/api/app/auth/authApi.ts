@@ -67,6 +67,22 @@ export async function authLogout(): Promise<void> {
   }
 }
 
+/** 학생 회원 탈퇴 — accessToken을 즉시 무효화하고 서버 세션도 정리한다. */
+export async function withdrawUser(accessToken: string): Promise<void> {
+  const base = getBaseUrl();
+
+  const res = await fetch(`${base}/user/me`, {
+    method: "DELETE",
+    headers: {
+      ...JSON_HEADERS,
+      Authorization: `Bearer ${accessToken}`,
+    },
+    credentials: "include",
+  });
+
+  return parseFetchResponse<void>(res);
+}
+
 /** 리프레시 토큰은 백엔드에서 쿠키로 관리하므로 body 없이 credentials: 'include'로 호출 */
 export async function authReissue(): Promise<ReissueResponse> {
   const base = getBaseUrl();
