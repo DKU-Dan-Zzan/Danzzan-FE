@@ -1,4 +1,4 @@
-// 역할: 부스맵 필터/선택 셀렉터 함수의 분기 결과를 검증합니다.
+// 역할: 부스맵 필터/선택 셀렉터 함수의 분기 결과를 검증한다.
 import { describe, expect, it } from "vitest";
 import type { Booth, College, PrimaryFilter, Pub } from "@/types/app/boothmap/boothmap.types";
 import {
@@ -9,8 +9,44 @@ import {
 } from "@/routes/boothmap/boothMapSelectors";
 
 const booths: Booth[] = [
-  { id: 1, name: "푸드1", type: "FOOD_TRUCK", location_x: 0, location_y: 0 },
-  { id: 2, name: "체험1", type: "EXPERIENCE", location_x: 1, location_y: 1 },
+  {
+    id: 1,
+    name: "푸드트럭 B",
+    type: "FOOD_TRUCK",
+    location_x: 0,
+    location_y: 0,
+    operationStatus: "OPEN",
+  },
+  {
+    id: 2,
+    name: "체험 B",
+    type: "EXPERIENCE",
+    location_x: 1,
+    location_y: 1,
+  },
+  {
+    id: 3,
+    name: "푸드트럭 A",
+    type: "FOOD_TRUCK",
+    location_x: 2,
+    location_y: 2,
+    operationStatus: "OPEN",
+  },
+  {
+    id: 4,
+    name: "푸드트럭 C",
+    type: "FOOD_TRUCK",
+    location_x: 3,
+    location_y: 3,
+    operationStatus: "CLOSED",
+  },
+  {
+    id: 5,
+    name: "이벤트 A",
+    type: "EVENT",
+    location_x: 4,
+    location_y: 4,
+  },
 ];
 
 const colleges: College[] = [
@@ -44,10 +80,13 @@ const pubs: Pub[] = [
 ];
 
 describe("boothMapSelectors", () => {
-  it("primary filter에 맞는 booth 목록을 반환한다", () => {
-    expect(getVisibleBooths("ALL", booths)).toHaveLength(2);
+  it("ALL에서는 카테고리별로 묶고 각 카테고리 안에서 이름순으로 정렬한다", () => {
+    expect(getVisibleBooths("ALL", booths).map((booth) => booth.id)).toEqual([2, 5, 3, 1, 4]);
+  });
+
+  it("푸드트럭 필터에서는 CLOSED 상태를 맨 아래로 정렬한다", () => {
     expect(getVisibleBooths("PUB", booths)).toHaveLength(0);
-    expect(getVisibleBooths("FOOD_TRUCK", booths)).toEqual([booths[0]]);
+    expect(getVisibleBooths("FOOD_TRUCK", booths).map((booth) => booth.id)).toEqual([3, 1, 4]);
   });
 
   it("college 필터와 선택 상태를 반영한다", () => {

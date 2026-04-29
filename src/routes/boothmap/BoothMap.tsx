@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { startTransition, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import type {
   Booth,
   College,
@@ -87,6 +87,7 @@ function mapBoothDtoToBooth(dto: BoothDto): Booth {
     description: dto.description,
     location_x: dto.locationX,
     location_y: dto.locationY,
+    operationStatus: dto.operationStatus,
     startTime: dto.startTime,
     endTime: dto.endTime,
   };
@@ -188,16 +189,18 @@ export default function BoothMap() {
   );
 
   const handlePrimaryChange = (next: PrimaryFilter) => {
-    setPrimaryFilter(next);
-    setSelectedMapItem(null);
-    setSelectedDetailItem(null);
-    setSheetMode("LIST");
-    setSheetSnap("PEEK");
-    setPubListCollegeId(null);
+    startTransition(() => {
+      setPrimaryFilter(next);
+      setSelectedMapItem(null);
+      setSelectedDetailItem(null);
+      setSheetMode("LIST");
+      setSheetSnap(next === "FOOD_TRUCK" ? "HALF" : "PEEK");
+      setPubListCollegeId(null);
 
-    if (next !== "PUB") {
-      setSelectedCollegeId(null);
-    }
+      if (next !== "PUB") {
+        setSelectedCollegeId(null);
+      }
+    });
   };
 
   const visibleBooths = useMemo(() => {
@@ -214,14 +217,25 @@ export default function BoothMap() {
     return getVisiblePubs(pubs, targetCollegeId);
   }, [primaryFilter, pubs, pubListCollegeId, selectedCollegeId]);
 
+  const deferredVisibleBooths = useDeferredValue(visibleBooths);
+  const deferredVisibleColleges = useDeferredValue(visibleColleges);
+  const deferredVisiblePubs = useDeferredValue(visiblePubs);
+
   const shouldShowPubList = getShouldShowPubList(primaryFilter, selectedMapItem);
   const selectedBooth = useMemo(() => {
-    if (selectedMapItem?.kind !== "booth") {
+    const boothId =
+      selectedMapItem?.kind === "booth"
+        ? selectedMapItem.id
+        : selectedDetailItem?.kind === "booth"
+          ? selectedDetailItem.id
+          : null;
+
+    if (boothId === null) {
       return null;
     }
 
-    return booths.find((booth) => booth.id === selectedMapItem.id) ?? null;
-  }, [booths, selectedMapItem]);
+    return booths.find((booth) => booth.id === boothId) ?? null;
+  }, [booths, selectedDetailItem, selectedMapItem]);
 
   const boothDetailAvailability = useMemo(() => {
     const baseAvailability = visibleBooths.reduce<Record<number, boolean>>((acc, booth) => {
@@ -358,13 +372,32 @@ export default function BoothMap() {
     setSheetSnap("HALF");
   }, []);
 
+  const openFoodTruckDetail = useCallback((id: number) => {
+    setSelectedMapItem(null);
+    setSelectedDetailItem({ kind: "booth", id });
+    setSelectedCollegeId(null);
+    setPubListCollegeId(null);
+    setSheetMode("DETAIL");
+    setSheetSnap("FULL");
+  }, []);
+
   const onSelectBoothFromList = useCallback((id: number) => {
     const selectedListBooth = booths.find((booth) => booth.id === id) ?? null;
+    const canOpenFoodTruckDetail = Boolean(boothDetailAvailability[id]);
     const shouldSwitchToFoodTruckFilter =
       primaryFilter === "ALL" && isFoodTruckBooth(selectedListBooth);
 
+    if (isFoodTruckBooth(selectedListBooth) && !canOpenFoodTruckDetail) {
+      return;
+    }
+
     if (shouldSwitchToFoodTruckFilter) {
       setPrimaryFilter("FOOD_TRUCK");
+    }
+
+    if (isFoodTruckBooth(selectedListBooth)) {
+      openFoodTruckDetail(id);
+      return;
     }
 
     setSelectedMapItem({ kind: "booth", id });
@@ -373,14 +406,24 @@ export default function BoothMap() {
     setPubListCollegeId(null);
     setSheetMode("LIST");
     setSheetSnap("HALF");
-  }, [booths, primaryFilter]);
+  }, [boothDetailAvailability, booths, openFoodTruckDetail, primaryFilter]);
 
   const onOpenBoothDetailFromList = useCallback((id: number) => {
+    const selectedListBooth = booths.find((booth) => booth.id === id) ?? null;
+    if (isFoodTruckBooth(selectedListBooth)) {
+      if (!boothDetailAvailability[id]) {
+        return;
+      }
+
+      openFoodTruckDetail(id);
+      return;
+    }
+
     void resolveBoothSelection(id, {
       detailSnap: "FULL",
       fallbackSnap: "HALF",
     });
-  }, [resolveBoothSelection]);
+  }, [boothDetailAvailability, booths, openFoodTruckDetail, resolveBoothSelection]);
 
   const onChangePrimaryFilterFromMap = useCallback((next: PrimaryFilter) => {
     handlePrimaryChange(next);
@@ -461,8 +504,8 @@ export default function BoothMap() {
       <div className="absolute inset-0">
         <div className="absolute inset-0">
           <KakaoMapView
-            booths={visibleBooths}
-            colleges={visibleColleges}
+            booths={deferredVisibleBooths}
+            colleges={deferredVisibleColleges}
             primaryFilter={primaryFilter}
             selectedMapItem={selectedMapItem}
             sheetSnap={sheetSnap}
@@ -486,13 +529,15 @@ export default function BoothMap() {
             dates={FESTIVAL_DATES}
             selectedDate={selectedDate}
             onChange={(date) => {
-              setSelectedDate(date);
-              setSelectedMapItem(null);
-              setSelectedDetailItem(null);
-              setSelectedCollegeId(null);
-              setPubListCollegeId(null);
-              setSheetMode("LIST");
-              setSheetSnap("PEEK");
+              startTransition(() => {
+                setSelectedDate(date);
+                setSelectedMapItem(null);
+                setSelectedDetailItem(null);
+                setSelectedCollegeId(null);
+                setPubListCollegeId(null);
+                setSheetMode("LIST");
+                setSheetSnap("PEEK");
+              });
             }}
           />
 
@@ -507,12 +552,14 @@ export default function BoothMap() {
                 colleges={colleges}
                 selectedCollegeId={selectedCollegeId}
                 onSelect={(idOrNull) => {
-                  setSelectedCollegeId(idOrNull);
-                  setPubListCollegeId(idOrNull);
-                  setSelectedMapItem(idOrNull ? { kind: "college", id: idOrNull } : null);
-                  setSelectedDetailItem(null);
-                  setSheetMode("LIST");
-                  setSheetSnap(idOrNull ? "HALF" : "PEEK");
+                  startTransition(() => {
+                    setSelectedCollegeId(idOrNull);
+                    setPubListCollegeId(idOrNull);
+                    setSelectedMapItem(idOrNull ? { kind: "college", id: idOrNull } : null);
+                    setSelectedDetailItem(null);
+                    setSheetMode("LIST");
+                    setSheetSnap(idOrNull ? "HALF" : "PEEK");
+                  });
                 }}
               />
             </div>
@@ -533,7 +580,7 @@ export default function BoothMap() {
         ) : sheetMode === "LIST" ? (
           shouldShowPubList ? (
             <PubList
-              pubs={visiblePubs}
+              pubs={deferredVisiblePubs}
               selectedCollegeId={
                 primaryFilter === "PUB"
                   ? (selectedCollegeId ?? pubListCollegeId)
@@ -543,7 +590,7 @@ export default function BoothMap() {
             />
           ) : (
             <BoothList
-              booths={visibleBooths}
+              booths={deferredVisibleBooths}
               boothDetailAvailability={boothDetailAvailability}
               onSelectBooth={onSelectBoothFromList}
               onOpenBoothDetail={onOpenBoothDetailFromList}

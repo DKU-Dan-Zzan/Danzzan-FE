@@ -51,7 +51,7 @@ export function useTicketingFlow() {
 
   const [reserveProcessing, setReserveProcessing] = useState(false);
   const [reserveErrorMessage, setReserveErrorMessage] = useState<string | null>(null);
-  const [reserveMessage, setReserveMessage] = useState("입장 상태가 확인되어 예매를 진행하고 있습니다.");
+  const [reserveMessage, setReserveMessage] = useState("예매 요청을 처리하고 있습니다.");
   const [agreementChecked, setAgreementChecked] = useState(false);
   const [thirdPartyPrivacyConsentChecked, setThirdPartyPrivacyConsentChecked] = useState(false);
   const [reservationError, setReservationError] = useState<string | null>(null);
@@ -70,7 +70,7 @@ export function useTicketingFlow() {
     setSoldOutDescription(DEFAULT_SOLD_OUT_DESCRIPTION);
     setReserveProcessing(false);
     setReserveErrorMessage(null);
-    setReserveMessage("입장 상태가 확인되어 예매를 진행하고 있습니다.");
+    setReserveMessage("예매 요청을 처리하고 있습니다.");
     setAgreementChecked(false);
     setThirdPartyPrivacyConsentChecked(false);
     setReservationError(null);
@@ -374,7 +374,7 @@ export function useTicketingFlow() {
     setSoldOutDescription(DEFAULT_SOLD_OUT_DESCRIPTION);
     setReserveProcessing(false);
     setReserveErrorMessage(null);
-    setReserveMessage("입장 상태가 확인되어 예매를 진행하고 있습니다.");
+    setReserveMessage("예매 요청을 처리하고 있습니다.");
     setAgreementChecked(false);
     setThirdPartyPrivacyConsentChecked(false);
     setReservationError(null);

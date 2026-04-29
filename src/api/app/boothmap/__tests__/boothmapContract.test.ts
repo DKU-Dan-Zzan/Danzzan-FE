@@ -84,6 +84,7 @@ describe("boothmapContract", () => {
       description: "설명",
       imageUrl: null,
       thumbnailUrl: null,
+      operationStatus: null,
       startTime: "11:00",
       endTime: "17:00",
     });
@@ -176,5 +177,24 @@ describe("boothmapContract", () => {
     );
 
     expect(parsed.booths[0]?.subType).toBe("SMOKING_AREA");
+  });
+
+  it("푸드트럭 부스는 location이 없어도 0으로 보정한다", () => {
+    const parsed = parseBoothMapContract(
+      {
+        colleges: [],
+        booths: [
+          {
+            boothId: 12,
+            name: "푸드트럭 B",
+            type: "FOOD_TRUCK",
+          },
+        ],
+      },
+      "/map/booth-map",
+    );
+
+    expect(parsed.booths[0]?.locationX).toBe(0);
+    expect(parsed.booths[0]?.locationY).toBe(0);
   });
 });

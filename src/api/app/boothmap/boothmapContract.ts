@@ -1,6 +1,6 @@
 // 역할: boothmap contract 응답 스키마를 검증하고 도메인 형태로 정규화한다.
 
-import type { BoothSubType, BoothType } from "@/types/app/boothmap/boothmap.types";
+import type { BoothOperationStatus, BoothSubType, BoothType } from "@/types/app/boothmap/boothmap.types";
 
 type RecordLike = Record<string, unknown>;
 
@@ -17,6 +17,8 @@ const BOOTH_SUB_TYPE_VALUES: BoothSubType[] = [
   "SMOKING_AREA",
 ];
 const boothSubTypeSet = new Set<BoothSubType>(BOOTH_SUB_TYPE_VALUES);
+const BOOTH_OPERATION_STATUS_VALUES: BoothOperationStatus[] = ["OPEN", "CLOSED", "UNKNOWN"];
+const boothOperationStatusSet = new Set<BoothOperationStatus>(BOOTH_OPERATION_STATUS_VALUES);
 
 const isRecord = (value: unknown): value is RecordLike => {
   return Boolean(value) && typeof value === "object";
@@ -105,6 +107,27 @@ const parseBoothSubType = (
   return normalized;
 };
 
+const parseBoothOperationStatus = (
+  raw: unknown,
+  endpoint: string,
+  label: string,
+): BoothOperationStatus | null => {
+  if (raw === undefined || raw === null) {
+    return null;
+  }
+
+  if (typeof raw !== "string" || !raw.trim()) {
+    throw new BoothmapContractError(endpoint, `${label} operationStatus 값이 올바르지 않습니다.`);
+  }
+
+  const normalized = raw.trim().toUpperCase() as BoothOperationStatus;
+  if (!boothOperationStatusSet.has(normalized)) {
+    throw new BoothmapContractError(endpoint, `${label} operationStatus 값이 유효하지 않습니다. (${raw})`);
+  }
+
+  return normalized;
+};
+
 export class BoothmapContractError extends Error {
   readonly endpoint: string;
 
@@ -130,6 +153,7 @@ export type ContractBoothDto = {
   description: string | null;
   locationX: number;
   locationY: number;
+  operationStatus: BoothOperationStatus | null;
   startTime: string | null;
   endTime: string | null;
 };
@@ -145,6 +169,7 @@ export type ContractBoothSummaryResponse = {
   description: string | null;
   imageUrl: string | null;
   thumbnailUrl: string | null;
+  operationStatus: BoothOperationStatus | null;
   startTime: string | null;
   endTime: string | null;
 };
@@ -224,13 +249,16 @@ export const parseBoothMapContract = (payload: unknown, endpoint: string): Contr
     const description = readNullableString(item, "description");
     const locationX = readNumber(item, "locationX");
     const locationY = readNumber(item, "locationY");
+    const operationStatus = parseBoothOperationStatus(item.operationStatus, endpoint, `booths[${index}]`);
     const startTime = readNullableString(item, "startTime");
     const endTime = readNullableString(item, "endTime");
+    const normalizedLocationX = type === "FOOD_TRUCK" ? (locationX ?? 0) : locationX;
+    const normalizedLocationY = type === "FOOD_TRUCK" ? (locationY ?? 0) : locationY;
     if (
       boothId === undefined ||
       !name ||
-      locationX === undefined ||
-      locationY === undefined
+      normalizedLocationX === undefined ||
+      normalizedLocationY === undefined
     ) {
       throw new BoothmapContractError(endpoint, `booths[${index}] 필수 필드가 누락되었습니다.`);
     }
@@ -241,8 +269,9 @@ export const parseBoothMapContract = (payload: unknown, endpoint: string): Contr
       type,
       subType,
       description: description ?? null,
-      locationX,
-      locationY,
+      locationX: normalizedLocationX,
+      locationY: normalizedLocationY,
+      operationStatus,
       startTime: startTime ?? null,
       endTime: endTime ?? null,
     };
@@ -268,6 +297,7 @@ export const parseBoothSummaryContract = (
   const description = readNullableString(unwrapped, "description");
   const imageUrl = readNullableString(unwrapped, "imageUrl");
   const thumbnailUrl = readNullableString(unwrapped, "thumbnailUrl");
+  const operationStatus = parseBoothOperationStatus(unwrapped.operationStatus, endpoint, "booth");
   const startTime = readNullableString(unwrapped, "startTime");
   const endTime = readNullableString(unwrapped, "endTime");
   if (
@@ -287,6 +317,7 @@ export const parseBoothSummaryContract = (
     description,
     imageUrl,
     thumbnailUrl: thumbnailUrl ?? null,
+    operationStatus,
     startTime,
     endTime,
   };

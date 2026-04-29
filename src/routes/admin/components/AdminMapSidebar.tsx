@@ -1,7 +1,5 @@
-// 역할: 관리자 지도 편집 사이드바(날짜/모드/목록/선택정보) UI를 렌더링합니다.
 import { AlertCircle, Map, MapPin, School, Tent, Trash2 } from "lucide-react";
 import type { AdminMapBooth, AdminMapCollege } from "@/api/app/admin/adminMapApi";
-import { Switch } from "@/components/common/ui/switch";
 import { cn } from "@/components/common/ui/utils";
 import type { EditorMode, SelectedItem } from "@/routes/admin/adminMapTypes";
 
@@ -11,9 +9,6 @@ type AdminMapSidebarProps = {
   selectedDate: string;
   editorMode: EditorMode;
   statusMessage: string;
-  comingSoonOverlayEnabled: boolean;
-  comingSoonOverlaySaving: boolean;
-  unplacedBooths: AdminMapBooth[];
   colleges: AdminMapCollege[];
   selectedItem: SelectedItem;
   selectedBooth: AdminMapBooth | null;
@@ -22,8 +17,6 @@ type AdminMapSidebarProps = {
   onActivateBoothMode: () => void;
   onActivateCollegeMode: () => void;
   onClearSelection: () => void;
-  onToggleComingSoonOverlay: (enabled: boolean) => void;
-  onSelectBooth: (boothId: number) => void;
   onSelectCollege: (collegeId: number) => void;
   onClearBoothLocation: () => void;
 };
@@ -34,9 +27,6 @@ export const AdminMapSidebar = ({
   selectedDate,
   editorMode,
   statusMessage,
-  comingSoonOverlayEnabled,
-  comingSoonOverlaySaving,
-  unplacedBooths,
   colleges,
   selectedItem,
   selectedBooth,
@@ -45,8 +35,6 @@ export const AdminMapSidebar = ({
   onActivateBoothMode,
   onActivateCollegeMode,
   onClearSelection,
-  onToggleComingSoonOverlay,
-  onSelectBooth,
   onSelectCollege,
   onClearBoothLocation,
 }: AdminMapSidebarProps) => {
@@ -138,51 +126,7 @@ export const AdminMapSidebar = ({
         </div>
 
         <div className="mt-4 rounded-2xl bg-[var(--surface-subtle)] px-3 py-3 text-xs leading-5 text-[var(--text-muted)]">
-          {statusMessage || "왼쪽 목록에서 항목을 선택하면 편집 안내가 여기에 표시됩니다."}
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-[var(--border-base)] bg-white p-4 shadow-sm">
-        <h2 className="text-sm font-bold text-[var(--text)]">배치 안 된 부스</h2>
-        <p className="mt-1 text-xs text-[var(--text-muted)]">
-          먼저 선택한 뒤 지도에서 위치를 지정해 주세요.
-        </p>
-
-        <div className="mt-3 max-h-64 space-y-2 overflow-y-auto">
-          {unplacedBooths.length === 0 && (
-            <div className="rounded-2xl bg-[var(--surface-subtle)] px-3 py-4 text-center text-sm text-[var(--text-muted)]">
-              배치되지 않은 부스가 없습니다.
-            </div>
-          )}
-
-          {unplacedBooths.map((booth) => {
-            const isSelected =
-              selectedItem?.kind === "booth" && selectedItem.id === booth.id;
-
-            return (
-              <button
-                key={booth.id}
-                type="button"
-                onClick={() => onSelectBooth(booth.id)}
-                aria-label={`${booth.name} 선택`}
-                className={cn(
-                  "w-full rounded-2xl border px-3 py-3 text-left transition-colors",
-                  isSelected
-                    ? "border-[var(--accent)] bg-[var(--accent)]/10 ring-2 ring-[var(--accent)]/20"
-                    : "border-[var(--border-base)] bg-[var(--surface-subtle)] hover:bg-[var(--border-base)]",
-                )}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-semibold text-[var(--text)]">
-                    {booth.name}
-                  </span>
-                  <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-[var(--text-muted)]">
-                    {booth.type}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
+          {statusMessage || "왼쪽 목록에서 항목을 선택하면 편집 안내가 여기 표시됩니다."}
         </div>
       </section>
 
@@ -270,31 +214,6 @@ export const AdminMapSidebar = ({
         </div>
       </section>
 
-      <section className="rounded-2xl border border-[var(--border-base)] bg-white p-4 shadow-sm">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-sm font-bold text-[var(--text)]">타임테이블 Coming Soon</h2>
-            <p className="mt-1 text-xs leading-5 text-[var(--text-muted)]">
-              타임테이블 날짜 3개 영역 전체를 반투명 레이어로 덮고 중앙 문구를 노출합니다.
-            </p>
-          </div>
-
-          <Switch
-            checked={comingSoonOverlayEnabled}
-            disabled={comingSoonOverlaySaving}
-            aria-label="타임테이블 Coming Soon 오버레이 토글"
-            onCheckedChange={onToggleComingSoonOverlay}
-          />
-        </div>
-
-        <div className="mt-3 rounded-2xl bg-[var(--surface-subtle)] px-3 py-3 text-xs leading-5 text-[var(--text-muted)]">
-          {comingSoonOverlaySaving
-            ? "설정을 저장하는 중입니다."
-            : comingSoonOverlayEnabled
-              ? "현재 사용자 타임테이블 화면에 Coming Soon 오버레이가 표시됩니다."
-              : "현재 사용자 타임테이블 화면에는 Coming Soon 오버레이가 숨겨져 있습니다."}
-        </div>
-      </section>
     </aside>
   );
 };

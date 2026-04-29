@@ -60,6 +60,7 @@ function mapBoothDtoToBooth(dto: BoothDto): Booth {
     subType: dto.subType,
     location_x: dto.locationX,
     location_y: dto.locationY,
+    operationStatus: dto.operationStatus,
     startTime: dto.startTime,
     endTime: dto.endTime,
   };

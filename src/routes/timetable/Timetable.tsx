@@ -12,14 +12,9 @@ import ContentImageSection from "@/components/app/timetable/ContentImage"
 import DayTabs from "@/components/app/timetable/DayTabs"
 import Timeline from "@/components/app/timetable/Timeline"
 import { cn } from "@/components/common/ui/utils"
+import { FESTIVAL_DAYS } from "@/config/festivalDays"
 import { appQueryKeys, useAppQuery } from "@/lib/query"
-import type { FestivalDay, Performance } from "@/types/app/timetable/timetable.types"
-
-const FESTIVAL_DAYS: FestivalDay[] = [
-  { key: "DAY-1", label: "1일차", date: "2026-05-12" },
-  { key: "DAY-2", label: "2일차", date: "2026-05-13" },
-  { key: "DAY-3", label: "3일차", date: "2026-05-14" },
-]
+import type { Performance } from "@/types/app/timetable/timetable.types"
 
 function todayISODateLocal() {
   const d = new Date()
@@ -88,7 +83,6 @@ export default function Timetable() {
 
   const performancesQuery = useAppQuery({
     queryKey: appQueryKeys.timetablePerformances(activeDate),
-    enabled: !isDay1,
     queryFn: ({ signal }) => getPerformances(activeDate, { signal }),
     staleTime: 60_000,
   })
@@ -255,7 +249,7 @@ export default function Timetable() {
           </div>
 
           <div className="px-4 pb-4 pt-5">
-            {isDay1 ? (
+            {isDay1 && (
               <ContentImageSection
                 images={contentImages}
                 isLoading={isImageLoading}
@@ -267,7 +261,9 @@ export default function Timetable() {
                   void contentImagesQuery.refetch()
                 }}
               />
-            ) : isLoading ? (
+            )}
+            {isDay1 && <div className="h-4" />}
+            {isLoading ? (
               <div className="py-12 text-center text-[var(--timetable-empty-text)]">
                 공연 정보를 불러오는 중입니다...
               </div>
