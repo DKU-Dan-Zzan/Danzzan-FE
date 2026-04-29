@@ -10,9 +10,10 @@ import {
   LogOut,
   Ticket,
   User,
+  UserX,
 } from "lucide-react";
 import { cn } from "@/components/common/ui/utils";
-import { authLogout } from "@/api/app/auth/authApi";
+import { authLogout, withdrawUser } from "@/api/app/auth/authApi";
 import { studentProfileApi } from "@/api/app/auth/studentProfileApi";
 import { useMyTicketsQuery } from "@/hooks/ticketing/useMyTicketsQuery";
 import { authStore } from "@/store/common/authStore";
@@ -26,6 +27,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/common/ui/alert-dialog";
+import { Checkbox } from "@/components/common/ui/checkbox";
+
+type WithdrawStep = "ticket-waiver" | "final";
 
 const FAQ_ITEMS = [
   {
@@ -119,17 +123,27 @@ function ListRow({
   value,
   onClick,
   showArrow = false,
+  iconClassName,
+  labelClassName,
 }: {
   icon?: React.ReactNode;
   label: string;
   value?: string;
   onClick?: () => void;
   showArrow?: boolean;
+  iconClassName?: string;
+  labelClassName?: string;
 }) {
   const content = (
     <div className="flex min-h-[44px] items-center gap-3.5 px-5 py-2">
-      {icon && <span className="shrink-0 text-[var(--mypage-list-item-icon)]">{icon}</span>}
-      <span className="flex-1 text-[15px] text-[var(--mypage-list-item-text)]">{label}</span>
+      {icon && (
+        <span className={cn("shrink-0 text-[var(--mypage-list-item-icon)]", iconClassName)}>
+          {icon}
+        </span>
+      )}
+      <span className={cn("flex-1 text-[15px] text-[var(--mypage-list-item-text)]", labelClassName)}>
+        {label}
+      </span>
       {value && <span className="text-[14px] text-[var(--mypage-list-item-value)]">{value}</span>}
       {showArrow && <ChevronRight size={16} className="shrink-0 text-[var(--mypage-list-arrow)]" />}
     </div>
@@ -157,6 +171,11 @@ function MyPage() {
   const isLoggedIn = !!session.tokens?.accessToken && session.role === "student";
   const user = session.user;
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const [withdrawConfirmOpen, setWithdrawConfirmOpen] = useState(false);
+  const [withdrawStep, setWithdrawStep] = useState<WithdrawStep>("ticket-waiver");
+  const [withdrawTicketWaiverAgreed, setWithdrawTicketWaiverAgreed] = useState(false);
+  const [withdrawError, setWithdrawError] = useState<string | null>(null);
+  const [withdrawing, setWithdrawing] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -262,6 +281,45 @@ function MyPage() {
     void authLogout();
     authStore.clear();
     navigate("/ticket/login", { replace: true });
+  };
+
+  const resetWithdrawDialog = () => {
+    setWithdrawStep("ticket-waiver");
+    setWithdrawTicketWaiverAgreed(false);
+    setWithdrawError(null);
+  };
+
+  const openWithdrawDialog = () => {
+    resetWithdrawDialog();
+    setWithdrawConfirmOpen(true);
+  };
+
+  const handleWithdrawOpenChange = (open: boolean) => {
+    if (withdrawing) return;
+    setWithdrawConfirmOpen(open);
+    if (!open) {
+      resetWithdrawDialog();
+    }
+  };
+
+  const handleWithdrawConfirm = async () => {
+    const accessToken = session.tokens?.accessToken;
+    if (!accessToken || withdrawing) return;
+
+    setWithdrawing(true);
+    setWithdrawError(null);
+
+    try {
+      await withdrawUser(accessToken);
+      setWithdrawConfirmOpen(false);
+      resetWithdrawDialog();
+      authStore.clear();
+      navigate("/ticket/login", { replace: true });
+    } catch {
+      setWithdrawError("회원 탈퇴 처리에 실패했어요. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setWithdrawing(false);
+    }
   };
 
   const tickets = ticketsQuery.data ?? [];
@@ -370,6 +428,13 @@ function MyPage() {
           onClick={() => setLogoutConfirmOpen(true)}
           showArrow
         />
+        <ListRow
+          icon={<UserX size={18} />}
+          label="회원 탈퇴"
+          onClick={openWithdrawDialog}
+          iconClassName="text-[var(--mypage-withdraw-text)]"
+          labelClassName="text-[var(--mypage-withdraw-text)]"
+        />
       </SectionCard>
       <div className="h-4" />
 
@@ -392,6 +457,82 @@ function MyPage() {
             >
               로그아웃
             </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={withdrawConfirmOpen} onOpenChange={handleWithdrawOpenChange}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            {withdrawStep === "final" ? (
+              <>
+                <AlertDialogTitle>정말 탈퇴할까요?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  계정 정보가 삭제되고 다시 로그인할 수 없어요.
+                </AlertDialogDescription>
+              </>
+            ) : (
+              <>
+                <AlertDialogTitle>보유 티켓 권한 포기 동의</AlertDialogTitle>
+                <AlertDialogDescription>
+                  탈퇴하면 보유 중인 미사용 티켓은 즉시 권리포기 처리돼요.
+                  권리포기된 티켓은 사용할 수 없고 복구되지 않아요.
+                </AlertDialogDescription>
+              </>
+            )}
+          </AlertDialogHeader>
+          {withdrawStep === "ticket-waiver" && (
+            <label
+              htmlFor="withdraw-ticket-waiver"
+              className="flex items-start gap-3 rounded-[10px] border border-red-100 bg-red-50/70 px-3 py-3 text-[13px] leading-[1.5] text-red-700"
+            >
+              <Checkbox
+                id="withdraw-ticket-waiver"
+                checked={withdrawTicketWaiverAgreed}
+                onCheckedChange={(checked) => setWithdrawTicketWaiverAgreed(checked === true)}
+                className="mt-0.5 shrink-0 border-red-300 data-[state=checked]:border-red-600 data-[state=checked]:bg-red-600"
+              />
+              <span>보유 티켓이 사라지는 것에 동의합니다.</span>
+            </label>
+          )}
+          {withdrawError && (
+            <p className="rounded-[8px] bg-red-50 px-3 py-2 text-[13px] leading-[1.5] text-red-600">
+              {withdrawError}
+            </p>
+          )}
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={withdrawing}>취소</AlertDialogCancel>
+            {withdrawStep === "final" ? (
+              <AlertDialogAction
+                disabled={withdrawing}
+                className="bg-red-600 text-white hover:bg-red-600 hover:brightness-95 disabled:opacity-60"
+                style={{
+                  backgroundImage: "none",
+                  boxShadow: "none",
+                }}
+                onClick={(event) => {
+                  event.preventDefault();
+                  void handleWithdrawConfirm();
+                }}
+              >
+                {withdrawing ? "처리 중" : "탈퇴하기"}
+              </AlertDialogAction>
+            ) : (
+              <AlertDialogAction
+                disabled={!withdrawTicketWaiverAgreed || withdrawing}
+                className="bg-red-600 text-white hover:bg-red-600 hover:brightness-95 disabled:opacity-60"
+                style={{
+                  backgroundImage: "none",
+                  boxShadow: "none",
+                }}
+                onClick={(event) => {
+                  event.preventDefault();
+                  setWithdrawStep("final");
+                }}
+              >
+                다음
+              </AlertDialogAction>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

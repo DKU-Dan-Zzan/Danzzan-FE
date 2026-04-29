@@ -44,6 +44,7 @@ const MyPage = lazyWithPreload(() => import("./routes/mypage/MyPage"));
 const Admin = lazy(() => import("./routes/admin/Admin"));
 const AdminLogin = lazy(() => import("./routes/admin/AdminLogin"));
 const AdminMap = lazy(() => import("./routes/admin/AdminMap"));
+const NotFoundPage = lazy(() => import("./routes/not-found/NotFoundPage"));
 const ROUTE_WARMUP_FALLBACK_DELAY_MS = 160;
 const ROUTE_WARMUP_IDLE_TIMEOUT_MS = 1400;
 
@@ -182,6 +183,7 @@ function App() {
         <Route path="/timetable" element={<Timetable />} />
         <Route path="/map" element={withRouteSuspense(<BoothMap />)} />
         <Route path="/mypage" element={withRouteSuspense(<MyPage />)} />
+        <Route path="*" element={withRouteSuspense(<NotFoundPage />)} />
       </Route>
 
       {/* admin: 헤더/바텀네비 미적용 */}

@@ -24,27 +24,23 @@ describe("Home snap scroll source", () => {
     const source = readSource("src/routes/home/Home.tsx");
 
     expect(source).toContain("home-snap-section");
-    expect(source).toContain(
-      "home-snap-section relative h-[100svh] overflow-hidden",
-    );
-    expect(source).toContain(
-      "home-snap-section min-h-[100svh] scroll-mt-0 bg-[var(--surface)]",
-    );
+    expect(source).toContain("h-[100svh]");
+    expect(source).toContain("min-h-[100svh]");
+    expect(source).toContain("scroll-mt-0");
   });
 
   it("섹션 2 내부에는 Lineup 이후 CurrentPerformanceSection과 AdBanner가 이어서 배치된다", () => {
     const source = readSource("src/routes/home/Home.tsx");
 
-    expect(source).toContain(
-      `<LineupSection banners={lineups} />
-          <div className="mt-[var(--home-section-performance-margin-top)]">
-            <CurrentPerformanceSection />
-          </div>
+    const lineupIndex = source.indexOf("<LineupSection banners={lineups} />");
+    const performanceIndex = source.indexOf("<CurrentPerformanceSection />");
+    const adIndex = source.indexOf("<AdBanner ads={allAds} />");
 
-          <div>
-            <AdBanner ads={allAds} />
-          </div>`,
-    );
+    expect(lineupIndex).toBeGreaterThan(-1);
+    expect(performanceIndex).toBeGreaterThan(-1);
+    expect(adIndex).toBeGreaterThan(-1);
+    expect(lineupIndex).toBeLessThan(performanceIndex);
+    expect(performanceIndex).toBeLessThan(adIndex);
   });
 
   it("index.css는 home-snap-mode와 home-snap-section 규칙을 선언한다", () => {

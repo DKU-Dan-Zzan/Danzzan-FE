@@ -3,8 +3,11 @@ import type { AuthLoginResponseDto } from "@/types/ticketing/dto/auth.dto";
 import type { AuthSession, AuthTokens, AuthUser } from "@/types/ticketing/model/auth.model";
 
 const mapUserRole = (role?: string): AuthUser["role"] => {
-  if (role === "student" || role === "admin") {
-    return role;
+  if (role === "student" || role === "ROLE_USER" || role === "user") {
+    return "student";
+  }
+  if (role === "admin" || role === "ROLE_ADMIN") {
+    return "admin";
   }
   return "unknown";
 };

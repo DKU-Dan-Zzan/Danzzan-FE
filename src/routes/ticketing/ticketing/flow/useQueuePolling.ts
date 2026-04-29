@@ -39,7 +39,7 @@ export const useQueuePolling = ({
 }: UseQueuePollingParams) => {
   const pollBackoffRef = useRef(0);
   const queuePositionRef = useRef(queuePosition);
-  const restoreAttemptedRef = useRef(false);
+  const restoredEventIdRef = useRef<string | null>(null);
   const wasOnlineRef = useRef(isNetworkOnline);
 
   useEffect(() => {
@@ -80,14 +80,19 @@ export const useQueuePolling = ({
   }, [isNetworkOnline, setWaitingError, setWaitingPolling, step, waitingError]);
 
   useEffect(() => {
-    if (restoreAttemptedRef.current) {
-      return;
-    }
-    restoreAttemptedRef.current = true;
-
     if (!activeEventId) {
+      restoredEventIdRef.current = null;
       return;
     }
+
+    if (step !== "home" && step !== "waiting") {
+      return;
+    }
+
+    if (restoredEventIdRef.current === activeEventId) {
+      return;
+    }
+    restoredEventIdRef.current = activeEventId;
 
     if (!isNetworkOnline) {
       setQueueStatus("WAITING");
@@ -109,6 +114,7 @@ export const useQueuePolling = ({
     setStep,
     setWaitingError,
     setWaitingPolling,
+    step,
   ]);
 
   useEffect(() => {
