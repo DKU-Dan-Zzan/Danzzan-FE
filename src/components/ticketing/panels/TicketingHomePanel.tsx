@@ -121,10 +121,10 @@ export function TicketingHomePanel({
                   <ActionIcon className="h-[30px] w-[30px] text-[var(--ticketing-quick-action-icon)]" strokeWidth={action.iconStrokeWidth} />
                 </div>
                 <div className="flex min-h-[56px] flex-col justify-center">
-                  <h2 className={`${TICKETING_CLASSES.typography.cardTitle} text-[var(--text)]`}>
+                  <h2 className={`${TICKETING_CLASSES.typography.cardTitle} text-[var(--ticketing-quick-action-text)]`}>
                     {action.title}
                   </h2>
-                  <p className={`mt-1 ${TICKETING_CLASSES.typography.heroDescription} font-normal text-[var(--text-muted)]`}>
+                  <p className={`mt-1 ${TICKETING_CLASSES.typography.heroDescription} font-normal text-[var(--ticketing-quick-action-text)] opacity-70`}>
                     {action.description}
                   </p>
                 </div>
@@ -139,7 +139,7 @@ export function TicketingHomePanel({
       })}
 
       <Card className={`${APP_CARD_VARIANTS.gradWhite} rounded-[24px] p-5`}>
-        <h3 className={`flex items-center gap-2 ${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--text)]`}>
+        <h3 className={`flex items-center gap-2 ${TICKETING_CLASSES.typography.cardSubtitle} font-extrabold text-[var(--text)]`}>
           <ClipboardList className="h-[17px] w-[17px] text-[var(--text-muted)]" strokeWidth={2.1} />
           티켓 예매 이용 가이드
         </h3>
@@ -162,7 +162,7 @@ export function TicketingHomePanel({
                   {item.step}
                 </div>
                 <div>
-                  <p className={`${TICKETING_CLASSES.typography.heroDescription} text-[17px] leading-6 font-bold text-[var(--text)] md:text-[18px]`}>
+                  <p className={`${TICKETING_CLASSES.typography.heroDescription} text-[17px] leading-6 font-extrabold text-[var(--text)] md:text-[18px]`}>
                     {item.title}
                   </p>
                   <p className={`mt-1 ${TICKETING_CLASSES.typography.sectionBody} text-[var(--text-muted)] opacity-60`}>

@@ -295,7 +295,13 @@ function Notice() {
         })()}
       </section>
 
-      <AdBanner ads={allAds} marginTopClassName="mt-4" />
+      {/* 고정 배너 높이만큼 하단 여백 확보 */}
+      <div className="h-[70px] shrink-0" />
+
+      {/* 네비바 바로 위 고정 광고 배너 */}
+      <div className="fixed inset-x-0 bottom-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))] z-40 mx-auto max-w-[var(--app-mobile-shell-max-width)]">
+        <AdBanner ads={allAds} marginTopClassName="mt-0" />
+      </div>
 
       {/* 상세 보기 패널 */}
       <Dialog

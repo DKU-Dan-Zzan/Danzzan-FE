@@ -48,9 +48,9 @@ export function MyTicketListPanel({
           boxShadow: "0 2px 12px rgba(28,43,106,0.07)",
         }}
       >
-        <div className="flex items-center gap-2.5">
-          <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(28,43,106,0.08)", color: "var(--poster-navy)" }}>
-            <TicketCheck className="h-3.5 w-3.5" />
+        <div className="flex items-center gap-3">
+          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(28,43,106,0.08)", color: "var(--poster-navy)" }}>
+            <TicketCheck className="h-5 w-5" />
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-semibold" style={{ color: "rgba(28,43,106,0.5)" }}>
@@ -83,7 +83,7 @@ export function MyTicketListPanel({
           <p className="text-[0.6rem] font-bold tracking-[0.15em]" style={{ color: "rgba(28,43,106,0.4)" }}>TICKET HOLDER</p>
           <p className="text-[11px] font-medium" style={{ color: "rgba(28,43,106,0.4)" }}>티켓 소지자 정보</p>
         </div>
-        <dl className="mt-2 grid grid-cols-[2.5rem_1fr] gap-x-2 gap-y-1.5 text-[13px]">
+        <dl className="mt-2 grid grid-cols-[52px_1fr] gap-y-1.5 text-[13px]">
           <dt className="font-medium" style={{ color: "rgba(28,43,106,0.45)" }}>학번</dt>
           <dd className="font-extrabold tracking-tight" style={{ color: "var(--poster-navy)" }}>{student.studentId}</dd>
           <dt className="font-medium" style={{ color: "rgba(28,43,106,0.45)" }}>이름</dt>
