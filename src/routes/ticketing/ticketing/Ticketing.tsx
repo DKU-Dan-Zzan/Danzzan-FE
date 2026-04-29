@@ -66,10 +66,8 @@ export default function Ticketing() {
     return (
       <ReservationProcessingPanel
         processing={flow.reserveProcessing}
-        message={flow.reserveMessage}
         errorMessage={flow.reserveErrorMessage}
         onRetry={flow.retryReserve}
-        onBackToList={flow.backToList}
       />
     );
   }

@@ -124,7 +124,7 @@ export const useReservationAction = ({
     setStep("reserving");
     setReserveProcessing(true);
     setReserveErrorMessage(null);
-    setReserveMessage("입장 상태가 확인되어 예매를 진행하고 있습니다.");
+    setReserveMessage("예매 요청을 처리하고 있습니다.");
     setReservationError(null);
 
     try {
