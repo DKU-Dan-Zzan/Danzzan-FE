@@ -1,7 +1,7 @@
 // 역할: 발급된 티켓 목록과 빈 상태/오류 상태를 보여주는 내 티켓 패널을 렌더링합니다.
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
-import { Megaphone, TicketCheck } from "lucide-react";
+import { Megaphone, Ticket as TicketIcon } from "lucide-react";
 import { PaperTicketCard } from "@/components/ticketing/panels/PaperTicketCard";
 import { TicketingAdBannerCard } from "@/components/ticketing/panels/TicketingAdBannerCard";
 import {
@@ -48,9 +48,9 @@ export function MyTicketListPanel({
           boxShadow: "0 2px 12px rgba(28,43,106,0.07)",
         }}
       >
-        <div className="flex items-center gap-2.5">
-          <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(28,43,106,0.08)", color: "var(--poster-navy)" }}>
-            <TicketCheck className="h-3.5 w-3.5" />
+        <div className="flex items-center gap-3">
+          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(28,43,106,0.08)", color: "var(--poster-navy)" }}>
+            <TicketIcon className="h-5 w-5" />
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-semibold" style={{ color: "rgba(28,43,106,0.5)" }}>
@@ -83,7 +83,7 @@ export function MyTicketListPanel({
           <p className="text-[0.6rem] font-bold tracking-[0.15em]" style={{ color: "rgba(28,43,106,0.4)" }}>TICKET HOLDER</p>
           <p className="text-[11px] font-medium" style={{ color: "rgba(28,43,106,0.4)" }}>티켓 소지자 정보</p>
         </div>
-        <dl className="mt-2 grid grid-cols-[2.5rem_1fr] gap-x-2 gap-y-1.5 text-[13px]">
+        <dl className="mt-2 grid grid-cols-[52px_1fr] gap-y-1.5 text-[13px]">
           <dt className="font-medium" style={{ color: "rgba(28,43,106,0.45)" }}>학번</dt>
           <dd className="font-extrabold tracking-tight" style={{ color: "var(--poster-navy)" }}>{student.studentId}</dd>
           <dt className="font-medium" style={{ color: "rgba(28,43,106,0.45)" }}>이름</dt>
@@ -150,8 +150,8 @@ export function MyTicketListPanel({
         </Card>
       )}
 
-      {/* 고정 배너 높이(70px) 만큼 하단 여백 확보 */}
-      <div className="h-[70px] shrink-0" />
+      {/* 홈과 동일한 9:2 배너 높이만큼 하단 여백 확보 */}
+      <div className="h-[var(--app-ad-banner-height)] shrink-0" />
 
       {/* 네비바 바로 위 고정 광고 배너 — 기기 무관 */}
       <div className="fixed inset-x-0 bottom-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))] z-40 mx-auto max-w-[var(--app-mobile-shell-max-width)]">
