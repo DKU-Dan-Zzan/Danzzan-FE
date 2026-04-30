@@ -139,7 +139,7 @@ export function TicketingHomePanel({
       })}
 
       <Card className={`${APP_CARD_VARIANTS.gradWhite} rounded-[24px] p-5`}>
-        <h3 className={`flex items-center gap-2 ${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--text)]`}>
+        <h3 className={`flex items-center gap-2 ${TICKETING_CLASSES.typography.cardSubtitle} !font-extrabold text-[var(--text)]`}>
           <ClipboardList className="h-[17px] w-[17px] text-[var(--text-muted)]" strokeWidth={2.1} />
           티켓 예매 이용 가이드
         </h3>

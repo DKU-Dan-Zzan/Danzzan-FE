@@ -1,7 +1,7 @@
 // 역할: 발급된 티켓 목록과 빈 상태/오류 상태를 보여주는 내 티켓 패널을 렌더링합니다.
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
-import { Megaphone, TicketCheck } from "lucide-react";
+import { Megaphone, Ticket } from "lucide-react";
 import { PaperTicketCard } from "@/components/ticketing/panels/PaperTicketCard";
 import { TicketingAdBannerCard } from "@/components/ticketing/panels/TicketingAdBannerCard";
 import {
@@ -50,7 +50,7 @@ export function MyTicketListPanel({
       >
         <div className="flex items-center gap-2.5">
           <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(28,43,106,0.08)", color: "var(--poster-navy)" }}>
-            <TicketCheck className="h-3.5 w-3.5" />
+            <Ticket className="h-3.5 w-3.5" />
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-semibold" style={{ color: "rgba(28,43,106,0.5)" }}>
