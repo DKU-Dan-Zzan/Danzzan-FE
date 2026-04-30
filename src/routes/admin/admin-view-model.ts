@@ -1,4 +1,5 @@
 // 역할: 관리자 공지/광고 화면에서 공유하는 폼 상태와 표시용 변환 모델을 정의합니다.
+import type { AdvertisementPlacement } from "@/api/app/admin/adminApi";
 
 export type NoticeAuthor = "개발팀" | "총학생회";
 
@@ -13,8 +14,11 @@ export type NoticeFormState = {
 };
 
 export type AdFormState = {
+  id?: number;
   title: string;
   imageUrl: string;
+  linkUrl: string;
+  placement: AdvertisementPlacement;
 };
 
 export const formatDate = (dateString: string): string => {
