@@ -194,7 +194,13 @@ export default function BoothMap() {
       setSelectedMapItem(null);
       setSelectedDetailItem(null);
       setSheetMode("LIST");
-      setSheetSnap(next === "FOOD_TRUCK" ? "HALF" : "PEEK");
+      setSheetSnap(
+        next === "FOOD_TRUCK" ||
+          next === "EXPERIENCE" ||
+          next === "EVENT"
+          ? "HALF"
+          : "PEEK",
+      );
       setPubListCollegeId(null);
 
       if (next !== "PUB") {
@@ -427,7 +433,11 @@ export default function BoothMap() {
 
   const onChangePrimaryFilterFromMap = useCallback((next: PrimaryFilter) => {
     handlePrimaryChange(next);
-    if (next === "FOOD_TRUCK") {
+    if (
+      next === "FOOD_TRUCK" ||
+      next === "EXPERIENCE" ||
+      next === "EVENT"
+    ) {
       setSheetMode("LIST");
       setSheetSnap("HALF");
     }
