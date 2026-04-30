@@ -2,12 +2,15 @@
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import {
+  type AdvertisementResponse,
   createAdminAd,
   deleteAdminAdById,
   getAdminAdImageUpload,
+  updateAdminAdById,
 } from "@/api/app/admin/adminApi";
 import {
   buildAdPayload,
+  createEmptyAdForm,
   createUploadFailureMessage,
   uploadToPresignedUrl,
   validateAdPayload,
@@ -29,9 +32,22 @@ export const useAdminAdActions = ({
 }: UseAdminAdActionsParams) => {
   const [editingAd, setEditingAd] = useState<AdFormState | null>(null);
   const [adImageUploading, setAdImageUploading] = useState(false);
+  const [adSubmitting, setAdSubmitting] = useState(false);
 
   const openAddAdDialog = () => {
-    setEditingAd({ title: "", imageUrl: "" });
+    setGlobalError(null);
+    setEditingAd(createEmptyAdForm());
+  };
+
+  const openEditAdDialog = (ad: AdvertisementResponse) => {
+    setGlobalError(null);
+    setEditingAd({
+      id: ad.id,
+      title: ad.title,
+      imageUrl: ad.imageUrl,
+      linkUrl: ad.linkUrl ?? "",
+      placement: ad.placement,
+    });
   };
 
   const handleDeleteAdById = async (id: number) => {
@@ -63,17 +79,29 @@ export const useAdminAdActions = ({
 
     if (validationMessage) {
       setGlobalError(validationMessage);
+      toast.error(validationMessage);
       return;
     }
 
     try {
+      setAdSubmitting(true);
       setGlobalError(null);
-      await createAdminAd(payload);
+      let isEditMode = false;
+      if (typeof editingAd.id === "number") {
+        isEditMode = true;
+        await updateAdminAdById(editingAd.id, payload);
+      } else {
+        await createAdminAd(payload);
+      }
       setEditingAd(null);
       await reloadAds();
-      toast.success("광고 이미지를 등록했습니다.");
+      toast.success(isEditMode ? "광고를 수정했습니다." : "광고 이미지를 등록했습니다.");
     } catch (error) {
-      setGlobalError(error instanceof Error ? error.message : "광고를 저장하지 못했습니다.");
+      const message = error instanceof Error ? error.message : "광고를 저장하지 못했습니다.";
+      setGlobalError(message);
+      toast.error(message);
+    } finally {
+      setAdSubmitting(false);
     }
   };
 
@@ -123,7 +151,9 @@ export const useAdminAdActions = ({
     editingAd,
     setEditingAd,
     adImageUploading,
+    adSubmitting,
     openAddAdDialog,
+    openEditAdDialog,
     handleDeleteAdById,
     handleSubmitAd,
     handleUploadAdImage,
