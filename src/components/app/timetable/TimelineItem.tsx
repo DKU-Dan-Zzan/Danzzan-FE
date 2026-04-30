@@ -50,7 +50,7 @@ export default function TimelineItem({
         </div>
 
         {/* 타임라인: 점 + 긴 점선 */}
-        <div className="col-start-2 row-span-2 row-start-1 flex w-[24px] shrink-0 flex-col items-center self-stretch">
+        <div className="col-start-2 row-span-2 row-start-1 ml-2 flex w-[24px] shrink-0 flex-col items-center self-stretch">
           <div className="flex h-11 w-full shrink-0 items-center justify-center">
             <div
               className="relative z-[1] h-3.5 w-3.5 shrink-0 rounded-full ring-[3px] ring-[color:color-mix(in_srgb,var(--timetable-v2-accent)_14%,white)]"

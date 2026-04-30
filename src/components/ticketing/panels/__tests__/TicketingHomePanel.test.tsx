@@ -12,6 +12,6 @@ describe("TicketingHomePanel", () => {
       />,
     );
 
-    expect(markup).toContain("h-[30px] w-[30px] text-[var(--ticketing-quick-action-icon)]");
+    expect(markup).toContain("h-[30px] w-[30px] text-[var(--text)]");
   });
 });
