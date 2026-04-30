@@ -158,6 +158,7 @@ function Admin() {
     adImageUploading,
     adSubmitting,
     openAddAdDialog,
+    openEditAdDialog,
     handleDeleteAdById,
     handleSubmitAd,
     handleUploadAdImage,
@@ -611,25 +612,51 @@ function Admin() {
               {allAds.map((ad) => (
                 <div
                   key={ad.id}
-                  className="group relative overflow-hidden rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)]"
+                  className="overflow-hidden rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)]"
                 >
                   <img
                     src={ad.imageUrl}
                     alt={ad.title}
                     className="h-[70px] w-full object-cover"
                   />
-                  <div className="absolute inset-0 flex items-start justify-end bg-gradient-to-b from-black/30 to-transparent p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
-                    <button
-                      type="button"
-                      onClick={() => void handleDeleteAdById(ad.id)}
-                      aria-label="광고 이미지 삭제"
-                      className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--status-danger)] text-[var(--text-on-accent)] shadow-md"
-                    >
-                      <Trash2 className="h-3 w-3" strokeWidth={2.5} />
-                    </button>
-                  </div>
-                  <div className="px-2 pb-1 pt-0.5">
-                    <p className="truncate text-[10px] text-[var(--text-muted)]">{ad.title}</p>
+                  <div className="space-y-2 px-2.5 pb-2.5 pt-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="truncate text-xs font-semibold text-[var(--text)]">{ad.title}</p>
+                      <span
+                        className={cn(
+                          "inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                          ad.linkUrl
+                            ? "bg-[var(--status-success-bg)] text-[var(--status-success-text)]"
+                            : "bg-[var(--surface-subtle)] text-[var(--text-muted)]",
+                        )}
+                      >
+                        {ad.linkUrl ? "링크 ON" : "링크 OFF"}
+                      </span>
+                    </div>
+                    <p className="truncate text-[10px] text-[var(--text-muted)]/90">
+                      {ad.linkUrl ? "클릭 시 외부 페이지로 이동" : "클릭 동작 없음"}
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-1.5 border-t border-[var(--border-base)]/80 pt-1.5">
+                      <button
+                        type="button"
+                        onClick={() => openEditAdDialog(ad)}
+                        aria-label="광고 정보 수정"
+                        className="inline-flex h-8 w-full items-center justify-center gap-1 rounded-lg border border-[var(--accent)] bg-[var(--surface)] px-2 text-[11px] font-semibold text-[var(--accent)] shadow-sm hover:bg-[var(--accent)]/10"
+                      >
+                        <Pencil className="h-3 w-3" strokeWidth={2.5} />
+                        편집
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void handleDeleteAdById(ad.id)}
+                        aria-label="광고 이미지 삭제"
+                        className="inline-flex h-8 w-full items-center justify-center gap-1 rounded-lg bg-[var(--status-danger)] px-2 text-[11px] font-semibold text-[var(--text-on-accent)] shadow-sm hover:brightness-95"
+                      >
+                        <Trash2 className="h-3 w-3" strokeWidth={2.5} />
+                        삭제
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
