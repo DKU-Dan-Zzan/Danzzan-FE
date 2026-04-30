@@ -156,6 +156,7 @@ function Admin() {
     editingAd,
     setEditingAd,
     adImageUploading,
+    adSubmitting,
     openAddAdDialog,
     handleDeleteAdById,
     handleSubmitAd,
@@ -886,7 +887,7 @@ function Admin() {
         {editingAd && (
           <DialogContent className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-[var(--surface)] p-5 shadow-xl">
             <DialogTitle className="text-sm font-bold text-[var(--text)]">
-              광고 이미지 추가
+              {editingAd.id ? "광고 이미지 수정" : "광고 이미지 추가"}
             </DialogTitle>
             <form className="mt-4 space-y-4" onSubmit={handleSubmitAd}>
               {/* 제목 입력 */}
@@ -909,6 +910,29 @@ function Admin() {
                   )}
                   required
                 />
+              </div>
+
+              {/* 랜딩 URL 입력 */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-[var(--text)]">
+                  클릭 이동 URL <span className="text-[var(--text-muted)]">(선택)</span>
+                </label>
+                <input
+                  type="url"
+                  value={editingAd.linkUrl}
+                  onChange={(e) =>
+                    setEditingAd((prev) => prev ? { ...prev, linkUrl: e.target.value } : prev)
+                  }
+                  placeholder="https://example.com/landing"
+                  className={cn(
+                    "h-10 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 text-sm",
+                    ADMIN_FOCUS_VISIBLE_RING_CLASS,
+                    "focus-visible:border-[var(--accent)] focus-visible:ring-[var(--ring)]",
+                  )}
+                />
+                <p className="text-[11px] text-[var(--text-muted)]">
+                  미입력 시 배너 클릭 동작은 비활성화됩니다. HTTPS 주소만 허용됩니다.
+                </p>
               </div>
 
               {/* 이미지 업로드 */}
@@ -945,7 +969,7 @@ function Admin() {
                       type="file"
                       accept="image/jpeg,image/jpg,image/png,image/webp"
                       className="hidden"
-                      disabled={adImageUploading}
+                      disabled={adImageUploading || adSubmitting}
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
@@ -969,6 +993,11 @@ function Admin() {
               </div>
 
               <div className="space-y-2">
+                {globalError && (
+                  <p className="rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-[11px] text-[var(--status-danger-text)]">
+                    {globalError}
+                  </p>
+                )}
                 {(!editingAd.title.trim() || !editingAd.imageUrl) && (
                   <p className="text-right text-[11px] text-[var(--text-muted)]">
                     {!editingAd.title.trim() && !editingAd.imageUrl
@@ -982,16 +1011,25 @@ function Admin() {
                   <button
                     type="button"
                     onClick={() => setEditingAd(null)}
+                    disabled={adSubmitting}
                     className={ADMIN_SECONDARY_ACTION_BUTTON_CLASS}
                   >
                     취소
                   </button>
                   <button
                     type="submit"
-                    disabled={adImageUploading || !editingAd.imageUrl || !editingAd.title.trim()}
+                    disabled={adSubmitting || adImageUploading || !editingAd.imageUrl || !editingAd.title.trim()}
                     className={ADMIN_PRIMARY_ACTION_BUTTON_CLASS}
                   >
-                    {adImageUploading ? "업로드 중..." : "등록하기"}
+                    {adSubmitting
+                      ? editingAd.id
+                        ? "수정 중..."
+                        : "등록 중..."
+                      : adImageUploading
+                        ? "업로드 중..."
+                        : editingAd.id
+                          ? "수정하기"
+                          : "등록하기"}
                   </button>
                 </div>
               </div>
