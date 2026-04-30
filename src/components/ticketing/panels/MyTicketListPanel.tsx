@@ -150,8 +150,8 @@ export function MyTicketListPanel({
         </Card>
       )}
 
-      {/* 고정 배너 높이(70px) 만큼 하단 여백 확보 */}
-      <div className="h-[70px] shrink-0" />
+      {/* 홈과 동일한 9:2 배너 높이만큼 하단 여백 확보 */}
+      <div className="h-[var(--app-ad-banner-height)] shrink-0" />
 
       {/* 네비바 바로 위 고정 광고 배너 — 기기 무관 */}
       <div className="fixed inset-x-0 bottom-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))] z-40 mx-auto max-w-[var(--app-mobile-shell-max-width)]">

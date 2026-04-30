@@ -35,7 +35,8 @@ describe("TicketingAdBannerCard", () => {
 
     expect(markup).toContain("bg-[var(--home-ad-banner-bg)]");
     expect(markup).toContain("shadow-[var(--home-elevated-card-shadow)]");
-    expect(markup).toContain("h-[70px]");
+    expect(markup).toContain("aspect-[9/2]");
+    expect(markup).toContain("block h-full w-full object-cover");
     expect(markup).not.toContain("max-w-[var(--ticketing-ad-slot-max-width)]");
   });
 });
