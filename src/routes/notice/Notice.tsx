@@ -322,7 +322,7 @@ function Notice() {
               </button>
             </div>
 
-            <div className="h-[calc(66.67vh-52px)] overflow-y-auto px-5 py-4">
+            <div className="h-[calc(66.67vh-52px)] overflow-y-auto px-5 pt-4 pb-10">
               {detailLoading && (
                 <p className="py-6 text-center text-[12px] text-[var(--text-muted)]">
                   공지 상세를 불러오는 중입니다...
@@ -437,7 +437,7 @@ function Notice() {
                         <img
                           src={detailNotice.imageUrls?.[activeImageIndex]}
                           alt={detailNotice.title}
-                          className="max-h-60 w-full object-cover"
+                          className="h-auto w-full object-contain"
                         />
                         <div className="pointer-events-none absolute right-2 top-2 rounded-full bg-[var(--admin-dialog-overlay-bg)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-on-accent)]">
                           {activeImageIndex + 1} / {detailNotice.imageUrls?.length ?? 0}
@@ -467,7 +467,7 @@ function Notice() {
                       <img
                         src={detailNotice.thumbnailImageUrl}
                         alt={detailNotice.title}
-                        className="max-h-60 w-full object-cover"
+                        className="h-auto w-full object-contain"
                       />
                     </div>
                   ) : null}
