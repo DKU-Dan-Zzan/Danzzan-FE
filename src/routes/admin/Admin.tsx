@@ -585,7 +585,8 @@ function Admin() {
             <div>
               <h2 className="text-sm font-bold text-[var(--text)]">광고 배너 관리</h2>
               <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-                등록된 이미지가 홈 화면·내 티켓 화면에서 랜덤 순서로 5초마다 슬라이딩됩니다. 수량 제한 없음.
+                등록된 이미지가 홈 화면·공지사항·타임테이블·내 티켓 화면 하단에서 랜덤 순서로 5초마다
+                슬라이딩됩니다. 수량 제한 없음.
               </p>
             </div>
             <button
@@ -636,7 +637,7 @@ function Admin() {
 
           <div className="mt-4 space-y-1 text-[11px] text-[var(--text-muted)]">
             <p className="font-semibold text-[var(--text)]">배너 권장 규격</p>
-            <p>• 권장 크기: 1260 × 280 px (최소 630 × 140 px 이상) / 권장 비율: 9 : 2</p>
+            <p>• 권장 크기: 900px x 200 또는 1800 x 400 (9:2)</p>
             <p>• 중요한 로고·문구는 중앙 안전 영역(328px 이내)에 배치해 주세요. (기기별 양 끝 잘림 가능)</p>
             <p>• object-cover 방식으로 기기에 따라 이미지가 약간 확대되어 보일 수 있습니다.</p>
           </div>
