@@ -1,7 +1,7 @@
 // 역할: 발급된 티켓 목록과 빈 상태/오류 상태를 보여주는 내 티켓 패널을 렌더링합니다.
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
-import { Megaphone, TicketCheck } from "lucide-react";
+import { Megaphone, Ticket as TicketIcon } from "lucide-react";
 import { PaperTicketCard } from "@/components/ticketing/panels/PaperTicketCard";
 import { TicketingAdBannerCard } from "@/components/ticketing/panels/TicketingAdBannerCard";
 import {
@@ -50,7 +50,7 @@ export function MyTicketListPanel({
       >
         <div className="flex items-center gap-3">
           <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(28,43,106,0.08)", color: "var(--poster-navy)" }}>
-            <TicketCheck className="h-5 w-5" />
+            <TicketIcon className="h-5 w-5" />
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-semibold" style={{ color: "rgba(28,43,106,0.5)" }}>
@@ -150,8 +150,8 @@ export function MyTicketListPanel({
         </Card>
       )}
 
-      {/* 고정 배너 높이(70px) 만큼 하단 여백 확보 */}
-      <div className="h-[70px] shrink-0" />
+      {/* 홈과 동일한 9:2 배너 높이만큼 하단 여백 확보 */}
+      <div className="h-[var(--app-ad-banner-height)] shrink-0" />
 
       {/* 네비바 바로 위 고정 광고 배너 — 기기 무관 */}
       <div className="fixed inset-x-0 bottom-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))] z-40 mx-auto max-w-[var(--app-mobile-shell-max-width)]">
