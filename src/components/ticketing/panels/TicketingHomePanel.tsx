@@ -162,7 +162,7 @@ export function TicketingHomePanel({
                   {item.step}
                 </div>
                 <div>
-                  <p className={`${TICKETING_CLASSES.typography.heroDescription} text-[17px] leading-6 font-bold text-[var(--text)] md:text-[18px]`}>
+                  <p className={`${TICKETING_CLASSES.typography.heroDescription} text-[17px] leading-6 font-extrabold text-[var(--text)] md:text-[18px]`}>
                     {item.title}
                   </p>
                   <p className={`mt-1 ${TICKETING_CLASSES.typography.sectionBody} text-[var(--text-muted)] opacity-60`}>
