@@ -546,7 +546,6 @@ export default function BoothMap() {
                 setSelectedCollegeId(null);
                 setPubListCollegeId(null);
                 setSheetMode("LIST");
-                setSheetSnap("PEEK");
               });
             }}
           />
