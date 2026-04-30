@@ -10,6 +10,10 @@ export const formatBoothOperatingLabel = (
     return "미운영";
   }
 
+  if (operationStatus === "UNKNOWN") {
+    return "운영시간 미정";
+  }
+
   const timeRange = formatOperatingTime(startTime, endTime);
   if (timeRange) {
     return timeRange;
