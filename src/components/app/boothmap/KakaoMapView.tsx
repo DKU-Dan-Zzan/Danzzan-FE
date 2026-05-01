@@ -641,6 +641,25 @@ export default function KakaoMapView({
     return bounds
   }
 
+  const fitBoundsWithSheetPadding = (
+    bounds: import("@/types/app/boothmap/kakao-map").KakaoLatLngBounds,
+    targetSnap: SheetSnap,
+  ) => {
+    const map = mapInstanceRef.current
+    if (!map || !mapRef.current) return
+
+    const coveredHeight = Math.max(
+      Math.round(mapRef.current.clientHeight * getBottomSheetCoveredRatio(targetSnap)),
+      0,
+    )
+    const horizontalPadding = 24
+    const topPadding = 24
+    const centerShift = Math.max(Math.round(coveredHeight / 2 - 65), 0)
+    const bottomPadding = topPadding + centerShift * 2
+
+    map.setBounds(bounds, topPadding, horizontalPadding, bottomPadding, horizontalPadding)
+  }
+
   const createZonePolygon = ({
     paths,
     strokeColor,
@@ -1072,17 +1091,17 @@ export default function KakaoMapView({
 
     if (primaryFilter === "PUB" && pubZone) {
       const bounds = createZoneBounds(pubZone.polygons)
-      map.setBounds(bounds)
+      fitBoundsWithSheetPadding(bounds, sheetSnap)
     }
 
     if (primaryFilter === "FOOD_TRUCK" && foodTruckZone) {
       const bounds = createZoneBounds(foodTruckZone.polygons)
-      map.setBounds(bounds)
+      fitBoundsWithSheetPadding(bounds, sheetSnap)
     }
 
     if (primaryFilter === "FACILITY" && smokingZones.length > 0) {
       const bounds = createZoneBounds(smokingZones.flatMap((zone) => zone.polygons))
-      map.setBounds(bounds)
+      fitBoundsWithSheetPadding(bounds, sheetSnap)
     }
 
     if (
@@ -1092,11 +1111,11 @@ export default function KakaoMapView({
       visibleItems.length > 0
     ) {
       const bounds = createItemBounds(visibleItems)
-      map.setBounds(bounds)
+      fitBoundsWithSheetPadding(bounds, sheetSnap)
     }
 
     prevPrimaryFilterRef.current = primaryFilter
-  }, [isLoaded, primaryFilter, pubZone, foodTruckZone, smokingZones, visibleItems])
+  }, [isLoaded, primaryFilter, pubZone, foodTruckZone, sheetSnap, smokingZones, visibleItems])
 
   if (isError) {
     return (
