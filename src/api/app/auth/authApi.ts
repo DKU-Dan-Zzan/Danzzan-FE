@@ -51,8 +51,7 @@ export async function userLogout(accessToken: string): Promise<void> {
   }
 }
 
-/** Body 없음. 쿠키(refreshToken)만 credentials: 'include'로 전송. 서버가 Set-Cookie로 쿠키 삭제 */
-export async function authLogout(): Promise<void> {
+export async function authLogout(refreshToken?: string): Promise<void> {
   const base = getBaseUrl();
   if (!base) return;
 
@@ -61,6 +60,7 @@ export async function authLogout(): Promise<void> {
       method: "POST",
       headers: JSON_HEADERS,
       credentials: "include",
+      body: JSON.stringify({ refreshToken: refreshToken ?? "" }),
     });
   } catch {
     // 로그아웃 실패해도 클라이언트 세션은 제거
@@ -83,14 +83,14 @@ export async function withdrawUser(accessToken: string): Promise<void> {
   return parseFetchResponse<void>(res);
 }
 
-/** 리프레시 토큰은 백엔드에서 쿠키로 관리하므로 body 없이 credentials: 'include'로 호출 */
-export async function authReissue(): Promise<ReissueResponse> {
+export async function authReissue(refreshToken?: string): Promise<ReissueResponse> {
   const base = getBaseUrl();
 
   const res = await fetch(`${base}/auth/reissue`, {
     method: "POST",
     headers: JSON_HEADERS,
     credentials: "include",
+    body: JSON.stringify({ refreshToken: refreshToken ?? "" }),
   });
 
   return parseFetchResponse<ReissueResponse>(res);

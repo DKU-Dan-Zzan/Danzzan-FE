@@ -44,7 +44,7 @@ export const useAuth = () => {
       const accessToken = currentState.tokens?.accessToken ?? "";
       void userLogout(accessToken);
     } else {
-      void authLogout();
+      void authLogout(currentState.tokens?.refreshToken ?? undefined);
     }
     authStore.clear();
   }, []);

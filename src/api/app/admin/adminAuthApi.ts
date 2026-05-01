@@ -68,8 +68,7 @@ export const adminAuthApi = {
     }
 
     const client = getClient();
-    // /auth/login: 관리자 전용 엔드포인트 (AdminEntity 조회, cookie 기반 refresh)
-    const dto = await client.post<{ accessToken: string }>(
+    const dto = await client.post<{ accessToken: string; refreshToken?: string }>(
       "/auth/login",
       {
         studentNumber: payload.studentId,
@@ -78,6 +77,7 @@ export const adminAuthApi = {
     );
 
     const accessToken = dto?.accessToken ?? "";
+    const refreshToken = dto?.refreshToken ?? "";
     const role = resolveRoleFromAccessToken(accessToken);
     if (!hasRequiredRole("admin", role)) {
       throw new Error("관리자 권한이 없는 계정입니다.");
@@ -86,7 +86,7 @@ export const adminAuthApi = {
     return {
       tokens: {
         accessToken,
-        refreshToken: "", // refresh token은 HTTP-only cookie로 관리
+        refreshToken,
         expiresIn: null,
       },
       user: decodeTokenPayload(accessToken, payload.studentId),
