@@ -1084,7 +1084,6 @@ export default function KakaoMapView({
   useEffect(() => {
     if (!isLoaded || !mapInstanceRef.current || !window.kakao?.maps) return
 
-    const map = mapInstanceRef.current
     const previous = prevPrimaryFilterRef.current
 
     if (previous === primaryFilter) return
