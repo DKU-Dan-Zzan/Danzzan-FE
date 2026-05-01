@@ -1,6 +1,6 @@
 // 역할: 부스맵 좌표를 캠퍼스 존 단위로 분류하는 계산 유틸을 제공한다.
 
-export type MapZoneType = "PUB" | "FOOD_TRUCK";
+export type MapZoneType = "PUB" | "FOOD_TRUCK" | "SMOKING_AREA";
 
 export type MapZonePoint = {
     lat: number;
@@ -60,6 +60,34 @@ export const MAP_ZONES: MapZone[] = [
         { lat: 37.31964629337825, lng: 127.12850344450922 },
         { lat: 37.31934176888273, lng: 127.12889496965757 },
         { lat: 37.31924954827104, lng: 127.12877071219148 },
+      ],
+    ],
+  },
+  {
+    id: "smoking-zone-1",
+    type: "SMOKING_AREA",
+    label: "흡연 구역",
+    markers: [],
+    polygons: [
+      [
+        { lat: 37.32071091805039, lng: 127.1292808970107 },
+        { lat: 37.32110683147262, lng: 127.12977516678993 },
+        { lat: 37.32105722525822, lng: 127.1298202098405 },
+        { lat: 37.32066131510317, lng: 127.12932311964958 },
+      ],
+    ],
+  },
+  {
+    id: "smoking-zone-2",
+    type: "SMOKING_AREA",
+    label: "흡연 구역",
+    markers: [],
+    polygons: [
+      [
+        { lat: 37.31927254592375, lng: 127.12833640135568 },
+        { lat: 37.31933552326824, lng: 127.1284239426137 },
+        { lat: 37.31914603090032, lng: 127.12867746072817 },
+        { lat: 37.31908079503266, lng: 127.12859555652706 },
       ],
     ],
   },

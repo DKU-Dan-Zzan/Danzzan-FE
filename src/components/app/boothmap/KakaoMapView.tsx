@@ -706,13 +706,17 @@ export default function KakaoMapView({
 
   const pubZone = MAP_ZONES.find((zone) => zone.type === "PUB") ?? null
   const foodTruckZone = MAP_ZONES.find((zone) => zone.type === "FOOD_TRUCK") ?? null
+  const smokingZones = MAP_ZONES.filter((zone) => zone.type === "SMOKING_AREA")
 
   const shouldShowPubZoneSummary = primaryFilter === "ALL" && pubZone
   const shouldShowFoodTruckZoneSummary = primaryFilter === "ALL" && foodTruckZone
+  const shouldShowSmokingZoneSummary = primaryFilter === "ALL" && smokingZones.length > 0
 
   const shouldShowPubZoneDetail = primaryFilter === "PUB" && pubZone
   const shouldShowFoodTruckZoneDetail =
     primaryFilter === "FOOD_TRUCK" && foodTruckZone
+  const shouldShowSmokingZoneDetail =
+    primaryFilter === "FACILITY" && smokingZones.length > 0
   const shouldShowPersistentFoodTruckZoneMarker =
     primaryFilter === "FOOD_TRUCK" && foodTruckZone
 
@@ -934,6 +938,7 @@ export default function KakaoMapView({
     clearZoneOverlays()
     const pubZonePalette = getBoothmapZonePalette("PUB")
     const foodTruckZonePalette = getBoothmapZonePalette("FOOD_TRUCK")
+    const smokingZonePalette = getBoothmapZonePalette("SMOKING_AREA")
 
     if (shouldShowPubZoneSummary && pubZone) {
       pubZone.polygons.forEach((paths) => {
@@ -999,6 +1004,32 @@ export default function KakaoMapView({
       })
     }
 
+    if (shouldShowSmokingZoneSummary) {
+      smokingZones.forEach((zone) => {
+        zone.polygons.forEach((paths) => {
+          createZonePolygon({
+            paths,
+            strokeColor: smokingZonePalette.stroke,
+            fillColor: smokingZonePalette.fill,
+            fillOpacity: 0.22,
+          })
+        })
+      })
+    }
+
+    if (shouldShowSmokingZoneDetail) {
+      smokingZones.forEach((zone) => {
+        zone.polygons.forEach((paths) => {
+          createZonePolygon({
+            paths,
+            strokeColor: smokingZonePalette.stroke,
+            fillColor: smokingZonePalette.fill,
+            fillOpacity: 0.12,
+          })
+        })
+      })
+    }
+
     if (shouldShowPersistentFoodTruckZoneMarker && foodTruckZone) {
       foodTruckZone.markers.forEach((marker) => {
         createZoneMarkerRecord({
@@ -1020,11 +1051,14 @@ export default function KakaoMapView({
     primaryFilter,
     shouldShowPubZoneSummary,
     shouldShowFoodTruckZoneSummary,
+    shouldShowSmokingZoneSummary,
     shouldShowPubZoneDetail,
     shouldShowFoodTruckZoneDetail,
+    shouldShowSmokingZoneDetail,
     shouldShowPersistentFoodTruckZoneMarker,
     pubZone,
     foodTruckZone,
+    smokingZones,
     onPrimaryFilterChange,
   ])
 
@@ -1046,6 +1080,11 @@ export default function KakaoMapView({
       map.setBounds(bounds)
     }
 
+    if (primaryFilter === "FACILITY" && smokingZones.length > 0) {
+      const bounds = createZoneBounds(smokingZones.flatMap((zone) => zone.polygons))
+      map.setBounds(bounds)
+    }
+
     if (
       primaryFilter !== "ALL" &&
       primaryFilter !== "PUB" &&
@@ -1057,7 +1096,7 @@ export default function KakaoMapView({
     }
 
     prevPrimaryFilterRef.current = primaryFilter
-  }, [isLoaded, primaryFilter, pubZone, foodTruckZone, visibleItems])
+  }, [isLoaded, primaryFilter, pubZone, foodTruckZone, smokingZones, visibleItems])
 
   if (isError) {
     return (

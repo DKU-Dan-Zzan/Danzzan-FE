@@ -3,7 +3,7 @@
 import type { BoothSubType } from "@/types/app/boothmap/boothmap.types";
 
 export type BoothmapMarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "EVENT" | "FACILITY";
-export type BoothmapZoneType = "PUB" | "FOOD_TRUCK";
+export type BoothmapZoneType = "PUB" | "FOOD_TRUCK" | "SMOKING_AREA";
 export type BoothmapLabelKind = "booth" | "college";
 
 type BoothmapColorConfig = {
@@ -34,6 +34,9 @@ const BOOTHMAP_COLOR_CONFIG = {
   zoneFoodTruckStroke: { cssVar: "--boothmap-zone-food-truck-stroke", fallback: "#dc2626" },
   zoneFoodTruckFill: { cssVar: "--boothmap-zone-food-truck-fill", fallback: "#fca5a5" },
   zoneFoodTruckDot: { cssVar: "--boothmap-zone-food-truck-dot", fallback: "#ef4444" },
+  zoneSmokingStroke: { cssVar: "--boothmap-zone-smoking-stroke", fallback: "#475569" },
+  zoneSmokingFill: { cssVar: "--boothmap-zone-smoking-fill", fallback: "#cbd5e1" },
+  zoneSmokingDot: { cssVar: "--boothmap-zone-smoking-dot", fallback: "#334155" },
   overlayLabelBorder: { cssVar: "--boothmap-overlay-label-border", fallback: "#d1d5db" },
   overlayLabelBackground: {
     cssVar: "--boothmap-overlay-label-bg",
@@ -147,6 +150,14 @@ export function getBoothmapZonePalette(type: BoothmapZoneType): {
       stroke: getBoothmapColor("zonePubStroke"),
       fill: getBoothmapColor("zonePubFill"),
       dot: getBoothmapColor("zonePubDot"),
+    };
+  }
+
+  if (type === "SMOKING_AREA") {
+    return {
+      stroke: getBoothmapColor("zoneSmokingStroke"),
+      fill: getBoothmapColor("zoneSmokingFill"),
+      dot: getBoothmapColor("zoneSmokingDot"),
     };
   }
 
