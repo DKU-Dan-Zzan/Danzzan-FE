@@ -34,6 +34,27 @@ const shuffleArray = <T,>(arr: T[]): T[] => {
 
 const HOVER_POINTER_MEDIA_QUERY = "(hover: hover) and (pointer: fine)"
 
+const sanitizeExternalHttpsUrl = (rawUrl?: string | null): string | null => {
+  if (typeof rawUrl !== "string") {
+    return null
+  }
+
+  const trimmed = rawUrl.trim()
+  if (!trimmed) {
+    return null
+  }
+
+  try {
+    const parsed = new URL(trimmed)
+    if (parsed.protocol !== "https:") {
+      return null
+    }
+    return parsed.toString()
+  } catch {
+    return null
+  }
+}
+
 export function AdCarousel({
   slides,
   intervalMs = 5000,
@@ -127,6 +148,7 @@ export function AdCarousel({
   if (n === 1) {
     const slide = shuffled[0]
     const url = buildVersionedUrl(slide.imageUrl, slide.updatedAt)
+    const safeLinkUrl = sanitizeExternalHttpsUrl(slide.linkUrl)
     const img = (
       <img
         src={url}
@@ -137,8 +159,8 @@ export function AdCarousel({
     )
     return (
       <div className={cn("relative w-full overflow-hidden", containerClassName)}>
-        {slide.linkUrl ? (
-          <a href={slide.linkUrl} target="_blank" rel="noreferrer" className="block h-full w-full">
+        {safeLinkUrl ? (
+          <a href={safeLinkUrl} target="_blank" rel="noopener noreferrer" className="block h-full w-full">
             {img}
           </a>
         ) : (
@@ -178,6 +200,7 @@ export function AdCarousel({
       >
         {extended.map((slide, idx) => {
           const url = buildVersionedUrl(slide.imageUrl, slide.updatedAt)
+          const safeLinkUrl = sanitizeExternalHttpsUrl(slide.linkUrl)
           const isCurrent = idx === displayIndex
           const img = (
             <img
@@ -193,8 +216,8 @@ export function AdCarousel({
               className="basis-full shrink-0 grow-0 max-w-full overflow-hidden"
               aria-hidden={!isCurrent}
             >
-              {slide.linkUrl ? (
-                <a href={slide.linkUrl} target="_blank" rel="noreferrer" className="block h-full w-full">
+              {safeLinkUrl ? (
+                <a href={safeLinkUrl} target="_blank" rel="noopener noreferrer" className="block h-full w-full">
                   {img}
                 </a>
               ) : (

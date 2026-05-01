@@ -25,9 +25,9 @@ describe("TicketingAdBannerCard", () => {
       />,
     );
 
-    expect(markup).toContain('href="https://example.com"');
+    expect(markup).toContain('href="https://example.com/');
     expect(markup).toContain("target=\"_blank\"");
-    expect(markup).toContain("rel=\"noreferrer\"");
+    expect(markup).toContain("rel=\"noopener noreferrer\"");
   });
 
   it("내 티켓용 imageOnly 변형은 이미지 단독 배너 스타일을 사용한다", () => {

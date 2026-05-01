@@ -33,6 +33,15 @@ export const createEmptyNoticeForm = (): NoticeFormState => {
   };
 };
 
+export const createEmptyAdForm = (): AdFormState => {
+  return {
+    title: "",
+    imageUrl: "",
+    linkUrl: "",
+    placement: DEFAULT_ADMIN_AD_PLACEMENT,
+  };
+};
+
 export const createNoticeEditForm = (notice: NoticeResponse): NoticeFormState => {
   return {
     id: notice.id,
@@ -57,10 +66,12 @@ export const buildNoticePayload = (form: NoticeFormState): CreateNoticeRequest =
 };
 
 export const buildAdPayload = (form: AdFormState): CreateAdvertisementRequest => {
+  const trimmedLinkUrl = form.linkUrl.trim();
   return {
     title: form.title.trim() || "광고 배너",
     imageUrl: form.imageUrl.trim(),
-    placement: DEFAULT_ADMIN_AD_PLACEMENT,
+    linkUrl: trimmedLinkUrl ? trimmedLinkUrl : null,
+    placement: form.placement,
   };
 };
 
@@ -87,6 +98,16 @@ export const validateAdPayload = (payload: CreateAdvertisementRequest): string |
   }
   if (!payload.imageUrl) {
     return "이미지를 업로드해 주세요.";
+  }
+  if (payload.linkUrl) {
+    try {
+      const parsed = new URL(payload.linkUrl);
+      if (parsed.protocol !== "https:") {
+        return "광고 이동 URL은 https 주소만 입력할 수 있습니다.";
+      }
+    } catch {
+      return "광고 이동 URL 형식이 올바르지 않습니다.";
+    }
   }
   return null;
 };

@@ -271,6 +271,7 @@ export type AdvertisementResponse = {
   id: number;
   title: string;
   imageUrl: string;
+  linkUrl: string | null;
   placement: AdvertisementPlacement;
   isActive: boolean;
   createdAt: string;
@@ -280,6 +281,7 @@ export type AdvertisementResponse = {
 export type CreateAdvertisementRequest = {
   title: string;
   imageUrl: string;
+  linkUrl?: string | null;
   placement: AdvertisementPlacement;
 };
 
@@ -288,6 +290,16 @@ export async function createAdminAd(
 ): Promise<AdvertisementResponse> {
   return fetchWithAuth<AdvertisementResponse>("/api/admin/ads", {
     method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function updateAdminAdById(
+  id: number,
+  body: CreateAdvertisementRequest,
+): Promise<AdvertisementResponse> {
+  return fetchWithAuth<AdvertisementResponse>(`/api/admin/ads/item/${id}`, {
+    method: "PATCH",
     body: JSON.stringify(body),
   });
 }
