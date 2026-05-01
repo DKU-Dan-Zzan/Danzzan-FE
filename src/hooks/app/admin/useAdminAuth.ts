@@ -9,7 +9,7 @@ import { requireAdminRole } from "@/lib/app/admin/admin-auth-session";
 import { isAccessTokenExpired } from "@/api/common/authCore";
 
 const setAdminSession = (session: AuthSession): void => {
-  authStore.setSession(session, "admin");
+  authStore.setSession(session, "admin", { refreshMode: "cookie" });
 };
 
 export function resolveAdminLoginErrorMessage(error: unknown): string {
@@ -65,7 +65,8 @@ export function useAdminAuth() {
 
   const logout = useCallback(async () => {
     try {
-      await authLogout();
+      const refreshToken = authStore.getRefreshToken() ?? undefined;
+      await authLogout(refreshToken);
     } finally {
       authStore.clear();
     }

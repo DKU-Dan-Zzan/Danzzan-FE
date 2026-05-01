@@ -288,7 +288,7 @@ export const authStore = {
       const refreshed =
         refreshMode === "token" && snapshot.tokens?.refreshToken
           ? await refreshAccessTokenWithToken(snapshot.tokens.refreshToken)
-          : await refreshAccessTokenWithCookie();
+          : await refreshAccessTokenWithCookie(snapshot.tokens?.refreshToken || undefined);
 
       const nextTokens: AuthTokens = {
         accessToken: refreshed.accessToken,
@@ -308,10 +308,7 @@ export const authStore = {
         role:
           snapshot.role ??
           resolveRoleFromAccessToken(refreshed.accessToken),
-        refreshMode:
-          refreshed.refreshToken != null
-            ? "token"
-            : refreshMode,
+        refreshMode,
       });
 
       return refreshed.accessToken;

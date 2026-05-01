@@ -37,13 +37,16 @@ const readTokenSet = (payload: RefreshPayload): RefreshedTokenSet => {
   };
 };
 
-export const refreshAccessTokenWithCookie = async (): Promise<RefreshedTokenSet> => {
+export const refreshAccessTokenWithCookie = async (
+  refreshToken?: string,
+): Promise<RefreshedTokenSet> => {
   const base = getApiBaseUrl();
 
   const res = await fetch(`${base}/auth/reissue`, {
     method: "POST",
     headers: JSON_HEADERS,
     credentials: "include",
+    body: JSON.stringify({ refreshToken: refreshToken ?? "" }),
   });
 
   const payload = await parseFetchResponse<RefreshPayload>(res);
