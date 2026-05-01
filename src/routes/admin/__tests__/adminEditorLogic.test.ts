@@ -78,11 +78,14 @@ describe("adminEditorLogic", () => {
     const payload = buildAdPayload({
       title: " 배너 ",
       imageUrl: " https://cdn.example.com/banner.png ",
+      linkUrl: " https://example.com/landing ",
+      placement: "HOME_BOTTOM",
     });
 
     expect(payload).toEqual({
       title: "배너",
       imageUrl: "https://cdn.example.com/banner.png",
+      linkUrl: "https://example.com/landing",
       placement: DEFAULT_ADMIN_AD_PLACEMENT,
     });
   });
@@ -110,9 +113,30 @@ describe("adminEditorLogic", () => {
       validateAdPayload({
         title: "배너",
         imageUrl: "",
+        linkUrl: null,
         placement: DEFAULT_ADMIN_AD_PLACEMENT,
       }),
     ).toBe("이미지를 업로드해 주세요.");
+  });
+
+  it("광고 이동 URL은 https 형식을 검증한다", () => {
+    expect(
+      validateAdPayload({
+        title: "배너",
+        imageUrl: "https://cdn.example.com/banner.png",
+        linkUrl: "http://example.com",
+        placement: DEFAULT_ADMIN_AD_PLACEMENT,
+      }),
+    ).toBe("광고 이동 URL은 https 주소만 입력할 수 있습니다.");
+
+    expect(
+      validateAdPayload({
+        title: "배너",
+        imageUrl: "https://cdn.example.com/banner.png",
+        linkUrl: "not-a-url",
+        placement: DEFAULT_ADMIN_AD_PLACEMENT,
+      }),
+    ).toBe("광고 이동 URL 형식이 올바르지 않습니다.");
   });
 
   it("이미지 파일 타입과 용량을 검증한다", () => {

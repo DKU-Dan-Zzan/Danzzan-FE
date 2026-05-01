@@ -1,0 +1,40 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_TICKETING_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_TICKETING_URL: ${{ secrets.VITE_TICKETING_URL }}
+          VITE_FESTIVAL_HOME_URL: ${{ secrets.VITE_FESTIVAL_HOME_URL }}
+          VITE_API_MODE: live
+
+      - name: Upload to NHN Object Storage
+        run: |
+          aws s3 sync dist/ s3://${{ secrets.NHN_BUCKET }}/ \
+            --endpoint-url ${{ secrets.NHN_ENDPOINT }} \
+            --delete \
+            --no-progress
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.NHN_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.NHN_SECRET_KEY }}
+          AWS_DEFAULT_REGION: kr1

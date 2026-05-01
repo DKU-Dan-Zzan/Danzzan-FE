@@ -13,6 +13,7 @@ export default function AdBanner({ ads, marginTopClassName = "mt-9" }: AdBannerP
   const slides = ads.length
     ? ads.map((ad) => ({
         imageUrl: ad.imageUrl,
+        linkUrl: ad.linkUrl,
         alt: ad.title,
         updatedAt: ad.updatedAt,
       }))

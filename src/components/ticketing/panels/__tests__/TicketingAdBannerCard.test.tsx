@@ -25,9 +25,9 @@ describe("TicketingAdBannerCard", () => {
       />,
     );
 
-    expect(markup).toContain('href="https://example.com"');
+    expect(markup).toContain('href="https://example.com/');
     expect(markup).toContain("target=\"_blank\"");
-    expect(markup).toContain("rel=\"noreferrer\"");
+    expect(markup).toContain("rel=\"noopener noreferrer\"");
   });
 
   it("내 티켓용 imageOnly 변형은 이미지 단독 배너 스타일을 사용한다", () => {
@@ -35,7 +35,8 @@ describe("TicketingAdBannerCard", () => {
 
     expect(markup).toContain("bg-[var(--home-ad-banner-bg)]");
     expect(markup).toContain("shadow-[var(--home-elevated-card-shadow)]");
-    expect(markup).toContain("h-[70px]");
+    expect(markup).toContain("aspect-[9/2]");
+    expect(markup).toContain("block h-full w-full object-cover");
     expect(markup).not.toContain("max-w-[var(--ticketing-ad-slot-max-width)]");
   });
 });

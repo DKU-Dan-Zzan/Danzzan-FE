@@ -156,7 +156,9 @@ function Admin() {
     editingAd,
     setEditingAd,
     adImageUploading,
+    adSubmitting,
     openAddAdDialog,
+    openEditAdDialog,
     handleDeleteAdById,
     handleSubmitAd,
     handleUploadAdImage,
@@ -585,7 +587,8 @@ function Admin() {
             <div>
               <h2 className="text-sm font-bold text-[var(--text)]">광고 배너 관리</h2>
               <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-                등록된 이미지가 홈 화면·내 티켓 화면에서 랜덤 순서로 5초마다 슬라이딩됩니다. 수량 제한 없음.
+                등록된 이미지가 홈 화면·공지사항·타임테이블·내 티켓 화면 하단에서 랜덤 순서로 5초마다
+                슬라이딩됩니다. 수량 제한 없음.
               </p>
             </div>
             <button
@@ -609,25 +612,51 @@ function Admin() {
               {allAds.map((ad) => (
                 <div
                   key={ad.id}
-                  className="group relative overflow-hidden rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)]"
+                  className="overflow-hidden rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)]"
                 >
                   <img
                     src={ad.imageUrl}
                     alt={ad.title}
                     className="h-[70px] w-full object-cover"
                   />
-                  <div className="absolute inset-0 flex items-start justify-end bg-gradient-to-b from-black/30 to-transparent p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
-                    <button
-                      type="button"
-                      onClick={() => void handleDeleteAdById(ad.id)}
-                      aria-label="광고 이미지 삭제"
-                      className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--status-danger)] text-[var(--text-on-accent)] shadow-md"
-                    >
-                      <Trash2 className="h-3 w-3" strokeWidth={2.5} />
-                    </button>
-                  </div>
-                  <div className="px-2 pb-1 pt-0.5">
-                    <p className="truncate text-[10px] text-[var(--text-muted)]">{ad.title}</p>
+                  <div className="space-y-2 px-2.5 pb-2.5 pt-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="truncate text-xs font-semibold text-[var(--text)]">{ad.title}</p>
+                      <span
+                        className={cn(
+                          "inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                          ad.linkUrl
+                            ? "bg-[var(--status-success-bg)] text-[var(--status-success-text)]"
+                            : "bg-[var(--surface-subtle)] text-[var(--text-muted)]",
+                        )}
+                      >
+                        {ad.linkUrl ? "링크 ON" : "링크 OFF"}
+                      </span>
+                    </div>
+                    <p className="truncate text-[10px] text-[var(--text-muted)]/90">
+                      {ad.linkUrl ? "클릭 시 외부 페이지로 이동" : "클릭 동작 없음"}
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-1.5 border-t border-[var(--border-base)]/80 pt-1.5">
+                      <button
+                        type="button"
+                        onClick={() => openEditAdDialog(ad)}
+                        aria-label="광고 정보 수정"
+                        className="inline-flex h-8 w-full items-center justify-center gap-1 rounded-lg border border-[var(--accent)] bg-[var(--surface)] px-2 text-[11px] font-semibold text-[var(--accent)] shadow-sm hover:bg-[var(--accent)]/10"
+                      >
+                        <Pencil className="h-3 w-3" strokeWidth={2.5} />
+                        편집
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void handleDeleteAdById(ad.id)}
+                        aria-label="광고 이미지 삭제"
+                        className="inline-flex h-8 w-full items-center justify-center gap-1 rounded-lg bg-[var(--status-danger)] px-2 text-[11px] font-semibold text-[var(--text-on-accent)] shadow-sm hover:brightness-95"
+                      >
+                        <Trash2 className="h-3 w-3" strokeWidth={2.5} />
+                        삭제
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -636,7 +665,7 @@ function Admin() {
 
           <div className="mt-4 space-y-1 text-[11px] text-[var(--text-muted)]">
             <p className="font-semibold text-[var(--text)]">배너 권장 규격</p>
-            <p>• 권장 크기: 1260 × 280 px (최소 630 × 140 px 이상) / 권장 비율: 9 : 2</p>
+            <p>• 권장 크기: 900px x 200 또는 1800 x 400 (9:2)</p>
             <p>• 중요한 로고·문구는 중앙 안전 영역(328px 이내)에 배치해 주세요. (기기별 양 끝 잘림 가능)</p>
             <p>• object-cover 방식으로 기기에 따라 이미지가 약간 확대되어 보일 수 있습니다.</p>
           </div>
@@ -885,7 +914,7 @@ function Admin() {
         {editingAd && (
           <DialogContent className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-[var(--surface)] p-5 shadow-xl">
             <DialogTitle className="text-sm font-bold text-[var(--text)]">
-              광고 이미지 추가
+              {editingAd.id ? "광고 이미지 수정" : "광고 이미지 추가"}
             </DialogTitle>
             <form className="mt-4 space-y-4" onSubmit={handleSubmitAd}>
               {/* 제목 입력 */}
@@ -908,6 +937,29 @@ function Admin() {
                   )}
                   required
                 />
+              </div>
+
+              {/* 랜딩 URL 입력 */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-[var(--text)]">
+                  클릭 이동 URL <span className="text-[var(--text-muted)]">(선택)</span>
+                </label>
+                <input
+                  type="url"
+                  value={editingAd.linkUrl}
+                  onChange={(e) =>
+                    setEditingAd((prev) => prev ? { ...prev, linkUrl: e.target.value } : prev)
+                  }
+                  placeholder="https://example.com/landing"
+                  className={cn(
+                    "h-10 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 text-sm",
+                    ADMIN_FOCUS_VISIBLE_RING_CLASS,
+                    "focus-visible:border-[var(--accent)] focus-visible:ring-[var(--ring)]",
+                  )}
+                />
+                <p className="text-[11px] text-[var(--text-muted)]">
+                  미입력 시 배너 클릭 동작은 비활성화됩니다. HTTPS 주소만 허용됩니다.
+                </p>
               </div>
 
               {/* 이미지 업로드 */}
@@ -944,7 +996,7 @@ function Admin() {
                       type="file"
                       accept="image/jpeg,image/jpg,image/png,image/webp"
                       className="hidden"
-                      disabled={adImageUploading}
+                      disabled={adImageUploading || adSubmitting}
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
@@ -968,6 +1020,11 @@ function Admin() {
               </div>
 
               <div className="space-y-2">
+                {globalError && (
+                  <p className="rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-[11px] text-[var(--status-danger-text)]">
+                    {globalError}
+                  </p>
+                )}
                 {(!editingAd.title.trim() || !editingAd.imageUrl) && (
                   <p className="text-right text-[11px] text-[var(--text-muted)]">
                     {!editingAd.title.trim() && !editingAd.imageUrl
@@ -981,16 +1038,25 @@ function Admin() {
                   <button
                     type="button"
                     onClick={() => setEditingAd(null)}
+                    disabled={adSubmitting}
                     className={ADMIN_SECONDARY_ACTION_BUTTON_CLASS}
                   >
                     취소
                   </button>
                   <button
                     type="submit"
-                    disabled={adImageUploading || !editingAd.imageUrl || !editingAd.title.trim()}
+                    disabled={adSubmitting || adImageUploading || !editingAd.imageUrl || !editingAd.title.trim()}
                     className={ADMIN_PRIMARY_ACTION_BUTTON_CLASS}
                   >
-                    {adImageUploading ? "업로드 중..." : "등록하기"}
+                    {adSubmitting
+                      ? editingAd.id
+                        ? "수정 중..."
+                        : "등록 중..."
+                      : adImageUploading
+                        ? "업로드 중..."
+                        : editingAd.id
+                          ? "수정하기"
+                          : "등록하기"}
                   </button>
                 </div>
               </div>

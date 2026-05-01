@@ -52,6 +52,7 @@ export const adApi = {
     const ads = await getAppPlacementAds("MY_TICKET", { signal });
     return ads.map((ad) => ({
       imageUrl: ad.imageUrl,
+      linkUrl: ad.linkUrl,
       alt: ad.title,
       updatedAt: ad.updatedAt,
     }));

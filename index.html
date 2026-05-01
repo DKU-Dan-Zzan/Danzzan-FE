@@ -24,6 +24,22 @@
     />
   </head>
   <body>
+    <script>
+      (function () {
+        var ua = navigator.userAgent.toLowerCase();
+        var isKakao = ua.indexOf('kakaotalk') !== -1;
+        if (!isKakao) return;
+
+        var url = location.href;
+        var isIOS = /iphone|ipad|ipod/.test(ua);
+        if (isIOS) {
+          location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(url);
+        } else {
+          location.href = 'intent://' + url.replace(/https?:\/\//, '') +
+            '#Intent;scheme=https;package=com.android.chrome;end';
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
