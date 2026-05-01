@@ -39,6 +39,11 @@ describe("boothmapTheme", () => {
       fill: "#fca5a5",
       dot: "#ef4444",
     });
+    expect(getBoothmapZonePalette("SMOKING_AREA")).toEqual({
+      stroke: "#475569",
+      fill: "#cbd5e1",
+      dot: "#334155",
+    });
   });
 
   it("라벨 accent는 kind에 맞게 분기한다", () => {

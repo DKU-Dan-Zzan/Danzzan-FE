@@ -119,6 +119,16 @@ function isFoodTruckBooth(booth?: Booth | null) {
   return booth?.type === "FOOD_TRUCK";
 }
 
+function shouldOpenListSheetAtHalf(filter: PrimaryFilter) {
+  return (
+    filter === "PUB" ||
+    filter === "FACILITY" ||
+    filter === "FOOD_TRUCK" ||
+    filter === "EXPERIENCE" ||
+    filter === "EVENT"
+  );
+}
+
 export default function BoothMap() {
   const [primaryFilter, setPrimaryFilter] = useState<PrimaryFilter>("ALL");
   const [selectedMapItem, setSelectedMapItem] = useState<SelectedMapItem>(null);
@@ -194,7 +204,7 @@ export default function BoothMap() {
       setSelectedMapItem(null);
       setSelectedDetailItem(null);
       setSheetMode("LIST");
-      setSheetSnap(next === "FOOD_TRUCK" ? "HALF" : "PEEK");
+      setSheetSnap(shouldOpenListSheetAtHalf(next) ? "HALF" : "PEEK");
       setPubListCollegeId(null);
 
       if (next !== "PUB") {
@@ -427,7 +437,7 @@ export default function BoothMap() {
 
   const onChangePrimaryFilterFromMap = useCallback((next: PrimaryFilter) => {
     handlePrimaryChange(next);
-    if (next === "FOOD_TRUCK") {
+    if (shouldOpenListSheetAtHalf(next)) {
       setSheetMode("LIST");
       setSheetSnap("HALF");
     }
@@ -536,7 +546,6 @@ export default function BoothMap() {
                 setSelectedCollegeId(null);
                 setPubListCollegeId(null);
                 setSheetMode("LIST");
-                setSheetSnap("PEEK");
               });
             }}
           />

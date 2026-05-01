@@ -26,7 +26,13 @@ export type KakaoMap = {
   setLevel: (level: number, options?: { animate?: boolean; anchor?: KakaoLatLng }) => void;
   setCenter: (coords: KakaoLatLng) => void;
   panTo: (coords: KakaoLatLng) => void;
-  setBounds: (bounds: KakaoLatLngBounds) => void;
+  setBounds: (
+    bounds: KakaoLatLngBounds,
+    paddingTop?: number,
+    paddingRight?: number,
+    paddingBottom?: number,
+    paddingLeft?: number,
+  ) => void;
   getProjection: () => KakaoProjection | null;
 };
 

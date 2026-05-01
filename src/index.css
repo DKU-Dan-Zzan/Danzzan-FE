@@ -210,6 +210,9 @@
   --boothmap-zone-food-truck-stroke: #dc2626;
   --boothmap-zone-food-truck-fill: #fca5a5;
   --boothmap-zone-food-truck-dot: #ef4444;
+  --boothmap-zone-smoking-stroke: #475569;
+  --boothmap-zone-smoking-fill: color-mix(in srgb, var(--neutral-300) 74%, var(--ink-300));
+  --boothmap-zone-smoking-dot: #334155;
 
   --boothmap-overlay-label-bg: color-mix(in srgb, var(--card-surface-base) 95%, white);
   --boothmap-overlay-label-border: var(--card-outline-border);
