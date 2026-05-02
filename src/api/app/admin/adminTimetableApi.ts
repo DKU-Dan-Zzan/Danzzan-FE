@@ -171,3 +171,30 @@ export async function getAdminArtistImagePresign(
     method: parsed.method,
   };
 }
+
+export type DirectUploadResponse = {
+  imageUrl: string;
+  key: string;
+};
+
+export async function uploadArtistImageDirect(
+  artistId: number,
+  file: File,
+): Promise<DirectUploadResponse> {
+  const baseUrl = getApiBaseUrl();
+  const token = getAdminAccessToken();
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(`${baseUrl}/admin/timetable/artists/${artistId}/images/upload`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw Object.assign(new Error("아티스트 이미지 업로드에 실패했습니다."), { status: res.status });
+  }
+
+  return res.json();
+}

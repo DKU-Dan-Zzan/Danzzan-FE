@@ -212,6 +212,28 @@ export async function getNoticeImagePresign(
   return parseNoticeImagePresignContract(raw, endpoint);
 }
 
+export async function uploadNoticeImageDirect(
+  file: File,
+): Promise<DirectUploadResponse> {
+  const baseUrl = getApiBaseUrl();
+  const token = getAdminAccessToken();
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(`${baseUrl}/api/admin/notices/images`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw Object.assign(new Error("공지 이미지 업로드에 실패했습니다."), { status: res.status });
+  }
+
+  const data = await res.json();
+  return { imageUrl: data.imageUrl ?? data.url, key: data.key ?? "" };
+}
+
 export type AdImageUploadRequest = {
   fileName: string;
   contentType: string;
