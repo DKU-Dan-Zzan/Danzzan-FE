@@ -19,6 +19,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Create .env.production
+        run: |
+          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env.production
+          echo "VITE_TICKETING_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env.production
+          echo "VITE_TICKETING_URL=${{ secrets.VITE_TICKETING_URL }}" >> .env.production
+          echo "VITE_FESTIVAL_HOME_URL=${{ secrets.VITE_FESTIVAL_HOME_URL }}" >> .env.production
+          echo "VITE_API_MODE=live" >> .env.production
+          echo "VITE_KAKAO_MAP_JS_KEY=${{ secrets.VITE_KAKAO_MAP_JS_KEY }}" >> .env.production
+          echo "VITE_MAPBOX_ACCESS_TOKEN=${{ secrets.VITE_MAPBOX_ACCESS_TOKEN }}" >> .env.production
+
       - name: Build
         run: npm run build
         env:
