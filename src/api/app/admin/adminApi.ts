@@ -267,6 +267,32 @@ export async function getAdminAdImageUpload(
 
 export type AdvertisementPlacement = "HOME_BOTTOM" | "MY_TICKET";
 
+export type DirectUploadResponse = {
+  imageUrl: string;
+  key: string;
+};
+
+export async function uploadAdImageDirect(
+  file: File,
+): Promise<DirectUploadResponse> {
+  const baseUrl = getApiBaseUrl();
+  const token = getAdminAccessToken();
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(`${baseUrl}/api/admin/ads/images/upload`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw Object.assign(new Error("광고 이미지 업로드에 실패했습니다."), { status: res.status });
+  }
+
+  return res.json();
+}
+
 export type AdvertisementResponse = {
   id: number;
   title: string;

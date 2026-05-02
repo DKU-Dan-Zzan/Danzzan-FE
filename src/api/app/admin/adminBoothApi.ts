@@ -192,3 +192,30 @@ export async function deleteAdminPubImage(pubId: number, imageId: number): Promi
     method: "DELETE",
   });
 }
+
+export type DirectUploadResponse = {
+  imageUrl: string;
+  key: string;
+};
+
+export async function uploadPubImageDirect(
+  pubId: number,
+  file: File,
+): Promise<DirectUploadResponse> {
+  const baseUrl = getApiBaseUrl();
+  const token = getAdminAccessToken();
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(`${baseUrl}/admin/map/pubs/${pubId}/images/upload`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw Object.assign(new Error("주점 이미지 업로드에 실패했습니다."), { status: res.status });
+  }
+
+  return res.json();
+}

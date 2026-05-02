@@ -5,14 +5,12 @@ import {
   type AdvertisementResponse,
   createAdminAd,
   deleteAdminAdById,
-  getAdminAdImageUpload,
   updateAdminAdById,
+  uploadAdImageDirect,
 } from "@/api/app/admin/adminApi";
 import {
   buildAdPayload,
   createEmptyAdForm,
-  createUploadFailureMessage,
-  uploadToPresignedUrl,
   validateAdPayload,
   validateImageFile,
 } from "@/routes/admin/adminEditorLogic";
@@ -122,20 +120,10 @@ export const useAdminAdActions = ({
       setAdImageUploading(true);
       setGlobalError(null);
 
-      const uploadMeta = await getAdminAdImageUpload({
-        fileName: file.name,
-        contentType: file.type,
-        fileSize: file.size,
-      });
-
-      const putRes = await uploadToPresignedUrl(uploadMeta, file);
-
-      if (!putRes.ok) {
-        throw new Error(await createUploadFailureMessage("광고 이미지 업로드 실패", putRes));
-      }
+      const result = await uploadAdImageDirect(file);
 
       setEditingAd((previous) =>
-        previous ? { ...previous, imageUrl: uploadMeta.imageUrl } : previous,
+        previous ? { ...previous, imageUrl: result.imageUrl } : previous,
       );
       toast.success("이미지 업로드가 완료되었습니다.");
     } catch (error) {

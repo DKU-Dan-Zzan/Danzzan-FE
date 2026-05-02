@@ -7,7 +7,6 @@ import {
   deleteAdminPubImage,
   deleteAdminPubOperation,
   getAdminBoothManagement,
-  getAdminPubImagePresign,
   getAdminPubImages,
   type AdminBoothManagementBooth,
   type AdminBoothManagementResponse,
@@ -18,12 +17,11 @@ import {
   updateAdminPubMainImage,
   updateAdminPub,
   updateAdminPubOperation,
+  uploadPubImageDirect,
 } from "@/api/app/admin/adminBoothApi";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { cn } from "@/components/common/ui/utils";
 import {
-  createUploadFailureMessage,
-  uploadToPresignedUrl,
   validateImageFile,
 } from "@/routes/admin/adminEditorLogic";
 import { formatDescription } from "@/utils/app/boothmap/formatDescription";
@@ -500,20 +498,11 @@ export default function AdminBoothManagerPanel({
       const uploadedImages: Array<{ id: string; imageUrl: string }> = [];
 
       for (const pendingImage of pendingPubImages) {
-        const presign = await getAdminPubImagePresign(selectedPub.id, {
-          fileName: pendingImage.file.name,
-          contentType: pendingImage.file.type,
-          fileSize: pendingImage.file.size,
-        });
-
-        const putResponse = await uploadToPresignedUrl(presign, pendingImage.file);
-        if (!putResponse.ok) {
-          throw new Error(await createUploadFailureMessage("주점 이미지 업로드 실패", putResponse));
-        }
+        const result = await uploadPubImageDirect(selectedPub.id, pendingImage.file);
 
         uploadedImages.push({
           id: pendingImage.id,
-          imageUrl: presign.imageUrl ?? presign.fileUrl,
+          imageUrl: result.imageUrl,
         });
       }
 
