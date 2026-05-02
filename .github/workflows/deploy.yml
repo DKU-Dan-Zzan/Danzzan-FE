@@ -27,6 +27,8 @@ jobs:
           VITE_TICKETING_URL: ${{ secrets.VITE_TICKETING_URL }}
           VITE_FESTIVAL_HOME_URL: ${{ secrets.VITE_FESTIVAL_HOME_URL }}
           VITE_API_MODE: live
+          VITE_KAKAO_MAP_JS_KEY: ${{ secrets.VITE_KAKAO_MAP_JS_KEY }}
+          VITE_MAPBOX_ACCESS_TOKEN: ${{ secrets.VITE_MAPBOX_ACCESS_TOKEN }}
 
       - name: Upload to NHN Object Storage
         run: |
