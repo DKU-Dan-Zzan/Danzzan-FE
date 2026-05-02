@@ -15,11 +15,11 @@ import {
   createAdminPerformance,
   deleteAdminArtist,
   deleteAdminPerformance,
-  getAdminArtistImagePresign,
   getAdminArtists,
   getAdminPerformancesByDate,
   updateAdminArtist,
   updateAdminPerformance,
+  uploadArtistImageDirect,
   type AdminArtist,
   type AdminPerformance,
 } from "@/api/app/admin/adminTimetableApi";
@@ -29,8 +29,6 @@ import { Switch } from "@/components/common/ui/switch";
 import { cn } from "@/components/common/ui/utils";
 import { FESTIVAL_DAYS } from "@/config/festivalDays";
 import {
-  createUploadFailureMessage,
-  uploadToPresignedUrl,
   validateImageFile,
 } from "@/routes/admin/adminEditorLogic";
 
@@ -337,20 +335,8 @@ export default function AdminTimetableManagerPanel({
   };
 
   const uploadArtistImage = async (artistId: number, file: File): Promise<string> => {
-    const presigned = await getAdminArtistImagePresign(artistId, {
-      fileName: file.name,
-      contentType: file.type,
-      fileSize: file.size,
-    });
-    const uploadResponse = await uploadToPresignedUrl(presigned, file);
-    if (!uploadResponse.ok) {
-      const message = await createUploadFailureMessage(
-        "아티스트 이미지 업로드 실패",
-        uploadResponse,
-      );
-      throw new Error(message);
-    }
-    return presigned.fileUrl;
+    const result = await uploadArtistImageDirect(artistId, file);
+    return result.imageUrl;
   };
 
   const validateArtistForm = (form: ArtistFormState): string | null => {

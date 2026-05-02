@@ -4,8 +4,8 @@ import { toast } from "sonner";
 import {
   createAdminNotice,
   deleteAdminNotice,
-  getNoticeImagePresign,
   restoreAdminNotice,
+  uploadNoticeImageDirect,
   type NoticeResponse,
   type NoticeStatusFilter,
   updateAdminNotice,
@@ -16,8 +16,6 @@ import {
   buildNoticePayload,
   createEmptyNoticeForm,
   createNoticeEditForm,
-  createUploadFailureMessage,
-  uploadToPresignedUrl,
   validateImageFile,
   validateNoticePayload,
 } from "@/routes/admin/adminEditorLogic";
@@ -130,28 +128,8 @@ export const useAdminNoticeActions = ({
           continue;
         }
 
-        const presign = await getNoticeImagePresign({
-          fileName: file.name,
-          contentType: file.type,
-          fileSize: file.size,
-        });
-
-        if (import.meta.env.DEV) {
-          console.log("[notice presign]", presign);
-        }
-
-        if (!presign.presignedUrl) {
-          console.error("[notice presign] presignedUrl is undefined", presign);
-          throw new Error("presignedUrl이 비어 있습니다. presign API 응답을 확인해 주세요.");
-        }
-
-        const putRes = await uploadToPresignedUrl(presign, file);
-
-        if (!putRes.ok) {
-          throw new Error(await createUploadFailureMessage("S3 업로드 실패", putRes));
-        }
-
-        const url = presign.imageUrl ?? presign.fileUrl;
+        const result = await uploadNoticeImageDirect(file);
+        const url = result.imageUrl;
         setEditingNotice((previous) =>
           previous
             ? {
