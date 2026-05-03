@@ -78,11 +78,12 @@
         }
       })();
     </script>
-    <!-- 인앱 스플래시 (React 로드 전 즉시 표시) -->
+    <!-- 인앱 스플래시 (Android PWA 전용) -->
     <div id="app-splash" style="
+      display: none;
       position: fixed; inset: 0; z-index: 9999;
       background: #0d0d1a;
-      display: flex; align-items: flex-end; justify-content: center;
+      align-items: flex-end; justify-content: center;
       padding-bottom: 80px;
       pointer-events: none;
     ">
@@ -124,7 +125,9 @@
     </style>
     <script>
       (function () {
+        if (!/android/i.test(navigator.userAgent)) return;
         var splash = document.getElementById('app-splash');
+        splash.style.display = 'flex';
         setTimeout(function () {
           splash.style.transition = 'opacity 0.4s ease';
           splash.style.opacity = '0';
