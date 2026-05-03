@@ -7,11 +7,11 @@ const PROJECT_ROOT = path.resolve(__dirname, "../../..");
 const VITE_CONFIG_PATH = path.join(PROJECT_ROOT, "vite.config.ts");
 
 describe("PWA manifest theme source", () => {
-  it("manifest theme/background color를 홈 상단 톤(#e2e8f0)으로 고정한다", () => {
+  it("manifest theme/background color를 아이콘 배경 톤(#ffffff)으로 고정한다", () => {
     const source = fs.readFileSync(VITE_CONFIG_PATH, "utf8");
 
-    expect(source).toContain('theme_color: "#e2e8f0"');
-    expect(source).toContain('background_color: "#e2e8f0"');
+    expect(source).toContain('theme_color: "#ffffff"');
+    expect(source).toContain('background_color: "#ffffff"');
   });
 });
 
