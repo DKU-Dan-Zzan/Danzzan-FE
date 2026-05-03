@@ -364,7 +364,7 @@ function Admin() {
             </div>
           </header>
 
-          <div className="overflow-hidden rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)]">
+          <div className="overflow-x-auto rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)]">
             <table className="min-w-full text-left text-xs">
               <thead className="bg-[var(--surface-subtle)] text-[var(--text-muted)]">
                 <tr>
@@ -504,7 +504,18 @@ function Admin() {
                       {formatDate(notice.createdAt)}
                     </td>
                     <td className="border-r border-[var(--border-base)] px-3 py-2 text-center">
-                      {pinReorderMode ? (
+                      {noticeStatus === "ALL" ? (
+                        <span
+                          className={cn(
+                            "inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                            notice.isActive === false
+                              ? "bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)]"
+                              : "bg-[var(--status-success-bg)] text-[var(--status-success)]",
+                          )}
+                        >
+                          {notice.isActive === false ? "보관함" : "앱 노출중"}
+                        </span>
+                      ) : pinReorderMode ? (
                         <span className="text-[11px] text-[var(--text-muted)]">-</span>
                       ) : (
                         <button
