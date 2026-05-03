@@ -214,9 +214,7 @@ export default function AdminTimetableManagerPanel({
     if (!isValidTime(form.startTime) || !isValidTime(form.endTime)) {
       return "시작/종료 시간을 HH:mm 형식으로 입력해 주세요.";
     }
-    if (form.startTime >= form.endTime) {
-      return "시작 시간은 종료 시간보다 빨라야 합니다.";
-    }
+    // 자정을 넘기는 공연(예: 23:00 → 01:00)을 허용하기 위해 검증 제거
     return null;
   };
 

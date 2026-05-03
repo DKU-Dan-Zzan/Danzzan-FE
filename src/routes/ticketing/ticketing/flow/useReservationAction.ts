@@ -88,8 +88,8 @@ export const useReservationAction = ({
         setStep("in-progress");
         setReserveProcessing(false);
         setReserveMessage("일시적인 오류가 발생했습니다. 네트워크 상태를 확인한 뒤 다시 시도해주세요.");
-        setReserveErrorMessage("요청 처리에 실패했습니다. 잠시 후 다시 시도해주세요.");
-        setReservationError("요청 처리에 실패했습니다. 잠시 후 다시 시도해주세요.");
+        setReserveErrorMessage("현재 예매가 불가능한 티켓입니다. 매진, 중복 예매 또는 마감 여부를 확인해 주세요.");
+        setReservationError("현재 예매가 불가능한 티켓입니다. 매진, 중복 예매 또는 마감 여부를 확인해 주세요.");
         break;
     }
 
