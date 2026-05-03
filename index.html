@@ -6,7 +6,7 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#e2e8f0" />
+    <meta name="theme-color" content="#ffffff" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="DAN-ZZAN" />
@@ -40,6 +40,61 @@
         }
       })();
     </script>
+    <!-- 인앱 스플래시 (React 로드 전 즉시 표시) -->
+    <div id="app-splash" style="
+      position: fixed; inset: 0; z-index: 9999;
+      background: #0d0d1a;
+      display: flex; align-items: flex-end; justify-content: center;
+      padding-bottom: 80px;
+      pointer-events: none;
+    ">
+      <div style="
+        position: absolute; inset: 0;
+        background-image: url('/posters/main-poster-final-vertical.jpeg');
+        background-size: cover;
+        background-position: center top;
+        animation: splashBgZoom 2.8s cubic-bezier(.25,.46,.45,.94) forwards;
+      "></div>
+      <div style="
+        position: absolute; inset: 0;
+        background: linear-gradient(to bottom,
+          rgba(10,10,25,.2) 0%,
+          rgba(10,10,25,.1) 40%,
+          rgba(10,10,25,.55) 75%,
+          rgba(10,10,25,.88) 100%);
+      "></div>
+      <img src="/pwa-192.png" style="
+        position: relative;
+        width: 72px; height: 72px;
+        border-radius: 18px;
+        object-fit: cover;
+        box-shadow: 0 8px 32px rgba(0,0,0,.5);
+        animation: splashIconUp 2.8s cubic-bezier(.25,.46,.45,.94) forwards;
+      " alt="" />
+    </div>
+    <style>
+      @keyframes splashBgZoom {
+        from { transform: scale(1.07); }
+        to   { transform: scale(1); }
+      }
+      @keyframes splashIconUp {
+        0%   { opacity: 0; transform: translateY(16px); }
+        20%  { opacity: 1; transform: translateY(0); }
+        75%  { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(-6px); }
+      }
+    </style>
+    <script>
+      (function () {
+        var splash = document.getElementById('app-splash');
+        setTimeout(function () {
+          splash.style.transition = 'opacity 0.4s ease';
+          splash.style.opacity = '0';
+          setTimeout(function () { splash.remove(); }, 400);
+        }, 2800);
+      })();
+    </script>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
