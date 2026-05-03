@@ -951,7 +951,7 @@ export default function Signup() {
                         disabled={sessionCreating}
                       >
                         <Send className="h-4 w-4" strokeWidth={2.2} />
-                        인증번호 받기
+                        문자 인증코드 발급
                       </Button>
                     )}
 
@@ -990,18 +990,23 @@ export default function Signup() {
                             APP_CARD_VARIANTS.gradTint,
                           )}
                         >
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-start gap-2">
                             <MessageSquare
-                              className="h-4 w-4 text-[var(--text-emphasis-vivid)]"
+                              className="mt-0.5 h-4 w-4 text-[var(--text-emphasis-vivid)]"
                               strokeWidth={2.2}
                             />
-                            <p className="text-sm font-semibold text-[var(--text)]">
-                              아래 인증코드를 복사해
-                              <span className="ml-1 font-extrabold text-[var(--primary)]">
-                                {octomoReceiveNumber.replace(/(\d{4})(\d{4})/, "$1-$2")}
-                              </span>
-                              으로 문자 전송해주세요
-                            </p>
+                            <div className="space-y-1">
+                              <p className="text-sm font-semibold text-[var(--text)]">
+                                인증코드를 복사해
+                                <span className="ml-1 font-extrabold text-[var(--primary)]">
+                                  {octomoReceiveNumber.replace(/(\d{4})(\d{4})/, "$1-$2")}
+                                </span>
+                                으로 문자 전송해주세요.
+                              </p>
+                              <p className="text-[11px] font-medium text-[var(--text-muted)]">
+                                해당 번호는 문자 수신 전용 번호입니다. 통화로는 인증되지 않아요.
+                              </p>
+                            </div>
                           </div>
 
                           {/* 인증코드 + 복사 버튼 */}
@@ -1040,6 +1045,23 @@ export default function Signup() {
                               문자 앱으로 바로 전송
                             </a>
                           )}
+
+                          <div className="rounded-xl border border-[color:color-mix(in_srgb,var(--border-base)_60%,transparent)] bg-[color:color-mix(in_srgb,var(--surface_container_lowest)_84%,white)] px-3 py-2.5">
+                            <ol className="space-y-1 text-[11px] font-medium text-[var(--text-muted)]">
+                              <li>1) 인증코드 복사</li>
+                              <li>
+                                2) 문자 앱에서{" "}
+                                <span className="font-semibold text-[var(--text)]">
+                                  {octomoReceiveNumber.replace(/(\d{4})(\d{4})/, "$1-$2")}
+                                </span>
+                                로 전송
+                              </li>
+                              <li>
+                                3) 이 화면으로 돌아와{" "}
+                                <span className="font-semibold text-[var(--text)]">인증 확인 버튼 클릭</span>
+                              </li>
+                            </ol>
+                          </div>
 
                           {/* 타이머 */}
                           <div className="flex items-center justify-between">
