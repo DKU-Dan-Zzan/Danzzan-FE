@@ -9,6 +9,7 @@ type AdminMapSidebarProps = {
   selectedDate: string;
   editorMode: EditorMode;
   statusMessage: string;
+  booths: AdminMapBooth[];
   colleges: AdminMapCollege[];
   selectedItem: SelectedItem;
   selectedBooth: AdminMapBooth | null;
@@ -17,9 +18,14 @@ type AdminMapSidebarProps = {
   onActivateBoothMode: () => void;
   onActivateCollegeMode: () => void;
   onClearSelection: () => void;
+  onSelectBooth: (boothId: number) => void;
   onSelectCollege: (collegeId: number) => void;
   onClearBoothLocation: () => void;
 };
+
+function getBoothDisplayName(name: string) {
+  return name.replace("(기업)", "").trim();
+}
 
 export const AdminMapSidebar = ({
   globalError,
@@ -27,6 +33,7 @@ export const AdminMapSidebar = ({
   selectedDate,
   editorMode,
   statusMessage,
+  booths,
   colleges,
   selectedItem,
   selectedBooth,
@@ -35,6 +42,7 @@ export const AdminMapSidebar = ({
   onActivateBoothMode,
   onActivateCollegeMode,
   onClearSelection,
+  onSelectBooth,
   onSelectCollege,
   onClearBoothLocation,
 }: AdminMapSidebarProps) => {
@@ -131,6 +139,41 @@ export const AdminMapSidebar = ({
       </section>
 
       <section className="rounded-2xl border border-[var(--border-base)] bg-white p-4 shadow-sm">
+        <h2 className="text-sm font-bold text-[var(--text)]">부스 목록</h2>
+
+        <div className="mt-3 max-h-64 space-y-2 overflow-y-auto">
+          {booths.map((booth) => {
+            const isSelected =
+              selectedItem?.kind === "booth" && selectedItem.id === booth.id;
+
+            return (
+              <button
+                key={booth.id}
+                type="button"
+                onClick={() => onSelectBooth(booth.id)}
+                aria-label={`${getBoothDisplayName(booth.name)} 선택`}
+                className={cn(
+                  "w-full rounded-2xl border px-3 py-3 text-left transition-colors",
+                  isSelected
+                    ? "border-[var(--accent)] bg-[var(--accent)]/10 ring-2 ring-[var(--accent)]/20"
+                    : "border-[var(--border-base)] bg-[var(--surface-subtle)] hover:bg-[var(--border-base)]",
+                )}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-semibold text-[var(--text)]">
+                    {getBoothDisplayName(booth.name)}
+                  </span>
+                  <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-[var(--text-muted)]">
+                    {booth.locationX != null && booth.locationY != null ? "배치됨" : "미배치"}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-[var(--border-base)] bg-white p-4 shadow-sm">
         <h2 className="text-sm font-bold text-[var(--text)]">단과대 목록</h2>
 
         <div className="mt-3 max-h-64 space-y-2 overflow-y-auto">
@@ -180,7 +223,7 @@ export const AdminMapSidebar = ({
 
           {selectedBooth && (
             <div className="space-y-2">
-              <p className="text-sm font-bold text-[var(--text)]">{selectedBooth.name}</p>
+              <p className="text-sm font-bold text-[var(--text)]">{getBoothDisplayName(selectedBooth.name)}</p>
               <p className="text-xs text-[var(--text-muted)]">유형: {selectedBooth.type}</p>
               <p className="text-xs text-[var(--text-muted)]">
                 경도(X): {selectedBooth.locationX ?? "-"}
