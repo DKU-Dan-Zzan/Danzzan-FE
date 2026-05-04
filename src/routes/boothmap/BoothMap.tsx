@@ -119,6 +119,10 @@ function isFoodTruckBooth(booth?: Booth | null) {
   return booth?.type === "FOOD_TRUCK";
 }
 
+function isExperienceBooth(booth?: Booth | null) {
+  return booth?.type === "EXPERIENCE";
+}
+
 function shouldOpenListSheetAtHalf(filter: PrimaryFilter) {
   return (
     filter === "PUB" ||
@@ -138,6 +142,7 @@ export default function BoothMap() {
   const [pubListCollegeId, setPubListCollegeId] = useState<number | null>(null);
   const [sheetMode, setSheetMode] = useState<SheetMode>("LIST");
   const [sheetSnap, setSheetSnap] = useState<SheetSnap>("PEEK");
+  const [isBoothExpanded, setIsBoothExpanded] = useState(false);
   const [selectedDate, setSelectedDate] = useState(getInitialFestivalDate);
   const [mapViewport, setMapViewport] = useState<MapViewport>(DEFAULT_MAP_VIEWPORT);
   const [bottomNavHeight, setBottomNavHeight] = useState(56);
@@ -206,6 +211,7 @@ export default function BoothMap() {
       setSheetMode("LIST");
       setSheetSnap(shouldOpenListSheetAtHalf(next) ? "HALF" : "PEEK");
       setPubListCollegeId(null);
+      setIsBoothExpanded(next === "EXPERIENCE");
 
       if (next !== "PUB") {
         setSelectedCollegeId(null);
@@ -367,12 +373,16 @@ export default function BoothMap() {
       return;
     }
 
+    if (primaryFilter === "ALL" && isExperienceBooth(booth)) {
+      setIsBoothExpanded(true);
+    }
+
     setSelectedMapItem({ kind: "booth", id });
     setSelectedDetailItem(null);
     setSelectedCollegeId(null);
     setPubListCollegeId(null);
     setSheetMode("LIST");
-  }, [booths, resolveBoothSelection]);
+  }, [booths, primaryFilter, resolveBoothSelection]);
 
   const onClickMarkerCollege = useCallback((id: number) => {
     setPubListCollegeId(id);
@@ -408,6 +418,10 @@ export default function BoothMap() {
     if (isFoodTruckBooth(selectedListBooth)) {
       openFoodTruckDetail(id);
       return;
+    }
+
+    if (primaryFilter === "ALL" && isExperienceBooth(selectedListBooth)) {
+      setIsBoothExpanded(true);
     }
 
     setSelectedMapItem({ kind: "booth", id });
@@ -517,12 +531,14 @@ export default function BoothMap() {
             booths={deferredVisibleBooths}
             colleges={deferredVisibleColleges}
             primaryFilter={primaryFilter}
+            isBoothExpanded={isBoothExpanded}
             selectedMapItem={selectedMapItem}
             sheetSnap={sheetSnap}
             viewport={mapViewport}
             onViewportChange={setMapViewport}
             onClickBooth={onClickMarkerBooth}
             onClickCollege={onClickMarkerCollege}
+            onExpandBooth={() => onChangePrimaryFilterFromMap("EXPERIENCE")}
             onPrimaryFilterChange={onChangePrimaryFilterFromMap}
           />
         </div>
@@ -545,6 +561,7 @@ export default function BoothMap() {
                 setSelectedDetailItem(null);
                 setSelectedCollegeId(null);
                 setPubListCollegeId(null);
+                setIsBoothExpanded(primaryFilter === "EXPERIENCE");
                 setSheetMode("LIST");
               });
             }}

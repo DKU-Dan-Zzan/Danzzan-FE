@@ -22,6 +22,24 @@ const typeBadgeClassName: Record<string, string> = {
     "border-[color:color-mix(in_srgb,var(--boothmap-marker-facility)_18%,white)] bg-[color:color-mix(in_srgb,var(--boothmap-marker-facility)_10%,white)] text-[var(--boothmap-marker-facility)]",
 };
 
+const COMPANY_BOOTH_SUFFIX = "(기업)";
+
+function isCompanyBooth(name: string) {
+  return name.includes(COMPANY_BOOTH_SUFFIX);
+}
+
+function getBoothDisplayName(name: string) {
+  return name.replace(COMPANY_BOOTH_SUFFIX, "").trim();
+}
+
+function getBoothChipLabel(booth: Booth) {
+  if (booth.type !== "EXPERIENCE") {
+    return typeLabel[booth.type];
+  }
+
+  return isCompanyBooth(booth.name) ? "기업부스" : "학생부스";
+}
+
 export default function BoothList({
   booths,
   boothDetailAvailability,
@@ -46,6 +64,7 @@ export default function BoothList({
   return (
     <div className="space-y-3">
       {booths.map((booth) => {
+        const displayName = getBoothDisplayName(booth.name);
         const operatingTimeText = formatBoothOperatingLabel(
           booth.startTime,
           booth.endTime,
@@ -74,15 +93,15 @@ export default function BoothList({
             style={{ contentVisibility: "auto", containIntrinsicSize: "120px" }}
             aria-label={
               booth.type === "FOOD_TRUCK"
-                ? `${booth.name} 상세보기`
-                : `${booth.name} 선택`
+                ? `${displayName} 상세보기`
+                : `${displayName} 선택`
             }
             className="w-full rounded-[26px] border border-[var(--boothmap-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--boothmap-surface)_96%,white)_0%,color-mix(in_srgb,var(--boothmap-surface-soft)_86%,white)_100%)] p-4 text-left shadow-[var(--boothmap-card-shadow)] transition hover:-translate-y-0.5 hover:shadow-[var(--boothmap-card-shadow-strong)]"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1 pl-1">
                 <div className="truncate text-[17px] font-extrabold tracking-[-0.02em] text-[var(--boothmap-text)]">
-                  {booth.name}
+                  {displayName}
                 </div>
               </div>
 
@@ -93,7 +112,7 @@ export default function BoothList({
                     typeBadgeClassName[booth.type],
                   )}
                 >
-                  {typeLabel[booth.type]}
+                  {getBoothChipLabel(booth)}
                 </div>
               </div>
             </div>
