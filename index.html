@@ -78,65 +78,8 @@
         }
       })();
     </script>
-    <!-- 인앱 스플래시 (Android PWA 전용) -->
-    <div id="app-splash" style="
-      display: none;
-      position: fixed; inset: 0; z-index: 9999;
-      background: #0d0d1a;
-      align-items: flex-end; justify-content: center;
-      padding-bottom: 80px;
-      pointer-events: none;
-    ">
-      <div style="
-        position: absolute; inset: 0;
-        background-image: url('/posters/main-poster-final-vertical.jpeg');
-        background-size: cover;
-        background-position: center top;
-        animation: splashBgZoom 2.8s cubic-bezier(.25,.46,.45,.94) forwards;
-      "></div>
-      <div style="
-        position: absolute; inset: 0;
-        background: linear-gradient(to bottom,
-          rgba(10,10,25,.2) 0%,
-          rgba(10,10,25,.1) 40%,
-          rgba(10,10,25,.55) 75%,
-          rgba(10,10,25,.88) 100%);
-      "></div>
-      <img src="/pwa-192.png" style="
-        position: relative;
-        width: 72px; height: 72px;
-        border-radius: 18px;
-        object-fit: cover;
-        box-shadow: 0 8px 32px rgba(0,0,0,.5);
-        animation: splashIconUp 2.8s cubic-bezier(.25,.46,.45,.94) forwards;
-      " alt="" />
-    </div>
-    <style>
-      @keyframes splashBgZoom {
-        from { transform: scale(1.07); }
-        to   { transform: scale(1); }
-      }
-      @keyframes splashIconUp {
-        0%   { opacity: 0; transform: translateY(16px); }
-        20%  { opacity: 1; transform: translateY(0); }
-        75%  { opacity: 1; transform: translateY(0); }
-        100% { opacity: 0; transform: translateY(-6px); }
-      }
-    </style>
-    <script>
-      (function () {
-        if (!/android/i.test(navigator.userAgent)) return;
-        var splash = document.getElementById('app-splash');
-        splash.style.display = 'flex';
-        setTimeout(function () {
-          splash.style.transition = 'opacity 0.4s ease';
-          splash.style.opacity = '0';
-          setTimeout(function () { splash.remove(); }, 400);
-        }, 2800);
-      })();
-    </script>
 
-    <div id="root"></div>
+<div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
