@@ -45,6 +45,10 @@ declare global {
 
 const NUDGE_STEP = 0.000005;
 
+function getBoothDisplayName(name: string) {
+  return name.replace("(기업)", "").trim();
+}
+
 export default function AdminMapEditorPanel({
   topSlot,
 }: {
@@ -549,6 +553,24 @@ export default function AdminMapEditorPanel({
     setStatusMessage("학과가 선택되었습니다. 지도를 클릭하거나 해당 마커를 드래그해 위치를 지정해 주세요.");
   };
 
+  const handleSelectBooth = (boothId: number) => {
+    const booth = editableBooths.find((item) => item.id === boothId) ?? null;
+
+    setEditorMode("booth");
+    setSelectedItem({ kind: "booth", id: boothId });
+    setStatusMessage("부스가 선택되었습니다. 지도를 클릭하거나 해당 마커를 드래그해 위치를 지정해 주세요.");
+
+    if (!booth || booth.locationX == null || booth.locationY == null) {
+      return;
+    }
+
+    if (!mapRef.current || !window.kakao?.maps) {
+      return;
+    }
+
+    mapRef.current.panTo(new window.kakao.maps.LatLng(booth.locationY, booth.locationX));
+  };
+
   const handleClearSelection = () => {
     setSelectedItem(null);
     setEditorMode("idle");
@@ -648,6 +670,7 @@ export default function AdminMapEditorPanel({
           selectedDate={selectedDate}
           editorMode={editorMode}
           statusMessage={statusMessage}
+          booths={editableBooths}
           colleges={colleges}
           selectedItem={selectedItem}
           selectedBooth={selectedBooth}
@@ -658,6 +681,7 @@ export default function AdminMapEditorPanel({
           onActivateBoothMode={activateBoothMode}
           onActivateCollegeMode={activateCollegeMode}
           onClearSelection={handleClearSelection}
+          onSelectBooth={handleSelectBooth}
           onSelectCollege={handleSelectCollege}
           onClearBoothLocation={handleClearBoothLocation}
         />

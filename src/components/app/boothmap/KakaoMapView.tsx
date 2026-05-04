@@ -196,6 +196,10 @@ function getOverlayKey(kind: "booth" | "college", id: number) {
   return `${kind}:${id}`
 }
 
+function getBoothDisplayName(name: string) {
+  return name.replace("(기업)", "").trim()
+}
+
 export default function KakaoMapView({
   booths,
   colleges,
@@ -767,7 +771,7 @@ export default function KakaoMapView({
         id: booth.id,
         lat: booth.location_y,
         lng: booth.location_x,
-        name: booth.name,
+        name: getBoothDisplayName(booth.name),
         type: booth.type,
         subType: booth.subType,
         onClick: () => onClickBooth(booth.id),
