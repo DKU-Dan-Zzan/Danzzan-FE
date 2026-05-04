@@ -648,10 +648,6 @@ export default function KakaoMapView({
   const fitBoundsWithSheetPadding = (
     bounds: import("@/types/app/boothmap/kakao-map").KakaoLatLngBounds,
     targetSnap: SheetSnap,
-    options?: {
-      extraHorizontalPadding?: number
-      extraVerticalPadding?: number
-    },
   ) => {
     const map = mapInstanceRef.current
     if (!map || !mapRef.current) return
@@ -660,10 +656,10 @@ export default function KakaoMapView({
       Math.round(mapRef.current.clientHeight * getBottomSheetCoveredRatio(targetSnap)),
       0,
     )
-    const horizontalPadding = 24 + (options?.extraHorizontalPadding ?? 0)
-    const topPadding = 24 + (options?.extraVerticalPadding ?? 0)
+    const horizontalPadding = 24
+    const topPadding = 24
     const centerShift = Math.max(Math.round(coveredHeight / 2 - 65), 0)
-    const bottomPadding = topPadding + centerShift * 2 + (options?.extraVerticalPadding ?? 0)
+    const bottomPadding = topPadding + centerShift * 2
 
     map.setBounds(bounds, topPadding, horizontalPadding, bottomPadding, horizontalPadding)
   }
@@ -932,6 +928,9 @@ export default function KakaoMapView({
 
 
           map.setLevel(2, { anchor: target }) // 클릭한 마커 기준 확대
+          if (selectedBooth.type === "EXPERIENCE") {
+            map.setLevel(1, { anchor: target })
+          }
           if (sheetSnap === "PEEK") {
             map.panTo(target)
           } else {
@@ -1156,16 +1155,23 @@ export default function KakaoMapView({
       visibleItems.length > 0
     ) {
       const bounds = createItemBounds(visibleItems)
-      fitBoundsWithSheetPadding(
-        bounds,
-        sheetSnap,
-        primaryFilter === "EXPERIENCE"
-          ? {
-            extraHorizontalPadding: 40,
-            extraVerticalPadding: 28,
-          }
-          : undefined,
-      )
+      fitBoundsWithSheetPadding(bounds, sheetSnap)
+      if (primaryFilter === "EXPERIENCE") {
+        const currentLevel = mapInstanceRef.current?.getLevel()
+        if (typeof currentLevel === "number") {
+          mapInstanceRef.current?.setLevel(Math.max(1, currentLevel - 1))
+        }
+
+        const centerLat =
+          visibleItems.reduce((sum, item) => sum + item.lat, 0) / visibleItems.length
+        const centerLng =
+          visibleItems.reduce((sum, item) => sum + item.lng, 0) / visibleItems.length
+        panToWithSheetOffset({
+          lat: centerLat,
+          lng: centerLng,
+          targetSnap: sheetSnap,
+        })
+      }
     }
 
     prevPrimaryFilterRef.current = primaryFilter
