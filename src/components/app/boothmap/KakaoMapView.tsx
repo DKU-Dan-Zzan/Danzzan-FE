@@ -38,12 +38,14 @@ type Props = {
   booths: Booth[];
   colleges: College[];
   primaryFilter: PrimaryFilter;
+  isBoothExpanded: boolean;
   selectedMapItem: SelectedMapItem;
   sheetSnap: SheetSnap;
   viewport: MapViewport;
   onViewportChange: (next: MapViewport) => void;
   onClickBooth: (id: number) => void;
   onClickCollege: (id: number) => void;
+  onExpandBooth: () => void;
   onPrimaryFilterChange: (next: PrimaryFilter) => void;
 };
 
@@ -198,12 +200,14 @@ export default function KakaoMapView({
   booths,
   colleges,
   primaryFilter,
+  isBoothExpanded,
   selectedMapItem,
   sheetSnap,
   viewport,
   onViewportChange,
   onClickBooth,
   onClickCollege,
+  onExpandBooth,
   onPrimaryFilterChange,
 }: Props) {
   const mapRef = useRef<HTMLDivElement | null>(null)
@@ -723,10 +727,13 @@ export default function KakaoMapView({
     record.labelOverlay?.setMap(null)
   }
 
+  const boothZone = MAP_ZONES.find((zone) => zone.type === "BOOTH") ?? null
   const pubZone = MAP_ZONES.find((zone) => zone.type === "PUB") ?? null
   const foodTruckZone = MAP_ZONES.find((zone) => zone.type === "FOOD_TRUCK") ?? null
   const smokingZones = MAP_ZONES.filter((zone) => zone.type === "SMOKING_AREA")
 
+  const shouldShowBoothZoneSummary =
+    primaryFilter === "ALL" && !isBoothExpanded && boothZone
   const shouldShowPubZoneSummary = primaryFilter === "ALL" && pubZone
   const shouldShowFoodTruckZoneSummary = primaryFilter === "ALL" && foodTruckZone
   const shouldShowSmokingZoneSummary = primaryFilter === "ALL" && smokingZones.length > 0
@@ -784,7 +791,17 @@ export default function KakaoMapView({
       colleges.forEach(addCollege)
     } else if (primaryFilter === "ALL") {
       booths
-        .filter((booth) => booth.type !== "FOOD_TRUCK")
+        .filter((booth) => {
+          if (booth.type === "FOOD_TRUCK") {
+            return false
+          }
+
+          if (booth.type === "EXPERIENCE") {
+            return isBoothExpanded
+          }
+
+          return true
+        })
         .forEach(addBooth)
     } else if (primaryFilter === "FOOD_TRUCK") {
       // Food trucks stay grouped under the shared zone marker.
@@ -793,7 +810,7 @@ export default function KakaoMapView({
     }
 
     return items
-  }, [booths, colleges, primaryFilter, onClickBooth, onClickCollege])
+  }, [booths, colleges, isBoothExpanded, primaryFilter, onClickBooth, onClickCollege])
 
   // 1) 마커 목록이 바뀔 때만 전체 오버레이 재구성
   useEffect(() => {
@@ -911,6 +928,9 @@ export default function KakaoMapView({
 
 
           map.setLevel(2, { anchor: target }) // 클릭한 마커 기준 확대
+          if (selectedBooth.type === "EXPERIENCE") {
+            map.setLevel(1, { anchor: target })
+          }
           if (sheetSnap === "PEEK") {
             map.panTo(target)
           } else {
@@ -958,6 +978,27 @@ export default function KakaoMapView({
     const pubZonePalette = getBoothmapZonePalette("PUB")
     const foodTruckZonePalette = getBoothmapZonePalette("FOOD_TRUCK")
     const smokingZonePalette = getBoothmapZonePalette("SMOKING_AREA")
+
+    if (shouldShowBoothZoneSummary && boothZone) {
+      boothZone.polygons.forEach((paths) => {
+        createZonePolygon({
+          paths,
+          strokeColor: getBoothmapColor("markerExperience"),
+          fillColor: getBoothmapColor("markerExperience"),
+          fillOpacity: 0.16,
+        })
+      })
+
+      boothZone.markers.forEach((marker) => {
+        createZoneMarkerRecord({
+          lat: marker.lat,
+          lng: marker.lng,
+          label: boothZone.label,
+          type: "EXPERIENCE",
+          onClick: onExpandBooth,
+        })
+      })
+    }
 
     if (shouldShowPubZoneSummary && pubZone) {
       pubZone.polygons.forEach((paths) => {
@@ -1066,8 +1107,12 @@ export default function KakaoMapView({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- zone overlay는 filter 변화만 반영하고 기존 핸들러 참조를 유지
   }, [
+    boothZone,
     isLoaded,
+    isBoothExpanded,
+    onExpandBooth,
     primaryFilter,
+    shouldShowBoothZoneSummary,
     shouldShowPubZoneSummary,
     shouldShowFoodTruckZoneSummary,
     shouldShowSmokingZoneSummary,
@@ -1111,6 +1156,22 @@ export default function KakaoMapView({
     ) {
       const bounds = createItemBounds(visibleItems)
       fitBoundsWithSheetPadding(bounds, sheetSnap)
+      if (primaryFilter === "EXPERIENCE") {
+        const currentLevel = mapInstanceRef.current?.getLevel()
+        if (typeof currentLevel === "number") {
+          mapInstanceRef.current?.setLevel(Math.max(1, currentLevel - 1))
+        }
+
+        const centerLat =
+          visibleItems.reduce((sum, item) => sum + item.lat, 0) / visibleItems.length
+        const centerLng =
+          visibleItems.reduce((sum, item) => sum + item.lng, 0) / visibleItems.length
+        panToWithSheetOffset({
+          lat: centerLat,
+          lng: centerLng,
+          targetSnap: sheetSnap,
+        })
+      }
     }
 
     prevPrimaryFilterRef.current = primaryFilter

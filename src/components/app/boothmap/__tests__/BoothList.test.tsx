@@ -85,4 +85,31 @@ describe("BoothList", () => {
     expect(onSelectBooth).not.toHaveBeenCalled();
     cleanup();
   });
+  it("체험 부스는 표시용 이름과 칩 라벨을 분리해서 보여준다", () => {
+    const booths: Booth[] = [
+      {
+        id: 3,
+        name: "엔비디아 (기업)",
+        type: "EXPERIENCE",
+        description: "기업 부스",
+        location_x: 0,
+        location_y: 0,
+      },
+      {
+        id: 4,
+        name: "베이크슈",
+        type: "EXPERIENCE",
+        description: "학생 부스",
+        location_x: 0,
+        location_y: 0,
+      },
+    ];
+    const { cleanup } = renderBoothList(booths, {});
+
+    expect(document.body.textContent).toContain("엔비디아");
+    expect(document.body.textContent).not.toContain("(기업)");
+    expect(document.body.textContent).toContain("기업부스");
+    expect(document.body.textContent).toContain("학생부스");
+    cleanup();
+  });
 });

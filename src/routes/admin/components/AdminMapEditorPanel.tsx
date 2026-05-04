@@ -43,6 +43,8 @@ declare global {
   }
 }
 
+const NUDGE_STEP = 0.000005;
+
 export default function AdminMapEditorPanel({
   topSlot,
 }: {
@@ -53,6 +55,7 @@ export default function AdminMapEditorPanel({
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<KakaoMap | null>(null);
+  const shouldAutoFitBoundsRef = useRef(true);
   const mapClickHandlerRef = useRef<((mouseEvent: KakaoMouseEvent) => void) | null>(
     null,
   );
@@ -108,6 +111,7 @@ export default function AdminMapEditorPanel({
     try {
       setGlobalError(null);
       setLoading(true);
+      shouldAutoFitBoundsRef.current = true;
 
       const data = await getAdminMap(date);
       setColleges(data.colleges ?? []);
@@ -155,6 +159,60 @@ export default function AdminMapEditorPanel({
       ),
     );
   }, []);
+
+  const persistBoothLocation = useCallback(
+    async ({
+      boothId,
+      boothName,
+      lat,
+      lng,
+      previousLocationX,
+      previousLocationY,
+    }: {
+      boothId: number;
+      boothName: string;
+      lat: number;
+      lng: number;
+      previousLocationX: number | null;
+      previousLocationY: number | null;
+    }) => {
+      try {
+        setSaving(true);
+        setGlobalError(null);
+        updateBoothState(boothId, lng, lat);
+        await updateBoothLocation(boothId, lng, lat);
+        setStatusMessage(`부스 위치를 저장했습니다: ${boothName}`);
+      } catch (error) {
+        updateBoothState(boothId, previousLocationX, previousLocationY);
+        setGlobalError(
+          error instanceof Error ? error.message : "부스 위치 저장에 실패했습니다.",
+        );
+      } finally {
+        setSaving(false);
+      }
+    },
+    [updateBoothState],
+  );
+
+  const nudgeSelectedBooth = useCallback(
+    (deltaLat: number, deltaLng: number) => {
+      if (!selectedBooth) return;
+      if (selectedBooth.locationX == null || selectedBooth.locationY == null) return;
+
+      const nextLat = selectedBooth.locationY + deltaLat;
+      const nextLng = selectedBooth.locationX + deltaLng;
+
+      void persistBoothLocation({
+        boothId: selectedBooth.id,
+        boothName: selectedBooth.name,
+        lat: nextLat,
+        lng: nextLng,
+        previousLocationX: selectedBooth.locationX,
+        previousLocationY: selectedBooth.locationY,
+      });
+    },
+    [persistBoothLocation, selectedBooth],
+  );
 
   const saveSelectedLocation = useCallback(
     async (lat: number, lng: number) => {
@@ -429,19 +487,14 @@ export default function AdminMapEditorPanel({
         setSelectedItem({ kind: "booth", id: booth.id });
 
         void (async () => {
-          try {
-            setSaving(true);
-            setGlobalError(null);
-            await updateBoothLocation(booth.id, lng, lat);
-            updateBoothState(booth.id, lng, lat);
-            setStatusMessage(`부스 위치를 저장했습니다: ${booth.name}`);
-          } catch (error) {
-            setGlobalError(
-              error instanceof Error ? error.message : "부스 위치 저장에 실패했습니다.",
-            );
-          } finally {
-            setSaving(false);
-          }
+          await persistBoothLocation({
+            boothId: booth.id,
+            boothName: booth.name,
+            lat,
+            lng,
+            previousLocationX: booth.locationX,
+            previousLocationY: booth.locationY,
+          });
         })();
       });
 
@@ -450,8 +503,9 @@ export default function AdminMapEditorPanel({
       hasPosition = true;
     });
 
-    if (hasPosition) {
+    if (hasPosition && shouldAutoFitBoundsRef.current) {
       map.setBounds(bounds);
+      shouldAutoFitBoundsRef.current = false;
     }
 
     return () => {
@@ -466,6 +520,7 @@ export default function AdminMapEditorPanel({
     isKakaoLoaded,
     colleges,
     placedBooths,
+    persistBoothLocation,
     selectedItem,
     editorMode,
     updateBoothState,
@@ -620,6 +675,50 @@ export default function AdminMapEditorPanel({
               {saving ? "저장 중" : "즉시 저장"}
             </span>
           </div>
+
+          {editorMode === "booth" && selectedBooth && (
+            <div className="mb-3 rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] p-3">
+              <div className="text-xs font-semibold text-[var(--text-muted)]">
+                선택된 부스 미세 조정
+              </div>
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                <div />
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => nudgeSelectedBooth(NUDGE_STEP, 0)}
+                  className="rounded-xl border border-[var(--border-base)] bg-white px-3 py-2 text-sm font-semibold text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)] disabled:opacity-60"
+                >
+                  위
+                </button>
+                <div />
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => nudgeSelectedBooth(0, -NUDGE_STEP)}
+                  className="rounded-xl border border-[var(--border-base)] bg-white px-3 py-2 text-sm font-semibold text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)] disabled:opacity-60"
+                >
+                  왼쪽
+                </button>
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => nudgeSelectedBooth(-NUDGE_STEP, 0)}
+                  className="rounded-xl border border-[var(--border-base)] bg-white px-3 py-2 text-sm font-semibold text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)] disabled:opacity-60"
+                >
+                  아래
+                </button>
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => nudgeSelectedBooth(0, NUDGE_STEP)}
+                  className="rounded-xl border border-[var(--border-base)] bg-white px-3 py-2 text-sm font-semibold text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)] disabled:opacity-60"
+                >
+                  오른쪽
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="relative min-h-[720px] overflow-hidden rounded-2xl border border-[var(--border-base)]">
             <div ref={mapContainerRef} className="h-[720px] w-full" />
