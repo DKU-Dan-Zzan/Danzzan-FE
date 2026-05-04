@@ -45,10 +45,6 @@ declare global {
 
 const NUDGE_STEP = 0.000005;
 
-function getBoothDisplayName(name: string) {
-  return name.replace("(기업)", "").trim();
-}
-
 export default function AdminMapEditorPanel({
   topSlot,
 }: {
