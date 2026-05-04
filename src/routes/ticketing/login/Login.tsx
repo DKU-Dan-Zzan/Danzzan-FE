@@ -30,7 +30,7 @@ const LOGIN_ACTION =
   "축제 서비스 계정으로 로그인";
 const SHOW_PASSWORD = "비밀번호 보기";
 const HIDE_PASSWORD = "비밀번호 숨기기";
-const SIGNUP_PROMPT = "축제 서비스가 처음 이용이신가요?";
+const SIGNUP_PROMPT = "축제 서비스를 처음 이용하시나요?";
 const SIGNUP_ACTION = "회원가입";
 const RESET_PROMPT = "비밀번호를 잊으셨나요?";
 const RESET_ACTION = "비밀번호 재설정";
