@@ -28,7 +28,6 @@ export default function TimelineItem({
 }) {
   const isEndTimeHiddenArtist = shouldHideEndTimeByArtistName(item.artistName)
   const timeLabel = `${item.startTime} ~${isEndTimeHiddenArtist ? "" : ` ${item.endTime}`}`
-  const timeWidthPlaceholder = isEndTimeHiddenArtist ? (item.endTime || "00:00") : null
   const timeRangeA11yLabel = isEndTimeHiddenArtist
     ? `${item.startTime} 시작, 종료 시각 미정`
     : `${item.startTime}부터 ${item.endTime}까지`
@@ -41,7 +40,7 @@ export default function TimelineItem({
         isLast ? "pb-6" : "pb-14",
       ].join(" ")}
     >
-      <div className="mx-auto grid w-full max-w-[420px] grid-cols-[auto_24px_minmax(0,1fr)] items-start pt-3">
+      <div className="mx-auto grid w-full max-w-[420px] grid-cols-[9.5rem_24px_minmax(0,1fr)] items-start pt-3 sm:grid-cols-[10rem_24px_minmax(0,1fr)]">
         {/* 시간 */}
         <div className="col-start-1 row-start-1 flex items-center justify-end self-start pr-1">
           <p
@@ -57,11 +56,6 @@ export default function TimelineItem({
             }
           >
             {timeLabel}
-            {timeWidthPlaceholder ? (
-              <span className="invisible" aria-hidden>
-                {timeWidthPlaceholder}
-              </span>
-            ) : null}
           </p>
         </div>
 
