@@ -27,9 +27,12 @@ export default function TimelineItem({
   showNow?: boolean
 }) {
   const isEndTimeHiddenArtist = shouldHideEndTimeByArtistName(item.artistName)
-  const displayEndTime = isEndTimeHiddenArtist ? "--:--" : item.endTime
-  const endTimeA11yLabel = isEndTimeHiddenArtist ? "종료 시각 미정" : `${item.endTime}까지`
-  const timeLabel = `${item.startTime} ~ ${displayEndTime}`
+  const timeLabel = isEndTimeHiddenArtist
+    ? `${item.startTime} ~`
+    : `${item.startTime} ~ ${item.endTime}`
+  const timeRangeA11yLabel = isEndTimeHiddenArtist
+    ? `${item.startTime} 시작, 종료 시각 미정`
+    : `${item.startTime}부터 ${item.endTime}까지`
 
   return (
     <li
@@ -50,8 +53,8 @@ export default function TimelineItem({
             }}
             aria-label={
               showNow
-                ? `지금 진행 중인 공연, ${item.startTime}부터 ${endTimeA11yLabel}`
-                : `공연 시간 ${item.startTime}부터 ${endTimeA11yLabel}`
+                ? `지금 진행 중인 공연, ${timeRangeA11yLabel}`
+                : `공연 시간 ${timeRangeA11yLabel}`
             }
           >
             {timeLabel}
