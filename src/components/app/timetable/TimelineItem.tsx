@@ -8,6 +8,12 @@ function hashtagLabel(description: string) {
 
 /** 원형 사진 */
 const AVATAR_PX = "9rem"
+const END_TIME_PLACEHOLDER_ARTIST_NAMES = new Set(["PSY", "싸이", "PSY(싸이)"])
+
+function shouldHideEndTimeByArtistName(artistName: string) {
+  const normalizedArtistName = artistName.trim().replace(/\s+/g, "").toUpperCase()
+  return END_TIME_PLACEHOLDER_ARTIST_NAMES.has(normalizedArtistName)
+}
 
 export default function TimelineItem({
   item,
@@ -20,7 +26,10 @@ export default function TimelineItem({
   innerRef?: (el: HTMLLIElement | null) => void
   showNow?: boolean
 }) {
-  const timeLabel = `${item.startTime} ~ ${item.endTime}`
+  const isEndTimeHiddenArtist = shouldHideEndTimeByArtistName(item.artistName)
+  const displayEndTime = isEndTimeHiddenArtist ? "--:--" : item.endTime
+  const endTimeA11yLabel = isEndTimeHiddenArtist ? "종료 시각 미정" : `${item.endTime}까지`
+  const timeLabel = `${item.startTime} ~ ${displayEndTime}`
 
   return (
     <li
@@ -41,8 +50,8 @@ export default function TimelineItem({
             }}
             aria-label={
               showNow
-                ? `지금 진행 중인 공연, ${item.startTime}부터 ${item.endTime}까지`
-                : `공연 시간 ${item.startTime}부터 ${item.endTime}까지`
+                ? `지금 진행 중인 공연, ${item.startTime}부터 ${endTimeA11yLabel}`
+                : `공연 시간 ${item.startTime}부터 ${endTimeA11yLabel}`
             }
           >
             {timeLabel}
