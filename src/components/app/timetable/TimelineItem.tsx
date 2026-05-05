@@ -27,9 +27,8 @@ export default function TimelineItem({
   showNow?: boolean
 }) {
   const isEndTimeHiddenArtist = shouldHideEndTimeByArtistName(item.artistName)
-  const timeLabel = isEndTimeHiddenArtist
-    ? `${item.startTime} ~`
-    : `${item.startTime} ~ ${item.endTime}`
+  const timeLabel = `${item.startTime} ~${isEndTimeHiddenArtist ? "" : ` ${item.endTime}`}`
+  const timeWidthPlaceholder = isEndTimeHiddenArtist ? (item.endTime || "00:00") : null
   const timeRangeA11yLabel = isEndTimeHiddenArtist
     ? `${item.startTime} 시작, 종료 시각 미정`
     : `${item.startTime}부터 ${item.endTime}까지`
@@ -58,6 +57,11 @@ export default function TimelineItem({
             }
           >
             {timeLabel}
+            {timeWidthPlaceholder ? (
+              <span className="invisible" aria-hidden>
+                {timeWidthPlaceholder}
+              </span>
+            ) : null}
           </p>
         </div>
 
