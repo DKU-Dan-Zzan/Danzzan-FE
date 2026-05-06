@@ -245,6 +245,7 @@ export default function KakaoMapView({
   const selectedMapItemRef = useRef<SelectedMapItem>(selectedMapItem)
   const markerIconMarkupRef = useRef<Map<string, string>>(new Map())
   const [markerAssetVersion, setMarkerAssetVersion] = useState(0)
+  const [markerAssetsReady, setMarkerAssetsReady] = useState(false)
 
   // 이름 말풍선
 
@@ -265,6 +266,7 @@ export default function KakaoMapView({
     })
 
     if (missingPaths.length === 0) {
+      setMarkerAssetsReady(true)
       return () => {
         cancelled = true
       }
@@ -301,6 +303,8 @@ export default function KakaoMapView({
       if (didChange) {
         setMarkerAssetVersion((version) => version + 1)
       }
+
+      setMarkerAssetsReady(true)
     })
 
     return () => {
@@ -856,7 +860,7 @@ export default function KakaoMapView({
 
   // 1) 마커 목록이 바뀔 때만 전체 오버레이 재구성
   useEffect(() => {
-    if (!isLoaded || !mapInstanceRef.current) return
+    if (!isLoaded || !mapInstanceRef.current || !markerAssetsReady) return
 
     const { kakao } = window
     const map = mapInstanceRef.current
@@ -933,13 +937,14 @@ export default function KakaoMapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- overlay 재구성은 현재 계산된 visibleItems 기준으로만 동작
   }, [
     isLoaded,
+    markerAssetsReady,
     visibleItems,
     markerAssetVersion,
   ])
 
   // 2) 선택 상태만 바뀔 때는 필요한 overlay만 교체
   useEffect(() => {
-    if (!isLoaded || !mapInstanceRef.current) return
+    if (!isLoaded || !mapInstanceRef.current || !markerAssetsReady) return
 
     const { kakao } = window
     const map = mapInstanceRef.current
@@ -1011,10 +1016,10 @@ export default function KakaoMapView({
 
     prevSelectedKeyRef.current = nextKey
     // eslint-disable-next-line react-hooks/exhaustive-deps -- 선택 상태 effect는 현재 선택 key 전이만 추적
-  }, [isLoaded, selectedMapItem, boothMap, collegeMap, sheetSnap])
+  }, [isLoaded, markerAssetsReady, selectedMapItem, boothMap, collegeMap, sheetSnap])
 
   useEffect(() => {
-    if (!isLoaded || !mapInstanceRef.current) return
+    if (!isLoaded || !mapInstanceRef.current || !markerAssetsReady) return
 
     clearZoneOverlays()
     const pubZonePalette = getBoothmapZonePalette("PUB")
@@ -1152,6 +1157,7 @@ export default function KakaoMapView({
     boothZone,
     isLoaded,
     isBoothExpanded,
+    markerAssetsReady,
     onExpandBooth,
     primaryFilter,
     shouldShowBoothZoneSummary,
