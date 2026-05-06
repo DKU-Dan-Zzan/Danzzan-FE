@@ -76,15 +76,31 @@ type OverlayRecord = {
   onClick: () => void
 }
 
-function getMarkerConfig(params: { type: MarkerType; subType?: Booth["subType"] }) {
+function getMarkerConfig(params: {
+  type: MarkerType
+  subType?: Booth["subType"]
+  name?: string
+}) {
   return getBoothmapBoothMarkerTheme(params)
 }
 
 function createMarkerDataUrl(params: {
   color: string
   selected: boolean
+  useCircleShape: boolean
   iconMarkup: string
 }) {
+  if (params.useCircleShape) {
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="12.5" fill="${params.color}" stroke="rgba(255,255,255,0.92)" stroke-width="2.5"/>
+        ${params.iconMarkup}
+      </svg>
+    `
+
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`
+  }
+
   const stroke = params.selected ? params.color : "rgba(255,255,255,0.92)"
   const fill = params.selected ? getBoothmapColor("overlayBadgeText") : params.color
 
@@ -101,6 +117,7 @@ function createMarkerDataUrl(params: {
 const RAW_MARKER_ICON_PATHS = Array.from(
   new Set([
     ...Object.values(BOOTHMAP_MARKER_THEME).map((theme) => theme.iconPath),
+    "/markers/facility-info.svg",
     "/markers/facility-smoking.svg",
   ]),
 )
@@ -228,6 +245,7 @@ export default function KakaoMapView({
   const selectedMapItemRef = useRef<SelectedMapItem>(selectedMapItem)
   const markerIconMarkupRef = useRef<Map<string, string>>(new Map())
   const [markerAssetVersion, setMarkerAssetVersion] = useState(0)
+  const [markerAssetsReady, setMarkerAssetsReady] = useState(false)
 
   // 이름 말풍선
 
@@ -248,6 +266,7 @@ export default function KakaoMapView({
     })
 
     if (missingPaths.length === 0) {
+      setMarkerAssetsReady(true)
       return () => {
         cancelled = true
       }
@@ -284,6 +303,8 @@ export default function KakaoMapView({
       if (didChange) {
         setMarkerAssetVersion((version) => version + 1)
       }
+
+      setMarkerAssetsReady(true)
     })
 
     return () => {
@@ -454,21 +475,38 @@ export default function KakaoMapView({
   const createMarkerImage = ({
     type,
     subType,
+    name,
     selected,
+    useCircleShape = false,
   }: {
     type: MarkerType
     subType?: Booth["subType"]
+    name?: string
     selected: boolean
+    useCircleShape?: boolean
   }) => {
     const { kakao } = window
-    const { color, iconPath } = getMarkerConfig({ type, subType })
-    const width = selected ? 44 : 34
-    const height = selected ? 54 : 42
+    const { color, iconPath } = getMarkerConfig({ type, subType, name })
+    const width = selected ? 44 : useCircleShape ? 40 : 34
+    const height = selected ? 54 : useCircleShape ? 40 : 42
     const size = new kakao.maps.Size(width, height)
-    const offset = new kakao.maps.Point(width / 2, height)
-    const iconSize = selected ? 17 : 15
-    const iconX = 24 - iconSize / 2
-    const iconY = selected ? 15.5 : 16.5
+    const offset = new kakao.maps.Point(width / 2, useCircleShape ? height / 2 : height)
+    const isFacilityInfoIcon = iconPath === "/markers/facility-info.svg"
+    const iconSize = isFacilityInfoIcon
+      ? selected
+        ? 21
+        : useCircleShape
+          ? 14
+          : 18
+      : selected
+        ? 17
+        : useCircleShape
+          ? 12
+          : 15
+    const iconCenterX = useCircleShape ? width / 2 : 24
+    const iconCenterY = useCircleShape ? height / 2 : 24
+    const iconX = iconCenterX - iconSize / 2
+    const iconY = iconCenterY - iconSize / 2
     const iconColor = selected ? color : getBoothmapColor("overlayBadgeText")
     const rawSvgContent = markerIconMarkupRef.current.get(iconPath)
     const iconMarkup = rawSvgContent
@@ -487,7 +525,7 @@ export default function KakaoMapView({
         y: iconY,
         size: iconSize,
       })
-    const src = createMarkerDataUrl({ color, selected, iconMarkup })
+    const src = createMarkerDataUrl({ color, selected, useCircleShape, iconMarkup })
     return new kakao.maps.MarkerImage(src, size, { offset })
   }
 
@@ -552,11 +590,12 @@ export default function KakaoMapView({
   }): OverlayRecord => {
     const { kakao } = window
     const map = mapInstanceRef.current
+    const useCircleShape = kind === "booth" && type === "EXPERIENCE" && !isSelected
 
     const position = new kakao.maps.LatLng(lat, lng)
     const marker = new kakao.maps.Marker({
       position,
-      image: createMarkerImage({ type, subType, selected: isSelected }),
+      image: createMarkerImage({ type, subType, name, selected: isSelected, useCircleShape }),
       zIndex: isSelected ? 10 : 1,
     })
 
@@ -710,7 +749,10 @@ export default function KakaoMapView({
       createMarkerImage({
         type: record.type,
         subType: record.subType,
+        name: record.name,
         selected: isSelected,
+        useCircleShape:
+          record.kind === "booth" && record.type === "EXPERIENCE" && !isSelected,
       }),
     )
     record.marker.setZIndex?.(isSelected ? 10 : 1)
@@ -818,7 +860,7 @@ export default function KakaoMapView({
 
   // 1) 마커 목록이 바뀔 때만 전체 오버레이 재구성
   useEffect(() => {
-    if (!isLoaded || !mapInstanceRef.current) return
+    if (!isLoaded || !mapInstanceRef.current || !markerAssetsReady) return
 
     const { kakao } = window
     const map = mapInstanceRef.current
@@ -895,13 +937,14 @@ export default function KakaoMapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- overlay 재구성은 현재 계산된 visibleItems 기준으로만 동작
   }, [
     isLoaded,
+    markerAssetsReady,
     visibleItems,
     markerAssetVersion,
   ])
 
   // 2) 선택 상태만 바뀔 때는 필요한 overlay만 교체
   useEffect(() => {
-    if (!isLoaded || !mapInstanceRef.current) return
+    if (!isLoaded || !mapInstanceRef.current || !markerAssetsReady) return
 
     const { kakao } = window
     const map = mapInstanceRef.current
@@ -973,10 +1016,10 @@ export default function KakaoMapView({
 
     prevSelectedKeyRef.current = nextKey
     // eslint-disable-next-line react-hooks/exhaustive-deps -- 선택 상태 effect는 현재 선택 key 전이만 추적
-  }, [isLoaded, selectedMapItem, boothMap, collegeMap, sheetSnap])
+  }, [isLoaded, markerAssetsReady, selectedMapItem, boothMap, collegeMap, sheetSnap])
 
   useEffect(() => {
-    if (!isLoaded || !mapInstanceRef.current) return
+    if (!isLoaded || !mapInstanceRef.current || !markerAssetsReady) return
 
     clearZoneOverlays()
     const pubZonePalette = getBoothmapZonePalette("PUB")
@@ -1114,6 +1157,7 @@ export default function KakaoMapView({
     boothZone,
     isLoaded,
     isBoothExpanded,
+    markerAssetsReady,
     onExpandBooth,
     primaryFilter,
     shouldShowBoothZoneSummary,
@@ -1160,6 +1204,12 @@ export default function KakaoMapView({
     ) {
       const bounds = createItemBounds(visibleItems)
       fitBoundsWithSheetPadding(bounds, sheetSnap)
+      if (primaryFilter === "FACILITY") {
+        const currentLevel = mapInstanceRef.current?.getLevel()
+        if (typeof currentLevel === "number") {
+          mapInstanceRef.current?.setLevel(currentLevel + 1)
+        }
+      }
       if (primaryFilter === "EXPERIENCE") {
         const currentLevel = mapInstanceRef.current?.getLevel()
         if (typeof currentLevel === "number") {
