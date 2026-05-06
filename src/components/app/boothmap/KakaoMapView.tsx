@@ -83,8 +83,20 @@ function getMarkerConfig(params: { type: MarkerType; subType?: Booth["subType"] 
 function createMarkerDataUrl(params: {
   color: string
   selected: boolean
+  useCircleShape: boolean
   iconMarkup: string
 }) {
+  if (params.useCircleShape) {
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="12.5" fill="${params.color}" stroke="rgba(255,255,255,0.92)" stroke-width="2.5"/>
+        ${params.iconMarkup}
+      </svg>
+    `
+
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`
+  }
+
   const stroke = params.selected ? params.color : "rgba(255,255,255,0.92)"
   const fill = params.selected ? getBoothmapColor("overlayBadgeText") : params.color
 
@@ -455,20 +467,24 @@ export default function KakaoMapView({
     type,
     subType,
     selected,
+    useCircleShape = false,
   }: {
     type: MarkerType
     subType?: Booth["subType"]
     selected: boolean
+    useCircleShape?: boolean
   }) => {
     const { kakao } = window
     const { color, iconPath } = getMarkerConfig({ type, subType })
-    const width = selected ? 44 : 34
-    const height = selected ? 54 : 42
+    const width = selected ? 44 : useCircleShape ? 40 : 34
+    const height = selected ? 54 : useCircleShape ? 40 : 42
     const size = new kakao.maps.Size(width, height)
-    const offset = new kakao.maps.Point(width / 2, height)
-    const iconSize = selected ? 17 : 15
-    const iconX = 24 - iconSize / 2
-    const iconY = selected ? 15.5 : 16.5
+    const offset = new kakao.maps.Point(width / 2, useCircleShape ? height / 2 : height)
+    const iconSize = selected ? 17 : useCircleShape ? 12 : 15
+    const iconCenterX = useCircleShape ? width / 2 : 24
+    const iconCenterY = useCircleShape ? height / 2 : 24
+    const iconX = iconCenterX - iconSize / 2
+    const iconY = iconCenterY - iconSize / 2
     const iconColor = selected ? color : getBoothmapColor("overlayBadgeText")
     const rawSvgContent = markerIconMarkupRef.current.get(iconPath)
     const iconMarkup = rawSvgContent
@@ -487,7 +503,7 @@ export default function KakaoMapView({
         y: iconY,
         size: iconSize,
       })
-    const src = createMarkerDataUrl({ color, selected, iconMarkup })
+    const src = createMarkerDataUrl({ color, selected, useCircleShape, iconMarkup })
     return new kakao.maps.MarkerImage(src, size, { offset })
   }
 
@@ -552,11 +568,12 @@ export default function KakaoMapView({
   }): OverlayRecord => {
     const { kakao } = window
     const map = mapInstanceRef.current
+    const useCircleShape = kind === "booth" && type === "EXPERIENCE" && !isSelected
 
     const position = new kakao.maps.LatLng(lat, lng)
     const marker = new kakao.maps.Marker({
       position,
-      image: createMarkerImage({ type, subType, selected: isSelected }),
+      image: createMarkerImage({ type, subType, selected: isSelected, useCircleShape }),
       zIndex: isSelected ? 10 : 1,
     })
 
@@ -711,6 +728,8 @@ export default function KakaoMapView({
         type: record.type,
         subType: record.subType,
         selected: isSelected,
+        useCircleShape:
+          record.kind === "booth" && record.type === "EXPERIENCE" && !isSelected,
       }),
     )
     record.marker.setZIndex?.(isSelected ? 10 : 1)
