@@ -479,7 +479,15 @@ function Notice() {
                   ) : null}
 
                   <div className="mt-4 whitespace-pre-wrap text-[13px] leading-relaxed text-[var(--text)]">
-                    {detailNotice.content}
+                    {detailNotice.content.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
+                      /^https?:\/\//.test(part) ? (
+                        <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline break-all">
+                          {part}
+                        </a>
+                      ) : (
+                        <span key={i}>{part}</span>
+                      )
+                    )}
                   </div>
                 </article>
               )}
