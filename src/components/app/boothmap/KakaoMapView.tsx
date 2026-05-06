@@ -76,7 +76,11 @@ type OverlayRecord = {
   onClick: () => void
 }
 
-function getMarkerConfig(params: { type: MarkerType; subType?: Booth["subType"] }) {
+function getMarkerConfig(params: {
+  type: MarkerType
+  subType?: Booth["subType"]
+  name?: string
+}) {
   return getBoothmapBoothMarkerTheme(params)
 }
 
@@ -113,6 +117,7 @@ function createMarkerDataUrl(params: {
 const RAW_MARKER_ICON_PATHS = Array.from(
   new Set([
     ...Object.values(BOOTHMAP_MARKER_THEME).map((theme) => theme.iconPath),
+    "/markers/facility-info.svg",
     "/markers/facility-smoking.svg",
   ]),
 )
@@ -466,21 +471,34 @@ export default function KakaoMapView({
   const createMarkerImage = ({
     type,
     subType,
+    name,
     selected,
     useCircleShape = false,
   }: {
     type: MarkerType
     subType?: Booth["subType"]
+    name?: string
     selected: boolean
     useCircleShape?: boolean
   }) => {
     const { kakao } = window
-    const { color, iconPath } = getMarkerConfig({ type, subType })
+    const { color, iconPath } = getMarkerConfig({ type, subType, name })
     const width = selected ? 44 : useCircleShape ? 40 : 34
     const height = selected ? 54 : useCircleShape ? 40 : 42
     const size = new kakao.maps.Size(width, height)
     const offset = new kakao.maps.Point(width / 2, useCircleShape ? height / 2 : height)
-    const iconSize = selected ? 17 : useCircleShape ? 12 : 15
+    const isFacilityInfoIcon = iconPath === "/markers/facility-info.svg"
+    const iconSize = isFacilityInfoIcon
+      ? selected
+        ? 21
+        : useCircleShape
+          ? 14
+          : 18
+      : selected
+        ? 17
+        : useCircleShape
+          ? 12
+          : 15
     const iconCenterX = useCircleShape ? width / 2 : 24
     const iconCenterY = useCircleShape ? height / 2 : 24
     const iconX = iconCenterX - iconSize / 2
@@ -573,7 +591,7 @@ export default function KakaoMapView({
     const position = new kakao.maps.LatLng(lat, lng)
     const marker = new kakao.maps.Marker({
       position,
-      image: createMarkerImage({ type, subType, selected: isSelected, useCircleShape }),
+      image: createMarkerImage({ type, subType, name, selected: isSelected, useCircleShape }),
       zIndex: isSelected ? 10 : 1,
     })
 
@@ -727,6 +745,7 @@ export default function KakaoMapView({
       createMarkerImage({
         type: record.type,
         subType: record.subType,
+        name: record.name,
         selected: isSelected,
         useCircleShape:
           record.kind === "booth" && record.type === "EXPERIENCE" && !isSelected,

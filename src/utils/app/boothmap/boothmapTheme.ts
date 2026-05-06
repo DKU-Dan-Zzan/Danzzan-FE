@@ -112,6 +112,7 @@ export function getBoothmapMarkerTheme(type: BoothmapMarkerType): { color: strin
 export function getBoothmapBoothMarkerTheme(params: {
   type?: string | null;
   subType?: BoothSubType | string | null;
+  name?: string | null;
 }): { color: string; iconPath: string } {
   const markerType = parseBoothmapMarkerType(params.type ?? undefined);
   const baseTheme = getBoothmapMarkerTheme(markerType);
@@ -122,6 +123,7 @@ export function getBoothmapBoothMarkerTheme(params: {
 
   const normalizedSubType =
     typeof params.subType === "string" ? params.subType.trim().toUpperCase() : null;
+  const normalizedName = typeof params.name === "string" ? params.name.trim() : "";
 
   if (normalizedSubType === "SMOKING_AREA") {
     return {
@@ -130,9 +132,16 @@ export function getBoothmapBoothMarkerTheme(params: {
     };
   }
 
+  if (normalizedName.includes("화장실")) {
+    return {
+      color: baseTheme.color,
+      iconPath: "/markers/facility-restroom.svg",
+    };
+  }
+
   return {
     color: baseTheme.color,
-    iconPath: "/markers/facility-restroom.svg",
+    iconPath: "/markers/facility-info.svg",
   };
 }
 

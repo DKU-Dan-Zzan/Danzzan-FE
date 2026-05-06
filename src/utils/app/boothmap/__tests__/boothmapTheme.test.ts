@@ -1,9 +1,7 @@
-// 역할: boothmapTheme 유틸의 색상/아이콘 매핑 규칙을 검증하는 테스트다.
-
 import { describe, expect, it } from "vitest";
 import {
-  getBoothmapColor,
   getBoothmapBoothMarkerTheme,
+  getBoothmapColor,
   getBoothmapLabelAccent,
   getBoothmapMarkerTheme,
   getBoothmapZonePalette,
@@ -17,7 +15,7 @@ describe("boothmapTheme", () => {
     expect(parseBoothmapMarkerType(undefined)).toBe("EXPERIENCE");
   });
 
-  it("마커 테마는 단일 소스 색상/아이콘을 반환한다", () => {
+  it("마커 테마는 타입별 색상과 아이콘을 반환한다", () => {
     expect(getBoothmapMarkerTheme("EVENT")).toEqual({
       color: "#f6ca3b",
       iconPath: "/markers/booth-event.svg",
@@ -28,7 +26,7 @@ describe("boothmapTheme", () => {
     });
   });
 
-  it("존 팔레트는 타입별 색상을 제공한다", () => {
+  it("구역 팔레트는 타입별 색상을 제공한다", () => {
     expect(getBoothmapZonePalette("PUB")).toEqual({
       stroke: "#1d4ed8",
       fill: "#93c5fd",
@@ -55,22 +53,29 @@ describe("boothmapTheme", () => {
     expect(getBoothmapColor("overlayBadgeText")).toBe("#ffffff");
     expect(getBoothmapColor("overlayBadgeBackground")).toBe("#111827");
   });
-  it("FACILITY는 subType에 따라 아이콘을 분기한다", () => {
+
+  it("FACILITY는 흡연구역을 smoking 아이콘에 매핑한다", () => {
     expect(getBoothmapBoothMarkerTheme({ type: "FACILITY", subType: "SMOKING_AREA" })).toEqual({
       color: "#3b82f6",
       iconPath: "/markers/facility-smoking.svg",
     });
+  });
 
-    expect(getBoothmapBoothMarkerTheme({ type: "FACILITY", subType: "TOILET" })).toEqual({
+  it("FACILITY는 이름에 화장실이 포함되면 restroom 아이콘을 사용한다", () => {
+    expect(
+      getBoothmapBoothMarkerTheme({ type: "FACILITY", subType: "TOILET", name: "남자 화장실" }),
+    ).toEqual({
       color: "#3b82f6",
       iconPath: "/markers/facility-restroom.svg",
     });
   });
 
-  it("알 수 없는 FACILITY subType은 restroom 아이콘으로 fallback한다", () => {
-    expect(getBoothmapBoothMarkerTheme({ type: "FACILITY", subType: "UNKNOWN" })).toEqual({
+  it("그 외 FACILITY는 info 아이콘으로 fallback한다", () => {
+    expect(
+      getBoothmapBoothMarkerTheme({ type: "FACILITY", subType: "UNKNOWN", name: "GS25 주류" }),
+    ).toEqual({
       color: "#3b82f6",
-      iconPath: "/markers/facility-restroom.svg",
+      iconPath: "/markers/facility-info.svg",
     });
   });
 });
