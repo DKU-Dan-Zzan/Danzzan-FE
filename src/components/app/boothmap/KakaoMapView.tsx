@@ -1204,6 +1204,12 @@ export default function KakaoMapView({
     ) {
       const bounds = createItemBounds(visibleItems)
       fitBoundsWithSheetPadding(bounds, sheetSnap)
+      if (primaryFilter === "FACILITY") {
+        const currentLevel = mapInstanceRef.current?.getLevel()
+        if (typeof currentLevel === "number") {
+          mapInstanceRef.current?.setLevel(currentLevel + 1)
+        }
+      }
       if (primaryFilter === "EXPERIENCE") {
         const currentLevel = mapInstanceRef.current?.getLevel()
         if (typeof currentLevel === "number") {
