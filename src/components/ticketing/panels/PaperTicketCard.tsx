@@ -26,12 +26,22 @@ const toCompactEventDate = (value: string): string => {
   return normalized;
 };
 
-const getGuideLines = (ticket: Ticket) => ({
-  dayLabel: resolveTicketDayLabel({ eventDate: ticket.eventDate, eventName: ticket.eventName }),
-  dateLabel: ticket.eventDate ? toCompactEventDate(ticket.eventDate) : "미정",
-  queueLabel: ticket.queueNumber != null ? String(ticket.queueNumber) : ticket.id.slice(-4).toUpperCase(),
-  wristbandValue: "10:00~",
-});
+// 티켓팅 날짜 → 실제 공연 날짜 변환 (5/7→5/12, 5/8→5/13)
+const TICKETING_TO_PERFORMANCE_DATE: Record<string, string> = {
+  "5/7": "5/12",
+  "5/8": "5/13",
+};
+
+const getGuideLines = (ticket: Ticket) => {
+  const compactDate = ticket.eventDate ? toCompactEventDate(ticket.eventDate) : "미정";
+  const performanceDate = TICKETING_TO_PERFORMANCE_DATE[compactDate] ?? compactDate;
+  return {
+    dayLabel: resolveTicketDayLabel({ eventDate: ticket.eventDate, eventName: ticket.eventName }),
+    dateLabel: performanceDate,
+    queueLabel: ticket.queueNumber != null ? String(ticket.queueNumber) : ticket.id.slice(-4).toUpperCase(),
+    wristbandValue: "10:00~",
+  };
+};
 
 export function PaperTicketCard({ ticket }: PaperTicketCardProps) {
   const { label, bg, text } = statusDisplayMap[ticket.status];
