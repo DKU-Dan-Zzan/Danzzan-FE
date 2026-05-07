@@ -5,9 +5,8 @@ export type FestivalDayRule = {
 };
 
 export const DEFAULT_FESTIVAL_DAY_RULES: FestivalDayRule[] = [
-  { dayNumber: 1, date: "2026-05-12" },
-  { dayNumber: 2, date: "2026-05-13" },
-  { dayNumber: 3, date: "2026-05-14" },
+  { dayNumber: 2, date: "2026-05-07" },
+  { dayNumber: 3, date: "2026-05-08" },
 ];
 
 const toMonthDayKey = (month: number, day: number): string => {
