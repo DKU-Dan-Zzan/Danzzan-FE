@@ -28,8 +28,8 @@ const toCompactEventDate = (value: string): string => {
 
 // 티켓팅 날짜 → 실제 공연 날짜 변환 (5/7→5/12, 5/8→5/13)
 const TICKETING_TO_PERFORMANCE_DATE: Record<string, string> = {
-  "5/7": "5/12",
-  "5/8": "5/13",
+  "5/7": "5/13",
+  "5/8": "5/14",
 };
 
 const getGuideLines = (ticket: Ticket) => {
