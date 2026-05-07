@@ -8,7 +8,7 @@ const createTicket = (overrides: Partial<Ticket> = {}): Ticket => ({
   id: "ticket-1",
   status: "issued",
   eventName: "단국존 선예매 티켓",
-  eventDate: "2026-05-13",
+  eventDate: "2026-05-07",
   issuedAt: "2026-05-10 10:00",
   seat: "A-1",
   qrCodeUrl: "",
@@ -21,9 +21,9 @@ const createTicket = (overrides: Partial<Ticket> = {}): Ticket => ({
 });
 
 describe("PaperTicketCard", () => {
-  it("공연 일자(2026-05-13) 기반으로 DAY 2를 표시한다", () => {
+  it("공연 일자(2026-05-07) 기반으로 DAY 2를 표시한다", () => {
     const markup = renderToStaticMarkup(
-      <PaperTicketCard ticket={createTicket({ eventDate: "2026-05-13", eventName: "단국존 선예매 티켓" })} />,
+      <PaperTicketCard ticket={createTicket({ eventDate: "2026-05-07", eventName: "단국존 선예매 티켓" })} />,
     );
 
     expect(markup).toContain("DAY 2");

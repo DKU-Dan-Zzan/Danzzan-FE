@@ -7,13 +7,13 @@ import {
 
 describe("resolveTicketDayLabel", () => {
   it("ISO 날짜로 DAY를 계산한다", () => {
-    expect(resolveTicketDayLabel({ eventDate: "2026-05-13" })).toBe("DAY 2");
-    expect(resolveTicketDayLabel({ eventDate: "2026-05-14T19:00:00+09:00" })).toBe("DAY 3");
+    expect(resolveTicketDayLabel({ eventDate: "2026-05-07" })).toBe("DAY 2");
+    expect(resolveTicketDayLabel({ eventDate: "2026-05-08T19:00:00+09:00" })).toBe("DAY 3");
   });
 
   it("한글 날짜/슬래시 날짜로도 DAY를 계산한다", () => {
-    expect(resolveTicketDayLabel({ eventDate: "05월 13일 (화) 19:00" })).toBe("DAY 2");
-    expect(resolveTicketDayLabel({ eventDate: "5/14" })).toBe("DAY 3");
+    expect(resolveTicketDayLabel({ eventDate: "05월 07일 (수) 19:00" })).toBe("DAY 2");
+    expect(resolveTicketDayLabel({ eventDate: "5/8" })).toBe("DAY 3");
   });
 
   it("날짜 계산이 불가능하면 eventName의 n일차를 fallback으로 사용한다", () => {
