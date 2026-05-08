@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import { useAdminAuth } from "@/hooks/app/admin/useAdminAuth";
+import AnalyticsTracker from "@/components/common/AnalyticsTracker";
 import DelayedSpinner from "@/components/common/loading/DelayedSpinner";
 import {
   preloadBottomNavLazyRoutes,
@@ -175,7 +176,9 @@ function App() {
   }, [location.pathname]);
 
   return (
-    <Routes>
+    <>
+      <AnalyticsTracker />
+      <Routes>
       {/* 일반 사용자: 헤더/바텀네비 적용 */}
       <Route element={<AppLayout />}>
         <Route path="/" element={<Home />} />
@@ -207,7 +210,8 @@ function App() {
       <Route path="/reset-password" element={<Navigate to="/ticket/reset-password" replace />} />
       <Route path="/ticketing" element={<Navigate to="/ticket/ticketing" replace />} />
       <Route path="/myticket" element={<LegacyMyTicketRedirect />} />
-    </Routes>
+      </Routes>
+    </>
   );
 }
 

@@ -7,9 +7,13 @@ import type { WristbandSession } from "@/types/ticketing/model/wristband.model";
 
 interface WristbandDashboardProps {
   onSelectSession: (session: WristbandSession) => void;
+  mapSessionDateForDisplay?: (date: string) => string;
 }
 
-export function WristbandDashboard({ onSelectSession }: WristbandDashboardProps) {
+export function WristbandDashboard({
+  onSelectSession,
+  mapSessionDateForDisplay,
+}: WristbandDashboardProps) {
   const { listSessions, loading, error } = useWristband();
   const [sessions, setSessions] = useState<WristbandSession[]>([]);
 
@@ -32,6 +36,10 @@ export function WristbandDashboard({ onSelectSession }: WristbandDashboardProps)
     [sessions],
   );
 
+  const resolveDisplayDate = (date: string) => {
+    return mapSessionDateForDisplay?.(date) ?? date;
+  };
+
   const formatDate = (dateStr: string) => {
     const [year, month, day] = dateStr.split("-");
     if (!year || !month || !day) {
@@ -43,7 +51,7 @@ export function WristbandDashboard({ onSelectSession }: WristbandDashboardProps)
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-semibold text-foreground mb-2">배부 날짜 선택</h2>
+        <h2 className="mb-2 text-2xl font-semibold text-foreground">배부 날짜 선택</h2>
         <p className="text-sm text-muted-foreground">배부 날짜를 선택하여 상세 페이지로 이동합니다.</p>
       </div>
 
@@ -59,29 +67,30 @@ export function WristbandDashboard({ onSelectSession }: WristbandDashboardProps)
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {sortedSessions.map((session) => (
-            <Card key={session.id} className="p-8 hover:shadow-md transition-shadow">
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <div>
-                    <span className="text-sm font-semibold text-[var(--admin-accent-text)]">{session.dayLabel}</span>
+          {sortedSessions.map((session) => {
+            const displayDate = resolveDisplayDate(session.date);
+
+            return (
+              <Card key={session.id} className="p-8 transition-shadow hover:shadow-md">
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <div>
+                      <span className="text-sm font-semibold text-[var(--admin-accent-text)]">
+                        {session.dayLabel}
+                      </span>
+                    </div>
+                    <h3 className="text-2xl font-bold text-foreground">
+                      {session.title || `${formatDate(displayDate)} 공연 팔찌 배부`}
+                    </h3>
+                    <p className="text-base text-muted-foreground">운영 일자: {displayDate}</p>
                   </div>
-                  <h3 className="text-2xl font-bold text-foreground">
-                    {session.title || `${formatDate(session.date)} 공연 팔찌 배부`}
-                  </h3>
-                  <p className="text-base text-muted-foreground">
-                    운영 일자: {session.date}
-                  </p>
+                  <Button className="h-12 w-full text-base" onClick={() => onSelectSession(session)}>
+                    관리하기
+                  </Button>
                 </div>
-                <Button
-                  className="w-full h-12 text-base"
-                  onClick={() => onSelectSession(session)}
-                >
-                  관리하기
-                </Button>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
 
           {!sortedSessions.length && (
             <Card className="p-8 text-center text-sm text-muted-foreground">
