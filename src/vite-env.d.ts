@@ -5,6 +5,8 @@
 
 interface ImportMetaEnv {
   readonly VITE_KAKAO_MAP_JS_KEY: string
+  readonly VITE_ENABLE_GA?: string
+  readonly VITE_GA_MEASUREMENT_ID?: string
 }
 
 interface ImportMeta {
