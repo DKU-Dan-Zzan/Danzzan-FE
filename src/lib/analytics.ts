@@ -5,7 +5,7 @@ const GA_SRC_BASE = "https://www.googletagmanager.com/gtag/js?id=";
 
 declare global {
   interface Window {
-    dataLayer?: Array<IArguments | Record<string, unknown> | Date | string>;
+    dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
   }
 }
@@ -28,8 +28,8 @@ const ensureGtagStub = (): void => {
   window.dataLayer = window.dataLayer ?? [];
   window.gtag =
     window.gtag ??
-    function gtag() {
-      window.dataLayer?.push(arguments);
+    function gtag(...args: unknown[]) {
+      window.dataLayer?.push(args);
     };
 };
 
