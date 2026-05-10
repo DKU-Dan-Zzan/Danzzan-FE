@@ -38,6 +38,7 @@ export type AdminBoothManagementPub = {
   department: string;
   instagram: string | null;
   operationInfoExists: boolean;
+  displayOperationIds: number[];
 };
 
 export type AdminPubOperation = {
@@ -74,6 +75,7 @@ export type UpdateAdminPubPayload = {
   intro?: string | null;
   description?: string | null;
   instagram?: string | null;
+  displayOperationIds: number[];
 };
 
 export type UpsertAdminPubOperationPayload = {

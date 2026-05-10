@@ -55,6 +55,7 @@ type PubFormState = {
   intro: string;
   description: string;
   instagram: string;
+  displayOperationIds: number[];
 };
 
 type PubOperationDraft = {
@@ -186,6 +187,7 @@ export default function AdminBoothManagerPanel({
       intro: normalizeMultilineField(selectedPub.intro),
       description: normalizeMultilineField(selectedPub.description),
       instagram: selectedPub.instagram ?? "",
+      displayOperationIds: selectedPub.displayOperationIds,
     });
   }, [selectedPub]);
 
@@ -351,11 +353,16 @@ export default function AdminBoothManagerPanel({
         });
         toast.success(`${selectedBooth.name} 저장이 완료되었습니다.`);
       } else if (selectedPub && pubForm) {
+        if (pubForm.displayOperationIds.length === 0) {
+          throw new Error("표시 일자는 최소 1개 이상 선택해야 합니다.");
+        }
+
         await updateAdminPub(selectedPub.id, {
           name: pubForm.name || null,
           intro: normalizeMultilineField(pubForm.intro) || null,
           description: normalizeMultilineField(pubForm.description) || null,
           instagram: pubForm.instagram || null,
+          displayOperationIds: pubForm.displayOperationIds,
         });
         toast.success(`${selectedPub.name} 저장이 완료되었습니다.`);
       } else {
@@ -957,6 +964,57 @@ export default function AdminBoothManagerPanel({
                     className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 text-sm text-[var(--text)]"
                   />
                 </label>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-semibold text-[var(--text)]">표시 일자</span>
+                    <span className="text-xs text-[var(--text-muted)]">최소 1개 이상 선택</span>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {managementData?.pubOperations.map((operation, index) => {
+                      const checked = pubForm.displayOperationIds.includes(operation.id);
+                      return (
+                        <label
+                          key={operation.id}
+                          className={cn(
+                            "flex cursor-pointer items-start gap-3 rounded-2xl border px-4 py-3 text-sm transition-colors",
+                            checked
+                              ? "border-[var(--accent)] bg-[var(--accent)]/10"
+                              : "border-[var(--border-base)] bg-[var(--surface-subtle)]",
+                          )}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(event) =>
+                              setPubForm((prev) => {
+                                if (!prev) {
+                                  return prev;
+                                }
+
+                                const nextIds = event.target.checked
+                                  ? [...prev.displayOperationIds, operation.id]
+                                  : prev.displayOperationIds.filter((id) => id !== operation.id);
+
+                                return {
+                                  ...prev,
+                                  displayOperationIds: Array.from(new Set(nextIds)).sort((a, b) => a - b),
+                                };
+                              })
+                            }
+                            className="mt-0.5 h-4 w-4 rounded border-[var(--border-base)] text-[var(--accent)]"
+                          />
+                          <span className="space-y-1">
+                            <span className="block font-semibold text-[var(--text)]">{index + 1}일차</span>
+                            <span className="block text-xs text-[var(--text-muted)]">
+                              {operation.operationDate} / {operation.startTime} - {operation.endTime}
+                            </span>
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
 
                 <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] p-4">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
