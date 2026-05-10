@@ -20,13 +20,13 @@ export default function AnalyticsTracker() {
     }
 
     const timeoutId = window.setTimeout(() => {
-      trackPageView(location.pathname);
+      trackPageView(location.pathname + location.search);
     }, 0);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   return null;
 }

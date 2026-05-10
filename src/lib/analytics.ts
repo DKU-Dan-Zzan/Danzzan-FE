@@ -1,36 +1,43 @@
 import { normalizeEnvValue } from "@/lib/env";
 
-const GA_SCRIPT_ID = "ga4-gtag-script";
-const GA_SRC_BASE = "https://www.googletagmanager.com/gtag/js?id=";
+const GA_SCRIPT_SRC_BASE = "https://www.googletagmanager.com/gtag/js?id=";
 
 declare global {
   interface Window {
-    dataLayer?: unknown[];
+    dataLayer?: IArguments[];
     gtag?: (...args: unknown[]) => void;
   }
 }
 
-const measurementId = normalizeEnvValue(import.meta.env.VITE_GA_MEASUREMENT_ID);
-const isGaEnabled = import.meta.env.VITE_ENABLE_GA === "true" && measurementId.length > 0;
+const GA_MEASUREMENT_ID = normalizeEnvValue(import.meta.env.VITE_GA_MEASUREMENT_ID);
+const ENABLE_GA = import.meta.env.VITE_ENABLE_GA === "true";
 
 let initialized = false;
-let lastTrackedPagePath: string | null = null;
+let lastTrackedPageKey: string | null = null;
 
 const canUseDom = (): boolean => {
   return typeof window !== "undefined" && typeof document !== "undefined";
 };
 
-const ensureGtagStub = (): void => {
+export const isAnalyticsEnabled = (): boolean => {
+  return ENABLE_GA && GA_MEASUREMENT_ID.length > 0;
+};
+
+const ensureDataLayerAndGtag = (): void => {
   if (!canUseDom()) {
     return;
   }
 
-  window.dataLayer = window.dataLayer ?? [];
-  window.gtag =
-    window.gtag ??
-    function gtag(...args: unknown[]) {
-      window.dataLayer?.push(args);
-    };
+  window.dataLayer = window.dataLayer || [];
+
+  if (typeof window.gtag === "function") {
+    return;
+  }
+
+  window.gtag = function gtag() {
+    // eslint-disable-next-line prefer-rest-params
+    window.dataLayer?.push(arguments);
+  };
 };
 
 const injectGaScript = (): void => {
@@ -38,14 +45,18 @@ const injectGaScript = (): void => {
     return;
   }
 
-  if (document.getElementById(GA_SCRIPT_ID)) {
+  const scriptSrc = `${GA_SCRIPT_SRC_BASE}${encodeURIComponent(GA_MEASUREMENT_ID)}`;
+  const existingScript = document.querySelector<HTMLScriptElement>(
+    `script[src="${scriptSrc}"]`,
+  );
+
+  if (existingScript) {
     return;
   }
 
   const script = document.createElement("script");
-  script.id = GA_SCRIPT_ID;
   script.async = true;
-  script.src = `${GA_SRC_BASE}${encodeURIComponent(measurementId)}`;
+  script.src = scriptSrc;
   script.onerror = () => {
     // Keep the app stable even when GA is blocked or fails to load.
   };
@@ -53,21 +64,21 @@ const injectGaScript = (): void => {
   document.head.appendChild(script);
 };
 
-export const isAnalyticsEnabled = (): boolean => {
-  return isGaEnabled;
-};
-
 export const initializeAnalytics = (): void => {
-  if (!isGaEnabled || initialized) {
+  if (!isAnalyticsEnabled() || initialized || !canUseDom()) {
     return;
   }
 
   try {
-    ensureGtagStub();
+    ensureDataLayerAndGtag();
     injectGaScript();
 
-    window.gtag?.("js", new Date());
-    window.gtag?.("config", measurementId, {
+    if (typeof window.gtag !== "function") {
+      return;
+    }
+
+    window.gtag("js", new Date());
+    window.gtag("config", GA_MEASUREMENT_ID, {
       send_page_view: false,
     });
 
@@ -78,22 +89,24 @@ export const initializeAnalytics = (): void => {
 };
 
 export const trackPageView = (pagePath: string): void => {
-  if (!isGaEnabled || !pagePath || lastTrackedPagePath === pagePath) {
+  if (!isAnalyticsEnabled() || !pagePath || !canUseDom() || lastTrackedPageKey === pagePath) {
     return;
   }
 
   try {
     initializeAnalytics();
-    const pageLocation = canUseDom() ? `${window.location.origin}${pagePath}` : undefined;
-    const pageTitle = canUseDom() ? document.title : undefined;
 
-    window.gtag?.("event", "page_view", {
-      send_to: measurementId,
+    if (typeof window.gtag !== "function") {
+      return;
+    }
+
+    window.gtag("config", GA_MEASUREMENT_ID, {
       page_path: pagePath,
-      page_location: pageLocation,
-      page_title: pageTitle,
+      page_location: `${window.location.origin}${pagePath}`,
+      page_title: document.title,
     });
-    lastTrackedPagePath = pagePath;
+
+    lastTrackedPageKey = pagePath;
   } catch {
     // Ignore analytics failures so routing/rendering continues normally.
   }
