@@ -303,7 +303,7 @@ export default function AdminBoothManagerPanel({
 
   const filteredItems = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
-    return listItems.filter((item) => {
+    const filtered = listItems.filter((item) => {
       if (filter !== "ALL" && item.type !== filter) {
         return false;
       }
@@ -330,6 +330,13 @@ export default function AdminBoothManagerPanel({
 
       return haystack.includes(keyword);
     });
+
+    // 주점 카테고리에서는 (단과대 필터 유무와 무관하게) 가나다 순으로 정렬
+    if (filter === "PUB") {
+      return [...filtered].sort((a, b) => a.name.localeCompare(b.name, "ko"));
+    }
+
+    return filtered;
   }, [filter, listItems, pubCollegeFilter, searchTerm]);
 
   const selectedPubOperation = useMemo(() => {
