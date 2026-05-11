@@ -100,6 +100,24 @@ describe("boothMapSelectors", () => {
     expect(getVisiblePubs(pubs, 20)).toEqual([pubs[1]]);
   });
 
+  it("pub 목록을 가나다 순으로 정렬한다", () => {
+    const unordered: Pub[] = [
+      { ...pubs[0], id: 301, name: "다주점", college_id: 10 },
+      { ...pubs[0], id: 302, name: "가주점", college_id: 10 },
+      { ...pubs[0], id: 303, name: "나주점", college_id: 10 },
+    ];
+    expect(getVisiblePubs(unordered, null).map((pub) => pub.name)).toEqual([
+      "가주점",
+      "나주점",
+      "다주점",
+    ]);
+    expect(getVisiblePubs(unordered, 10).map((pub) => pub.name)).toEqual([
+      "가주점",
+      "나주점",
+      "다주점",
+    ]);
+  });
+
   it("pub list 노출 여부를 계산한다", () => {
     const pubFilter: PrimaryFilter = "PUB";
     const otherFilter: PrimaryFilter = "ALL";

@@ -31,6 +31,7 @@ export type AdminBoothManagementBooth = {
 export type AdminBoothManagementPub = {
   id: number;
   type: "PUB";
+  collegeId: number;
   name: string;
   intro: string | null;
   description: string | null;
@@ -38,6 +39,7 @@ export type AdminBoothManagementPub = {
   department: string;
   instagram: string | null;
   operationInfoExists: boolean;
+  displayOperationIds: number[];
 };
 
 export type AdminPubOperation = {
@@ -45,6 +47,11 @@ export type AdminPubOperation = {
   operationDate: string;
   startTime: string;
   endTime: string;
+};
+
+export type AdminCollegeOption = {
+  id: number;
+  name: string;
 };
 
 export type AdminPubImage = {
@@ -58,6 +65,7 @@ export type AdminBoothManagementResponse = {
   booths: AdminBoothManagementBooth[];
   pubs: AdminBoothManagementPub[];
   pubOperations: AdminPubOperation[];
+  colleges: AdminCollegeOption[];
 };
 
 export type UpdateAdminBoothPayload = {
@@ -74,6 +82,17 @@ export type UpdateAdminPubPayload = {
   intro?: string | null;
   description?: string | null;
   instagram?: string | null;
+  displayOperationIds: number[];
+};
+
+export type CreateAdminPubPayload = {
+  collegeId: number;
+  department: string;
+  name: string;
+  intro?: string | null;
+  description?: string | null;
+  instagram?: string | null;
+  displayOperationIds: number[];
 };
 
 export type UpsertAdminPubOperationPayload = {
@@ -125,6 +144,19 @@ export async function updateAdminPub(
   await fetchWithAuth<void>(`/admin/map/pubs/${pubId}/management`, {
     method: "PATCH",
     body: JSON.stringify(payload),
+  });
+}
+
+export async function createAdminPub(payload: CreateAdminPubPayload): Promise<number> {
+  return fetchWithAuth<number>("/admin/map/pubs", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function hideAdminPub(pubId: number): Promise<void> {
+  await fetchWithAuth<void>(`/admin/map/pubs/${pubId}/hide`, {
+    method: "PATCH",
   });
 }
 

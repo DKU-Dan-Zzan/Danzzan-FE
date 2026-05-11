@@ -90,8 +90,10 @@ export const getVisiblePubs = (
   pubs: Pub[],
   selectedCollegeId: number | null,
 ): Pub[] => {
-  if (!selectedCollegeId) return pubs;
-  return pubs.filter((pub) => pub.college_id === selectedCollegeId);
+  const filtered = selectedCollegeId
+    ? pubs.filter((pub) => pub.college_id === selectedCollegeId)
+    : pubs;
+  return [...filtered].sort((a, b) => a.name.localeCompare(b.name, "ko"));
 };
 
 export const getShouldShowPubList = (

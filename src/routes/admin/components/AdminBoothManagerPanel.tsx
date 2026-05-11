@@ -3,11 +3,13 @@ import { ArrowLeft, CheckCircle2, ImagePlus, Plus, RefreshCcw, Save, Search, Sta
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
+  createAdminPub,
   createAdminPubOperation,
   deleteAdminPubImage,
   deleteAdminPubOperation,
   getAdminBoothManagement,
   getAdminPubImages,
+  hideAdminPub,
   type AdminBoothManagementBooth,
   type AdminBoothManagementResponse,
   type AdminPubImage,
@@ -51,10 +53,13 @@ type BoothFormState = {
 };
 
 type PubFormState = {
+  collegeId: string;
+  department: string;
   name: string;
   intro: string;
   description: string;
   instagram: string;
+  displayOperationIds: number[];
 };
 
 type PubOperationDraft = {
@@ -84,6 +89,7 @@ type ManagementListItem =
       collegeName: string;
       department: string;
       operationInfoExists: boolean;
+      displayOperationIds?: number[];
     }
   | {
       kind: "pub";
@@ -94,6 +100,7 @@ type ManagementListItem =
       collegeName: string;
       department: string;
       operationInfoExists: boolean;
+      displayOperationIds: number[];
     };
 
 export default function AdminBoothManagerPanel({
@@ -112,6 +119,7 @@ export default function AdminBoothManagerPanel({
   const [selectedItem, setSelectedItem] = useState<SelectedManagementItem>(null);
   const [boothForm, setBoothForm] = useState<BoothFormState | null>(null);
   const [pubForm, setPubForm] = useState<PubFormState | null>(null);
+  const [creatingPub, setCreatingPub] = useState(false);
   const [savingItem, setSavingItem] = useState(false);
   const [pubImages, setPubImages] = useState<AdminPubImage[]>([]);
   const [pubImagesLoading, setPubImagesLoading] = useState(false);
@@ -176,18 +184,23 @@ export default function AdminBoothManagerPanel({
 
   useEffect(() => {
     if (!selectedPub) {
-      setPubForm(null);
+      if (!creatingPub) {
+        setPubForm(null);
+      }
       setPubImages([]);
       return;
     }
 
     setPubForm({
+      collegeId: String(selectedPub.collegeId),
+      department: selectedPub.department,
       name: selectedPub.name,
       intro: normalizeMultilineField(selectedPub.intro),
       description: normalizeMultilineField(selectedPub.description),
       instagram: selectedPub.instagram ?? "",
+      displayOperationIds: selectedPub.displayOperationIds,
     });
-  }, [selectedPub]);
+  }, [creatingPub, selectedPub]);
 
   const clearPendingPubImages = () => {
     setPendingPubImages((previous) => {
@@ -252,6 +265,7 @@ export default function AdminBoothManagerPanel({
       collegeName: pub.collegeName,
       department: pub.department,
       operationInfoExists: pub.operationInfoExists,
+      displayOperationIds: pub.displayOperationIds,
     }));
 
     const collator = new Intl.Collator("ko", { numeric: true, sensitivity: "base" });
@@ -289,7 +303,7 @@ export default function AdminBoothManagerPanel({
 
   const filteredItems = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
-    return listItems.filter((item) => {
+    const filtered = listItems.filter((item) => {
       if (filter !== "ALL" && item.type !== filter) {
         return false;
       }
@@ -316,6 +330,13 @@ export default function AdminBoothManagerPanel({
 
       return haystack.includes(keyword);
     });
+
+    // 주점 카테고리에서는 (단과대 필터 유무와 무관하게) 가나다 순으로 정렬
+    if (filter === "PUB") {
+      return [...filtered].sort((a, b) => a.name.localeCompare(b.name, "ko"));
+    }
+
+    return filtered;
   }, [filter, listItems, pubCollegeFilter, searchTerm]);
 
   const selectedPubOperation = useMemo(() => {
@@ -328,7 +349,24 @@ export default function AdminBoothManagerPanel({
 
   const hasMainPubImage = useMemo(() => pubImages.some((image) => image.isMain), [pubImages]);
 
+  const startCreatingPub = () => {
+    setCreatingPub(true);
+    setSelectedItem(null);
+    clearPendingPubImages();
+    setPubImages([]);
+    setPubForm({
+      collegeId: managementData?.colleges[0] ? String(managementData.colleges[0].id) : "",
+      department: "",
+      name: "",
+      intro: "",
+      description: "",
+      instagram: "",
+      displayOperationIds: managementData?.pubOperations.map((operation) => operation.id) ?? [],
+    });
+  };
+
   const handleSelectItem = (item: ManagementListItem) => {
+    setCreatingPub(false);
     setSelectedItem({ kind: item.kind, id: item.id });
   };
 
@@ -350,12 +388,42 @@ export default function AdminBoothManagerPanel({
           endTime: boothForm.endTime || null,
         });
         toast.success(`${selectedBooth.name} 저장이 완료되었습니다.`);
+      } else if (creatingPub && pubForm) {
+        const trimmedName = pubForm.name.trim();
+        const trimmedDepartment = pubForm.department.trim();
+        const collegeIdNumber = Number(pubForm.collegeId);
+        if (!trimmedName) {
+          throw new Error("주점 이름을 입력해 주세요.");
+        }
+        if (!trimmedDepartment) {
+          throw new Error("학과를 입력해 주세요.");
+        }
+        if (!pubForm.collegeId || Number.isNaN(collegeIdNumber)) {
+          throw new Error("단과대를 선택해 주세요.");
+        }
+
+        const dedupedDisplayIds = Array.from(new Set(pubForm.displayOperationIds));
+        const createdPubId = await createAdminPub({
+          collegeId: collegeIdNumber,
+          department: trimmedDepartment,
+          name: trimmedName,
+          intro: normalizeMultilineField(pubForm.intro) || null,
+          description: normalizeMultilineField(pubForm.description) || null,
+          instagram: pubForm.instagram || null,
+          displayOperationIds: dedupedDisplayIds,
+        });
+        toast.success("새 주점을 추가했습니다.");
+        await loadManagementData(selectedDate);
+        setCreatingPub(false);
+        setSelectedItem({ kind: "pub", id: createdPubId });
       } else if (selectedPub && pubForm) {
+        const dedupedDisplayIds = Array.from(new Set(pubForm.displayOperationIds));
         await updateAdminPub(selectedPub.id, {
           name: pubForm.name || null,
           intro: normalizeMultilineField(pubForm.intro) || null,
           description: normalizeMultilineField(pubForm.description) || null,
           instagram: pubForm.instagram || null,
+          displayOperationIds: dedupedDisplayIds,
         });
         toast.success(`${selectedPub.name} 저장이 완료되었습니다.`);
       } else {
@@ -433,6 +501,30 @@ export default function AdminBoothManagerPanel({
       toast.error(message);
     } finally {
       setSavingPubOperation(false);
+    }
+  };
+
+  const handleHidePub = async () => {
+    if (!selectedPub) {
+      return;
+    }
+
+    if (!window.confirm(`${selectedPub.name} 주점을 사용자 화면에서 숨길까요?`)) {
+      return;
+    }
+
+    try {
+      setSavingItem(true);
+      setGlobalError(null);
+      await hideAdminPub(selectedPub.id);
+      toast.success("주점을 숨김 처리했습니다.");
+      await loadManagementData(selectedDate);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "주점 숨김 처리에 실패했습니다.";
+      setGlobalError(message);
+      toast.error(message);
+    } finally {
+      setSavingItem(false);
     }
   };
 
@@ -763,7 +855,9 @@ export default function AdminBoothManagerPanel({
                       <span
                         className={cn(
                           "shrink-0 self-start whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-semibold",
-                          item.operationInfoExists
+                          item.kind === "pub" && item.displayOperationIds?.length === 0
+                            ? "bg-[var(--status-danger-bg)] text-[var(--status-danger-text)]"
+                            : item.operationInfoExists
                             ? "bg-[var(--status-success-bg)] text-[var(--status-success)]"
                             : "bg-[var(--surface-subtle)] text-[var(--text-muted)]",
                         )}
@@ -788,9 +882,20 @@ export default function AdminBoothManagerPanel({
                 </p>
               </div>
 
+              {filter === "PUB" && (
+                <button
+                  type="button"
+                  disabled={savingItem || !managementData}
+                  onClick={startCreatingPub}
+                  className="mr-2 inline-flex h-10 items-center justify-center gap-1.5 rounded-2xl border border-[var(--border-base)] bg-white px-4 text-sm font-semibold text-[var(--text)] disabled:opacity-60"
+                >
+                  <Plus className="h-4 w-4" strokeWidth={2.3} />
+                  새 주점
+                </button>
+              )}
               <button
                 type="button"
-                disabled={savingItem || (!selectedBooth && !selectedPub)}
+                disabled={savingItem || (!selectedBooth && !selectedPub && !creatingPub)}
                 onClick={() => void handleSaveSelectedItem()}
                 className="inline-flex h-10 items-center justify-center gap-1.5 rounded-2xl bg-[var(--accent)] px-4 text-sm font-semibold text-white disabled:opacity-60"
               >
@@ -799,7 +904,7 @@ export default function AdminBoothManagerPanel({
               </button>
             </div>
 
-            {!selectedBooth && !selectedPub && (
+            {!selectedBooth && !selectedPub && !creatingPub && (
               <div className="mt-4 rounded-2xl border border-dashed border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-10 text-center text-sm text-[var(--text-muted)]">
                 왼쪽 목록에서 부스 또는 주점을 선택해 주세요.
               </div>
@@ -895,20 +1000,61 @@ export default function AdminBoothManagerPanel({
               </div>
             )}
 
-            {selectedPub && pubForm && (
+            {(selectedPub || creatingPub) && pubForm && (
               <div className="mt-5 space-y-5">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="rounded-full bg-[var(--surface-subtle)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-muted)]">
                       PUB
                     </span>
-                    <h3 className="text-lg font-semibold text-[var(--text)]">{selectedPub.name}</h3>
+                    <h3 className="text-lg font-semibold text-[var(--text)]">{creatingPub ? "새 주점" : selectedPub?.name}</h3>
                   </div>
                   <div className="mt-2 flex flex-wrap gap-3 text-xs text-[var(--text-muted)]">
-                    <span>단과대: {selectedPub.collegeName}</span>
-                    <span>학과: {selectedPub.department}</span>
+                    {creatingPub ? (
+                      <span>저장 후 이미지 등록과 추가 수정을 이어서 할 수 있습니다.</span>
+                    ) : (
+                      <>
+                        <span>단과대: {selectedPub?.collegeName}</span>
+                        <span>학과: {selectedPub?.department}</span>
+                      </>
+                    )}
                   </div>
                 </div>
+
+                {creatingPub && (
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <label className="block space-y-2">
+                      <span className="text-sm font-semibold text-[var(--text)]">단과대</span>
+                      <select
+                        value={pubForm.collegeId}
+                        onChange={(event) =>
+                          setPubForm((prev) => (prev ? { ...prev, collegeId: event.target.value } : prev))
+                        }
+                        className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 text-sm text-[var(--text)]"
+                      >
+                        <option value="">단과대를 선택해 주세요</option>
+                        {(managementData?.colleges ?? []).map((college) => (
+                          <option key={college.id} value={college.id}>
+                            {college.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label className="block space-y-2">
+                      <span className="text-sm font-semibold text-[var(--text)]">학과</span>
+                      <input
+                        type="text"
+                        value={pubForm.department}
+                        onChange={(event) =>
+                          setPubForm((prev) => (prev ? { ...prev, department: event.target.value } : prev))
+                        }
+                        placeholder="예: 컴퓨터공학과"
+                        className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 text-sm text-[var(--text)]"
+                      />
+                    </label>
+                  </div>
+                )}
 
                 <label className="block space-y-2">
                   <span className="text-sm font-semibold text-[var(--text)]">name</span>
@@ -958,6 +1104,71 @@ export default function AdminBoothManagerPanel({
                   />
                 </label>
 
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-semibold text-[var(--text)]">표시 일자</span>
+                    <span className="text-xs text-[var(--text-muted)]">최소 1개 이상 선택</span>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {managementData?.pubOperations.map((operation, index) => {
+                      const checked = pubForm.displayOperationIds.includes(operation.id);
+                      return (
+                        <label
+                          key={operation.id}
+                          className={cn(
+                            "flex cursor-pointer items-start gap-3 rounded-2xl border px-4 py-3 text-sm transition-colors",
+                            checked
+                              ? "border-[var(--accent)] bg-[var(--accent)]/10"
+                              : "border-[var(--border-base)] bg-[var(--surface-subtle)]",
+                          )}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(event) =>
+                              setPubForm((prev) => {
+                                if (!prev) {
+                                  return prev;
+                                }
+
+                                const nextIds = event.target.checked
+                                  ? [...prev.displayOperationIds, operation.id]
+                                  : prev.displayOperationIds.filter((id) => id !== operation.id);
+
+                                return {
+                                  ...prev,
+                                  displayOperationIds: Array.from(new Set(nextIds)).sort((a, b) => a - b),
+                                };
+                              })
+                            }
+                            className="mt-0.5 h-4 w-4 rounded border-[var(--border-base)] text-[var(--accent)]"
+                          />
+                          <span className="space-y-1">
+                            <span className="block font-semibold text-[var(--text)]">{index + 1}일차</span>
+                            <span className="block text-xs text-[var(--text-muted)]">
+                              {operation.operationDate} / {operation.startTime} - {operation.endTime}
+                            </span>
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {!creatingPub && selectedPub && (
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      disabled={savingItem || pubForm.displayOperationIds.length === 0}
+                      onClick={() => void handleHidePub()}
+                      className="inline-flex h-10 items-center justify-center rounded-2xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-4 text-sm font-semibold text-[var(--status-danger-text)] disabled:opacity-60"
+                    >
+                      숨김 처리
+                    </button>
+                  </div>
+                )}
+
+                {!creatingPub && (
                 <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] p-4">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div>
@@ -1097,7 +1308,7 @@ export default function AdminBoothManagerPanel({
                             <div className="relative aspect-[4/3] bg-[var(--surface-subtle)]">
                               <img
                                 src={image.imageUrl}
-                                alt={`${selectedPub.name} 이미지 ${image.id}`}
+                                alt={`${selectedPub?.name ?? "주점"} 이미지 ${image.id}`}
                                 className="h-full w-full object-cover"
                               />
                               {image.isMain && (
@@ -1148,6 +1359,7 @@ export default function AdminBoothManagerPanel({
                     )}
                   </div>
                 </div>
+                )}
               </div>
             )}
           </section>
