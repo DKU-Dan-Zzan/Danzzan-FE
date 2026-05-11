@@ -9,6 +9,24 @@ import { formatBoothOperatingLabel } from "@/utils/app/boothmap/formatBoothOpera
 import { formatDescription } from "@/utils/app/boothmap/formatDescription";
 import { formatOperatingTime } from "@/utils/app/boothmap/formatOperatingTime";
 
+const INSTAGRAM_HANDLE_PATTERN = /^[A-Za-z0-9._]+$/;
+
+function parseInstagramHandles(instagram?: string | null) {
+  if (!instagram) {
+    return [];
+  }
+
+  return instagram
+    .split(/[\s,]+/)
+    .map((token) => token.trim().replace(/^@+/, ""))
+    .filter((token) => token.length > 0 && INSTAGRAM_HANDLE_PATTERN.test(token))
+    .map((handle) => ({
+      handle,
+      href: `https://www.instagram.com/${handle}`,
+      label: `@${handle}`,
+    }));
+}
+
 function DetailSheet({
   selectedItem,
   pubs,
@@ -194,6 +212,7 @@ function DetailSheet({
     const operatingTimeText = formatOperatingTime(pubDetail.startTime, pubDetail.endTime);
     const intro = formatDescription(pubDetail.intro);
     const description = formatDescription(pubDetail.description || summaryPub?.intro);
+    const instagramLinks = parseInstagramHandles(pubDetail.instagram);
 
     return (
       <div className="space-y-3">
@@ -209,19 +228,20 @@ function DetailSheet({
                 {pubDetail.department ? ` ${pubDetail.department}` : ""}
               </span>
 
-              {pubDetail.instagram && (
-                <a
-                  href={
-                    pubDetail.instagram.startsWith("http")
-                      ? pubDetail.instagram
-                      : `https://instagram.com/${pubDetail.instagram.replace("@", "")}`
-                  }
-                  target="_blank"
-                  rel="noreferrer"
-                  className="font-semibold text-[var(--boothmap-text-muted)] underline underline-offset-2"
-                >
-                  {pubDetail.instagram}
-                </a>
+              {instagramLinks.length > 0 && (
+                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                  {instagramLinks.map((link) => (
+                    <a
+                      key={link.handle}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-[var(--boothmap-text-muted)] underline underline-offset-2"
+                    >
+                      {link.label}
+                    </a>
+                  ))}
+                </div>
               )}
             </div>
 
