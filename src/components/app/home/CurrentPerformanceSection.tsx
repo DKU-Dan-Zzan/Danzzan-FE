@@ -106,7 +106,7 @@ export default function CurrentPerformanceSection() {
 
                 <p className="mt-1 text-[14px] font-semibold text-[var(--text-body-deep)]">
                   {currentPerformance.startTime}
-                  {!shouldHideEndTime ? ` - ${currentPerformance.endTime}` : ""}
+                  {!shouldHideEndTime ? ` - ${currentPerformance.endTime}` : " - ??:??"}
                 </p>
               </div>
             </div>
