@@ -13,6 +13,12 @@ import { cn } from "@/components/common/ui/utils";
 const CARD_WIDTH = 314.4;
 const CARD_HEIGHT = 94;
 const CARD_ASPECT_RATIO = `${CARD_WIDTH} / ${CARD_HEIGHT}`;
+const END_TIME_PLACEHOLDER_ARTIST_NAMES = new Set(["PSY", "싸이", "PSY(싸이)"]);
+
+function shouldHideEndTimeByArtistName(artistName: string) {
+  const normalizedArtistName = artistName.trim().replace(/\s+/g, "").toUpperCase();
+  return END_TIME_PLACEHOLDER_ARTIST_NAMES.has(normalizedArtistName);
+}
 
 export default function CurrentPerformanceSection() {
   const navigate = useNavigate();
@@ -42,6 +48,10 @@ export default function CurrentPerformanceSection() {
     const performances: Performance[] = performancesQuery.data?.performances ?? [];
     return getCurrentPerformance(performances, now);
   }, [performancesQuery.data, now]);
+
+  const shouldHideEndTime = currentPerformance
+    ? shouldHideEndTimeByArtistName(currentPerformance.artistName)
+    : false;
 
   const status = performancesQuery.isPending
     ? "loading"
@@ -95,7 +105,8 @@ export default function CurrentPerformanceSection() {
                 </p>
 
                 <p className="mt-1 text-[14px] font-semibold text-[var(--text-body-deep)]">
-                  {currentPerformance.startTime} - {currentPerformance.endTime}
+                  {currentPerformance.startTime}
+                  {!shouldHideEndTime ? ` - ${currentPerformance.endTime}` : ""}
                 </p>
               </div>
             </div>
