@@ -407,7 +407,6 @@ function MyPage() {
         <ListRow icon={<IdCard size={18} />} label="학번" value={user?.studentId ?? "—"} />
         <ListRow icon={<GraduationCap size={18} />} label="단과대학" value={user?.college || "—"} />
         <ListRow icon={<GraduationCap size={18} />} label="학과" value={user?.department || "—"} />
-        <ListRow icon={<IdCard size={18} />} label="네이버 아이디" value={user?.naverId ? user.naverId.split("@")[0] : undefined} />
       </SectionCard>
 
       <div className="mx-4 mt-3 overflow-hidden rounded-[16px] bg-white" style={{ boxShadow: "0 1px 8px rgba(28,43,106,0.08)" }}>
