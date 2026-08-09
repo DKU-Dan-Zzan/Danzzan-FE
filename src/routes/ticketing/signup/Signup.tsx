@@ -84,7 +84,7 @@ const CONSENT_ITEMS: { id: number; title: string; required: boolean; content: Re
       <div className="space-y-3 text-[13px] leading-6 text-[var(--text-muted)]">
         <div>
           <p className="font-bold text-[var(--text)]">개인정보 수집 및 이용에 관한 동의서</p>
-          <p className="mt-1">시행일자: 2026년 5월 1일</p>
+          <p className="mt-1">시행일자: 2026년 9월 1일</p>
           <p className="mt-1">
             단국대학교 죽전캠퍼스 총학생회(이하 &quot;총학생회&quot;)는 「개인정보 보호법」 제15조 및
             제22조에 따라 아래와 같이 이용자의 개인정보를 수집·이용합니다. 이용자는 동의를 거부할
@@ -109,7 +109,7 @@ const CONSENT_ITEMS: { id: number; title: string; required: boolean; content: Re
           <ul className="mt-1 space-y-1">
             <li>
               - 이용자 본인 확인 및 서비스 제공에 관한 정보: 학번, 본 서비스 비밀번호(암호화 저장),
-              연락처(휴대전화번호), 학적정보(재학·수료·졸업 구분), 소속(전공), 네이버 아이디
+              연락처(휴대전화번호), 학적정보(재학·수료·졸업 구분), 소속(전공)
             </li>
             <li>
               - 회원가입 과정에서 일시적으로 수집 후 즉시 폐기되는 정보: 단국대학교 포털 비밀번호
