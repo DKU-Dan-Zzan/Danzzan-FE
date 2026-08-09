@@ -32,7 +32,7 @@ describe("LegalDocument", () => {
 
     expect(markup).toContain(">이용약관<");
     expect(markup).not.toContain("서비스 이용약관");
-    expect(markup).toContain("시행일자: 2026년 5월 1일");
+    expect(markup).toContain("시행일자: 2026년 9월 1일");
     expect(markup).toContain("제1조 (목적)");
   });
 });
