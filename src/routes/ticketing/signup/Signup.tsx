@@ -9,13 +9,10 @@ import {
   Check,
   RefreshCw,
   CheckCircle2,
-  XCircle,
   Send,
   X,
   Eye,
   EyeOff,
-  ArrowDown,
-  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { Checkbox } from "@/components/common/ui/checkbox";
@@ -198,10 +195,6 @@ const AUTH_PLACEHOLDER_CLASS =
   "text-[0.96rem] sm:text-[0.98rem] placeholder:text-[0.8rem] sm:placeholder:text-[0.84rem] placeholder:tracking-[-0.01em]";
 
 const STEP_LABELS = ["단국대 인증", "전화번호 인증", "가입 완료"] as const;
-const NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE = "네이버 아이디가 서로 일치하지 않습니다.";
-const NAVER_ID_LABEL_CLASS_NAME = "text-[var(--naver-green)]";
-const NAVER_ID_INPUT_CLASS_NAME =
-  "border-[var(--naver-green)] focus-visible:border-[var(--naver-green)] focus-visible:shadow-[0_0_0_4px_rgba(3,199,90,0.18)]";
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
@@ -462,8 +455,6 @@ export default function Signup() {
   // ── Step 3 상태
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [naverId, setNaverId] = useState("");
-  const [naverIdConfirm, setNaverIdConfirm] = useState("");
   const [step3Error, setStep3Error] = useState<string | null>(null);
 
   // ── 비밀번호 표시 토글
@@ -472,7 +463,6 @@ export default function Signup() {
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(true);
 
   const passwordPolicy = getPasswordPolicyState(password, passwordConfirm);
-  const isNaverIdMatched = naverId.trim().length > 0 && naverId.trim() === naverIdConfirm.trim();
 
   // ── 타이머
   useEffect(() => {
@@ -640,24 +630,12 @@ export default function Signup() {
       return;
     }
 
-    if (!naverId.trim() || !naverIdConfirm.trim()) {
-      setStep3Error("네이버 아이디를 입력해 주세요.");
-      return;
-    }
-
-    if (!isNaverIdMatched) {
-      setStep3Error(NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE);
-      return;
-    }
-
     setSubmitting(true);
     try {
       await signupApi.completeSignup(
         signupToken,
         password,
         passwordConfirm,
-        naverId.trim(),
-        naverIdConfirm.trim(),
         phoneVerificationSessionId,
       );
       setSignupComplete(true);
@@ -1216,102 +1194,6 @@ export default function Signup() {
                         </p>
                       </div>
 
-                      {/* ── 네이버 아이디 섹션 ── */}
-                      <div className="space-y-3 rounded-xl border border-[rgba(3,199,90,0.22)] bg-[rgba(3,199,90,0.03)] p-3.5">
-                        {/* 헤더 */}
-                        <div className="flex items-center gap-2.5">
-                          <img
-                            src="/symbol_cr_npaygr_large.svg"
-                            alt="Naver"
-                            className="h-7 w-7 shrink-0"
-                          />
-                          <span className="text-[13px] font-bold text-[var(--text)]">입장 확인용 네이버 아이디 등록</span>
-                        </div>
-
-                        {/* 안내 박스 */}
-                        <div className="flex items-start gap-2 rounded-lg bg-[rgba(3,199,90,0.08)] px-3 py-2.5">
-                          <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--naver-green)]" strokeWidth={2.2} />
-                          <p className="text-[11.5px] leading-[1.6] text-[var(--text-muted)]">
-                            얼굴인식 입장(FaceSign)에 사용할 네이버 아이디를 정확히 확인해 주세요.<br />
-                            오입력을 방지하기 위해 동일한 아이디를 한 번 더 입력합니다.
-                          </p>
-                        </div>
-
-                        {/* 네이버 아이디 */}
-                        <div className="space-y-2">
-                          <Label htmlFor="naverId" className={cn("text-sm font-semibold", NAVER_ID_LABEL_CLASS_NAME)}>
-                            네이버 아이디
-                          </Label>
-                          <div className="relative">
-                            <Input
-                              id="naverId"
-                              value={naverId}
-                              onChange={(e) => {
-                                if (step3Error === NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE) setStep3Error(null);
-                                setNaverId(e.target.value);
-                              }}
-                              placeholder="네이버 아이디 입력 (@naver.com 제외)"
-                              className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS, NAVER_ID_INPUT_CLASS_NAME, "pr-10")}
-                              autoComplete="username"
-                              required
-                              disabled={submitting}
-                            />
-                            {naverId.trim().length > 0 && (
-                              naverIdConfirm.trim().length > 0 && !isNaverIdMatched
-                                ? <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--status-danger-text)]" strokeWidth={2} />
-                                : <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--naver-green)]" strokeWidth={2} />
-                            )}
-                          </div>
-                        </div>
-
-                        {/* 화살표 */}
-                        <div className="flex justify-center">
-                          <ArrowDown className="h-4 w-4 text-[var(--naver-green)]" strokeWidth={2.2} />
-                        </div>
-
-                        {/* 네이버 아이디 재입력 */}
-                        <div className="space-y-2">
-                          <Label htmlFor="naverIdConfirm" className={cn("text-sm font-semibold", NAVER_ID_LABEL_CLASS_NAME)}>
-                            네이버 아이디 재입력
-                          </Label>
-                          <div className="relative">
-                            <Input
-                              id="naverIdConfirm"
-                              value={naverIdConfirm}
-                              onChange={(e) => {
-                                if (step3Error === NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE) setStep3Error(null);
-                                setNaverIdConfirm(e.target.value);
-                              }}
-                              placeholder="네이버 아이디를 다시 입력해 주세요"
-                              className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS, NAVER_ID_INPUT_CLASS_NAME, "pr-10")}
-                              autoComplete="off"
-                              required
-                              disabled={submitting}
-                            />
-                            {naverIdConfirm.trim().length > 0 && (
-                              !isNaverIdMatched
-                                ? <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--status-danger-text)]" strokeWidth={2} />
-                                : <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--naver-green)]" strokeWidth={2} />
-                            )}
-                          </div>
-
-                          {/* 일치 확인 */}
-                          {isNaverIdMatched && (
-                            <div className="flex items-center gap-1.5 pl-0.5">
-                              <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[var(--naver-green)]" strokeWidth={2.2} />
-                              <span className="text-[11.5px] font-medium text-[var(--naver-green)]">입력한 네이버 아이디가 일치합니다.</span>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* 하단 안내 */}
-                        <div className="flex items-start gap-2 rounded-lg bg-[var(--status-danger-bg)] px-3 py-2.5">
-                          <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--status-danger-text)]" strokeWidth={2} />
-                          <p className="text-[11.5px] leading-[1.6] text-[var(--status-danger-text)]">
-                            빠른 단국존 입장을 위해서는 네이버 Face Sign 사전 인증이 필요합니다.
-                          </p>
-                        </div>
-                      </div>
                     </section>
 
                     {step3Error && <ErrorBox message={step3Error} />}
