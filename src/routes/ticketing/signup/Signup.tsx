@@ -189,7 +189,7 @@ const ERROR_401 =
   "단국대 포털 학번 또는 비밀번호가 올바르지 않습니다.";
 const ERROR_409 = "이미 가입한 학번입니다.";
 const ERROR_403 =
-  "대학원생 및 천안캠퍼스 학생은 단국축제서비스 회원가입이 불가합니다. 단국대학교 죽전캠퍼스 재학생만 이용할 수 있습니다.";
+  "대학원생 및 천안캠퍼스 학생은 단국축제서비스 회원가입이 불가합니다. 단국대학교 죽전캠퍼스 재학생 및 2026학년도 2학기 등록휴학생만 이용할 수 있습니다.";
 const ERROR_SIGNUP = "회원가입에 실패했습니다.";
 const AUTH_PLACEHOLDER_CLASS =
   "text-[0.96rem] sm:text-[0.98rem] placeholder:text-[0.8rem] sm:placeholder:text-[0.84rem] placeholder:tracking-[-0.01em]";
