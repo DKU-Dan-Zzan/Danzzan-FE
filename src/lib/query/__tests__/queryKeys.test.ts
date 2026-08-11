@@ -42,6 +42,6 @@ describe("appQueryKeys", () => {
         size: 10,
       },
     ]);
-    expect(appQueryKeys.boothMapData("2026-05-12")).toEqual(["boothmap", "data", { date: "2026-05-12" }]);
+    expect(appQueryKeys.boothMapData("2026-09-09")).toEqual(["boothmap", "data", { date: "2026-09-09" }]);
   });
 });

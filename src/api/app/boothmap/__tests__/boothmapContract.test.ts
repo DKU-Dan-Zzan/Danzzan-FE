@@ -35,7 +35,7 @@ describe("boothmapContract", () => {
           ],
         },
       },
-      "/map/booth-map?date=2026-05-12",
+      "/map/booth-map?date=2026-09-09",
     );
 
     expect(parsed.colleges).toHaveLength(1);

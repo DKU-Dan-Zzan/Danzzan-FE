@@ -36,6 +36,10 @@ import type {
   KakaoMarker,
   KakaoMouseEvent,
 } from "@/types/app/boothmap/kakao-map";
+import {
+  DEFAULT_FESTIVAL_DATE,
+  FESTIVAL_DATES,
+} from "@/utils/app/boothmap/festivalDates";
 
 declare global {
   interface Window {
@@ -81,8 +85,7 @@ export default function AdminMapEditorPanel({
     "보기 모드입니다. 부스 또는 학과 편집 모드를 선택해 주세요.",
   );
 
-  const FESTIVAL_DATES = ["2026-05-12", "2026-05-13", "2026-05-14"];
-  const [selectedDate, setSelectedDate] = useState<string>("2026-05-12");
+  const [selectedDate, setSelectedDate] = useState<string>(DEFAULT_FESTIVAL_DATE);
 
   const editableBooths = useMemo(
     () => booths.filter((booth) => booth.type !== "FOOD_TRUCK"),

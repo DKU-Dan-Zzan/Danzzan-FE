@@ -31,10 +31,12 @@ function DetailSheet({
   selectedItem,
   pubs,
   colleges,
+  selectedDate,
 }: {
   selectedItem: SelectedDetailItem;
   pubs: Pub[];
   colleges: College[];
+  selectedDate: string;
   onClose: () => void;
 }) {
   const [viewerImage, setViewerImage] = useState<string | null>(null);
@@ -44,8 +46,8 @@ function DetailSheet({
   const selectedBoothId = selectedItem?.kind === "booth" ? selectedItem.id : null;
   const selectedPubId = selectedItem?.kind === "pub" ? selectedItem.id : null;
 
-  const boothDetailQuery = useBoothDetailQuery(selectedBoothId);
-  const pubDetailQuery = usePubDetailQuery(selectedPubId);
+  const boothDetailQuery = useBoothDetailQuery(selectedBoothId, selectedDate);
+  const pubDetailQuery = usePubDetailQuery(selectedPubId, selectedDate);
 
   const boothDetail = selectedItem?.kind === "booth" ? (boothDetailQuery.data ?? null) : null;
   const pubDetail = selectedItem?.kind === "pub" ? (pubDetailQuery.data ?? null) : null;

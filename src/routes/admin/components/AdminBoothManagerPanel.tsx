@@ -27,8 +27,10 @@ import {
   validateImageFile,
 } from "@/routes/admin/adminEditorLogic";
 import { formatDescription } from "@/utils/app/boothmap/formatDescription";
-
-const FESTIVAL_DATES = ["2026-05-12", "2026-05-13", "2026-05-14"] as const;
+import {
+  DEFAULT_FESTIVAL_DATE,
+  FESTIVAL_DATES,
+} from "@/utils/app/boothmap/festivalDates";
 const FILTER_OPTIONS = [
   { value: "ALL", label: "전체" },
   { value: "EXPERIENCE", label: "체험 부스" },
@@ -109,7 +111,7 @@ export default function AdminBoothManagerPanel({
   topSlot?: ReactNode;
 }) {
   const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState<string>(FESTIVAL_DATES[0]);
+  const [selectedDate, setSelectedDate] = useState<string>(DEFAULT_FESTIVAL_DATE);
   const [filter, setFilter] = useState<AdminBoothFilter>("ALL");
   const [pubCollegeFilter, setPubCollegeFilter] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
