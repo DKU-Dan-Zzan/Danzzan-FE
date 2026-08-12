@@ -65,7 +65,8 @@ export default function Timetable() {
     const queryDate = searchParams.get("date")
     const baseDate = queryDate || todayISODateLocal()
     const targetIdx = FESTIVAL_DAYS.findIndex((d) => d.date === baseDate)
-    return targetIdx !== -1 ? targetIdx : 1
+    // 축제 기간 밖(또는 알 수 없는 date 쿼리)이면 1일차 탭을 연다.
+    return targetIdx !== -1 ? targetIdx : 0
   })
   const [scrollTargetId, setScrollTargetId] = useState<number | null>(null)
   const [clockTick, setClockTick] = useState(() => Date.now())

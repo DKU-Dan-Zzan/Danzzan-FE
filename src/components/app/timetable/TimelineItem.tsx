@@ -8,12 +8,6 @@ function hashtagLabel(description: string) {
 
 /** 원형 사진 */
 const AVATAR_PX = "9rem"
-const END_TIME_PLACEHOLDER_ARTIST_NAMES = new Set(["PSY", "싸이", "PSY(싸이)"])
-
-function shouldHideEndTimeByArtistName(artistName: string) {
-  const normalizedArtistName = artistName.trim().replace(/\s+/g, "").toUpperCase()
-  return END_TIME_PLACEHOLDER_ARTIST_NAMES.has(normalizedArtistName)
-}
 
 export default function TimelineItem({
   item,
@@ -26,12 +20,8 @@ export default function TimelineItem({
   innerRef?: (el: HTMLLIElement | null) => void
   showNow?: boolean
 }) {
-  const isEndTimeHiddenArtist = shouldHideEndTimeByArtistName(item.artistName)
-  const timeLabel = `${item.startTime} ~${isEndTimeHiddenArtist ? "" : ` ${item.endTime}`}`
-  const timeWidthStrutLabel = `${item.startTime} ~ ${item.endTime}`
-  const timeRangeA11yLabel = isEndTimeHiddenArtist
-    ? `${item.startTime} 시작, 종료 시각 미정`
-    : `${item.startTime}부터 ${item.endTime}까지`
+  const timeLabel = `${item.startTime} ~ ${item.endTime}`
+  const timeRangeA11yLabel = `${item.startTime}부터 ${item.endTime}까지`
 
   return (
     <li
@@ -44,45 +34,20 @@ export default function TimelineItem({
       <div className="mx-auto grid w-full max-w-[420px] grid-cols-[auto_24px_minmax(0,1fr)] items-start pt-3">
         {/* 시간 */}
         <div className="col-start-1 row-start-1 flex items-center justify-end self-start pr-1">
-          {isEndTimeHiddenArtist ? (
-            <div className="relative">
-              <span
-                className="invisible inline-flex h-11 max-w-[9.5rem] items-center px-2.5 text-right text-[14px] font-bold tabular-nums leading-none tracking-[-0.02em] sm:max-w-[10rem] sm:text-[15px]"
-                aria-hidden
-              >
-                {timeWidthStrutLabel}
-              </span>
-              <p
-                className="absolute right-0 top-0 inline-flex h-11 max-w-[9.5rem] items-center rounded-full px-2.5 text-right text-[14px] font-bold tabular-nums leading-none tracking-[-0.02em] sm:max-w-[10rem] sm:text-[15px]"
-                style={{
-                  background: "var(--timetable-v2-time-pill-bg)",
-                  color: "var(--timetable-v2-time-pill-fg)",
-                }}
-                aria-label={
-                  showNow
-                    ? `지금 진행 중인 공연, ${timeRangeA11yLabel}`
-                    : `공연 시간 ${timeRangeA11yLabel}`
-                }
-              >
-                {timeLabel}
-              </p>
-            </div>
-          ) : (
-            <p
-              className="inline-flex h-11 max-w-[9.5rem] items-center rounded-full px-2.5 text-right text-[14px] font-bold tabular-nums leading-none tracking-[-0.02em] sm:max-w-[10rem] sm:text-[15px]"
-              style={{
-                background: "var(--timetable-v2-time-pill-bg)",
-                color: "var(--timetable-v2-time-pill-fg)",
-              }}
-              aria-label={
-                showNow
-                  ? `지금 진행 중인 공연, ${timeRangeA11yLabel}`
-                  : `공연 시간 ${timeRangeA11yLabel}`
-              }
-            >
-              {timeLabel}
-            </p>
-          )}
+          <p
+            className="inline-flex h-11 max-w-[9.5rem] items-center rounded-full px-2.5 text-right text-[14px] font-bold tabular-nums leading-none tracking-[-0.02em] sm:max-w-[10rem] sm:text-[15px]"
+            style={{
+              background: "var(--timetable-v2-time-pill-bg)",
+              color: "var(--timetable-v2-time-pill-fg)",
+            }}
+            aria-label={
+              showNow
+                ? `지금 진행 중인 공연, ${timeRangeA11yLabel}`
+                : `공연 시간 ${timeRangeA11yLabel}`
+            }
+          >
+            {timeLabel}
+          </p>
         </div>
 
         {/* 타임라인: 점 + 긴 점선 */}
