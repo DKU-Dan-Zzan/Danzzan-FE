@@ -68,9 +68,9 @@ describe("ticket signup consents", () => {
     });
 
     expect(container.textContent).toContain("개인정보 수집 및 이용에 관한 동의서");
-    expect(container.textContent).toContain("시행일자: 2026년 5월 1일");
+    expect(container.textContent).toContain("시행일자: 2026년 9월 1일");
     expect(container.textContent).toContain("통계 데이터 등 개인을 특정할 수 없는 데이터를 작성하기 위해");
-    expect(container.textContent).toContain("연락처(휴대전화번호), 학적정보(재학·수료·졸업 구분), 소속(전공), 네이버 아이디");
+    expect(container.textContent).toContain("연락처(휴대전화번호), 학적정보(재학·수료·졸업 구분), 소속(전공)");
     expect(container.textContent).toContain("회원 탈퇴 시 또는 2026년 12월 31일 중 이른 시점까지 보유·이용");
 
     await act(async () => {

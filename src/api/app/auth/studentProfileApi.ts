@@ -12,7 +12,6 @@ type StudentProfileDto = {
   department?: string;
   studentId?: string;
   college?: string;
-  naverId?: string;
 };
 
 const getClient = () =>
@@ -40,7 +39,6 @@ const mapUser = (dto: StudentProfileDto | null | undefined): AuthUser | null => 
     department: dto.department ?? "",
     studentId: dto.studentId ?? "",
     college: dto.college ?? "",
-    naverId: dto.naverId ?? undefined,
   };
 };
 

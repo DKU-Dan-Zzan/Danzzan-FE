@@ -20,7 +20,6 @@ export interface AuthUser {
   department: string;
   studentId: string;
   college: string;
-  naverId?: string;
 }
 
 export interface AuthSession {
