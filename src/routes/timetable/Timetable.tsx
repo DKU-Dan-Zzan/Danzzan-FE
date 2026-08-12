@@ -16,6 +16,15 @@ import { FESTIVAL_DAYS } from "@/config/festivalDays"
 import { appQueryKeys, useAppQuery } from "@/lib/query"
 import type { Performance } from "@/types/app/timetable/timetable.types"
 
+/**
+ * 콘텐츠 이미지 섹션(1일차 상단 이벤트 배너) 노출 여부.
+ *
+ * 지난 3일 축제에서는 1일차가 공연 없이 이벤트만 있는 날이라 이 자리에 배너를 띄웠다.
+ * 이번 이틀 축제는 1일차부터 공연이 있고 게시할 콘텐츠도 확정되지 않아 임시로 숨긴다.
+ * 콘텐츠가 확정되면 true로 되돌리면 된다.
+ */
+const SHOW_CONTENT_IMAGES: boolean = false
+
 function todayISODateLocal() {
   const d = new Date()
   const y = d.getFullYear()
@@ -250,7 +259,7 @@ export default function Timetable() {
           </div>
 
           <div className="px-4 pb-4 pt-5">
-            {isDay1 && (
+            {SHOW_CONTENT_IMAGES && isDay1 && (
               <ContentImageSection
                 images={contentImages}
                 isLoading={isImageLoading}
@@ -263,7 +272,7 @@ export default function Timetable() {
                 }}
               />
             )}
-            {isDay1 && <div className="h-4" />}
+            {SHOW_CONTENT_IMAGES && isDay1 && <div className="h-4" />}
             {isLoading ? (
               <div className="py-12 text-center text-[var(--timetable-empty-text)]">
                 공연 정보를 불러오는 중입니다...
