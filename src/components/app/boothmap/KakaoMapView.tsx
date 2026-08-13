@@ -807,6 +807,10 @@ export default function KakaoMapView({
     }> = []
 
     const addBooth = (booth: Booth) => {
+      if (booth.location_x == null || booth.location_y == null) {
+        return
+      }
+
       items.push({
         key: getOverlayKey("booth", booth.id),
         kind: "booth",
@@ -967,7 +971,12 @@ export default function KakaoMapView({
 
       if (selectedMapItem?.kind === "booth") {
         const selectedBooth = boothMap.get(selectedMapItem.id)
-        if (selectedBooth && selectedBooth.type !== "FOOD_TRUCK") {
+        if (
+          selectedBooth &&
+          selectedBooth.type !== "FOOD_TRUCK" &&
+          selectedBooth.location_x != null &&
+          selectedBooth.location_y != null
+        ) {
           const target = new kakao.maps.LatLng(
             selectedBooth.location_y,
             selectedBooth.location_x

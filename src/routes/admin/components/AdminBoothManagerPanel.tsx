@@ -54,6 +54,7 @@ type BoothFormState = {
   operationStatus: "OPEN" | "CLOSED" | "UNKNOWN";
   startTime: string;
   endTime: string;
+  operationDates: string[];
 };
 
 type BoothCreateFormState = {
@@ -205,6 +206,7 @@ export default function AdminBoothManagerPanel({
       operationStatus: selectedBooth.operationStatus,
       startTime: selectedBooth.startTime ?? "",
       endTime: selectedBooth.endTime ?? "",
+      operationDates: FESTIVAL_DATES.filter((date) => selectedBooth.operationDates.includes(date)),
     });
   }, [selectedBooth]);
 
@@ -454,6 +456,11 @@ export default function AdminBoothManagerPanel({
         setBoothCreateForm(null);
         setSelectedItem({ kind: "booth", id: createdBoothId });
       } else if (selectedBooth && boothForm) {
+        const operationDates = FESTIVAL_DATES.filter((date) => boothForm.operationDates.includes(date));
+        if (operationDates.length === 0) {
+          throw new Error("운영 날짜를 최소 1개 이상 선택해 주세요.");
+        }
+
         await updateAdminBooth(selectedBooth.id, {
           operationDate: selectedDate,
           operationStatus: boothForm.operationStatus,
@@ -464,6 +471,7 @@ export default function AdminBoothManagerPanel({
               : null,
           startTime: boothForm.startTime || null,
           endTime: boothForm.endTime || null,
+          operationDates,
         });
         toast.success(`${selectedBooth.name} 저장이 완료되었습니다.`);
       } else if (creatingPub && pubForm) {
@@ -928,7 +936,13 @@ export default function AdminBoothManagerPanel({
                           <span>단과대: {item.collegeName}</span>
                           <span>학과: {item.department}</span>
                           {item.kind === "booth" && (
-                            <span>위치: {item.locationX != null && item.locationY != null ? "배치완료" : "미배치"}</span>
+                            <span>
+                              위치: {item.type === "FOOD_TRUCK"
+                                ? "대표 위치 사용"
+                                : item.locationX != null && item.locationY != null
+                                  ? "배치완료"
+                                  : "미배치"}
+                            </span>
                           )}
                         </div>
                       </div>
@@ -1258,6 +1272,57 @@ export default function AdminBoothManagerPanel({
                       className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-sm text-[var(--text)]"
                     />
                   </label>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-semibold text-[var(--text)]">운영 날짜</span>
+                    <span className="text-xs text-[var(--text-muted)]">최소 1개 이상 선택</span>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {FESTIVAL_DATES.map((date) => {
+                      const checked = boothForm.operationDates.includes(date);
+                      return (
+                        <label
+                          key={date}
+                          className={cn(
+                            "flex cursor-pointer items-start gap-3 rounded-2xl border px-4 py-3 text-sm transition-colors",
+                            checked
+                              ? "border-[var(--accent)] bg-[var(--accent)]/10"
+                              : "border-[var(--border-base)] bg-[var(--surface-subtle)]",
+                          )}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(event) =>
+                              setBoothForm((prev) => {
+                                if (!prev) {
+                                  return prev;
+                                }
+
+                                const nextDates = event.target.checked
+                                  ? [...prev.operationDates, date]
+                                  : prev.operationDates.filter((value) => value !== date);
+
+                                return {
+                                  ...prev,
+                                  operationDates: FESTIVAL_DATES.filter((festivalDate) =>
+                                    Array.from(new Set(nextDates)).includes(festivalDate),
+                                  ),
+                                };
+                              })
+                            }
+                            className="mt-0.5 h-4 w-4 rounded border-[var(--border-base)] text-[var(--accent)]"
+                          />
+                          <span className="space-y-1">
+                            <span className="block font-semibold text-[var(--text)]">{formatFestivalDateLabel(date)}</span>
+                            <span className="block text-xs text-[var(--text-muted)]">{date}</span>
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}

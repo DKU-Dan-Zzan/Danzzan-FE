@@ -29,6 +29,7 @@ export type AdminBoothManagementBooth = {
   operationStatus: "OPEN" | "CLOSED" | "UNKNOWN";
   startTime: string | null;
   endTime: string | null;
+  operationDates: string[];
 };
 
 export type AdminBoothManagementPub = {
@@ -78,6 +79,7 @@ export type UpdateAdminBoothPayload = {
   description?: string | null;
   startTime?: string | null;
   endTime?: string | null;
+  operationDates: string[];
 };
 
 export type CreateAdminBoothPayload = {

@@ -149,8 +149,8 @@ export type ContractBoothDto = {
   type: BoothType;
   subType: BoothSubType | null;
   description: string | null;
-  locationX: number;
-  locationY: number;
+  locationX: number | null;
+  locationY: number | null;
   operationStatus: BoothOperationStatus | null;
   startTime: string | null;
   endTime: string | null;
@@ -251,7 +251,8 @@ export const parseBoothMapContract = (payload: unknown, endpoint: string): Contr
     const startTime = readNullableString(item, "startTime");
     const endTime = readNullableString(item, "endTime");
 
-    if (locationX === undefined || locationY === undefined) {
+    const usesRepresentativeMarker = type === "FOOD_TRUCK";
+    if (!usesRepresentativeMarker && (locationX === undefined || locationY === undefined)) {
       return [];
     }
 
@@ -265,8 +266,8 @@ export const parseBoothMapContract = (payload: unknown, endpoint: string): Contr
       type,
       subType,
       description: description ?? null,
-      locationX,
-      locationY,
+      locationX: locationX ?? null,
+      locationY: locationY ?? null,
       operationStatus,
       startTime: startTime ?? null,
       endTime: endTime ?? null,

@@ -90,6 +90,26 @@ describe("boothmapContract", () => {
     expect(parsed.booths[0]?.boothId).toBe(11);
   });
 
+  it("좌표가 없는 푸드트럭은 목록에 포함한다", () => {
+    const parsed = parseBoothMapContract(
+      {
+        colleges: [],
+        booths: [
+          {
+            boothId: 12,
+            name: "푸드트럭 B",
+            type: "FOOD_TRUCK",
+          },
+        ],
+      },
+      "/map/booth-map",
+    );
+
+    expect(parsed.booths).toHaveLength(1);
+    expect(parsed.booths[0]?.locationX).toBeNull();
+    expect(parsed.booths[0]?.locationY).toBeNull();
+  });
+
   it("좌표 외 필수 필드가 깨진 공개 부스는 에러를 던진다", () => {
     expect(() =>
       parseBoothMapContract(
