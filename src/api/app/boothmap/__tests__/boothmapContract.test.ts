@@ -64,6 +64,52 @@ describe("boothmapContract", () => {
     ).toThrow(BoothmapContractError);
   });
 
+  it("좌표가 없는 공개 부스는 건너뛴다", () => {
+    const parsed = parseBoothMapContract(
+      {
+        colleges: [],
+        booths: [
+          {
+            boothId: 11,
+            name: "체험 부스 A",
+            type: "EXPERIENCE",
+            locationX: 127.1,
+            locationY: 37.3,
+          },
+          {
+            boothId: 12,
+            name: "푸드트럭 B",
+            type: "FOOD_TRUCK",
+          },
+        ],
+      },
+      "/map/booth-map",
+    );
+
+    expect(parsed.booths).toHaveLength(1);
+    expect(parsed.booths[0]?.boothId).toBe(11);
+  });
+
+  it("좌표 외 필수 필드가 깨진 공개 부스는 에러를 던진다", () => {
+    expect(() =>
+      parseBoothMapContract(
+        {
+          colleges: [],
+          booths: [
+            {
+              boothId: 12,
+              name: "",
+              type: "FOOD_TRUCK",
+              locationX: 127.2,
+              locationY: 37.4,
+            },
+          ],
+        },
+        "/map/booth-map",
+      ),
+    ).toThrow(BoothmapContractError);
+  });
+
   it("부스 상세 응답을 파싱한다", () => {
     const parsed = parseBoothSummaryContract(
       {
@@ -135,7 +181,7 @@ describe("boothmapContract", () => {
     expect(parsed.thumbnailImageUrls).toHaveLength(1);
   });
 
-  it("주점 상세 응답에서 thumbnailImageUrls가 없어도 파싱한다", () => {
+  it("thumbnailImageUrls가 없어도 주점 상세 응답을 파싱한다", () => {
     const parsed = parsePubDetailContract(
       {
         pubId: 4,
@@ -177,24 +223,5 @@ describe("boothmapContract", () => {
     );
 
     expect(parsed.booths[0]?.subType).toBe("SMOKING_AREA");
-  });
-
-  it("푸드트럭 부스는 location이 없어도 0으로 보정한다", () => {
-    const parsed = parseBoothMapContract(
-      {
-        colleges: [],
-        booths: [
-          {
-            boothId: 12,
-            name: "푸드트럭 B",
-            type: "FOOD_TRUCK",
-          },
-        ],
-      },
-      "/map/booth-map",
-    );
-
-    expect(parsed.booths[0]?.locationX).toBe(0);
-    expect(parsed.booths[0]?.locationY).toBe(0);
   });
 });

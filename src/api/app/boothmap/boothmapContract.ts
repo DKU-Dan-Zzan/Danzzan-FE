@@ -1,5 +1,3 @@
-// 역할: boothmap contract 응답 스키마를 검증하고 도메인 형태로 정규화한다.
-
 import type { BoothOperationStatus, BoothSubType, BoothType } from "@/types/app/boothmap/boothmap.types";
 
 type RecordLike = Record<string, unknown>;
@@ -77,11 +75,11 @@ const readStringArray = (record: RecordLike, key: string): string[] | undefined 
 
 const parseBoothType = (raw: unknown, endpoint: string, label: string): BoothType => {
   if (typeof raw !== "string" || !raw.trim()) {
-    throw new BoothmapContractError(endpoint, `${label} type 값이 비어 있습니다.`);
+    throw new BoothmapContractError(endpoint, `${label} type is missing.`);
   }
   const normalized = raw.trim().toUpperCase() as BoothType;
   if (!boothTypeSet.has(normalized)) {
-    throw new BoothmapContractError(endpoint, `${label} type 값이 유효하지 않습니다. (${raw})`);
+    throw new BoothmapContractError(endpoint, `${label} type is invalid. (${raw})`);
   }
   return normalized;
 };
@@ -96,7 +94,7 @@ const parseBoothSubType = (
   }
 
   if (typeof raw !== "string" || !raw.trim()) {
-    throw new BoothmapContractError(endpoint, `${label} subType 값이 올바르지 않습니다.`);
+    throw new BoothmapContractError(endpoint, `${label} subType is invalid.`);
   }
 
   const normalized = raw.trim().toUpperCase() as BoothSubType;
@@ -117,12 +115,12 @@ const parseBoothOperationStatus = (
   }
 
   if (typeof raw !== "string" || !raw.trim()) {
-    throw new BoothmapContractError(endpoint, `${label} operationStatus 값이 올바르지 않습니다.`);
+    throw new BoothmapContractError(endpoint, `${label} operationStatus is invalid.`);
   }
 
   const normalized = raw.trim().toUpperCase() as BoothOperationStatus;
   if (!boothOperationStatusSet.has(normalized)) {
-    throw new BoothmapContractError(endpoint, `${label} operationStatus 값이 유효하지 않습니다. (${raw})`);
+    throw new BoothmapContractError(endpoint, `${label} operationStatus is invalid. (${raw})`);
   }
 
   return normalized;
@@ -204,16 +202,16 @@ export type ContractPubDetailResponse = {
 export const parseBoothMapContract = (payload: unknown, endpoint: string): ContractBoothMapResponse => {
   const unwrapped = unwrapEnvelope(payload);
   if (!isRecord(unwrapped)) {
-    throw new BoothmapContractError(endpoint, "부스맵 응답이 객체 형태가 아닙니다.");
+    throw new BoothmapContractError(endpoint, "booth map response must be an object.");
   }
 
   if (!Array.isArray(unwrapped.colleges) || !Array.isArray(unwrapped.booths)) {
-    throw new BoothmapContractError(endpoint, "부스맵 colleges/booths 필드가 배열 형태가 아닙니다.");
+    throw new BoothmapContractError(endpoint, "booth map response must contain array fields.");
   }
 
   const colleges = unwrapped.colleges.map((item, index) => {
     if (!isRecord(item)) {
-      throw new BoothmapContractError(endpoint, `colleges[${index}]가 객체가 아닙니다.`);
+      throw new BoothmapContractError(endpoint, `colleges[${index}] must be an object.`);
     }
 
     const collegeId = readNumber(item, "collegeId");
@@ -226,7 +224,7 @@ export const parseBoothMapContract = (payload: unknown, endpoint: string): Contr
       locationX === undefined ||
       locationY === undefined
     ) {
-      throw new BoothmapContractError(endpoint, `colleges[${index}] 필수 필드가 누락되었습니다.`);
+      throw new BoothmapContractError(endpoint, `colleges[${index}] is missing required fields.`);
     }
 
     return {
@@ -237,9 +235,9 @@ export const parseBoothMapContract = (payload: unknown, endpoint: string): Contr
     };
   });
 
-  const booths = unwrapped.booths.map((item, index) => {
+  const booths = unwrapped.booths.flatMap((item, index) => {
     if (!isRecord(item)) {
-      throw new BoothmapContractError(endpoint, `booths[${index}]가 객체가 아닙니다.`);
+      throw new BoothmapContractError(endpoint, `booths[${index}] must be an object.`);
     }
 
     const boothId = readNumber(item, "boothId");
@@ -252,29 +250,27 @@ export const parseBoothMapContract = (payload: unknown, endpoint: string): Contr
     const operationStatus = parseBoothOperationStatus(item.operationStatus, endpoint, `booths[${index}]`);
     const startTime = readNullableString(item, "startTime");
     const endTime = readNullableString(item, "endTime");
-    const normalizedLocationX = type === "FOOD_TRUCK" ? (locationX ?? 0) : locationX;
-    const normalizedLocationY = type === "FOOD_TRUCK" ? (locationY ?? 0) : locationY;
-    if (
-      boothId === undefined ||
-      !name ||
-      normalizedLocationX === undefined ||
-      normalizedLocationY === undefined
-    ) {
-      throw new BoothmapContractError(endpoint, `booths[${index}] 필수 필드가 누락되었습니다.`);
+
+    if (locationX === undefined || locationY === undefined) {
+      return [];
     }
 
-    return {
+    if (boothId === undefined || !name) {
+      throw new BoothmapContractError(endpoint, `booths[${index}] is missing required fields.`);
+    }
+
+    return [{
       boothId,
       name,
       type,
       subType,
       description: description ?? null,
-      locationX: normalizedLocationX,
-      locationY: normalizedLocationY,
+      locationX,
+      locationY,
       operationStatus,
       startTime: startTime ?? null,
       endTime: endTime ?? null,
-    };
+    }];
   });
 
   return {
@@ -289,7 +285,7 @@ export const parseBoothSummaryContract = (
 ): ContractBoothSummaryResponse => {
   const unwrapped = unwrapEnvelope(payload);
   if (!isRecord(unwrapped)) {
-    throw new BoothmapContractError(endpoint, "부스 상세 응답이 객체 형태가 아닙니다.");
+    throw new BoothmapContractError(endpoint, "booth summary response must be an object.");
   }
 
   const boothId = readNumber(unwrapped, "boothId");
@@ -308,7 +304,7 @@ export const parseBoothSummaryContract = (
     startTime === undefined ||
     endTime === undefined
   ) {
-    throw new BoothmapContractError(endpoint, "부스 상세 응답 필수 필드가 누락되었습니다.");
+    throw new BoothmapContractError(endpoint, "booth summary response is missing required fields.");
   }
 
   return {
@@ -326,12 +322,12 @@ export const parseBoothSummaryContract = (
 export const parsePubsContract = (payload: unknown, endpoint: string): ContractPubSummaryResponse[] => {
   const unwrapped = unwrapEnvelope(payload);
   if (!Array.isArray(unwrapped)) {
-    throw new BoothmapContractError(endpoint, "주점 목록 응답이 배열 형태가 아닙니다.");
+    throw new BoothmapContractError(endpoint, "pub list response must be an array.");
   }
 
   return unwrapped.map((item, index) => {
     if (!isRecord(item)) {
-      throw new BoothmapContractError(endpoint, `pubs[${index}]가 객체가 아닙니다.`);
+      throw new BoothmapContractError(endpoint, `pubs[${index}] must be an object.`);
     }
 
     const pubId = readNumber(item, "pubId");
@@ -355,7 +351,7 @@ export const parsePubsContract = (payload: unknown, endpoint: string): ContractP
       startTime === undefined ||
       endTime === undefined
     ) {
-      throw new BoothmapContractError(endpoint, `pubs[${index}] 필수 필드가 누락되었습니다.`);
+      throw new BoothmapContractError(endpoint, `pubs[${index}] is missing required fields.`);
     }
 
     return {
@@ -376,7 +372,7 @@ export const parsePubsContract = (payload: unknown, endpoint: string): ContractP
 export const parsePubDetailContract = (payload: unknown, endpoint: string): ContractPubDetailResponse => {
   const unwrapped = unwrapEnvelope(payload);
   if (!isRecord(unwrapped)) {
-    throw new BoothmapContractError(endpoint, "주점 상세 응답이 객체 형태가 아닙니다.");
+    throw new BoothmapContractError(endpoint, "pub detail response must be an object.");
   }
 
   const pubId = readNumber(unwrapped, "pubId");
@@ -402,7 +398,7 @@ export const parsePubDetailContract = (payload: unknown, endpoint: string): Cont
     startTime === undefined ||
     endTime === undefined
   ) {
-    throw new BoothmapContractError(endpoint, "주점 상세 응답 필수 필드가 누락되었습니다.");
+    throw new BoothmapContractError(endpoint, "pub detail response is missing required fields.");
   }
 
   return {

@@ -22,6 +22,9 @@ export type AdminBoothManagementBooth = {
   type: "EXPERIENCE" | "FOOD_TRUCK" | "EVENT" | "FACILITY";
   name: string;
   description: string | null;
+  locationX: number | null;
+  locationY: number | null;
+  placed: boolean;
   operationInfoExists: boolean;
   operationStatus: "OPEN" | "CLOSED" | "UNKNOWN";
   startTime: string | null;
@@ -81,8 +84,6 @@ export type CreateAdminBoothPayload = {
   type: "EXPERIENCE" | "FOOD_TRUCK" | "EVENT" | "FACILITY";
   name: string;
   description?: string | null;
-  locationX: number;
-  locationY: number;
   operationStatus: "OPEN" | "CLOSED" | "UNKNOWN";
   startTime?: string | null;
   endTime?: string | null;

@@ -60,8 +60,6 @@ type BoothCreateFormState = {
   type: AdminBoothManagementBooth["type"];
   name: string;
   description: string;
-  locationX: string;
-  locationY: string;
   operationStatus: "OPEN" | "CLOSED" | "UNKNOWN";
   startTime: string;
   endTime: string;
@@ -112,6 +110,8 @@ type ManagementListItem =
       summary: string;
       collegeName: string;
       department: string;
+      locationX: number | null;
+      locationY: number | null;
       operationInfoExists: boolean;
       displayOperationIds?: number[];
     }
@@ -279,6 +279,8 @@ export default function AdminBoothManagerPanel({
       summary: booth.description ?? "",
       collegeName: "-",
       department: "-",
+      locationX: booth.locationX,
+      locationY: booth.locationY,
       operationInfoExists: booth.operationInfoExists,
     }));
 
@@ -404,8 +406,6 @@ export default function AdminBoothManagerPanel({
       type: resolveNewBoothType(filter),
       name: "",
       description: "",
-      locationX: "",
-      locationY: "",
       operationStatus: "UNKNOWN",
       startTime: "",
       endTime: "",
@@ -427,18 +427,10 @@ export default function AdminBoothManagerPanel({
 
       if (creatingBooth && boothCreateForm) {
         const trimmedName = boothCreateForm.name.trim();
-        const locationX = Number(boothCreateForm.locationX);
-        const locationY = Number(boothCreateForm.locationY);
         const operationDates = FESTIVAL_DATES.filter((date) => boothCreateForm.operationDates.includes(date));
 
         if (!trimmedName) {
           throw new Error("부스 이름을 입력해 주세요.");
-        }
-        if (boothCreateForm.locationX.trim().length === 0 || Number.isNaN(locationX)) {
-          throw new Error("경도(locationX)를 숫자로 입력해 주세요.");
-        }
-        if (boothCreateForm.locationY.trim().length === 0 || Number.isNaN(locationY)) {
-          throw new Error("위도(locationY)를 숫자로 입력해 주세요.");
         }
         if (operationDates.length === 0) {
           throw new Error("운영 날짜를 최소 1개 이상 선택해 주세요.");
@@ -451,8 +443,6 @@ export default function AdminBoothManagerPanel({
             boothCreateForm.type === "FOOD_TRUCK"
               ? normalizeMultilineField(boothCreateForm.description) || null
               : null,
-          locationX,
-          locationY,
           operationStatus: boothCreateForm.operationStatus,
           startTime: boothCreateForm.startTime || null,
           endTime: boothCreateForm.endTime || null,
@@ -937,6 +927,9 @@ export default function AdminBoothManagerPanel({
                         <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-[var(--text-muted)]">
                           <span>단과대: {item.collegeName}</span>
                           <span>학과: {item.department}</span>
+                          {item.kind === "booth" && (
+                            <span>위치: {item.locationX != null && item.locationY != null ? "배치완료" : "미배치"}</span>
+                          )}
                         </div>
                       </div>
 
@@ -1019,7 +1012,7 @@ export default function AdminBoothManagerPanel({
                     <h3 className="text-lg font-semibold text-[var(--text)]">새 부스</h3>
                   </div>
                   <p className="mt-2 text-xs text-[var(--text-muted)]">
-                    부스와 선택한 날짜의 운영정보를 함께 생성합니다.
+                    부스와 선택한 날짜의 운영정보를 함께 생성하며, 위치는 생성 후 관리자 지도에서 배치합니다.
                   </p>
                 </div>
 
@@ -1074,32 +1067,8 @@ export default function AdminBoothManagerPanel({
                   </label>
                 )}
 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <label className="block space-y-2">
-                    <span className="text-sm font-semibold text-[var(--text)]">locationX</span>
-                    <input
-                      type="number"
-                      step="any"
-                      value={boothCreateForm.locationX}
-                      onChange={(event) =>
-                        setBoothCreateForm((prev) => (prev ? { ...prev, locationX: event.target.value } : prev))
-                      }
-                      className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 text-sm text-[var(--text)]"
-                    />
-                  </label>
-
-                  <label className="block space-y-2">
-                    <span className="text-sm font-semibold text-[var(--text)]">locationY</span>
-                    <input
-                      type="number"
-                      step="any"
-                      value={boothCreateForm.locationY}
-                      onChange={(event) =>
-                        setBoothCreateForm((prev) => (prev ? { ...prev, locationY: event.target.value } : prev))
-                      }
-                      className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 text-sm text-[var(--text)]"
-                    />
-                  </label>
+                <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-3 text-sm text-[var(--text-muted)]">
+                  새 부스는 우선 미배치 상태로 생성됩니다. 위치 지정과 이동은 관리자 지도에서 이어서 진행할 수 있습니다.
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-3">
