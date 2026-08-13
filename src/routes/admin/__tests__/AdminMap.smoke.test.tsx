@@ -25,12 +25,20 @@ vi.mock("@/api/app/admin/adminMapApi", () => ({
 }));
 
 vi.mock("@/api/app/admin/adminBoothApi", () => ({
+  createAdminBooth: vi.fn(async () => 1),
+  createAdminPub: vi.fn(async () => 1),
   createAdminPubOperation: vi.fn(async () => undefined),
+  deleteAdminPubImage: vi.fn(async () => undefined),
   deleteAdminPubOperation: vi.fn(async () => undefined),
   getAdminBoothManagement: (...args: unknown[]) => mockGetAdminBoothManagement(...args),
+  getAdminPubImages: vi.fn(async () => []),
+  hideAdminPub: vi.fn(async () => undefined),
+  registerAdminPubImages: vi.fn(async () => undefined),
   updateAdminBooth: vi.fn(async () => undefined),
   updateAdminPub: vi.fn(async () => undefined),
+  updateAdminPubMainImage: vi.fn(async () => undefined),
   updateAdminPubOperation: vi.fn(async () => undefined),
+  uploadPubImageDirect: vi.fn(async () => ({ imageUrl: "", key: "" })),
 }));
 
 describe("AdminMap smoke", () => {
