@@ -377,6 +377,8 @@ export default function AdminBoothManagerPanel({
     return managementData.pubOperations.find((operation) => operation.operationDate === selectedDate) ?? null;
   }, [managementData, selectedDate]);
 
+  const shouldShowPubOperationsSection = filter === "PUB" || selectedItem?.kind === "pub";
+
   const hasMainPubImage = useMemo(() => pubImages.some((image) => image.isMain), [pubImages]);
 
   const startCreatingPub = () => {
@@ -1691,131 +1693,132 @@ export default function AdminBoothManagerPanel({
             )}
           </section>
 
-          <section className="rounded-3xl border border-[var(--border-base)] bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h2 className="text-base font-semibold text-[var(--text)]">주점 공통 운영정보</h2>
-                <p className="mt-1 text-xs text-[var(--text-muted)]">
-                  pub_operation은 개별 주점이 아니라 전체 주점에 공통 적용되는 운영시간입니다.
-                </p>
+          {shouldShowPubOperationsSection && (
+            <section className="rounded-3xl border border-[var(--border-base)] bg-white p-5 shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-base font-semibold text-[var(--text)]">주점 공통 운영정보</h2>
+                  <p className="mt-1 text-xs text-[var(--text-muted)]">
+                    pub_operation은 개별 주점이 아니라 전체 주점에 공통 적용되는 운영시간입니다.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={resetPubOperationDraft}
+                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-2xl border border-[var(--border-base)] bg-white px-4 text-sm font-semibold text-[var(--text)]"
+                >
+                  <Plus className="h-4 w-4" strokeWidth={2.3} />
+                  새 항목
+                </button>
               </div>
 
-              <button
-                type="button"
-                onClick={resetPubOperationDraft}
-                className="inline-flex h-10 items-center justify-center gap-1.5 rounded-2xl border border-[var(--border-base)] bg-white px-4 text-sm font-semibold text-[var(--text)]"
-              >
-                <Plus className="h-4 w-4" strokeWidth={2.3} />
-                새 항목
-              </button>
-            </div>
+              {selectedPubOperation && (
+                <div className="mt-4 rounded-2xl bg-[var(--surface-subtle)] px-4 py-3 text-sm text-[var(--text-muted)]">
+                  현재 선택 날짜({selectedDate}) 운영정보: {selectedPubOperation.startTime} - {selectedPubOperation.endTime}
+                </div>
+              )}
 
-            {selectedPubOperation && (
-              <div className="mt-4 rounded-2xl bg-[var(--surface-subtle)] px-4 py-3 text-sm text-[var(--text-muted)]">
-                현재 선택 날짜({selectedDate}) 운영정보: {selectedPubOperation.startTime} - {selectedPubOperation.endTime}
-              </div>
-            )}
+              <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+                <div className="space-y-3">
+                  {managementData?.pubOperations.map((operation) => {
+                    const isEditing = pubOperationDraft.id === operation.id;
+                    return (
+                      <div
+                        key={operation.id}
+                        className={cn(
+                          "rounded-2xl border px-4 py-3",
+                          isEditing
+                            ? "border-[var(--accent)] bg-[var(--accent)]/10"
+                            : "border-[var(--border-base)] bg-white",
+                        )}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-semibold text-[var(--text)]">{operation.operationDate}</p>
+                            <p className="mt-1 text-xs text-[var(--text-muted)]">
+                              {operation.startTime} - {operation.endTime}
+                            </p>
+                          </div>
 
-            <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-              <div className="space-y-3">
-                {managementData?.pubOperations.map((operation) => {
-                  const isEditing = pubOperationDraft.id === operation.id;
-                  return (
-                    <div
-                      key={operation.id}
-                      className={cn(
-                        "rounded-2xl border px-4 py-3",
-                        isEditing
-                          ? "border-[var(--accent)] bg-[var(--accent)]/10"
-                          : "border-[var(--border-base)] bg-white",
-                      )}
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-semibold text-[var(--text)]">{operation.operationDate}</p>
-                          <p className="mt-1 text-xs text-[var(--text-muted)]">
-                            {operation.startTime} - {operation.endTime}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setPubOperationDraft({
-                                id: operation.id,
-                                operationDate: operation.operationDate,
-                                startTime: operation.startTime,
-                                endTime: operation.endTime,
-                              })
-                            }
-                            className="rounded-xl border border-[var(--border-base)] px-3 py-2 text-xs font-semibold text-[var(--text)]"
-                          >
-                            수정
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => void handleDeletePubOperation(operation)}
-                            className="inline-flex items-center gap-1 rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-xs font-semibold text-[var(--status-danger-text)]"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
-                            삭제
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setPubOperationDraft({
+                                  id: operation.id,
+                                  operationDate: operation.operationDate,
+                                  startTime: operation.startTime,
+                                  endTime: operation.endTime,
+                                })
+                              }
+                              className="rounded-xl border border-[var(--border-base)] px-3 py-2 text-xs font-semibold text-[var(--text)]"
+                            >
+                              수정
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void handleDeletePubOperation(operation)}
+                              className="inline-flex items-center gap-1 rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-xs font-semibold text-[var(--status-danger-text)]"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
+                              삭제
+                            </button>
+                          </div>
                         </div>
                       </div>
+                    );
+                  })}
+
+                  {managementData && managementData.pubOperations.length === 0 && (
+                    <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-8 text-center text-sm text-[var(--text-muted)]">
+                      등록된 주점 공통 운영정보가 없습니다.
                     </div>
-                  );
-                })}
-
-                {managementData && managementData.pubOperations.length === 0 && (
-                  <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-8 text-center text-sm text-[var(--text-muted)]">
-                    등록된 주점 공통 운영정보가 없습니다.
-                  </div>
-                )}
-              </div>
-
-              <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] p-4">
-                <h3 className="text-sm font-semibold text-[var(--text)]">
-                  {pubOperationDraft.id === null ? "새 운영정보 추가" : "운영정보 수정"}
-                </h3>
-
-                <div className="mt-4 space-y-4">
-                  <label className="block space-y-2">
-                    <span className="text-sm font-semibold text-[var(--text)]">운영 날짜</span>
-                    <input
-                      type="date"
-                      value={pubOperationDraft.operationDate}
-                      onChange={(event) =>
-                        setPubOperationDraft((prev) => ({ ...prev, operationDate: event.target.value }))
-                      }
-                      className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-white px-3 text-sm text-[var(--text)]"
-                    />
-                  </label>
-
-                  <label className="block space-y-2">
-                    <span className="text-sm font-semibold text-[var(--text)]">시작 시간</span>
-                    <input
-                      type="time"
-                      value={pubOperationDraft.startTime}
-                      onChange={(event) =>
-                        setPubOperationDraft((prev) => ({ ...prev, startTime: event.target.value }))
-                      }
-                      className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-white px-3 text-sm text-[var(--text)]"
-                    />
-                  </label>
-
-                  <label className="block space-y-2">
-                    <span className="text-sm font-semibold text-[var(--text)]">종료 시간</span>
-                    <input
-                      type="time"
-                      value={pubOperationDraft.endTime}
-                      onChange={(event) =>
-                        setPubOperationDraft((prev) => ({ ...prev, endTime: event.target.value }))
-                      }
-                      className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-white px-3 text-sm text-[var(--text)]"
-                    />
-                  </label>
+                  )}
                 </div>
+
+                <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] p-4">
+                  <h3 className="text-sm font-semibold text-[var(--text)]">
+                    {pubOperationDraft.id === null ? "새 운영정보 추가" : "운영정보 수정"}
+                  </h3>
+
+                  <div className="mt-4 space-y-4">
+                    <label className="block space-y-2">
+                      <span className="text-sm font-semibold text-[var(--text)]">운영 날짜</span>
+                      <input
+                        type="date"
+                        value={pubOperationDraft.operationDate}
+                        onChange={(event) =>
+                          setPubOperationDraft((prev) => ({ ...prev, operationDate: event.target.value }))
+                        }
+                        className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-white px-3 text-sm text-[var(--text)]"
+                      />
+                    </label>
+
+                    <label className="block space-y-2">
+                      <span className="text-sm font-semibold text-[var(--text)]">시작 시간</span>
+                      <input
+                        type="time"
+                        value={pubOperationDraft.startTime}
+                        onChange={(event) =>
+                          setPubOperationDraft((prev) => ({ ...prev, startTime: event.target.value }))
+                        }
+                        className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-white px-3 text-sm text-[var(--text)]"
+                      />
+                    </label>
+
+                    <label className="block space-y-2">
+                      <span className="text-sm font-semibold text-[var(--text)]">종료 시간</span>
+                      <input
+                        type="time"
+                        value={pubOperationDraft.endTime}
+                        onChange={(event) =>
+                          setPubOperationDraft((prev) => ({ ...prev, endTime: event.target.value }))
+                        }
+                        className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-white px-3 text-sm text-[var(--text)]"
+                      />
+                    </label>
+                  </div>
 
                 <div className="mt-5 flex gap-2">
                   <button
@@ -1838,6 +1841,7 @@ export default function AdminBoothManagerPanel({
               </div>
             </div>
           </section>
+          )}
         </div>
       </div>
     </AdminShell>
