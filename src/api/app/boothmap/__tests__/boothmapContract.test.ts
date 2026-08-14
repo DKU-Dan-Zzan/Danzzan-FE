@@ -64,7 +64,7 @@ describe("boothmapContract", () => {
     ).toThrow(BoothmapContractError);
   });
 
-  it("좌표가 없는 공개 부스는 건너뛴다", () => {
+  it("좌표가 없는 일반 공개 부스는 건너뛴다", () => {
     const parsed = parseBoothMapContract(
       {
         colleges: [],
@@ -78,8 +78,8 @@ describe("boothmapContract", () => {
           },
           {
             boothId: 12,
-            name: "푸드트럭 B",
-            type: "FOOD_TRUCK",
+            name: "체험 부스 B",
+            type: "EXPERIENCE",
           },
         ],
       },
