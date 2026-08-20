@@ -37,20 +37,17 @@ import {
 } from "@/routes/boothmap/boothMapSelectors";
 import { cn } from "@/components/common/ui/utils";
 import { formatDescription } from "@/utils/app/boothmap/formatDescription";
+import {
+  DEFAULT_FESTIVAL_DATE,
+  FESTIVAL_DATE_OPTIONS,
+  isFestivalDate,
+} from "@/utils/app/boothmap/festivalDates";
 
 const DEFAULT_MAP_VIEWPORT: MapViewport = {
   lat: 37.32085,
   lng: 127.12805,
   kakaoLevel: 3,
 };
-
-const FESTIVAL_DATES = [
-  { label: "5/12", value: "2026-05-12" },
-  { label: "5/13", value: "2026-05-13" },
-  { label: "5/14", value: "2026-05-14" },
-];
-
-const DEFAULT_FESTIVAL_DATE = FESTIVAL_DATES[0].value;
 
 function getInitialFestivalDate() {
   const today = new Date();
@@ -59,8 +56,7 @@ function getInitialFestivalDate() {
   const date = `${today.getDate()}`.padStart(2, "0");
   const todayValue = `${year}-${month}-${date}`;
 
-  return FESTIVAL_DATES.find((festivalDate) => festivalDate.value === todayValue)?.value
-    ?? DEFAULT_FESTIVAL_DATE;
+  return isFestivalDate(todayValue) ? todayValue : DEFAULT_FESTIVAL_DATE;
 }
 
 const TOP_PANEL_Z_INDEX_CLASS: Record<SheetSnap, string> = {
@@ -143,7 +139,7 @@ export default function BoothMap() {
   const [sheetMode, setSheetMode] = useState<SheetMode>("LIST");
   const [sheetSnap, setSheetSnap] = useState<SheetSnap>("PEEK");
   const [isBoothExpanded, setIsBoothExpanded] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(getInitialFestivalDate);
+  const [selectedDate, setSelectedDate] = useState<string>(getInitialFestivalDate);
   const [mapViewport, setMapViewport] = useState<MapViewport>(DEFAULT_MAP_VIEWPORT);
   const [bottomNavHeight, setBottomNavHeight] = useState(56);
   const boothSelectionRequestSeqRef = useRef(0);
@@ -282,8 +278,8 @@ export default function BoothMap() {
       foodTruckBoothsToCheck.map(async (booth) => {
         try {
           const summary = await queryClient.fetchQuery({
-            queryKey: appQueryKeys.boothMapBoothDetail(booth.id),
-            queryFn: () => getBoothSummary(booth.id),
+            queryKey: appQueryKeys.boothMapBoothDetail(booth.id, selectedDate),
+            queryFn: () => getBoothSummary(booth.id, selectedDate),
             staleTime: 5 * 60_000,
           });
 
@@ -315,7 +311,7 @@ export default function BoothMap() {
     return () => {
       cancelled = true;
     };
-  }, [visibleBooths]);
+  }, [selectedDate, visibleBooths]);
 
   const resolveBoothSelection = useCallback(async (
     id: number,
@@ -333,8 +329,8 @@ export default function BoothMap() {
 
     try {
       const summary = await queryClient.fetchQuery({
-        queryKey: appQueryKeys.boothMapBoothDetail(id),
-        queryFn: () => getBoothSummary(id),
+        queryKey: appQueryKeys.boothMapBoothDetail(id, selectedDate),
+        queryFn: () => getBoothSummary(id, selectedDate),
         staleTime: 5 * 60_000,
       });
 
@@ -361,7 +357,7 @@ export default function BoothMap() {
     setSelectedDetailItem(null);
     setSheetMode("LIST");
     setSheetSnap(options.fallbackSnap);
-  }, []);
+  }, [selectedDate]);
 
   const onClickMarkerBooth = useCallback((id: number) => {
     const booth = booths.find((item) => item.id === id);
@@ -552,7 +548,7 @@ export default function BoothMap() {
       >
         <div className="pointer-events-auto mt-[calc(env(safe-area-inset-top)+3.4rem)] px-3 py-2 sm:px-4 sm:pb-4">
           <FestivalDateTabs
-            dates={FESTIVAL_DATES}
+            dates={FESTIVAL_DATE_OPTIONS}
             selectedDate={selectedDate}
             onChange={(date) => {
               startTransition(() => {
@@ -627,6 +623,7 @@ export default function BoothMap() {
             selectedItem={selectedDetailItem}
             pubs={pubs}
             colleges={colleges}
+            selectedDate={selectedDate}
             onClose={handleDetailClose}
           />
         )}

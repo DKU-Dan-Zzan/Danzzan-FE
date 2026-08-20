@@ -25,12 +25,20 @@ vi.mock("@/api/app/admin/adminMapApi", () => ({
 }));
 
 vi.mock("@/api/app/admin/adminBoothApi", () => ({
+  createAdminBooth: vi.fn(async () => 1),
+  createAdminPub: vi.fn(async () => 1),
   createAdminPubOperation: vi.fn(async () => undefined),
+  deleteAdminPubImage: vi.fn(async () => undefined),
   deleteAdminPubOperation: vi.fn(async () => undefined),
   getAdminBoothManagement: (...args: unknown[]) => mockGetAdminBoothManagement(...args),
+  getAdminPubImages: vi.fn(async () => []),
+  hideAdminPub: vi.fn(async () => undefined),
+  registerAdminPubImages: vi.fn(async () => undefined),
   updateAdminBooth: vi.fn(async () => undefined),
   updateAdminPub: vi.fn(async () => undefined),
+  updateAdminPubMainImage: vi.fn(async () => undefined),
   updateAdminPubOperation: vi.fn(async () => undefined),
+  uploadPubImageDirect: vi.fn(async () => ({ imageUrl: "", key: "" })),
 }));
 
 describe("AdminMap smoke", () => {
@@ -64,7 +72,7 @@ describe("AdminMap smoke", () => {
     expect(container.textContent).toContain("개발자 전용 관리자 페이지");
     expect(container.textContent).toContain("Map");
     expect(container.textContent).toContain("Booth");
-    expect(container.textContent).toContain("현재 운영 일");
+    expect(container.textContent).toContain("운영 날짜");
     expect(container.textContent).toContain("지도 편집 영역");
 
     const boothTabButton = Array.from(container.querySelectorAll("button")).find(
@@ -77,6 +85,16 @@ describe("AdminMap smoke", () => {
 
     expect(mockGetAdminBoothManagement).toHaveBeenCalled();
     expect(container.textContent).toContain("관리 대상 목록");
+    expect(container.textContent).not.toContain("주점 공통 운영정보");
+
+    const pubFilterButton = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.textContent?.trim() === "주점",
+    );
+
+    await act(async () => {
+      pubFilterButton?.click();
+    });
+
     expect(container.textContent).toContain("주점 공통 운영정보");
 
     await act(async () => {

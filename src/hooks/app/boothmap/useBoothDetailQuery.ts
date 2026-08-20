@@ -6,29 +6,29 @@ import {
 } from "@/api/app/boothmap/boothmapApi";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
 
-export const useBoothDetailQuery = (boothId: number | null) => {
+export const useBoothDetailQuery = (boothId: number | null, date: string | null) => {
   return useAppQuery({
-    queryKey: appQueryKeys.boothMapBoothDetail(boothId ?? -1),
-    enabled: boothId !== null,
+    queryKey: appQueryKeys.boothMapBoothDetail(boothId ?? -1, date ?? ""),
+    enabled: boothId !== null && date !== null,
     queryFn: ({ signal }) => {
-      if (boothId === null) {
+      if (boothId === null || date === null) {
         throw new Error("부스 상세 조회 대상이 없습니다.");
       }
-      return getBoothSummary(boothId, undefined, { signal });
+      return getBoothSummary(boothId, date, { signal });
     },
     staleTime: 5 * 60_000,
   });
 };
 
-export const usePubDetailQuery = (pubId: number | null) => {
+export const usePubDetailQuery = (pubId: number | null, date: string | null) => {
   return useAppQuery({
-    queryKey: appQueryKeys.boothMapPubDetail(pubId ?? -1),
-    enabled: pubId !== null,
+    queryKey: appQueryKeys.boothMapPubDetail(pubId ?? -1, date ?? ""),
+    enabled: pubId !== null && date !== null,
     queryFn: ({ signal }) => {
-      if (pubId === null) {
+      if (pubId === null || date === null) {
         throw new Error("주점 상세 조회 대상이 없습니다.");
       }
-      return getPubDetail(pubId, undefined, { signal });
+      return getPubDetail(pubId, date, { signal });
     },
     staleTime: 5 * 60_000,
   });

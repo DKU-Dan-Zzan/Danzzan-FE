@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type ReactNode } from "react";
+﻿import { useEffect, useMemo, useState, type ChangeEvent, type ReactNode } from "react";
 import { ArrowLeft, CheckCircle2, ImagePlus, Plus, RefreshCcw, Save, Search, Star, Trash2, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
+  createAdminBooth,
   createAdminPub,
   createAdminPubOperation,
   deleteAdminPubImage,
@@ -27,13 +28,16 @@ import {
   validateImageFile,
 } from "@/routes/admin/adminEditorLogic";
 import { formatDescription } from "@/utils/app/boothmap/formatDescription";
-
-const FESTIVAL_DATES = ["2026-05-12", "2026-05-13", "2026-05-14"] as const;
+import {
+  DEFAULT_FESTIVAL_DATE,
+  FESTIVAL_DATES,
+  formatFestivalDateLabel,
+} from "@/utils/app/boothmap/festivalDates";
 const FILTER_OPTIONS = [
   { value: "ALL", label: "전체" },
   { value: "EXPERIENCE", label: "체험 부스" },
   { value: "FOOD_TRUCK", label: "푸드트럭" },
-  { value: "EVENT", label: "이벤트" },
+  { value: "EVENT", label: "이벤트 부스" },
   { value: "FACILITY", label: "편의시설" },
   { value: "PUB", label: "주점" },
 ] as const;
@@ -50,6 +54,17 @@ type BoothFormState = {
   operationStatus: "OPEN" | "CLOSED" | "UNKNOWN";
   startTime: string;
   endTime: string;
+  operationDates: string[];
+};
+
+type BoothCreateFormState = {
+  type: AdminBoothManagementBooth["type"];
+  name: string;
+  description: string;
+  operationStatus: "OPEN" | "CLOSED" | "UNKNOWN";
+  startTime: string;
+  endTime: string;
+  operationDates: string[];
 };
 
 type PubFormState = {
@@ -79,6 +94,14 @@ function normalizeMultilineField(value?: string | null) {
   return formatDescription(value).replace(/\r\n/g, "\n");
 }
 
+function resolveNewBoothType(filter: AdminBoothFilter): AdminBoothManagementBooth["type"] {
+  if (filter === "EXPERIENCE" || filter === "FOOD_TRUCK" || filter === "EVENT" || filter === "FACILITY") {
+    return filter;
+  }
+
+  return "EXPERIENCE";
+}
+
 type ManagementListItem =
   | {
       kind: "booth";
@@ -88,6 +111,8 @@ type ManagementListItem =
       summary: string;
       collegeName: string;
       department: string;
+      locationX: number | null;
+      locationY: number | null;
       operationInfoExists: boolean;
       displayOperationIds?: number[];
     }
@@ -109,7 +134,7 @@ export default function AdminBoothManagerPanel({
   topSlot?: ReactNode;
 }) {
   const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState<string>(FESTIVAL_DATES[0]);
+  const [selectedDate, setSelectedDate] = useState<string>(DEFAULT_FESTIVAL_DATE);
   const [filter, setFilter] = useState<AdminBoothFilter>("ALL");
   const [pubCollegeFilter, setPubCollegeFilter] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
@@ -119,6 +144,8 @@ export default function AdminBoothManagerPanel({
   const [selectedItem, setSelectedItem] = useState<SelectedManagementItem>(null);
   const [boothForm, setBoothForm] = useState<BoothFormState | null>(null);
   const [pubForm, setPubForm] = useState<PubFormState | null>(null);
+  const [boothCreateForm, setBoothCreateForm] = useState<BoothCreateFormState | null>(null);
+  const [creatingBooth, setCreatingBooth] = useState(false);
   const [creatingPub, setCreatingPub] = useState(false);
   const [savingItem, setSavingItem] = useState(false);
   const [pubImages, setPubImages] = useState<AdminPubImage[]>([]);
@@ -179,6 +206,7 @@ export default function AdminBoothManagerPanel({
       operationStatus: selectedBooth.operationStatus,
       startTime: selectedBooth.startTime ?? "",
       endTime: selectedBooth.endTime ?? "",
+      operationDates: FESTIVAL_DATES.filter((date) => selectedBooth.operationDates.includes(date)),
     });
   }, [selectedBooth]);
 
@@ -253,6 +281,8 @@ export default function AdminBoothManagerPanel({
       summary: booth.description ?? "",
       collegeName: "-",
       department: "-",
+      locationX: booth.locationX,
+      locationY: booth.locationY,
       operationInfoExists: booth.operationInfoExists,
     }));
 
@@ -347,9 +377,13 @@ export default function AdminBoothManagerPanel({
     return managementData.pubOperations.find((operation) => operation.operationDate === selectedDate) ?? null;
   }, [managementData, selectedDate]);
 
+  const shouldShowPubOperationsSection = filter === "PUB" || selectedItem?.kind === "pub";
+
   const hasMainPubImage = useMemo(() => pubImages.some((image) => image.isMain), [pubImages]);
 
   const startCreatingPub = () => {
+    setCreatingBooth(false);
+    setBoothCreateForm(null);
     setCreatingPub(true);
     setSelectedItem(null);
     clearPendingPubImages();
@@ -365,7 +399,27 @@ export default function AdminBoothManagerPanel({
     });
   };
 
+  const startCreatingBooth = () => {
+    setCreatingPub(false);
+    setPubForm(null);
+    setCreatingBooth(true);
+    setSelectedItem(null);
+    clearPendingPubImages();
+    setPubImages([]);
+    setBoothCreateForm({
+      type: resolveNewBoothType(filter),
+      name: "",
+      description: "",
+      operationStatus: "UNKNOWN",
+      startTime: "",
+      endTime: "",
+      operationDates: [selectedDate],
+    });
+  };
+
   const handleSelectItem = (item: ManagementListItem) => {
+    setCreatingBooth(false);
+    setBoothCreateForm(null);
     setCreatingPub(false);
     setSelectedItem({ kind: item.kind, id: item.id });
   };
@@ -375,7 +429,40 @@ export default function AdminBoothManagerPanel({
       setSavingItem(true);
       setGlobalError(null);
 
-      if (selectedBooth && boothForm) {
+      if (creatingBooth && boothCreateForm) {
+        const trimmedName = boothCreateForm.name.trim();
+        const operationDates = FESTIVAL_DATES.filter((date) => boothCreateForm.operationDates.includes(date));
+
+        if (!trimmedName) {
+          throw new Error("부스 이름을 입력해 주세요.");
+        }
+        if (operationDates.length === 0) {
+          throw new Error("운영 날짜를 최소 1개 이상 선택해 주세요.");
+        }
+
+        const createdBoothId = await createAdminBooth({
+          type: boothCreateForm.type,
+          name: trimmedName,
+          description:
+            boothCreateForm.type === "FOOD_TRUCK"
+              ? normalizeMultilineField(boothCreateForm.description) || null
+              : null,
+          operationStatus: boothCreateForm.operationStatus,
+          startTime: boothCreateForm.startTime || null,
+          endTime: boothCreateForm.endTime || null,
+          operationDates,
+        });
+        toast.success("새 부스를 추가했습니다.");
+        await loadManagementData(selectedDate);
+        setCreatingBooth(false);
+        setBoothCreateForm(null);
+        setSelectedItem({ kind: "booth", id: createdBoothId });
+      } else if (selectedBooth && boothForm) {
+        const operationDates = FESTIVAL_DATES.filter((date) => boothForm.operationDates.includes(date));
+        if (operationDates.length === 0) {
+          throw new Error("운영 날짜를 최소 1개 이상 선택해 주세요.");
+        }
+
         await updateAdminBooth(selectedBooth.id, {
           operationDate: selectedDate,
           operationStatus: boothForm.operationStatus,
@@ -386,6 +473,7 @@ export default function AdminBoothManagerPanel({
               : null,
           startTime: boothForm.startTime || null,
           endTime: boothForm.endTime || null,
+          operationDates,
         });
         toast.success(`${selectedBooth.name} 저장이 완료되었습니다.`);
       } else if (creatingPub && pubForm) {
@@ -849,6 +937,15 @@ export default function AdminBoothManagerPanel({
                         <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-[var(--text-muted)]">
                           <span>단과대: {item.collegeName}</span>
                           <span>학과: {item.department}</span>
+                          {item.kind === "booth" && (
+                            <span>
+                              위치: {item.type === "FOOD_TRUCK"
+                                ? "대표 위치 사용"
+                                : item.locationX != null && item.locationY != null
+                                  ? "배치완료"
+                                  : "미배치"}
+                            </span>
+                          )}
                         </div>
                       </div>
 
@@ -893,9 +990,20 @@ export default function AdminBoothManagerPanel({
                   새 주점
                 </button>
               )}
+              {filter !== "PUB" && (
+                <button
+                  type="button"
+                  disabled={savingItem || !managementData}
+                  onClick={startCreatingBooth}
+                  className="mr-2 inline-flex h-10 items-center justify-center gap-1.5 rounded-2xl border border-[var(--border-base)] bg-white px-4 text-sm font-semibold text-[var(--text)] disabled:opacity-60"
+                >
+                  <Plus className="h-4 w-4" strokeWidth={2.3} />
+                  새 부스
+                </button>
+              )}
               <button
                 type="button"
-                disabled={savingItem || (!selectedBooth && !selectedPub && !creatingPub)}
+                disabled={savingItem || (!selectedBooth && !selectedPub && !creatingPub && !creatingBooth)}
                 onClick={() => void handleSaveSelectedItem()}
                 className="inline-flex h-10 items-center justify-center gap-1.5 rounded-2xl bg-[var(--accent)] px-4 text-sm font-semibold text-white disabled:opacity-60"
               >
@@ -904,9 +1012,179 @@ export default function AdminBoothManagerPanel({
               </button>
             </div>
 
-            {!selectedBooth && !selectedPub && !creatingPub && (
+            {!selectedBooth && !selectedPub && !creatingPub && !creatingBooth && (
               <div className="mt-4 rounded-2xl border border-dashed border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-10 text-center text-sm text-[var(--text-muted)]">
                 왼쪽 목록에서 부스 또는 주점을 선택해 주세요.
+              </div>
+            )}
+
+            {creatingBooth && boothCreateForm && (
+              <div className="mt-5 space-y-5">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full bg-[var(--surface-subtle)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-muted)]">
+                      새 부스
+                    </span>
+                    <h3 className="text-lg font-semibold text-[var(--text)]">새 부스</h3>
+                  </div>
+                  <p className="mt-2 text-xs text-[var(--text-muted)]">
+                    부스와 선택한 날짜의 운영정보를 함께 생성하며, 위치는 생성 후 관리자 지도에서 배치합니다.
+                  </p>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <label className="block space-y-2">
+                    <span className="text-sm font-semibold text-[var(--text)]">type</span>
+                    <select
+                      value={boothCreateForm.type}
+                      onChange={(event) =>
+                        setBoothCreateForm((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                type: event.target.value as BoothCreateFormState["type"],
+                              }
+                            : prev,
+                        )
+                      }
+                      className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 text-sm text-[var(--text)]"
+                    >
+                      <option value="EXPERIENCE">EXPERIENCE</option>
+                      <option value="FOOD_TRUCK">FOOD_TRUCK</option>
+                      <option value="EVENT">EVENT</option>
+                      <option value="FACILITY">FACILITY</option>
+                    </select>
+                  </label>
+
+                  <label className="block space-y-2">
+                    <span className="text-sm font-semibold text-[var(--text)]">name</span>
+                    <input
+                      type="text"
+                      value={boothCreateForm.name}
+                      onChange={(event) =>
+                        setBoothCreateForm((prev) => (prev ? { ...prev, name: event.target.value } : prev))
+                      }
+                      className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 text-sm text-[var(--text)]"
+                    />
+                  </label>
+                </div>
+
+                {boothCreateForm.type === "FOOD_TRUCK" && (
+                  <label className="block space-y-2">
+                    <span className="text-sm font-semibold text-[var(--text)]">description</span>
+                    <textarea
+                      rows={5}
+                      value={boothCreateForm.description}
+                      onChange={(event) =>
+                        setBoothCreateForm((prev) => (prev ? { ...prev, description: event.target.value } : prev))
+                      }
+                      className="w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-3 text-sm text-[var(--text)]"
+                    />
+                  </label>
+                )}
+
+                <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-3 text-sm text-[var(--text-muted)]">
+                  새 부스는 우선 미배치 상태로 생성됩니다. 위치 지정과 이동은 관리자 지도에서 이어서 진행할 수 있습니다.
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-3">
+                  <label className="space-y-2">
+                    <span className="text-sm font-semibold text-[var(--text)]">운영 상태</span>
+                    <select
+                      value={boothCreateForm.operationStatus}
+                      onChange={(event) =>
+                        setBoothCreateForm((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                operationStatus: event.target.value as BoothCreateFormState["operationStatus"],
+                              }
+                            : prev,
+                        )
+                      }
+                      className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-sm text-[var(--text)]"
+                    >
+                      <option value="OPEN">OPEN</option>
+                      <option value="CLOSED">CLOSED</option>
+                      <option value="UNKNOWN">UNKNOWN</option>
+                    </select>
+                  </label>
+
+                  <label className="space-y-2">
+                    <span className="text-sm font-semibold text-[var(--text)]">시작 시간</span>
+                    <input
+                      type="time"
+                      value={boothCreateForm.startTime}
+                      onChange={(event) =>
+                        setBoothCreateForm((prev) => (prev ? { ...prev, startTime: event.target.value } : prev))
+                      }
+                      className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-sm text-[var(--text)]"
+                    />
+                  </label>
+
+                  <label className="space-y-2">
+                    <span className="text-sm font-semibold text-[var(--text)]">종료 시간</span>
+                    <input
+                      type="time"
+                      value={boothCreateForm.endTime}
+                      onChange={(event) =>
+                        setBoothCreateForm((prev) => (prev ? { ...prev, endTime: event.target.value } : prev))
+                      }
+                      className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-sm text-[var(--text)]"
+                    />
+                  </label>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-semibold text-[var(--text)]">운영 날짜</span>
+                    <span className="text-xs text-[var(--text-muted)]">최소 1개 이상 선택</span>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {FESTIVAL_DATES.map((date) => {
+                      const checked = boothCreateForm.operationDates.includes(date);
+                      return (
+                        <label
+                          key={date}
+                          className={cn(
+                            "flex cursor-pointer items-start gap-3 rounded-2xl border px-4 py-3 text-sm transition-colors",
+                            checked
+                              ? "border-[var(--accent)] bg-[var(--accent)]/10"
+                              : "border-[var(--border-base)] bg-[var(--surface-subtle)]",
+                          )}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(event) =>
+                              setBoothCreateForm((prev) => {
+                                if (!prev) {
+                                  return prev;
+                                }
+
+                                const nextDates = event.target.checked
+                                  ? [...prev.operationDates, date]
+                                  : prev.operationDates.filter((value) => value !== date);
+
+                                return {
+                                  ...prev,
+                                  operationDates: FESTIVAL_DATES.filter((festivalDate) =>
+                                    Array.from(new Set(nextDates)).includes(festivalDate),
+                                  ),
+                                };
+                              })
+                            }
+                            className="mt-0.5 h-4 w-4 rounded border-[var(--border-base)] text-[var(--accent)]"
+                          />
+                          <span className="space-y-1">
+                            <span className="block font-semibold text-[var(--text)]">{formatFestivalDateLabel(date)}</span>
+                            <span className="block text-xs text-[var(--text-muted)]">{date}</span>
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             )}
 
@@ -996,6 +1274,57 @@ export default function AdminBoothManagerPanel({
                       className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-sm text-[var(--text)]"
                     />
                   </label>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-semibold text-[var(--text)]">운영 날짜</span>
+                    <span className="text-xs text-[var(--text-muted)]">최소 1개 이상 선택</span>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {FESTIVAL_DATES.map((date) => {
+                      const checked = boothForm.operationDates.includes(date);
+                      return (
+                        <label
+                          key={date}
+                          className={cn(
+                            "flex cursor-pointer items-start gap-3 rounded-2xl border px-4 py-3 text-sm transition-colors",
+                            checked
+                              ? "border-[var(--accent)] bg-[var(--accent)]/10"
+                              : "border-[var(--border-base)] bg-[var(--surface-subtle)]",
+                          )}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(event) =>
+                              setBoothForm((prev) => {
+                                if (!prev) {
+                                  return prev;
+                                }
+
+                                const nextDates = event.target.checked
+                                  ? [...prev.operationDates, date]
+                                  : prev.operationDates.filter((value) => value !== date);
+
+                                return {
+                                  ...prev,
+                                  operationDates: FESTIVAL_DATES.filter((festivalDate) =>
+                                    Array.from(new Set(nextDates)).includes(festivalDate),
+                                  ),
+                                };
+                              })
+                            }
+                            className="mt-0.5 h-4 w-4 rounded border-[var(--border-base)] text-[var(--accent)]"
+                          />
+                          <span className="space-y-1">
+                            <span className="block font-semibold text-[var(--text)]">{formatFestivalDateLabel(date)}</span>
+                            <span className="block text-xs text-[var(--text-muted)]">{date}</span>
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
@@ -1364,131 +1693,132 @@ export default function AdminBoothManagerPanel({
             )}
           </section>
 
-          <section className="rounded-3xl border border-[var(--border-base)] bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h2 className="text-base font-semibold text-[var(--text)]">주점 공통 운영정보</h2>
-                <p className="mt-1 text-xs text-[var(--text-muted)]">
-                  pub_operation은 개별 주점이 아니라 전체 주점에 공통 적용되는 운영시간입니다.
-                </p>
+          {shouldShowPubOperationsSection && (
+            <section className="rounded-3xl border border-[var(--border-base)] bg-white p-5 shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-base font-semibold text-[var(--text)]">주점 공통 운영정보</h2>
+                  <p className="mt-1 text-xs text-[var(--text-muted)]">
+                    pub_operation은 개별 주점이 아니라 전체 주점에 공통 적용되는 운영시간입니다.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={resetPubOperationDraft}
+                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-2xl border border-[var(--border-base)] bg-white px-4 text-sm font-semibold text-[var(--text)]"
+                >
+                  <Plus className="h-4 w-4" strokeWidth={2.3} />
+                  새 항목
+                </button>
               </div>
 
-              <button
-                type="button"
-                onClick={resetPubOperationDraft}
-                className="inline-flex h-10 items-center justify-center gap-1.5 rounded-2xl border border-[var(--border-base)] bg-white px-4 text-sm font-semibold text-[var(--text)]"
-              >
-                <Plus className="h-4 w-4" strokeWidth={2.3} />
-                새 항목
-              </button>
-            </div>
+              {selectedPubOperation && (
+                <div className="mt-4 rounded-2xl bg-[var(--surface-subtle)] px-4 py-3 text-sm text-[var(--text-muted)]">
+                  현재 선택 날짜({selectedDate}) 운영정보: {selectedPubOperation.startTime} - {selectedPubOperation.endTime}
+                </div>
+              )}
 
-            {selectedPubOperation && (
-              <div className="mt-4 rounded-2xl bg-[var(--surface-subtle)] px-4 py-3 text-sm text-[var(--text-muted)]">
-                현재 선택 날짜({selectedDate}) 운영정보: {selectedPubOperation.startTime} - {selectedPubOperation.endTime}
-              </div>
-            )}
+              <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+                <div className="space-y-3">
+                  {managementData?.pubOperations.map((operation) => {
+                    const isEditing = pubOperationDraft.id === operation.id;
+                    return (
+                      <div
+                        key={operation.id}
+                        className={cn(
+                          "rounded-2xl border px-4 py-3",
+                          isEditing
+                            ? "border-[var(--accent)] bg-[var(--accent)]/10"
+                            : "border-[var(--border-base)] bg-white",
+                        )}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-semibold text-[var(--text)]">{operation.operationDate}</p>
+                            <p className="mt-1 text-xs text-[var(--text-muted)]">
+                              {operation.startTime} - {operation.endTime}
+                            </p>
+                          </div>
 
-            <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-              <div className="space-y-3">
-                {managementData?.pubOperations.map((operation) => {
-                  const isEditing = pubOperationDraft.id === operation.id;
-                  return (
-                    <div
-                      key={operation.id}
-                      className={cn(
-                        "rounded-2xl border px-4 py-3",
-                        isEditing
-                          ? "border-[var(--accent)] bg-[var(--accent)]/10"
-                          : "border-[var(--border-base)] bg-white",
-                      )}
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-semibold text-[var(--text)]">{operation.operationDate}</p>
-                          <p className="mt-1 text-xs text-[var(--text-muted)]">
-                            {operation.startTime} - {operation.endTime}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setPubOperationDraft({
-                                id: operation.id,
-                                operationDate: operation.operationDate,
-                                startTime: operation.startTime,
-                                endTime: operation.endTime,
-                              })
-                            }
-                            className="rounded-xl border border-[var(--border-base)] px-3 py-2 text-xs font-semibold text-[var(--text)]"
-                          >
-                            수정
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => void handleDeletePubOperation(operation)}
-                            className="inline-flex items-center gap-1 rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-xs font-semibold text-[var(--status-danger-text)]"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
-                            삭제
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setPubOperationDraft({
+                                  id: operation.id,
+                                  operationDate: operation.operationDate,
+                                  startTime: operation.startTime,
+                                  endTime: operation.endTime,
+                                })
+                              }
+                              className="rounded-xl border border-[var(--border-base)] px-3 py-2 text-xs font-semibold text-[var(--text)]"
+                            >
+                              수정
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void handleDeletePubOperation(operation)}
+                              className="inline-flex items-center gap-1 rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-3 py-2 text-xs font-semibold text-[var(--status-danger-text)]"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" strokeWidth={2.3} />
+                              삭제
+                            </button>
+                          </div>
                         </div>
                       </div>
+                    );
+                  })}
+
+                  {managementData && managementData.pubOperations.length === 0 && (
+                    <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-8 text-center text-sm text-[var(--text-muted)]">
+                      등록된 주점 공통 운영정보가 없습니다.
                     </div>
-                  );
-                })}
-
-                {managementData && managementData.pubOperations.length === 0 && (
-                  <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-8 text-center text-sm text-[var(--text-muted)]">
-                    등록된 주점 공통 운영정보가 없습니다.
-                  </div>
-                )}
-              </div>
-
-              <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] p-4">
-                <h3 className="text-sm font-semibold text-[var(--text)]">
-                  {pubOperationDraft.id === null ? "새 운영정보 추가" : "운영정보 수정"}
-                </h3>
-
-                <div className="mt-4 space-y-4">
-                  <label className="block space-y-2">
-                    <span className="text-sm font-semibold text-[var(--text)]">운영 날짜</span>
-                    <input
-                      type="date"
-                      value={pubOperationDraft.operationDate}
-                      onChange={(event) =>
-                        setPubOperationDraft((prev) => ({ ...prev, operationDate: event.target.value }))
-                      }
-                      className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-white px-3 text-sm text-[var(--text)]"
-                    />
-                  </label>
-
-                  <label className="block space-y-2">
-                    <span className="text-sm font-semibold text-[var(--text)]">시작 시간</span>
-                    <input
-                      type="time"
-                      value={pubOperationDraft.startTime}
-                      onChange={(event) =>
-                        setPubOperationDraft((prev) => ({ ...prev, startTime: event.target.value }))
-                      }
-                      className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-white px-3 text-sm text-[var(--text)]"
-                    />
-                  </label>
-
-                  <label className="block space-y-2">
-                    <span className="text-sm font-semibold text-[var(--text)]">종료 시간</span>
-                    <input
-                      type="time"
-                      value={pubOperationDraft.endTime}
-                      onChange={(event) =>
-                        setPubOperationDraft((prev) => ({ ...prev, endTime: event.target.value }))
-                      }
-                      className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-white px-3 text-sm text-[var(--text)]"
-                    />
-                  </label>
+                  )}
                 </div>
+
+                <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] p-4">
+                  <h3 className="text-sm font-semibold text-[var(--text)]">
+                    {pubOperationDraft.id === null ? "새 운영정보 추가" : "운영정보 수정"}
+                  </h3>
+
+                  <div className="mt-4 space-y-4">
+                    <label className="block space-y-2">
+                      <span className="text-sm font-semibold text-[var(--text)]">운영 날짜</span>
+                      <input
+                        type="date"
+                        value={pubOperationDraft.operationDate}
+                        onChange={(event) =>
+                          setPubOperationDraft((prev) => ({ ...prev, operationDate: event.target.value }))
+                        }
+                        className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-white px-3 text-sm text-[var(--text)]"
+                      />
+                    </label>
+
+                    <label className="block space-y-2">
+                      <span className="text-sm font-semibold text-[var(--text)]">시작 시간</span>
+                      <input
+                        type="time"
+                        value={pubOperationDraft.startTime}
+                        onChange={(event) =>
+                          setPubOperationDraft((prev) => ({ ...prev, startTime: event.target.value }))
+                        }
+                        className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-white px-3 text-sm text-[var(--text)]"
+                      />
+                    </label>
+
+                    <label className="block space-y-2">
+                      <span className="text-sm font-semibold text-[var(--text)]">종료 시간</span>
+                      <input
+                        type="time"
+                        value={pubOperationDraft.endTime}
+                        onChange={(event) =>
+                          setPubOperationDraft((prev) => ({ ...prev, endTime: event.target.value }))
+                        }
+                        className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-white px-3 text-sm text-[var(--text)]"
+                      />
+                    </label>
+                  </div>
 
                 <div className="mt-5 flex gap-2">
                   <button
@@ -1511,6 +1841,7 @@ export default function AdminBoothManagerPanel({
               </div>
             </div>
           </section>
+          )}
         </div>
       </div>
     </AdminShell>

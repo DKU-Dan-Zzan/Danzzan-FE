@@ -24,8 +24,8 @@ export const appQueryKeys = {
   adminPlacementAd: (placement: "HOME_BOTTOM" | "MY_TICKET") =>
     ["admin", "ad", { placement }] as const,
   boothMapData: (date: string) => ["boothmap", "data", { date }] as const,
-  boothMapBoothDetail: (boothId: number) => ["boothmap", "booth-detail", { boothId }] as const,
-  boothMapPubDetail: (pubId: number) => ["boothmap", "pub-detail", { pubId }] as const,
+  boothMapBoothDetail: (boothId: number, date: string) => ["boothmap", "booth-detail", { boothId, date }] as const,
+  boothMapPubDetail: (pubId: number, date: string) => ["boothmap", "pub-detail", { pubId, date }] as const,
   ticketingEvents: () => ["ticketing", "events"] as const,
   ticketingWaitingRoomAd: () => ["ticketing", "waiting-room-ad"] as const,
   myTicketList: () => ["ticketing", "my-ticket", "list"] as const,

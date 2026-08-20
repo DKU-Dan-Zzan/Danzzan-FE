@@ -1,7 +1,7 @@
 // 역할: /admin/map 의 기존 지도 편집 관리자 기능 본문을 렌더링한다.
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2, RefreshCcw, Save } from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCcw } from "lucide-react";
 import {
   clearBoothLocation,
   getAdminMap,
@@ -36,6 +36,10 @@ import type {
   KakaoMarker,
   KakaoMouseEvent,
 } from "@/types/app/boothmap/kakao-map";
+import {
+  DEFAULT_FESTIVAL_DATE,
+  FESTIVAL_DATES,
+} from "@/utils/app/boothmap/festivalDates";
 
 declare global {
   interface Window {
@@ -81,8 +85,7 @@ export default function AdminMapEditorPanel({
     "보기 모드입니다. 부스 또는 학과 편집 모드를 선택해 주세요.",
   );
 
-  const FESTIVAL_DATES = ["2026-05-12", "2026-05-13", "2026-05-14"];
-  const [selectedDate, setSelectedDate] = useState<string>("2026-05-12");
+  const [selectedDate, setSelectedDate] = useState<string>(DEFAULT_FESTIVAL_DATE);
 
   const editableBooths = useMemo(
     () => booths.filter((booth) => booth.type !== "FOOD_TRUCK"),
@@ -647,14 +650,9 @@ export default function AdminMapEditorPanel({
               새로고침
             </button>
 
-            <button
-              type="button"
-              disabled
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md bg-[var(--accent)] px-3 text-sm font-medium text-white opacity-70"
-            >
-              <Save className="h-4 w-4" strokeWidth={2.3} />
-              {saving ? "저장 중..." : "즉시 저장"}
-            </button>
+            <span className="inline-flex h-8 items-center justify-center rounded-full border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 text-sm font-medium text-[var(--text-muted)]">
+              {saving ? "변경 사항 자동 저장 중" : "변경 사항 자동 저장"}
+            </span>
           </>
         }
       >
@@ -687,12 +685,12 @@ export default function AdminMapEditorPanel({
             <div>
               <h2 className="text-sm font-bold text-[var(--text)]">지도 편집 영역</h2>
               <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-                마커 클릭 또는 왼쪽 목록 선택 후 지도를 클릭하면 위치가 반영됩니다. 마커 드래그도 가능합니다.
+                왼쪽에서 대상을 고른 뒤 지도를 클릭하거나 마커를 드래그하면 위치가 바로 반영됩니다.
               </p>
             </div>
 
             <span className="rounded-full border border-[var(--border-base)] bg-[var(--surface-subtle)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-muted)]">
-              {saving ? "저장 중" : "즉시 저장"}
+              {saving ? "자동 저장 중" : "자동 저장"}
             </span>
           </div>
 

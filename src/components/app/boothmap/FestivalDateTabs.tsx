@@ -19,7 +19,10 @@ export default function FestivalDateTabs({
 }: FestivalDateTabsProps) {
   return (
     <div className={className}>
-      <div className="grid grid-cols-3 rounded-[24px] border border-[color:color-mix(in_srgb,var(--boothmap-panel-border)_62%,transparent)] bg-[color:color-mix(in_srgb,var(--boothmap-chip-bg)_62%,transparent)] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.4)]">
+      <div
+        className="grid rounded-[24px] border border-[color:color-mix(in_srgb,var(--boothmap-panel-border)_62%,transparent)] bg-[color:color-mix(in_srgb,var(--boothmap-chip-bg)_62%,transparent)] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.4)]"
+        style={{ gridTemplateColumns: `repeat(${Math.max(dates.length, 1)}, minmax(0, 1fr))` }}
+      >
         {dates.map((item) => {
           const isSelected = selectedDate === item.value;
 

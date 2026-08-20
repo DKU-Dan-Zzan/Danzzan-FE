@@ -99,7 +99,7 @@ describe("prefetchTabData", () => {
     });
     getPubsMock.mockResolvedValue([]);
 
-    await prefetchTabDataByPath("/map?date=2026-05-12#top");
+    await prefetchTabDataByPath("/map?date=2026-09-09#top");
 
     expect(getBoothMapMock).toHaveBeenCalledWith(
       DEFAULT_BOOTHMAP_PREFETCH_DATE,

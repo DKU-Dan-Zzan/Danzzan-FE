@@ -30,8 +30,8 @@ export type Booth = {
   subType?: BoothSubType | null;
   description?: string | null;
   image_url?: string;
-  location_x: number;
-  location_y: number;
+  location_x: number | null;
+  location_y: number | null;
   operationStatus?: BoothOperationStatus | null;
   startTime?: string | null;
   endTime?: string | null;

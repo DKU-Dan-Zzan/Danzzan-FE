@@ -22,10 +22,14 @@ export type AdminBoothManagementBooth = {
   type: "EXPERIENCE" | "FOOD_TRUCK" | "EVENT" | "FACILITY";
   name: string;
   description: string | null;
+  locationX: number | null;
+  locationY: number | null;
+  placed: boolean;
   operationInfoExists: boolean;
   operationStatus: "OPEN" | "CLOSED" | "UNKNOWN";
   startTime: string | null;
   endTime: string | null;
+  operationDates: string[];
 };
 
 export type AdminBoothManagementPub = {
@@ -75,6 +79,17 @@ export type UpdateAdminBoothPayload = {
   description?: string | null;
   startTime?: string | null;
   endTime?: string | null;
+  operationDates: string[];
+};
+
+export type CreateAdminBoothPayload = {
+  type: "EXPERIENCE" | "FOOD_TRUCK" | "EVENT" | "FACILITY";
+  name: string;
+  description?: string | null;
+  operationStatus: "OPEN" | "CLOSED" | "UNKNOWN";
+  startTime?: string | null;
+  endTime?: string | null;
+  operationDates: string[];
 };
 
 export type UpdateAdminPubPayload = {
@@ -133,6 +148,13 @@ export async function updateAdminBooth(
 ): Promise<void> {
   await fetchWithAuth<void>(`/admin/map/booths/${boothId}/management`, {
     method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function createAdminBooth(payload: CreateAdminBoothPayload): Promise<number> {
+  return fetchWithAuth<number>("/admin/map/booths", {
+    method: "POST",
     body: JSON.stringify(payload),
   });
 }

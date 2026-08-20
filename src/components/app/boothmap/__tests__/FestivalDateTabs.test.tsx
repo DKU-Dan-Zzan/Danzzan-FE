@@ -8,11 +8,10 @@ describe("FestivalDateTabs", () => {
     const markup = renderToStaticMarkup(
       <FestivalDateTabs
         dates={[
-          { label: "1일차", value: "2026-05-12" },
-          { label: "2일차", value: "2026-05-13" },
-          { label: "3일차", value: "2026-05-14" },
+          { label: "9/9", value: "2026-09-09" },
+          { label: "9/10", value: "2026-09-10" },
         ]}
-        selectedDate="2026-05-12"
+        selectedDate="2026-09-09"
         onChange={vi.fn()}
       />,
     );

@@ -14,9 +14,10 @@ import type { AuthUser } from "@/types/common/auth.model";
 import type { Booth, College, Pub } from "@/types/app/boothmap/boothmap.types";
 import { queryClient } from "@/lib/query/queryClient";
 import { appQueryKeys } from "@/lib/query/queryKeys";
+import { DEFAULT_FESTIVAL_DATE } from "@/utils/app/boothmap/festivalDates";
 
 const NOTICE_PREFETCH_PAGE_SIZE = 6;
-export const DEFAULT_BOOTHMAP_PREFETCH_DATE = "2026-05-12";
+export const DEFAULT_BOOTHMAP_PREFETCH_DATE = DEFAULT_FESTIVAL_DATE;
 const BOTTOM_NAV_DATA_PREFETCH_PATHS = ["/notice", "/map", "/mypage"] as const;
 type BottomNavDataPrefetchPath = (typeof BOTTOM_NAV_DATA_PREFETCH_PATHS)[number];
 
