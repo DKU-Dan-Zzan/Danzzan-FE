@@ -1443,9 +1443,9 @@ body,
   --app-nav-home-highlight: #ff642d;    /* 하단 네비 홈 버튼 */
   --app-nav-text-active: #ff642d;
   --app-nav-text: #91827d;              /* 기본 텍스트 (비활성 라벨) */
-  --timetable-v2-accent: #e13600;       /* DAY 탭 활성, 타임라인 */
+  --timetable-v2-accent: #ff642d;       /* DAY 탭 활성, 타임라인 */
   --timetable-v2-time-pill-bg: #ffece6; /* 시간 알약 배경 */
-  --timetable-v2-time-pill-fg: #e13600;
+  --timetable-v2-time-pill-fg: #ff642d;
 
   /* 배경 — 전부 흰색. 입력창만 회색으로 파이게 둔다 */
   --bg-base: #ffffff;                   /* 페이지 바닥 — 헤더와 동일하게 흰색 */
