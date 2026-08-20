@@ -15,93 +15,93 @@
      ══════════════════════════════════════════════════════════ */
 
   /* 브랜드 색 */
-  --brand-05: #050912; /* 1회 */
-  --brand-06: #070c17; /* 1회 */
-  --brand-07: #080e1b; /* 2회 */
-  --brand-11: #0f172a; /* 24회 */
-  --brand-15: #131d3b; /* 1회 */
-  --brand-17: #1e293b; /* 1회 */
-  --brand-18: #10204a; /* 1회 */
-  --brand-19: #18254a; /* 5회 */
-  --brand-20: #073161; /* 3회 */
-  --brand-22: #0a3767; /* 2회 */
-  --brand-23: #1d2c59; /* 1회 */
-  --brand-26: #203163; /* 20회 */
-  --brand-26a: #1c2b6a; /* 1회 */
-  --brand-28: #163a79; /* 2회 */
-  --brand-28a: #32405f; /* 1회 */
-  --brand-33: #0a559c; /* 26회 */
-  --brand-35: #3b4a76; /* 3회 */
-  --brand-37: #374f84; /* 2회 */
-  --brand-40: #2142ab; /* 5회 */
-  --brand-40a: #1e40af; /* 1회 */
-  --brand-41: #2853a9; /* 2회 */
-  --brand-41a: #4f6284; /* 1회 */
-  --brand-44: #3a5fa8; /* 1회 */
-  --brand-44a: #2a4fb8; /* 1회 */
-  --brand-45: #2f5fb8; /* 2회 */
-  --brand-48: #1d4ed8; /* 4회 */
-  --brand-48a: #2f56c7; /* 5회 */
-  --brand-50: #6d28d9; /* 1회 */
-  --brand-53: #2563eb; /* 10회 */
-  --brand-57: #3d5ee6; /* 2회 */
-  --brand-57a: #2f63f6; /* 5회 */
-  --brand-59: #5a74d3; /* 1회 */
-  --brand-59a: #4f79df; /* 1회 */
-  --brand-60: #3b82f6; /* 8회 */
-  --brand-61: #7e91b9; /* 4회 */
-  --brand-65: #8ea0bf; /* 2회 */
-  --brand-65a: #8fa9be; /* 2회 */
-  --brand-66: #8a9dc6; /* 1회 */
-  --brand-69: #8fa5d2; /* 1회 */
-  --brand-70: #8ea8d8; /* 2회 */
-  --brand-72: #99afd6; /* 2회 */
-  --brand-75: #a0b4dc; /* 1회 */
-  --brand-78: #afc0dd; /* 2회 */
-  --brand-78a: #a0c1ec; /* 1회 */
-  --brand-78b: #93c5fd; /* 7회 */
-  --brand-79: #a8beec; /* 1회 */
-  --brand-82: #c0cde4; /* 2회 */
-  --brand-84: #b8c6f2; /* 1회 */
-  --brand-85: #bed1f6; /* 1회 */
-  --brand-87: #bfdbfe; /* 1회 */
-  --brand-89: #cbe6fc; /* 1회 */
-  --brand-91: #d6e2fa; /* 1회 */
-  --brand-91a: #e3e8ef; /* 16회 */
-  --brand-93: #dbeafe; /* 1회 */
-  --brand-94: #e2eafb; /* 1회 */
-  --brand-95: #f0f4f6; /* 3회 */
-  --brand-95a: #e7efff; /* 5회 */
-  --brand-95b: #eef1f8; /* 1회 */
-  --brand-95c: #ede9fe; /* 1회 */
-  --brand-96: #eef3fd; /* 4회 */
-  --brand-96a: #ecf1ff; /* 1회 */
-  --brand-97: #f1f6fd; /* 7회 */
-  --brand-98: #f8fafb; /* 15회 */
-  --brand-99: #f8fbff; /* 10회 */
+  --brand-05: #120905; /* 1회 */
+  --brand-06: #170b07; /* 1회 */
+  --brand-07: #1b0d08; /* 2회 */
+  --brand-11: #2b160e; /* 24회 */
+  --brand-15: #3b1e13; /* 1회 */
+  --brand-17: #442115; /* 1회 */
+  --brand-18: #452115; /* 1회 */
+  --brand-19: #4c2416; /* 5회 */
+  --brand-20: #522616; /* 3회 */
+  --brand-22: #5a2817; /* 2회 */
+  --brand-23: #5e2a18; /* 1회 */
+  --brand-26: #6b2d18; /* 20회 */
+  --brand-26a: #6e2e18; /* 1회 */
+  --brand-28: #763019; /* 2회 */
+  --brand-28a: #783119; /* 1회 */
+  --brand-33: #8e3518; /* 26회 */
+  --brand-35: #9c3615; /* 3회 */
+  --brand-37: #aa3611; /* 2회 */
+  --brand-40: #c2360a; /* 5회 */
+  --brand-40a: #c3360a; /* 1회 */
+  --brand-41: #c93608; /* 2회 */
+  --brand-41a: #cc3607; /* 1회 */
+  --brand-44: #e13501; /* 1회 */
+  --brand-44a: #e13501; /* 1회 */
+  --brand-45: #e43703; /* 2회 */
+  --brand-48: #eb3c0a; /* 4회 */
+  --brand-48a: #ec3c0a; /* 5회 */
+  --brand-50: #f04211; /* 1회 */
+  --brand-53: #f64e1a; /* 10회 */
+  --brand-57: #fc5d27; /* 2회 */
+  --brand-57a: #fd5f28; /* 5회 */
+  --brand-59: #ff662e; /* 1회 */
+  --brand-59a: #ff672f; /* 1회 */
+  --brand-60: #ff6932; /* 8회 */
+  --brand-61: #ff6e38; /* 4회 */
+  --brand-65: #ff7f4e; /* 2회 */
+  --brand-65a: #ff7f4e; /* 2회 */
+  --brand-66: #ff8251; /* 1회 */
+  --brand-69: #ff8f62; /* 1회 */
+  --brand-70: #ff9367; /* 2회 */
+  --brand-72: #ff9970; /* 2회 */
+  --brand-75: #ffa37d; /* 1회 */
+  --brand-78: #ffaf8d; /* 2회 */
+  --brand-78a: #ffaf8d; /* 1회 */
+  --brand-78b: #ffb291; /* 7회 */
+  --brand-79: #ffb595; /* 1회 */
+  --brand-82: #ffc1a5; /* 2회 */
+  --brand-84: #ffc5ab; /* 1회 */
+  --brand-85: #ffccb5; /* 1회 */
+  --brand-87: #ffd2be; /* 1회 */
+  --brand-89: #ffd8c8; /* 1회 */
+  --brand-91: #ffded1; /* 1회 */
+  --brand-91a: #ffdfd3; /* 16회 */
+  --brand-93: #ffe4da; /* 1회 */
+  --brand-94: #ffe6de; /* 1회 */
+  --brand-95: #ffede7; /* 3회 */
+  --brand-95a: #ffede7; /* 5회 */
+  --brand-95b: #ffede7; /* 1회 */
+  --brand-95c: #ffede8; /* 1회 */
+  --brand-96: #fff0ec; /* 4회 */
+  --brand-96a: #fff0ec; /* 1회 */
+  --brand-97: #fff3ef; /* 7회 */
+  --brand-98: #fff7f4; /* 15회 */
+  --brand-99: #fffaf8; /* 10회 */
 
   /* 회청색 계열 */
-  --neutral-19: #2c3436; /* 8회 */
-  --neutral-24: #354347; /* 1회 */
-  --neutral-27: #334155; /* 3회 */
-  --neutral-27a: #3c4a4e; /* 1회 */
-  --neutral-35: #475569; /* 3회 */
-  --neutral-46: #6b7280; /* 1회 */
-  --neutral-46a: #5e6b8f; /* 4회 */
-  --neutral-47: #61708f; /* 1회 */
-  --neutral-54: #7f8f96; /* 2회 */
-  --neutral-61: #8b97ad; /* 1회 */
-  --neutral-61a: #8f99aa; /* 2회 */
-  --neutral-61b: #8b94ae; /* 1회 */
-  --neutral-63: #8f9bb4; /* 2회 */
-  --neutral-65: #9ca3af; /* 19회 */
-  --neutral-65a: #94a3b8; /* 1회 */
-  --neutral-76: #b3bfd1; /* 3회 */
-  --neutral-84: #d1d5db; /* 4회 */
-  --neutral-91: #e5e7eb; /* 3회 */
-  --neutral-93: #e8eef1; /* 3회 */
-  --neutral-96: #f3f4f6; /* 16회 */
-  --neutral-97: #f7f9fa; /* 2회 */
+  --neutral-19: #2e3134; /* 8회 */
+  --neutral-24: #39433d; /* 1회 */
+  --neutral-27: #404b3d; /* 3회 */
+  --neutral-27a: #424c3e; /* 1회 */
+  --neutral-35: #625a4e; /* 3회 */
+  --neutral-46: #80736b; /* 1회 */
+  --neutral-46a: #81746c; /* 4회 */
+  --neutral-47: #83756d; /* 1회 */
+  --neutral-54: #948681; /* 2회 */
+  --neutral-61: #a49994; /* 1회 */
+  --neutral-61a: #a49995; /* 2회 */
+  --neutral-61b: #a49995; /* 1회 */
+  --neutral-63: #a99e9a; /* 2회 */
+  --neutral-65: #aca39f; /* 19회 */
+  --neutral-65a: #ada39f; /* 1회 */
+  --neutral-76: #c6c0be; /* 3회 */
+  --neutral-84: #d9d5d3; /* 4회 */
+  --neutral-91: #e9e8e7; /* 3회 */
+  --neutral-93: #eeeceb; /* 3회 */
+  --neutral-96: #f5f4f4; /* 16회 */
+  --neutral-97: #f9f8f8; /* 2회 */
 
   --font-display: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-body: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -1422,4 +1422,48 @@ body,
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* ══════════════════════════════════════════════════════════
+   시안 정확 매칭 — "웹 컬러 제안" 좌측 팔레트 (LEGEND)
+   시안이 지정한 색을 역할별로 그대로 못박는다.
+   ══════════════════════════════════════════════════════════ */
+:root,
+[data-color-scheme="webapp"],
+[data-color-scheme="electric-curator"] {
+  --accent: #ff642d;                    /* MAIN 1 — 버튼, 활성 칩 */
+  --primary: #ff642d;
+  --brand-main: #f0410f;                /* MAIN 2 — 얇은 라인, 활성화 */
+  --text-emphasis-vivid: #e13600;       /* 변경 컬러 — 강조 텍스트 */
+  --text-emphasis-vivid-strong: #e13600;
+  --emphasis-primary: #e13600;
+  --text: #232124;                      /* 활성화 텍스트 */
+  --text-body-deep: #232124;
+  --text-muted: #91827d;                /* 기본 텍스트 */
+  --app-nav-home-highlight: #ff642d;    /* 하단 네비 홈 버튼 */
+  --app-nav-text-active: #ff642d;
+  --app-nav-text: #91827d;              /* 기본 텍스트 (비활성 라벨) */
+  --timetable-v2-accent: #e13600;       /* DAY 탭 활성, 타임라인 */
+  --timetable-v2-time-pill-bg: #ffece6; /* 시간 알약 배경 */
+  --timetable-v2-time-pill-fg: #e13600;
+
+  /* 배경 — 전부 흰색. 입력창만 회색으로 파이게 둔다 */
+  --bg-base: #ffffff;                   /* 페이지 바닥 — 헤더와 동일하게 흰색 */
+  --bg-page-soft: #ffffff;
+  --boothmap-page-bg: #ffffff;
+  --surface-subtle: #ebe8e6;            /* 입력창·연한 면 (검색창) */
+  --admin-header-bg: #ffffff;
+  --app-header-bg: #ffffff;
+  --app-overscroll-bg: #ffffff;
+  --footer-bg: #ffffff;
+  --surface: #ffffff;
+  --surface-base: #ffffff;
+  --surface-strong: #ffffff;
+  --surface_container_lowest: #ffffff;
+  --app-bottom-nav-surface: #ffffff;
+  --card-surface-base: #ffffff;
+  --card-outline-bg: #ffffff;
+  --home-card-bg: #ffffff;
+  --boothmap-paper-base: #ffffff;
+  --boothmap-paper-soft: #ffffff;
 }
