@@ -3,6 +3,72 @@
 @import "tailwindcss";
 
 :root {
+  /* ══════════════════════════════════════════════════════════
+     브랜드 원색 (Brand primitives) — 단일 진실 공급원
+
+     앱 전역의 브랜드 색은 모두 이 블록에서 파생된다.
+     색을 바꾸려면 여기 값만 교체하면 되고 아래 토큰들은 손대지 않는다.
+     이름의 숫자는 명도(HSL Lightness %). 00=검정에 가깝고 99=흰색에 가깝다.
+     ══════════════════════════════════════════════════════════ */
+
+  --brand-05: #050912; /* 1회 */
+  --brand-06: #070c17; /* 1회 */
+  --brand-07: #080e1b; /* 2회 */
+  --brand-11: #0f172a; /* 23회 */
+  --brand-15: #131d3b; /* 1회 */
+  --brand-17: #1e293b; /* 1회 */
+  --brand-18: #10204a; /* 1회 */
+  --brand-19: #18254a; /* 5회 */
+  --brand-22: #0a3767; /* 2회 */
+  --brand-23: #1d2c59; /* 1회 */
+  --brand-26: #203163; /* 20회 */
+  --brand-26a: #1c2b6a; /* 1회 */
+  --brand-28: #163a79; /* 2회 */
+  --brand-28a: #32405f; /* 1회 */
+  --brand-33: #0a559c; /* 26회 */
+  --brand-35: #3b4a76; /* 3회 */
+  --brand-37: #374f84; /* 2회 */
+  --brand-40: #2142ab; /* 5회 */
+  --brand-40a: #1e40af; /* 1회 */
+  --brand-41: #2853a9; /* 2회 */
+  --brand-44: #3a5fa8; /* 1회 */
+  --brand-45: #2f5fb8; /* 2회 */
+  --brand-48: #1d4ed8; /* 4회 */
+  --brand-48a: #2f56c7; /* 5회 */
+  --brand-53: #2563eb; /* 10회 */
+  --brand-57: #3d5ee6; /* 2회 */
+  --brand-57a: #2f63f6; /* 5회 */
+  --brand-59: #5a74d3; /* 1회 */
+  --brand-59a: #4f79df; /* 1회 */
+  --brand-60: #3b82f6; /* 8회 */
+  --brand-61: #7e91b9; /* 4회 */
+  --brand-65: #8ea0bf; /* 2회 */
+  --brand-66: #8a9dc6; /* 1회 */
+  --brand-69: #8fa5d2; /* 1회 */
+  --brand-70: #8ea8d8; /* 2회 */
+  --brand-72: #99afd6; /* 2회 */
+  --brand-75: #a0b4dc; /* 1회 */
+  --brand-78: #afc0dd; /* 2회 */
+  --brand-78a: #a0c1ec; /* 1회 */
+  --brand-78b: #93c5fd; /* 7회 */
+  --brand-79: #a8beec; /* 1회 */
+  --brand-82: #c0cde4; /* 2회 */
+  --brand-84: #b8c6f2; /* 1회 */
+  --brand-85: #bed1f6; /* 1회 */
+  --brand-87: #bfdbfe; /* 1회 */
+  --brand-91: #d6e2fa; /* 1회 */
+  --brand-91a: #e3e8ef; /* 16회 */
+  --brand-93: #dbeafe; /* 1회 */
+  --brand-95: #e7efff; /* 3회 */
+  --brand-95a: #f0f4f6; /* 2회 */
+  --brand-95b: #eef1f8; /* 1회 */
+  --brand-95c: #ede9fe; /* 1회 */
+  --brand-96: #eef3fd; /* 3회 */
+  --brand-96a: #ecf1ff; /* 1회 */
+  --brand-97: #f1f6fd; /* 6회 */
+  --brand-98: #f8fafb; /* 11회 */
+  --brand-99: #f8fbff; /* 7회 */
+
   --font-display: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-body: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --type-display-lg-size: 2rem;
@@ -13,22 +79,22 @@
   --spacing-4: 1rem;
   --spacing-6: 1.5rem;
   --spacing-8: 2rem;
-  --ec-glass-bg: rgba(248, 250, 251, 0.7);
+  --ec-glass-bg: color-mix(in srgb, var(--brand-98) 70%, transparent);
   --ec-glass-blur: 28px;
   --ec-ambient-shadow: 0 20px 50px rgba(44, 52, 54, 0.06);
-  --brand-main: #0a559c;
-  --bg-base: #f8fbff;
-  --bg-page-soft: #f8fbff;
-  --text: #0f172a;
+  --brand-main: var(--brand-33);
+  --bg-base: var(--brand-99);
+  --bg-page-soft: var(--brand-99);
+  --text: var(--brand-11);
   --text-muted: #475569;
   --text-on-accent: #ffffff;
-  --accent: #2563eb;
-  --border-base: rgba(147, 197, 253, 0.56);
-  --outline_variant: rgba(147, 197, 253, 0.22);
+  --accent: var(--brand-53);
+  --border-base: color-mix(in srgb, var(--brand-78b) 56%, transparent);
+  --outline_variant: color-mix(in srgb, var(--brand-78b) 22%, transparent);
   --surface-subtle: rgba(255, 255, 255, 0.9);
-  --surface-tint-subtle: rgba(59, 130, 246, 0.1);
-  --shadow-color: rgba(15, 23, 42, 0.12);
-  --admin-header-bg: #f8fbff;
+  --surface-tint-subtle: color-mix(in srgb, var(--brand-60) 10%, transparent);
+  --shadow-color: color-mix(in srgb, var(--brand-11) 12%, transparent);
+  --admin-header-bg: var(--brand-99);
   --app-bottom-nav-height: 56px;
   --app-bottom-nav-runtime-offset: calc(var(--app-bottom-nav-height) + env(safe-area-inset-bottom));
   --app-mobile-shell-max-width: 430px;
@@ -41,54 +107,54 @@
   --app-bottom-nav-indicator-height: 3px;
   --app-bottom-nav-indicator-bottom: 2px;
   --app-header-first-card-gap: 20px;
-  --app-header-bg: #f1f6fd;
+  --app-header-bg: var(--brand-97);
   --app-header-bg-gradient:
     linear-gradient(
       180deg,
-      #f1f6fd 0%,
-      #f7faff 100%
+      var(--brand-97) 0%,
+      var(--brand-99) 100%
     );
-  --app-header-border: rgba(143, 165, 210, 0.34);
-  --app-overscroll-bg: #f1f6fd;
+  --app-header-border: color-mix(in srgb, var(--brand-69) 34%, transparent);
+  --app-overscroll-bg: var(--brand-97);
   --app-overscroll-bg-gradient: none;
-  --app-nav-bg: rgba(251, 253, 255, 0.96);
+  --app-nav-bg: color-mix(in srgb, var(--brand-98) 96%, transparent);
   --app-nav-bg-gradient: none;
-  --app-nav-border: rgba(138, 157, 198, 0.26);
-  --app-nav-shadow: 0 -8px 24px rgba(16, 32, 74, 0.1);
+  --app-nav-border: color-mix(in srgb, var(--brand-66) 26%, transparent);
+  --app-nav-shadow: 0 -8px 24px color-mix(in srgb, var(--brand-18) 10%, transparent);
   --app-nav-text: #8b97ad;
   --app-nav-text-active: var(--brand-main);
   --app-nav-home-highlight: rgb(7 49 97);
-  --footer-bg: #f8fbff;
+  --footer-bg: var(--brand-99);
   --footer-bg-gradient: none;
-  --footer-text-primary: #32405f;
+  --footer-text-primary: var(--brand-28a);
   --footer-text-secondary: #61708f;
-  --footer-divider: rgba(126, 145, 185, 0.44);
-  --footer-divider-glow: rgba(126, 145, 185, 0.16);
-  --footer-divider-transparent: rgba(126, 145, 185, 0);
+  --footer-divider: color-mix(in srgb, var(--brand-61) 44%, transparent);
+  --footer-divider-glow: color-mix(in srgb, var(--brand-61) 16%, transparent);
+  --footer-divider-transparent: color-mix(in srgb, var(--brand-61) 0%, transparent);
   --footer-icon-bg: var(--footer-bg);
   --footer-icon-bg-hover: var(--footer-bg);
-  --footer-icon-border: rgba(126, 145, 185, 0.32);
+  --footer-icon-border: color-mix(in srgb, var(--brand-61) 32%, transparent);
   --footer-icon-fg: var(--footer-text-primary);
-  --footer-icon-shadow: 0 10px 20px -18px rgba(15, 23, 42, 0.24);
-  --app-circle-border: rgba(160, 180, 220, 0.56);
-  --app-circle-bg-start: rgba(252, 254, 255, 0.98);
-  --app-circle-bg-end: rgba(228, 236, 252, 0.96);
-  --text-emphasis-vivid: #2853a9;
-  --text-emphasis-vivid-strong: #2f63f6;
-  --text-body-deep: #203163;
-  --text-bold-emphasis: #374f84;
+  --footer-icon-shadow: 0 10px 20px -18px color-mix(in srgb, var(--brand-11) 24%, transparent);
+  --app-circle-border: color-mix(in srgb, var(--brand-75) 56%, transparent);
+  --app-circle-bg-start: color-mix(in srgb, var(--brand-98) 98%, transparent);
+  --app-circle-bg-end: color-mix(in srgb, var(--brand-95) 96%, transparent);
+  --text-emphasis-vivid: var(--brand-41);
+  --text-emphasis-vivid-strong: var(--brand-57a);
+  --text-body-deep: var(--brand-26);
+  --text-bold-emphasis: var(--brand-37);
   --app-circle-fg: var(--text-bold-emphasis);
   --app-circle-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 12px 20px -16px rgba(33, 66, 171, 0.38);
+    0 12px 20px -16px color-mix(in srgb, var(--brand-40) 38%, transparent);
   --emphasis-primary: var(--text-emphasis-vivid);
-  --emphasis-primary-soft: rgba(47, 95, 184, 0.45);
+  --emphasis-primary-soft: color-mix(in srgb, var(--brand-45) 45%, transparent);
   --timetable-active-color: var(--emphasis-primary);
   --timetable-active-line: var(--emphasis-primary-soft);
   --ticketing-quick-action-icon: var(--text-emphasis-vivid);
   --ticketing-quick-action-text: var(--text-emphasis-vivid);
   --ticketing-action-bg-start: color-mix(in srgb, var(--text-emphasis-vivid) 86%, white);
-  --ticketing-action-bg-end: color-mix(in srgb, var(--text-emphasis-vivid) 94%, #163a79);
+  --ticketing-action-bg-end: color-mix(in srgb, var(--text-emphasis-vivid) 94%, var(--brand-28));
   --ticketing-action-shadow:
     0 12px 20px -14px color-mix(in srgb, var(--text-emphasis-vivid) 42%, transparent);
   --ticketing-action-disabled-bg-start: color-mix(in srgb, var(--text-emphasis-vivid) 24%, white);
@@ -103,28 +169,28 @@
   --app-header-ticket-btn-shadow: var(--app-circle-shadow);
   --app-header-ticket-btn-shadow-hover:
     inset 0 1px 0 rgba(255, 255, 255, 0.98),
-    0 16px 24px -16px rgba(33, 66, 171, 0.42);
+    0 16px 24px -16px color-mix(in srgb, var(--brand-40) 42%, transparent);
 
   /* Shared semantic palette (single source of truth) */
   --surface-base: rgba(255, 255, 255, 0.84);
   --surface-strong: rgba(255, 255, 255, 0.78);
-  --surface-tint-base: rgba(59, 130, 246, 0.14);
-  --surface-tint-strong: rgba(59, 130, 246, 0.18);
-  --surface-tint-emphasis: rgba(59, 130, 246, 0.29);
-  --border-subtle: rgba(147, 197, 253, 0.46);
-  --border-strong: rgba(147, 197, 253, 0.66);
-  --border-emphasis: rgba(147, 197, 253, 0.82);
+  --surface-tint-base: color-mix(in srgb, var(--brand-60) 14%, transparent);
+  --surface-tint-strong: color-mix(in srgb, var(--brand-60) 18%, transparent);
+  --surface-tint-emphasis: color-mix(in srgb, var(--brand-60) 29%, transparent);
+  --border-subtle: color-mix(in srgb, var(--brand-78b) 46%, transparent);
+  --border-strong: color-mix(in srgb, var(--brand-78b) 66%, transparent);
+  --border-emphasis: color-mix(in srgb, var(--brand-78b) 82%, transparent);
   --surface: var(--surface-base);
   --surface-tint: var(--surface-tint-base);
   --border: var(--border-base);
 
   /* App card system (v1) */
-  --card-surface-base: #f8faff;
+  --card-surface-base: var(--brand-99);
   --card-radius: 20px;
   --card-border-width: 1px;
-  --card-border-base: #c0cde4;
-  --card-border-tint: #afc0dd;
-  --card-border-active: #8ea8d8;
+  --card-border-base: var(--brand-82);
+  --card-border-tint: var(--brand-78);
+  --card-border-active: var(--brand-70);
   --card-shadow-soft: 0 12px 22px -20px var(--shadow-color);
   --card-shadow-elevated: 0 18px 30px -24px var(--shadow-color);
 
@@ -132,7 +198,7 @@
   --card-outline-border: #bdd0f7e6;
   --card-outline-shadow: var(--home-current-performance-card-shadow);
 
-  --card-soft-tint-bg: #eef3fd;
+  --card-soft-tint-bg: var(--brand-96);
   --card-soft-tint-border: var(--card-border-tint);
   --card-soft-tint-shadow: var(--card-shadow-soft);
 
@@ -145,7 +211,7 @@
   --card-grad-white-shadow: var(--mypage-info-card-shadow);
 
   --card-grad-tint-start: #eef5fff0;
-  --card-grad-tint-mid: #e7efff;
+  --card-grad-tint-mid: var(--brand-95);
   --card-grad-tint-end: #ffffff;
   --card-grad-tint-bg:
     linear-gradient(150deg, var(--card-grad-tint-start) 0%, var(--card-grad-tint-mid) 56%, var(--card-grad-tint-end) 100%);
@@ -179,31 +245,31 @@
 
   --ticket-paper-base: rgba(255, 252, 243, 0.96);
   --ticket-paper-top: rgba(255, 255, 255, 0.98);
-  --ticket-paper-border: rgba(160, 193, 236, 0.76);
-  --ticket-fiber: rgba(15, 23, 42, 0.055);
-  --ticket-fiber-soft: rgba(15, 23, 42, 0.03);
-  --ticket-perf: rgba(147, 197, 253, 0.62);
+  --ticket-paper-border: color-mix(in srgb, var(--brand-78a) 76%, transparent);
+  --ticket-fiber: color-mix(in srgb, var(--brand-11) 5.5%, transparent);
+  --ticket-fiber-soft: color-mix(in srgb, var(--brand-11) 3%, transparent);
+  --ticket-perf: color-mix(in srgb, var(--brand-78b) 62%, transparent);
 
   /* Boothmap palette (single source for map + sheet UI) */
   --boothmap-marker-pub: var(--text-emphasis-vivid);
   --boothmap-marker-food-truck: #ef4444;
   --boothmap-marker-experience: #10b981;
   --boothmap-marker-event: #f6ca3b;
-  --boothmap-marker-facility: #3b82f6;
+  --boothmap-marker-facility: var(--brand-60);
 
   --boothmap-selected-shadow: color-mix(in srgb, var(--text-bold-emphasis) 28%, transparent);
   --boothmap-selected-shadow-soft: color-mix(in srgb, var(--text-bold-emphasis) 25%, transparent);
   --boothmap-selected-ring: color-mix(in srgb, var(--text-bold-emphasis) 18%, transparent);
 
-  --boothmap-college-accent: #2563eb;
-  --boothmap-college-stroke-default: #1e40af;
-  --boothmap-college-stroke-selected: #1d4ed8;
-  --boothmap-college-fill-default: #eff6ff;
-  --boothmap-college-fill-selected: #dbeafe;
+  --boothmap-college-accent: var(--brand-53);
+  --boothmap-college-stroke-default: var(--brand-40a);
+  --boothmap-college-stroke-selected: var(--brand-48);
+  --boothmap-college-fill-default: var(--brand-97);
+  --boothmap-college-fill-selected: var(--brand-93);
 
-  --boothmap-zone-pub-stroke: #1d4ed8;
-  --boothmap-zone-pub-fill: #93c5fd;
-  --boothmap-zone-pub-dot: #2563eb;
+  --boothmap-zone-pub-stroke: var(--brand-48);
+  --boothmap-zone-pub-fill: var(--brand-78b);
+  --boothmap-zone-pub-dot: var(--brand-53);
   --boothmap-zone-food-truck-stroke: #dc2626;
   --boothmap-zone-food-truck-fill: #fca5a5;
   --boothmap-zone-food-truck-dot: #ef4444;
@@ -271,20 +337,20 @@
   --primary_container: color-mix(in srgb, var(--accent) 42%, white);
   --on-primary: var(--text-on-accent);
   --primary-foreground: var(--text-on-accent);
-  --primary-soft: rgba(59, 130, 246, 0.12);
+  --primary-soft: color-mix(in srgb, var(--brand-60) 12%, transparent);
   --secondary: rgba(255, 255, 255, 0.8);
   --on-secondary-container: var(--text);
   --secondary-foreground: var(--text);
   --muted: rgba(255, 255, 255, 0.72);
   --muted-foreground: var(--text-muted);
-  --accent-soft: rgba(59, 130, 246, 0.16);
+  --accent-soft: color-mix(in srgb, var(--brand-60) 16%, transparent);
   --accent-foreground: var(--accent);
   --destructive: #b3261e;
   --destructive-foreground: var(--text-on-accent);
   --input: var(--border);
   --input-background: white;
   --switch-background: rgba(148, 163, 184, 0.5);
-  --ring: rgba(37, 99, 235, 0.45);
+  --ring: color-mix(in srgb, var(--brand-53) 45%, transparent);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -313,7 +379,7 @@
   --admin-auth-page-bg: var(--admin-page-bg);
   --admin-auth-card-bg: var(--admin-panel-bg);
   --admin-auth-card-border: var(--admin-panel-border);
-  --admin-auth-card-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+  --admin-auth-card-shadow: 0 16px 34px color-mix(in srgb, var(--brand-11) 8%, transparent);
   --admin-auth-brand-text: var(--admin-accent-text);
   --admin-auth-subtext: var(--text-muted);
   --admin-auth-input-bg: white;
@@ -344,9 +410,9 @@
   --admin-badge-pending-bg: var(--status-success-bg);
   --admin-badge-pending-border: var(--status-success-border);
   --admin-badge-pending-text: #15803d;
-  --admin-guide-bg: #f8fafc;
-  --admin-guide-border: #e2e8f0;
-  --admin-guide-icon-bg: #e2e8f0;
+  --admin-guide-bg: var(--brand-98);
+  --admin-guide-border: var(--brand-91a);
+  --admin-guide-icon-bg: var(--brand-91a);
   --admin-guide-icon-text: #475569;
   --admin-guide-text: #334155;
   --admin-guide-step-text: var(--admin-accent-text);
@@ -362,17 +428,17 @@
   --admin-danger-outline-border: var(--admin-danger-note-border);
   --admin-danger-outline-text: var(--admin-danger-note-text);
   --admin-danger-outline-hover-bg: var(--admin-danger-note-bg);
-  --admin-dialog-shadow: rgba(15, 23, 42, 0.35);
+  --admin-dialog-shadow: color-mix(in srgb, var(--brand-11) 35%, transparent);
   --admin-dialog-description-text: #334155;
-  --admin-dialog-issue-bg: #f2f7ff;
-  --admin-dialog-issue-border: #bfdbfe;
-  --admin-dialog-issue-title: #1d4ed8;
+  --admin-dialog-issue-bg: var(--brand-97);
+  --admin-dialog-issue-border: var(--brand-87);
+  --admin-dialog-issue-title: var(--brand-48);
   --admin-dialog-cancel-bg: #fff5f5;
   --admin-dialog-cancel-border: #fecaca;
   --admin-dialog-cancel-title: #b91c1c;
-  --admin-dialog-overlay-bg: rgba(15, 23, 42, 0.52);
+  --admin-dialog-overlay-bg: color-mix(in srgb, var(--brand-11) 52%, transparent);
   --admin-issue-action-bg: var(--accent);
-  --admin-issue-action-hover-bg: #1d4ed8;
+  --admin-issue-action-hover-bg: var(--brand-48);
   --admin-issue-action-border: var(--accent);
   --admin-issue-action-text: var(--text-on-accent);
   --admin-danger-action-bg: #c62828;
@@ -384,13 +450,13 @@
   --home-bg-start: rgb(255 255 255);
   --home-bg-mid: rgb(251 253 255);
   --home-bg-end: rgb(248 251 255);
-  --home-glow-strong: rgba(33, 66, 171, 0.24);
-  --home-glow-soft: rgba(47, 86, 199, 0.18);
+  --home-glow-strong: color-mix(in srgb, var(--brand-40) 24%, transparent);
+  --home-glow-soft: color-mix(in srgb, var(--brand-48a) 18%, transparent);
   --home-notice-bg-start: rgba(143, 153, 170, 0.13);
   --home-notice-bg-end: rgba(143, 153, 170, 0.08);
   --home-notice-border: transparent;
-  --home-notice-shadow: rgba(33, 66, 171, 0.28);
-  --home-notice-depth-shadow: rgba(30, 41, 59, 0.14);
+  --home-notice-shadow: color-mix(in srgb, var(--brand-40) 28%, transparent);
+  --home-notice-depth-shadow: color-mix(in srgb, var(--brand-17) 14%, transparent);
   --home-notice-icon-border: #bdd0f7e6;
   --home-notice-icon-bg-start: var(--app-circle-bg-start);
   --home-notice-icon-bg-end: var(--app-circle-bg-end);
@@ -419,8 +485,8 @@
     linear-gradient(145deg, var(--surface-tint-subtle) 0%, var(--surface-subtle) 100%);
   --home-poster-placeholder-shadow: 0 18px 40px -26px var(--shadow-color);
   --home-elevated-card-shadow:
-    0 14px 30px -14px rgba(10, 55, 103, 0.28),
-    0 28px 64px -28px rgba(10, 55, 103, 0.24);
+    0 14px 30px -14px color-mix(in srgb, var(--brand-22) 28%, transparent),
+    0 28px 64px -28px color-mix(in srgb, var(--brand-22) 24%, transparent);
   --home-poster-card-shadow: var(--home-elevated-card-shadow);
   --home-lineup-card-shadow: var(--home-elevated-card-shadow);
   --home-current-performance-card-shadow: var(--home-elevated-card-shadow);
@@ -438,14 +504,14 @@
   /* MyPage route tokens */
   --mypage-page-bg: var(--bg-page-soft);
   --mypage-page-bg-gradient: var(--bg-page-soft);
-  --mypage-profile-avatar-bg: #e2e8f0;
+  --mypage-profile-avatar-bg: var(--brand-91a);
   --mypage-profile-avatar-icon: #9ca3af;
-  --mypage-profile-name: #0f172a;
+  --mypage-profile-name: var(--brand-11);
   --mypage-profile-subtitle: #9ca3af;
-  --mypage-section-title: #0f172a;
+  --mypage-section-title: var(--brand-11);
   --mypage-section-label: #9ca3af;
   --mypage-section-dot: transparent;
-  --mypage-ticket-hero-bg: linear-gradient(140deg, #0a559c 0%, #2563eb 100%);
+  --mypage-ticket-hero-bg: linear-gradient(140deg, var(--brand-33) 0%, var(--brand-53) 100%);
   --mypage-ticket-hero-text: #ffffff;
   --mypage-ticket-hero-muted: rgba(255, 255, 255, 0.58);
   --mypage-ticket-hero-btn-bg: rgba(255, 255, 255, 0.18);
@@ -454,54 +520,54 @@
   --mypage-ticket-hero-row-divider: rgba(255, 255, 255, 0.12);
   --mypage-list-bg: #ffffff;
   --mypage-list-divider: #f3f4f6;
-  --mypage-list-item-text: #0f172a;
+  --mypage-list-item-text: var(--brand-11);
   --mypage-list-item-value: #9ca3af;
   --mypage-list-item-icon: #9ca3af;
   --mypage-list-arrow: #d1d5db;
   --mypage-hero-card-bg: #ffffff;
   --mypage-hero-card-border: transparent;
   --mypage-hero-card-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
-  --mypage-hero-overline: #0a559c;
-  --mypage-hero-name: #0f172a;
+  --mypage-hero-overline: var(--brand-33);
+  --mypage-hero-name: var(--brand-11);
   --mypage-hero-name-size: 24px;
   --mypage-hero-subtitle: #9ca3af;
-  --mypage-hero-badge-bg: #f2f7ff;
+  --mypage-hero-badge-bg: var(--brand-97);
   --mypage-hero-badge-border: transparent;
   --mypage-hero-badge-shadow: none;
   --mypage-hero-icon-color: #9ca3af;
   --mypage-hero-divider: #f3f4f6;
   --mypage-hero-stat-label: #9ca3af;
-  --mypage-hero-stat-value: #0f172a;
+  --mypage-hero-stat-value: var(--brand-11);
   --mypage-ticket-card-bg: #ffffff;
   --mypage-ticket-card-border: #f3f4f6;
   --mypage-ticket-card-shadow: none;
-  --mypage-ticket-strip: linear-gradient(180deg, #0a559c 0%, #2563eb 100%);
-  --mypage-ticket-event: #0f172a;
+  --mypage-ticket-strip: linear-gradient(180deg, var(--brand-33) 0%, var(--brand-53) 100%);
+  --mypage-ticket-event: var(--brand-11);
   --mypage-ticket-meta: #9ca3af;
-  --mypage-ticket-badge-issued-bg: rgba(10, 85, 156, 0.08);
-  --mypage-ticket-badge-issued-border: rgba(10, 85, 156, 0.22);
-  --mypage-ticket-badge-issued-text: #0a559c;
+  --mypage-ticket-badge-issued-bg: color-mix(in srgb, var(--brand-33) 8%, transparent);
+  --mypage-ticket-badge-issued-border: color-mix(in srgb, var(--brand-33) 22%, transparent);
+  --mypage-ticket-badge-issued-text: var(--brand-33);
   --mypage-ticket-badge-used-bg: #f3f4f6;
   --mypage-ticket-badge-used-border: #e5e7eb;
   --mypage-ticket-badge-used-text: #9ca3af;
   --mypage-ticket-empty-icon: #d1d5db;
   --mypage-ticket-empty-text: #9ca3af;
-  --mypage-ticket-cta-bg: rgba(10, 85, 156, 0.05);
-  --mypage-ticket-cta-border: rgba(10, 85, 156, 0.14);
-  --mypage-ticket-cta-text: #0a559c;
-  --mypage-ticket-icon-bg: rgba(10, 85, 156, 0.09);
+  --mypage-ticket-cta-bg: color-mix(in srgb, var(--brand-33) 5%, transparent);
+  --mypage-ticket-cta-border: color-mix(in srgb, var(--brand-33) 14%, transparent);
+  --mypage-ticket-cta-text: var(--brand-33);
+  --mypage-ticket-icon-bg: color-mix(in srgb, var(--brand-33) 9%, transparent);
   --mypage-ticket-viewall-text: #9ca3af;
   --mypage-info-card-bg: #ffffff;
   --mypage-info-card-border: transparent;
   --mypage-info-card-shadow: none;
-  --mypage-info-header-bg-start: #f8fafc;
+  --mypage-info-header-bg-start: var(--brand-98);
   --mypage-info-header-bg-end: #ffffff;
   --mypage-info-header-border: #f3f4f6;
-  --mypage-info-overline: #0a559c;
-  --mypage-info-title: #0f172a;
+  --mypage-info-overline: var(--brand-33);
+  --mypage-info-title: var(--brand-11);
   --mypage-info-item-divider: #f3f4f6;
   --mypage-info-item-label: #9ca3af;
-  --mypage-info-item-value: #0f172a;
+  --mypage-info-item-value: var(--brand-11);
   --mypage-info-icon-size: 36px;
   --mypage-info-icon-border: transparent;
   --mypage-info-icon-bg: #f3f4f6;
@@ -509,11 +575,11 @@
   --mypage-info-icon-bg-end: #f3f4f6;
   --mypage-info-icon-symbol: #9ca3af;
   --mypage-info-icon-shadow: none;
-  --mypage-portal-card-border: rgba(168, 190, 236, 0.72);
-  --mypage-portal-card-bg-start: rgba(214, 226, 250, 0.82);
-  --mypage-portal-card-bg-mid: rgba(190, 209, 246, 0.48);
+  --mypage-portal-card-border: color-mix(in srgb, var(--brand-79) 72%, transparent);
+  --mypage-portal-card-bg-start: color-mix(in srgb, var(--brand-91) 82%, transparent);
+  --mypage-portal-card-bg-mid: color-mix(in srgb, var(--brand-85) 48%, transparent);
   --mypage-portal-card-bg-end: rgba(255, 255, 255, 0.96);
-  --mypage-portal-card-shadow: rgba(33, 66, 171, 0.34);
+  --mypage-portal-card-shadow: color-mix(in srgb, var(--brand-40) 34%, transparent);
   --mypage-portal-card-inner-border: rgba(255, 255, 255, 0.52);
   --mypage-portal-overline: var(--brand-main);
   --mypage-portal-name: rgb(15 23 42);
@@ -550,32 +616,32 @@
       rgb(234 241 251) 88%,
       var(--footer-bg) 100%
     );
-  --mypage-glow-top: rgba(79, 121, 223, 0.22);
-  --mypage-glow-bottom: rgba(47, 86, 199, 0.18);
+  --mypage-glow-top: color-mix(in srgb, var(--brand-59a) 22%, transparent);
+  --mypage-glow-bottom: color-mix(in srgb, var(--brand-48a) 18%, transparent);
   --mypage-guest-card-border: transparent;
   --mypage-guest-card-bg: #ffffff;
   --mypage-guest-card-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
   --mypage-guest-icon-border: transparent;
-  --mypage-guest-icon-bg-start: #0a559c;
-  --mypage-guest-icon-bg-end: #2563eb;
-  --mypage-guest-icon-shadow: 0 8px 24px -4px rgba(10, 85, 156, 0.32);
-  --mypage-guest-overline: #0a559c;
-  --mypage-guest-title: #0f172a;
+  --mypage-guest-icon-bg-start: var(--brand-33);
+  --mypage-guest-icon-bg-end: var(--brand-53);
+  --mypage-guest-icon-shadow: 0 8px 24px -4px color-mix(in srgb, var(--brand-33) 32%, transparent);
+  --mypage-guest-overline: var(--brand-33);
+  --mypage-guest-title: var(--brand-11);
   --mypage-guest-description: #9ca3af;
-  --mypage-guest-cta-bg-start: #0a559c;
-  --mypage-guest-cta-bg-end: #2563eb;
-  --mypage-guest-cta-shadow: 0 8px 24px -4px rgba(10, 85, 156, 0.35);
+  --mypage-guest-cta-bg-start: var(--brand-33);
+  --mypage-guest-cta-bg-end: var(--brand-53);
+  --mypage-guest-cta-shadow: 0 8px 24px -4px color-mix(in srgb, var(--brand-33) 35%, transparent);
   --mypage-info-card-border: transparent;
   --mypage-info-card-bg: #ffffff;
   --mypage-info-card-shadow: none;
   --mypage-info-header-border: #f3f4f6;
-  --mypage-info-header-bg-start: #f8fafc;
+  --mypage-info-header-bg-start: var(--brand-98);
   --mypage-info-header-bg-end: #ffffff;
-  --mypage-info-overline: #0a559c;
-  --mypage-info-title: #0f172a;
+  --mypage-info-overline: var(--brand-33);
+  --mypage-info-title: var(--brand-11);
   --mypage-info-item-divider: #f3f4f6;
   --mypage-info-item-label: #9ca3af;
-  --mypage-info-item-value: #0f172a;
+  --mypage-info-item-value: var(--brand-11);
   --mypage-logout-gap: 8px;
   --mypage-logout-text: #9ca3af;
   --mypage-logout-text-hover: #ef4444;
@@ -586,33 +652,33 @@
   --mypage-withdraw-text-hover: var(--mypage-logout-text-hover);
   --mypage-settings-card-bg: #ffffff;
   --mypage-settings-card-border: transparent;
-  --mypage-settings-row-label: #0f172a;
+  --mypage-settings-row-label: var(--brand-11);
   --mypage-settings-row-divider: #f3f4f6;
   --mypage-settings-row-arrow: #d1d5db;
   --mypage-settings-icon-bg: #f3f4f6;
   --mypage-settings-icon-color: #9ca3af;
-  --mypage-faq-question: #0f172a;
-  --mypage-faq-answer-bg: #f8fafc;
+  --mypage-faq-question: var(--brand-11);
+  --mypage-faq-answer-bg: var(--brand-98);
   --mypage-faq-answer: #9ca3af;
   --mypage-faq-divider: #f3f4f6;
   --mypage-faq-icon: #d1d5db;
-  --mypage-faq-icon-open: #0a559c;
-  --mypage-cta-gradient: linear-gradient(135deg, #0a559c 0%, #2563eb 100%);
-  --mypage-cta-shadow: 0 8px 24px -4px rgba(10, 85, 156, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  --mypage-avatar-gradient: linear-gradient(135deg, #0a559c 0%, #2563eb 100%);
-  --mypage-avatar-shadow: 0 8px 24px -4px rgba(10, 85, 156, 0.3);
-  --mypage-role-badge-bg: rgba(10, 85, 156, 0.07);
-  --mypage-role-badge-border: rgba(10, 85, 156, 0.18);
-  --mypage-role-badge-text: #0a559c;
+  --mypage-faq-icon-open: var(--brand-33);
+  --mypage-cta-gradient: linear-gradient(135deg, var(--brand-33) 0%, var(--brand-53) 100%);
+  --mypage-cta-shadow: 0 8px 24px -4px color-mix(in srgb, var(--brand-33) 35%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  --mypage-avatar-gradient: linear-gradient(135deg, var(--brand-33) 0%, var(--brand-53) 100%);
+  --mypage-avatar-shadow: 0 8px 24px -4px color-mix(in srgb, var(--brand-33) 30%, transparent);
+  --mypage-role-badge-bg: color-mix(in srgb, var(--brand-33) 7%, transparent);
+  --mypage-role-badge-border: color-mix(in srgb, var(--brand-33) 18%, transparent);
+  --mypage-role-badge-text: var(--brand-33);
   --mypage-stats-bg: #f7f7f7;
   --mypage-stats-border: #e5e7eb;
   --mypage-stats-divider: #e5e7eb;
   --mypage-logout-border: transparent;
 
   /* 2026 단국대 축제 포스터 팔레트 (落花流水 ;만개) */
-  --poster-navy: #1c2b6a;
-  --poster-blue: #3a5fa8;
-  --poster-bg: #eef1f8;
+  --poster-navy: var(--brand-26a);
+  --poster-blue: var(--brand-44);
+  --poster-bg: var(--brand-95b);
   --poster-card-white: #ffffff;
   /* 티켓 상태 배지 */
   --ticket-badge-issued-bg: #dcfce7;
@@ -621,7 +687,7 @@
   --ticket-badge-used-text: #b91c1c;
   --ticket-badge-cancelled-bg: #f3f4f6;
   --ticket-badge-cancelled-text: #6b7280;
-  --ticket-badge-unknown-bg: #ede9fe;
+  --ticket-badge-unknown-bg: var(--brand-95c);
   --ticket-badge-unknown-text: #6d28d9;
   /* 공지사항 중요공지 강조 색상 */
   --notice-pin-red: #dc2626;
@@ -631,19 +697,19 @@
   --timetable-empty-text: rgb(143 155 180);
   --timetable-card-bg: rgb(255 255 255);
   --timetable-card-border: var(--border-base);
-  --timetable-line: rgba(47, 86, 199, 0.55);
-  --timetable-info-bg: rgba(47, 86, 199, 0.1);
-  --timetable-info-border: rgba(47, 86, 199, 0.2);
+  --timetable-line: color-mix(in srgb, var(--brand-48a) 55%, transparent);
+  --timetable-info-bg: color-mix(in srgb, var(--brand-48a) 10%, transparent);
+  --timetable-info-border: color-mix(in srgb, var(--brand-48a) 20%, transparent);
   --timetable-info-text: rgb(42 79 184);
   --timetable-notice-bg: rgb(247 235 226);
   --timetable-notice-border: rgb(247 235 226 / 45%);
-  --timetable-overlay-bg: rgba(15, 23, 42, 0.8);
+  --timetable-overlay-bg: color-mix(in srgb, var(--brand-11) 80%, transparent);
   --timetable-close-bg: rgba(255, 255, 255, 0.9);
   --timetable-v2-accent: var(--emphasis-primary);
   --timetable-v2-avatar-shadow:
-    0 1px 2px rgba(24, 37, 74, 0.06),
-    0 8px 20px -8px rgba(32, 49, 99, 0.22),
-    0 20px 44px -28px rgba(32, 49, 99, 0.35);
+    0 1px 2px color-mix(in srgb, var(--brand-19) 6%, transparent),
+    0 8px 20px -8px color-mix(in srgb, var(--brand-26) 22%, transparent),
+    0 20px 44px -28px color-mix(in srgb, var(--brand-26) 35%, transparent);
   --timetable-v2-notice-surface: linear-gradient(
     145deg,
     color-mix(in srgb, var(--emphasis-primary) 9%, white) 0%,
@@ -651,8 +717,8 @@
     #ffffff 100%
   );
   --timetable-v2-notice-shadow:
-    0 2px 4px rgba(24, 37, 74, 0.04),
-    0 14px 36px -24px rgba(32, 49, 99, 0.28);
+    0 2px 4px color-mix(in srgb, var(--brand-19) 4%, transparent),
+    0 14px 36px -24px color-mix(in srgb, var(--brand-26) 28%, transparent);
   --timetable-v2-badge-genre-fg: #5e6b8f;
   --timetable-v2-timeline-dash: color-mix(in srgb, var(--timetable-v2-accent) 52%, transparent);
   /* 타임라인 좌측 시간 칩 — DAY 탭 악센트와 동일 계열, 더 연한 면 */
@@ -662,14 +728,14 @@
 }
 
 [data-color-scheme="webapp"] {
-  --ink-900: #131d3b;
-  --ink-800: #18254a;
-  --ink-700: #1d2c59;
-  --ink-600: #203163;
-  --ink-500: #3b4a76;
+  --ink-900: var(--brand-15);
+  --ink-800: var(--brand-19);
+  --ink-700: var(--brand-23);
+  --ink-600: var(--brand-26);
+  --ink-500: var(--brand-35);
   --ink-400: #5e6b8f;
   --ink-300: #8b94ae;
-  --neutral-300: #e3e8ef;
+  --neutral-300: var(--brand-91a);
   --neutral-100: #f7f7f7;
   --paper-50: #fefaf7;
 
@@ -696,34 +762,34 @@
   --text: var(--webapp-text-main);
   --text-muted: var(--ink-400);
   --accent: var(--webapp-button-primary);
-  --border-base: rgba(227, 232, 239, 0.92);
+  --border-base: color-mix(in srgb, var(--brand-91a) 92%, transparent);
   --surface-base: rgba(247, 247, 247, 0.84);
   --surface-strong: rgba(247, 247, 247, 0.78);
   --surface-subtle: rgba(247, 247, 247, 0.9);
-  --surface-tint-subtle: rgba(227, 232, 239, 0.56);
-  --surface-tint-base: rgba(227, 232, 239, 0.72);
-  --surface-tint-strong: rgba(227, 232, 239, 0.82);
-  --surface-tint-emphasis: rgba(227, 232, 239, 0.9);
+  --surface-tint-subtle: color-mix(in srgb, var(--brand-91a) 56%, transparent);
+  --surface-tint-base: color-mix(in srgb, var(--brand-91a) 72%, transparent);
+  --surface-tint-strong: color-mix(in srgb, var(--brand-91a) 82%, transparent);
+  --surface-tint-emphasis: color-mix(in srgb, var(--brand-91a) 90%, transparent);
   --surface-tint: var(--surface-tint-base);
-  --border-subtle: rgba(227, 232, 239, 0.74);
-  --border-strong: rgba(227, 232, 239, 0.98);
-  --border-emphasis: rgba(153, 175, 214, 0.62);
+  --border-subtle: color-mix(in srgb, var(--brand-91a) 74%, transparent);
+  --border-strong: color-mix(in srgb, var(--brand-91a) 98%, transparent);
+  --border-emphasis: color-mix(in srgb, var(--brand-72) 62%, transparent);
   --outline_variant: rgba(179, 191, 209, 0.34);
   --border: var(--border-base);
-  --shadow-color: rgba(32, 49, 99, 0.16);
-  --ring: rgba(59, 74, 118, 0.42);
-  --card-surface-base: #f8faff;
+  --shadow-color: color-mix(in srgb, var(--brand-26) 16%, transparent);
+  --ring: color-mix(in srgb, var(--brand-35) 42%, transparent);
+  --card-surface-base: var(--brand-99);
   --card-radius: 20px;
   --card-border-width: 1px;
-  --card-border-base: #c0cde4;
-  --card-border-tint: #afc0dd;
-  --card-border-active: #8ea8d8;
+  --card-border-base: var(--brand-82);
+  --card-border-tint: var(--brand-78);
+  --card-border-active: var(--brand-70);
   --card-shadow-soft: 0 12px 22px -20px var(--shadow-color);
   --card-shadow-elevated: 0 18px 30px -24px var(--shadow-color);
   --card-outline-bg: var(--home-card-bg);
   --card-outline-border: #bdd0f7e6;
   --card-outline-shadow: var(--home-current-performance-card-shadow);
-  --card-soft-tint-bg: #eef3fd;
+  --card-soft-tint-bg: var(--brand-96);
   --card-soft-tint-border: var(--card-border-tint);
   --card-soft-tint-shadow: var(--card-shadow-soft);
   --card-grad-white-start: #eef5fff0;
@@ -734,7 +800,7 @@
   --card-grad-white-border: var(--mypage-info-card-border);
   --card-grad-white-shadow: var(--mypage-info-card-shadow);
   --card-grad-tint-start: #eef5fff0;
-  --card-grad-tint-mid: #e7efff;
+  --card-grad-tint-mid: var(--brand-95);
   --card-grad-tint-end: #ffffff;
   --card-grad-tint-bg:
     linear-gradient(150deg, var(--card-grad-tint-start) 0%, var(--card-grad-tint-mid) 56%, var(--card-grad-tint-end) 100%);
@@ -743,7 +809,7 @@
   --primary: var(--webapp-button-primary);
   --primary_container: color-mix(in srgb, var(--webapp-button-primary) 38%, white);
   --on-primary: var(--text-on-accent);
-  --primary-soft: rgba(59, 74, 118, 0.14);
+  --primary-soft: color-mix(in srgb, var(--brand-35) 14%, transparent);
   --button-disabled-bg: var(--webapp-button-disabled);
   --button-disabled-text: var(--paper-50);
 
@@ -753,8 +819,8 @@
   --app-overscroll-bg: var(--webapp-main-bg);
   --app-nav-bg: var(--webapp-bottom-bar);
   --app-bottom-nav-surface: var(--surface_container_lowest);
-  --app-nav-border: rgba(32, 49, 99, 0.1);
-  --app-nav-shadow: 0 -8px 24px rgba(32, 49, 99, 0.08);
+  --app-nav-border: color-mix(in srgb, var(--brand-26) 10%, transparent);
+  --app-nav-shadow: 0 -8px 24px color-mix(in srgb, var(--brand-26) 8%, transparent);
   --app-nav-text: rgb(127 143 150);
   --app-nav-text-active: rgb(143 169 190);
   --app-nav-home-highlight: rgb(7 49 97);
@@ -765,33 +831,33 @@
   --footer-bg: var(--webapp-footer-bg);
   --footer-text-primary: #7b838b;
   --footer-text-secondary: #939aa1;
-  --footer-divider: rgba(32, 49, 99, 0.2);
-  --footer-divider-glow: rgba(32, 49, 99, 0.1);
-  --footer-divider-transparent: rgba(32, 49, 99, 0);
+  --footer-divider: color-mix(in srgb, var(--brand-26) 20%, transparent);
+  --footer-divider-glow: color-mix(in srgb, var(--brand-26) 10%, transparent);
+  --footer-divider-transparent: color-mix(in srgb, var(--brand-26) 0%, transparent);
   --footer-icon-bg: var(--footer-bg);
   --footer-icon-bg-hover: var(--footer-bg);
-  --footer-icon-border: rgba(32, 49, 99, 0.18);
+  --footer-icon-border: color-mix(in srgb, var(--brand-26) 18%, transparent);
   --footer-icon-fg: var(--footer-text-primary);
-  --footer-icon-shadow: 0 10px 20px -16px rgba(32, 49, 99, 0.26);
-  --app-circle-border: rgba(153, 175, 214, 0.62);
+  --footer-icon-shadow: 0 10px 20px -16px color-mix(in srgb, var(--brand-26) 26%, transparent);
+  --app-circle-border: color-mix(in srgb, var(--brand-72) 62%, transparent);
   --app-circle-bg-start: rgba(247, 247, 247, 0.98);
-  --app-circle-bg-end: rgba(227, 232, 239, 0.88);
-  --text-emphasis-vivid: #2853a9;
-  --text-emphasis-vivid-strong: #2f63f6;
+  --app-circle-bg-end: color-mix(in srgb, var(--brand-91a) 88%, transparent);
+  --text-emphasis-vivid: var(--brand-41);
+  --text-emphasis-vivid-strong: var(--brand-57a);
   --text-body-deep: var(--ink-600);
-  --text-bold-emphasis: #374f84;
+  --text-bold-emphasis: var(--brand-37);
   --app-circle-fg: var(--text-bold-emphasis);
   --app-circle-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.92),
-    0 12px 20px -16px rgba(32, 49, 99, 0.28);
+    0 12px 20px -16px color-mix(in srgb, var(--brand-26) 28%, transparent);
   --emphasis-primary: var(--text-emphasis-vivid);
-  --emphasis-primary-soft: rgba(47, 95, 184, 0.45);
+  --emphasis-primary-soft: color-mix(in srgb, var(--brand-45) 45%, transparent);
   --timetable-active-color: var(--emphasis-primary);
   --timetable-active-line: var(--emphasis-primary-soft);
   --ticketing-quick-action-icon: var(--text-emphasis-vivid);
   --ticketing-quick-action-text: var(--text-emphasis-vivid);
   --ticketing-action-bg-start: color-mix(in srgb, var(--text-emphasis-vivid) 86%, white);
-  --ticketing-action-bg-end: color-mix(in srgb, var(--text-emphasis-vivid) 94%, #163a79);
+  --ticketing-action-bg-end: color-mix(in srgb, var(--text-emphasis-vivid) 94%, var(--brand-28));
   --ticketing-action-shadow:
     0 12px 20px -14px color-mix(in srgb, var(--text-emphasis-vivid) 42%, transparent);
   --ticketing-action-disabled-bg-start: color-mix(in srgb, var(--text-emphasis-vivid) 24%, white);
@@ -806,7 +872,7 @@
   --app-header-ticket-btn-shadow: var(--app-circle-shadow);
   --app-header-ticket-btn-shadow-hover:
     inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 16px 24px -16px rgba(32, 49, 99, 0.34);
+    0 16px 24px -16px color-mix(in srgb, var(--brand-26) 34%, transparent);
 
   --status-warning-bg: var(--webapp-caution-bg);
   --status-warning-border: rgba(167, 127, 84, 0.36);
@@ -814,14 +880,14 @@
   --status-info-bg: var(--webapp-surface-text-bg);
   --status-info-border: rgba(179, 191, 209, 0.52);
   --status-info-text: var(--webapp-text-emphasis);
-  --status-neutral-bg: rgba(227, 232, 239, 0.42);
+  --status-neutral-bg: color-mix(in srgb, var(--brand-91a) 42%, transparent);
   --status-neutral-border: rgba(179, 191, 209, 0.36);
   --status-neutral-text: var(--ink-400);
 
   --home-notice-bg-start: var(--neutral-100);
   --home-notice-bg-end: var(--neutral-100);
   --home-notice-border: transparent;
-  --home-notice-shadow: rgba(32, 49, 99, 0.14);
+  --home-notice-shadow: color-mix(in srgb, var(--brand-26) 14%, transparent);
   --home-notice-icon-border: #bdd0f7e6;
   --home-notice-icon-bg-start: var(--app-circle-bg-start);
   --home-notice-icon-bg-end: var(--app-circle-bg-end);
@@ -830,25 +896,25 @@
   --home-lineup-card-border: #bdd0f7e6;
   --home-ad-banner-bg: #ffffff;
 
-  --mypage-portal-card-bg-start: rgba(227, 232, 239, 0.92);
-  --mypage-portal-card-bg-mid: rgba(227, 232, 239, 0.78);
+  --mypage-portal-card-bg-start: color-mix(in srgb, var(--brand-91a) 92%, transparent);
+  --mypage-portal-card-bg-mid: color-mix(in srgb, var(--brand-91a) 78%, transparent);
   --mypage-portal-card-bg-end: rgba(247, 247, 247, 0.96);
 
-  --timetable-tab-inactive: #8ea0bf;
-  --timetable-empty-text: #8ea0bf;
+  --timetable-tab-inactive: var(--brand-65);
+  --timetable-empty-text: var(--brand-65);
   --timetable-card-bg: rgba(255, 255, 255, 0.92);
   --timetable-card-border: rgba(255, 255, 255, 0.7);
-  --timetable-line: rgba(90, 116, 211, 0.62);
-  --timetable-info-bg: rgba(236, 241, 255, 0.9);
-  --timetable-info-border: rgba(184, 198, 242, 0.42);
-  --timetable-info-text: #2f63f6;
+  --timetable-line: color-mix(in srgb, var(--brand-59) 62%, transparent);
+  --timetable-info-bg: color-mix(in srgb, var(--brand-96a) 90%, transparent);
+  --timetable-info-border: color-mix(in srgb, var(--brand-84) 42%, transparent);
+  --timetable-info-text: var(--brand-57a);
   --timetable-notice-bg: rgb(247 235 226);
   --timetable-notice-border: rgb(247 235 226 / 45%);
-  --timetable-overlay-bg: rgba(15, 23, 42, 0.72);
+  --timetable-overlay-bg: color-mix(in srgb, var(--brand-11) 72%, transparent);
   --timetable-close-bg: rgba(255, 255, 255, 0.92);
 
   /* Timetable UI v2 — 서비스급 리디자인 토큰 */
-  --timetable-v2-accent: #2f63f6;
+  --timetable-v2-accent: var(--brand-57a);
   --timetable-v2-accent-soft: color-mix(in srgb, var(--timetable-v2-accent) 22%, transparent);
   --timetable-v2-accent-glow: color-mix(in srgb, var(--timetable-v2-accent) 35%, transparent);
   --timetable-v2-surface-tint: linear-gradient(
@@ -867,32 +933,32 @@
   --timetable-v2-badge-stage-bg: color-mix(in srgb, var(--ink-500) 7%, white);
   --timetable-v2-avatar-ring: rgba(255, 255, 255, 0.96);
   --timetable-v2-avatar-shadow:
-    0 1px 2px rgba(24, 37, 74, 0.06),
-    0 8px 20px -8px rgba(32, 49, 99, 0.22),
-    0 20px 44px -28px rgba(32, 49, 99, 0.35);
+    0 1px 2px color-mix(in srgb, var(--brand-19) 6%, transparent),
+    0 8px 20px -8px color-mix(in srgb, var(--brand-26) 22%, transparent),
+    0 20px 44px -28px color-mix(in srgb, var(--brand-26) 35%, transparent);
   --timetable-v2-timeline-line: linear-gradient(
     180deg,
     color-mix(in srgb, var(--timetable-v2-accent) 55%, transparent) 0%,
     color-mix(in srgb, var(--timetable-v2-accent) 18%, transparent) 52%,
-    rgba(227, 232, 239, 0.45) 100%
+    color-mix(in srgb, var(--brand-91a) 45%, transparent) 100%
   );
   --timetable-v2-timeline-node-outer: #ffffff;
   --timetable-v2-timeline-node-mid: color-mix(in srgb, var(--timetable-v2-accent) 28%, white);
   --timetable-v2-timeline-node-core: var(--timetable-v2-accent);
   --timetable-v2-timeline-node-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.9),
-    0 2px 8px rgba(61, 94, 230, 0.22),
-    0 12px 24px -14px rgba(32, 49, 99, 0.35);
-  --timetable-v2-now-bg: linear-gradient(135deg, #2f63f6 0%, #3b82f6 100%);
-  --timetable-v2-now-shadow: 0 10px 26px -12px rgba(61, 94, 230, 0.55);
+    0 2px 8px color-mix(in srgb, var(--brand-57) 22%, transparent),
+    0 12px 24px -14px color-mix(in srgb, var(--brand-26) 35%, transparent);
+  --timetable-v2-now-bg: linear-gradient(135deg, var(--brand-57a) 0%, var(--brand-60) 100%);
+  --timetable-v2-now-shadow: 0 10px 26px -12px color-mix(in srgb, var(--brand-57) 55%, transparent);
   /* 타임라인 점선 — 악센트와 동일 계열 */
   --timetable-v2-timeline-dash: color-mix(in srgb, var(--timetable-v2-accent) 52%, transparent);
-  --timetable-v2-time-pill-bg: color-mix(in srgb, var(--timetable-v2-accent) 10%, rgb(240, 245, 255));
+  --timetable-v2-time-pill-bg: color-mix(in srgb, var(--timetable-v2-accent) 10%, var(--brand-96));
   --timetable-v2-time-pill-fg: var(--timetable-info-text);
   --timetable-v2-notice-surface: var(--timetable-v2-surface-tint);
   --timetable-v2-notice-shadow:
-    0 2px 4px rgba(24, 37, 74, 0.04),
-    0 14px 36px -24px rgba(32, 49, 99, 0.28);
+    0 2px 4px color-mix(in srgb, var(--brand-19) 4%, transparent),
+    0 14px 36px -24px color-mix(in srgb, var(--brand-26) 28%, transparent);
 }
 
 [data-color-scheme="electric-curator"] {
@@ -911,7 +977,7 @@
   --tertiary_container: rgb(250 183 154);
   --on-tertiary-container: rgb(93 59 55);
   --outline_variant: rgba(172, 179, 182, 0.15);
-  --ec-glass-bg: rgba(248, 250, 251, 0.7);
+  --ec-glass-bg: color-mix(in srgb, var(--brand-98) 70%, transparent);
   --ec-glass-blur: 28px;
   --ec-ambient-shadow: 0 20px 50px rgba(44, 52, 54, 0.06);
   --font-display: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -971,8 +1037,8 @@
   --app-header-bg-gradient:
     linear-gradient(
       180deg,
-      rgba(248, 250, 251, 0.88) 0%,
-      rgba(240, 244, 246, 0.78) 100%
+      color-mix(in srgb, var(--brand-98) 88%, transparent) 0%,
+      color-mix(in srgb, var(--brand-95a) 78%, transparent) 100%
     );
   --app-header-border: transparent;
   --app-overscroll-bg: var(--surface);
@@ -985,8 +1051,8 @@
   --app-nav-bg-gradient:
     linear-gradient(
       180deg,
-      rgba(248, 250, 251, 0.84) 0%,
-      rgba(240, 244, 246, 0.82) 100%
+      color-mix(in srgb, var(--brand-98) 84%, transparent) 0%,
+      color-mix(in srgb, var(--brand-95a) 82%, transparent) 100%
     );
   --app-nav-border: transparent;
   --app-nav-shadow: var(--ec-ambient-shadow);
@@ -1057,7 +1123,7 @@
     radial-gradient(126% 74% at 88% 4%, color-mix(in srgb, var(--primary_container) 44%, transparent) 0%, transparent 60%),
     radial-gradient(88% 62% at 12% 0%, color-mix(in srgb, var(--tertiary_container) 28%, transparent) 0%, transparent 60%),
     linear-gradient(180deg, rgb(248 250 251) 0%, rgb(247 249 250) 100%);
-  --home-notice-bg-start: rgba(248, 250, 251, 0.8);
+  --home-notice-bg-start: color-mix(in srgb, var(--brand-98) 80%, transparent);
   --home-notice-bg-end: rgba(232, 238, 241, 0.7);
   --home-notice-border: transparent;
   --home-notice-shadow: var(--ec-ambient-shadow);
@@ -1169,10 +1235,10 @@
 .home-hero-bottom-vignette {
   background: linear-gradient(
     180deg,
-    rgba(8, 14, 27, 0) 0%,
-    rgba(8, 14, 27, 0.24) 42%,
-    rgba(7, 12, 23, 0.62) 76%,
-    rgba(5, 9, 18, 0.88) 100%
+    color-mix(in srgb, var(--brand-07) 0%, transparent) 0%,
+    color-mix(in srgb, var(--brand-07) 24%, transparent) 42%,
+    color-mix(in srgb, var(--brand-06) 62%, transparent) 76%,
+    color-mix(in srgb, var(--brand-05) 88%, transparent) 100%
   );
 }
 
