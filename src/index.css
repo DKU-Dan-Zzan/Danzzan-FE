@@ -9,16 +9,21 @@
      앱 전역의 브랜드 색은 모두 이 블록에서 파생된다.
      색을 바꾸려면 여기 값만 교체하면 되고 아래 토큰들은 손대지 않는다.
      이름의 숫자는 명도(HSL Lightness %). 00=검정에 가깝고 99=흰색에 가깝다.
+
+       --brand-*   : 채도가 높은 브랜드 색 (버튼·활성 상태·강조)
+       --neutral-* : 채도가 낮은 회청색 (본문 텍스트·비활성·구분선)
      ══════════════════════════════════════════════════════════ */
 
+  /* 브랜드 색 */
   --brand-05: #050912; /* 1회 */
   --brand-06: #070c17; /* 1회 */
   --brand-07: #080e1b; /* 2회 */
-  --brand-11: #0f172a; /* 23회 */
+  --brand-11: #0f172a; /* 24회 */
   --brand-15: #131d3b; /* 1회 */
   --brand-17: #1e293b; /* 1회 */
   --brand-18: #10204a; /* 1회 */
   --brand-19: #18254a; /* 5회 */
+  --brand-20: #073161; /* 3회 */
   --brand-22: #0a3767; /* 2회 */
   --brand-23: #1d2c59; /* 1회 */
   --brand-26: #203163; /* 20회 */
@@ -31,10 +36,13 @@
   --brand-40: #2142ab; /* 5회 */
   --brand-40a: #1e40af; /* 1회 */
   --brand-41: #2853a9; /* 2회 */
+  --brand-41a: #4f6284; /* 1회 */
   --brand-44: #3a5fa8; /* 1회 */
+  --brand-44a: #2a4fb8; /* 1회 */
   --brand-45: #2f5fb8; /* 2회 */
   --brand-48: #1d4ed8; /* 4회 */
   --brand-48a: #2f56c7; /* 5회 */
+  --brand-50: #6d28d9; /* 1회 */
   --brand-53: #2563eb; /* 10회 */
   --brand-57: #3d5ee6; /* 2회 */
   --brand-57a: #2f63f6; /* 5회 */
@@ -43,6 +51,7 @@
   --brand-60: #3b82f6; /* 8회 */
   --brand-61: #7e91b9; /* 4회 */
   --brand-65: #8ea0bf; /* 2회 */
+  --brand-65a: #8fa9be; /* 2회 */
   --brand-66: #8a9dc6; /* 1회 */
   --brand-69: #8fa5d2; /* 1회 */
   --brand-70: #8ea8d8; /* 2회 */
@@ -56,18 +65,43 @@
   --brand-84: #b8c6f2; /* 1회 */
   --brand-85: #bed1f6; /* 1회 */
   --brand-87: #bfdbfe; /* 1회 */
+  --brand-89: #cbe6fc; /* 1회 */
   --brand-91: #d6e2fa; /* 1회 */
   --brand-91a: #e3e8ef; /* 16회 */
   --brand-93: #dbeafe; /* 1회 */
-  --brand-95: #e7efff; /* 3회 */
-  --brand-95a: #f0f4f6; /* 2회 */
+  --brand-94: #e2eafb; /* 1회 */
+  --brand-95: #f0f4f6; /* 3회 */
+  --brand-95a: #e7efff; /* 5회 */
   --brand-95b: #eef1f8; /* 1회 */
   --brand-95c: #ede9fe; /* 1회 */
-  --brand-96: #eef3fd; /* 3회 */
+  --brand-96: #eef3fd; /* 4회 */
   --brand-96a: #ecf1ff; /* 1회 */
-  --brand-97: #f1f6fd; /* 6회 */
-  --brand-98: #f8fafb; /* 11회 */
-  --brand-99: #f8fbff; /* 7회 */
+  --brand-97: #f1f6fd; /* 7회 */
+  --brand-98: #f8fafb; /* 15회 */
+  --brand-99: #f8fbff; /* 10회 */
+
+  /* 회청색 계열 */
+  --neutral-19: #2c3436; /* 8회 */
+  --neutral-24: #354347; /* 1회 */
+  --neutral-27: #334155; /* 3회 */
+  --neutral-27a: #3c4a4e; /* 1회 */
+  --neutral-35: #475569; /* 3회 */
+  --neutral-46: #6b7280; /* 1회 */
+  --neutral-46a: #5e6b8f; /* 4회 */
+  --neutral-47: #61708f; /* 1회 */
+  --neutral-54: #7f8f96; /* 2회 */
+  --neutral-61: #8b97ad; /* 1회 */
+  --neutral-61a: #8f99aa; /* 2회 */
+  --neutral-61b: #8b94ae; /* 1회 */
+  --neutral-63: #8f9bb4; /* 2회 */
+  --neutral-65: #9ca3af; /* 19회 */
+  --neutral-65a: #94a3b8; /* 1회 */
+  --neutral-76: #b3bfd1; /* 3회 */
+  --neutral-84: #d1d5db; /* 4회 */
+  --neutral-91: #e5e7eb; /* 3회 */
+  --neutral-93: #e8eef1; /* 3회 */
+  --neutral-96: #f3f4f6; /* 16회 */
+  --neutral-97: #f7f9fa; /* 2회 */
 
   --font-display: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-body: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -81,12 +115,12 @@
   --spacing-8: 2rem;
   --ec-glass-bg: color-mix(in srgb, var(--brand-98) 70%, transparent);
   --ec-glass-blur: 28px;
-  --ec-ambient-shadow: 0 20px 50px rgba(44, 52, 54, 0.06);
+  --ec-ambient-shadow: 0 20px 50px color-mix(in srgb, var(--neutral-19) 6%, transparent);
   --brand-main: var(--brand-33);
   --bg-base: var(--brand-99);
   --bg-page-soft: var(--brand-99);
   --text: var(--brand-11);
-  --text-muted: #475569;
+  --text-muted: var(--neutral-35);
   --text-on-accent: #ffffff;
   --accent: var(--brand-53);
   --border-base: color-mix(in srgb, var(--brand-78b) 56%, transparent);
@@ -121,13 +155,13 @@
   --app-nav-bg-gradient: none;
   --app-nav-border: color-mix(in srgb, var(--brand-66) 26%, transparent);
   --app-nav-shadow: 0 -8px 24px color-mix(in srgb, var(--brand-18) 10%, transparent);
-  --app-nav-text: #8b97ad;
+  --app-nav-text: var(--neutral-61);
   --app-nav-text-active: var(--brand-main);
-  --app-nav-home-highlight: rgb(7 49 97);
+  --app-nav-home-highlight: var(--brand-20);
   --footer-bg: var(--brand-99);
   --footer-bg-gradient: none;
   --footer-text-primary: var(--brand-28a);
-  --footer-text-secondary: #61708f;
+  --footer-text-secondary: var(--neutral-47);
   --footer-divider: color-mix(in srgb, var(--brand-61) 44%, transparent);
   --footer-divider-glow: color-mix(in srgb, var(--brand-61) 16%, transparent);
   --footer-divider-transparent: color-mix(in srgb, var(--brand-61) 0%, transparent);
@@ -138,7 +172,7 @@
   --footer-icon-shadow: 0 10px 20px -18px color-mix(in srgb, var(--brand-11) 24%, transparent);
   --app-circle-border: color-mix(in srgb, var(--brand-75) 56%, transparent);
   --app-circle-bg-start: color-mix(in srgb, var(--brand-98) 98%, transparent);
-  --app-circle-bg-end: color-mix(in srgb, var(--brand-95) 96%, transparent);
+  --app-circle-bg-end: color-mix(in srgb, var(--brand-95a) 96%, transparent);
   --text-emphasis-vivid: var(--brand-41);
   --text-emphasis-vivid-strong: var(--brand-57a);
   --text-body-deep: var(--brand-26);
@@ -211,7 +245,7 @@
   --card-grad-white-shadow: var(--mypage-info-card-shadow);
 
   --card-grad-tint-start: #eef5fff0;
-  --card-grad-tint-mid: var(--brand-95);
+  --card-grad-tint-mid: var(--brand-95a);
   --card-grad-tint-end: #ffffff;
   --card-grad-tint-bg:
     linear-gradient(150deg, var(--card-grad-tint-start) 0%, var(--card-grad-tint-mid) 56%, var(--card-grad-tint-end) 100%);
@@ -273,9 +307,9 @@
   --boothmap-zone-food-truck-stroke: #dc2626;
   --boothmap-zone-food-truck-fill: #fca5a5;
   --boothmap-zone-food-truck-dot: #ef4444;
-  --boothmap-zone-smoking-stroke: #475569;
+  --boothmap-zone-smoking-stroke: var(--neutral-35);
   --boothmap-zone-smoking-fill: color-mix(in srgb, var(--neutral-300) 74%, var(--ink-300));
-  --boothmap-zone-smoking-dot: #334155;
+  --boothmap-zone-smoking-dot: var(--neutral-27);
 
   --boothmap-overlay-label-bg: color-mix(in srgb, var(--card-surface-base) 95%, white);
   --boothmap-overlay-label-border: var(--card-outline-border);
@@ -349,7 +383,7 @@
   --destructive-foreground: var(--text-on-accent);
   --input: var(--border);
   --input-background: white;
-  --switch-background: rgba(148, 163, 184, 0.5);
+  --switch-background: color-mix(in srgb, var(--neutral-65a) 50%, transparent);
   --ring: color-mix(in srgb, var(--brand-53) 45%, transparent);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -413,8 +447,8 @@
   --admin-guide-bg: var(--brand-98);
   --admin-guide-border: var(--brand-91a);
   --admin-guide-icon-bg: var(--brand-91a);
-  --admin-guide-icon-text: #475569;
-  --admin-guide-text: #334155;
+  --admin-guide-icon-text: var(--neutral-35);
+  --admin-guide-text: var(--neutral-27);
   --admin-guide-step-text: var(--admin-accent-text);
   --admin-guide-chip-bg: var(--admin-accent-soft-bg);
   --admin-guide-chip-text: var(--admin-accent-text);
@@ -429,7 +463,7 @@
   --admin-danger-outline-text: var(--admin-danger-note-text);
   --admin-danger-outline-hover-bg: var(--admin-danger-note-bg);
   --admin-dialog-shadow: color-mix(in srgb, var(--brand-11) 35%, transparent);
-  --admin-dialog-description-text: #334155;
+  --admin-dialog-description-text: var(--neutral-27);
   --admin-dialog-issue-bg: var(--brand-97);
   --admin-dialog-issue-border: var(--brand-87);
   --admin-dialog-issue-title: var(--brand-48);
@@ -448,12 +482,12 @@
 
   /* Home route tokens */
   --home-bg-start: rgb(255 255 255);
-  --home-bg-mid: rgb(251 253 255);
-  --home-bg-end: rgb(248 251 255);
+  --home-bg-mid: var(--brand-98);
+  --home-bg-end: var(--brand-99);
   --home-glow-strong: color-mix(in srgb, var(--brand-40) 24%, transparent);
   --home-glow-soft: color-mix(in srgb, var(--brand-48a) 18%, transparent);
-  --home-notice-bg-start: rgba(143, 153, 170, 0.13);
-  --home-notice-bg-end: rgba(143, 153, 170, 0.08);
+  --home-notice-bg-start: color-mix(in srgb, var(--neutral-61a) 13%, transparent);
+  --home-notice-bg-end: color-mix(in srgb, var(--neutral-61a) 8%, transparent);
   --home-notice-border: transparent;
   --home-notice-shadow: color-mix(in srgb, var(--brand-40) 28%, transparent);
   --home-notice-depth-shadow: color-mix(in srgb, var(--brand-17) 14%, transparent);
@@ -505,11 +539,11 @@
   --mypage-page-bg: var(--bg-page-soft);
   --mypage-page-bg-gradient: var(--bg-page-soft);
   --mypage-profile-avatar-bg: var(--brand-91a);
-  --mypage-profile-avatar-icon: #9ca3af;
+  --mypage-profile-avatar-icon: var(--neutral-65);
   --mypage-profile-name: var(--brand-11);
-  --mypage-profile-subtitle: #9ca3af;
+  --mypage-profile-subtitle: var(--neutral-65);
   --mypage-section-title: var(--brand-11);
-  --mypage-section-label: #9ca3af;
+  --mypage-section-label: var(--neutral-65);
   --mypage-section-dot: transparent;
   --mypage-ticket-hero-bg: linear-gradient(140deg, var(--brand-33) 0%, var(--brand-53) 100%);
   --mypage-ticket-hero-text: #ffffff;
@@ -519,61 +553,61 @@
   --mypage-ticket-hero-btn-text: #ffffff;
   --mypage-ticket-hero-row-divider: rgba(255, 255, 255, 0.12);
   --mypage-list-bg: #ffffff;
-  --mypage-list-divider: #f3f4f6;
+  --mypage-list-divider: var(--neutral-96);
   --mypage-list-item-text: var(--brand-11);
-  --mypage-list-item-value: #9ca3af;
-  --mypage-list-item-icon: #9ca3af;
-  --mypage-list-arrow: #d1d5db;
+  --mypage-list-item-value: var(--neutral-65);
+  --mypage-list-item-icon: var(--neutral-65);
+  --mypage-list-arrow: var(--neutral-84);
   --mypage-hero-card-bg: #ffffff;
   --mypage-hero-card-border: transparent;
   --mypage-hero-card-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
   --mypage-hero-overline: var(--brand-33);
   --mypage-hero-name: var(--brand-11);
   --mypage-hero-name-size: 24px;
-  --mypage-hero-subtitle: #9ca3af;
+  --mypage-hero-subtitle: var(--neutral-65);
   --mypage-hero-badge-bg: var(--brand-97);
   --mypage-hero-badge-border: transparent;
   --mypage-hero-badge-shadow: none;
-  --mypage-hero-icon-color: #9ca3af;
-  --mypage-hero-divider: #f3f4f6;
-  --mypage-hero-stat-label: #9ca3af;
+  --mypage-hero-icon-color: var(--neutral-65);
+  --mypage-hero-divider: var(--neutral-96);
+  --mypage-hero-stat-label: var(--neutral-65);
   --mypage-hero-stat-value: var(--brand-11);
   --mypage-ticket-card-bg: #ffffff;
-  --mypage-ticket-card-border: #f3f4f6;
+  --mypage-ticket-card-border: var(--neutral-96);
   --mypage-ticket-card-shadow: none;
   --mypage-ticket-strip: linear-gradient(180deg, var(--brand-33) 0%, var(--brand-53) 100%);
   --mypage-ticket-event: var(--brand-11);
-  --mypage-ticket-meta: #9ca3af;
+  --mypage-ticket-meta: var(--neutral-65);
   --mypage-ticket-badge-issued-bg: color-mix(in srgb, var(--brand-33) 8%, transparent);
   --mypage-ticket-badge-issued-border: color-mix(in srgb, var(--brand-33) 22%, transparent);
   --mypage-ticket-badge-issued-text: var(--brand-33);
-  --mypage-ticket-badge-used-bg: #f3f4f6;
-  --mypage-ticket-badge-used-border: #e5e7eb;
-  --mypage-ticket-badge-used-text: #9ca3af;
-  --mypage-ticket-empty-icon: #d1d5db;
-  --mypage-ticket-empty-text: #9ca3af;
+  --mypage-ticket-badge-used-bg: var(--neutral-96);
+  --mypage-ticket-badge-used-border: var(--neutral-91);
+  --mypage-ticket-badge-used-text: var(--neutral-65);
+  --mypage-ticket-empty-icon: var(--neutral-84);
+  --mypage-ticket-empty-text: var(--neutral-65);
   --mypage-ticket-cta-bg: color-mix(in srgb, var(--brand-33) 5%, transparent);
   --mypage-ticket-cta-border: color-mix(in srgb, var(--brand-33) 14%, transparent);
   --mypage-ticket-cta-text: var(--brand-33);
   --mypage-ticket-icon-bg: color-mix(in srgb, var(--brand-33) 9%, transparent);
-  --mypage-ticket-viewall-text: #9ca3af;
+  --mypage-ticket-viewall-text: var(--neutral-65);
   --mypage-info-card-bg: #ffffff;
   --mypage-info-card-border: transparent;
   --mypage-info-card-shadow: none;
   --mypage-info-header-bg-start: var(--brand-98);
   --mypage-info-header-bg-end: #ffffff;
-  --mypage-info-header-border: #f3f4f6;
+  --mypage-info-header-border: var(--neutral-96);
   --mypage-info-overline: var(--brand-33);
   --mypage-info-title: var(--brand-11);
-  --mypage-info-item-divider: #f3f4f6;
-  --mypage-info-item-label: #9ca3af;
+  --mypage-info-item-divider: var(--neutral-96);
+  --mypage-info-item-label: var(--neutral-65);
   --mypage-info-item-value: var(--brand-11);
   --mypage-info-icon-size: 36px;
   --mypage-info-icon-border: transparent;
-  --mypage-info-icon-bg: #f3f4f6;
-  --mypage-info-icon-bg-start: #f3f4f6;
-  --mypage-info-icon-bg-end: #f3f4f6;
-  --mypage-info-icon-symbol: #9ca3af;
+  --mypage-info-icon-bg: var(--neutral-96);
+  --mypage-info-icon-bg-start: var(--neutral-96);
+  --mypage-info-icon-bg-end: var(--neutral-96);
+  --mypage-info-icon-symbol: var(--neutral-65);
   --mypage-info-icon-shadow: none;
   --mypage-portal-card-border: color-mix(in srgb, var(--brand-79) 72%, transparent);
   --mypage-portal-card-bg-start: color-mix(in srgb, var(--brand-91) 82%, transparent);
@@ -582,18 +616,18 @@
   --mypage-portal-card-shadow: color-mix(in srgb, var(--brand-40) 34%, transparent);
   --mypage-portal-card-inner-border: rgba(255, 255, 255, 0.52);
   --mypage-portal-overline: var(--brand-main);
-  --mypage-portal-name: rgb(15 23 42);
+  --mypage-portal-name: var(--brand-11);
   --mypage-portal-name-size: 28px;
-  --mypage-portal-subtitle: rgb(79 98 132);
+  --mypage-portal-subtitle: var(--brand-41a);
   --mypage-portal-icon-border: var(--app-circle-border);
   --mypage-portal-icon-bg-start: var(--app-circle-bg-start);
   --mypage-portal-icon-bg-end: var(--app-circle-bg-end);
   --mypage-portal-icon-color: var(--app-circle-fg);
   --mypage-portal-icon-shadow: var(--app-circle-shadow);
-  --mypage-bg-start: rgb(245 249 255);
-  --mypage-bg-mid: rgb(233 240 255);
-  --mypage-bg-low: rgb(226 234 251);
-  --mypage-bg-end: rgb(238 243 252);
+  --mypage-bg-start: var(--brand-99);
+  --mypage-bg-mid: var(--brand-95a);
+  --mypage-bg-low: var(--brand-94);
+  --mypage-bg-end: var(--brand-97);
   --mypage-page-gradient:
     linear-gradient(
       180deg,
@@ -612,8 +646,8 @@
       180deg,
       var(--mypage-bg-start) 0%,
       var(--mypage-bg-mid) 50%,
-      rgb(230 238 252) 76%,
-      rgb(234 241 251) 88%,
+      var(--brand-95a) 76%,
+      var(--brand-96) 88%,
       var(--footer-bg) 100%
     );
   --mypage-glow-top: color-mix(in srgb, var(--brand-59a) 22%, transparent);
@@ -627,23 +661,23 @@
   --mypage-guest-icon-shadow: 0 8px 24px -4px color-mix(in srgb, var(--brand-33) 32%, transparent);
   --mypage-guest-overline: var(--brand-33);
   --mypage-guest-title: var(--brand-11);
-  --mypage-guest-description: #9ca3af;
+  --mypage-guest-description: var(--neutral-65);
   --mypage-guest-cta-bg-start: var(--brand-33);
   --mypage-guest-cta-bg-end: var(--brand-53);
   --mypage-guest-cta-shadow: 0 8px 24px -4px color-mix(in srgb, var(--brand-33) 35%, transparent);
   --mypage-info-card-border: transparent;
   --mypage-info-card-bg: #ffffff;
   --mypage-info-card-shadow: none;
-  --mypage-info-header-border: #f3f4f6;
+  --mypage-info-header-border: var(--neutral-96);
   --mypage-info-header-bg-start: var(--brand-98);
   --mypage-info-header-bg-end: #ffffff;
   --mypage-info-overline: var(--brand-33);
   --mypage-info-title: var(--brand-11);
-  --mypage-info-item-divider: #f3f4f6;
-  --mypage-info-item-label: #9ca3af;
+  --mypage-info-item-divider: var(--neutral-96);
+  --mypage-info-item-label: var(--neutral-65);
   --mypage-info-item-value: var(--brand-11);
   --mypage-logout-gap: 8px;
-  --mypage-logout-text: #9ca3af;
+  --mypage-logout-text: var(--neutral-65);
   --mypage-logout-text-hover: #ef4444;
   --mypage-logout-font-size: 14px;
   --mypage-logout-underline-thickness: 0px;
@@ -653,15 +687,15 @@
   --mypage-settings-card-bg: #ffffff;
   --mypage-settings-card-border: transparent;
   --mypage-settings-row-label: var(--brand-11);
-  --mypage-settings-row-divider: #f3f4f6;
-  --mypage-settings-row-arrow: #d1d5db;
-  --mypage-settings-icon-bg: #f3f4f6;
-  --mypage-settings-icon-color: #9ca3af;
+  --mypage-settings-row-divider: var(--neutral-96);
+  --mypage-settings-row-arrow: var(--neutral-84);
+  --mypage-settings-icon-bg: var(--neutral-96);
+  --mypage-settings-icon-color: var(--neutral-65);
   --mypage-faq-question: var(--brand-11);
   --mypage-faq-answer-bg: var(--brand-98);
-  --mypage-faq-answer: #9ca3af;
-  --mypage-faq-divider: #f3f4f6;
-  --mypage-faq-icon: #d1d5db;
+  --mypage-faq-answer: var(--neutral-65);
+  --mypage-faq-divider: var(--neutral-96);
+  --mypage-faq-icon: var(--neutral-84);
   --mypage-faq-icon-open: var(--brand-33);
   --mypage-cta-gradient: linear-gradient(135deg, var(--brand-33) 0%, var(--brand-53) 100%);
   --mypage-cta-shadow: 0 8px 24px -4px color-mix(in srgb, var(--brand-33) 35%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.15);
@@ -671,8 +705,8 @@
   --mypage-role-badge-border: color-mix(in srgb, var(--brand-33) 18%, transparent);
   --mypage-role-badge-text: var(--brand-33);
   --mypage-stats-bg: #f7f7f7;
-  --mypage-stats-border: #e5e7eb;
-  --mypage-stats-divider: #e5e7eb;
+  --mypage-stats-border: var(--neutral-91);
+  --mypage-stats-divider: var(--neutral-91);
   --mypage-logout-border: transparent;
 
   /* 2026 단국대 축제 포스터 팔레트 (落花流水 ;만개) */
@@ -685,22 +719,22 @@
   --ticket-badge-issued-text: #15803d;
   --ticket-badge-used-bg: #fee2e2;
   --ticket-badge-used-text: #b91c1c;
-  --ticket-badge-cancelled-bg: #f3f4f6;
-  --ticket-badge-cancelled-text: #6b7280;
+  --ticket-badge-cancelled-bg: var(--neutral-96);
+  --ticket-badge-cancelled-text: var(--neutral-46);
   --ticket-badge-unknown-bg: var(--brand-95c);
-  --ticket-badge-unknown-text: #6d28d9;
+  --ticket-badge-unknown-text: var(--brand-50);
   /* 공지사항 중요공지 강조 색상 */
   --notice-pin-red: #dc2626;
 
   /* Timetable route tokens */
-  --timetable-tab-inactive: rgb(143 155 180);
-  --timetable-empty-text: rgb(143 155 180);
+  --timetable-tab-inactive: var(--neutral-63);
+  --timetable-empty-text: var(--neutral-63);
   --timetable-card-bg: rgb(255 255 255);
   --timetable-card-border: var(--border-base);
   --timetable-line: color-mix(in srgb, var(--brand-48a) 55%, transparent);
   --timetable-info-bg: color-mix(in srgb, var(--brand-48a) 10%, transparent);
   --timetable-info-border: color-mix(in srgb, var(--brand-48a) 20%, transparent);
-  --timetable-info-text: rgb(42 79 184);
+  --timetable-info-text: var(--brand-44a);
   --timetable-notice-bg: rgb(247 235 226);
   --timetable-notice-border: rgb(247 235 226 / 45%);
   --timetable-overlay-bg: color-mix(in srgb, var(--brand-11) 80%, transparent);
@@ -719,11 +753,11 @@
   --timetable-v2-notice-shadow:
     0 2px 4px color-mix(in srgb, var(--brand-19) 4%, transparent),
     0 14px 36px -24px color-mix(in srgb, var(--brand-26) 28%, transparent);
-  --timetable-v2-badge-genre-fg: #5e6b8f;
+  --timetable-v2-badge-genre-fg: var(--neutral-46a);
   --timetable-v2-timeline-dash: color-mix(in srgb, var(--timetable-v2-accent) 52%, transparent);
   /* 타임라인 좌측 시간 칩 — DAY 탭 악센트와 동일 계열, 더 연한 면 */
   /* 좌측 시간 칩 — 밝은 스카이 블루 톤(악센트와 맞춤) */
-  --timetable-v2-time-pill-bg: color-mix(in srgb, var(--timetable-v2-accent) 18%, rgb(245 250 255));
+  --timetable-v2-time-pill-bg: color-mix(in srgb, var(--timetable-v2-accent) 18%, var(--brand-99));
   --timetable-v2-time-pill-fg: var(--timetable-info-text);
 }
 
@@ -733,15 +767,15 @@
   --ink-700: var(--brand-23);
   --ink-600: var(--brand-26);
   --ink-500: var(--brand-35);
-  --ink-400: #5e6b8f;
-  --ink-300: #8b94ae;
+  --ink-400: var(--neutral-46a);
+  --ink-300: var(--neutral-61b);
   --neutral-300: var(--brand-91a);
   --neutral-100: #f7f7f7;
   --paper-50: #fefaf7;
 
   --webapp-header-bar: var(--neutral-300);
   --webapp-bottom-bar: var(--neutral-300);
-  --webapp-footer-bg: #f6f7f9;
+  --webapp-footer-bg: var(--neutral-96);
   --webapp-main-bg: var(--paper-50);
   --webapp-text-main: var(--text-body-deep);
   --webapp-text-emphasis: var(--text-body-deep);
@@ -774,7 +808,7 @@
   --border-subtle: color-mix(in srgb, var(--brand-91a) 74%, transparent);
   --border-strong: color-mix(in srgb, var(--brand-91a) 98%, transparent);
   --border-emphasis: color-mix(in srgb, var(--brand-72) 62%, transparent);
-  --outline_variant: rgba(179, 191, 209, 0.34);
+  --outline_variant: color-mix(in srgb, var(--neutral-76) 34%, transparent);
   --border: var(--border-base);
   --shadow-color: color-mix(in srgb, var(--brand-26) 16%, transparent);
   --ring: color-mix(in srgb, var(--brand-35) 42%, transparent);
@@ -800,7 +834,7 @@
   --card-grad-white-border: var(--mypage-info-card-border);
   --card-grad-white-shadow: var(--mypage-info-card-shadow);
   --card-grad-tint-start: #eef5fff0;
-  --card-grad-tint-mid: var(--brand-95);
+  --card-grad-tint-mid: var(--brand-95a);
   --card-grad-tint-end: #ffffff;
   --card-grad-tint-bg:
     linear-gradient(150deg, var(--card-grad-tint-start) 0%, var(--card-grad-tint-mid) 56%, var(--card-grad-tint-end) 100%);
@@ -821,9 +855,9 @@
   --app-bottom-nav-surface: var(--surface_container_lowest);
   --app-nav-border: color-mix(in srgb, var(--brand-26) 10%, transparent);
   --app-nav-shadow: 0 -8px 24px color-mix(in srgb, var(--brand-26) 8%, transparent);
-  --app-nav-text: rgb(127 143 150);
-  --app-nav-text-active: rgb(143 169 190);
-  --app-nav-home-highlight: rgb(7 49 97);
+  --app-nav-text: var(--neutral-54);
+  --app-nav-text-active: var(--brand-65a);
+  --app-nav-home-highlight: var(--brand-20);
   --app-bottom-nav-height: 64px;
   --app-bottom-nav-icon-size: 22px;
   --app-bottom-nav-label-size: 10px;
@@ -878,10 +912,10 @@
   --status-warning-border: rgba(167, 127, 84, 0.36);
   --status-warning-text: #855626;
   --status-info-bg: var(--webapp-surface-text-bg);
-  --status-info-border: rgba(179, 191, 209, 0.52);
+  --status-info-border: color-mix(in srgb, var(--neutral-76) 52%, transparent);
   --status-info-text: var(--webapp-text-emphasis);
   --status-neutral-bg: color-mix(in srgb, var(--brand-91a) 42%, transparent);
-  --status-neutral-border: rgba(179, 191, 209, 0.36);
+  --status-neutral-border: color-mix(in srgb, var(--neutral-76) 36%, transparent);
   --status-neutral-text: var(--ink-400);
 
   --home-notice-bg-start: var(--neutral-100);
@@ -927,9 +961,9 @@
   --timetable-v2-text-secondary: var(--ink-400);
   --timetable-v2-text-tertiary: var(--ink-300);
   --timetable-v2-badge-genre-bg: color-mix(in srgb, var(--timetable-v2-accent) 11%, white);
-  --timetable-v2-badge-genre-fg: #5e6b8f;
+  --timetable-v2-badge-genre-fg: var(--neutral-46a);
   --timetable-v2-badge-meta-bg: rgba(255, 255, 255, 0.72);
-  --timetable-v2-badge-meta-fg: #5e6b8f;
+  --timetable-v2-badge-meta-fg: var(--neutral-46a);
   --timetable-v2-badge-stage-bg: color-mix(in srgb, var(--ink-500) 7%, white);
   --timetable-v2-avatar-ring: rgba(255, 255, 255, 0.96);
   --timetable-v2-avatar-shadow:
@@ -962,13 +996,13 @@
 }
 
 [data-color-scheme="electric-curator"] {
-  --surface: rgb(248 250 251);
-  --surface_container: rgb(232 238 241);
-  --surface_container_low: rgb(240 244 246);
+  --surface: var(--brand-98);
+  --surface_container: var(--neutral-93);
+  --surface_container_low: var(--brand-95);
   --surface_container_lowest: #ffffff;
-  --surface_container_high: rgb(227 235 238);
-  --primary: rgb(143 169 190);
-  --primary_container: rgb(203 230 252);
+  --surface_container_high: var(--neutral-93);
+  --primary: var(--brand-65a);
+  --primary_container: var(--brand-89);
   --on-primary: #ffffff;
   --secondary: rgb(245 176 112);
   --secondary_container: rgb(252 214 175);
@@ -979,7 +1013,7 @@
   --outline_variant: rgba(172, 179, 182, 0.15);
   --ec-glass-bg: color-mix(in srgb, var(--brand-98) 70%, transparent);
   --ec-glass-blur: 28px;
-  --ec-ambient-shadow: 0 20px 50px rgba(44, 52, 54, 0.06);
+  --ec-ambient-shadow: 0 20px 50px color-mix(in srgb, var(--neutral-19) 6%, transparent);
   --font-display: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-body: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --type-display-lg-size: 3.5rem;
@@ -996,7 +1030,7 @@
 
   --bg-base: var(--surface);
   --bg-page-soft: var(--surface);
-  --text: rgb(44 52 54);
+  --text: var(--neutral-19);
   --text-muted: rgb(101 114 118);
   --text-on-accent: var(--on-primary);
   --accent: var(--primary);
@@ -1013,7 +1047,7 @@
   --border-strong: color-mix(in srgb, var(--primary) 40%, transparent);
   --border-emphasis: color-mix(in srgb, var(--primary) 62%, transparent);
   --border: var(--border-base);
-  --shadow-color: rgba(44, 52, 54, 0.12);
+  --shadow-color: color-mix(in srgb, var(--neutral-19) 12%, transparent);
   --ring: color-mix(in srgb, var(--primary) 40%, transparent);
 
   --background: var(--bg-base);
@@ -1038,27 +1072,27 @@
     linear-gradient(
       180deg,
       color-mix(in srgb, var(--brand-98) 88%, transparent) 0%,
-      color-mix(in srgb, var(--brand-95a) 78%, transparent) 100%
+      color-mix(in srgb, var(--brand-95) 78%, transparent) 100%
     );
   --app-header-border: transparent;
   --app-overscroll-bg: var(--surface);
   --app-overscroll-bg-gradient:
     radial-gradient(120% 72% at 16% -12%, color-mix(in srgb, var(--primary_container) 38%, transparent) 0%, transparent 68%),
     radial-gradient(90% 68% at 84% 2%, color-mix(in srgb, var(--tertiary_container) 26%, transparent) 0%, transparent 64%),
-    linear-gradient(180deg, rgb(248 250 251) 0%, rgb(247 249 250) 100%);
+    linear-gradient(180deg, var(--brand-98) 0%, var(--neutral-97) 100%);
   --app-nav-bg: var(--ec-glass-bg);
   --app-bottom-nav-surface: var(--surface_container_lowest);
   --app-nav-bg-gradient:
     linear-gradient(
       180deg,
       color-mix(in srgb, var(--brand-98) 84%, transparent) 0%,
-      color-mix(in srgb, var(--brand-95a) 82%, transparent) 100%
+      color-mix(in srgb, var(--brand-95) 82%, transparent) 100%
     );
   --app-nav-border: transparent;
   --app-nav-shadow: var(--ec-ambient-shadow);
-  --app-nav-text: rgb(127 143 150);
+  --app-nav-text: var(--neutral-54);
   --app-nav-text-active: var(--primary);
-  --app-nav-home-highlight: rgb(7 49 97);
+  --app-nav-home-highlight: var(--brand-20);
   --app-bottom-nav-height: 64px;
   --app-bottom-nav-icon-size: 22px;
   --app-bottom-nav-label-size: 10px;
@@ -1070,7 +1104,7 @@
       color-mix(in srgb, var(--surface_container_low) 90%, white) 0%,
       var(--surface_container_low) 100%
     );
-  --footer-text-primary: rgb(60 74 78);
+  --footer-text-primary: var(--neutral-27a);
   --footer-text-secondary: rgb(117 130 134);
   --footer-divider: transparent;
   --footer-divider-glow: transparent;
@@ -1086,8 +1120,8 @@
   --app-circle-bg-end: color-mix(in srgb, var(--primary_container) 42%, white);
   --text-emphasis-vivid: var(--primary);
   --text-emphasis-vivid-strong: color-mix(in srgb, var(--primary) 78%, white);
-  --text-body-deep: rgb(44 52 54);
-  --text-bold-emphasis: rgb(53 67 71);
+  --text-body-deep: var(--neutral-19);
+  --text-bold-emphasis: var(--neutral-24);
   --app-circle-fg: var(--primary);
   --app-circle-shadow: var(--ec-ambient-shadow);
   --ticketing-action-bg-start: var(--primary);
@@ -1104,7 +1138,7 @@
   --app-header-ticket-btn-icon: var(--primary);
   --app-header-ticket-btn-shadow: var(--ec-ambient-shadow);
   --app-header-ticket-btn-shadow-hover:
-    0 24px 42px -30px rgba(44, 52, 54, 0.18);
+    0 24px 42px -30px color-mix(in srgb, var(--neutral-19) 18%, transparent);
 
   --status-info: var(--primary);
   --status-info-bg: color-mix(in srgb, var(--tertiary_container) 46%, transparent);
@@ -1122,12 +1156,12 @@
   --home-page-gradient:
     radial-gradient(126% 74% at 88% 4%, color-mix(in srgb, var(--primary_container) 44%, transparent) 0%, transparent 60%),
     radial-gradient(88% 62% at 12% 0%, color-mix(in srgb, var(--tertiary_container) 28%, transparent) 0%, transparent 60%),
-    linear-gradient(180deg, rgb(248 250 251) 0%, rgb(247 249 250) 100%);
+    linear-gradient(180deg, var(--brand-98) 0%, var(--neutral-97) 100%);
   --home-notice-bg-start: color-mix(in srgb, var(--brand-98) 80%, transparent);
-  --home-notice-bg-end: rgba(232, 238, 241, 0.7);
+  --home-notice-bg-end: color-mix(in srgb, var(--neutral-93) 70%, transparent);
   --home-notice-border: transparent;
   --home-notice-shadow: var(--ec-ambient-shadow);
-  --home-notice-depth-shadow: rgba(44, 52, 54, 0.08);
+  --home-notice-depth-shadow: color-mix(in srgb, var(--neutral-19) 8%, transparent);
   --home-notice-icon-border: transparent;
   --home-notice-icon-bg-start: color-mix(in srgb, var(--tertiary_container) 26%, white);
   --home-notice-icon-bg-end: color-mix(in srgb, var(--surface_container_lowest) 86%, transparent);
@@ -1150,7 +1184,7 @@
     linear-gradient(145deg, color-mix(in srgb, var(--surface_container_low) 86%, white) 0%, var(--surface_container_lowest) 100%);
   --home-poster-placeholder-shadow: var(--ec-ambient-shadow);
   --home-elevated-card-shadow:
-    0 20px 50px rgba(44, 52, 54, 0.06);
+    0 20px 50px color-mix(in srgb, var(--neutral-19) 6%, transparent);
   --home-poster-card-shadow: var(--home-elevated-card-shadow);
   --home-lineup-card-shadow: var(--home-elevated-card-shadow);
   --home-current-performance-card-shadow: var(--home-elevated-card-shadow);
