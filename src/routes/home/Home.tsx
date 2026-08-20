@@ -17,7 +17,7 @@ import {
 import { appQueryKeys, useAppQuery } from "@/lib/query"
 
 const dummyPosters: Poster[] = [
-  { id: "p1", imageUrl: "/posters/festival-poster.png", alt: "2026 단국축제 포스터" },
+  { id: "p1", imageUrl: "/posters/legend-poster-vertical.jpeg", alt: "2026 단국대학교 가을축제 LEGEND 포스터" },
 ]
 const HOME_SNAP_MODE_CLASS = "home-snap-mode"
 

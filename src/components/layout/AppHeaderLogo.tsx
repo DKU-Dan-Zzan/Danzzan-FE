@@ -9,8 +9,8 @@ const BASE_CLASS_NAME =
 export function AppHeaderLogo({ className }: AppHeaderLogoProps) {
   return (
     <img
-      src="/DAN-ZZAN.png"
-      alt="DAN-ZZAN"
+      src="/legend-logo.png"
+      alt="LEGEND"
       className={className ? `${BASE_CLASS_NAME} ${className}` : BASE_CLASS_NAME}
       draggable={false}
     />

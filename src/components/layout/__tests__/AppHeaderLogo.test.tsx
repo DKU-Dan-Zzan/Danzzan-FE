@@ -7,8 +7,8 @@ describe("AppHeaderLogo", () => {
   it("기본 로고 이미지를 좌측 정렬된 헤더 위치로 렌더링한다", () => {
     const markup = renderToStaticMarkup(<AppHeaderLogo />);
 
-    expect(markup).toContain('src="/DAN-ZZAN.png"');
-    expect(markup).toContain('alt="DAN-ZZAN"');
+    expect(markup).toContain('src="/legend-logo.png"');
+    expect(markup).toContain('alt="LEGEND"');
     expect(markup).toContain("left-4");
     expect(markup).toContain("object-contain");
     expect(markup).toContain("object-left");
