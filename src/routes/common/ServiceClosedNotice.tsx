@@ -13,11 +13,14 @@ type ServiceClosedNoticeProps = {
 /**
  * 봄 축제의 남색 팔레트가 아니라 가을 축제 "LEGEND" 아이덴티티를 따른다.
  * 이 화면들은 "서비스가 사라진 자리"라서, 앱의 나머지와 다르게 보이는 편이
- * 오히려 "이번 축제는 다르다"를 전달한다. 색은 메인 포스터에서 뽑았다.
+ * 오히려 "이번 축제는 다르다"를 전달한다.
+ *
+ * 색은 메인 포스터에서 뽑아 src/index.css 에 전역 토큰으로 등록했다.
  */
-const LEGEND_INK = "#0b0607"
-const LEGEND_EMBER = "#e8551f"
-const LEGEND_CREAM = "#f5e3a3"
+const LEGEND_INK = "var(--legend-ink)"
+const LEGEND_EMBER = "var(--legend-ember)"
+const LEGEND_EMBER_DEEP = "var(--legend-ember-deep)"
+const LEGEND_CREAM = "var(--legend-cream)"
 
 const ServiceClosedNotice = ({
   titleKey,
@@ -41,9 +44,9 @@ const ServiceClosedNotice = ({
         style={{
           backgroundImage: "url(/legend-poster.jpg)",
           maskImage:
-            "radial-gradient(100% 58% at 50% 27%, #000 0%, rgba(0,0,0,0.5) 55%, transparent 84%)",
+            "radial-gradient(100% 58% at 50% 27%, black 0%, rgba(0,0,0,0.5) 55%, transparent 84%)",
           WebkitMaskImage:
-            "radial-gradient(100% 58% at 50% 27%, #000 0%, rgba(0,0,0,0.5) 55%, transparent 84%)",
+            "radial-gradient(100% 58% at 50% 27%, black 0%, rgba(0,0,0,0.5) 55%, transparent 84%)",
         }}
       />
 
@@ -111,7 +114,7 @@ const ServiceClosedNotice = ({
           to={actionTo}
           className="mt-9 inline-flex h-12 w-full max-w-[15rem] items-center justify-center rounded-full text-[0.92rem] font-semibold tracking-[0.01em] text-white transition-[transform,filter] duration-150 ease-out hover:brightness-[1.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:translate-y-px motion-reduce:transition-none [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_400ms_both]"
           style={{
-            background: `linear-gradient(135deg, ${LEGEND_EMBER} 0%, #b3241a 100%)`,
+            background: `linear-gradient(135deg, ${LEGEND_EMBER} 0%, ${LEGEND_EMBER_DEEP} 100%)`,
             boxShadow: "0 16px 38px -18px rgba(232,85,31,0.9)",
             ["--tw-ring-color" as string]: "rgba(232,85,31,0.55)",
             ["--tw-ring-offset-color" as string]: LEGEND_INK,
