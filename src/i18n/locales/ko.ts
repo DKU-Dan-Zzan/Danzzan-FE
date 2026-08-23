@@ -121,4 +121,14 @@ export const ko = {
   "boothmap.zoneLabel.foodTruck": "푸드트럭 구역",
   "boothmap.kakaoMapLoadError": "카카오맵을 불러오지 못했어요.",
   "boothmap.mapLoading": "지도를 불러오는 중...",
+
+  "common.headerMyTicketAria": "내 티켓 보기",
+  "common.headerMyTicketSignInAria": "로그인 후 내 티켓 보기",
+  "common.headerMyInfoAria": "내정보",
+  "common.footerOrganizer": "주최 단국대학교 죽전캠퍼스 제58대 LOU:D 총학생회",
+  "common.footerSocialLinksLabel": "LOU:D 총학생회 Instagram · YouTube",
+  "common.footerPrivacyPolicy": "개인정보처리방침",
+  "common.footerTermsOfService": "이용약관",
+  "common.adBannerAlt": "광고 배너",
+  "common.adBannerSlideAria": "광고 배너 슬라이드",
 } as const

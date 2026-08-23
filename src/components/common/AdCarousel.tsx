@@ -2,6 +2,7 @@
 // 5초마다 랜덤 순서로 자동 전환되며, hover(PC)/touch(모바일) 시 일시정지됩니다.
 import { useState, useEffect, useRef, useCallback } from "react"
 import { cn } from "@/components/common/ui/utils"
+import { useT } from "@/i18n"
 
 export interface AdSlide {
   imageUrl: string
@@ -61,6 +62,7 @@ export function AdCarousel({
   containerClassName = "",
   imageClassName = "block h-full w-full object-cover",
 }: AdCarouselProps) {
+  const t = useT()
   const [shuffled, setShuffled] = useState<AdSlide[]>(() =>
     slides.length ? shuffleArray(slides) : [],
   )
@@ -152,7 +154,7 @@ export function AdCarousel({
     const img = (
       <img
         src={url}
-        alt={slide.alt ?? "광고 배너"}
+        alt={slide.alt ?? t("common.adBannerAlt")}
         className={imageClassName}
         loading="eager"
       />
@@ -185,7 +187,7 @@ export function AdCarousel({
           setIsHoverPaused(false)
         }
       }}
-      aria-label="광고 배너 슬라이드"
+      aria-label={t("common.adBannerSlideAria")}
     >
       <div
         className="flex h-full w-full"
@@ -205,7 +207,7 @@ export function AdCarousel({
           const img = (
             <img
               src={url}
-              alt={slide.alt ?? "광고 배너"}
+              alt={slide.alt ?? t("common.adBannerAlt")}
               className={imageClassName}
               loading={isCurrent ? "eager" : "lazy"}
             />

@@ -124,4 +124,14 @@ export const en: Record<keyof typeof ko, string> = {
   "boothmap.zoneLabel.foodTruck": "Food Truck Zone",
   "boothmap.kakaoMapLoadError": "Couldn't load Kakao Map.",
   "boothmap.mapLoading": "Loading map...",
+
+  "common.headerMyTicketAria": "View my ticket",
+  "common.headerMyTicketSignInAria": "Sign in to view my ticket",
+  "common.headerMyInfoAria": "My Info",
+  "common.footerOrganizer": "Organized by the 58th LOU:D Student Council, Dankook University Jukjeon Campus",
+  "common.footerSocialLinksLabel": "LOU:D Student Council Instagram · YouTube",
+  "common.footerPrivacyPolicy": "Privacy Policy",
+  "common.footerTermsOfService": "Terms of Service",
+  "common.adBannerAlt": "Ad banner",
+  "common.adBannerSlideAria": "Ad banner slides",
 }
