@@ -5,6 +5,7 @@ import { useSyncExternalStore } from "react"
 import { authStore } from "@/store/common/authStore"
 import { getMyTicketNavigationTarget } from "@/lib/common/my-ticket-navigation"
 import { AppTopBar } from "@/components/layout/AppTopBar"
+import LanguageToggle from "@/components/layout/LanguageToggle"
 import { cn } from "@/components/common/ui/utils"
 
 const HEADER_ICON_BUTTON_CLASS =
@@ -59,6 +60,7 @@ const Header = () => {
       <AppTopBar headerClassName={headerClassName}>
         {!isMyPage && (
           <>
+            <LanguageToggle />
             <button
               onClick={handleTicketClick}
               aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
