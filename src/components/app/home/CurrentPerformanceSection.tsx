@@ -7,6 +7,7 @@ import {
   formatDateToYYYYMMDD,
   getCurrentPerformance,
 } from "@/utils/app/timetable";
+import { useLanguage } from "@/i18n";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
 import { cn } from "@/components/common/ui/utils";
 
@@ -16,12 +17,13 @@ const CARD_ASPECT_RATIO = `${CARD_WIDTH} / ${CARD_HEIGHT}`;
 
 export default function CurrentPerformanceSection() {
   const navigate = useNavigate();
+  const { language } = useLanguage();
 
   const [now, setNow] = useState(new Date());
   const [today, setToday] = useState(formatDateToYYYYMMDD(new Date()));
 
   const performancesQuery = useAppQuery({
-    queryKey: appQueryKeys.timetablePerformances(today),
+    queryKey: appQueryKeys.timetablePerformances(language, today),
     queryFn: ({ signal }) => getPerformances(today, { signal }),
     staleTime: 60_000,
   });

@@ -8,6 +8,7 @@ import AdBanner from "@/components/app/home/AdBanner";
 import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialog";
 import { cn } from "@/components/common/ui/utils";
 import { useDebouncedValue } from "@/hooks/app/useDebouncedValue";
+import { useLanguage } from "@/i18n";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
 
 type CategoryKey = "ALL" | "GENERAL" | "EVENT";
@@ -37,6 +38,7 @@ const NOTICE_LIST_CARD_DEFAULT_CLASS =
   "border border-[var(--border-subtle)] bg-[var(--surface)] shadow-[0_4px_12px_var(--shadow-color)]";
 
 function Notice() {
+  const { language } = useLanguage();
   const [keyword, setKeyword] = useState("");
   const category: CategoryKey = "ALL";
   const [page, setPage] = useState(0);
@@ -50,7 +52,7 @@ function Notice() {
   const debouncedKeyword = useDebouncedValue(keyword, 300);
 
   const noticeListQuery = useAppQuery({
-    queryKey: appQueryKeys.noticeList({
+    queryKey: appQueryKeys.noticeList(language, {
       keyword: debouncedKeyword.trim(),
       category,
       page,
@@ -71,7 +73,7 @@ function Notice() {
   });
 
   const detailQuery = useAppQuery({
-    queryKey: appQueryKeys.noticeDetail(selectedNoticeId ?? -1),
+    queryKey: appQueryKeys.noticeDetail(language, selectedNoticeId ?? -1),
     enabled: selectedNoticeId !== null,
     queryFn: ({ signal }) => {
       if (selectedNoticeId === null) {

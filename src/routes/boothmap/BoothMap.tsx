@@ -28,6 +28,7 @@ import {
   type CollegeDto,
   type PubSummaryResponse,
 } from "@/api/app/boothmap/boothmapApi";
+import { useLanguage } from "@/i18n";
 import { appQueryKeys, queryClient, useAppQuery } from "@/lib/query";
 import {
   getShouldShowPubList,
@@ -130,6 +131,7 @@ function shouldOpenListSheetAtHalf(filter: PrimaryFilter) {
 }
 
 export default function BoothMap() {
+  const { language } = useLanguage();
   const [primaryFilter, setPrimaryFilter] = useState<PrimaryFilter>("ALL");
   const [selectedMapItem, setSelectedMapItem] = useState<SelectedMapItem>(null);
   const [selectedDetailItem, setSelectedDetailItem] = useState<SelectedDetailItem>(null);
@@ -170,7 +172,7 @@ export default function BoothMap() {
   }, []);
 
   const mapDataQuery = useAppQuery({
-    queryKey: appQueryKeys.boothMapData(selectedDate),
+    queryKey: appQueryKeys.boothMapData(language, selectedDate),
     queryFn: async ({ signal }) => {
       const [boothMapData, pubsData] = await Promise.all([
         getBoothMap(selectedDate, { signal }),
@@ -278,7 +280,7 @@ export default function BoothMap() {
       foodTruckBoothsToCheck.map(async (booth) => {
         try {
           const summary = await queryClient.fetchQuery({
-            queryKey: appQueryKeys.boothMapBoothDetail(booth.id, selectedDate),
+            queryKey: appQueryKeys.boothMapBoothDetail(language, booth.id, selectedDate),
             queryFn: () => getBoothSummary(booth.id, selectedDate),
             staleTime: 5 * 60_000,
           });
@@ -311,7 +313,7 @@ export default function BoothMap() {
     return () => {
       cancelled = true;
     };
-  }, [selectedDate, visibleBooths]);
+  }, [language, selectedDate, visibleBooths]);
 
   const resolveBoothSelection = useCallback(async (
     id: number,
@@ -329,7 +331,7 @@ export default function BoothMap() {
 
     try {
       const summary = await queryClient.fetchQuery({
-        queryKey: appQueryKeys.boothMapBoothDetail(id, selectedDate),
+        queryKey: appQueryKeys.boothMapBoothDetail(language, id, selectedDate),
         queryFn: () => getBoothSummary(id, selectedDate),
         staleTime: 5 * 60_000,
       });
@@ -357,7 +359,7 @@ export default function BoothMap() {
     setSelectedDetailItem(null);
     setSheetMode("LIST");
     setSheetSnap(options.fallbackSnap);
-  }, [selectedDate]);
+  }, [language, selectedDate]);
 
   const onClickMarkerBooth = useCallback((id: number) => {
     const booth = booths.find((item) => item.id === id);

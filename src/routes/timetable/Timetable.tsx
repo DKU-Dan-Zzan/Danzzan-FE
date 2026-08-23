@@ -13,6 +13,7 @@ import DayTabs from "@/components/app/timetable/DayTabs"
 import Timeline from "@/components/app/timetable/Timeline"
 import { cn } from "@/components/common/ui/utils"
 import { FESTIVAL_DAYS } from "@/config/festivalDays"
+import { useLanguage } from "@/i18n"
 import { appQueryKeys, useAppQuery } from "@/lib/query"
 import type { Performance } from "@/types/app/timetable/timetable.types"
 
@@ -69,6 +70,7 @@ export default function Timetable() {
   const SWIPE_MIN_DISTANCE = 48
   const HORIZONTAL_SWIPE_RATIO = 1.2
 
+  const { language } = useLanguage()
   const [searchParams] = useSearchParams()
   const [activeIdx, setActiveIdx] = useState(() => {
     const queryDate = searchParams.get("date")
@@ -92,20 +94,20 @@ export default function Timetable() {
   const isTodayTab = activeDate === todayISODateLocal()
 
   const performancesQuery = useAppQuery({
-    queryKey: appQueryKeys.timetablePerformances(activeDate),
+    queryKey: appQueryKeys.timetablePerformances(language, activeDate),
     queryFn: ({ signal }) => getPerformances(activeDate, { signal }),
     staleTime: 60_000,
   })
 
   const contentImagesQuery = useAppQuery({
-    queryKey: appQueryKeys.timetableContentImages(),
+    queryKey: appQueryKeys.timetableContentImages(language),
     enabled: true,
     queryFn: ({ signal }) => getContentImages({ signal }),
     staleTime: 10 * 60_000,
   })
 
   const displayConfigQuery = useAppQuery({
-    queryKey: appQueryKeys.timetableDisplayConfig(),
+    queryKey: appQueryKeys.timetableDisplayConfig(language),
     enabled: true,
     queryFn: ({ signal }) => getTimetableDisplayConfig({ signal }),
     staleTime: 60_000,

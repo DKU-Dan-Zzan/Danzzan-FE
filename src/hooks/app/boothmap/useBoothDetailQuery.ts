@@ -4,11 +4,13 @@ import {
   getBoothSummary,
   getPubDetail,
 } from "@/api/app/boothmap/boothmapApi";
+import { useLanguage } from "@/i18n";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
 
 export const useBoothDetailQuery = (boothId: number | null, date: string | null) => {
+  const { language } = useLanguage();
   return useAppQuery({
-    queryKey: appQueryKeys.boothMapBoothDetail(boothId ?? -1, date ?? ""),
+    queryKey: appQueryKeys.boothMapBoothDetail(language, boothId ?? -1, date ?? ""),
     enabled: boothId !== null && date !== null,
     queryFn: ({ signal }) => {
       if (boothId === null || date === null) {
@@ -21,8 +23,9 @@ export const useBoothDetailQuery = (boothId: number | null, date: string | null)
 };
 
 export const usePubDetailQuery = (pubId: number | null, date: string | null) => {
+  const { language } = useLanguage();
   return useAppQuery({
-    queryKey: appQueryKeys.boothMapPubDetail(pubId ?? -1, date ?? ""),
+    queryKey: appQueryKeys.boothMapPubDetail(language, pubId ?? -1, date ?? ""),
     enabled: pubId !== null && date !== null,
     queryFn: ({ signal }) => {
       if (pubId === null || date === null) {
