@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/common/ui/dialog"
+import { useT } from "@/i18n"
 
 type ContentImageSectionProps = {
   images: ContentImageDto[]
@@ -27,10 +28,12 @@ export default function ContentImageSection({
   onSelectImage,
   onCloseImage,
 }: ContentImageSectionProps) {
+  const t = useT()
+
   if (isLoading) {
     return (
       <div className="py-12 text-center text-[var(--timetable-empty-text)]">
-        콘텐츠 이미지를 불러오는 중입니다...
+        {t("timetable.loadingContentImages")}
       </div>
     )
   }
@@ -45,7 +48,7 @@ export default function ContentImageSection({
             onClick={onRetry}
             className="mt-2 rounded-md border border-[var(--border-subtle)] bg-[var(--surface)] px-2 py-1 text-xs font-semibold text-[var(--text)]"
           >
-            다시 시도
+            {t("common.retry")}
           </button>
         )}
       </div>
@@ -55,7 +58,7 @@ export default function ContentImageSection({
   if (images.length === 0) {
     return (
       <div className="py-12 text-center text-[var(--timetable-empty-text)]">
-        등록된 콘텐츠 이미지가 없습니다.
+        {t("timetable.emptyContentImages")}
       </div>
     )
   }
@@ -106,11 +109,11 @@ export default function ContentImageSection({
               </div>
             </div>
             <DialogClose
-              aria-label="닫기"
+              aria-label={t("common.close")}
               className="absolute right-4 top-[max(env(safe-area-inset-top),1rem)] inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white shadow-lg backdrop-blur-sm transition hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white/70 sm:top-4"
             >
               <X className="h-6 w-6" />
-              <span className="sr-only">닫기</span>
+              <span className="sr-only">{t("common.close")}</span>
             </DialogClose>
           </DialogContent>
         </Dialog>

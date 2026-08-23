@@ -71,4 +71,15 @@ export const en: Record<keyof typeof ko, string> = {
   "notice.loadingDetail": "Loading notice details...",
   "notice.imageDotAria": "View notice image {{index}}",
   "notice.missingDetailTarget": "No notice was selected to view.",
+
+  "timetable.pageTitle": "Timetable",
+  "timetable.scheduleDisclaimer": "* Schedule may change based on on-site conditions",
+  "timetable.loadingPerformances": "Loading performance info...",
+  "timetable.emptyState": "No performances scheduled.",
+  "timetable.loadingContentImages": "Loading content images...",
+  "timetable.emptyContentImages": "No content images available.",
+  "timetable.timeRangeA11y": "from {{start}} to {{end}}",
+  "timetable.nowPlayingAria": "Now playing, {{range}}",
+  "timetable.performanceTimeAria": "Performance time {{range}}",
+  "timetable.nowBadgeAria": "Now playing",
 }

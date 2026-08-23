@@ -13,7 +13,7 @@ import DayTabs from "@/components/app/timetable/DayTabs"
 import Timeline from "@/components/app/timetable/Timeline"
 import { cn } from "@/components/common/ui/utils"
 import { FESTIVAL_DAYS } from "@/config/festivalDays"
-import { useLanguage } from "@/i18n"
+import { useLanguage, useT } from "@/i18n"
 import { appQueryKeys, useAppQuery } from "@/lib/query"
 import type { Performance } from "@/types/app/timetable/timetable.types"
 
@@ -70,6 +70,7 @@ export default function Timetable() {
   const SWIPE_MIN_DISTANCE = 48
   const HORIZONTAL_SWIPE_RATIO = 1.2
 
+  const t = useT()
   const { language } = useLanguage()
   const [searchParams] = useSearchParams()
   const [activeIdx, setActiveIdx] = useState(() => {
@@ -240,7 +241,7 @@ export default function Timetable() {
 
         {/* 타이틀 - 스크롤 시 사라짐 */}
         <div className="bg-white pb-1 pl-[28px] pr-4 pt-3">
-          <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-body-deep)]">타임테이블</h1>
+          <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-body-deep)]">{t("timetable.pageTitle")}</h1>
         </div>
 
         {/* DAY 탭만 sticky - 글로벌 헤더 바로 아래 고정 */}
@@ -256,7 +257,7 @@ export default function Timetable() {
         <div ref={contentStartRef} className="relative mx-3 mt-1 overflow-hidden rounded-2xl bg-white">
           <div className="px-4 pt-3">
             <p className="text-center text-[11px] font-medium leading-relaxed text-neutral-400">
-              * 일정은 현장 상황에 따라 변경될 수 있습니다
+              {t("timetable.scheduleDisclaimer")}
             </p>
           </div>
 
@@ -277,7 +278,7 @@ export default function Timetable() {
             {SHOW_CONTENT_IMAGES && isDay1 && <div className="h-4" />}
             {isLoading ? (
               <div className="py-12 text-center text-[var(--timetable-empty-text)]">
-                공연 정보를 불러오는 중입니다...
+                {t("timetable.loadingPerformances")}
               </div>
             ) : loadError ? (
               <div className="py-12 text-center text-[var(--timetable-empty-text)]">
@@ -287,12 +288,12 @@ export default function Timetable() {
                   onClick={() => void performancesQuery.refetch()}
                   className="mt-2 rounded-md border border-[var(--border-subtle)] bg-[var(--surface)] px-2 py-1 text-xs font-semibold text-[var(--text)]"
                 >
-                  다시 시도
+                  {t("common.retry")}
                 </button>
               </div>
             ) : items.length === 0 ? (
               <div className="py-12 text-center text-[var(--timetable-empty-text)]">
-                등록된 공연이 없습니다.
+                {t("timetable.emptyState")}
               </div>
             ) : (
               <Timeline

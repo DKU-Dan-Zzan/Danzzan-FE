@@ -68,4 +68,15 @@ export const ko = {
   "notice.loadingDetail": "공지 상세를 불러오는 중입니다...",
   "notice.imageDotAria": "공지 이미지 {{index}}번 보기",
   "notice.missingDetailTarget": "공지 상세 대상이 없습니다.",
+
+  "timetable.pageTitle": "타임테이블",
+  "timetable.scheduleDisclaimer": "* 일정은 현장 상황에 따라 변경될 수 있습니다",
+  "timetable.loadingPerformances": "공연 정보를 불러오는 중입니다...",
+  "timetable.emptyState": "등록된 공연이 없습니다.",
+  "timetable.loadingContentImages": "콘텐츠 이미지를 불러오는 중입니다...",
+  "timetable.emptyContentImages": "등록된 콘텐츠 이미지가 없습니다.",
+  "timetable.timeRangeA11y": "{{start}}부터 {{end}}까지",
+  "timetable.nowPlayingAria": "지금 진행 중인 공연, {{range}}",
+  "timetable.performanceTimeAria": "공연 시간 {{range}}",
+  "timetable.nowBadgeAria": "지금 진행 중",
 } as const
