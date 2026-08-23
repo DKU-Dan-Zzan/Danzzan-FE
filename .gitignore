@@ -40,3 +40,4 @@ dist-ssr
 coverage
 *.tsbuildinfo
 .ai/
+.superpowers/
