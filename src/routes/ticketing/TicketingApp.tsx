@@ -137,7 +137,7 @@ export default function TicketingApp() {
               titleKey="closed.ticketing.title"
               descriptionKey="closed.ticketing.description"
               actionKey="closed.ticketing.action"
-              actionTo="/timetable"
+              actionTo="/"
             />
           } />
 
@@ -182,7 +182,7 @@ export default function TicketingApp() {
                   titleKey="closed.ticketing.title"
                   descriptionKey="closed.ticketing.description"
                   actionKey="closed.ticketing.action"
-                  actionTo="/timetable"
+                  actionTo="/"
                 />
               }
             />
@@ -193,7 +193,7 @@ export default function TicketingApp() {
                   titleKey="closed.ticketing.title"
                   descriptionKey="closed.ticketing.description"
                   actionKey="closed.ticketing.action"
-                  actionTo="/timetable"
+                  actionTo="/"
                 />
               }
             />
@@ -204,7 +204,7 @@ export default function TicketingApp() {
                   titleKey="closed.ticketing.title"
                   descriptionKey="closed.ticketing.description"
                   actionKey="closed.ticketing.action"
-                  actionTo="/timetable"
+                  actionTo="/"
                 />
               }
             />
@@ -218,7 +218,7 @@ export default function TicketingApp() {
                 titleKey="closed.ticketing.title"
                 descriptionKey="closed.ticketing.description"
                 actionKey="closed.ticketing.action"
-                actionTo="/timetable"
+                actionTo="/"
               />
             }
           />
@@ -229,7 +229,7 @@ export default function TicketingApp() {
                 titleKey="closed.ticketing.title"
                 descriptionKey="closed.ticketing.description"
                 actionKey="closed.ticketing.action"
-                actionTo="/timetable"
+                actionTo="/"
               />
             }
           />
@@ -242,7 +242,7 @@ export default function TicketingApp() {
                     titleKey="closed.ticketing.title"
                     descriptionKey="closed.ticketing.description"
                     actionKey="closed.ticketing.action"
-                    actionTo="/timetable"
+                    actionTo="/"
                   />
                 }
               />

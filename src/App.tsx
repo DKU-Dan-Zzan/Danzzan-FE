@@ -240,7 +240,7 @@ function App() {
             titleKey="closed.ticketing.title"
             descriptionKey="closed.ticketing.description"
             actionKey="closed.ticketing.action"
-            actionTo="/timetable"
+            actionTo="/"
           />
         }
       />
@@ -251,7 +251,7 @@ function App() {
             titleKey="closed.ticketing.title"
             descriptionKey="closed.ticketing.description"
             actionKey="closed.ticketing.action"
-            actionTo="/timetable"
+            actionTo="/"
           />
         }
       />

@@ -27,7 +27,7 @@ describe("ServiceClosedNotice", () => {
     const markup = renderNotice()
 
     expect(markup).toContain("티켓 없이 들어오세요")
-    expect(markup).toContain("타임테이블 보기")
+    expect(markup).toContain("홈으로")
   })
 
   it("영어일 때 영문 문구를 렌더링한다", () => {
@@ -36,7 +36,7 @@ describe("ServiceClosedNotice", () => {
     const markup = renderNotice()
 
     expect(markup).toContain("No ticket needed")
-    expect(markup).toContain("View timetable")
+    expect(markup).toContain("Go home")
   })
 
   it("액션 버튼이 지정한 경로를 가리킨다", () => {
