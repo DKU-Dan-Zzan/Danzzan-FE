@@ -14,6 +14,7 @@ export const ko = {
   "common.home": "홈으로",
   "common.loading": "페이지 전환 중",
   "common.retry": "다시 시도",
+  "common.close": "닫기",
 
   "notFound.title": "페이지를 찾을 수 없어요",
   "notFound.description": "주소가 바뀌었거나 접근할 수 없는 페이지예요.",
@@ -56,4 +57,15 @@ export const ko = {
   "home.lineupCaption": "올해 축제를 빛낼 아티스트들을 지금 확인하세요",
   "home.lineupFallbackAlt": "라인업 이미지",
   "home.lineupDotAria": "라인업 {{index}}로 이동",
+
+  "notice.pageTitle": "공지사항",
+  "notice.searchLabel": "공지 검색",
+  "notice.searchPlaceholder": "공지 제목 또는 내용을 검색해 보세요",
+  "notice.loadingList": "공지사항을 불러오는 중입니다...",
+  "notice.emptyState": "아직 등록된 공지사항이 없습니다.",
+  "notice.photoBadge": "🖼 사진",
+  "notice.detailTitle": "공지 상세",
+  "notice.loadingDetail": "공지 상세를 불러오는 중입니다...",
+  "notice.imageDotAria": "공지 이미지 {{index}}번 보기",
+  "notice.missingDetailTarget": "공지 상세 대상이 없습니다.",
 } as const

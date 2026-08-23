@@ -16,6 +16,7 @@ export const en: Record<keyof typeof ko, string> = {
   "common.home": "Go home",
   "common.loading": "Loading page",
   "common.retry": "Try again",
+  "common.close": "Close",
 
   "notFound.title": "Page not found",
   "notFound.description": "This address may have changed or is unavailable.",
@@ -59,4 +60,15 @@ export const en: Record<keyof typeof ko, string> = {
   "home.lineupCaption": "Check out this year's lineup of artists",
   "home.lineupFallbackAlt": "Lineup image",
   "home.lineupDotAria": "Go to lineup {{index}}",
+
+  "notice.pageTitle": "Notices",
+  "notice.searchLabel": "Search notices",
+  "notice.searchPlaceholder": "Search notice titles or content",
+  "notice.loadingList": "Loading notices...",
+  "notice.emptyState": "No notices yet.",
+  "notice.photoBadge": "🖼 Photo",
+  "notice.detailTitle": "Notice details",
+  "notice.loadingDetail": "Loading notice details...",
+  "notice.imageDotAria": "View notice image {{index}}",
+  "notice.missingDetailTarget": "No notice was selected to view.",
 }
