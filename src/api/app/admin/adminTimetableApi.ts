@@ -25,6 +25,8 @@ export type AdminPerformance = {
   startTime: string;
   endTime: string;
   stage: string | null;
+  stageEn?: string | null;
+  enIsManual?: boolean;
   artistId: number;
   artistName: string;
   artistImageUrl: string | null;
@@ -42,6 +44,7 @@ export type CreatePerformancePayload = {
   startTime: string;
   endTime: string;
   stage?: string | null;
+  stageEn?: string;
 };
 
 export type UpdatePerformancePayload = {
@@ -50,6 +53,7 @@ export type UpdatePerformancePayload = {
   startTime?: string;
   endTime?: string;
   stage?: string | null;
+  stageEn?: string;
 };
 
 export type AdminArtist = {
@@ -57,18 +61,25 @@ export type AdminArtist = {
   name: string;
   description: string | null;
   imageUrl: string | null;
+  nameEn?: string | null;
+  descriptionEn?: string | null;
+  enIsManual?: boolean;
 };
 
 export type CreateArtistPayload = {
   name: string;
   description?: string | null;
   imageUrl?: string | null;
+  nameEn?: string;
+  descriptionEn?: string;
 };
 
 export type UpdateArtistPayload = {
   name?: string;
   description?: string | null;
   imageUrl?: string | null;
+  nameEn?: string;
+  descriptionEn?: string;
 };
 
 export type AdminArtistImagePresignRequest = {
