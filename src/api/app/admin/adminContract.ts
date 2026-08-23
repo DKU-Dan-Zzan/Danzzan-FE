@@ -15,6 +15,18 @@ const readString = (record: RecordLike, key: string): string | undefined => {
   return trimmed || undefined;
 };
 
+/**
+ * 영문 입력값을 정규화한다. 비어 있거나 공백만 있는 값은 undefined로 바꿔서
+ * BE가 "관리자가 직접 입력함"으로 오인해 자동 번역을 영구히 멈추지 않도록 한다.
+ */
+export const normalizeEnglish = (value: string | null | undefined): string | undefined => {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+  const trimmed = value.trim();
+  return trimmed === "" ? undefined : trimmed;
+};
+
 export class AdminContractError extends Error {
   readonly endpoint: string;
 

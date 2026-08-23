@@ -88,6 +88,9 @@ export type NoticeResponse = {
   isActive?: boolean;
   createdAt: string;
   updatedAt: string;
+  titleEn?: string | null;
+  contentEn?: string | null;
+  enIsManual?: boolean;
 };
 
 export type CreateNoticeRequest = {
@@ -98,6 +101,8 @@ export type CreateNoticeRequest = {
   isPinned?: boolean;
   thumbnailImageUrl?: string | null;
   images?: string[];
+  titleEn?: string;
+  contentEn?: string;
 };
 
 export type UpdateNoticeRequest = CreateNoticeRequest;

@@ -41,6 +41,7 @@ import {
   formatDate,
   type NoticeAuthor,
 } from "@/routes/admin/admin-view-model";
+import EnglishFieldsAccordion from "@/routes/admin/components/EnglishFieldsAccordion";
 import type { AdminConfirmDialogState } from "@/routes/admin/adminConfirmDialog";
 import { useAdminAdActions } from "@/routes/admin/hooks/useAdminAdActions";
 import { useAdminNoticeActions } from "@/routes/admin/hooks/useAdminNoticeActions";
@@ -876,6 +877,27 @@ function Admin() {
                   required
                 />
               </div>
+
+              <EnglishFieldsAccordion
+                isManual={Boolean(editingNotice.enIsManual)}
+                fields={[
+                  {
+                    name: "titleEn",
+                    label: "영문 제목",
+                    value: editingNotice.titleEn,
+                    multiline: false,
+                  },
+                  {
+                    name: "contentEn",
+                    label: "영문 본문",
+                    value: editingNotice.contentEn,
+                    multiline: true,
+                  },
+                ]}
+                onChange={(name, value) =>
+                  setEditingNotice((prev) => (prev ? { ...prev, [name]: value } : prev))
+                }
+              />
 
               <div className="flex items-center justify-between">
                 <label className="flex items-center gap-2 text-xs font-semibold text-[var(--text)]">

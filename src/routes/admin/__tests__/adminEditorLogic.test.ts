@@ -25,6 +25,9 @@ describe("adminEditorLogic", () => {
       isPinned: false,
       thumbnailImageUrl: "",
       images: [],
+      titleEn: "",
+      contentEn: "",
+      enIsManual: false,
     });
   });
 
@@ -41,6 +44,9 @@ describe("adminEditorLogic", () => {
       imageUrls: ["https://cdn.example.com/1.png"],
       createdAt: "2026-03-22T00:00:00Z",
       updatedAt: "2026-03-22T00:00:00Z",
+      titleEn: "Notice",
+      contentEn: "Content",
+      enIsManual: true,
     };
 
     expect(createNoticeEditForm(notice)).toEqual({
@@ -51,7 +57,26 @@ describe("adminEditorLogic", () => {
       isPinned: true,
       thumbnailImageUrl: "",
       images: ["https://cdn.example.com/1.png"],
+      titleEn: "Notice",
+      contentEn: "Content",
+      enIsManual: true,
     });
+  });
+
+  it("영문 필드가 비어있는 공지는 빈 문자열과 enIsManual false로 폼을 만든다", () => {
+    const notice: NoticeResponse = {
+      id: 2,
+      title: "공지2",
+      content: "내용2",
+      author: "개발팀",
+      createdAt: "2026-03-22T00:00:00Z",
+      updatedAt: "2026-03-22T00:00:00Z",
+    };
+
+    const form = createNoticeEditForm(notice);
+    expect(form.titleEn).toBe("");
+    expect(form.contentEn).toBe("");
+    expect(form.enIsManual).toBe(false);
   });
 
   it("공지 폼에서 요청 payload를 만든다", () => {
@@ -62,6 +87,9 @@ describe("adminEditorLogic", () => {
       isPinned: false,
       thumbnailImageUrl: " ",
       images: ["a"],
+      titleEn: "",
+      contentEn: "",
+      enIsManual: false,
     });
 
     expect(payload).toEqual({
@@ -71,7 +99,45 @@ describe("adminEditorLogic", () => {
       isPinned: false,
       thumbnailImageUrl: null,
       images: ["a"],
+      titleEn: undefined,
+      contentEn: undefined,
     });
+  });
+
+  it("영문 필드가 비어 있으면 payload에서 undefined로 보내 자동 번역을 유지한다", () => {
+    const payload = buildNoticePayload({
+      title: "제목",
+      content: "내용",
+      author: "개발팀",
+      isPinned: false,
+      thumbnailImageUrl: "",
+      images: [],
+      titleEn: "   ",
+      contentEn: "",
+      enIsManual: false,
+    });
+
+    expect(payload.titleEn).toBeUndefined();
+    expect(payload.contentEn).toBeUndefined();
+    expect("titleEn" in payload).toBe(true);
+    expect(JSON.stringify(payload)).not.toContain('"titleEn":""');
+  });
+
+  it("영문 필드를 직접 입력하면 앞뒤 공백만 제거한 값이 payload에 실린다", () => {
+    const payload = buildNoticePayload({
+      title: "제목",
+      content: "내용",
+      author: "개발팀",
+      isPinned: false,
+      thumbnailImageUrl: "",
+      images: [],
+      titleEn: "  Manual Title  ",
+      contentEn: "  Manual Content  ",
+      enIsManual: true,
+    });
+
+    expect(payload.titleEn).toBe("Manual Title");
+    expect(payload.contentEn).toBe("Manual Content");
   });
 
   it("광고 폼에서 요청 payload를 만든다", () => {

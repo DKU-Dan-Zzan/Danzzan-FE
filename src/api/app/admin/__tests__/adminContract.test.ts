@@ -3,9 +3,33 @@
 import { describe, expect, it } from "vitest";
 import {
   AdminContractError,
+  normalizeEnglish,
   parseAdImageUploadContract,
   parseNoticeImagePresignContract,
 } from "@/api/app/admin/adminContract";
+
+describe("normalizeEnglish", () => {
+  it("빈 문자열은 undefined로 정규화한다", () => {
+    expect(normalizeEnglish("")).toBeUndefined();
+  });
+
+  it("공백만 있는 문자열은 undefined로 정규화한다", () => {
+    expect(normalizeEnglish("   ")).toBeUndefined();
+  });
+
+  it("null과 undefined는 undefined로 정규화한다", () => {
+    expect(normalizeEnglish(null)).toBeUndefined();
+    expect(normalizeEnglish(undefined)).toBeUndefined();
+  });
+
+  it("앞뒤 공백을 제거한 값을 반환한다", () => {
+    expect(normalizeEnglish("  Hello World  ")).toBe("Hello World");
+  });
+
+  it("정상 값은 그대로 반환한다", () => {
+    expect(normalizeEnglish("Notice Title")).toBe("Notice Title");
+  });
+});
 
 describe("adminContract", () => {
   it("공지 presign 응답이 data envelope에 감싸져 있어도 파싱한다", () => {
