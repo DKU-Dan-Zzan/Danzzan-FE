@@ -7,7 +7,7 @@ import {
   formatDateToYYYYMMDD,
   getCurrentPerformance,
 } from "@/utils/app/timetable";
-import { useLanguage } from "@/i18n";
+import { useLanguage, useT } from "@/i18n";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
 import { cn } from "@/components/common/ui/utils";
 
@@ -16,6 +16,7 @@ const CARD_HEIGHT = 94;
 const CARD_ASPECT_RATIO = `${CARD_WIDTH} / ${CARD_HEIGHT}`;
 
 export default function CurrentPerformanceSection() {
+  const t = useT();
   const navigate = useNavigate();
   const { language } = useLanguage();
 
@@ -55,11 +56,11 @@ export default function CurrentPerformanceSection() {
 
   const helperText =
     status === "loading"
-      ? "현재 진행 중인 공연을 확인하고 있어요."
+      ? t("home.performanceLoading")
       : status === "error"
-        ? performancesQuery.error?.message ?? "공연 정보를 불러오지 못했어요. 잠시 후 다시 확인해 주세요."
+        ? performancesQuery.error?.message ?? t("home.performanceError")
       : status === "empty"
-          ? "진행중인 공연이 없습니다"
+          ? t("home.performanceEmpty")
           : null;
 
   const handleRetry = () => {
@@ -70,7 +71,7 @@ export default function CurrentPerformanceSection() {
     <section className="px-5">
       <div className="mx-auto w-full max-w-[314px]">
         <p className="mb-[var(--home-current-performance-caption-gap)] text-center text-[length:var(--home-lineup-caption-font-size)] leading-[1.4] font-bold text-[var(--home-lineup-caption-color)]">
-          현재 진행 중인 공연을 지금 확인하세요
+          {t("home.performanceCaption")}
         </p>
 
         <button
@@ -108,7 +109,7 @@ export default function CurrentPerformanceSection() {
               </div>
               <div className="min-w-0 flex-1 text-left">
                 <p className="text-[16px] font-semibold leading-tight text-[var(--text-body-deep)]">{helperText}</p>
-                <p className="mt-1 text-[13px] font-semibold text-[var(--text-body-deep)]">타임테이블에서 다음 공연을 확인해보세요</p>
+                <p className="mt-1 text-[13px] font-semibold text-[var(--text-body-deep)]">{t("home.performanceHelperCta")}</p>
               </div>
             </div>
           )}
@@ -120,7 +121,7 @@ export default function CurrentPerformanceSection() {
               onClick={handleRetry}
               className="inline-flex rounded-[var(--radius-md)] bg-[linear-gradient(135deg,var(--primary)_0%,var(--primary_container)_100%)] px-3 py-1.5 text-[12px] font-semibold text-[var(--text-on-accent)] shadow-[var(--ec-ambient-shadow)]"
             >
-              다시 시도
+              {t("common.retry")}
             </button>
           </div>
         )}

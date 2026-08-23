@@ -26,9 +26,14 @@ describe("Common not-found route", () => {
 
   it("The shared page keeps a concise branded 404 tone and only the home recovery action", () => {
     const source = readSource("src/routes/not-found/NotFoundPage.tsx");
+    const koDictionarySource = readSource("src/i18n/locales/ko.ts");
 
-    expect(source).toContain("페이지를 찾을 수 없어요");
-    expect(source).toContain("주소가 바뀌었거나 접근할 수 없는 페이지예요.");
+    // 문구 자체는 사전으로 옮겨졌다. 화면은 키를 통해 조회한다.
+    expect(source).toContain('t("notFound.title")');
+    expect(source).toContain('t("notFound.description")');
+    expect(source).toContain('t("common.home")');
+    expect(koDictionarySource).toContain("페이지를 찾을 수 없어요");
+    expect(koDictionarySource).toContain("주소가 바뀌었거나 접근할 수 없는 페이지예요.");
     expect(source).toContain('aria-labelledby="not-found-title"');
     expect(source).toContain('id="not-found-title"');
     expect(source).toContain('to="/"');

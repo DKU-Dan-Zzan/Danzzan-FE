@@ -7,6 +7,7 @@ import LineupSection, { type LineupBanner } from "@/components/app/home/LineupSe
 import CurrentPerformanceSection from "@/components/app/home/CurrentPerformanceSection";
 import AdBanner from "@/components/app/home/AdBanner";
 import DelayedSpinner from "@/components/common/loading/DelayedSpinner";
+import { useT } from "@/i18n";
 
 import { getEmergencyNotice, getHomeImages, getLineupImages } from "@/api/app/home/homeApi"
 import { getPlacementAds } from "@/api/app/ad/adApi"
@@ -16,9 +17,6 @@ import {
 } from "@/lib/home/anchorScroll";
 import { appQueryKeys, useAppQuery } from "@/lib/query"
 
-const dummyPosters: Poster[] = [
-  { id: "p1", imageUrl: "/posters/festival-poster.png", alt: "2026 단국축제 포스터" },
-]
 const HOME_SNAP_MODE_CLASS = "home-snap-mode"
 
 const getVersionFromImageUrl = (imageUrl: string) => {
@@ -44,9 +42,17 @@ const withImageVersion = (imageUrl: string, version?: string | null) => {
 }
 
 function Home() {
+  const t = useT();
   const lineupAnchorRef = useRef<HTMLDivElement | null>(null);
   const anchorLockRef = useRef(false);
   const touchStartYRef = useRef<number | null>(null);
+
+  const dummyPosters = useMemo<Poster[]>(
+    () => [
+      { id: "p1", imageUrl: "/posters/festival-poster.png", alt: t("home.dummyPosterAlt") },
+    ],
+    [t],
+  )
 
   const imagesQuery = useAppQuery({
     queryKey: appQueryKeys.homeImages(),
@@ -82,9 +88,9 @@ function Home() {
     return images.map((img, idx) => ({
       id: `${img.id}-${img.version?.trim() || getVersionFromImageUrl(img.imageUrl) || "noversion"}`,
       imageUrl: withImageVersion(img.imageUrl, img.version),
-      alt: `포스터 ${idx + 1}`,
+      alt: t("home.posterAlt", { index: idx + 1 }),
     }))
-  }, [imagesQuery.data])
+  }, [imagesQuery.data, dummyPosters, t])
 
   const lineups = useMemo<LineupBanner[]>(() => {
     const images = lineupQuery.data
@@ -95,9 +101,9 @@ function Home() {
     return images.map((img, idx) => ({
       id: String(img.id),
       imageUrl: img.imageUrl,
-      alt: `라인업 이미지 ${idx + 1}`,
+      alt: t("home.lineupImageAlt", { index: idx + 1 }),
     }))
-  }, [lineupQuery.data])
+  }, [lineupQuery.data, t])
 
   const hasLineupAnchor = lineups.length > 0;
 
@@ -116,11 +122,11 @@ function Home() {
 
     return {
       id: emergencyNoticeQuery.data.id,
-      title: "긴급공지 및 내용",
+      title: t("home.emergencyNoticeTitle"),
       content: emergencyNoticeQuery.data.content,
       updatedAt: emergencyNoticeQuery.data.updatedAt ?? undefined,
     }
-  }, [emergencyNoticeQuery.data])
+  }, [emergencyNoticeQuery.data, t])
 
   const corePending =
     imagesQuery.isPending ||
@@ -248,7 +254,7 @@ function Home() {
             onClick={handleRetryAll}
             className="mt-2 rounded-[var(--radius-md)] bg-[linear-gradient(135deg,var(--primary)_0%,var(--primary_container)_100%)] px-3 py-1.5 text-[11px] font-semibold text-[var(--text-on-accent)] shadow-[var(--ec-ambient-shadow)]"
           >
-            다시 시도
+            {t("common.retry")}
           </button>
         </div>
       )}
@@ -263,12 +269,12 @@ function Home() {
           {hasLineupAnchor && (
             <div className="pointer-events-none absolute inset-x-0 bottom-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom)+12px)] z-20 flex flex-col items-center gap-2 px-5">
               <p className="ec-scroll-cue-twinkle text-center text-[15px] font-medium tracking-[0.02em] text-[rgba(255,255,255,0.78)]">
-                스크롤하여 올해의 아티스트를 확인해보세요
+                {t("home.scrollCue")}
               </p>
               <button
                 type="button"
                 onClick={scrollToLineupAnchor}
-                aria-label="아티스트 섹션으로 이동"
+                aria-label={t("home.scrollToArtistsAria")}
                 className="ec-scroll-cue-float pointer-events-auto inline-flex h-12 w-16 items-center justify-center text-[rgba(214,230,255,0.94)] drop-shadow-[0_7px_16px_rgba(0,0,0,0.42)] transition-opacity duration-200 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--on-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 <svg
@@ -315,7 +321,7 @@ function Home() {
       {shouldShowInlineSpinner && (
         <DelayedSpinner
           delayMs={280}
-          label="홈 콘텐츠 동기화 중"
+          label={t("home.syncingLabel")}
           containerClassName="mx-auto mt-3 flex w-full max-w-[var(--home-content-max-width)] items-center justify-center py-2"
           spinnerClassName="h-4 w-4 border-[var(--home-card-border)] border-t-[var(--accent)]"
         />

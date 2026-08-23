@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest"
-import { translate } from "@/i18n"
+import { translate, type TranslationKey } from "@/i18n"
 import { ko } from "@/i18n/locales/ko"
 import { en } from "@/i18n/locales/en"
+
+const PLACEHOLDER_PATTERN = /{{(\w+)}}/g
 
 describe("사전 무결성", () => {
   it("ko와 en의 키 집합이 정확히 일치한다", () => {
@@ -35,9 +37,16 @@ describe("translate", () => {
     expect(translate("en", unknownKey)).toBe("__does.not.exist__")
   })
 
-  it("사전에 남은 보간 자리표시자가 없다", () => {
+  it("보간 변수를 모두 채워 넘기면 사전에 남은 자리표시자가 없다", () => {
+    // 일부 키(home.posterAlt 등)는 의도적으로 {{index}}, {{time}} 같은 자리표시자를 갖는다.
+    // 그 변수를 모두 채워서 translate()를 호출했을 때 {{}}가 남지 않는지 확인한다.
     Object.entries(en).forEach(([key, value]) => {
-      expect(value, `en.${key}에 치환되지 않은 {{}}가 있다`).not.toContain("{{")
+      const names = Array.from(value.matchAll(PLACEHOLDER_PATTERN), (m) => m[1])
+      if (names.length === 0) return
+
+      const vars = Object.fromEntries(names.map((name) => [name, "x"]))
+      const result = translate("en", key as TranslationKey, vars)
+      expect(result, `en.${key}에 치환되지 않은 {{}}가 있다`).not.toContain("{{")
     })
   })
 

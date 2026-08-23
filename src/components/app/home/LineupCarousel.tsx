@@ -1,5 +1,6 @@
 // 역할: home 화면에서 사용하는 Lineup Carousel UI 블록을 렌더링합니다.
 import { useCallback, useEffect, useMemo, useRef, useState, type TouchEvent } from "react"
+import { useT } from "@/i18n"
 
 export type LineupBanner = {
   id: string
@@ -23,6 +24,7 @@ export default function LineupCarousel({
   intervalMs = 4500,
   aspect = `${LINEUP_CARD_WIDTH_PX}/${LINEUP_CARD_HEIGHT_PX}`,
 }: Props) {
+  const t = useT()
   const count = banners.length
   const [index, setIndex] = useState(0)
   const [trackIndex, setTrackIndex] = useState(count > 1 ? 1 : 0)
@@ -174,7 +176,7 @@ export default function LineupCarousel({
                 <div style={{ aspectRatio: aspect }}>
                   <img
                     src={banner.imageUrl}
-                    alt={banner.alt ?? "라인업 이미지"}
+                    alt={banner.alt ?? t("home.lineupFallbackAlt")}
                     className="h-full w-full object-cover"
                     draggable={false}
                   />
@@ -203,7 +205,7 @@ export default function LineupCarousel({
                   setIndex(i)
                   setTrackIndex(i + 1)
                 }}
-                aria-label={`라인업 ${i + 1}로 이동`}
+                aria-label={t("home.lineupDotAria", { index: i + 1 })}
                 className={`h-[var(--home-dot-height)] rounded-full bg-[var(--surface_container_high)] transition-all duration-300 ${
                   active ? "w-[var(--home-dot-active-width)] bg-[linear-gradient(135deg,var(--primary)_0%,var(--primary_container)_100%)]" : "w-[var(--home-dot-width)]"
                 }`}
