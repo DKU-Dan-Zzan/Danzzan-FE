@@ -1,5 +1,6 @@
 import { cn } from "@/components/common/ui/utils";
 import type { College } from "@/types/app/boothmap/boothmap.types";
+import { useT } from "@/i18n";
 
 const CHIP_BASE_CLASS =
   "shrink-0 rounded-full border px-3 py-2 text-sm font-bold tracking-[-0.01em] transition";
@@ -19,6 +20,8 @@ export default function SecondaryCollegeChips({
   selectedCollegeId: number | null;
   onSelect: (idOrNull: number | null) => void;
 }) {
+  const t = useT();
+
   if (!visible) return null;
 
   return (
@@ -31,7 +34,7 @@ export default function SecondaryCollegeChips({
           selectedCollegeId === null ? CHIP_ACTIVE_CLASS : CHIP_INACTIVE_CLASS,
         )}
       >
-        전체
+        {t("boothmap.allColleges")}
       </button>
 
       {colleges.map((college) => {

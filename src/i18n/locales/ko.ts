@@ -79,4 +79,46 @@ export const ko = {
   "timetable.nowPlayingAria": "지금 진행 중인 공연, {{range}}",
   "timetable.performanceTimeAria": "공연 시간 {{range}}",
   "timetable.nowBadgeAria": "지금 진행 중",
+
+  "boothmap.loading": "부스맵을 불러오는 중...",
+  "boothmap.loadError": "부스맵 정보를 불러오지 못했어요.",
+
+  "boothmap.type.pub": "주점",
+  "boothmap.type.foodTruck": "푸드트럭",
+  "boothmap.type.experience": "부스",
+  "boothmap.type.event": "이벤트",
+  "boothmap.type.facility": "편의시설",
+  "boothmap.companyBoothChip": "기업부스",
+  "boothmap.studentBoothChip": "학생부스",
+
+  "boothmap.emptyBoothList": "표시할 부스가 아직 없어요.",
+  "boothmap.boothDetailAria": "{{name}} 상세보기",
+  "boothmap.boothSelectAria": "{{name}} 선택",
+
+  "boothmap.selectCollegeToViewPubs": "단과대를 선택하면 주점을 볼 수 있어요.",
+  "boothmap.emptyPubsForCollege": "해당 단과대 주점 정보가 아직 없어요.",
+  "boothmap.operatingHoursLabel": "운영시간",
+
+  "boothmap.allColleges": "전체",
+
+  "boothmap.backToList": "목록으로",
+
+  "boothmap.imageDetailTitle": "이미지 상세 보기",
+  "boothmap.detailImageAlt": "상세 이미지",
+  "boothmap.noSelection": "선택된 항목이 없어요.",
+  "boothmap.detailLoadError": "상세 정보를 불러오지 못했어요.",
+  "boothmap.boothImageDetailAria": "부스 이미지 상세 보기",
+  "boothmap.boothImageAlt": "{{name}} 이미지",
+  "boothmap.noDetailContent": "등록된 상세 정보가 없어요.",
+  "boothmap.collegeFallback": "단과대",
+  "boothmap.pubImageDetailAria": "주점 이미지 {{index}} 상세 보기",
+  "boothmap.pubImageAlt": "{{name}} 이미지 {{index}}",
+  "boothmap.noDisplayableDetail": "표시할 상세 정보가 없어요.",
+
+  "boothmap.collegePubMarkerName": "{{college}} 주점",
+  "boothmap.zoneLabel.booth": "부스 구역",
+  "boothmap.zoneLabel.pub": "주점 구역",
+  "boothmap.zoneLabel.foodTruck": "푸드트럭 구역",
+  "boothmap.kakaoMapLoadError": "카카오맵을 불러오지 못했어요.",
+  "boothmap.mapLoading": "지도를 불러오는 중...",
 } as const

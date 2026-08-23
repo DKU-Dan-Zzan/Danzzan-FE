@@ -82,4 +82,46 @@ export const en: Record<keyof typeof ko, string> = {
   "timetable.nowPlayingAria": "Now playing, {{range}}",
   "timetable.performanceTimeAria": "Performance time {{range}}",
   "timetable.nowBadgeAria": "Now playing",
+
+  "boothmap.loading": "Loading the booth map...",
+  "boothmap.loadError": "Couldn't load booth map info.",
+
+  "boothmap.type.pub": "Pub",
+  "boothmap.type.foodTruck": "Food Truck",
+  "boothmap.type.experience": "Booth",
+  "boothmap.type.event": "Event",
+  "boothmap.type.facility": "Facility",
+  "boothmap.companyBoothChip": "Company booth",
+  "boothmap.studentBoothChip": "Student booth",
+
+  "boothmap.emptyBoothList": "No booths to show yet.",
+  "boothmap.boothDetailAria": "View {{name}} details",
+  "boothmap.boothSelectAria": "Select {{name}}",
+
+  "boothmap.selectCollegeToViewPubs": "Select a college to see its pubs.",
+  "boothmap.emptyPubsForCollege": "No pub info for this college yet.",
+  "boothmap.operatingHoursLabel": "Operating Hours",
+
+  "boothmap.allColleges": "All",
+
+  "boothmap.backToList": "Back to list",
+
+  "boothmap.imageDetailTitle": "Image detail view",
+  "boothmap.detailImageAlt": "Detail image",
+  "boothmap.noSelection": "Nothing is selected.",
+  "boothmap.detailLoadError": "Couldn't load the details.",
+  "boothmap.boothImageDetailAria": "View booth image details",
+  "boothmap.boothImageAlt": "{{name}} image",
+  "boothmap.noDetailContent": "No details have been added yet.",
+  "boothmap.collegeFallback": "College",
+  "boothmap.pubImageDetailAria": "View pub image {{index}} details",
+  "boothmap.pubImageAlt": "{{name}} image {{index}}",
+  "boothmap.noDisplayableDetail": "There are no details to show.",
+
+  "boothmap.collegePubMarkerName": "{{college}} Pubs",
+  "boothmap.zoneLabel.booth": "Booth Zone",
+  "boothmap.zoneLabel.pub": "Pub Zone",
+  "boothmap.zoneLabel.foodTruck": "Food Truck Zone",
+  "boothmap.kakaoMapLoadError": "Couldn't load Kakao Map.",
+  "boothmap.mapLoading": "Loading map...",
 }

@@ -2,6 +2,7 @@ import { memo } from "react";
 import { ChevronRight, Clock3 } from "lucide-react";
 import type { Pub } from "@/types/app/boothmap/boothmap.types";
 import { formatOperatingTime } from "@/utils/app/boothmap/formatOperatingTime";
+import { useT } from "@/i18n";
 
 function PubList({
   pubs,
@@ -12,11 +13,13 @@ function PubList({
   selectedCollegeId: number | null;
   onSelectPub: (id: number) => void;
 }) {
+  const t = useT();
+
   if (!selectedCollegeId) {
     return (
       <div className="rounded-[26px] border border-[var(--boothmap-border)] bg-[color:color-mix(in_srgb,var(--boothmap-surface)_90%,white)] px-5 py-8 text-center shadow-[var(--boothmap-card-shadow)]">
         <div className="text-sm font-semibold text-[var(--boothmap-text-muted)]">
-          단과대를 선택하면 주점을 볼 수 있어요.
+          {t("boothmap.selectCollegeToViewPubs")}
         </div>
       </div>
     );
@@ -26,7 +29,7 @@ function PubList({
     return (
       <div className="rounded-[26px] border border-[var(--boothmap-border)] bg-[color:color-mix(in_srgb,var(--boothmap-surface)_90%,white)] px-5 py-8 text-center shadow-[var(--boothmap-card-shadow)]">
         <div className="text-sm font-semibold text-[var(--boothmap-text-muted)]">
-          해당 단과대 주점 정보가 아직 없어요.
+          {t("boothmap.emptyPubsForCollege")}
         </div>
       </div>
     );
@@ -40,7 +43,7 @@ function PubList({
         <div className="rounded-[24px] border border-[var(--boothmap-border)] bg-[linear-gradient(145deg,color-mix(in_srgb,var(--boothmap-surface)_96%,white)_0%,color-mix(in_srgb,var(--boothmap-surface-soft)_92%,white)_100%)] px-4 py-3 shadow-[var(--boothmap-card-shadow)]">
           <div>
             <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--boothmap-text-muted)]">
-              운영시간
+              {t("boothmap.operatingHoursLabel")}
             </div>
             <div className="mt-1 inline-flex items-center gap-1.5 text-sm font-bold text-[var(--boothmap-text-subtle)]">
               <Clock3 className="h-3.5 w-3.5" />

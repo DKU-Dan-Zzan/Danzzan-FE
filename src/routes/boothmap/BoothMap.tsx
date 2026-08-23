@@ -28,7 +28,7 @@ import {
   type CollegeDto,
   type PubSummaryResponse,
 } from "@/api/app/boothmap/boothmapApi";
-import { useLanguage } from "@/i18n";
+import { useLanguage, useT } from "@/i18n";
 import { appQueryKeys, queryClient, useAppQuery } from "@/lib/query";
 import {
   getShouldShowPubList,
@@ -131,6 +131,7 @@ function shouldOpenListSheetAtHalf(filter: PrimaryFilter) {
 }
 
 export default function BoothMap() {
+  const t = useT();
   const { language } = useLanguage();
   const [primaryFilter, setPrimaryFilter] = useState<PrimaryFilter>("ALL");
   const [selectedMapItem, setSelectedMapItem] = useState<SelectedMapItem>(null);
@@ -496,7 +497,7 @@ export default function BoothMap() {
     return (
       <div className="flex h-screen items-center justify-center bg-[var(--boothmap-page-bg)]">
         <div className="text-sm font-semibold text-[var(--boothmap-text-subtle)]">
-          부스맵을 불러오는 중...
+          {t("boothmap.loading")}
         </div>
       </div>
     );
@@ -506,7 +507,7 @@ export default function BoothMap() {
     return (
       <div className="flex h-screen items-center justify-center bg-[var(--boothmap-page-bg)]">
         <div className="rounded-xl border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-danger-bg)] px-4 py-3 text-sm font-semibold text-[var(--boothmap-danger-text)]">
-          <div>부스맵 정보를 불러오지 못했어요.</div>
+          <div>{t("boothmap.loadError")}</div>
           <button
             type="button"
             onClick={() => {
@@ -514,7 +515,7 @@ export default function BoothMap() {
             }}
             className="mt-2 rounded-md border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-surface)] px-2 py-1 text-xs font-semibold text-[var(--boothmap-danger-text)]"
           >
-            다시 시도
+            {t("common.retry")}
           </button>
         </div>
       </div>
