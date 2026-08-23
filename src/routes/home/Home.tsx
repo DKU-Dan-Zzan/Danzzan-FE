@@ -7,7 +7,7 @@ import LineupSection, { type LineupBanner } from "@/components/app/home/LineupSe
 import CurrentPerformanceSection from "@/components/app/home/CurrentPerformanceSection";
 import AdBanner from "@/components/app/home/AdBanner";
 import DelayedSpinner from "@/components/common/loading/DelayedSpinner";
-import { useT } from "@/i18n";
+import { useLanguage, useT } from "@/i18n";
 
 import { getEmergencyNotice, getHomeImages, getLineupImages } from "@/api/app/home/homeApi"
 import { getPlacementAds } from "@/api/app/ad/adApi"
@@ -42,6 +42,7 @@ const withImageVersion = (imageUrl: string, version?: string | null) => {
 }
 
 function Home() {
+  const { language } = useLanguage()
   const t = useT();
   const lineupAnchorRef = useRef<HTMLDivElement | null>(null);
   const anchorLockRef = useRef(false);
@@ -67,7 +68,7 @@ function Home() {
   })
 
   const emergencyNoticeQuery = useAppQuery({
-    queryKey: appQueryKeys.homeEmergencyNotice(),
+    queryKey: appQueryKeys.homeEmergencyNotice(language),
     queryFn: ({ signal }) => getEmergencyNotice({ signal }),
     staleTime: 0,
     refetchOnMount: "always",

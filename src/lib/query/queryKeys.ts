@@ -18,7 +18,10 @@ export type AdminNoticeListKeyParams = {
 export const appQueryKeys = {
   homeImages: () => ["home", "images"] as const,
   homeLineup: () => ["home", "lineup"] as const,
-  homeEmergencyNotice: () => ["home", "emergency-notice"] as const,
+  // 긴급공지는 BE 가 lang 으로 본문과 상대시간("방금 전"/"just now")을 모두 바꾸므로
+  // 언어를 키에 포함해야 한다. 홈 이미지/라인업은 이미지 URL 만 내려주므로 제외한다.
+  homeEmergencyNotice: (language: Language) =>
+    ["home", "emergency-notice", language] as const,
   placementAds: (placement: "HOME_BOTTOM" | "MY_TICKET") => ["ads", "active", { placement }] as const,
   adminAds: () => ["admin", "ads"] as const,
   adminEmergencyNotice: () => ["admin", "emergency-notice"] as const,
