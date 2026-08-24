@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { Ticket, User } from "lucide-react"
 import { useSyncExternalStore } from "react"
 import { authStore } from "@/store/common/authStore"
-import { getMyTicketNavigationTarget } from "@/lib/common/my-ticket-navigation"
 import { AppTopBar } from "@/components/layout/AppTopBar"
 import LanguageToggle from "@/components/layout/LanguageToggle"
 import { cn } from "@/components/common/ui/utils"
@@ -30,7 +29,7 @@ const Header = () => {
   const isMyPageAuthenticated = isMyPage && isLoggedIn
 
   const handleTicketClick = () => {
-    navigate(getMyTicketNavigationTarget(isLoggedIn))
+    navigate("/ticketing")
   }
 
   const handleMyInfoClick = () => {

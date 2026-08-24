@@ -40,7 +40,8 @@ describe("BottomNav preload policy", () => {
 
     expect(source).toContain("registerRoutePreloader(\"/notice\", Notice.preload)");
     expect(source).toContain("registerRoutePreloader(\"/map\", BoothMap.preload)");
-    expect(source).toContain("registerRoutePreloader(\"/mypage\", MyPage.preload)");
+    // /mypage는 가을 축제 비활성 안내 화면으로 교체되어 더 이상 지연 로드/프리로드 대상이 아니다. (DANZ-358)
+    expect(source).not.toContain("registerRoutePreloader(\"/mypage\"");
     expect(source).toContain("void preloadBottomNavLazyRoutes()");
     expect(source).toContain("void prefetchBottomNavTabData()");
   });
