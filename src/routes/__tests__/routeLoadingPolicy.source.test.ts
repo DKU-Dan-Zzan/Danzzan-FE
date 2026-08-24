@@ -31,12 +31,11 @@ describe("Route loading policy", () => {
     expect(source).toContain("import DelayedSpinner from \"@/components/common/loading/DelayedSpinner\";");
     expect(source).toContain("const Notice = lazyWithPreload(() => import(\"./routes/notice/Notice\"));");
     expect(source).toContain("const BoothMap = lazyWithPreload(() => import(\"./routes/boothmap/BoothMap\"));");
+    expect(source).toContain("const MyPage = lazyWithPreload(() => import(\"./routes/mypage/MyPage\"));");
 
     expect(source).toContain("registerRoutePreloader(\"/notice\", Notice.preload);");
     expect(source).toContain("registerRoutePreloader(\"/map\", BoothMap.preload);");
-    // /mypage는 가을 축제 비활성 안내 화면으로 교체되어 더 이상 지연 로드/프리로드 대상이 아니다. (DANZ-358)
-    expect(source).not.toContain("const MyPage = lazyWithPreload");
-    expect(source).not.toContain("registerRoutePreloader(\"/mypage\"");
+    expect(source).toContain("registerRoutePreloader(\"/mypage\", MyPage.preload);");
     expect(source).toContain("if (typeof window.requestIdleCallback === \"function\")");
     expect(source).toContain("window.requestIdleCallback(");
     expect(source).toContain("window.setTimeout(() => {");
@@ -49,12 +48,13 @@ describe("Route loading policy", () => {
     expect(source).not.toContain("화면 불러오는 중...");
   });
 
-  it("Ticketing router keeps its layout eager", () => {
+  it("Ticketing router keeps student ticketing path eager", () => {
     const source = readSource("src/routes/ticketing/TicketingApp.tsx");
 
     expect(source).toContain('import { UserLayout } from "@/components/ticketing/layout/UserLayout";');
+    expect(source).toContain('import Ticketing from "@/routes/ticketing/ticketing/Ticketing";');
+
     expect(source).not.toContain("const UserLayout = lazy(() =>");
-    // ticketing 경로는 가을 축제 비활성 안내 화면으로 교체되어 Ticketing 화면을 더 이상 라우팅에서 참조하지 않는다. (DANZ-358)
-    expect(source).not.toContain('import Ticketing from "@/routes/ticketing/ticketing/Ticketing";');
+    expect(source).not.toContain("const Ticketing = lazy(() =>");
   });
 });

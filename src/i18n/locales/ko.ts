@@ -21,8 +21,8 @@ export const ko = {
 
   "closed.ticketing.title": "티켓 없이 들어오세요",
   "closed.ticketing.description":
-    "가을 축제는 티켓팅 없이 자유롭게 입장하실 수 있어요.",
-  "closed.ticketing.action": "홈으로",
+    "가을 축제는 티켓팅 없이 자유롭게 입장하실 수 있어요. 공연 시간은 타임테이블에서 확인해 주세요.",
+  "closed.ticketing.action": "타임테이블 보기",
 
   "closed.auth.title": "로그인이 필요 없어요",
   "closed.auth.description":

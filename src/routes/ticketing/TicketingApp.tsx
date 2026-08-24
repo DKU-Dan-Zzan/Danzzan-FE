@@ -1,6 +1,6 @@
 // 역할: 티켓팅 도메인 라우트 트리와 인증 가드를 연결하는 엔트리 라우터입니다.
 import { lazy, Suspense } from "react";
-import { Outlet, Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { cn } from "@/components/common/ui/utils";
 import { UserLayout } from "@/components/ticketing/layout/UserLayout";
 import { useAuth } from "@/hooks/ticketing/useAuth";
@@ -9,7 +9,7 @@ import {
   buildReturnTo,
   isRoleAuthenticated,
 } from "@/routes/common/authGuard";
-import ServiceClosedNotice from "@/routes/common/ServiceClosedNotice";
+import Ticketing from "@/routes/ticketing/ticketing/Ticketing";
 import { env } from "@/utils/common/env";
 
 const AdminLayout = lazy(() =>
@@ -17,6 +17,12 @@ const AdminLayout = lazy(() =>
     default: module.AdminLayout,
   })),
 );
+const Login = lazy(() => import("@/routes/ticketing/login/Login"));
+const ResetPassword = lazy(() => import("@/routes/ticketing/reset-password/ResetPassword"));
+const Signup = lazy(() => import("@/routes/ticketing/signup/Signup"));
+const MyTicket = lazy(() => import("@/routes/ticketing/my-ticket/MyTicket"));
+const AdminLogin = lazy(() => import("@/routes/ticketing/admin/login/AdminLogin"));
+const WristbandPage = lazy(() => import("@/routes/ticketing/admin/wristband/WristbandPage"));
 const TokenRequired = lazy(() => import("@/routes/ticketing/admin/token-required/TokenRequired"));
 const NotFoundPage = lazy(() => import("@/routes/ticketing/not-found/NotFoundPage"));
 
@@ -100,6 +106,24 @@ function TicketingRouteLoading() {
   );
 }
 
+function RequireStudentAuth() {
+  const { session } = useAuth();
+  const location = useLocation();
+  const returnTo = buildReturnTo(location.pathname, location.search);
+
+  if (
+    !isRoleAuthenticated({
+      accessToken: session.tokens?.accessToken,
+      role: session.role,
+      requiredRole: "student",
+    })
+  ) {
+    return <Navigate to={buildLoginRedirectPath("/ticket/login", returnTo)} replace />;
+  }
+
+  return <Outlet />;
+}
+
 function RequireAdminAuth() {
   const { session } = useAuth();
   const location = useLocation();
@@ -127,125 +151,44 @@ function RequireAdminAuth() {
   return <Outlet />;
 }
 
+function LegacyMyTicketRedirect() {
+  const location = useLocation();
+
+  return (
+    <Navigate
+      to={{
+        pathname: "/ticket/my-ticket",
+        search: location.search,
+      }}
+      replace
+    />
+  );
+}
+
 export default function TicketingApp() {
   return (
     <div className={TICKETING_ROOT_CLASS_NAME}>
       <Suspense fallback={<TicketingRouteLoading />}>
         <Routes>
-          <Route index element={
-            <ServiceClosedNotice
-              titleKey="closed.ticketing.title"
-              descriptionKey="closed.ticketing.description"
-              actionKey="closed.ticketing.action"
-              actionTo="/"
-            />
-          } />
+          <Route index element={<Navigate to="login" replace />} />
 
           <Route element={<UserLayout />}>
-            <Route
-              path="login"
-              element={
-                <ServiceClosedNotice
-                  titleKey="closed.auth.title"
-                  descriptionKey="closed.auth.description"
-                  actionKey="closed.auth.action"
-                  actionTo="/"
-                />
-              }
-            />
-            <Route
-              path="reset-password"
-              element={
-                <ServiceClosedNotice
-                  titleKey="closed.auth.title"
-                  descriptionKey="closed.auth.description"
-                  actionKey="closed.auth.action"
-                  actionTo="/"
-                />
-              }
-            />
-            <Route
-              path="signup"
-              element={
-                <ServiceClosedNotice
-                  titleKey="closed.auth.title"
-                  descriptionKey="closed.auth.description"
-                  actionKey="closed.auth.action"
-                  actionTo="/"
-                />
-              }
-            />
-            <Route
-              path="ticketing"
-              element={
-                <ServiceClosedNotice
-                  titleKey="closed.ticketing.title"
-                  descriptionKey="closed.ticketing.description"
-                  actionKey="closed.ticketing.action"
-                  actionTo="/"
-                />
-              }
-            />
-            <Route
-              path="my-ticket"
-              element={
-                <ServiceClosedNotice
-                  titleKey="closed.ticketing.title"
-                  descriptionKey="closed.ticketing.description"
-                  actionKey="closed.ticketing.action"
-                  actionTo="/"
-                />
-              }
-            />
-            <Route
-              path="myticket"
-              element={
-                <ServiceClosedNotice
-                  titleKey="closed.ticketing.title"
-                  descriptionKey="closed.ticketing.description"
-                  actionKey="closed.ticketing.action"
-                  actionTo="/"
-                />
-              }
-            />
+            <Route path="login" element={<Login />} />
+            <Route path="reset-password" element={<ResetPassword />} />
+            <Route path="signup" element={<Signup />} />
+            <Route element={<RequireStudentAuth />}>
+              <Route path="ticketing" element={<Ticketing />} />
+              <Route path="my-ticket" element={<MyTicket />} />
+              <Route path="myticket" element={<LegacyMyTicketRedirect />} />
+            </Route>
             <Route path="*" element={<NotFoundPage />} />
           </Route>
 
-          <Route
-            path="admin"
-            element={
-              <ServiceClosedNotice
-                titleKey="closed.ticketing.title"
-                descriptionKey="closed.ticketing.description"
-                actionKey="closed.ticketing.action"
-                actionTo="/"
-              />
-            }
-          />
-          <Route
-            path="admin/login"
-            element={
-              <ServiceClosedNotice
-                titleKey="closed.ticketing.title"
-                descriptionKey="closed.ticketing.description"
-                actionKey="closed.ticketing.action"
-                actionTo="/"
-              />
-            }
-          />
+          <Route path="admin" element={<AdminLogin />} />
+          <Route path="admin/login" element={<AdminLogin />} />
           <Route path="admin/*" element={<RequireAdminAuth />}>
             <Route element={<AdminLayout />}>
-              <Route
-                path="wristband"
-                element={
-                  <ServiceClosedNotice
-                    titleKey="closed.ticketing.title"
-                    descriptionKey="closed.ticketing.description"
-                    actionKey="closed.ticketing.action"
-                    actionTo="/"
-                  />
-                }
-              />
+              <Route path="wristband" element={<WristbandPage />} />
             </Route>
           </Route>
         </Routes>

@@ -888,34 +888,6 @@
       "reason": "네이버 브랜드 공식 색상 (Face Sign 연동 UI 토큰)",
       "owner": "fe-platform",
       "expiresAt": "2026-12-31"
-    },
-    {
-      "ruleId": "STYLE_NO_NEW_RAW_HEX",
-      "target": "src/index.css::#0b0607",
-      "reason": "가을 축제 LEGEND 팔레트 승인값",
-      "owner": "fe-platform",
-      "expiresAt": "2026-12-31"
-    },
-    {
-      "ruleId": "STYLE_NO_NEW_RAW_HEX",
-      "target": "src/index.css::#e8551f",
-      "reason": "가을 축제 LEGEND 팔레트 승인값",
-      "owner": "fe-platform",
-      "expiresAt": "2026-12-31"
-    },
-    {
-      "ruleId": "STYLE_NO_NEW_RAW_HEX",
-      "target": "src/index.css::#b3241a",
-      "reason": "가을 축제 LEGEND 팔레트 승인값",
-      "owner": "fe-platform",
-      "expiresAt": "2026-12-31"
-    },
-    {
-      "ruleId": "STYLE_NO_NEW_RAW_HEX",
-      "target": "src/index.css::#f5e3a3",
-      "reason": "가을 축제 LEGEND 팔레트 승인값",
-      "owner": "fe-platform",
-      "expiresAt": "2026-12-31"
     }
   ]
 }

@@ -1,13 +1,16 @@
-// 역할: 앱 하단 고정 탭 내비게이션을 렌더링합니다.
+// 역할: 앱 하단 고정 탭 내비게이션을 렌더링하고 인증 상태에 따라 티켓팅 탭 경로를 결정합니다.
 import { NavLink } from "react-router-dom";
 import { Clock3, Home, Map, Megaphone, Ticket } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { cn } from "@/components/common/ui/utils";
 import type { TranslationKey } from "@/i18n";
 import { useT } from "@/i18n";
+import { hasAuthenticatedRole } from "@/lib/common/auth-access";
+import { getTicketingNavigationTarget } from "@/lib/common/ticketing-navigation";
 import { preloadRouteByPath } from "@/lib/navigation/routePreload";
 import { markBottomNavTransitionStart } from "@/lib/perf/navTiming";
 import { prefetchTabDataByPath } from "@/lib/query/prefetchTabData";
+import { authStore } from "@/store/common/authStore";
 
 type BottomNavItem = {
   to: string;
@@ -51,9 +54,20 @@ const APP_BOTTOM_NAV_RUNTIME_OFFSET_VAR = "--app-bottom-nav-runtime-offset";
 const BottomNav = () => {
   const t = useT();
   const navRef = useRef<HTMLElement | null>(null);
+  const session = useSyncExternalStore(
+    authStore.subscribe,
+    authStore.getSnapshot,
+    authStore.getSnapshot,
+  );
+  const hasTicketingAccess = hasAuthenticatedRole({
+    accessToken: session.tokens?.accessToken,
+    role: session.role,
+    requiredRole: "student",
+  });
+  const ticketingTarget = getTicketingNavigationTarget(hasTicketingAccess);
   const items: BottomNavItem[] = [
     ...STATIC_ITEMS,
-    { to: "/ticketing", icon: Ticket, labelKey: "nav.ticketing" },
+    { to: ticketingTarget, icon: Ticket, labelKey: "nav.ticketing" },
   ];
 
   const warmTabRoute = (routePath: string) => {

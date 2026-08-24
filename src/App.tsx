@@ -25,7 +25,6 @@ import Home from "./routes/home/Home";
 import Timetable from "./routes/timetable/Timetable";
 import TicketingApp from "./routes/ticketing/TicketingApp";
 import LegalDocument from "./routes/legal/LegalDocument";
-import ServiceClosedNotice from "./routes/common/ServiceClosedNotice";
 
 type LazyWithPreload<T extends ComponentType<unknown>> = LazyExoticComponent<T> & {
   preload: () => Promise<{ default: T }>;
@@ -42,6 +41,7 @@ const lazyWithPreload = <T extends ComponentType<unknown>>(
 const AdminLayout = lazy(() => import("./components/layout/AdminLayout"));
 const Notice = lazyWithPreload(() => import("./routes/notice/Notice"));
 const BoothMap = lazyWithPreload(() => import("./routes/boothmap/BoothMap"));
+const MyPage = lazyWithPreload(() => import("./routes/mypage/MyPage"));
 const Admin = lazy(() => import("./routes/admin/Admin"));
 const AdminLogin = lazy(() => import("./routes/admin/AdminLogin"));
 const AdminMap = lazy(() => import("./routes/admin/AdminMap"));
@@ -88,6 +88,20 @@ function ProtectedAdminRoute() {
   return <Outlet />;
 }
 
+function LegacyMyTicketRedirect() {
+  const location = useLocation();
+
+  return (
+    <Navigate
+      to={{
+        pathname: "/ticket/my-ticket",
+        search: location.search,
+      }}
+      replace
+    />
+  );
+}
+
 function App() {
   const location = useLocation();
 
@@ -105,6 +119,7 @@ function App() {
   useEffect(() => {
     registerRoutePreloader("/notice", Notice.preload);
     registerRoutePreloader("/map", BoothMap.preload);
+    registerRoutePreloader("/mypage", MyPage.preload);
 
     const runWarmup = () => {
       void preloadBottomNavLazyRoutes();
@@ -170,17 +185,7 @@ function App() {
         <Route path="/notice" element={withRouteSuspense(<Notice />)} />
         <Route path="/timetable" element={<Timetable />} />
         <Route path="/map" element={withRouteSuspense(<BoothMap />)} />
-        <Route
-          path="/mypage"
-          element={
-            <ServiceClosedNotice
-              titleKey="closed.mypage.title"
-              descriptionKey="closed.mypage.description"
-              actionKey="closed.mypage.action"
-              actionTo="/"
-            />
-          }
-        />
+        <Route path="/mypage" element={withRouteSuspense(<MyPage />)} />
         <Route path="*" element={withRouteSuspense(<NotFoundPage />)} />
       </Route>
 
@@ -200,61 +205,11 @@ function App() {
       <Route path="/legal/privacy" element={<LegalDocument documentType="privacy" />} />
       <Route path="/legal/terms" element={<LegalDocument documentType="terms" />} />
 
-      <Route
-        path="/login"
-        element={
-          <ServiceClosedNotice
-            titleKey="closed.auth.title"
-            descriptionKey="closed.auth.description"
-            actionKey="closed.auth.action"
-            actionTo="/"
-          />
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          <ServiceClosedNotice
-            titleKey="closed.auth.title"
-            descriptionKey="closed.auth.description"
-            actionKey="closed.auth.action"
-            actionTo="/"
-          />
-        }
-      />
-      <Route
-        path="/reset-password"
-        element={
-          <ServiceClosedNotice
-            titleKey="closed.auth.title"
-            descriptionKey="closed.auth.description"
-            actionKey="closed.auth.action"
-            actionTo="/"
-          />
-        }
-      />
-      <Route
-        path="/ticketing"
-        element={
-          <ServiceClosedNotice
-            titleKey="closed.ticketing.title"
-            descriptionKey="closed.ticketing.description"
-            actionKey="closed.ticketing.action"
-            actionTo="/"
-          />
-        }
-      />
-      <Route
-        path="/myticket"
-        element={
-          <ServiceClosedNotice
-            titleKey="closed.ticketing.title"
-            descriptionKey="closed.ticketing.description"
-            actionKey="closed.ticketing.action"
-            actionTo="/"
-          />
-        }
-      />
+      <Route path="/login" element={<Navigate to="/ticket/login" replace />} />
+      <Route path="/signup" element={<Navigate to="/ticket/signup" replace />} />
+      <Route path="/reset-password" element={<Navigate to="/ticket/reset-password" replace />} />
+      <Route path="/ticketing" element={<Navigate to="/ticket/ticketing" replace />} />
+      <Route path="/myticket" element={<LegacyMyTicketRedirect />} />
       </Routes>
     </>
   );
