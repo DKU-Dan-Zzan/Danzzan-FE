@@ -2,8 +2,11 @@
 import { Home } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/common/ui/button";
+import { useT } from "@/i18n";
 
 export default function NotFoundPage() {
+  const t = useT();
+
   return (
     <section
       aria-labelledby="not-found-title"
@@ -29,10 +32,10 @@ export default function NotFoundPage() {
           id="not-found-title"
           className="text-[1.8rem] font-extrabold leading-[1.22] tracking-[0] text-[var(--text)]"
         >
-          페이지를 찾을 수 없어요
+          {t("notFound.title")}
         </h1>
         <p className="mt-3 max-w-[18rem] text-[0.94rem] leading-6 tracking-[0] text-[var(--text-muted)]">
-          주소가 바뀌었거나 접근할 수 없는 페이지예요.
+          {t("notFound.description")}
         </p>
 
         <div className="mt-8 w-full max-w-[220px]">
@@ -42,7 +45,7 @@ export default function NotFoundPage() {
           >
             <Link to="/">
               <Home size={17} aria-hidden />
-              홈으로
+              {t("common.home")}
             </Link>
           </Button>
         </div>

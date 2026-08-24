@@ -1,4 +1,5 @@
 import type { Performance } from "@/types/app/timetable/timetable.types"
+import { useT } from "@/i18n"
 
 function hashtagLabel(description: string) {
   const t = description.trim()
@@ -20,8 +21,12 @@ export default function TimelineItem({
   innerRef?: (el: HTMLLIElement | null) => void
   showNow?: boolean
 }) {
+  const t = useT()
   const timeLabel = `${item.startTime} ~ ${item.endTime}`
-  const timeRangeA11yLabel = `${item.startTime}부터 ${item.endTime}까지`
+  const timeRangeA11yLabel = t("timetable.timeRangeA11y", {
+    start: item.startTime,
+    end: item.endTime,
+  })
 
   return (
     <li
@@ -42,8 +47,8 @@ export default function TimelineItem({
             }}
             aria-label={
               showNow
-                ? `지금 진행 중인 공연, ${timeRangeA11yLabel}`
-                : `공연 시간 ${timeRangeA11yLabel}`
+                ? t("timetable.nowPlayingAria", { range: timeRangeA11yLabel })
+                : t("timetable.performanceTimeAria", { range: timeRangeA11yLabel })
             }
           >
             {timeLabel}
@@ -98,7 +103,7 @@ export default function TimelineItem({
                   background: "var(--timetable-v2-now-bg)",
                   boxShadow: "var(--timetable-v2-now-shadow)",
                 }}
-                aria-label="지금 진행 중"
+                aria-label={t("timetable.nowBadgeAria")}
               >
                 NOW
               </span>

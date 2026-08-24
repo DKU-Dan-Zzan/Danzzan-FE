@@ -23,13 +23,17 @@ describe("Home anchor scroll source", () => {
 
   it("Home은 둥실둥실 스크롤 유도 화살표 버튼을 렌더링하고 앵커 이동에 연결한다", () => {
     const source = readSource("src/routes/home/Home.tsx");
+    const koDictionarySource = readSource("src/i18n/locales/ko.ts");
 
     expect(source).toContain("home-scroll-cue-arrow");
     expect(source).toContain("viewBox=\"0 0 64 24\"");
-    expect(source).toContain("스크롤하여 올해의 아티스트를 확인해보세요");
+    // 문구 자체는 사전으로 옮겨졌다. 화면은 키를 통해 조회한다.
+    expect(source).toContain('t("home.scrollCue")');
+    expect(source).toContain('aria-label={t("home.scrollToArtistsAria")}');
+    expect(koDictionarySource).toContain("스크롤하여 올해의 아티스트를 확인해보세요");
+    expect(koDictionarySource).toContain("아티스트 섹션으로 이동");
     expect(source).toContain("ec-scroll-cue-twinkle");
     expect(source).toContain("home-hero-bottom-vignette");
-    expect(source).toContain("aria-label=\"아티스트 섹션으로 이동\"");
     expect(source).toContain("onClick={scrollToLineupAnchor}");
     expect(source).toContain("ec-scroll-cue-float");
     expect(source).toContain("app-bottom-nav-height");

@@ -2,9 +2,10 @@
 // 역할: BoothList의 푸드트럭 클릭 동작을 검증한다.
 import { act } from "react";
 import { createRoot } from "react-dom/client";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import BoothList from "@/components/app/boothmap/BoothList";
 import type { Booth } from "@/types/app/boothmap/boothmap.types";
+import { languageStore } from "@/store/common/languageStore";
 
 function renderBoothList(booths: Booth[], boothDetailAvailability: Record<number, boolean>) {
   const onSelectBooth = vi.fn();
@@ -38,6 +39,10 @@ function renderBoothList(booths: Booth[], boothDetailAvailability: Record<number
 }
 
 describe("BoothList", () => {
+  beforeEach(() => {
+    languageStore.setLanguage("ko");
+  });
+
   it("description이 없는 푸드트럭은 클릭해도 상세로 이동하지 않는다", () => {
     const booths: Booth[] = [
       {
@@ -110,6 +115,34 @@ describe("BoothList", () => {
     expect(document.body.textContent).not.toContain("(기업)");
     expect(document.body.textContent).toContain("기업부스");
     expect(document.body.textContent).toContain("학생부스");
+    cleanup();
+  });
+
+  it("영어에서는 칩 라벨이 영문으로 렌더링된다", () => {
+    languageStore.setLanguage("en");
+
+    const booths: Booth[] = [
+      {
+        id: 3,
+        name: "엔비디아 (기업)",
+        type: "EXPERIENCE",
+        description: "기업 부스",
+        location_x: 0,
+        location_y: 0,
+      },
+      {
+        id: 4,
+        name: "베이크슈",
+        type: "EXPERIENCE",
+        description: "학생 부스",
+        location_x: 0,
+        location_y: 0,
+      },
+    ];
+    const { cleanup } = renderBoothList(booths, {});
+
+    expect(document.body.textContent).toContain("Company booth");
+    expect(document.body.textContent).toContain("Student booth");
     cleanup();
   });
 });

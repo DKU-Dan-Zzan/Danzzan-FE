@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SheetMode, SheetSnap } from "@/types/app/boothmap/boothmap.types";
 import { BOTTOM_SHEET_HEIGHT_RATIO } from "@/utils/app/boothmap/sheetSnap";
+import { useT } from "@/i18n";
 
 type SnapPx = { PEEK: number; HALF: number; FULL: number };
 
@@ -35,6 +36,7 @@ export default function BottomSheet({
   bottomOffset?: number;
   frameWidth?: number;
 }) {
+  const t = useT();
   const bottomSheetOverlap = 2;
 
   const buildSnaps = useCallback(() => {
@@ -164,7 +166,7 @@ export default function BottomSheet({
             onClick={onBackToList}
             className="inline-flex items-center gap-1 rounded-full border border-[color:color-mix(in_srgb,var(--boothmap-panel-border)_72%,white)] bg-[color:color-mix(in_srgb,var(--boothmap-surface-soft)_78%,white)] px-3 py-1.5 text-sm font-semibold text-[var(--boothmap-text-muted)] transition hover:text-[var(--boothmap-text-subtle)]"
           >
-            목록으로
+            {t("boothmap.backToList")}
           </button>
         </div>
       )}

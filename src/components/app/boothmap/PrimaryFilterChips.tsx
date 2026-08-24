@@ -2,14 +2,15 @@ import { Compass } from "lucide-react";
 import { cn } from "@/components/common/ui/utils";
 import { BOOTHMAP_MARKER_THEME } from "@/utils/app/boothmap/boothmapTheme";
 import type { PrimaryFilter } from "@/types/app/boothmap/boothmap.types";
+import { useT, type TranslationKey } from "@/i18n";
 
-const chips: Array<{ label: string; value: PrimaryFilter; iconPath?: string }> = [
-  { label: "ALL", value: "ALL" },
-  { label: "주점", value: "PUB", iconPath: BOOTHMAP_MARKER_THEME.PUB.iconPath },
-  { label: "푸드트럭", value: "FOOD_TRUCK", iconPath: BOOTHMAP_MARKER_THEME.FOOD_TRUCK.iconPath },
-  { label: "부스", value: "EXPERIENCE", iconPath: BOOTHMAP_MARKER_THEME.EXPERIENCE.iconPath },
-  { label: "이벤트", value: "EVENT", iconPath: BOOTHMAP_MARKER_THEME.EVENT.iconPath },
-  { label: "편의시설", value: "FACILITY", iconPath: BOOTHMAP_MARKER_THEME.FACILITY.iconPath },
+const chips: Array<{ labelKey: TranslationKey | null; value: PrimaryFilter; iconPath?: string }> = [
+  { labelKey: null, value: "ALL" },
+  { labelKey: "boothmap.type.pub", value: "PUB", iconPath: BOOTHMAP_MARKER_THEME.PUB.iconPath },
+  { labelKey: "boothmap.type.foodTruck", value: "FOOD_TRUCK", iconPath: BOOTHMAP_MARKER_THEME.FOOD_TRUCK.iconPath },
+  { labelKey: "boothmap.type.experience", value: "EXPERIENCE", iconPath: BOOTHMAP_MARKER_THEME.EXPERIENCE.iconPath },
+  { labelKey: "boothmap.type.event", value: "EVENT", iconPath: BOOTHMAP_MARKER_THEME.EVENT.iconPath },
+  { labelKey: "boothmap.type.facility", value: "FACILITY", iconPath: BOOTHMAP_MARKER_THEME.FACILITY.iconPath },
 ];
 
 const CHIP_BASE_CLASS =
@@ -26,6 +27,8 @@ export default function PrimaryFilterChips({
   value: PrimaryFilter;
   onChange: (v: PrimaryFilter) => void;
 }) {
+  const t = useT();
+
   return (
     <div className="-mx-1 overflow-x-auto px-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       <div className="flex w-max gap-1.5">
@@ -63,7 +66,7 @@ export default function PrimaryFilterChips({
                 ) : (
                   <Compass className="h-3.5 w-3.5" />
                 )}
-                {chip.label}
+                {chip.labelKey ? t(chip.labelKey) : chip.value}
               </span>
             </button>
           );

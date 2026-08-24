@@ -11,6 +11,9 @@ export type NoticeFormState = {
   isPinned: boolean;
   thumbnailImageUrl: string;
   images: string[];
+  titleEn: string;
+  contentEn: string;
+  enIsManual: boolean;
 };
 
 export type AdFormState = {

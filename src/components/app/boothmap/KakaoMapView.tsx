@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import useKakaoMapLoader from "@/hooks/app/boothmap/useKakaoMapLoader"
+import { useT } from "@/i18n"
 import {
   BOOTHMAP_MARKER_THEME,
   getBoothmapColor,
@@ -231,6 +232,7 @@ export default function KakaoMapView({
   onExpandBooth,
   onPrimaryFilterChange,
 }: Props) {
+  const t = useT()
   const mapRef = useRef<HTMLDivElement | null>(null)
   const mapInstanceRef = useRef<KakaoMap | null>(null)
   const isInitialBoundsAppliedRef = useRef(false)
@@ -831,7 +833,7 @@ export default function KakaoMapView({
         id: college.id,
         lat: college.location_y,
         lng: college.location_x,
-        name: `${college.name} 주점`,
+        name: t("boothmap.collegePubMarkerName", { college: college.name }),
         type: "PUB",
         onClick: () => onClickCollege(college.id),
       })
@@ -860,7 +862,7 @@ export default function KakaoMapView({
     }
 
     return items
-  }, [booths, colleges, isBoothExpanded, primaryFilter, onClickBooth, onClickCollege])
+  }, [booths, colleges, isBoothExpanded, primaryFilter, onClickBooth, onClickCollege, t])
 
   // 1) 마커 목록이 바뀔 때만 전체 오버레이 재구성
   useEffect(() => {
@@ -1049,7 +1051,7 @@ export default function KakaoMapView({
         createZoneMarkerRecord({
           lat: marker.lat,
           lng: marker.lng,
-          label: boothZone.label,
+          label: t("boothmap.zoneLabel.booth"),
           type: "EXPERIENCE",
           onClick: onExpandBooth,
         })
@@ -1070,7 +1072,7 @@ export default function KakaoMapView({
         createZoneMarkerRecord({
           lat: marker.lat,
           lng: marker.lng,
-          label: "주점 구역",
+          label: t("boothmap.zoneLabel.pub"),
           type: "PUB",
           onClick: () => onPrimaryFilterChange("PUB"),
         })
@@ -1091,7 +1093,7 @@ export default function KakaoMapView({
         createZoneMarkerRecord({
           lat: marker.lat,
           lng: marker.lng,
-          label: "푸드트럭 구역",
+          label: t("boothmap.zoneLabel.foodTruck"),
           type: "FOOD_TRUCK",
           onClick: () => onPrimaryFilterChange("FOOD_TRUCK"),
         })
@@ -1151,7 +1153,7 @@ export default function KakaoMapView({
         createZoneMarkerRecord({
           lat: marker.lat,
           lng: marker.lng,
-          label: "푸드트럭 구역",
+          label: t("boothmap.zoneLabel.foodTruck"),
           type: "FOOD_TRUCK",
           onClick: () => onPrimaryFilterChange("FOOD_TRUCK"),
         })
@@ -1181,6 +1183,7 @@ export default function KakaoMapView({
     foodTruckZone,
     smokingZones,
     onPrimaryFilterChange,
+    t,
   ])
 
   useEffect(() => {
@@ -1244,7 +1247,7 @@ export default function KakaoMapView({
     return (
       <div className="absolute inset-0 flex items-center justify-center bg-[var(--boothmap-surface-muted)]">
         <div className="rounded-2xl border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-surface)] px-4 py-3 text-sm font-semibold text-[var(--boothmap-danger-text)] shadow-sm">
-          카카오맵을 불러오지 못했어요.
+          {t("boothmap.kakaoMapLoadError")}
         </div>
       </div>
     )
@@ -1254,7 +1257,7 @@ export default function KakaoMapView({
     return (
       <div className="absolute inset-0 flex items-center justify-center bg-[var(--boothmap-surface-muted)]">
         <div className="rounded-2xl border border-[var(--boothmap-panel-border)] bg-[var(--boothmap-panel-bg)] px-4 py-3 text-sm font-semibold text-[var(--boothmap-text-subtle)] shadow-[var(--boothmap-panel-shadow)] backdrop-blur-md">
-          지도를 불러오는 중...
+          {t("boothmap.mapLoading")}
         </div>
       </div>
     )

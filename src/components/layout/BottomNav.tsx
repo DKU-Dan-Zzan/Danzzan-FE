@@ -3,6 +3,8 @@ import { NavLink } from "react-router-dom";
 import { Clock3, Home, Map, Megaphone, Ticket } from "lucide-react";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { cn } from "@/components/common/ui/utils";
+import type { TranslationKey } from "@/i18n";
+import { useT } from "@/i18n";
 import { hasAuthenticatedRole } from "@/lib/common/auth-access";
 import { getTicketingNavigationTarget } from "@/lib/common/ticketing-navigation";
 import { preloadRouteByPath } from "@/lib/navigation/routePreload";
@@ -13,15 +15,15 @@ import { authStore } from "@/store/common/authStore";
 type BottomNavItem = {
   to: string;
   icon: typeof Home;
-  label: string;
+  labelKey: TranslationKey;
   center?: boolean;
 };
 
 const STATIC_ITEMS: BottomNavItem[] = [
-  { to: "/map", icon: Map, label: "부스맵" },
-  { to: "/timetable", icon: Clock3, label: "타임테이블" },
-  { to: "/", icon: Home, label: "HOME", center: true },
-  { to: "/notice", icon: Megaphone, label: "공지사항" },
+  { to: "/map", icon: Map, labelKey: "nav.boothmap" },
+  { to: "/timetable", icon: Clock3, labelKey: "nav.timetable" },
+  { to: "/", icon: Home, labelKey: "nav.home", center: true },
+  { to: "/notice", icon: Megaphone, labelKey: "nav.notice" },
 ];
 
 const BOTTOM_NAV_WRAPPER_CLASS =
@@ -50,6 +52,7 @@ const BOTTOM_NAV_HOME_ICON_CLASS = "h-[22px] w-[22px]";
 const APP_BOTTOM_NAV_RUNTIME_OFFSET_VAR = "--app-bottom-nav-runtime-offset";
 
 const BottomNav = () => {
+  const t = useT();
   const navRef = useRef<HTMLElement | null>(null);
   const session = useSyncExternalStore(
     authStore.subscribe,
@@ -64,7 +67,7 @@ const BottomNav = () => {
   const ticketingTarget = getTicketingNavigationTarget(hasTicketingAccess);
   const items: BottomNavItem[] = [
     ...STATIC_ITEMS,
-    { to: ticketingTarget, icon: Ticket, label: "티켓팅" },
+    { to: ticketingTarget, icon: Ticket, labelKey: "nav.ticketing" },
   ];
 
   const warmTabRoute = (routePath: string) => {
@@ -115,7 +118,8 @@ const BottomNav = () => {
       <div className={BOTTOM_NAV_PANEL_CLASS} />
 
       <div className={BOTTOM_NAV_GRID_CLASS}>
-        {items.map(({ to, icon: Icon, label, center }) => {
+        {items.map(({ to, icon: Icon, labelKey, center }) => {
+          const label = t(labelKey);
           if (center) {
             return (
               <NavLink

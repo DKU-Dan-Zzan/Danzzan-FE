@@ -1,6 +1,7 @@
 // 역할: home 화면에서 사용하는 Emergency Notice UI 블록을 렌더링합니다.
 import { useState } from "react"
 import { ChevronDown, Megaphone } from "lucide-react"
+import { useLanguage, useT } from "@/i18n"
 
 export interface EmergencyNoticeData {
   id: number
@@ -14,6 +15,8 @@ interface Props {
 }
 
 const EmergencyNotice = ({ notice }: Props) => {
+  const t = useT()
+  const { language } = useLanguage()
   const [isExpanded, setIsExpanded] = useState(false)
   const contentId = `emergency-notice-content-${notice?.id ?? "empty"}`
   const updatedAtLabel = (() => {
@@ -22,7 +25,8 @@ const EmergencyNotice = ({ notice }: Props) => {
     const parsed = new Date(notice.updatedAt)
     if (Number.isNaN(parsed.getTime())) return null
 
-    return parsed.toLocaleString("ko-KR", {
+    const locale = language === "en" ? "en-US" : "ko-KR"
+    return parsed.toLocaleString(locale, {
       month: "2-digit",
       day: "2-digit",
       hour: "2-digit",
@@ -46,7 +50,7 @@ const EmergencyNotice = ({ notice }: Props) => {
           }`}
           aria-expanded={isExpanded}
           aria-controls={contentId}
-          aria-label={isExpanded ? "긴급 공지 접기" : "긴급 공지 전문 펼치기"}
+          aria-label={isExpanded ? t("home.emergencyCollapseAria") : t("home.emergencyExpandAria")}
         >
           <div className="flex h-[var(--home-notice-icon-size)] w-[var(--home-notice-icon-size)] shrink-0 items-center justify-center rounded-full bg-[linear-gradient(145deg,var(--home-notice-icon-bg-start)_0%,var(--home-notice-icon-bg-end)_100%)] text-[var(--status-danger)] shadow-[var(--home-notice-icon-inner-shadow)]">
             <Megaphone size={14} strokeWidth={2.2} />
@@ -55,7 +59,7 @@ const EmergencyNotice = ({ notice }: Props) => {
           <div className="min-w-0 flex-1">
             {isExpanded && updatedAtLabel && (
               <p className="mb-1 text-[length:var(--home-notice-updated-font-size)] leading-none tracking-[var(--type-label-md-tracking)] text-[var(--text-body-deep)]">
-                업데이트 {updatedAtLabel}
+                {t("home.emergencyUpdatedPrefix", { time: updatedAtLabel })}
               </p>
             )}
             <p

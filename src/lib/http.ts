@@ -3,9 +3,15 @@
 import axios from "axios";
 import { getApiBaseUrl } from "@/api/common/baseUrl";
 import { JSON_HEADERS } from "@/api/common/httpConstants";
+import { attachLanguageParam } from "@/api/common/httpClient";
 
 export const http = axios.create({
   baseURL: getApiBaseUrl(),
   withCredentials: false,
   headers: { ...JSON_HEADERS },
+});
+
+http.interceptors.request.use((config) => {
+  const { params } = attachLanguageParam({ method: config.method, params: config.params });
+  return { ...config, params };
 });

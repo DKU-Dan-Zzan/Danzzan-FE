@@ -1,6 +1,7 @@
 // 역할: 지연 노출 조건을 지원하는 공용 로딩 스피너 컴포넌트를 제공합니다.
 import { useEffect, useState } from "react";
 import { cn } from "@/components/common/ui/utils";
+import { useT } from "@/i18n";
 
 type DelayedSpinnerProps = {
   delayMs?: number;
@@ -15,10 +16,12 @@ const DEFAULT_SPINNER_CLASS =
 
 export default function DelayedSpinner({
   delayMs = 300,
-  label = "페이지 전환 중",
+  label,
   containerClassName,
   spinnerClassName,
 }: DelayedSpinnerProps) {
+  const t = useT();
+  const resolvedLabel = label ?? t("common.loading");
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -39,10 +42,10 @@ export default function DelayedSpinner({
     <div className={cn(DEFAULT_CONTAINER_CLASS, containerClassName)}>
       <div
         role="status"
-        aria-label={label}
+        aria-label={resolvedLabel}
         className={cn(DEFAULT_SPINNER_CLASS, spinnerClassName)}
       />
-      <span className="sr-only">{label}</span>
+      <span className="sr-only">{resolvedLabel}</span>
     </div>
   );
 }
