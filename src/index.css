@@ -332,10 +332,13 @@
   --boothmap-border: var(--boothmap-border-soft);
   --boothmap-text: var(--text-body-deep);
   --boothmap-text-subtle: var(--text-bold-emphasis);
+  --boothmap-text-soft: color-mix(in srgb, var(--text-body-deep) 62%, white);
   --boothmap-text-muted: color-mix(in srgb, var(--text-body-deep) 52%, white);
   --boothmap-accent: var(--text-emphasis-vivid);
   --boothmap-accent-soft: color-mix(in srgb, var(--text-emphasis-vivid) 12%, white);
   --boothmap-accent-text: var(--text-emphasis-vivid);
+  --boothmap-intro-bg: color-mix(in srgb, var(--text-body-deep) 6%, white);
+  --boothmap-intro-text: var(--text-body-deep);
   --boothmap-danger-bg: var(--status-danger-bg);
   --boothmap-danger-border: var(--status-danger-border);
   --boothmap-danger-text: var(--status-danger-text);
@@ -1466,4 +1469,29 @@ body,
   --home-card-bg: #ffffff;
   --boothmap-paper-base: #ffffff;
   --boothmap-paper-soft: #ffffff;
+
+  /* 부스맵 목록·상세 본문 — 주점명/운영시간/설명은 무채색 계열로 통일.
+     브랜드 색은 마커·활성 칩·인스타 핸들 같은 강조 요소에만 남긴다. */
+  --boothmap-text: #232124;          /* 주점·부스 이름 */
+  --boothmap-text-subtle: #5c5759;   /* 운영시간·설명 본문 */
+  --boothmap-text-soft: #7a7476;     /* 카드 부제 — 단과대·한줄소개 */
+  --boothmap-text-muted: #8f8a8c;    /* 섹션 라벨·보조 안내 */
+
+  /* 한줄소개 콜아웃 — 강조는 유지하되 색은 빼고 면으로만 구분한다 */
+  --boothmap-intro-bg: #f1efef;
+  --boothmap-intro-text: #232124;
+
+  /* 카테고리 마커 — 붉은 계열에 주점/푸드트럭/편의시설이 몰려 구분이 안 되던 것을
+     색상환에서 서로 떨어뜨린다. 주점만 브랜드 주황을 쓴다. */
+  --boothmap-marker-pub: #ff642d;         /* 주점 — 브랜드 주황 */
+  --boothmap-marker-food-truck: #ec4899;  /* 푸드트럭 — 핑크 */
+  --boothmap-marker-facility: #3b82f6;    /* 편의시설 — 파랑 */
+
+  /* 구역 폴리곤 — 같은 카테고리의 마커 색과 계열을 맞춘다 */
+  --boothmap-zone-pub-stroke: #e8480f;
+  --boothmap-zone-pub-fill: #ffc4a8;
+  --boothmap-zone-pub-dot: #ff642d;
+  --boothmap-zone-food-truck-stroke: #be185d;
+  --boothmap-zone-food-truck-fill: #fbcfe8;
+  --boothmap-zone-food-truck-dot: #ec4899;
 }

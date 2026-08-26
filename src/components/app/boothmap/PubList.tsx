@@ -65,13 +65,13 @@ function PubList({
               </div>
 
               {pub.department && (
-                <div className="mt-1 truncate text-sm font-semibold text-[var(--boothmap-text-subtle)]">
+                <div className="mt-1 truncate text-sm font-semibold text-[var(--boothmap-text-soft)]">
                   {pub.department}
                 </div>
               )}
 
               {pub.intro && (
-                <div className="mt-2 line-clamp-2 text-sm font-medium leading-6 text-[var(--boothmap-text-subtle)]">
+                <div className="mt-2 line-clamp-2 text-sm font-medium leading-6 text-[var(--boothmap-text-soft)]">
                   {pub.intro}
                 </div>
               )}
