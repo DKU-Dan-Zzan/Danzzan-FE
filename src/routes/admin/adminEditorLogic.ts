@@ -6,6 +6,7 @@ import type {
   NoticeResponse,
   UpdateEmergencyRequest,
 } from "@/api/app/admin/adminApi";
+import { normalizeEnglish } from "@/api/app/admin/adminContract";
 import type {
   AdFormState,
   NoticeAuthor,
@@ -30,6 +31,9 @@ export const createEmptyNoticeForm = (): NoticeFormState => {
     isPinned: false,
     thumbnailImageUrl: "",
     images: [],
+    titleEn: "",
+    contentEn: "",
+    enIsManual: false,
   };
 };
 
@@ -51,6 +55,9 @@ export const createNoticeEditForm = (notice: NoticeResponse): NoticeFormState =>
     isPinned: Boolean(notice.isPinned ?? notice.isEmergency),
     thumbnailImageUrl: notice.thumbnailImageUrl ?? "",
     images: notice.imageUrls ?? [],
+    titleEn: notice.titleEn ?? "",
+    contentEn: notice.contentEn ?? "",
+    enIsManual: Boolean(notice.enIsManual),
   };
 };
 
@@ -62,6 +69,8 @@ export const buildNoticePayload = (form: NoticeFormState): CreateNoticeRequest =
     isPinned: form.isPinned,
     thumbnailImageUrl: form.thumbnailImageUrl.trim() || null,
     images: form.images,
+    titleEn: normalizeEnglish(form.titleEn),
+    contentEn: normalizeEnglish(form.contentEn),
   };
 };
 

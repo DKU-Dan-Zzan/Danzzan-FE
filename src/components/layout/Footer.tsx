@@ -1,6 +1,7 @@
 import { Instagram } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 import { Link } from "react-router-dom";
+import { useT } from "@/i18n";
 
 type SocialIconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -37,32 +38,34 @@ const SOCIAL_LINKS = [
 ] as const satisfies ReadonlyArray<SocialLink>;
 
 type PolicyLink = {
-  label: string;
+  labelKey: "common.footerPrivacyPolicy" | "common.footerTermsOfService";
   to: string;
 };
 
 const POLICY_LINKS = [
   {
-    label: "개인정보처리방침",
+    labelKey: "common.footerPrivacyPolicy",
     to: "/legal/privacy",
   },
   {
-    label: "이용약관",
+    labelKey: "common.footerTermsOfService",
     to: "/legal/terms",
   },
 ] as const satisfies ReadonlyArray<PolicyLink>;
 
 // 역할: 앱 레이아웃 레이어의 Footer 구성 컴포넌트를 제공합니다.
 const Footer = () => {
+  const t = useT();
+
   return (
     <footer className="relative w-full bg-[var(--footer-bg)] [background-image:var(--footer-bg-gradient)] bg-no-repeat bg-[length:100%_100%]">
       <div className="mx-auto max-w-[430px] px-5 pb-7 pt-6">
         <p className="text-center text-[13px] leading-5 text-[var(--footer-text-primary)]">
-          주최 단국대학교 죽전캠퍼스 제58대 LOU:D 총학생회
+          {t("common.footerOrganizer")}
         </p>
 
         <p className="mt-4 text-center text-[12px] text-[var(--footer-text-secondary)]">
-          LOU:D 총학생회 Instagram · YouTube
+          {t("common.footerSocialLinksLabel")}
         </p>
 
         <div className="mt-2 flex items-center justify-center gap-3">
@@ -81,7 +84,7 @@ const Footer = () => {
         </div>
 
         <div className="mt-4 flex items-center justify-center text-[13px] text-[var(--footer-text-secondary)]">
-          {POLICY_LINKS.map(({ label, to }, index) => (
+          {POLICY_LINKS.map(({ labelKey, to }, index) => (
             <div key={to} className="flex items-center">
               {index > 0 && <span className="mx-2 text-[var(--footer-text-secondary)]">|</span>}
               <Link
@@ -89,7 +92,7 @@ const Footer = () => {
                 state={{ returnTo: "/mypage" }}
                 className="underline-offset-2 transition-colors duration-150 hover:text-[var(--footer-text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--footer-bg)]"
               >
-                {label}
+                {t(labelKey)}
               </Link>
             </div>
           ))}

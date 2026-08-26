@@ -1,5 +1,6 @@
 // 역할: home 화면에서 사용하는 Poster Carousel UI 블록을 렌더링합니다.
 import { useEffect, useMemo, useState } from "react"
+import { useT } from "@/i18n"
 
 export type Poster = {
   id: string
@@ -23,6 +24,7 @@ export default function PosterCarousel({
   aspect = "4962/7017",
   fillViewport = false,
 }: Props) {
+  const t = useT()
   const count = posters.length
   const [index, setIndex] = useState(0)
 
@@ -57,10 +59,10 @@ export default function PosterCarousel({
           >
             <div className="text-center">
               <div className="text-[15px] leading-[1.3] font-semibold text-[var(--text)]">
-                2026 단국축제
+                {t("home.posterPlaceholderTitle")}
               </div>
               <div className="mt-1 text-xs leading-[1.3] text-[var(--text-muted)]">
-                축제 포스터 영역
+                {t("home.posterPlaceholderSubtitle")}
               </div>
             </div>
           </div>
@@ -89,7 +91,7 @@ export default function PosterCarousel({
               <div key={p.id} className="relative h-full min-w-full">
                 <img
                   src={p.imageUrl}
-                  alt={p.alt ?? "축제 포스터"}
+                  alt={p.alt ?? t("home.posterFallbackAlt")}
                   className="h-full w-full object-cover"
                   draggable={false}
                 />
@@ -111,7 +113,7 @@ export default function PosterCarousel({
                 key={p.id}
                 type="button"
                 onClick={() => setIndex(i)}
-                aria-label={`포스터 ${i + 1}로 이동`}
+                aria-label={t("home.posterDotAria", { index: i + 1 })}
                 className={`h-[var(--home-dot-height)] rounded-full bg-[var(--surface_container_high)] transition-all duration-300 ${
                   active ? "w-[var(--home-dot-active-width)] bg-[linear-gradient(135deg,var(--primary)_0%,var(--primary_container)_100%)]" : "w-[var(--home-dot-width)]"
                 }`}

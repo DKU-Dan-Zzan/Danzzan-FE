@@ -117,6 +117,14 @@
   --ec-glass-blur: 28px;
   --ec-ambient-shadow: 0 20px 50px color-mix(in srgb, var(--neutral-19) 6%, transparent);
   --brand-main: var(--brand-33);
+
+  /* 가을 축제(2026 DANFESTA "LEGEND") 팔레트.
+     메인 포스터에서 추출했으며, 티켓팅·로그인 등 이번 축제에 제공하지 않는
+     서비스의 안내 화면에서만 사용한다. 앱의 기본 팔레트는 --brand-main 계열이다. */
+  --legend-ink: #0b0607;
+  --legend-ember: #e8551f;
+  --legend-ember-deep: #b3241a;
+  --legend-cream: #f5e3a3;
   --bg-base: var(--brand-99);
   --bg-page-soft: var(--brand-99);
   --text: var(--brand-11);

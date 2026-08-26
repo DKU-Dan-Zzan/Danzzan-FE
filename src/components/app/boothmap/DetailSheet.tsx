@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialo
 import { formatBoothOperatingLabel } from "@/utils/app/boothmap/formatBoothOperatingLabel";
 import { formatDescription } from "@/utils/app/boothmap/formatDescription";
 import { formatOperatingTime } from "@/utils/app/boothmap/formatOperatingTime";
+import { useT } from "@/i18n";
 
 const INSTAGRAM_HANDLE_PATTERN = /^[A-Za-z0-9._]+$/;
 
@@ -39,6 +40,7 @@ function DetailSheet({
   selectedDate: string;
   onClose: () => void;
 }) {
+  const t = useT();
   const [viewerImage, setViewerImage] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const lastFocusedElementRef = useRef<HTMLElement | null>(null);
@@ -87,11 +89,11 @@ function DetailSheet({
   const imageViewerDialog = (
     <Dialog open={Boolean(viewerImage)} onOpenChange={handleViewerOpenChange}>
       <DialogContent className="max-h-[92vh] w-fit max-w-[92vw] border-0 bg-transparent p-0 shadow-none">
-        <DialogTitle className="sr-only">이미지 상세 보기</DialogTitle>
+        <DialogTitle className="sr-only">{t("boothmap.imageDetailTitle")}</DialogTitle>
         {viewerImage && (
           <img
             src={viewerImage}
-            alt="상세 이미지"
+            alt={t("boothmap.detailImageAlt")}
             decoding="async"
             width={1200}
             height={900}
@@ -106,7 +108,7 @@ function DetailSheet({
     return (
       <div className="rounded-[26px] border border-[var(--boothmap-border)] bg-[color:color-mix(in_srgb,var(--boothmap-surface)_90%,white)] px-5 py-8 text-center shadow-[var(--boothmap-card-shadow)]">
         <div className="text-sm font-semibold text-[var(--boothmap-text-muted)]">
-          선택된 항목이 없어요.
+          {t("boothmap.noSelection")}
         </div>
       </div>
     );
@@ -136,7 +138,7 @@ function DetailSheet({
     return (
       <div className="rounded-[26px] border border-[var(--boothmap-danger-border)] bg-[var(--boothmap-surface)] p-6 text-center shadow-[var(--boothmap-card-shadow)]">
         <div className="text-sm font-semibold text-[var(--boothmap-danger-text)]">
-          상세 정보를 불러오지 못했어요.
+          {t("boothmap.detailLoadError")}
         </div>
       </div>
     );
@@ -170,13 +172,13 @@ function DetailSheet({
               <button
                 type="button"
                 onClick={() => openViewer(boothImageUrl)}
-                aria-label="부스 이미지 상세 보기"
+                aria-label={t("boothmap.boothImageDetailAria")}
                 className="mx-auto block max-h-[320px] w-auto max-w-full cursor-pointer rounded-xl"
               >
                 <img
                   src={boothThumbnailUrl}
                   data-fallback-src={boothImageUrl}
-                  alt={`${boothDetail.name} 이미지`}
+                  alt={t("boothmap.boothImageAlt", { name: boothDetail.name })}
                   loading="lazy"
                   decoding="async"
                   width={1200}
@@ -195,7 +197,7 @@ function DetailSheet({
           )}
 
           <div className="mt-5 whitespace-pre-line text-sm font-medium leading-7 text-[var(--boothmap-text-subtle)]">
-            {description || "등록된 상세 정보가 없어요."}
+            {description || t("boothmap.noDetailContent")}
           </div>
         </div>
 
@@ -207,7 +209,7 @@ function DetailSheet({
   if (selectedItem.kind === "pub" && pubDetail) {
     const summaryPub = pubs.find((item) => item.id === selectedItem.id);
     const fallbackCollege =
-      colleges.find((college) => college.id === summaryPub?.college_id)?.name ?? "단과대";
+      colleges.find((college) => college.id === summaryPub?.college_id)?.name ?? t("boothmap.collegeFallback");
     const displayCollege = pubDetail.collegeName || fallbackCollege;
     const imageUrls = pubDetail.imageUrls ?? [];
     const thumbnailImageUrls = pubDetail.thumbnailImageUrls ?? [];
@@ -273,13 +275,13 @@ function DetailSheet({
                       <button
                         type="button"
                         onClick={() => openViewer(imageUrl)}
-                        aria-label={`주점 이미지 ${index + 1} 상세 보기`}
+                        aria-label={t("boothmap.pubImageDetailAria", { index: index + 1 })}
                         className="block w-full cursor-pointer rounded-[22px]"
                       >
                         <img
                           src={displayImageUrl}
                           data-fallback-src={imageUrl}
-                          alt={`${pubDetail.name} 이미지 ${index + 1}`}
+                          alt={t("boothmap.pubImageAlt", { name: pubDetail.name, index: index + 1 })}
                           loading="lazy"
                           decoding="async"
                           width={1200}
@@ -335,7 +337,7 @@ function DetailSheet({
   return (
     <div className="rounded-[26px] border border-[var(--boothmap-border)] bg-[color:color-mix(in_srgb,var(--boothmap-surface)_90%,white)] px-5 py-8 text-center shadow-[var(--boothmap-card-shadow)]">
       <div className="text-sm font-semibold text-[var(--boothmap-text-muted)]">
-        표시할 상세 정보가 없어요.
+        {t("boothmap.noDisplayableDetail")}
       </div>
     </div>
   );

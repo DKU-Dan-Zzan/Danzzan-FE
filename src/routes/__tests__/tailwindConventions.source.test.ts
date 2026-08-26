@@ -26,10 +26,25 @@ function extractInputTagByPlaceholder(source: string, placeholder: string) {
   return source.slice(inputStartIndex, inputEndIndex);
 }
 
+function extractInputTagByToken(source: string, token: string) {
+  const tokenIndex = source.indexOf(token);
+  if (tokenIndex < 0) {
+    throw new Error(`token not found: ${token}`);
+  }
+
+  const inputStartIndex = source.lastIndexOf("<input", tokenIndex);
+  const inputEndIndex = source.indexOf("/>", tokenIndex);
+  if (inputStartIndex < 0 || inputEndIndex < 0) {
+    throw new Error(`input tag range not found for token: ${token}`);
+  }
+
+  return source.slice(inputStartIndex, inputEndIndex);
+}
+
 describe("Tailwind source conventions", () => {
   it("Notice 검색 입력은 focus-visible 스타일을 포함한다", () => {
     const source = readSource("src/routes/notice/Notice.tsx");
-    const inputTagSource = extractInputTagByPlaceholder(source, "공지 제목 또는 내용을 검색해 보세요");
+    const inputTagSource = extractInputTagByToken(source, 'placeholder={t("notice.searchPlaceholder")}');
 
     expect(inputTagSource).toContain("focus-visible:outline-none");
     expect(inputTagSource).toContain("focus-visible:ring-2");

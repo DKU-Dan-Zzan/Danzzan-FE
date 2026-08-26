@@ -30,6 +30,9 @@ export type AdminBoothManagementBooth = {
   startTime: string | null;
   endTime: string | null;
   operationDates: string[];
+  nameEn?: string | null;
+  descriptionEn?: string | null;
+  enIsManual?: boolean;
 };
 
 export type AdminBoothManagementPub = {
@@ -44,6 +47,11 @@ export type AdminBoothManagementPub = {
   instagram: string | null;
   operationInfoExists: boolean;
   displayOperationIds: number[];
+  nameEn?: string | null;
+  introEn?: string | null;
+  descriptionEn?: string | null;
+  departmentEn?: string | null;
+  enIsManual?: boolean;
 };
 
 export type AdminPubOperation = {
@@ -77,6 +85,8 @@ export type UpdateAdminBoothPayload = {
   operationStatus: "OPEN" | "CLOSED" | "UNKNOWN";
   name?: string | null;
   description?: string | null;
+  nameEn?: string;
+  descriptionEn?: string;
   startTime?: string | null;
   endTime?: string | null;
   operationDates: string[];
@@ -86,6 +96,8 @@ export type CreateAdminBoothPayload = {
   type: "EXPERIENCE" | "FOOD_TRUCK" | "EVENT" | "FACILITY";
   name: string;
   description?: string | null;
+  nameEn?: string;
+  descriptionEn?: string;
   operationStatus: "OPEN" | "CLOSED" | "UNKNOWN";
   startTime?: string | null;
   endTime?: string | null;
@@ -97,6 +109,10 @@ export type UpdateAdminPubPayload = {
   intro?: string | null;
   description?: string | null;
   instagram?: string | null;
+  nameEn?: string;
+  introEn?: string;
+  descriptionEn?: string;
+  departmentEn?: string;
   displayOperationIds: number[];
 };
 
@@ -107,6 +123,10 @@ export type CreateAdminPubPayload = {
   intro?: string | null;
   description?: string | null;
   instagram?: string | null;
+  nameEn?: string;
+  introEn?: string;
+  descriptionEn?: string;
+  departmentEn?: string;
   displayOperationIds: number[];
 };
 

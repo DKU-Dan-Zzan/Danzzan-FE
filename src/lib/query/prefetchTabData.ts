@@ -10,6 +10,7 @@ import {
 import { getNotices } from "@/api/app/notice/noticeApi";
 import { studentProfileApi } from "@/api/app/auth/studentProfileApi";
 import { authStore } from "@/store/common/authStore";
+import { getCurrentLanguage } from "@/store/common/languageStore";
 import type { AuthUser } from "@/types/common/auth.model";
 import type { Booth, College, Pub } from "@/types/app/boothmap/boothmap.types";
 import { queryClient } from "@/lib/query/queryClient";
@@ -87,7 +88,7 @@ function mapPubSummaryToPub(dto: PubSummaryResponse): Pub {
 
 const prefetchNoticeTabData = async () => {
   await queryClient.prefetchQuery({
-    queryKey: appQueryKeys.noticeList({
+    queryKey: appQueryKeys.noticeList(getCurrentLanguage(), {
       keyword: "",
       category: "ALL",
       page: 0,
@@ -109,7 +110,7 @@ const prefetchNoticeTabData = async () => {
 
 const prefetchBoothMapTabData = async () => {
   await queryClient.prefetchQuery({
-    queryKey: appQueryKeys.boothMapData(DEFAULT_BOOTHMAP_PREFETCH_DATE),
+    queryKey: appQueryKeys.boothMapData(getCurrentLanguage(), DEFAULT_BOOTHMAP_PREFETCH_DATE),
     queryFn: async ({ signal }) => {
       const [boothMapData, pubsData] = await Promise.all([
         getBoothMap(DEFAULT_BOOTHMAP_PREFETCH_DATE, { signal }),

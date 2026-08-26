@@ -8,6 +8,7 @@ import AdBanner from "@/components/app/home/AdBanner";
 import { Dialog, DialogContent, DialogTitle } from "@/components/common/ui/dialog";
 import { cn } from "@/components/common/ui/utils";
 import { useDebouncedValue } from "@/hooks/app/useDebouncedValue";
+import { useLanguage, useT } from "@/i18n";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
 
 type CategoryKey = "ALL" | "GENERAL" | "EVENT";
@@ -37,6 +38,8 @@ const NOTICE_LIST_CARD_DEFAULT_CLASS =
   "border border-[var(--border-subtle)] bg-[var(--surface)] shadow-[0_4px_12px_var(--shadow-color)]";
 
 function Notice() {
+  const t = useT();
+  const { language } = useLanguage();
   const [keyword, setKeyword] = useState("");
   const category: CategoryKey = "ALL";
   const [page, setPage] = useState(0);
@@ -50,7 +53,7 @@ function Notice() {
   const debouncedKeyword = useDebouncedValue(keyword, 300);
 
   const noticeListQuery = useAppQuery({
-    queryKey: appQueryKeys.noticeList({
+    queryKey: appQueryKeys.noticeList(language, {
       keyword: debouncedKeyword.trim(),
       category,
       page,
@@ -71,11 +74,11 @@ function Notice() {
   });
 
   const detailQuery = useAppQuery({
-    queryKey: appQueryKeys.noticeDetail(selectedNoticeId ?? -1),
+    queryKey: appQueryKeys.noticeDetail(language, selectedNoticeId ?? -1),
     enabled: selectedNoticeId !== null,
     queryFn: ({ signal }) => {
       if (selectedNoticeId === null) {
-        throw new Error("공지 상세 대상이 없습니다.");
+        throw new Error(t("notice.missingDetailTarget"));
       }
       return getNoticeDetail(selectedNoticeId, { signal });
     },
@@ -141,13 +144,13 @@ function Notice() {
       <section className="bg-[var(--surface)] pb-4 pl-[28px] pr-4 pt-3 shadow-[0_8px_24px_var(--shadow-color)]">
         <div className="mb-3">
           <h1 className="mt-1 text-[20px] font-extrabold tracking-tight text-[var(--text-body-deep)]">
-            공지사항
+            {t("notice.pageTitle")}
           </h1>
         </div>
         <div className="flex gap-2">
           <div className="flex-1 rounded-full bg-[var(--surface-subtle)] px-4 py-2 shadow-inner">
             <label htmlFor="notice-search-input" className="sr-only">
-              공지 검색
+              {t("notice.searchLabel")}
             </label>
               <input
                 id="notice-search-input"
@@ -159,7 +162,7 @@ function Notice() {
                   setPage(0);
                 }
                 }}
-                placeholder="공지 제목 또는 내용을 검색해 보세요"
+                placeholder={t("notice.searchPlaceholder")}
                 className="h-7 w-full bg-transparent text-[13px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-subtle)]"
               />
             </div>
@@ -178,14 +181,14 @@ function Notice() {
               }}
               className="mt-2 rounded-md border border-[var(--status-danger-border)] bg-[var(--surface)] px-2 py-1 text-[11px] font-semibold text-[var(--status-danger-text)]"
             >
-              다시 시도
+              {t("common.retry")}
             </button>
           </div>
         )}
 
         {noticeListQuery.isPending && (notices ?? []).length === 0 && (
           <p className="py-8 text-center text-[12px] text-[var(--text-muted)]">
-            공지사항을 불러오는 중입니다...
+            {t("notice.loadingList")}
           </p>
         )}
 
@@ -194,7 +197,7 @@ function Notice() {
           (noticePinned ?? []).length === 0 &&
           (noticeOthers ?? []).length === 0 && (
             <p className="py-8 text-center text-[12px] text-[var(--text-muted)]">
-              아직 등록된 공지사항이 없습니다.
+              {t("notice.emptyState")}
             </p>
           )}
 
@@ -248,7 +251,7 @@ function Notice() {
                 </span>
                 {notice.thumbnailImageUrl && (
                   <span className="inline-flex items-center gap-0.5 rounded-full bg-[var(--surface-subtle)] px-1.5 py-0.5 text-[9px] text-[var(--text-muted)]">
-                    🖼 사진
+                    {t("notice.photoBadge")}
                   </span>
                 )}
               </div>
@@ -318,20 +321,20 @@ function Notice() {
             className="h-[66.67vh] w-full max-w-xl overflow-hidden rounded-3xl bg-white p-0 shadow-[0_18px_45px_var(--shadow-color)]"
           >
             <div className="flex items-center justify-between border-b border-[var(--home-card-border)] px-5 py-3.5">
-              <DialogTitle className="text-[13px] font-semibold text-[var(--text)]">공지 상세</DialogTitle>
+              <DialogTitle className="text-[13px] font-semibold text-[var(--text)]">{t("notice.detailTitle")}</DialogTitle>
               <button
                 type="button"
                 onClick={handleCloseDetail}
                 className="rounded-full border border-[var(--home-card-border)] bg-[var(--surface-subtle)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-muted)]"
               >
-                닫기
+                {t("common.close")}
               </button>
             </div>
 
             <div className="h-[calc(66.67vh-52px)] overflow-y-auto px-5 pt-4 pb-10">
               {detailLoading && (
                 <p className="py-6 text-center text-[12px] text-[var(--text-muted)]">
-                  공지 상세를 불러오는 중입니다...
+                  {t("notice.loadingDetail")}
                 </p>
               )}
 
@@ -345,7 +348,7 @@ function Notice() {
                     }}
                     className="mt-2 rounded-md border border-[var(--status-danger-border)] bg-[var(--surface)] px-2 py-1 text-[11px] font-semibold text-[var(--status-danger-text)]"
                   >
-                    다시 시도
+                    {t("common.retry")}
                   </button>
                 </div>
               )}
@@ -456,7 +459,7 @@ function Notice() {
                               key={idx}
                               type="button"
                               onClick={() => setActiveImageIndex(idx)}
-                              aria-label={`공지 이미지 ${idx + 1}번 보기`}
+                              aria-label={t("notice.imageDotAria", { index: idx + 1 })}
                               className={cn(
                                 "h-1.5 rounded-full transition-all",
                                 activeImageIndex === idx

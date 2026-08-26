@@ -1,9 +1,9 @@
 // 역할: layout 레이어의 Bottom Nav.test 동작과 회귀 조건을 검증하는 테스트입니다.
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { StaticRouter } from "react-router-dom/server";
 import BottomNav from "@/components/layout/BottomNav";
-import { authStore } from "@/store/common/authStore";
+import { languageStore } from "@/store/common/languageStore";
 
 function renderBottomNav(location: string) {
   return renderToStaticMarkup(
@@ -13,16 +13,12 @@ function renderBottomNav(location: string) {
   );
 }
 
-const createJwtLikeToken = (payload: Record<string, unknown>): string => {
-  const encode = (value: Record<string, unknown>) =>
-    Buffer.from(JSON.stringify(value)).toString("base64url");
-
-  return `${encode({ alg: "HS256", typ: "JWT" })}.${encode(payload)}.signature`;
-};
-
 describe("BottomNav", () => {
+  beforeEach(() => {
+    languageStore.setLanguage("ko");
+  });
+
   afterEach(() => {
-    authStore.clear();
     vi.restoreAllMocks();
   });
 
@@ -46,6 +42,19 @@ describe("BottomNav", () => {
     expect(markup).toContain(">공지사항<");
     expect(markup).toContain(">티켓팅<");
     expect(markup).not.toContain(">내정보<");
+  });
+
+  it("영어일 때 탭 라벨이 영문으로 바뀐다", () => {
+    languageStore.setLanguage("en");
+
+    const markup = renderBottomNav("/notice");
+
+    expect(markup).toContain(">Booth Map<");
+    expect(markup).toContain(">Timetable<");
+    expect(markup).toContain(">Notices<");
+    expect(markup).toContain(">Ticketing<");
+
+    languageStore.setLanguage("ko");
   });
 
   it("중앙 HOME 탭은 원형 하이라이트 스타일을 사용한다", () => {
@@ -79,68 +88,9 @@ describe("BottomNav", () => {
     expect(markup).not.toContain("max-w-[430px]");
   });
 
-  it("비로그인 상태에서는 티켓팅 탭이 로그인 redirect를 가리킨다", () => {
-    authStore.clear();
-
+  it("티켓팅 탭은 항상 안내 화면을 가리킨다", () => {
     const markup = renderBottomNav("/notice");
 
-    expect(markup).toContain('href="/ticket/login?redirect=%2Fticket%2Fticketing"');
-  });
-
-  it("student 로그인 상태에서는 티켓팅 탭이 티켓팅 홈을 가리킨다", () => {
-    authStore.setSession(
-      {
-        tokens: {
-          accessToken: createJwtLikeToken({ role: "ROLE_USER" }),
-          refreshToken: "",
-          expiresIn: null,
-        },
-        user: null,
-      },
-      "student",
-    );
-
-    const markup = renderBottomNav("/notice");
-
-    expect(markup).toContain('href="/ticket/ticketing"');
-  });
-
-  it("admin 로그인 상태에서도 티켓팅 탭이 티켓팅 홈을 가리킨다", () => {
-    authStore.setSession(
-      {
-        tokens: {
-          accessToken: createJwtLikeToken({ role: "ROLE_ADMIN" }),
-          refreshToken: "",
-          expiresIn: null,
-        },
-        user: null,
-      },
-      "admin",
-    );
-
-    const markup = renderBottomNav("/notice");
-
-    expect(markup).toContain('href="/ticket/ticketing"');
-  });
-
-  it("만료된 토큰 상태에서는 티켓팅 탭이 로그인 redirect를 가리킨다", () => {
-    authStore.setSession(
-      {
-        tokens: {
-          accessToken: createJwtLikeToken({
-            role: "ROLE_ADMIN",
-            exp: Math.floor(Date.now() / 1000) - 60,
-          }),
-          refreshToken: "",
-          expiresIn: null,
-        },
-        user: null,
-      },
-      "admin",
-    );
-
-    const markup = renderBottomNav("/notice");
-
-    expect(markup).toContain('href="/ticket/login?redirect=%2Fticket%2Fticketing"');
+    expect(markup).toContain('href="/ticketing"');
   });
 });

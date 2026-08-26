@@ -1,8 +1,9 @@
 // 역할: 앱 Footer가 웹앱 시안에 맞는 구조와 SNS 아이콘 링크를 노출하는지 검증합니다.
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { StaticRouter } from "react-router-dom/server";
 import Footer from "@/components/layout/Footer";
+import { languageStore } from "@/store/common/languageStore";
 
 function renderFooter() {
   return renderToStaticMarkup(
@@ -13,6 +14,10 @@ function renderFooter() {
 }
 
 describe("Footer", () => {
+  beforeEach(() => {
+    languageStore.setLanguage("ko");
+  });
+
   it("브랜드/카피와 Instagram, YouTube 아이콘 링크를 노출한다", () => {
     const markup = renderFooter();
 
@@ -46,5 +51,15 @@ describe("Footer", () => {
     expect(markup).toContain('href="/legal/privacy"');
     expect(markup).toContain(">이용약관<");
     expect(markup).toContain('href="/legal/terms"');
+  });
+
+  it("영어에서는 정책 링크와 저작권 문구가 영문으로 렌더링된다", () => {
+    languageStore.setLanguage("en");
+    const markup = renderFooter();
+
+    expect(markup).toContain("Organized by the 58th LOU:D Student Council, Dankook University Jukjeon Campus");
+    expect(markup).toContain("LOU:D Student Council Instagram · YouTube");
+    expect(markup).toContain(">Privacy Policy<");
+    expect(markup).toContain(">Terms of Service<");
   });
 });

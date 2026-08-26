@@ -7,6 +7,7 @@ import {
 } from "@/api/common/authCore";
 import { getErrorStatus } from "@/api/common/fetchAuth";
 import { JSON_HEADERS } from "@/api/common/httpConstants";
+import { getCurrentLanguage } from "@/store/common/languageStore";
 
 export type RequestParams = Record<string, string | number | boolean | null | undefined>;
 
@@ -27,6 +28,33 @@ export class HttpError extends Error {
     this.payload = payload;
   }
 }
+
+type LanguageAwareConfig = {
+  method?: string;
+  params?: Record<string, unknown>;
+  [key: string]: unknown;
+};
+
+/**
+ * 영어 표시 중인 GET 요청에 lang=en을 붙인다.
+ * 한국어는 BE 기본값이라 파라미터를 생략해 캐시 키를 단순하게 유지한다.
+ * 호출자가 lang을 명시했다면 존중한다.
+ */
+export const attachLanguageParam = <T extends LanguageAwareConfig>(
+  config: T,
+): T & { params: Record<string, unknown> } => {
+  const params = { ...(config.params ?? {}) };
+  const method = (config.method ?? "get").toLowerCase();
+
+  if (method === "get" && params.lang === undefined) {
+    const language = getCurrentLanguage();
+    if (language === "en") {
+      params.lang = "en";
+    }
+  }
+
+  return { ...config, params };
+};
 
 export const createHttpClient = (options: {
   baseUrl: string;
@@ -55,6 +83,11 @@ export const createHttpClient = (options: {
     baseURL: baseUrl,
     headers: { ...JSON_HEADERS },
     withCredentials: true,
+  });
+
+  instance.interceptors.request.use((config) => {
+    const { params } = attachLanguageParam({ method: config.method, params: config.params });
+    return { ...config, params };
   });
 
   const toHttpError = (error: unknown): HttpError => {

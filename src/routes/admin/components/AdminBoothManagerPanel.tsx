@@ -24,6 +24,8 @@ import {
 } from "@/api/app/admin/adminBoothApi";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { cn } from "@/components/common/ui/utils";
+import { normalizeEnglish } from "@/api/app/admin/adminContract";
+import EnglishFieldsAccordion from "@/routes/admin/components/EnglishFieldsAccordion";
 import {
   validateImageFile,
 } from "@/routes/admin/adminEditorLogic";
@@ -51,6 +53,9 @@ type SelectedManagementItem =
 type BoothFormState = {
   name: string;
   description: string;
+  nameEn: string;
+  descriptionEn: string;
+  enIsManual: boolean;
   operationStatus: "OPEN" | "CLOSED" | "UNKNOWN";
   startTime: string;
   endTime: string;
@@ -61,6 +66,8 @@ type BoothCreateFormState = {
   type: AdminBoothManagementBooth["type"];
   name: string;
   description: string;
+  nameEn: string;
+  descriptionEn: string;
   operationStatus: "OPEN" | "CLOSED" | "UNKNOWN";
   startTime: string;
   endTime: string;
@@ -74,6 +81,11 @@ type PubFormState = {
   intro: string;
   description: string;
   instagram: string;
+  nameEn: string;
+  introEn: string;
+  descriptionEn: string;
+  departmentEn: string;
+  enIsManual: boolean;
   displayOperationIds: number[];
 };
 
@@ -203,6 +215,9 @@ export default function AdminBoothManagerPanel({
     setBoothForm({
       name: selectedBooth.name,
       description: normalizeMultilineField(selectedBooth.description),
+      nameEn: selectedBooth.nameEn ?? "",
+      descriptionEn: normalizeMultilineField(selectedBooth.descriptionEn),
+      enIsManual: Boolean(selectedBooth.enIsManual),
       operationStatus: selectedBooth.operationStatus,
       startTime: selectedBooth.startTime ?? "",
       endTime: selectedBooth.endTime ?? "",
@@ -226,6 +241,11 @@ export default function AdminBoothManagerPanel({
       intro: normalizeMultilineField(selectedPub.intro),
       description: normalizeMultilineField(selectedPub.description),
       instagram: selectedPub.instagram ?? "",
+      nameEn: selectedPub.nameEn ?? "",
+      introEn: normalizeMultilineField(selectedPub.introEn),
+      descriptionEn: normalizeMultilineField(selectedPub.descriptionEn),
+      departmentEn: selectedPub.departmentEn ?? "",
+      enIsManual: Boolean(selectedPub.enIsManual),
       displayOperationIds: selectedPub.displayOperationIds,
     });
   }, [creatingPub, selectedPub]);
@@ -395,6 +415,11 @@ export default function AdminBoothManagerPanel({
       intro: "",
       description: "",
       instagram: "",
+      nameEn: "",
+      introEn: "",
+      descriptionEn: "",
+      departmentEn: "",
+      enIsManual: false,
       displayOperationIds: managementData?.pubOperations.map((operation) => operation.id) ?? [],
     });
   };
@@ -410,6 +435,8 @@ export default function AdminBoothManagerPanel({
       type: resolveNewBoothType(filter),
       name: "",
       description: "",
+      nameEn: "",
+      descriptionEn: "",
       operationStatus: "UNKNOWN",
       startTime: "",
       endTime: "",
@@ -447,6 +474,11 @@ export default function AdminBoothManagerPanel({
             boothCreateForm.type === "FOOD_TRUCK"
               ? normalizeMultilineField(boothCreateForm.description) || null
               : null,
+          nameEn: normalizeEnglish(boothCreateForm.nameEn),
+          descriptionEn:
+            boothCreateForm.type === "FOOD_TRUCK"
+              ? normalizeEnglish(boothCreateForm.descriptionEn)
+              : undefined,
           operationStatus: boothCreateForm.operationStatus,
           startTime: boothCreateForm.startTime || null,
           endTime: boothCreateForm.endTime || null,
@@ -471,6 +503,11 @@ export default function AdminBoothManagerPanel({
             selectedBooth.type === "FOOD_TRUCK"
               ? normalizeMultilineField(boothForm.description)
               : null,
+          nameEn: normalizeEnglish(boothForm.nameEn),
+          descriptionEn:
+            selectedBooth.type === "FOOD_TRUCK"
+              ? normalizeEnglish(boothForm.descriptionEn)
+              : undefined,
           startTime: boothForm.startTime || null,
           endTime: boothForm.endTime || null,
           operationDates,
@@ -498,6 +535,10 @@ export default function AdminBoothManagerPanel({
           intro: normalizeMultilineField(pubForm.intro) || null,
           description: normalizeMultilineField(pubForm.description) || null,
           instagram: pubForm.instagram || null,
+          nameEn: normalizeEnglish(pubForm.nameEn),
+          introEn: normalizeEnglish(pubForm.introEn),
+          descriptionEn: normalizeEnglish(pubForm.descriptionEn),
+          departmentEn: normalizeEnglish(pubForm.departmentEn),
           displayOperationIds: dedupedDisplayIds,
         });
         toast.success("새 주점을 추가했습니다.");
@@ -511,6 +552,10 @@ export default function AdminBoothManagerPanel({
           intro: normalizeMultilineField(pubForm.intro) || null,
           description: normalizeMultilineField(pubForm.description) || null,
           instagram: pubForm.instagram || null,
+          nameEn: normalizeEnglish(pubForm.nameEn),
+          introEn: normalizeEnglish(pubForm.introEn),
+          descriptionEn: normalizeEnglish(pubForm.descriptionEn),
+          departmentEn: normalizeEnglish(pubForm.departmentEn),
           displayOperationIds: dedupedDisplayIds,
         });
         toast.success(`${selectedPub.name} 저장이 완료되었습니다.`);
@@ -1083,6 +1128,31 @@ export default function AdminBoothManagerPanel({
                   </label>
                 )}
 
+                <EnglishFieldsAccordion
+                  isManual={false}
+                  fields={[
+                    {
+                      name: "nameEn",
+                      label: "영문 이름",
+                      value: boothCreateForm.nameEn,
+                      multiline: false,
+                    },
+                    ...(boothCreateForm.type === "FOOD_TRUCK"
+                      ? [
+                          {
+                            name: "descriptionEn",
+                            label: "영문 설명",
+                            value: boothCreateForm.descriptionEn,
+                            multiline: true,
+                          },
+                        ]
+                      : []),
+                  ]}
+                  onChange={(name, value) =>
+                    setBoothCreateForm((prev) => (prev ? { ...prev, [name]: value } : prev))
+                  }
+                />
+
                 <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 py-3 text-sm text-[var(--text-muted)]">
                   새 부스는 우선 미배치 상태로 생성됩니다. 위치 지정과 이동은 관리자 지도에서 이어서 진행할 수 있습니다.
                 </div>
@@ -1227,6 +1297,31 @@ export default function AdminBoothManagerPanel({
                     />
                   </label>
                 )}
+
+                <EnglishFieldsAccordion
+                  isManual={boothForm.enIsManual}
+                  fields={[
+                    {
+                      name: "nameEn",
+                      label: "영문 이름",
+                      value: boothForm.nameEn,
+                      multiline: false,
+                    },
+                    ...(selectedBooth.type === "FOOD_TRUCK"
+                      ? [
+                          {
+                            name: "descriptionEn",
+                            label: "영문 설명",
+                            value: boothForm.descriptionEn,
+                            multiline: true,
+                          },
+                        ]
+                      : []),
+                  ]}
+                  onChange={(name, value) =>
+                    setBoothForm((prev) => (prev ? { ...prev, [name]: value } : prev))
+                  }
+                />
 
                 <div className="grid gap-4 md:grid-cols-3">
                   <label className="space-y-2">
@@ -1432,6 +1527,29 @@ export default function AdminBoothManagerPanel({
                     className="h-11 w-full rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-4 text-sm text-[var(--text)]"
                   />
                 </label>
+
+                <EnglishFieldsAccordion
+                  isManual={pubForm.enIsManual}
+                  fields={[
+                    { name: "nameEn", label: "영문 이름", value: pubForm.nameEn, multiline: false },
+                    { name: "introEn", label: "영문 소개", value: pubForm.introEn, multiline: true },
+                    {
+                      name: "descriptionEn",
+                      label: "영문 설명",
+                      value: pubForm.descriptionEn,
+                      multiline: true,
+                    },
+                    {
+                      name: "departmentEn",
+                      label: "영문 학과",
+                      value: pubForm.departmentEn,
+                      multiline: false,
+                    },
+                  ]}
+                  onChange={(name, value) =>
+                    setPubForm((prev) => (prev ? { ...prev, [name]: value } : prev))
+                  }
+                />
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-3">

@@ -24,10 +24,12 @@ import {
   type AdminPerformance,
 } from "@/api/app/admin/adminTimetableApi";
 import { getAdminMap, updateComingSoonOverlayEnabled } from "@/api/app/admin/adminMapApi";
+import { normalizeEnglish } from "@/api/app/admin/adminContract";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { Switch } from "@/components/common/ui/switch";
 import { cn } from "@/components/common/ui/utils";
 import { FESTIVAL_DAYS } from "@/config/festivalDays";
+import EnglishFieldsAccordion from "@/routes/admin/components/EnglishFieldsAccordion";
 import {
   validateImageFile,
 } from "@/routes/admin/adminEditorLogic";
@@ -39,6 +41,8 @@ type PerformanceFormState = {
   startTime: string;
   endTime: string;
   stage: string;
+  stageEn: string;
+  enIsManual: boolean;
 };
 
 type ArtistFormState = {
@@ -46,6 +50,9 @@ type ArtistFormState = {
   name: string;
   description: string;
   imageUrl: string;
+  nameEn: string;
+  descriptionEn: string;
+  enIsManual: boolean;
 };
 
 type ArtistImageDraft = {
@@ -62,6 +69,8 @@ const buildEmptyPerformanceForm = (date: string): PerformanceFormState => ({
   startTime: "",
   endTime: "",
   stage: "",
+  stageEn: "",
+  enIsManual: false,
 });
 
 const performanceToForm = (performance: AdminPerformance): PerformanceFormState => ({
@@ -71,6 +80,8 @@ const performanceToForm = (performance: AdminPerformance): PerformanceFormState 
   startTime: performance.startTime,
   endTime: performance.endTime,
   stage: performance.stage ?? "",
+  stageEn: performance.stageEn ?? "",
+  enIsManual: Boolean(performance.enIsManual),
 });
 
 const buildEmptyArtistForm = (): ArtistFormState => ({
@@ -78,6 +89,9 @@ const buildEmptyArtistForm = (): ArtistFormState => ({
   name: "",
   description: "",
   imageUrl: "",
+  nameEn: "",
+  descriptionEn: "",
+  enIsManual: false,
 });
 
 const artistToForm = (artist: AdminArtist): ArtistFormState => ({
@@ -85,6 +99,9 @@ const artistToForm = (artist: AdminArtist): ArtistFormState => ({
   name: artist.name,
   description: artist.description ?? "",
   imageUrl: artist.imageUrl ?? "",
+  nameEn: artist.nameEn ?? "",
+  descriptionEn: artist.descriptionEn ?? "",
+  enIsManual: Boolean(artist.enIsManual),
 });
 
 const isValidTime = (value: string) => HHMM_PATTERN.test(value);
@@ -241,6 +258,7 @@ export default function AdminTimetableManagerPanel({
           startTime: performanceForm.startTime,
           endTime: performanceForm.endTime,
           stage: stageValue || null,
+          stageEn: normalizeEnglish(performanceForm.stageEn),
         });
         toast.success("공연을 추가했습니다.");
       } else {
@@ -250,6 +268,7 @@ export default function AdminTimetableManagerPanel({
           startTime: performanceForm.startTime,
           endTime: performanceForm.endTime,
           stage: stageValue,
+          stageEn: normalizeEnglish(performanceForm.stageEn),
         });
         toast.success("공연 정보를 수정했습니다.");
       }
@@ -366,6 +385,8 @@ export default function AdminTimetableManagerPanel({
         const created = await createAdminArtist({
           name: trimmedName,
           description: trimmedDescription || null,
+          nameEn: normalizeEnglish(artistForm.nameEn),
+          descriptionEn: normalizeEnglish(artistForm.descriptionEn),
         });
         savedArtistId = created.artistId;
       } else {
@@ -373,6 +394,8 @@ export default function AdminTimetableManagerPanel({
         await updateAdminArtist(savedArtistId, {
           name: trimmedName,
           description: trimmedDescription,
+          nameEn: normalizeEnglish(artistForm.nameEn),
+          descriptionEn: normalizeEnglish(artistForm.descriptionEn),
         });
       }
 
@@ -738,6 +761,21 @@ export default function AdminTimetableManagerPanel({
               />
             </label>
 
+            <EnglishFieldsAccordion
+              isManual={performanceForm.enIsManual}
+              fields={[
+                {
+                  name: "stageEn",
+                  label: "영문 스테이지",
+                  value: performanceForm.stageEn,
+                  multiline: false,
+                },
+              ]}
+              onChange={(name, value) =>
+                setPerformanceForm((prev) => ({ ...prev, [name]: value }))
+              }
+            />
+
             <button
               type="submit"
               disabled={savingPerformance}
@@ -892,6 +930,22 @@ export default function AdminTimetableManagerPanel({
                 className="rounded-md border border-[var(--border-base)] bg-white px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               />
             </label>
+
+            <EnglishFieldsAccordion
+              isManual={artistForm.enIsManual}
+              fields={[
+                { name: "nameEn", label: "영문 이름", value: artistForm.nameEn, multiline: false },
+                {
+                  name: "descriptionEn",
+                  label: "영문 설명",
+                  value: artistForm.descriptionEn,
+                  multiline: true,
+                },
+              ]}
+              onChange={(name, value) =>
+                setArtistForm((prev) => ({ ...prev, [name]: value }))
+              }
+            />
 
             <div className="flex flex-col gap-2">
               <span className="text-xs font-semibold text-[var(--text-soft)]">아티스트 이미지</span>

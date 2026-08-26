@@ -3,14 +3,16 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { Ticket, User } from "lucide-react"
 import { useSyncExternalStore } from "react"
 import { authStore } from "@/store/common/authStore"
-import { getMyTicketNavigationTarget } from "@/lib/common/my-ticket-navigation"
 import { AppTopBar } from "@/components/layout/AppTopBar"
+import LanguageToggle from "@/components/layout/LanguageToggle"
 import { cn } from "@/components/common/ui/utils"
+import { useT } from "@/i18n"
 
 const HEADER_ICON_BUTTON_CLASS =
   "absolute top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center text-[color:color-mix(in_srgb,var(--text)_96%,black)] transition-colors duration-150 hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
 
 const Header = () => {
+  const t = useT()
   const navigate = useNavigate()
   const location = useLocation()
   const isMyPage = location.pathname === "/mypage"
@@ -27,7 +29,7 @@ const Header = () => {
   const isMyPageAuthenticated = isMyPage && isLoggedIn
 
   const handleTicketClick = () => {
-    navigate(getMyTicketNavigationTarget(isLoggedIn))
+    navigate("/ticketing")
   }
 
   const handleMyInfoClick = () => {
@@ -59,18 +61,19 @@ const Header = () => {
       <AppTopBar headerClassName={headerClassName}>
         {!isMyPage && (
           <>
+            <LanguageToggle />
             <button
               onClick={handleTicketClick}
-              aria-label={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
-              title={isLoggedIn ? "내 티켓 보기" : "로그인 후 내 티켓 보기"}
+              aria-label={isLoggedIn ? t("common.headerMyTicketAria") : t("common.headerMyTicketSignInAria")}
+              title={isLoggedIn ? t("common.headerMyTicketAria") : t("common.headerMyTicketSignInAria")}
               className={cn(HEADER_ICON_BUTTON_CLASS, "right-[4.25rem]")}
             >
               <Ticket size={22} />
             </button>
             <button
               onClick={handleMyInfoClick}
-              aria-label="내정보"
-              title="내정보"
+              aria-label={t("common.headerMyInfoAria")}
+              title={t("common.headerMyInfoAria")}
               className={cn(HEADER_ICON_BUTTON_CLASS, "right-4")}
             >
               <User size={22} />

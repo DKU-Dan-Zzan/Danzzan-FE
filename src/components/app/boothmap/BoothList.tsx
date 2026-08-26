@@ -3,12 +3,13 @@ import { cn } from "@/components/common/ui/utils";
 import type { Booth } from "@/types/app/boothmap/boothmap.types";
 import { formatBoothOperatingLabel } from "@/utils/app/boothmap/formatBoothOperatingLabel";
 import { formatDescription } from "@/utils/app/boothmap/formatDescription";
+import { useT, type TranslationKey } from "@/i18n";
 
-const typeLabel: Record<string, string> = {
-  FOOD_TRUCK: "푸드트럭",
-  EXPERIENCE: "부스",
-  EVENT: "이벤트",
-  FACILITY: "편의시설",
+const typeLabelKey: Record<string, TranslationKey> = {
+  FOOD_TRUCK: "boothmap.type.foodTruck",
+  EXPERIENCE: "boothmap.type.experience",
+  EVENT: "boothmap.type.event",
+  FACILITY: "boothmap.type.facility",
 };
 
 const typeBadgeClassName: Record<string, string> = {
@@ -32,12 +33,12 @@ function getBoothDisplayName(name: string) {
   return name.replace(COMPANY_BOOTH_SUFFIX, "").trim();
 }
 
-function getBoothChipLabel(booth: Booth) {
+function getBoothChipLabel(booth: Booth, t: ReturnType<typeof useT>) {
   if (booth.type !== "EXPERIENCE") {
-    return typeLabel[booth.type];
+    return t(typeLabelKey[booth.type]);
   }
 
-  return isCompanyBooth(booth.name) ? "기업부스" : "학생부스";
+  return isCompanyBooth(booth.name) ? t("boothmap.companyBoothChip") : t("boothmap.studentBoothChip");
 }
 
 export default function BoothList({
@@ -51,11 +52,13 @@ export default function BoothList({
   onSelectBooth: (id: number) => void;
   onOpenBoothDetail: (id: number) => void;
 }) {
+  const t = useT();
+
   if (booths.length === 0) {
     return (
       <div className="rounded-[26px] border border-[var(--boothmap-border)] bg-[color:color-mix(in_srgb,var(--boothmap-surface)_90%,white)] px-5 py-8 text-center shadow-[var(--boothmap-card-shadow)]">
         <div className="text-sm font-semibold text-[var(--boothmap-text-muted)]">
-          표시할 부스가 아직 없어요.
+          {t("boothmap.emptyBoothList")}
         </div>
       </div>
     );
@@ -93,8 +96,8 @@ export default function BoothList({
             style={{ contentVisibility: "auto", containIntrinsicSize: "120px" }}
             aria-label={
               booth.type === "FOOD_TRUCK"
-                ? `${displayName} 상세보기`
-                : `${displayName} 선택`
+                ? t("boothmap.boothDetailAria", { name: displayName })
+                : t("boothmap.boothSelectAria", { name: displayName })
             }
             className="w-full rounded-[26px] border border-[var(--boothmap-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--boothmap-surface)_96%,white)_0%,color-mix(in_srgb,var(--boothmap-surface-soft)_86%,white)_100%)] p-4 text-left shadow-[var(--boothmap-card-shadow)] transition hover:-translate-y-0.5 hover:shadow-[var(--boothmap-card-shadow-strong)]"
           >
@@ -112,7 +115,7 @@ export default function BoothList({
                     typeBadgeClassName[booth.type],
                   )}
                 >
-                  {getBoothChipLabel(booth)}
+                  {getBoothChipLabel(booth, t)}
                 </div>
               </div>
             </div>
