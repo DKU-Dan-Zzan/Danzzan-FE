@@ -23,7 +23,7 @@ export const en: Record<keyof typeof ko, string> = {
 
   "closed.ticketing.title": "No ticketing this time",
   "closed.ticketing.description":
-    "The fall festival is free to enter — no ticketing required.",
+    "There is no ticket to book or collect. See Notices for entry details.",
   "closed.ticketing.action": "Go home",
 
   "closed.auth.title": "No sign-in needed",

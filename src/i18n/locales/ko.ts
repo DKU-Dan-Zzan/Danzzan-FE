@@ -21,7 +21,7 @@ export const ko = {
 
   "closed.ticketing.title": "티켓팅 없이 진행돼요",
   "closed.ticketing.description":
-    "가을 축제는 티켓팅 없이 자유롭게 입장하실 수 있어요.",
+    "따로 예매하거나 티켓을 받으실 필요가 없어요. 입장 안내는 공지사항에서 확인해 주세요.",
   "closed.ticketing.action": "홈으로",
 
   "closed.auth.title": "로그인이 필요 없어요",
