@@ -21,7 +21,7 @@ export const en: Record<keyof typeof ko, string> = {
   "notFound.title": "Page not found",
   "notFound.description": "This address may have changed or is unavailable.",
 
-  "closed.ticketing.title": "No ticket needed",
+  "closed.ticketing.title": "The fall festival runs without ticketing",
   "closed.ticketing.description":
     "The fall festival is free to enter — no ticketing required.",
   "closed.ticketing.action": "Go home",
@@ -32,7 +32,7 @@ export const en: Record<keyof typeof ko, string> = {
 
   "closed.auth.action": "Go home",
 
-  "closed.mypage.title": "Not available this festival",
+  "closed.mypage.title": "Enjoy the fall festival — no ticket needed!",
   "closed.mypage.description":
     "My Info was part of the ticketing service, so it is closed for the fall festival.",
   "closed.mypage.action": "Go home",

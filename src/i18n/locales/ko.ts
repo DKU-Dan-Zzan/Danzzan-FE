@@ -19,7 +19,7 @@ export const ko = {
   "notFound.title": "페이지를 찾을 수 없어요",
   "notFound.description": "주소가 바뀌었거나 접근할 수 없는 페이지예요.",
 
-  "closed.ticketing.title": "티켓 없이 들어오세요",
+  "closed.ticketing.title": "가을축제는 별도의 티켓팅 없이 진행됩니다",
   "closed.ticketing.description":
     "가을 축제는 티켓팅 없이 자유롭게 입장하실 수 있어요.",
   "closed.ticketing.action": "홈으로",
@@ -29,7 +29,7 @@ export const ko = {
     "가을 축제는 로그인 없이 모든 기능을 이용하실 수 있어요.",
   "closed.auth.action": "홈으로",
 
-  "closed.mypage.title": "가을 축제에는 제공되지 않아요",
+  "closed.mypage.title": "가을축제는 티켓 없이 즐길 수 있어요!",
   "closed.mypage.description":
     "내 정보는 티켓팅과 함께 사용하던 기능이라 이번 축제에는 열지 않아요.",
   "closed.mypage.action": "홈으로",
