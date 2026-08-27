@@ -916,6 +916,664 @@
       "reason": "가을 축제 LEGEND 팔레트 승인값",
       "owner": "fe-platform",
       "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#120905",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#170b07",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#1b0d08",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#232124",
+      "reason": "가을 축제 LEGEND MAIN 팔레트 승인값 (시안 지정색)",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#2b160e",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#2e3134",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#39433d",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#3b1e13",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#404b3d",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#424c3e",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#442115",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#452115",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#4c2416",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#522616",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#5a2817",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#5c5759",
+      "reason": "부스맵 텍스트·마커·구역 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#5e2a18",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#625a4e",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#6b2d18",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#6e2e18",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#763019",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#783119",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#7a7476",
+      "reason": "부스맵 텍스트·마커·구역 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#80736b",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#81746c",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#83756d",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#8e3518",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#8f8a8c",
+      "reason": "부스맵 텍스트·마커·구역 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#91827d",
+      "reason": "가을 축제 LEGEND MAIN 팔레트 승인값 (시안 지정색)",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#948681",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#9c3615",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#a49994",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#a49995",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#a99e9a",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#aa3611",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#aca39f",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ada39f",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#be185d",
+      "reason": "부스맵 텍스트·마커·구역 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#c2360a",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#c3360a",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#c6c0be",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#c93608",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#cc3607",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#d9d5d3",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#e13501",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#e13600",
+      "reason": "가을 축제 LEGEND MAIN 팔레트 승인값 (시안 지정색)",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#e43703",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#e8480f",
+      "reason": "부스맵 텍스트·마커·구역 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#e9e8e7",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#eb3c0a",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ebe8e6",
+      "reason": "가을 축제 LEGEND MAIN 팔레트 승인값 (시안 지정색)",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ec3c0a",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ec4899",
+      "reason": "부스맵 텍스트·마커·구역 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#eeeceb",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f0410f",
+      "reason": "가을 축제 LEGEND MAIN 팔레트 승인값 (시안 지정색)",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f04211",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f1efef",
+      "reason": "부스맵 텍스트·마커·구역 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f5f4f4",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f64e1a",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#f9f8f8",
+      "reason": "LEGEND 무채색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fbcfe8",
+      "reason": "부스맵 텍스트·마커·구역 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fc5d27",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fd5f28",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ff642d",
+      "reason": "가을 축제 LEGEND MAIN 팔레트 승인값 (시안 지정색)",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ff662e",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ff672f",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ff6932",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ff6e38",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ff7f4e",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ff8251",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ff8f62",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ff9367",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ff9970",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffa37d",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffaf8d",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffb291",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffb595",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffc1a5",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffc4a8",
+      "reason": "부스맵 텍스트·마커·구역 팔레트 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffc5ab",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffccb5",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffd2be",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffd8c8",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffded1",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffdfd3",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffe4da",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffe6de",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffece6",
+      "reason": "가을 축제 LEGEND MAIN 팔레트 승인값 (시안 지정색)",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffede7",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#ffede8",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fff0ec",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fff3ef",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fff7f4",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
+    },
+    {
+      "ruleId": "STYLE_NO_NEW_RAW_HEX",
+      "target": "src/index.css::#fffaf8",
+      "reason": "LEGEND 브랜드 원색 스케일 승인값",
+      "owner": "fe-platform",
+      "expiresAt": "2026-12-31"
     }
   ]
 }
