@@ -18,16 +18,13 @@ const SCRIM_HEADER_CLASS =
 const HEADER_ICON_BUTTON_CLASS =
   "absolute top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
 
-/** 배경이 밝은 화면(공지·타임테이블·부스맵)에서 쓰는 어두운 아이콘. */
-const HEADER_ICON_ON_LIGHT_CLASS =
-  "text-[color:color-mix(in_srgb,var(--text)_96%,black)] hover:text-[var(--text)]"
-
 /**
- * 홈처럼 배경이 어두운 화면에서 쓰는 밝은 아이콘. 옆 KO/EN 토글의 알약과
- * 같은 토큰을 써서, 팔레트가 바뀌어도 둘의 색이 갈라지지 않게 한다.
+ * 언어 토글의 활성 알약과 같은 브랜드 주황을 쓴다. 주황은 어두운 포스터
+ * (홈)와 흰 배경(공지·타임테이블) 양쪽에서 모두 읽히므로 화면별로 색을
+ * 나눌 필요가 없다. 값을 박지 않고 토큰을 참조해 토글과 함께 움직인다.
  */
-const HEADER_ICON_ON_DARK_CLASS =
-  "text-[color:var(--app-header-ticket-btn-bg-start)] hover:text-white"
+const HEADER_ICON_TONE_CLASS =
+  "text-[var(--brand-main)] hover:brightness-110"
 
 const Header = () => {
   const t = useT()
@@ -44,10 +41,6 @@ const Header = () => {
   const isBoothMapPage = location.pathname === "/map"
   const isNoticePage = location.pathname === "/notice"
   const isHomePage = location.pathname === "/"
-  // 홈만 배경이 어두운 포스터라 아이콘 색을 뒤집어야 보인다.
-  const headerIconToneClass = isHomePage
-    ? HEADER_ICON_ON_DARK_CLASS
-    : HEADER_ICON_ON_LIGHT_CLASS
   const isMyPageGuest = isMyPage && !isLoggedIn
   const isMyPageAuthenticated = isMyPage && isLoggedIn
 
@@ -93,7 +86,7 @@ const Header = () => {
               onClick={handleTicketClick}
               aria-label={isLoggedIn ? t("common.headerMyTicketAria") : t("common.headerMyTicketSignInAria")}
               title={isLoggedIn ? t("common.headerMyTicketAria") : t("common.headerMyTicketSignInAria")}
-              className={cn(HEADER_ICON_BUTTON_CLASS, headerIconToneClass, "right-[4.25rem]")}
+              className={cn(HEADER_ICON_BUTTON_CLASS, HEADER_ICON_TONE_CLASS, "right-[4.25rem]")}
             >
               <Ticket size={22} />
             </button>
@@ -101,7 +94,7 @@ const Header = () => {
               onClick={handleMyInfoClick}
               aria-label={t("common.headerMyInfoAria")}
               title={t("common.headerMyInfoAria")}
-              className={cn(HEADER_ICON_BUTTON_CLASS, headerIconToneClass, "right-4")}
+              className={cn(HEADER_ICON_BUTTON_CLASS, HEADER_ICON_TONE_CLASS, "right-4")}
             >
               <User size={22} />
             </button>
