@@ -1,13 +1,27 @@
 // 역할: 가을 축제에 제공하지 않는 서비스의 안내 화면을 공통으로 렌더링한다.
 
+import type { ReactNode } from "react"
 import { Link } from "react-router-dom"
 import { useT, type TranslationKey } from "@/i18n"
+import { NoAccountIcon, StageIcon } from "@/routes/common/ServiceClosedIcons"
 
 type ServiceClosedNoticeProps = {
   titleKey: TranslationKey
   descriptionKey: TranslationKey
   actionKey: TranslationKey
   actionTo: string
+  /** 기본 아이콘 대신 다른 그림을 쓰고 싶을 때만 넘긴다. */
+  icon?: ReactNode
+}
+
+/**
+ * 어떤 서비스의 안내인지는 titleKey 가 이미 구분하고 있다. 호출부가 16곳이라
+ * 매번 아이콘을 함께 넘기게 하면 짝이 어긋난 채 방치되기 쉬워, 여기서 묶는다.
+ */
+const ICON_BY_TITLE: Partial<Record<TranslationKey, ReactNode>> = {
+  "closed.ticketing.title": <StageIcon />,
+  "closed.auth.title": <NoAccountIcon />,
+  "closed.mypage.title": <NoAccountIcon />,
 }
 
 /**
@@ -27,8 +41,10 @@ const ServiceClosedNotice = ({
   descriptionKey,
   actionKey,
   actionTo,
+  icon,
 }: ServiceClosedNoticeProps) => {
   const t = useT()
+  const noticeIcon = icon ?? ICON_BY_TITLE[titleKey]
 
   return (
     <section
@@ -103,8 +119,21 @@ const ServiceClosedNotice = ({
           {t(titleKey)}
         </h1>
 
+        {noticeIcon ? (
+          <div
+            aria-hidden="true"
+            className="mt-6 select-none [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_300ms_both]"
+            style={{
+              color: LEGEND_EMBER,
+              filter: "drop-shadow(0 0 18px rgba(232,85,31,0.35))",
+            }}
+          >
+            {noticeIcon}
+          </div>
+        ) : null}
+
         <p
-          className="mt-3.5 max-w-[19.5rem] text-[0.92rem] leading-[1.72] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_320ms_both]"
+          className="mt-6 max-w-[19.5rem] text-balance text-[0.92rem] leading-[1.72] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_380ms_both]"
           style={{ color: "rgba(238,224,208,0.72)" }}
         >
           {t(descriptionKey)}
