@@ -16,7 +16,18 @@ const SCRIM_HEADER_CLASS =
   "fixed inset-x-0 top-0 z-50 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_56%,transparent)_0%,color-mix(in_srgb,var(--surface)_44%,transparent)_16%,color-mix(in_srgb,var(--surface)_32%,transparent)_34%,color-mix(in_srgb,var(--surface)_22%,transparent)_52%,color-mix(in_srgb,var(--surface)_12%,transparent)_70%,color-mix(in_srgb,var(--surface)_5%,transparent)_86%,color-mix(in_srgb,var(--surface)_0%,transparent)_100%)] shadow-none pt-[env(safe-area-inset-top)]"
 
 const HEADER_ICON_BUTTON_CLASS =
-  "absolute top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center text-[color:color-mix(in_srgb,var(--text)_96%,black)] transition-colors duration-150 hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+  "absolute top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+
+/** 배경이 밝은 화면(공지·타임테이블·부스맵)에서 쓰는 어두운 아이콘. */
+const HEADER_ICON_ON_LIGHT_CLASS =
+  "text-[color:color-mix(in_srgb,var(--text)_96%,black)] hover:text-[var(--text)]"
+
+/**
+ * 홈처럼 배경이 어두운 화면에서 쓰는 밝은 아이콘. 옆 KO/EN 토글의 알약과
+ * 같은 토큰을 써서, 팔레트가 바뀌어도 둘의 색이 갈라지지 않게 한다.
+ */
+const HEADER_ICON_ON_DARK_CLASS =
+  "text-[color:var(--app-header-ticket-btn-bg-start)] hover:text-white"
 
 const Header = () => {
   const t = useT()
@@ -33,6 +44,10 @@ const Header = () => {
   const isBoothMapPage = location.pathname === "/map"
   const isNoticePage = location.pathname === "/notice"
   const isHomePage = location.pathname === "/"
+  // 홈만 배경이 어두운 포스터라 아이콘 색을 뒤집어야 보인다.
+  const headerIconToneClass = isHomePage
+    ? HEADER_ICON_ON_DARK_CLASS
+    : HEADER_ICON_ON_LIGHT_CLASS
   const isMyPageGuest = isMyPage && !isLoggedIn
   const isMyPageAuthenticated = isMyPage && isLoggedIn
 
@@ -78,7 +93,7 @@ const Header = () => {
               onClick={handleTicketClick}
               aria-label={isLoggedIn ? t("common.headerMyTicketAria") : t("common.headerMyTicketSignInAria")}
               title={isLoggedIn ? t("common.headerMyTicketAria") : t("common.headerMyTicketSignInAria")}
-              className={cn(HEADER_ICON_BUTTON_CLASS, "right-[4.25rem]")}
+              className={cn(HEADER_ICON_BUTTON_CLASS, headerIconToneClass, "right-[4.25rem]")}
             >
               <Ticket size={22} />
             </button>
@@ -86,7 +101,7 @@ const Header = () => {
               onClick={handleMyInfoClick}
               aria-label={t("common.headerMyInfoAria")}
               title={t("common.headerMyInfoAria")}
-              className={cn(HEADER_ICON_BUTTON_CLASS, "right-4")}
+              className={cn(HEADER_ICON_BUTTON_CLASS, headerIconToneClass, "right-4")}
             >
               <User size={22} />
             </button>
