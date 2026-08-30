@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react"
 import { Link } from "react-router-dom"
+import { cn } from "@/components/common/ui/utils"
 import { useT, type TranslationKey } from "@/i18n"
 import { NoAccountIcon, StageIcon } from "@/routes/common/ServiceClosedIcons"
 
@@ -20,12 +21,35 @@ type ServiceClosedNoticeProps = {
  */
 const NOTE_BY_TITLE: Partial<Record<TranslationKey, TranslationKey>> = {
   "closed.ticketing.title": "closed.ticketing.note",
+  "closed.auth.title": "closed.auth.note",
+  "closed.mypage.title": "closed.mypage.note",
 }
 
 /**
  * 문구 안의 *별표* 구간을 브랜드 색으로 강조한다. 사전은 평문만 담고
  * 마크업은 여기서 입혀야, 번역할 때 태그를 깨뜨릴 일이 없다.
  */
+/**
+ * 가운데 마름모를 둔 구분선. 포스터의 반짝임을 작게 옮겨온 장식이라
+ * 로고 아래와 문단 사이에서 같은 모양을 쓴다.
+ */
+const OrnamentDivider = ({ className }: { className?: string }) => (
+  <div
+    aria-hidden="true"
+    className={cn("flex w-full items-center justify-center gap-2", className)}
+  >
+    <span
+      className="block h-px flex-1 max-w-[3.5rem]"
+      style={{ background: `linear-gradient(to right, transparent, ${LEGEND_EMBER})` }}
+    />
+    <span className="block h-[5px] w-[5px] rotate-45" style={{ backgroundColor: LEGEND_EMBER }} />
+    <span
+      className="block h-px flex-1 max-w-[3.5rem]"
+      style={{ background: `linear-gradient(to left, transparent, ${LEGEND_EMBER})` }}
+    />
+  </div>
+)
+
 const renderWithHighlight = (text: string) =>
   text.split("*").map((part, index) =>
     index % 2 === 1 ? (
@@ -57,7 +81,6 @@ const ICON_BY_TITLE: Partial<Record<TranslationKey, ReactNode>> = {
 const LEGEND_INK = "var(--legend-ink)"
 const LEGEND_EMBER = "var(--legend-ember)"
 const LEGEND_EMBER_DEEP = "var(--legend-ember-deep)"
-const LEGEND_CREAM = "var(--legend-cream)"
 
 const ServiceClosedNotice = ({
   titleKey,
@@ -127,30 +150,14 @@ const ServiceClosedNotice = ({
           2026 Fall Festival
         </p>
 
-        {/* 가운데 마름모를 둔 구분선. 포스터의 반짝임을 작게 옮겨온 장식이다. */}
-        <div
-          aria-hidden="true"
-          className="mt-6 flex items-center gap-2 [animation:ec-fade-in_520ms_ease-out_180ms_both]"
-        >
-          <span
-            className="block h-px w-14"
-            style={{ background: `linear-gradient(to right, transparent, ${LEGEND_EMBER})` }}
-          />
-          <span
-            className="block h-[5px] w-[5px] rotate-45"
-            style={{ backgroundColor: LEGEND_EMBER }}
-          />
-          <span
-            className="block h-px w-14"
-            style={{ background: `linear-gradient(to left, transparent, ${LEGEND_EMBER})` }}
-          />
-        </div>
+        <OrnamentDivider className="mt-6 [animation:ec-fade-in_520ms_ease-out_180ms_both]" />
 
-        <h1
-          id="service-closed-title"
-          className="mt-6 text-balance text-[1.3rem] font-bold leading-[1.45] tracking-[-0.015em] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_240ms_both]"
-          style={{ color: LEGEND_CREAM }}
-        >
+        {/*
+          제목은 화면에 그리지 않는다. 로고와 본문만으로 충분히 읽히고,
+          제목까지 두면 같은 말이 두 번 나온다. 다만 지우면 이 화면의
+          이름이 사라져 스크린리더가 "빈 화면"으로 읽으므로 sr-only 로 남긴다.
+        */}
+        <h1 id="service-closed-title" className="sr-only">
           {t(titleKey)}
         </h1>
 
@@ -176,11 +183,7 @@ const ServiceClosedNotice = ({
 
         {noteKey ? (
           <>
-            <div
-              aria-hidden="true"
-              className="mt-5 h-px w-full max-w-[17rem] [animation:ec-fade-in_520ms_ease-out_440ms_both]"
-              style={{ backgroundColor: "rgba(238,224,208,0.16)" }}
-            />
+            <OrnamentDivider className="mt-6 [animation:ec-fade-in_520ms_ease-out_440ms_both]" />
             <p
               className="mt-5 max-w-[19.5rem] whitespace-pre-line text-balance text-[0.92rem] leading-[1.72] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_480ms_both]"
               style={{ color: "rgba(238,224,208,0.72)" }}

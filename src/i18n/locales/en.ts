@@ -30,13 +30,17 @@ export const en: Record<keyof typeof ko, string> = {
 
   "closed.auth.title": "No sign-in needed",
   "closed.auth.description":
-    "Signing in is not required for this festival.\nYou can use the app without an account.",
+    "Signing in is *not required* for this festival.",
+  "closed.auth.note":
+    "You can use the app *without an account*.",
 
   "closed.auth.action": "Go home",
 
   "closed.mypage.title": "Just come and enjoy!",
   "closed.mypage.description":
-    "My Info is not available for this festival.\nYou can use the app without an account.",
+    "My Info is *not available* for this festival.",
+  "closed.mypage.note":
+    "You can use the app *without an account*.",
   "closed.mypage.action": "Go home",
 
   "home.dummyPosterAlt": "2026 Dankook University Festival poster",

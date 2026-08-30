@@ -28,12 +28,16 @@ export const ko = {
 
   "closed.auth.title": "로그인이 필요 없어요",
   "closed.auth.description":
-    "이번 축제에서는 로그인이 필요하지 않습니다.\n별도의 계정 없이 앱을 이용할 수 있습니다.",
+    "이번 축제에서는 로그인이\n*필요하지 않습니다*.",
+  "closed.auth.note":
+    "별도의 *계정 없이*\n*앱을 이용*할 수 있습니다.",
   "closed.auth.action": "홈으로",
 
   "closed.mypage.title": "티켓 없이 즐기세요!",
   "closed.mypage.description":
-    "이번 축제에서는 내 정보 기능을 운영하지 않습니다.\n별도의 계정 없이 앱을 이용할 수 있습니다.",
+    "이번 축제에서는 내 정보 기능을\n*운영하지 않습니다*.",
+  "closed.mypage.note":
+    "별도의 *계정 없이*\n*앱을 이용*할 수 있습니다.",
   "closed.mypage.action": "홈으로",
 
   "home.dummyPosterAlt": "2026 단국축제 포스터",
