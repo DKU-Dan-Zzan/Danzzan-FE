@@ -23,18 +23,20 @@ export const en: Record<keyof typeof ko, string> = {
 
   "closed.ticketing.title": "No advance ticketing",
   "closed.ticketing.description":
-    "There is no ticket to book or collect. See Notices for entry details.",
+    "No advance ticketing — entry follows *the on-site queue order*.",
+  "closed.ticketing.note":
+    "For full entry details, see *Notices* in the app.",
   "closed.ticketing.action": "Go home",
 
   "closed.auth.title": "No sign-in needed",
   "closed.auth.description":
-    "Everything at the fall festival works without an account.",
+    "Signing in is not required for this festival.\nYou can use the app without an account.",
 
   "closed.auth.action": "Go home",
 
   "closed.mypage.title": "Just come and enjoy!",
   "closed.mypage.description":
-    "My Info was part of the ticketing service, so it is closed for the fall festival.",
+    "My Info is not available for this festival.\nYou can use the app without an account.",
   "closed.mypage.action": "Go home",
 
   "home.dummyPosterAlt": "2026 Dankook University Festival poster",

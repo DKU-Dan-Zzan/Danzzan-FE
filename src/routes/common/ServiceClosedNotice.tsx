@@ -15,6 +15,29 @@ type ServiceClosedNoticeProps = {
 }
 
 /**
+ * 본문 아래 구분선을 두고 덧붙이는 안내. 티켓팅처럼 "이렇게 입장한다"와
+ * "자세한 건 어디서 본다"가 성격이 달라 한 문단에 묶으면 읽히지 않는 경우에만 쓴다.
+ */
+const NOTE_BY_TITLE: Partial<Record<TranslationKey, TranslationKey>> = {
+  "closed.ticketing.title": "closed.ticketing.note",
+}
+
+/**
+ * 문구 안의 *별표* 구간을 브랜드 색으로 강조한다. 사전은 평문만 담고
+ * 마크업은 여기서 입혀야, 번역할 때 태그를 깨뜨릴 일이 없다.
+ */
+const renderWithHighlight = (text: string) =>
+  text.split("*").map((part, index) =>
+    index % 2 === 1 ? (
+      <strong key={index} className="font-bold text-[var(--brand-main)]">
+        {part}
+      </strong>
+    ) : (
+      part
+    ),
+  )
+
+/**
  * 어떤 서비스의 안내인지는 titleKey 가 이미 구분하고 있다. 호출부가 16곳이라
  * 매번 아이콘을 함께 넘기게 하면 짝이 어긋난 채 방치되기 쉬워, 여기서 묶는다.
  */
@@ -45,6 +68,7 @@ const ServiceClosedNotice = ({
 }: ServiceClosedNoticeProps) => {
   const t = useT()
   const noticeIcon = icon ?? ICON_BY_TITLE[titleKey]
+  const noteKey = NOTE_BY_TITLE[titleKey]
 
   return (
     <section
@@ -103,13 +127,24 @@ const ServiceClosedNotice = ({
           2026 Fall Festival
         </p>
 
+        {/* 가운데 마름모를 둔 구분선. 포스터의 반짝임을 작게 옮겨온 장식이다. */}
         <div
           aria-hidden="true"
-          className="mt-6 h-px w-16 [animation:ec-fade-in_520ms_ease-out_180ms_both]"
-          style={{
-            background: `linear-gradient(to right, transparent, ${LEGEND_EMBER}, transparent)`,
-          }}
-        />
+          className="mt-6 flex items-center gap-2 [animation:ec-fade-in_520ms_ease-out_180ms_both]"
+        >
+          <span
+            className="block h-px w-14"
+            style={{ background: `linear-gradient(to right, transparent, ${LEGEND_EMBER})` }}
+          />
+          <span
+            className="block h-[5px] w-[5px] rotate-45"
+            style={{ backgroundColor: LEGEND_EMBER }}
+          />
+          <span
+            className="block h-px w-14"
+            style={{ background: `linear-gradient(to left, transparent, ${LEGEND_EMBER})` }}
+          />
+        </div>
 
         <h1
           id="service-closed-title"
@@ -133,11 +168,27 @@ const ServiceClosedNotice = ({
         ) : null}
 
         <p
-          className="mt-6 max-w-[19.5rem] text-balance text-[0.92rem] leading-[1.72] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_380ms_both]"
+          className="mt-6 max-w-[19.5rem] whitespace-pre-line text-balance text-[0.92rem] leading-[1.72] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_380ms_both]"
           style={{ color: "rgba(238,224,208,0.72)" }}
         >
-          {t(descriptionKey)}
+          {renderWithHighlight(t(descriptionKey))}
         </p>
+
+        {noteKey ? (
+          <>
+            <div
+              aria-hidden="true"
+              className="mt-5 h-px w-full max-w-[17rem] [animation:ec-fade-in_520ms_ease-out_440ms_both]"
+              style={{ backgroundColor: "rgba(238,224,208,0.16)" }}
+            />
+            <p
+              className="mt-5 max-w-[19.5rem] whitespace-pre-line text-balance text-[0.92rem] leading-[1.72] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_480ms_both]"
+              style={{ color: "rgba(238,224,208,0.72)" }}
+            >
+              {renderWithHighlight(t(noteKey))}
+            </p>
+          </>
+        ) : null}
 
         <Link
           to={actionTo}
