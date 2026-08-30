@@ -42,7 +42,6 @@ const Header = () => {
   const isNoticePage = location.pathname === "/notice"
   const isHomePage = location.pathname === "/"
   const isMyPageGuest = isMyPage && !isLoggedIn
-  const isMyPageAuthenticated = isMyPage && isLoggedIn
 
   const handleTicketClick = () => {
     navigate("/ticketing")
@@ -53,14 +52,15 @@ const Header = () => {
   }
 
   /**
-   * 홈은 배경이 가을 축제 포스터라 어둡다. 흰 막을 깔면 포스터 위에 뿌연
-   * 띠가 남아 아이덴티티를 해쳐서, 투명하게 두고 포스터를 그대로 보인다.
+   * 홈과 마이페이지 안내 화면은 배경이 가을 축제 포스터라 어둡다. 흰 막을
+   * 깔면 그 위에 뿌연 띠가 남아 아이덴티티를 해치므로 투명하게 둔다.
+   * 배경이 밝은 404 만 헤더 대비를 위해 막을 유지한다.
    */
   const headerClassName =
     isBoothMapPage ||
     isNoticePage ||
     isTimetablePage ||
-    isMyPageAuthenticated ||
+    isMyPage ||
     isHomePage
       ? TRANSPARENT_HEADER_CLASS
       : SCRIM_HEADER_CLASS

@@ -43,15 +43,25 @@ describe("Header", () => {
     );
   });
 
-  it("로그인 전 마이페이지에서는 반투명 헤더를 유지한다", () => {
+  it("마이페이지 안내 화면도 배경이 어두우므로 투명 헤더를 렌더링한다", () => {
     authStore.clear();
     const guestMyPageMarkup = renderHeader("/mypage");
 
-    expect(guestMyPageMarkup).toContain(
-      "bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_56%,transparent)_0%,color-mix(in_srgb,var(--surface)_44%,transparent)_16%",
+    expect(guestMyPageMarkup).toContain("bg-transparent shadow-none pt-[env(safe-area-inset-top)]");
+    expect(guestMyPageMarkup).not.toContain(
+      "bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_56%,transparent)_0%",
     );
     expect(guestMyPageMarkup).not.toContain("z-[45]");
     expect(guestMyPageMarkup).not.toContain("backdrop-blur-md");
+  });
+
+  it("배경이 밝은 404 에서는 헤더 대비를 위해 반투명 막을 유지한다", () => {
+    authStore.clear();
+    const notFoundMarkup = renderHeader("/some-unknown-path");
+
+    expect(notFoundMarkup).toContain(
+      "bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_56%,transparent)_0%,color-mix(in_srgb,var(--surface)_44%,transparent)_16%",
+    );
   });
 
   it("로그인된 마이페이지에서는 기존 불투명 오버레이 헤더를 유지한다", () => {
