@@ -19,7 +19,7 @@ export const ko = {
   "notFound.title": "페이지를 찾을 수 없어요",
   "notFound.description": "주소가 바뀌었거나 접근할 수 없는 페이지예요.",
 
-  "closed.ticketing.title": "티켓팅 없이 진행돼요",
+  "closed.ticketing.title": "사전 티켓팅 없이 진행됩니다",
   "closed.ticketing.description":
     "따로 예매하거나 티켓을 받으실 필요가 없어요. 입장 안내는 공지사항에서 확인해 주세요.",
   "closed.ticketing.action": "홈으로",

@@ -21,7 +21,7 @@ export const en: Record<keyof typeof ko, string> = {
   "notFound.title": "Page not found",
   "notFound.description": "This address may have changed or is unavailable.",
 
-  "closed.ticketing.title": "No ticketing this time",
+  "closed.ticketing.title": "No advance ticketing",
   "closed.ticketing.description":
     "There is no ticket to book or collect. See Notices for entry details.",
   "closed.ticketing.action": "Go home",

@@ -97,7 +97,7 @@ const ServiceClosedNotice = ({
 
         <h1
           id="service-closed-title"
-          className="mt-6 text-[1.5rem] font-bold leading-[1.42] tracking-[-0.01em] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_240ms_both]"
+          className="mt-6 text-balance text-[1.3rem] font-bold leading-[1.45] tracking-[-0.015em] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_240ms_both]"
           style={{ color: LEGEND_CREAM }}
         >
           {t(titleKey)}

@@ -26,7 +26,7 @@ describe("ServiceClosedNotice", () => {
   it("전달받은 문구를 한국어로 렌더링한다", () => {
     const markup = renderNotice()
 
-    expect(markup).toContain("티켓팅 없이 진행돼요")
+    expect(markup).toContain("사전 티켓팅 없이 진행됩니다")
     expect(markup).toContain("홈으로")
   })
 
@@ -35,7 +35,7 @@ describe("ServiceClosedNotice", () => {
 
     const markup = renderNotice()
 
-    expect(markup).toContain("No ticketing this time")
+    expect(markup).toContain("No advance ticketing")
     expect(markup).toContain("Go home")
   })
 
