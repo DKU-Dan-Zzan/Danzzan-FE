@@ -87,9 +87,9 @@ export function UserLayout() {
             containerClassName="relative mx-auto h-[68px] w-full max-w-[430px] px-4"
           >
             <img
-              src="/DAN-ZZAN.png"
-              alt="DAN-ZZAN"
-              className="pointer-events-none absolute left-1/2 top-1/2 h-12 w-[172px] -translate-x-1/2 -translate-y-1/2 object-contain select-none"
+              src="/legend-logo.png"
+              alt="LEGEND"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-10 w-[140px] -translate-x-1/2 -translate-y-1/2 object-contain select-none"
               draggable={false}
             />
 

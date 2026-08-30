@@ -1,13 +1,74 @@
 // 역할: 가을 축제에 제공하지 않는 서비스의 안내 화면을 공통으로 렌더링한다.
 
+import type { ReactNode } from "react"
 import { Link } from "react-router-dom"
+import { cn } from "@/components/common/ui/utils"
 import { useT, type TranslationKey } from "@/i18n"
+import { NoAccountIcon, StageIcon } from "@/routes/common/ServiceClosedIcons"
 
 type ServiceClosedNoticeProps = {
   titleKey: TranslationKey
   descriptionKey: TranslationKey
   actionKey: TranslationKey
   actionTo: string
+  /** 기본 아이콘 대신 다른 그림을 쓰고 싶을 때만 넘긴다. */
+  icon?: ReactNode
+}
+
+/**
+ * 본문 아래 구분선을 두고 덧붙이는 안내. 티켓팅처럼 "이렇게 입장한다"와
+ * "자세한 건 어디서 본다"가 성격이 달라 한 문단에 묶으면 읽히지 않는 경우에만 쓴다.
+ */
+const NOTE_BY_TITLE: Partial<Record<TranslationKey, TranslationKey>> = {
+  "closed.ticketing.title": "closed.ticketing.note",
+  "closed.auth.title": "closed.auth.note",
+  "closed.mypage.title": "closed.mypage.note",
+}
+
+/**
+ * 문구 안의 *별표* 구간을 브랜드 색으로 강조한다. 사전은 평문만 담고
+ * 마크업은 여기서 입혀야, 번역할 때 태그를 깨뜨릴 일이 없다.
+ */
+/**
+ * 가운데 마름모를 둔 구분선. 포스터의 반짝임을 작게 옮겨온 장식이라
+ * 로고 아래와 문단 사이에서 같은 모양을 쓴다.
+ */
+const OrnamentDivider = ({ className }: { className?: string }) => (
+  <div
+    aria-hidden="true"
+    className={cn("flex w-full items-center justify-center gap-2", className)}
+  >
+    <span
+      className="block h-px flex-1 max-w-[3.5rem]"
+      style={{ background: `linear-gradient(to right, transparent, ${LEGEND_EMBER})` }}
+    />
+    <span className="block h-[5px] w-[5px] rotate-45" style={{ backgroundColor: LEGEND_EMBER }} />
+    <span
+      className="block h-px flex-1 max-w-[3.5rem]"
+      style={{ background: `linear-gradient(to left, transparent, ${LEGEND_EMBER})` }}
+    />
+  </div>
+)
+
+const renderWithHighlight = (text: string) =>
+  text.split("*").map((part, index) =>
+    index % 2 === 1 ? (
+      <strong key={index} className="font-bold text-[var(--brand-main)]">
+        {part}
+      </strong>
+    ) : (
+      part
+    ),
+  )
+
+/**
+ * 어떤 서비스의 안내인지는 titleKey 가 이미 구분하고 있다. 호출부가 16곳이라
+ * 매번 아이콘을 함께 넘기게 하면 짝이 어긋난 채 방치되기 쉬워, 여기서 묶는다.
+ */
+const ICON_BY_TITLE: Partial<Record<TranslationKey, ReactNode>> = {
+  "closed.ticketing.title": <StageIcon />,
+  "closed.auth.title": <NoAccountIcon />,
+  "closed.mypage.title": <NoAccountIcon />,
 }
 
 /**
@@ -20,15 +81,17 @@ type ServiceClosedNoticeProps = {
 const LEGEND_INK = "var(--legend-ink)"
 const LEGEND_EMBER = "var(--legend-ember)"
 const LEGEND_EMBER_DEEP = "var(--legend-ember-deep)"
-const LEGEND_CREAM = "var(--legend-cream)"
 
 const ServiceClosedNotice = ({
   titleKey,
   descriptionKey,
   actionKey,
   actionTo,
+  icon,
 }: ServiceClosedNoticeProps) => {
   const t = useT()
+  const noticeIcon = icon ?? ICON_BY_TITLE[titleKey]
+  const noteKey = NOTE_BY_TITLE[titleKey]
 
   return (
     <section
@@ -87,28 +150,48 @@ const ServiceClosedNotice = ({
           2026 Fall Festival
         </p>
 
-        <div
-          aria-hidden="true"
-          className="mt-6 h-px w-16 [animation:ec-fade-in_520ms_ease-out_180ms_both]"
-          style={{
-            background: `linear-gradient(to right, transparent, ${LEGEND_EMBER}, transparent)`,
-          }}
-        />
+        <OrnamentDivider className="mt-6 [animation:ec-fade-in_520ms_ease-out_180ms_both]" />
 
-        <h1
-          id="service-closed-title"
-          className="mt-6 text-[1.5rem] font-bold leading-[1.42] tracking-[-0.01em] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_240ms_both]"
-          style={{ color: LEGEND_CREAM }}
-        >
+        {/*
+          제목은 화면에 그리지 않는다. 로고와 본문만으로 충분히 읽히고,
+          제목까지 두면 같은 말이 두 번 나온다. 다만 지우면 이 화면의
+          이름이 사라져 스크린리더가 "빈 화면"으로 읽으므로 sr-only 로 남긴다.
+        */}
+        <h1 id="service-closed-title" className="sr-only">
           {t(titleKey)}
         </h1>
 
+        {noticeIcon ? (
+          <div
+            aria-hidden="true"
+            className="mt-6 select-none [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_300ms_both]"
+            style={{
+              color: LEGEND_EMBER,
+              filter: "drop-shadow(0 0 18px rgba(232,85,31,0.35))",
+            }}
+          >
+            {noticeIcon}
+          </div>
+        ) : null}
+
         <p
-          className="mt-3.5 max-w-[19.5rem] text-[0.92rem] leading-[1.72] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_320ms_both]"
+          className="mt-6 max-w-[19.5rem] whitespace-pre-line text-balance text-[0.92rem] leading-[1.72] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_380ms_both]"
           style={{ color: "rgba(238,224,208,0.72)" }}
         >
-          {t(descriptionKey)}
+          {renderWithHighlight(t(descriptionKey))}
         </p>
+
+        {noteKey ? (
+          <>
+            <OrnamentDivider className="mt-6 [animation:ec-fade-in_520ms_ease-out_440ms_both]" />
+            <p
+              className="mt-5 max-w-[19.5rem] whitespace-pre-line text-balance text-[0.92rem] leading-[1.72] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_480ms_both]"
+              style={{ color: "rgba(238,224,208,0.72)" }}
+            >
+              {renderWithHighlight(t(noteKey))}
+            </p>
+          </>
+        ) : null}
 
         <Link
           to={actionTo}

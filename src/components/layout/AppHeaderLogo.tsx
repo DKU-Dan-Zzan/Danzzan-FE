@@ -4,13 +4,13 @@ type AppHeaderLogoProps = {
 };
 
 const BASE_CLASS_NAME =
-  "pointer-events-none absolute left-4 top-1/2 h-12 w-[172px] -translate-y-1/2 object-contain object-left select-none";
+  "pointer-events-none absolute left-4 top-1/2 h-7 w-[98px] -translate-y-1/2 object-contain object-left select-none";
 
 export function AppHeaderLogo({ className }: AppHeaderLogoProps) {
   return (
     <img
-      src="/DAN-ZZAN.png"
-      alt="DAN-ZZAN"
+      src="/legend-logo.png"
+      alt="LEGEND"
       className={className ? `${BASE_CLASS_NAME} ${className}` : BASE_CLASS_NAME}
       draggable={false}
     />

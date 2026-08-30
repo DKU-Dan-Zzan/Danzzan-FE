@@ -16,7 +16,8 @@ describe("app header round button style source", () => {
     expect(headerSource).not.toContain("APP_HEADER_ROUND_BUTTON_BASE_CLASS");
     expect(userLayoutSource).not.toContain("APP_HEADER_ROUND_BUTTON_BASE_CLASS");
 
-    const headerBindings = headerSource.match(/className=\{cn\(HEADER_ICON_BUTTON_CLASS,\s*"[^"]+"\)\}/g) ?? [];
+    const headerBindings =
+      headerSource.match(/className=\{cn\(HEADER_ICON_BUTTON_CLASS,[^)]*"[^"]+"\)\}/g) ?? [];
     expect(headerBindings.length).toBeGreaterThanOrEqual(2);
     expect(headerSource).toMatch(/right-/);
     expect(userLayoutSource).toMatch(/left-/);

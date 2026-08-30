@@ -19,19 +19,25 @@ export const ko = {
   "notFound.title": "페이지를 찾을 수 없어요",
   "notFound.description": "주소가 바뀌었거나 접근할 수 없는 페이지예요.",
 
-  "closed.ticketing.title": "티켓 없이 들어오세요",
+  "closed.ticketing.title": "사전 티켓팅 없이 진행됩니다",
   "closed.ticketing.description":
-    "가을 축제는 티켓팅 없이 자유롭게 입장하실 수 있어요.",
+    "별도의 티켓팅 없이\n*현장 대기 순서대로* 입장해요.",
+  "closed.ticketing.note":
+    "자세한 입장 안내는\n*앱 내 공지사항*에서 확인해 주세요.",
   "closed.ticketing.action": "홈으로",
 
   "closed.auth.title": "로그인이 필요 없어요",
   "closed.auth.description":
-    "가을 축제는 로그인 없이 모든 기능을 이용하실 수 있어요.",
+    "이번 축제에서는 로그인이\n*필요하지 않습니다*.",
+  "closed.auth.note":
+    "별도의 *계정 없이*\n*앱을 이용*할 수 있습니다.",
   "closed.auth.action": "홈으로",
 
-  "closed.mypage.title": "가을 축제에는 제공되지 않아요",
+  "closed.mypage.title": "티켓 없이 즐기세요!",
   "closed.mypage.description":
-    "내 정보는 티켓팅과 함께 사용하던 기능이라 이번 축제에는 열지 않아요.",
+    "이번 축제에서는 내 정보 기능을\n*운영하지 않습니다*.",
+  "closed.mypage.note":
+    "별도의 *계정 없이*\n*앱을 이용*할 수 있습니다.",
   "closed.mypage.action": "홈으로",
 
   "home.dummyPosterAlt": "2026 단국축제 포스터",

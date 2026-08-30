@@ -317,7 +317,7 @@ function DetailSheet({
           )}
 
           {intro && (
-            <div className="mt-4 whitespace-pre-line rounded-[20px] bg-[var(--boothmap-accent-soft)] px-4 py-3 text-sm font-bold text-[var(--boothmap-accent-text)]">
+            <div className="mt-4 whitespace-pre-line rounded-[20px] bg-[var(--boothmap-intro-bg)] px-4 py-3 text-sm font-bold text-[var(--boothmap-intro-text)]">
               {intro}
             </div>
           )}
