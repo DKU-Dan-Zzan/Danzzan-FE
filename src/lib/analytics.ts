@@ -100,7 +100,8 @@ export const trackPageView = (pagePath: string): void => {
       return;
     }
 
-    window.gtag("config", GA_MEASUREMENT_ID, {
+    window.gtag("event", "page_view", {
+      send_to: GA_MEASUREMENT_ID,
       page_path: pagePath,
       page_location: `${window.location.origin}${pagePath}`,
       page_title: document.title,
