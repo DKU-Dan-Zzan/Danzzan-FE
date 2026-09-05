@@ -500,7 +500,7 @@ export default function KakaoMapView({
     const size = new kakao.maps.Size(width, height)
     const offset = new kakao.maps.Point(width / 2, useCircleShape ? height / 2 : height)
     const isFacilityInfoIcon = iconPath === "/markers/facility-info.svg"
-    const iconSize = isFacilityInfoIcon
+    const baseIconSize = isFacilityInfoIcon
       ? selected
         ? 21
         : useCircleShape
@@ -511,6 +511,7 @@ export default function KakaoMapView({
         : useCircleShape
           ? 12
           : 15
+    const iconSize = type === "REST_AREA" ? baseIconSize * 1.2 : baseIconSize
     const iconCenterX = useCircleShape ? width / 2 : 24
     const iconCenterY = useCircleShape ? height / 2 : 24
     const iconX = iconCenterX - iconSize / 2
