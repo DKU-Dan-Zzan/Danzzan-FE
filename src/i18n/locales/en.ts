@@ -96,6 +96,7 @@ export const en: Record<keyof typeof ko, string> = {
   "boothmap.type.foodTruck": "Food Truck",
   "boothmap.type.experience": "Booth",
   "boothmap.type.event": "Event",
+  "boothmap.type.restArea": "Rest Area",
   "boothmap.type.facility": "Facility",
   "boothmap.companyBoothChip": "Company booth",
   "boothmap.studentBoothChip": "Student booth",

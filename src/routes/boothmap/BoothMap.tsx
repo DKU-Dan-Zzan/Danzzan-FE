@@ -124,6 +124,7 @@ function shouldOpenListSheetAtHalf(filter: PrimaryFilter) {
   return (
     filter === "PUB" ||
     filter === "FACILITY" ||
+    filter === "REST_AREA" ||
     filter === "FOOD_TRUCK" ||
     filter === "EXPERIENCE" ||
     filter === "EVENT"

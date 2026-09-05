@@ -80,6 +80,15 @@ const pubs: Pub[] = [
 ];
 
 describe("boothMapSelectors", () => {
+  it("쉼터는 편의시설과 별도로 필터링하고 편의시설 다음에 정렬한다", () => {
+    const facility: Booth = { ...booths[0], id: 6, type: "FACILITY" };
+    const restArea: Booth = { ...booths[0], id: 7, type: "REST_AREA" };
+    const items = [restArea, ...booths, facility];
+    expect(getVisibleBooths("REST_AREA", items)).toEqual([restArea]);
+    expect(getVisibleBooths("FACILITY", items)).toEqual([facility]);
+    expect(getVisibleBooths("ALL", items).map((booth) => booth.id)).toEqual([2, 5, 6, 7, 3, 1, 4]);
+  });
+
   it("ALL에서는 카테고리별로 묶고 각 카테고리 안에서 이름순으로 정렬한다", () => {
     expect(getVisibleBooths("ALL", booths).map((booth) => booth.id)).toEqual([2, 5, 3, 1, 4]);
   });

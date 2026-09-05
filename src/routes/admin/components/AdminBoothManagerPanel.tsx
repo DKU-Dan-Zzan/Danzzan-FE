@@ -41,6 +41,7 @@ const FILTER_OPTIONS = [
   { value: "FOOD_TRUCK", label: "푸드트럭" },
   { value: "EVENT", label: "이벤트 부스" },
   { value: "FACILITY", label: "편의시설" },
+  { value: "REST_AREA", label: "쉼터" },
   { value: "PUB", label: "주점" },
 ] as const;
 
@@ -107,7 +108,7 @@ function normalizeMultilineField(value?: string | null) {
 }
 
 function resolveNewBoothType(filter: AdminBoothFilter): AdminBoothManagementBooth["type"] {
-  if (filter === "EXPERIENCE" || filter === "FOOD_TRUCK" || filter === "EVENT" || filter === "FACILITY") {
+  if (filter === "EXPERIENCE" || filter === "FOOD_TRUCK" || filter === "EVENT" || filter === "FACILITY" || filter === "REST_AREA") {
     return filter;
   }
 
@@ -324,7 +325,8 @@ export default function AdminBoothManagerPanel({
       FOOD_TRUCK: 1,
       EVENT: 2,
       FACILITY: 3,
-      PUB: 4,
+      REST_AREA: 4,
+      PUB: 5,
     };
 
     return [...booths, ...pubs].sort((a, b) => {
@@ -1098,6 +1100,7 @@ export default function AdminBoothManagerPanel({
                       <option value="FOOD_TRUCK">FOOD_TRUCK</option>
                       <option value="EVENT">EVENT</option>
                       <option value="FACILITY">FACILITY</option>
+                      <option value="REST_AREA">REST_AREA</option>
                     </select>
                   </label>
 

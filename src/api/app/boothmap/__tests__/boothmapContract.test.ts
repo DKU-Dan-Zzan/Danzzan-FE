@@ -8,6 +8,15 @@ import {
 } from "@/api/app/boothmap/boothmapContract";
 
 describe("boothmapContract", () => {
+  it("쉼터 응답의 타입과 개별 좌표를 유지한다", () => {
+    const parsed = parseBoothMapContract({
+      colleges: [],
+      booths: [{ boothId: 1, name: "쉼터", type: "REST_AREA", locationX: 127.12, locationY: 37.31 }],
+    }, "/map/booth-map");
+    expect(parsed.booths).toHaveLength(1);
+    expect(parsed.booths[0]).toMatchObject({ type: "REST_AREA", locationX: 127.12, locationY: 37.31 });
+  });
+
   it("booth map 응답을 파싱한다", () => {
     const parsed = parseBoothMapContract(
       {
