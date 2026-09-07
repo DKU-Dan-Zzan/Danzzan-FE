@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-import { initializeAnalytics, isAnalyticsEnabled, trackPageView } from "@/lib/analytics";
+import { initializeAnalytics, isAnalyticsEnabled, trackLanguageChange, trackPageView } from "@/lib/analytics";
+import { getCurrentLanguage, languageStore } from "@/store/common/languageStore";
 
 export default function AnalyticsTracker() {
   const location = useLocation();
@@ -12,6 +13,14 @@ export default function AnalyticsTracker() {
     }
 
     initializeAnalytics();
+
+    // Initial language belongs to the first page view; only subsequent changes are selections.
+    let previousLanguage = getCurrentLanguage();
+    return languageStore.subscribe(() => {
+      const nextLanguage = getCurrentLanguage();
+      trackLanguageChange(previousLanguage, nextLanguage);
+      previousLanguage = nextLanguage;
+    });
   }, []);
 
   useEffect(() => {

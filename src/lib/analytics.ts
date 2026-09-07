@@ -1,4 +1,5 @@
 import { normalizeEnvValue } from "@/lib/env";
+import { getCurrentLanguage, type Language } from "@/store/common/languageStore";
 
 const GA_SCRIPT_SRC_BASE = "https://www.googletagmanager.com/gtag/js?id=";
 
@@ -78,6 +79,9 @@ export const initializeAnalytics = (): void => {
     }
 
     window.gtag("js", new Date());
+    window.gtag("set", "user_properties", {
+      app_language: getCurrentLanguage(),
+    });
     window.gtag("config", GA_MEASUREMENT_ID, {
       send_page_view: false,
     });
@@ -105,10 +109,35 @@ export const trackPageView = (pagePath: string): void => {
       page_path: pagePath,
       page_location: `${window.location.origin}${pagePath}`,
       page_title: document.title,
+      app_language: getCurrentLanguage(),
     });
 
     lastTrackedPageKey = pagePath;
   } catch {
     // Ignore analytics failures so routing/rendering continues normally.
+  }
+};
+
+export const trackLanguageChange = (fromLanguage: Language, toLanguage: Language): void => {
+  if (!isAnalyticsEnabled() || !canUseDom() || fromLanguage === toLanguage) {
+    return;
+  }
+
+  try {
+    initializeAnalytics();
+
+    if (typeof window.gtag !== "function") {
+      return;
+    }
+
+    window.gtag("set", "user_properties", { app_language: toLanguage });
+    window.gtag("event", "language_change", {
+      send_to: GA_MEASUREMENT_ID,
+      from_language: fromLanguage,
+      to_language: toLanguage,
+      app_language: toLanguage,
+    });
+  } catch {
+    // Analytics failures must not interrupt language selection.
   }
 };
