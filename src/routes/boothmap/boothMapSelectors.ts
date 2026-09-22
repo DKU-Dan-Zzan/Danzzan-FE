@@ -7,7 +7,7 @@ import type {
   SelectedMapItem,
 } from "@/types/app/boothmap/boothmap.types";
 
-const BOOTH_TYPE_ORDER = ["EXPERIENCE", "EVENT", "FACILITY", "FOOD_TRUCK"] as const;
+const BOOTH_TYPE_ORDER = ["EXPERIENCE", "EVENT", "FACILITY", "REST_AREA", "FOOD_TRUCK"] as const;
 const boothNameCollator = new Intl.Collator("ko", {
   numeric: true,
   sensitivity: "base",

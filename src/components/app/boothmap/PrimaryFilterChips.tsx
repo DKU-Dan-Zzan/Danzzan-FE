@@ -11,6 +11,7 @@ const chips: Array<{ labelKey: TranslationKey | null; value: PrimaryFilter; icon
   { labelKey: "boothmap.type.experience", value: "EXPERIENCE", iconPath: BOOTHMAP_MARKER_THEME.EXPERIENCE.iconPath },
   { labelKey: "boothmap.type.event", value: "EVENT", iconPath: BOOTHMAP_MARKER_THEME.EVENT.iconPath },
   { labelKey: "boothmap.type.facility", value: "FACILITY", iconPath: BOOTHMAP_MARKER_THEME.FACILITY.iconPath },
+  { labelKey: "boothmap.type.restArea", value: "REST_AREA", iconPath: BOOTHMAP_MARKER_THEME.REST_AREA.iconPath },
 ];
 
 const CHIP_BASE_CLASS =

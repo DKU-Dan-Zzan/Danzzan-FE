@@ -10,6 +10,7 @@ const typeLabelKey: Record<string, TranslationKey> = {
   EXPERIENCE: "boothmap.type.experience",
   EVENT: "boothmap.type.event",
   FACILITY: "boothmap.type.facility",
+  REST_AREA: "boothmap.type.restArea",
 };
 
 const typeBadgeClassName: Record<string, string> = {
@@ -19,6 +20,8 @@ const typeBadgeClassName: Record<string, string> = {
     "border-[color:color-mix(in_srgb,var(--boothmap-marker-experience)_18%,white)] bg-[color:color-mix(in_srgb,var(--boothmap-marker-experience)_10%,white)] text-[var(--boothmap-marker-experience)]",
   EVENT:
     "border-[color:color-mix(in_srgb,var(--boothmap-marker-event)_24%,white)] bg-[color:color-mix(in_srgb,var(--boothmap-marker-event)_14%,white)] text-[color:color-mix(in_srgb,var(--boothmap-marker-event)_70%,black)]",
+  REST_AREA:
+    "border-[color:color-mix(in_srgb,var(--boothmap-marker-rest-area)_18%,white)] bg-[color:color-mix(in_srgb,var(--boothmap-marker-rest-area)_10%,white)] text-[var(--boothmap-marker-rest-area)]",
   FACILITY:
     "border-[color:color-mix(in_srgb,var(--boothmap-marker-facility)_18%,white)] bg-[color:color-mix(in_srgb,var(--boothmap-marker-facility)_10%,white)] text-[var(--boothmap-marker-facility)]",
 };

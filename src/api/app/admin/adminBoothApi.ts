@@ -19,7 +19,7 @@ const fetchWithAuth = createFetchWithAuth({
 
 export type AdminBoothManagementBooth = {
   id: number;
-  type: "EXPERIENCE" | "FOOD_TRUCK" | "EVENT" | "FACILITY";
+  type: "EXPERIENCE" | "FOOD_TRUCK" | "EVENT" | "FACILITY" | "REST_AREA";
   name: string;
   description: string | null;
   locationX: number | null;
@@ -93,7 +93,7 @@ export type UpdateAdminBoothPayload = {
 };
 
 export type CreateAdminBoothPayload = {
-  type: "EXPERIENCE" | "FOOD_TRUCK" | "EVENT" | "FACILITY";
+  type: "EXPERIENCE" | "FOOD_TRUCK" | "EVENT" | "FACILITY" | "REST_AREA";
   name: string;
   description?: string | null;
   nameEn?: string;

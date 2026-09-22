@@ -93,6 +93,7 @@ export const ko = {
   "boothmap.type.foodTruck": "푸드트럭",
   "boothmap.type.experience": "부스",
   "boothmap.type.event": "이벤트",
+  "boothmap.type.restArea": "쉼터",
   "boothmap.type.facility": "편의시설",
   "boothmap.companyBoothChip": "기업부스",
   "boothmap.studentBoothChip": "학생부스",

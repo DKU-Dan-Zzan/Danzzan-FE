@@ -2,7 +2,7 @@
 
 // 부스맵 페이지에서 사용하는 타입 모음
 
-export type BoothType = "EXPERIENCE" | "FOOD_TRUCK" | "EVENT" | "FACILITY";
+export type BoothType = "EXPERIENCE" | "FOOD_TRUCK" | "EVENT" | "FACILITY" | "REST_AREA";
 export type BoothSubType = "TOILET" | "RESTROOM" | "SMOKING_AREA";
 export type BoothOperationStatus = "OPEN" | "CLOSED" | "UNKNOWN";
 export type PrimaryFilter = "ALL" | "PUB" | BoothType;

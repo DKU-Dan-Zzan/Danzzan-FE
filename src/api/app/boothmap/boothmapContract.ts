@@ -7,6 +7,7 @@ const BOOTH_TYPE_VALUES: BoothType[] = [
   "FOOD_TRUCK",
   "EVENT",
   "FACILITY",
+  "REST_AREA",
 ];
 const boothTypeSet = new Set<BoothType>(BOOTH_TYPE_VALUES);
 const BOOTH_SUB_TYPE_VALUES: BoothSubType[] = [

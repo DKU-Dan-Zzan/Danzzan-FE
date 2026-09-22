@@ -9,6 +9,14 @@ import {
 } from "@/utils/app/boothmap/boothmapTheme";
 
 describe("boothmapTheme", () => {
+  it("쉼터는 편의시설 subtype과 무관하게 전용 아이콘을 사용한다", () => {
+    expect(parseBoothmapMarkerType("REST_AREA")).toBe("REST_AREA");
+    expect(getBoothmapBoothMarkerTheme({ type: "REST_AREA", subType: "SMOKING_AREA" })).toEqual({
+      color: "#8b5cf6",
+      iconPath: "/markers/booth-restarea.svg",
+    });
+  });
+
   it("알 수 없는 타입은 EXPERIENCE로 정규화한다", () => {
     expect(parseBoothmapMarkerType("EXPERIENCE")).toBe("EXPERIENCE");
     expect(parseBoothmapMarkerType("UNKNOWN")).toBe("EXPERIENCE");

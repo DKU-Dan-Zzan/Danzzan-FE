@@ -173,6 +173,12 @@ function createInlineMarkerIconMarkup(params: {
     `
   }
 
+  if (params.type === "REST_AREA") {
+    return `
+      <path d="M ${left + params.size * 0.2} ${top + params.size * 0.25} H ${right - params.size * 0.2} V ${centerY} H ${left + params.size * 0.2} Z M ${left + params.size * 0.12} ${centerY + params.size * 0.15} H ${right - params.size * 0.12} M ${left + params.size * 0.25} ${centerY + params.size * 0.15} V ${bottom - params.size * 0.12} M ${right - params.size * 0.25} ${centerY + params.size * 0.15} V ${bottom - params.size * 0.12}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round"/>
+    `
+  }
+
   if (params.type === "FACILITY") {
     if (typeof params.subType === "string" && params.subType.trim().toUpperCase() === "SMOKING_AREA") {
       return `
@@ -494,7 +500,7 @@ export default function KakaoMapView({
     const size = new kakao.maps.Size(width, height)
     const offset = new kakao.maps.Point(width / 2, useCircleShape ? height / 2 : height)
     const isFacilityInfoIcon = iconPath === "/markers/facility-info.svg"
-    const iconSize = isFacilityInfoIcon
+    const baseIconSize = isFacilityInfoIcon
       ? selected
         ? 21
         : useCircleShape
@@ -505,6 +511,7 @@ export default function KakaoMapView({
         : useCircleShape
           ? 12
           : 15
+    const iconSize = type === "REST_AREA" ? baseIconSize * 1.2 : baseIconSize
     const iconCenterX = useCircleShape ? width / 2 : 24
     const iconCenterY = useCircleShape ? height / 2 : 24
     const iconX = iconCenterX - iconSize / 2

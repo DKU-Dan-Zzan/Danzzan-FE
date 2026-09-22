@@ -2,7 +2,7 @@
 
 import type { BoothSubType } from "@/types/app/boothmap/boothmap.types";
 
-export type BoothmapMarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "EVENT" | "FACILITY";
+export type BoothmapMarkerType = "PUB" | "FOOD_TRUCK" | "EXPERIENCE" | "EVENT" | "FACILITY" | "REST_AREA";
 export type BoothmapZoneType = "PUB" | "FOOD_TRUCK" | "SMOKING_AREA";
 export type BoothmapLabelKind = "booth" | "college";
 
@@ -16,6 +16,7 @@ const BOOTHMAP_COLOR_CONFIG = {
   markerFoodTruck: { cssVar: "--boothmap-marker-food-truck", fallback: "#ef4444" },
   markerExperience: { cssVar: "--boothmap-marker-experience", fallback: "#10b981" },
   markerEvent: { cssVar: "--boothmap-marker-event", fallback: "#f6ca3b" },
+  markerRestArea: { cssVar: "--boothmap-marker-rest-area", fallback: "#8b5cf6" },
   markerFacility: { cssVar: "--boothmap-marker-facility", fallback: "#3b82f6" },
   selectedShadow: { cssVar: "--boothmap-selected-shadow", fallback: "rgba(55, 79, 132, 0.28)" },
   selectedShadowSoft: {
@@ -72,6 +73,10 @@ export const BOOTHMAP_MARKER_THEME: Record<BoothmapMarkerType, MarkerTheme> = {
     colorToken: "markerEvent",
     iconPath: "/markers/booth-event.svg",
   },
+  REST_AREA: {
+    colorToken: "markerRestArea",
+    iconPath: "/markers/booth-restarea.svg",
+  },
   FACILITY: {
     colorToken: "markerFacility",
     iconPath: "/markers/facility-restroom.svg",
@@ -97,6 +102,7 @@ export function parseBoothmapMarkerType(type?: string): BoothmapMarkerType {
   if (type === "FOOD_TRUCK") return "FOOD_TRUCK";
   if (type === "EXPERIENCE") return "EXPERIENCE";
   if (type === "EVENT") return "EVENT";
+  if (type === "REST_AREA") return "REST_AREA";
   if (type === "FACILITY") return "FACILITY";
   return "EXPERIENCE";
 }

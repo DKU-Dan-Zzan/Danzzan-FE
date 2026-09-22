@@ -297,6 +297,7 @@
   --boothmap-marker-food-truck: #ef4444;
   --boothmap-marker-experience: #10b981;
   --boothmap-marker-event: #f6ca3b;
+  --boothmap-marker-rest-area: var(--color-violet-500);
   --boothmap-marker-facility: var(--brand-60);
 
   --boothmap-selected-shadow: color-mix(in srgb, var(--text-bold-emphasis) 28%, transparent);
