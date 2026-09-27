@@ -206,20 +206,24 @@ function MyPage() {
   if (!isLoggedIn) {
     return (
       <div className="mypage-root relative flex h-[100dvh] w-full flex-col items-center justify-center overflow-hidden px-6 pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.5rem)]">
-        {/* 포스터 배경 */}
+        {/* 포스터 배경 — 가을 축제(LEGEND) 포스터 */}
         <div className="absolute inset-0 overflow-hidden">
           <img
-            src="/posters/main-poster-final-vertical.jpeg"
+            src="/posters/legend-poster-vertical.jpeg"
             alt=""
             aria-hidden
-            className="absolute inset-0 h-full w-full object-cover object-top"
-            style={{ filter: "brightness(0.82) saturate(1.08)", transform: "scale(1.03)" }}
+            className="absolute inset-0 h-full w-full object-cover object-[50%_38%]"
+            style={{ filter: "brightness(0.95) saturate(1.05)", transform: "scale(1.03)" }}
           />
+          {/*
+            포스터가 어두워서 예전의 밝은 베일을 그대로 쓰면 회색으로 죽는다.
+            위쪽은 불꽃이 비치도록 얇게, 아래쪽은 흰 카드가 떠 보이도록 짙게 덮는다.
+          */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, rgba(238,241,248,0.4) 0%, rgba(238,241,248,0.68) 38%, rgba(238,241,248,0.86) 100%)",
+                "linear-gradient(180deg, rgba(238,241,248,0.18) 0%, rgba(238,241,248,0.52) 34%, rgba(238,241,248,0.88) 100%)",
             }}
           />
         </div>
@@ -332,17 +336,22 @@ function MyPage() {
       <div className="relative">
         <div className="absolute inset-0 overflow-hidden">
           <img
-            src="/posters/main-poster-final-vertical.jpeg"
+            src="/posters/legend-poster-vertical.jpeg"
             alt=""
             aria-hidden
-            className="h-full w-full object-cover object-top"
-            style={{ filter: "brightness(0.78) saturate(1.1)", transform: "scale(1.04)" }}
+            className="h-full w-full object-cover object-[50%_44%]"
+            // 포스터 가장자리의 날짜·주최 글씨가 배너 문구와 겹치지 않도록 불꽃 부분만 크게 쓴다.
+            style={{ filter: "brightness(0.95) saturate(1.05)", transform: "scale(1.6)" }}
           />
+          {/*
+            덮개를 남색에서 포스터의 잉크 색으로 바꾼다. 남색은 봄 포스터에 맞춘 색이라
+            가을 포스터의 붉은 불꽃과 부딪친다. 아래는 본문 배경색으로 녹여 이어 붙인다.
+          */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, rgba(28,43,106,0.3) 0%, rgba(28,43,106,0.55) 50%, var(--poster-bg) 100%)",
+                "linear-gradient(180deg, rgba(11,6,7,0.22) 0%, rgba(11,6,7,0.5) 50%, var(--poster-bg) 100%)",
             }}
           />
         </div>
