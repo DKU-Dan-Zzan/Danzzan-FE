@@ -13,14 +13,20 @@ import type { FestivalDay } from "@/types/app/timetable/timetable.types"
 export const FALLBACK_FESTIVAL_DATES = ["2026-09-09", "2026-09-10"] as const
 
 let operationDates: string[] = [...FALLBACK_FESTIVAL_DATES]
+
+/**
+ * 티켓팅 사용 여부. 설정에서 켜야 앱의 티켓팅 화면이 열린다.
+ * 서버 응답 전에는 꺼진 것으로 본다. 잠깐 열렸다 닫히는 것보다 낫다.
+ */
+let ticketingEnabled = false
 const listeners = new Set<() => void>()
 
-/** useSyncExternalStore 가 같은 배열을 계속 받도록 갱신할 때만 새 배열을 만든다. */
+/** 운영 날짜와 티켓팅 사용 여부를 함께 구독한다. */
 function emit() {
   listeners.forEach((listener) => listener())
 }
 
-export function subscribeFestivalDates(listener: () => void): () => void {
+export function subscribeFestivalSettings(listener: () => void): () => void {
   listeners.add(listener)
   return () => listeners.delete(listener)
 }
@@ -42,6 +48,16 @@ export function setFestivalDates(dates: string[]): void {
     return
   }
   operationDates = next
+  emit()
+}
+
+export function getTicketingEnabled(): boolean {
+  return ticketingEnabled
+}
+
+export function setTicketingEnabled(enabled: boolean): void {
+  if (ticketingEnabled === enabled) return
+  ticketingEnabled = enabled
   emit()
 }
 

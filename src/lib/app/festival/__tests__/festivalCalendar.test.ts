@@ -6,7 +6,7 @@ import {
   getFestivalDates,
   isFestivalDate,
   setFestivalDates,
-  subscribeFestivalDates,
+  subscribeFestivalSettings,
   toFestivalDays,
 } from "@/lib/app/festival/festivalCalendar"
 
@@ -28,7 +28,7 @@ describe("festivalCalendar", () => {
 
   it("서버 날짜로 갈아끼우고 구독자에게 알린다", () => {
     const listener = vi.fn()
-    const unsubscribe = subscribeFestivalDates(listener)
+    const unsubscribe = subscribeFestivalSettings(listener)
 
     setFestivalDates(["2027-05-14", "2027-05-15", "2027-05-16"])
 
@@ -42,7 +42,7 @@ describe("festivalCalendar", () => {
 
   it("같은 날짜를 다시 넣으면 알리지 않는다", () => {
     const listener = vi.fn()
-    const unsubscribe = subscribeFestivalDates(listener)
+    const unsubscribe = subscribeFestivalSettings(listener)
 
     setFestivalDates([...FALLBACK_FESTIVAL_DATES])
 

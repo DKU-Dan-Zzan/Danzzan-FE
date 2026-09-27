@@ -3,13 +3,13 @@ import { useMemo, useSyncExternalStore } from "react"
 
 import {
   getFestivalDates,
-  subscribeFestivalDates,
+  subscribeFestivalSettings,
   toFestivalDateOptions,
   toFestivalDays,
 } from "@/lib/app/festival/festivalCalendar"
 
 export function useFestivalDates() {
-  const dates = useSyncExternalStore(subscribeFestivalDates, getFestivalDates, getFestivalDates)
+  const dates = useSyncExternalStore(subscribeFestivalSettings, getFestivalDates, getFestivalDates)
 
   return useMemo(
     () => ({

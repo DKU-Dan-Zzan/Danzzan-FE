@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { Ticket, User } from "lucide-react"
 import { useSyncExternalStore } from "react"
 import { authStore } from "@/store/common/authStore"
+import { getMyTicketNavigationTarget } from "@/lib/common/my-ticket-navigation"
+import { useTicketingEnabled } from "@/hooks/app/festival/useTicketingEnabled"
 import { AppTopBar } from "@/components/layout/AppTopBar"
 import LanguageToggle from "@/components/layout/LanguageToggle"
 import { cn } from "@/components/common/ui/utils"
@@ -42,9 +44,11 @@ const Header = () => {
   const isNoticePage = location.pathname === "/notice"
   const isHomePage = location.pathname === "/"
   const isMyPageGuest = isMyPage && !isLoggedIn
+  const ticketingEnabled = useTicketingEnabled()
 
   const handleTicketClick = () => {
-    navigate("/ticketing")
+    // 티켓팅이 꺼져 있으면 안내 화면으로 보낸다.
+    navigate(ticketingEnabled ? getMyTicketNavigationTarget(isLoggedIn) : "/ticketing")
   }
 
   const handleMyInfoClick = () => {

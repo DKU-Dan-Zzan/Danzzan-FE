@@ -5,14 +5,17 @@
 import { useEffect } from "react"
 
 import { getFestivalSettings } from "@/api/app/festival/festivalSettingsApi"
-import { setFestivalDates } from "@/lib/app/festival/festivalCalendar"
+import { setFestivalDates, setTicketingEnabled } from "@/lib/app/festival/festivalCalendar"
 
 export function useLoadFestivalSettings(): void {
   useEffect(() => {
     const controller = new AbortController()
 
     getFestivalSettings({ signal: controller.signal })
-      .then((settings) => setFestivalDates(settings.operationDates))
+      .then((settings) => {
+        setFestivalDates(settings.operationDates)
+        setTicketingEnabled(settings.ticketingEnabled)
+      })
       .catch(() => {
         // 기본 날짜를 그대로 둔다.
       })
