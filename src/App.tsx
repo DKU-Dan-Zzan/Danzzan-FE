@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import { useAdminAuth } from "@/hooks/app/admin/useAdminAuth";
+import { useLoadFestivalSettings } from "@/hooks/app/festival/useLoadFestivalSettings";
 import AnalyticsTracker from "@/components/common/AnalyticsTracker";
 import DelayedSpinner from "@/components/common/loading/DelayedSpinner";
 import {
@@ -94,6 +95,9 @@ function ProtectedAdminRoute() {
 }
 
 function App() {
+  // 축제 운영 날짜를 서버에서 받아 부스맵·타임테이블 날짜 탭에 반영한다.
+  useLoadFestivalSettings();
+
   const location = useLocation();
 
   useEffect(() => {

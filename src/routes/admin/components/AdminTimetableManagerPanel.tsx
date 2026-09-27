@@ -27,7 +27,7 @@ import { normalizeEnglish } from "@/api/app/admin/adminContract";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { Switch } from "@/components/common/ui/switch";
 import { cn } from "@/components/common/ui/utils";
-import { FESTIVAL_DAYS } from "@/config/festivalDays";
+import { useFestivalDates } from "@/hooks/app/festival/useFestivalDates";
 import EnglishFieldsAccordion from "@/routes/admin/components/EnglishFieldsAccordion";
 import {
   validateImageFile,
@@ -110,10 +110,11 @@ export default function AdminTimetableManagerPanel({
 }: {
   topSlot?: ReactNode;
 }) {
-  const [activeDayKey, setActiveDayKey] = useState<string>(FESTIVAL_DAYS[0].key);
+  const { days: festivalDays } = useFestivalDates();
+  const [activeDayKey, setActiveDayKey] = useState<string>(() => festivalDays[0].key);
   const activeDay = useMemo(
-    () => FESTIVAL_DAYS.find((day) => day.key === activeDayKey) ?? FESTIVAL_DAYS[0],
-    [activeDayKey],
+    () => festivalDays.find((day) => day.key === activeDayKey) ?? festivalDays[0],
+    [activeDayKey, festivalDays],
   );
 
   const [performances, setPerformances] = useState<AdminPerformance[]>([]);
@@ -211,7 +212,7 @@ export default function AdminTimetableManagerPanel({
 
   const handleChangeDay = (dayKey: string) => {
     setActiveDayKey(dayKey);
-    const targetDay = FESTIVAL_DAYS.find((d) => d.key === dayKey);
+    const targetDay = festivalDays.find((d) => d.key === dayKey);
     if (targetDay) {
       setPerformanceForm(buildEmptyPerformanceForm(targetDay.date));
     }
@@ -545,7 +546,7 @@ export default function AdminTimetableManagerPanel({
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {FESTIVAL_DAYS.map((day) => (
+          {festivalDays.map((day) => (
             <button
               key={day.key}
               type="button"

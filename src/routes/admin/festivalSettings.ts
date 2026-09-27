@@ -1,69 +1,76 @@
-// 역할: 축제 설정(축제 이름/운영 날짜/티켓팅 회차)의 타입과 저장·불러오기를 담당한다.
+// 역할: 설정 페이지가 쓰는 화면용 모델과, 서버 응답/요청 사이의 변환을 담당한다.
 //
-// 저장소는 지금 브라우저 localStorage 다. 백엔드가 준비되면 loadFestivalSettings /
-// saveFestivalSettings 안쪽만 API 호출로 바꾸면 화면 코드는 그대로 둘 수 있다.
-// 백엔드에는 이미 festival_events 테이블(공연 날짜/티켓팅 시작 시각/수량/상태)이 있어
-// 티켓팅 회차는 그 테이블에 대응시키면 된다.
+// 서버는 티켓팅 시각을 `2027-05-01T18:00:00` 로 주고받는데, 화면의 datetime-local
+// 입력은 초가 없는 `2027-05-01T18:00` 을 쓴다. 그 차이를 여기서 흡수한다.
+
+import type {
+  FestivalSettings as FestivalSettingsDto,
+  UpdateFestivalSettingsPayload,
+} from "@/api/app/festival/festivalSettingsApi"
 
 export type TicketingRound = {
-  id: string
-  /** 티켓팅이 열리는 날짜와 시각. `2026-09-01T18:00` 형식 (datetime-local 입력값) */
+  /** 화면에서 목록을 다루기 위한 키. 서버 id 가 아니다. */
+  key: string
+  /** datetime-local 입력값 (`2027-05-01T18:00`) */
   ticketingAt: string
-  /** 이 회차에 풀 티켓 수량 */
   capacity: number
-  /** 이 티켓으로 입장하는 공연 날짜. 운영 날짜 중 하나 */
   performanceDate: string
 }
 
-export type FestivalSettings = {
+export type FestivalSettingsForm = {
+  schoolName: string
   festivalName: string
   startDate: string
   endDate: string
   ticketingEnabled: boolean
   ticketingRounds: TicketingRound[]
-  /** 마지막 저장 시각. 비어 있으면 아직 한 번도 저장하지 않은 상태 */
-  savedAt: string
 }
 
-const STORAGE_KEY = "danzzan.admin.festivalSettings"
-
-const EMPTY_SETTINGS: FestivalSettings = {
+export const EMPTY_FESTIVAL_SETTINGS_FORM: FestivalSettingsForm = {
+  schoolName: "단국대학교",
   festivalName: "",
   startDate: "",
   endDate: "",
   ticketingEnabled: false,
   ticketingRounds: [],
-  savedAt: "",
 }
 
-export function loadFestivalSettings(): FestivalSettings {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
-    if (!raw) return { ...EMPTY_SETTINGS }
-
-    const parsed = JSON.parse(raw) as Partial<FestivalSettings>
-    return {
-      ...EMPTY_SETTINGS,
-      ...parsed,
-      ticketingRounds: Array.isArray(parsed.ticketingRounds) ? parsed.ticketingRounds : [],
-    }
-  } catch {
-    // 저장된 값이 깨졌으면 빈 설정으로 시작한다.
-    return { ...EMPTY_SETTINGS }
+export function toForm(dto: FestivalSettingsDto): FestivalSettingsForm {
+  return {
+    schoolName: dto.schoolName || EMPTY_FESTIVAL_SETTINGS_FORM.schoolName,
+    festivalName: dto.festivalName,
+    startDate: dto.startDate ?? "",
+    endDate: dto.endDate ?? "",
+    ticketingEnabled: dto.ticketingEnabled,
+    ticketingRounds: dto.ticketingRounds.map((round, index) => ({
+      key: round.id != null ? String(round.id) : `round-${index}`,
+      ticketingAt: toInputDateTime(round.ticketingAt),
+      capacity: round.capacity,
+      performanceDate: round.performanceDate,
+    })),
   }
 }
 
-export function saveFestivalSettings(settings: FestivalSettings): void {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
-  } catch {
-    // 저장에 실패해도 화면 동작은 막지 않는다.
+export function toPayload(form: FestivalSettingsForm): UpdateFestivalSettingsPayload {
+  return {
+    schoolName: form.schoolName,
+    festivalName: form.festivalName.trim(),
+    startDate: form.startDate,
+    endDate: form.endDate,
+    ticketingEnabled: form.ticketingEnabled,
+    ticketingRounds: form.ticketingEnabled
+      ? form.ticketingRounds.map((round) => ({
+          ticketingAt: toServerDateTime(round.ticketingAt),
+          capacity: round.capacity,
+          performanceDate: round.performanceDate,
+        }))
+      : [],
   }
 }
 
 export function createEmptyTicketingRound(): TicketingRound {
   return {
-    id:
+    key:
       typeof crypto !== "undefined" && "randomUUID" in crypto
         ? crypto.randomUUID()
         : `round-${Date.now()}`,
@@ -73,7 +80,7 @@ export function createEmptyTicketingRound(): TicketingRound {
   }
 }
 
-/** 시작일부터 종료일까지의 날짜를 하루 간격으로 펼친다. 최대 14일까지만 만든다. */
+/** 시작일부터 종료일까지 하루 간격으로 펼친다. 서버와 같은 14일 상한을 쓴다. */
 export function buildFestivalDateRange(startDate: string, endDate: string): string[] {
   if (!startDate || !endDate) return []
 
@@ -94,6 +101,16 @@ export function formatDateLabel(date: string): string {
   if (!date) return "-"
   const [, month = "", day = ""] = date.split("-")
   return `${Number(month)}/${Number(day)}`
+}
+
+/** `2027-05-01T18:00:00` -> `2027-05-01T18:00` */
+function toInputDateTime(value: string): string {
+  return value.length >= 16 ? value.slice(0, 16) : value
+}
+
+/** `2027-05-01T18:00` -> `2027-05-01T18:00:00` */
+function toServerDateTime(value: string): string {
+  return value.length === 16 ? `${value}:00` : value
 }
 
 function toDateString(date: Date): string {

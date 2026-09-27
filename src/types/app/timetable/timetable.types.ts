@@ -11,8 +11,9 @@ export type Performance = {
   stage: string | null
 }
 
+// 운영 일수는 축제 설정에서 정하므로 며칠이든 될 수 있다(키는 DAY-1, DAY-2 ... 형태).
 export type FestivalDay = {
-  key: "DAY-1" | "DAY-2" | "DAY-3"
-  label: "1일차" | "2일차" | "3일차"
+  key: string
+  label: string
   date: string
 }

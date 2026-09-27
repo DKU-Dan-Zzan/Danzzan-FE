@@ -1,10 +1,8 @@
 // 역할: 관리자 콘솔의 기본 페이지. 축제 이름/운영 날짜/티켓팅 회차 등 축제 운영 정보를 등록한다.
 //
-// 지금은 입력한 값을 브라우저(localStorage)에만 저장한다.
-// 백엔드 작업이 끝나면 loadFestivalSettings/saveFestivalSettings 두 함수만 API 호출로 바꾸면 된다.
-// 여기서 저장한 운영 날짜가 앞으로 부스맵·타임테이블의 날짜 탭이 된다.
-// (지금은 src/config/festivalDays.ts 와 src/utils/app/boothmap/festivalDates.ts 에 날짜가 박혀 있다.)
-import { useMemo, useState } from "react"
+// 여기서 저장한 운영 날짜가 부스맵·타임테이블의 날짜 탭이 된다.
+// 저장에 성공하면 앱 전체가 쓰는 날짜 저장소(festivalCalendar)도 함께 갱신한다.
+import { useEffect, useMemo, useState } from "react"
 import { Plus, Save, Pencil, Trash2, X } from "lucide-react"
 import { Toaster, toast } from "sonner"
 
@@ -15,12 +13,18 @@ import {
   ADMIN_SECONDARY_ACTION_BUTTON_CLASS,
 } from "@/routes/admin/adminStyleClasses"
 import {
+  getFestivalSettings,
+  updateFestivalSettings,
+} from "@/api/app/festival/festivalSettingsApi"
+import { setFestivalDates } from "@/lib/app/festival/festivalCalendar"
+import {
   buildFestivalDateRange,
   createEmptyTicketingRound,
   formatDateLabel,
-  loadFestivalSettings,
-  saveFestivalSettings,
-  type FestivalSettings,
+  toForm,
+  toPayload,
+  EMPTY_FESTIVAL_SETTINGS_FORM,
+  type FestivalSettingsForm,
   type TicketingRound,
 } from "@/routes/admin/festivalSettings"
 import { cn } from "@/components/common/ui/utils"
@@ -32,17 +36,36 @@ const inputClass = cn(
 )
 
 export default function AdminSettings() {
-  const [settings, setSettings] = useState<FestivalSettings>(() => loadFestivalSettings())
-  // 저장된 값이 있으면 읽기 모드로, 처음 들어왔으면 바로 입력할 수 있게 편집 모드로 연다.
-  const [isEditing, setIsEditing] = useState(() => !loadFestivalSettings().savedAt)
+  const [settings, setSettings] = useState<FestivalSettingsForm>(EMPTY_FESTIVAL_SETTINGS_FORM)
+  const [isEditing, setIsEditing] = useState(false)
   const [draftRound, setDraftRound] = useState<TicketingRound | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    getFestivalSettings({ signal: controller.signal })
+      .then((dto) => {
+        setSettings(toForm(dto))
+        // 아직 한 번도 저장하지 않았으면 바로 입력할 수 있게 편집 모드로 연다.
+        setIsEditing(dto.operationDates.length === 0)
+      })
+      .catch(() => {
+        toast.error("축제 설정을 불러오지 못했습니다.")
+        setIsEditing(true)
+      })
+      .finally(() => setIsLoading(false))
+
+    return () => controller.abort()
+  }, [])
 
   const operationDates = useMemo(
     () => buildFestivalDateRange(settings.startDate, settings.endDate),
     [settings.startDate, settings.endDate],
   )
 
-  const updateSettings = (patch: Partial<FestivalSettings>) => {
+  const updateSettings = (patch: Partial<FestivalSettingsForm>) => {
     setSettings((prev) => ({ ...prev, ...patch }))
   }
 
@@ -61,11 +84,11 @@ export default function AdminSettings() {
   const handleRemoveRound = (id: string) => {
     setSettings((prev) => ({
       ...prev,
-      ticketingRounds: prev.ticketingRounds.filter((round) => round.id !== id),
+      ticketingRounds: prev.ticketingRounds.filter((round) => round.key !== id),
     }))
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!settings.festivalName.trim()) {
       toast.error("축제 이름을 입력해 주세요.")
       return
@@ -79,22 +102,39 @@ export default function AdminSettings() {
       return
     }
 
-    // 운영 날짜가 줄어든 뒤 남아 있는 회차의 공연 날짜를 정리한다.
-    const rounds = settings.ticketingRounds.map((round) =>
-      operationDates.includes(round.performanceDate) ? round : { ...round, performanceDate: "" },
-    )
-    const saved = { ...settings, ticketingRounds: rounds, savedAt: new Date().toISOString() }
-    setSettings(saved)
-    saveFestivalSettings(saved)
-    setDraftRound(null)
-    setIsEditing(false)
-    toast.success("축제 설정을 저장했습니다.")
+    // 운영 날짜가 줄어든 뒤 남아 있는 회차의 공연 날짜를 정리한다. 서버도 같은 검증을 한다.
+    const cleaned: FestivalSettingsForm = {
+      ...settings,
+      ticketingRounds: settings.ticketingRounds.filter((round) =>
+        operationDates.includes(round.performanceDate),
+      ),
+    }
+
+    setIsSaving(true)
+    try {
+      const saved = await updateFestivalSettings(toPayload(cleaned))
+      setSettings(toForm(saved))
+      // 부스맵·타임테이블의 날짜 탭이 저장 즉시 새 운영 날짜를 쓰게 한다.
+      setFestivalDates(saved.operationDates)
+      setDraftRound(null)
+      setIsEditing(false)
+      toast.success("축제 설정을 저장했습니다.")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "축제 설정을 저장하지 못했습니다.")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handleCancel = () => {
-    setSettings(loadFestivalSettings())
+    // 편집을 버리고 서버에 저장된 값으로 되돌린다.
     setDraftRound(null)
-    setIsEditing(false)
+    getFestivalSettings()
+      .then((dto) => {
+        setSettings(toForm(dto))
+        setIsEditing(false)
+      })
+      .catch(() => toast.error("저장된 설정을 불러오지 못했습니다."))
   }
 
   return (
@@ -113,16 +153,18 @@ export default function AdminSettings() {
               </button>
               <button
                 type="button"
-                onClick={handleSave}
+                disabled={isSaving}
+                onClick={() => void handleSave()}
                 className={cn(ADMIN_PRIMARY_ACTION_BUTTON_CLASS, "inline-flex items-center gap-1.5 text-sm")}
               >
                 <Save className="h-4 w-4" strokeWidth={2.3} />
-                저장
+                {isSaving ? "저장 중..." : "저장"}
               </button>
             </>
           ) : (
             <button
               type="button"
+              disabled={isLoading}
               onClick={() => setIsEditing(true)}
               className={cn(ADMIN_PRIMARY_ACTION_BUTTON_CLASS, "inline-flex items-center gap-1.5 text-sm")}
             >
@@ -132,6 +174,10 @@ export default function AdminSettings() {
           )
         }
       >
+        {isLoading && (
+          <p className="text-sm text-[var(--text-muted)]">불러오는 중...</p>
+        )}
+
         <section className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface)] p-5 shadow-sm">
           <h2 className="text-sm font-bold text-[var(--text)]">축제 기본 정보</h2>
           <p className="mt-0.5 text-xs text-[var(--text-muted)]">
@@ -236,7 +282,7 @@ export default function AdminSettings() {
               <ul className="space-y-2">
                 {settings.ticketingRounds.map((round, index) => (
                   <li
-                    key={round.id}
+                    key={round.key}
                     className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 py-2.5"
                   >
                     <div className="min-w-0">
@@ -249,7 +295,7 @@ export default function AdminSettings() {
                     {isEditing && (
                       <button
                         type="button"
-                        onClick={() => handleRemoveRound(round.id)}
+                        onClick={() => handleRemoveRound(round.key)}
                         aria-label={`${index + 1}회차 삭제`}
                         className={cn(
                           "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[var(--border-base)] bg-[var(--surface)] text-[var(--text-muted)] hover:text-[var(--status-danger)]",
@@ -351,11 +397,6 @@ export default function AdminSettings() {
           )}
         </section>
 
-        {settings.savedAt && !isEditing && (
-          <p className="text-right text-xs text-[var(--text-muted)]">
-            마지막 저장: {formatDateTimeLabel(settings.savedAt)}
-          </p>
-        )}
       </AdminShell>
     </>
   )
