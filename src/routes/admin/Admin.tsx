@@ -1,21 +1,17 @@
 // 역할: 관리자 공지/광고 운영 화면을 렌더링하고 편집 액션 훅을 조합합니다.
 import { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   AlertCircle,
   ArrowDown,
   ArrowUp,
   Bell,
-  LogOut,
   Megaphone,
   Pencil,
   Plus,
   RotateCcw,
   Trash2,
   UploadCloud,
-  Map,
 } from "lucide-react";
-import { useAdminAuth } from "@/hooks/app/admin/useAdminAuth";
 import { useAdminAds } from "@/hooks/app/admin/useAdminAds";
 import { useAdminNotices } from "@/hooks/app/admin/useAdminNotices";
 import type { NoticeStatusFilter } from "@/api/app/admin/adminApi";
@@ -57,9 +53,9 @@ const ADMIN_PINNED_NOTICE_BADGE_CLASS =
   "inline-flex items-center gap-1 rounded-full bg-[var(--status-pending)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-on-accent)]";
 
 
-function Admin() {
-  const navigate = useNavigate();
-  const { logout } = useAdminAuth();
+export type AdminNoticeSection = "notice" | "ad";
+
+function Admin({ section = "notice" }: { section?: AdminNoticeSection }) {
 
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [confirmDialogState, setConfirmDialogState] = useState<AdminConfirmDialogState | null>(null);
@@ -171,46 +167,18 @@ function Admin() {
     },
   });
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/admin/login", { replace: true });
-  };
-
   return (
     <>
       <Toaster position="top-right" closeButton richColors />
       <AdminShell
-        title="공지 및 광고 관리자 페이지"
-        headerClassName="sticky top-0 z-20 border-b border-[var(--border-base)] bg-[var(--admin-header-bg)]"
+        title={section === "ad" ? "광고 배너" : "공지사항"}
+        eyebrow={section === "ad" ? "ADVERTISEMENT" : "NOTICE"}
+        headerClassName="border-b border-[var(--border-base)] bg-[var(--admin-header-bg)]"
         mainClassName="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-5"
         actions={
-          <>
-            <span className="rounded-full border border-[var(--border-base)] bg-[var(--surface-subtle)] px-2.5 py-0.5 text-xs font-semibold text-[var(--text-muted)]">
-              운영자: 관리자
-            </span>
-
-            <button
-              type="button"
-              onClick={() => navigate("/admin/map")}
-              aria-label="지도 편집 (개발팀 전용)"
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-[var(--surface)] px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
-            >
-              <Map className="h-4 w-4" strokeWidth={2.3} />
-              <span>지도 편집</span>
-              <span className="rounded-full bg-[var(--status-warning-bg)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--status-warning-text)]">
-                개발팀 전용
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-[var(--surface)] px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
-            >
-              <LogOut className="h-4 w-4" strokeWidth={2.3} />
-              로그아웃
-            </button>
-          </>
+          <span className="rounded-full border border-[var(--border-base)] bg-[var(--surface-subtle)] px-2.5 py-0.5 text-xs font-semibold text-[var(--text-muted)]">
+            운영자: 관리자
+          </span>
         }
       >
         {globalError && (
@@ -220,6 +188,8 @@ function Admin() {
           </div>
         )}
 
+        {section === "notice" && (
+        <>
         {/* 긴급 공지 */}
         <section className="rounded-2xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] p-4 shadow-sm">
           <header className="mb-3 flex items-center justify-between">
@@ -593,6 +563,11 @@ function Admin() {
           )}
         </section>
 
+        </>
+        )}
+
+        {section === "ad" && (
+        <>
         {/* 광고 배너 관리 */}
         <section className="mb-6 rounded-2xl border border-[var(--border-base)] bg-[var(--surface)] p-4 shadow-sm">
           <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -682,6 +657,8 @@ function Admin() {
             <p>• object-cover 방식으로 기기에 따라 이미지가 약간 확대되어 보일 수 있습니다.</p>
           </div>
         </section>
+        </>
+        )}
       </AdminShell>
 
       {/* 공지 작성/수정 모달 */}

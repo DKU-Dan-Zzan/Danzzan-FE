@@ -86,26 +86,46 @@ vi.mock("@/routes/admin/hooks/useAdminAdActions", () => ({
 }));
 
 describe("Admin smoke", () => {
-  it("핵심 관리자 섹션을 렌더링한다", async () => {
-    const container = document.createElement("div");
-    document.body.appendChild(container);
-    const root = createRoot(container);
-
-    await act(async () => {
-      root.render(
-        <MemoryRouter>
-          <Admin />
-        </MemoryRouter>,
-      );
-    });
+  // 공지와 광고는 상단 메뉴의 하위 항목으로 나뉘어 각각 다른 페이지에서 렌더링된다.
+  it("공지 페이지는 공지 섹션만 렌더링한다", async () => {
+    const { container, root } = await renderAdmin("notice");
 
     expect(container.textContent).toContain("긴급 공지");
     expect(container.textContent).toContain("일반 공지 목록");
-    expect(container.textContent).toContain("광고 배너 관리");
+    expect(container.textContent).not.toContain("광고 배너 관리");
 
-    await act(async () => {
-      root.unmount();
-    });
-    container.remove();
+    await cleanup(container, root);
+  });
+
+  it("광고 페이지는 광고 섹션만 렌더링한다", async () => {
+    const { container, root } = await renderAdmin("ad");
+
+    expect(container.textContent).toContain("광고 배너 관리");
+    expect(container.textContent).not.toContain("일반 공지 목록");
+
+    await cleanup(container, root);
   });
 });
+
+async function renderAdmin(section: "notice" | "ad") {
+  const container = document.createElement("div");
+  document.body.appendChild(container);
+  const root = createRoot(container);
+
+  await act(async () => {
+    root.render(
+      <MemoryRouter>
+        <Admin section={section} />
+      </MemoryRouter>,
+    );
+  });
+
+  return { container, root };
+}
+
+async function cleanup(container: HTMLElement, root: ReturnType<typeof createRoot>) {
+  await act(async () => {
+    root.unmount();
+  });
+  container.remove();
+}

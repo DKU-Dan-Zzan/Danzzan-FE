@@ -44,7 +44,12 @@ const Notice = lazyWithPreload(() => import("./routes/notice/Notice"));
 const BoothMap = lazyWithPreload(() => import("./routes/boothmap/BoothMap"));
 const Admin = lazy(() => import("./routes/admin/Admin"));
 const AdminLogin = lazy(() => import("./routes/admin/AdminLogin"));
-const AdminMap = lazy(() => import("./routes/admin/AdminMap"));
+const AdminSettings = lazy(() => import("./routes/admin/AdminSettings"));
+const AdminTheme = lazy(() => import("./routes/admin/AdminTheme"));
+const AdminInvite = lazy(() => import("./routes/admin/AdminInvite"));
+const AdminBoothLayoutPage = lazy(() => import("./routes/admin/AdminBoothLayoutPage"));
+const AdminBoothInfoPage = lazy(() => import("./routes/admin/AdminBoothInfoPage"));
+const AdminTimetablePage = lazy(() => import("./routes/admin/AdminTimetablePage"));
 const NotFoundPage = lazy(() => import("./routes/not-found/NotFoundPage"));
 const ROUTE_WARMUP_FALLBACK_DELAY_MS = 160;
 const ROUTE_WARMUP_IDLE_TIMEOUT_MS = 1400;
@@ -191,8 +196,26 @@ function App() {
 
         {/* 로그인 필요한 관리자 페이지들 */}
         <Route element={<ProtectedAdminRoute />}>
-          <Route index element={withRouteSuspense(<Admin />)} />
-          <Route path="map" element={withRouteSuspense(<AdminMap />)} />
+          {/* 설정: 관리자 콘솔의 기본 페이지 */}
+          <Route index element={withRouteSuspense(<AdminSettings />)} />
+          <Route path="theme" element={withRouteSuspense(<AdminTheme />)} />
+
+          {/* 공지·광고 */}
+          <Route path="notices" element={withRouteSuspense(<Admin section="notice" />)} />
+          <Route path="ads" element={withRouteSuspense(<Admin section="ad" />)} />
+
+          {/* 부스맵 */}
+          <Route path="boothmap" element={<Navigate to="/admin/boothmap/layout" replace />} />
+          <Route path="boothmap/layout" element={withRouteSuspense(<AdminBoothLayoutPage />)} />
+          <Route path="boothmap/booths" element={withRouteSuspense(<AdminBoothInfoPage />)} />
+
+          {/* 타임테이블 */}
+          <Route path="timetable" element={withRouteSuspense(<AdminTimetablePage />)} />
+
+          <Route path="invite" element={withRouteSuspense(<AdminInvite />)} />
+
+          {/* 이전 주소(/admin/map)로 들어온 북마크를 새 부스맵으로 보낸다. */}
+          <Route path="map" element={<Navigate to="/admin/boothmap/layout" replace />} />
         </Route>
       </Route>
 
