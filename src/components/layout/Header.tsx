@@ -71,7 +71,11 @@ const Header = () => {
 
   return (
     <>
-      {(isNoticePage || (isMyPage && !isMyPageGuest) || isTimetablePage) && (
+      {/*
+        내 정보는 포스터가 헤더 뒤까지 올라오므로 막을 깔지 않는다. 막을 깔면 로고 아래에
+        흰 띠가 생겨 포스터가 거기서부터 시작하는 것처럼 잘려 보인다.
+      */}
+      {(isNoticePage || isTimetablePage) && (
         <div
           aria-hidden
           className={cn(
@@ -82,7 +86,11 @@ const Header = () => {
           )}
         />
       )}
-      <AppTopBar headerClassName={headerClassName}>
+      <AppTopBar
+        headerClassName={headerClassName}
+        // 내 정보는 로고가 어두운 포스터 위에 놓여, 원래 색으로는 묻혀서 보이지 않는다.
+        logoClassName={isMyPage && !isMyPageGuest ? "app-header-logo--on-poster" : undefined}
+      >
         {!isMyPage && (
           <>
             <LanguageToggle />

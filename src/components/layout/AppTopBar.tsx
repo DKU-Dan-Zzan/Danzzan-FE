@@ -9,6 +9,8 @@ type AppTopBarProps = {
   headerClassName?: string;
   containerClassName?: string;
   showLogo?: boolean;
+  /** 어두운 배경 위에 로고를 올릴 때처럼, 로고에만 덧입힐 클래스 */
+  logoClassName?: string;
 };
 
 export function AppTopBar({
@@ -18,6 +20,7 @@ export function AppTopBar({
   headerClassName = "sticky top-0 z-50 bg-transparent [background-image:none] shadow-none pt-[env(safe-area-inset-top)]",
   containerClassName = "relative mx-auto h-[68px] max-w-[430px] px-4",
   showLogo = true,
+  logoClassName,
 }: AppTopBarProps) {
   return (
     <>
@@ -29,7 +32,7 @@ export function AppTopBar({
       )}
       <header className={headerClassName}>
         <div className={containerClassName}>
-          {showLogo && <AppHeaderLogo />}
+          {showLogo && <AppHeaderLogo className={logoClassName} />}
           {children}
           {title && <h1 className="sr-only">{title}</h1>}
         </div>

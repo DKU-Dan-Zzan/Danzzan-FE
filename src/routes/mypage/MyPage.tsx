@@ -331,8 +331,10 @@ function MyPage() {
 
   return (
     <div className="mypage-root min-h-full" style={{ background: "var(--poster-bg)" }}>
-      <div className="h-[calc(env(safe-area-inset-top)+68px)]" />
-      {/* 포스터 배경 — 배너+버튼 전체 영역 커버 */}
+      {/*
+        포스터 배경 — 헤더(로고) 뒤까지 올라간다. 예전에는 헤더 높이만큼 흰 여백을 두어
+        포스터가 그 아래에서 시작했고, 로고와 배너 사이에 경계선이 보였다.
+      */}
       <div className="relative">
         <div className="absolute inset-0 overflow-hidden">
           <img
@@ -356,12 +358,15 @@ function MyPage() {
           />
         </div>
 
-        {/* 배너 콘텐츠 */}
-        <div className="relative" style={{ height: 220 }}>
+        {/* 배너 콘텐츠 — 위쪽은 헤더 로고 자리로 비워 둔다. */}
+        <div
+          className="relative pt-[calc(env(safe-area-inset-top)+68px)]"
+          style={{ height: "calc(env(safe-area-inset-top) + 288px)" }}
+        >
           {/* 우상단 축제 타이틀 */}
-          <div className="absolute right-4 top-4 text-right">
+          <div className="absolute right-4 top-[calc(env(safe-area-inset-top)+72px)] text-right">
             <p className="text-[10px] font-medium tracking-widest text-white/60">2026 DANFESTA</p>
-            <p className="text-[13px] font-semibold text-white/80">落花流水 ;만개</p>
+            <p className="text-[13px] font-semibold text-white/80">LEGEND</p>
           </div>
           {/* 좌하단 프로필 */}
           <div className="absolute bottom-5 left-5 flex items-end gap-3">
