@@ -27,8 +27,10 @@ export type TicketingRound = {
   capacity: number
   /** 운영 날짜 중 하나 */
   performanceDate: string
-  /** 티켓팅이 이미 시작됐거나 티켓이 나간 회차. 고치거나 지울 수 없다. */
+  /** 티켓팅이 이미 시작된 회차. 내용을 고칠 수 없다(삭제는 확인 후 가능). */
   locked?: boolean
+  /** 이 회차로 나간 티켓 수. 0 보다 크면 삭제할 때 확인을 받는다. */
+  issuedTicketCount?: number
 }
 
 export type FestivalSettings = {
@@ -53,6 +55,11 @@ export type UpdateFestivalSettingsPayload = {
    * 지우려 하는데, 그 회차로 이미 티켓이 나갔다면 티켓의 근거가 사라진다.
    */
   ticketingRounds: TicketingRound[]
+  /**
+   * 발급된 티켓까지 함께 취소하기로 확인한 회차 id.
+   * 티켓이 나간 회차는 이 목록에 있을 때만 서버가 지운다.
+   */
+  confirmedTicketCancelRoundIds: number[]
 }
 
 /**

@@ -13,8 +13,10 @@ export type TicketingRound = {
   key: string
   /** 서버에 저장된 회차의 id. 새로 추가한 회차는 없다. */
   id?: number
-  /** 티켓팅이 이미 시작된 회차. 고치거나 지울 수 없다. */
+  /** 티켓팅이 이미 시작된 회차. 내용을 고칠 수 없다. */
   locked?: boolean
+  /** 이 회차로 나간 티켓 수 */
+  issuedTicketCount?: number
   /** datetime-local 입력값 (`2027-05-01T18:00`) */
   ticketingAt: string
   capacity: number
@@ -50,6 +52,7 @@ export function toForm(dto: FestivalSettingsDto): FestivalSettingsForm {
       key: round.id != null ? String(round.id) : `round-${index}`,
       id: round.id,
       locked: round.locked ?? false,
+      issuedTicketCount: round.issuedTicketCount ?? 0,
       ticketingAt: toInputDateTime(round.ticketingAt),
       capacity: round.capacity,
       performanceDate: round.performanceDate,
@@ -57,7 +60,10 @@ export function toForm(dto: FestivalSettingsDto): FestivalSettingsForm {
   }
 }
 
-export function toPayload(form: FestivalSettingsForm): UpdateFestivalSettingsPayload {
+export function toPayload(
+  form: FestivalSettingsForm,
+  confirmedTicketCancelRoundIds: number[] = [],
+): UpdateFestivalSettingsPayload {
   return {
     schoolName: form.schoolName,
     festivalName: form.festivalName.trim(),
@@ -73,6 +79,7 @@ export function toPayload(form: FestivalSettingsForm): UpdateFestivalSettingsPay
           performanceDate: round.performanceDate,
         }))
       : [],
+    confirmedTicketCancelRoundIds,
   }
 }
 

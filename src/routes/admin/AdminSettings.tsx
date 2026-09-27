@@ -6,6 +6,16 @@ import { useEffect, useMemo, useState } from "react"
 import { Lock, Plus, Save, Pencil, Trash2, X } from "lucide-react"
 import { Toaster, toast } from "sonner"
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/common/ui/alert-dialog"
 import { AdminShell } from "@/components/layout/AdminShell"
 import {
   ADMIN_FOCUS_VISIBLE_RING_CLASS,
@@ -42,6 +52,12 @@ export default function AdminSettings() {
   const [draftRound, setDraftRound] = useState<TicketingRound | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  /**
+   * 발급된 티켓까지 함께 취소하기로 확인한 회차. 저장할 때 서버에 같이 보낸다.
+   * 확인하지 않은 회차를 지우려 하면 서버가 거절한다.
+   */
+  const [confirmedCancelIds, setConfirmedCancelIds] = useState<number[]>([])
+  const [roundPendingConfirm, setRoundPendingConfirm] = useState<TicketingRound | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -83,11 +99,30 @@ export default function AdminSettings() {
     setDraftRound(null)
   }
 
-  const handleRemoveRound = (id: string) => {
+  const removeRoundByKey = (key: string) => {
     setSettings((prev) => ({
       ...prev,
-      ticketingRounds: prev.ticketingRounds.filter((round) => round.key !== id),
+      ticketingRounds: prev.ticketingRounds.filter((round) => round.key !== key),
     }))
+  }
+
+  const handleRemoveRound = (round: TicketingRound) => {
+    // 티켓이 나간 회차를 지우면 학생이 받은 티켓도 함께 사라진다. 한 번 더 확인한다.
+    if ((round.issuedTicketCount ?? 0) > 0) {
+      setRoundPendingConfirm(round)
+      return
+    }
+    removeRoundByKey(round.key)
+  }
+
+  const confirmRemoveIssuedRound = () => {
+    if (!roundPendingConfirm) return
+
+    if (roundPendingConfirm.id != null) {
+      setConfirmedCancelIds((prev) => [...prev, roundPendingConfirm.id as number])
+    }
+    removeRoundByKey(roundPendingConfirm.key)
+    setRoundPendingConfirm(null)
   }
 
   const handleSave = async () => {
@@ -99,11 +134,6 @@ export default function AdminSettings() {
       toast.error("운영 날짜를 시작일부터 종료일까지 올바르게 선택해 주세요.")
       return
     }
-    if (settings.ticketingEnabled && settings.ticketingRounds.length === 0) {
-      toast.error("티켓팅을 사용하려면 티켓팅 회차를 한 개 이상 추가해 주세요.")
-      return
-    }
-
     // 운영 날짜가 줄어든 뒤 남아 있는 회차의 공연 날짜를 정리한다. 서버도 같은 검증을 한다.
     const cleaned: FestivalSettingsForm = {
       ...settings,
@@ -114,8 +144,9 @@ export default function AdminSettings() {
 
     setIsSaving(true)
     try {
-      const saved = await updateFestivalSettings(toPayload(cleaned))
+      const saved = await updateFestivalSettings(toPayload(cleaned, confirmedCancelIds))
       setSettings(toForm(saved))
+      setConfirmedCancelIds([])
       // 부스맵·타임테이블의 날짜 탭이 저장 즉시 새 운영 날짜를 쓰게 한다.
       setFestivalDates(saved.operationDates)
       setDraftRound(null)
@@ -131,6 +162,7 @@ export default function AdminSettings() {
   const handleCancel = () => {
     // 편집을 버리고 서버에 저장된 값으로 되돌린다.
     setDraftRound(null)
+    setConfirmedCancelIds([])
     getFestivalSettings()
       .then((dto) => {
         setSettings(toForm(dto))
@@ -279,6 +311,11 @@ export default function AdminSettings() {
               {settings.ticketingRounds.length === 0 && !draftRound && (
                 <p className="rounded-xl border border-dashed border-[var(--border-base)] px-3 py-4 text-center text-sm text-[var(--text-muted)]">
                   등록된 티켓팅 회차가 없습니다.
+                  <br />
+                  {/* 회차 없이 켜 두면 학생 화면의 티켓팅 목록이 비어 보인다. 막지는 않고 알려만 준다. */}
+                  <span className="text-[var(--status-warning-text)]">
+                    이대로 저장하면 학생 화면에 응모할 티켓이 보이지 않습니다.
+                  </span>
                 </p>
               )}
 
@@ -304,14 +341,16 @@ export default function AdminSettings() {
                       </p>
                       {round.locked && (
                         <p className="mt-0.5 text-[11px] text-[var(--text-muted)]">
-                          티켓이 나갈 수 있어 수정·삭제할 수 없습니다.
+                          {(round.issuedTicketCount ?? 0) > 0
+                            ? `티켓 ${(round.issuedTicketCount ?? 0).toLocaleString()}장이 발급되어 내용은 수정할 수 없습니다.`
+                            : "티켓팅이 시작되어 내용은 수정할 수 없습니다."}
                         </p>
                       )}
                     </div>
-                    {isEditing && !round.locked && (
+                    {isEditing && (
                       <button
                         type="button"
-                        onClick={() => handleRemoveRound(round.key)}
+                        onClick={() => handleRemoveRound(round)}
                         aria-label={`${index + 1}회차 삭제`}
                         className={cn(
                           "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[var(--border-base)] bg-[var(--surface)] text-[var(--text-muted)] hover:text-[var(--status-danger)]",
@@ -414,6 +453,35 @@ export default function AdminSettings() {
         </section>
 
       </AdminShell>
+
+      <AlertDialog
+        open={Boolean(roundPendingConfirm)}
+        onOpenChange={(open) => {
+          if (!open) setRoundPendingConfirm(null)
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>발급된 티켓도 함께 취소할까요?</AlertDialogTitle>
+            <AlertDialogDescription>
+              이 회차로 티켓 {(roundPendingConfirm?.issuedTicketCount ?? 0).toLocaleString()}장이
+              이미 발급되었습니다. 회차를 지우면 학생들이 받은 티켓과 대기열이 모두 사라지고,
+              되돌릴 수 없습니다. 저장을 눌러야 실제로 반영됩니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>취소</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(event) => {
+                event.preventDefault()
+                confirmRemoveIssuedRound()
+              }}
+            >
+              티켓까지 취소하고 삭제
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }
