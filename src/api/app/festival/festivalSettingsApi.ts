@@ -1,5 +1,6 @@
 // 역할: 축제 운영 정보(축제 이름/운영 날짜/티켓팅 회차) 조회·저장 API 어댑터.
 
+import axios from "axios"
 import { http } from "@/lib/http"
 import { getApiBaseUrl } from "@/api/common/baseUrl"
 import { createFetchWithAuth } from "@/api/common/fetchAuth"
@@ -26,6 +27,8 @@ export type TicketingRound = {
   capacity: number
   /** 운영 날짜 중 하나 */
   performanceDate: string
+  /** 티켓팅이 이미 시작됐거나 티켓이 나간 회차. 고치거나 지울 수 없다. */
+  locked?: boolean
 }
 
 export type FestivalSettings = {
@@ -45,7 +48,22 @@ export type UpdateFestivalSettingsPayload = {
   startDate: string
   endDate: string
   ticketingEnabled: boolean
-  ticketingRounds: Omit<TicketingRound, "id">[]
+  /**
+   * 이미 저장된 회차는 id 를 함께 보낸다. id 가 빠지면 서버가 새 회차로 보고 예전 회차를
+   * 지우려 하는데, 그 회차로 이미 티켓이 나갔다면 티켓의 근거가 사라진다.
+   */
+  ticketingRounds: TicketingRound[]
+}
+
+/**
+ * 취소된 요청인지 본다.
+ *
+ * React 개발 모드는 effect 를 두 번 실행하고 첫 번째를 정리(abort)한다. 그 취소를
+ * 실패로 처리하면 멀쩡히 불러왔는데도 "불러오지 못했습니다" 가 뜬다.
+ */
+export function isRequestAborted(error: unknown): boolean {
+  if (axios.isCancel(error)) return true
+  return error instanceof Error && error.name === "AbortError"
 }
 
 /** 공개 API. 로그인 없이도 부르며, 사용자 화면의 날짜 탭도 이 값을 쓴다. */

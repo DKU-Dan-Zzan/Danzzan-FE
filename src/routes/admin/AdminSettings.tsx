@@ -3,7 +3,7 @@
 // 여기서 저장한 운영 날짜가 부스맵·타임테이블의 날짜 탭이 된다.
 // 저장에 성공하면 앱 전체가 쓰는 날짜 저장소(festivalCalendar)도 함께 갱신한다.
 import { useEffect, useMemo, useState } from "react"
-import { Plus, Save, Pencil, Trash2, X } from "lucide-react"
+import { Lock, Plus, Save, Pencil, Trash2, X } from "lucide-react"
 import { Toaster, toast } from "sonner"
 
 import { AdminShell } from "@/components/layout/AdminShell"
@@ -14,6 +14,7 @@ import {
 } from "@/routes/admin/adminStyleClasses"
 import {
   getFestivalSettings,
+  isRequestAborted,
   updateFestivalSettings,
 } from "@/api/app/festival/festivalSettingsApi"
 import { setFestivalDates } from "@/lib/app/festival/festivalCalendar"
@@ -51,7 +52,8 @@ export default function AdminSettings() {
         // 아직 한 번도 저장하지 않았으면 바로 입력할 수 있게 편집 모드로 연다.
         setIsEditing(dto.operationDates.length === 0)
       })
-      .catch(() => {
+      .catch((error) => {
+        if (isRequestAborted(error)) return
         toast.error("축제 설정을 불러오지 못했습니다.")
         setIsEditing(true)
       })
@@ -246,7 +248,8 @@ export default function AdminSettings() {
             <div>
               <h2 className="text-sm font-bold text-[var(--text)]">티켓팅</h2>
               <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-                티켓팅 회차마다 수량과 공연 날짜를 다르게 지정할 수 있습니다.
+                회차를 저장하면 티켓팅이 그 시각에 자동으로 열립니다. 회차마다 수량과 공연 날짜를 다르게
+                지정할 수 있습니다.
               </p>
             </div>
 
@@ -286,13 +289,26 @@ export default function AdminSettings() {
                     className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 py-2.5"
                   >
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-[var(--text-muted)]">{index + 1}회차</p>
+                      <p className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-muted)]">
+                        {index + 1}회차
+                        {round.locked && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--status-warning-bg)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--status-warning-text)]">
+                            <Lock className="h-3 w-3" strokeWidth={2.4} />
+                            티켓팅 시작됨
+                          </span>
+                        )}
+                      </p>
                       <p className="mt-0.5 text-sm text-[var(--text)]">
                         티켓팅 {formatDateTimeLabel(round.ticketingAt)} · {round.capacity.toLocaleString()}개 · 공연{" "}
                         {formatDateLabel(round.performanceDate)}
                       </p>
+                      {round.locked && (
+                        <p className="mt-0.5 text-[11px] text-[var(--text-muted)]">
+                          티켓이 나갈 수 있어 수정·삭제할 수 없습니다.
+                        </p>
+                      )}
                     </div>
-                    {isEditing && (
+                    {isEditing && !round.locked && (
                       <button
                         type="button"
                         onClick={() => handleRemoveRound(round.key)}

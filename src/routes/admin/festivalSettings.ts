@@ -9,8 +9,12 @@ import type {
 } from "@/api/app/festival/festivalSettingsApi"
 
 export type TicketingRound = {
-  /** 화면에서 목록을 다루기 위한 키. 서버 id 가 아니다. */
+  /** 화면에서 목록을 다루기 위한 키. 저장된 회차는 서버 id 를 문자열로 쓴다. */
   key: string
+  /** 서버에 저장된 회차의 id. 새로 추가한 회차는 없다. */
+  id?: number
+  /** 티켓팅이 이미 시작된 회차. 고치거나 지울 수 없다. */
+  locked?: boolean
   /** datetime-local 입력값 (`2027-05-01T18:00`) */
   ticketingAt: string
   capacity: number
@@ -44,6 +48,8 @@ export function toForm(dto: FestivalSettingsDto): FestivalSettingsForm {
     ticketingEnabled: dto.ticketingEnabled,
     ticketingRounds: dto.ticketingRounds.map((round, index) => ({
       key: round.id != null ? String(round.id) : `round-${index}`,
+      id: round.id,
+      locked: round.locked ?? false,
       ticketingAt: toInputDateTime(round.ticketingAt),
       capacity: round.capacity,
       performanceDate: round.performanceDate,
@@ -58,8 +64,10 @@ export function toPayload(form: FestivalSettingsForm): UpdateFestivalSettingsPay
     startDate: form.startDate,
     endDate: form.endDate,
     ticketingEnabled: form.ticketingEnabled,
+    // 저장된 회차는 id 를 같이 보내야 서버가 같은 회차로 알아보고 티켓팅 이벤트를 유지한다.
     ticketingRounds: form.ticketingEnabled
       ? form.ticketingRounds.map((round) => ({
+          id: round.id,
           ticketingAt: toServerDateTime(round.ticketingAt),
           capacity: round.capacity,
           performanceDate: round.performanceDate,

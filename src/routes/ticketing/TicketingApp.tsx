@@ -177,15 +177,21 @@ export default function TicketingApp() {
             <Route path="login" element={<Login />} />
             <Route path="reset-password" element={<ResetPassword />} />
             <Route path="signup" element={<Signup />} />
-            {/* 티켓팅 화면은 축제 설정에서 티켓팅을 켠 동안만 열린다. */}
-            <Route element={<TicketingGate />}>
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
+
+          {/*
+            티켓팅 화면은 축제 설정에서 티켓팅을 켠 동안만 열린다.
+            게이트를 UserLayout 바깥에 두어야 안내 화면이 헤더 없이 화면을 꽉 채운다.
+          */}
+          <Route element={<TicketingGate />}>
+            <Route element={<UserLayout />}>
               <Route element={<RequireStudentAuth />}>
                 <Route path="ticketing" element={<Ticketing />} />
                 <Route path="my-ticket" element={<MyTicket />} />
                 <Route path="myticket" element={<LegacyMyTicketRedirect />} />
               </Route>
             </Route>
-            <Route path="*" element={<NotFoundPage />} />
           </Route>
 
           <Route path="admin" element={<AdminLogin />} />
