@@ -63,10 +63,10 @@ export default function AdminLogin() {
                 관리자 전용
               </p>
               <h1 className={ADMIN_LOGIN_TITLE_CLASS}>
-                공지사항/광고 업로드 시스템
+                축제 운영 관리자 페이지
               </h1>
               <p className="text-sm text-[var(--text-muted)]">
-                관리자 계정 인증 후 공지 및 배너 관리 페이지로 이동합니다.
+                관리자 계정 인증 후 축제 설정 화면으로 이동합니다.
               </p>
             </div>
 
