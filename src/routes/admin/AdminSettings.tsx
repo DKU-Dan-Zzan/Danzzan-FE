@@ -2,7 +2,7 @@
 //
 // 여기서 저장한 운영 날짜가 부스맵·타임테이블의 날짜 탭이 된다.
 // 저장에 성공하면 앱 전체가 쓰는 날짜 저장소(festivalCalendar)도 함께 갱신한다.
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react"
 import { Lock, Plus, Save, Pencil, Trash2, X } from "lucide-react"
 import { Toaster, toast } from "sonner"
 
@@ -25,7 +25,8 @@ import {
 import {
   getFestivalSettings,
   isRequestAborted,
-  updateFestivalSettings,
+  updateFestivalMetadata,
+  updateFestivalTicketingSettings,
 } from "@/api/app/festival/festivalSettingsApi"
 import { setFestivalDates } from "@/lib/app/festival/festivalCalendar"
 import {
@@ -33,12 +34,15 @@ import {
   createEmptyTicketingRound,
   formatDateLabel,
   toForm,
-  toPayload,
+  toMetadataPayload,
+  toTicketingPayload,
   EMPTY_FESTIVAL_SETTINGS_FORM,
   type FestivalSettingsForm,
   type TicketingRound,
 } from "@/routes/admin/festivalSettings"
 import { cn } from "@/components/common/ui/utils"
+import { authStore } from "@/store/common/authStore"
+import { hasAdminPermission } from "@/api/common/authCore"
 
 const inputClass = cn(
   "h-9 w-full rounded-xl border border-[var(--border-base)] bg-[var(--surface)] px-3 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)]",
@@ -47,6 +51,9 @@ const inputClass = cn(
 )
 
 export default function AdminSettings() {
+  const session = useSyncExternalStore(authStore.subscribe, authStore.getSnapshot, authStore.getSnapshot)
+  const canOperate = hasAdminPermission(session.role, session.permissions, "OPERATIONS")
+  const canTicket = hasAdminPermission(session.role, session.permissions, "TICKETING")
   const [settings, setSettings] = useState<FestivalSettingsForm>(EMPTY_FESTIVAL_SETTINGS_FORM)
   const [isEditing, setIsEditing] = useState(false)
   const [draftRound, setDraftRound] = useState<TicketingRound | null>(null)
@@ -125,7 +132,8 @@ export default function AdminSettings() {
     setRoundPendingConfirm(null)
   }
 
-  const handleSave = async () => {
+  const handleSaveMetadata = async () => {
+    if (!canOperate) return
     if (!settings.festivalName.trim()) {
       toast.error("축제 이름을 입력해 주세요.")
       return
@@ -134,29 +142,33 @@ export default function AdminSettings() {
       toast.error("운영 날짜를 시작일부터 종료일까지 올바르게 선택해 주세요.")
       return
     }
-    // 운영 날짜가 줄어든 뒤 남아 있는 회차의 공연 날짜를 정리한다. 서버도 같은 검증을 한다.
-    const cleaned: FestivalSettingsForm = {
-      ...settings,
-      ticketingRounds: settings.ticketingRounds.filter((round) =>
-        operationDates.includes(round.performanceDate),
-      ),
-    }
-
     setIsSaving(true)
     try {
-      const saved = await updateFestivalSettings(toPayload(cleaned, confirmedCancelIds))
-      setSettings(toForm(saved))
-      setConfirmedCancelIds([])
+      const saved = await updateFestivalMetadata(toMetadataPayload(settings))
+      setSettings((previous) => ({ ...toForm(saved), ticketingEnabled: previous.ticketingEnabled, ticketingRounds: previous.ticketingRounds }))
       // 부스맵·타임테이블의 날짜 탭이 저장 즉시 새 운영 날짜를 쓰게 한다.
       setFestivalDates(saved.operationDates)
-      setDraftRound(null)
-      setIsEditing(false)
-      toast.success("축제 설정을 저장했습니다.")
+      toast.success("축제 기본 정보를 저장했습니다.")
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "축제 설정을 저장하지 못했습니다.")
     } finally {
       setIsSaving(false)
     }
+  }
+
+  const handleSaveTicketing = async () => {
+    if (!canTicket) return
+    if (settings.ticketingRounds.some((round) => !operationDates.includes(round.performanceDate))) {
+      toast.error("운영 날짜에 포함되지 않는 티켓팅 회차가 있습니다. 기본 정보를 먼저 저장하거나 회차 날짜를 수정해 주세요.")
+      return
+    }
+    setIsSaving(true)
+    try {
+      const saved = await updateFestivalTicketingSettings(toTicketingPayload(settings, confirmedCancelIds))
+      setSettings((previous) => ({ ...toForm(saved), schoolName: previous.schoolName, festivalName: previous.festivalName, startDate: previous.startDate, endDate: previous.endDate }))
+      setConfirmedCancelIds([]); setDraftRound(null)
+      toast.success("티켓팅 설정을 저장했습니다.")
+    } catch (error) { toast.error(error instanceof Error ? error.message : "티켓팅 설정을 저장하지 못했습니다.") } finally { setIsSaving(false) }
   }
 
   const handleCancel = () => {
@@ -185,15 +197,16 @@ export default function AdminSettings() {
               <button type="button" onClick={handleCancel} className={cn(ADMIN_SECONDARY_ACTION_BUTTON_CLASS, "text-sm")}>
                 취소
               </button>
-              <button
+              {canOperate && <button
                 type="button"
                 disabled={isSaving}
-                onClick={() => void handleSave()}
+                onClick={() => void handleSaveMetadata()}
                 className={cn(ADMIN_PRIMARY_ACTION_BUTTON_CLASS, "inline-flex items-center gap-1.5 text-sm")}
               >
                 <Save className="h-4 w-4" strokeWidth={2.3} />
-                {isSaving ? "저장 중..." : "저장"}
-              </button>
+                {isSaving ? "저장 중..." : "기본 정보 저장"}
+              </button>}
+              {canTicket && <button type="button" disabled={isSaving} onClick={() => void handleSaveTicketing()} className={cn(ADMIN_PRIMARY_ACTION_BUTTON_CLASS, "inline-flex items-center gap-1.5 text-sm")}><Save className="h-4 w-4" strokeWidth={2.3} />{isSaving ? "저장 중..." : "티켓팅 저장"}</button>}
             </>
           ) : (
             <button
@@ -224,7 +237,7 @@ export default function AdminSettings() {
               <input
                 type="text"
                 value={settings.festivalName}
-                disabled={!isEditing}
+                disabled={!isEditing || !canOperate}
                 onChange={(event) => updateSettings({ festivalName: event.target.value })}
                 placeholder="예: 2026 DANFESTA"
                 className={inputClass}
@@ -237,7 +250,7 @@ export default function AdminSettings() {
                 <input
                   type="date"
                   value={settings.startDate}
-                  disabled={!isEditing}
+                  disabled={!isEditing || !canOperate}
                   onChange={(event) => updateSettings({ startDate: event.target.value })}
                   className={inputClass}
                 />
@@ -247,7 +260,7 @@ export default function AdminSettings() {
                 <input
                   type="date"
                   value={settings.endDate}
-                  disabled={!isEditing}
+                  disabled={!isEditing || !canOperate}
                   min={settings.startDate || undefined}
                   onChange={(event) => updateSettings({ endDate: event.target.value })}
                   className={inputClass}
@@ -290,7 +303,7 @@ export default function AdminSettings() {
                 <button
                   key={String(value)}
                   type="button"
-                  disabled={!isEditing}
+                  disabled={!isEditing || !canTicket}
                   onClick={() => updateSettings({ ticketingEnabled: value })}
                   className={cn(
                     "rounded-full px-3 py-1 text-xs font-bold transition-colors disabled:cursor-not-allowed",
@@ -347,7 +360,7 @@ export default function AdminSettings() {
                         </p>
                       )}
                     </div>
-                    {isEditing && (
+                    {isEditing && canTicket && (
                       <button
                         type="button"
                         onClick={() => handleRemoveRound(round)}
@@ -365,7 +378,7 @@ export default function AdminSettings() {
               </ul>
 
               {/* 추가를 누르면 이 입력 토글이 열리고, 저장하면 다시 닫힌다. */}
-              {isEditing && draftRound && (
+              {isEditing && canTicket && draftRound && (
                 <div className="rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)] p-3">
                   <div className="mb-2 flex items-center justify-between">
                     <p className="text-xs font-bold text-[var(--text)]">새 티켓팅 회차</p>
@@ -435,7 +448,7 @@ export default function AdminSettings() {
                 </div>
               )}
 
-              {isEditing && !draftRound && (
+              {isEditing && canTicket && !draftRound && (
                 <button
                   type="button"
                   onClick={() => setDraftRound(createEmptyTicketingRound())}
