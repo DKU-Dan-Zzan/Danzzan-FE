@@ -1,4 +1,4 @@
-// 역할: 아직 기능이 없는 관리자 메뉴(테마, 운영진 초대)의 빈 화면을 공통으로 제공한다.
+// 역할: 아직 기능이 없는 관리자 메뉴(테마, 매니저 초대)의 빈 화면을 공통으로 제공한다.
 import { AdminShell } from "@/components/layout/AdminShell"
 
 export default function AdminPlaceholderPage({

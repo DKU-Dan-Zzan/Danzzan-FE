@@ -16,6 +16,7 @@ export type AdminNoticeListKeyParams = {
 };
 
 export const appQueryKeys = {
+  adminStaff: (actorId: string | null, epoch: number) => ["admin", "staff", actorId, epoch] as const,
   homeImages: () => ["home", "images"] as const,
   homeLineup: () => ["home", "lineup"] as const,
   // 긴급공지는 BE 가 lang 으로 본문과 상대시간("방금 전"/"just now")을 모두 바꾸므로
