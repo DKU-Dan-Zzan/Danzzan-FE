@@ -2,7 +2,9 @@
 
 import { logAuthWarn, maskToken } from "@/api/common/authLogger";
 
-export type AuthRole = "student" | "admin";
+export type AuthRole = "student" | "manager" | "admin";
+export type AdminPermission = "OPERATIONS" | "TICKETING";
+export const ADMIN_PERMISSIONS: readonly AdminPermission[] = ["OPERATIONS", "TICKETING"];
 
 export type AuthErrorCode =
   | "AUTH_UNAUTHORIZED"
@@ -57,6 +59,9 @@ const normalizeRoleClaim = (role: unknown): AuthRole | null => {
   if (role === "admin" || role === "ROLE_ADMIN") {
     return "admin";
   }
+  if (role === "manager" || role === "ROLE_MANAGER") {
+    return "manager";
+  }
   if (role === "student" || role === "ROLE_USER" || role === "user") {
     return "student";
   }
@@ -106,6 +111,22 @@ export const resolveRoleFromAccessToken = (token: string | null | undefined): Au
   return null;
 };
 
+/** JWT claim is authoritative. Managers without a valid claim intentionally get no admin scope. */
+export const resolvePermissionsFromAccessToken = (token: string | null | undefined): AdminPermission[] => {
+  const role = resolveRoleFromAccessToken(token);
+  if (role === "admin") return [...ADMIN_PERMISSIONS];
+  if (role !== "manager" || !token) return [];
+  const claim = parseJwtPayload(token)?.permissions;
+  if (!Array.isArray(claim)) return [];
+  return [...new Set(claim.filter((value): value is AdminPermission => value === "OPERATIONS" || value === "TICKETING"))];
+};
+
+export const hasAdminPermission = (
+  role: AuthRole | null,
+  permissions: readonly AdminPermission[] | null | undefined,
+  permission: AdminPermission,
+): boolean => role === "admin" || (role === "manager" && Boolean(permissions?.includes(permission)));
+
 export const isAccessTokenExpired = (
   token: string | null | undefined,
   nowMs = Date.now(),
@@ -136,14 +157,20 @@ export const hasRequiredRole = (
   }
 
   if (requiredRole === "student") {
-    return currentRole === "student" || currentRole === "admin";
+    return currentRole === "student" || currentRole === "manager" || currentRole === "admin";
   }
 
-  return currentRole === "admin";
+  return currentRole === "admin" || currentRole === "manager";
 };
+
+export const canAccessAdminConsole = (role: AuthRole | null, permissions: readonly AdminPermission[] = []): boolean =>
+  role === "admin" || (role === "manager" && permissions.length > 0);
+
+export const canManageStaff = (role: AuthRole | null): boolean => role === "admin";
 
 type RefreshQueueOptions = {
   key?: string;
+  epoch?: number;
   refresh: () => Promise<string | null>;
 };
 
@@ -152,9 +179,11 @@ const DEFAULT_REFRESH_KEY = "auth.boundary.default";
 
 export const refreshIfNeeded = async ({
   key = DEFAULT_REFRESH_KEY,
+  epoch,
   refresh,
 }: RefreshQueueOptions): Promise<string | null> => {
-  const inFlight = refreshFlights.get(key);
+  const scopedKey = `${key}:${epoch ?? "legacy"}`;
+  const inFlight = refreshFlights.get(scopedKey);
   if (inFlight) {
     return inFlight;
   }
@@ -163,22 +192,22 @@ export const refreshIfNeeded = async ({
     try {
       const refreshedToken = await refresh();
       logAuthWarn("refresh-complete", {
-        key,
+        key: scopedKey,
         success: Boolean(refreshedToken),
         refreshedToken: maskToken(refreshedToken),
       });
       return refreshedToken;
     } catch (error) {
       logAuthWarn("refresh-failed", {
-        key,
+        key: scopedKey,
       });
       throw error;
     } finally {
-      refreshFlights.delete(key);
+      refreshFlights.delete(scopedKey);
     }
   })();
 
-  refreshFlights.set(key, task);
+  refreshFlights.set(scopedKey, task);
   return task;
 };
 
@@ -196,6 +225,7 @@ type WithAuthRetryOptions<T> = {
   onForbidden?: () => void | Promise<void>;
   sessionExpiredMessage?: string;
   forbiddenMessage?: string;
+  getSessionEpoch?: () => number;
 };
 
 const defaultSessionExpiredMessage = "세션이 만료되었습니다. 다시 로그인해 주세요.";
@@ -219,7 +249,9 @@ export const withAuthRetry = async <T>({
   onForbidden,
   sessionExpiredMessage = defaultSessionExpiredMessage,
   forbiddenMessage = defaultForbiddenMessage,
+  getSessionEpoch,
 }: WithAuthRetryOptions<T>): Promise<T> => {
+  const epoch = getSessionEpoch?.();
   try {
     return await execute(getAccessToken(), { isRetry: false });
   } catch (firstError) {
@@ -234,14 +266,19 @@ export const withAuthRetry = async <T>({
       throw firstError;
     }
 
+    if (epoch !== undefined && epoch !== getSessionEpoch?.()) {
+      throwSessionExpiredError(sessionExpiredMessage, firstError);
+    }
+
     let refreshedToken: string | null = null;
     try {
       refreshedToken = await refreshIfNeeded({
         key: refreshKey,
+        epoch,
         refresh: refreshAccessToken,
       });
     } catch (refreshError) {
-      await onSessionExpired?.();
+      if (epoch === undefined || epoch === getSessionEpoch?.()) await onSessionExpired?.();
       throw new AuthBoundaryError(
         sessionExpiredMessage,
         "AUTH_REFRESH_FAILED",
@@ -251,11 +288,12 @@ export const withAuthRetry = async <T>({
     }
 
     if (!refreshedToken) {
-      await onSessionExpired?.();
+      if (epoch === undefined || epoch === getSessionEpoch?.()) await onSessionExpired?.();
       throwSessionExpiredError(sessionExpiredMessage, firstError);
     }
 
     try {
+      if (epoch !== undefined && epoch !== getSessionEpoch?.()) throw new AuthBoundaryError("세션이 변경되었습니다.", "AUTH_SESSION_EXPIRED", 401);
       return await execute(refreshedToken, { isRetry: true });
     } catch (retryError) {
       const retryStatus = readStatus(retryError);
@@ -264,7 +302,7 @@ export const withAuthRetry = async <T>({
         throwForbiddenError(forbiddenMessage, retryError);
       }
       if (retryStatus === 401) {
-        await onSessionExpired?.();
+        if (epoch === undefined || epoch === getSessionEpoch?.()) await onSessionExpired?.();
         throwSessionExpiredError(sessionExpiredMessage, retryError);
       }
       throw retryError;

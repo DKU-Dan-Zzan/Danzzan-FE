@@ -107,6 +107,7 @@ const normalizeAdPayload = (
 
 const getTicketingClient = () =>
   createHttpClient({
+    getSessionEpoch: authStore.getSessionEpoch,
     baseUrl: getTicketingApiBaseUrl() || getApiBaseUrl(),
     getAccessToken: authStore.getAccessToken,
     refreshAccessToken: authStore.refreshAccessToken,

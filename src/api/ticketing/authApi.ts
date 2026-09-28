@@ -27,10 +27,9 @@ const getPublicClient = () =>
 export const authApi = {
   login: async (payload: AuthCredentials): Promise<AuthSession> => {
     if (env.apiMode === "mock") {
-      console.log("Mocking login request with payload:", payload);
       return Promise.resolve({
         tokens: {
-          accessToken: "mock-access-token",
+          accessToken: `mock.${btoa(JSON.stringify({ sub: "1", role: "ROLE_USER", exp: Math.floor(Date.now() / 1000) + 3600 }))}.mock`,
           refreshToken: "mock-refresh-token",
           expiresIn: 3600,
         },

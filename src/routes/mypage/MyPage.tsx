@@ -168,7 +168,7 @@ function MyPage() {
     authStore.getSnapshot,
   );
 
-  const isLoggedIn = !!session.tokens?.accessToken && session.role === "student";
+  const isLoggedIn = !!session.tokens?.accessToken && !!session.role;
   const user = session.user;
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const [withdrawConfirmOpen, setWithdrawConfirmOpen] = useState(false);
@@ -184,13 +184,14 @@ function MyPage() {
     const tokens = session.tokens;
     if (!hasProfileGap || !tokens) return;
 
+    const epoch = authStore.getSessionEpoch();
     let cancelled = false;
 
     void (async () => {
       try {
         const freshUser = await studentProfileApi.me();
         if (!freshUser || cancelled) return;
-        authStore.setSession({ tokens, user: freshUser }, session.role ?? undefined);
+        authStore.updateUser(freshUser, epoch);
       } catch {
         // keep login payload profile on failure
       }

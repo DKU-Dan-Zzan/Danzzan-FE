@@ -2,7 +2,9 @@
 
 import {
   hasRequiredRole,
+  hasAdminPermission,
   isAccessTokenExpired,
+  resolvePermissionsFromAccessToken,
   resolveRoleFromAccessToken,
   type AuthRole,
 } from "@/api/common/authCore";
@@ -22,4 +24,14 @@ export const hasAuthenticatedRole = (options: {
   // Token claim should be source of truth when available.
   const tokenRole = resolveRoleFromAccessToken(options.accessToken);
   return hasRequiredRole(options.requiredRole, tokenRole ?? options.role ?? null);
+};
+
+export const hasAuthenticatedAdminPermission = (options: {
+  accessToken?: string | null;
+  role?: AuthRole | null;
+  permission: import("@/api/common/authCore").AdminPermission;
+}): boolean => {
+  if (!options.accessToken || isAccessTokenExpired(options.accessToken)) return false;
+  const role = resolveRoleFromAccessToken(options.accessToken) ?? options.role ?? null;
+  return hasAdminPermission(role, resolvePermissionsFromAccessToken(options.accessToken), options.permission);
 };

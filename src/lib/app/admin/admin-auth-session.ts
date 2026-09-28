@@ -1,17 +1,18 @@
 // 역할: 관리자 인증 세션의 저장/복원 보조 로직을 제공한다.
 
-import { hasRequiredRole, resolveRoleFromAccessToken } from "@/api/common/authCore";
+import { canAccessAdminConsole, resolvePermissionsFromAccessToken, resolveRoleFromAccessToken } from "@/api/common/authCore";
 import { authStore } from "@/store/common/authStore";
 
 export const requireAdminRole = (accessToken: string): void => {
   const role = resolveRoleFromAccessToken(accessToken);
-  if (!hasRequiredRole("admin", role)) {
-    throw new Error("관리자 권한이 없는 계정입니다.");
+  if (!canAccessAdminConsole(role, resolvePermissionsFromAccessToken(accessToken))) {
+    throw new Error("사용 가능한 관리자 권한이 없는 계정입니다.");
   }
 };
 
 export const getAdminSession = (): string | null => {
-  return authStore.getRole() === "admin" ? authStore.getAccessToken() : null;
+  const state = authStore.getSnapshot();
+  return canAccessAdminConsole(state.role, state.permissions) ? authStore.getAccessToken() : null;
 };
 
 export const clearAdminSession = (): void => {
@@ -19,7 +20,8 @@ export const clearAdminSession = (): void => {
 };
 
 export const getAdminAccessToken = (): string | null => {
-  return authStore.getRole() === "admin" ? authStore.getAccessToken() : null;
+  const state = authStore.getSnapshot();
+  return canAccessAdminConsole(state.role, state.permissions) ? authStore.getAccessToken() : null;
 };
 
 export const reissueAdminToken = async (): Promise<string | null> => {

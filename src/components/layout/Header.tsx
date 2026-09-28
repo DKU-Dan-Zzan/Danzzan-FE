@@ -38,7 +38,7 @@ const Header = () => {
     authStore.getSnapshot,
     authStore.getSnapshot,
   )
-  const isLoggedIn = !!session.tokens?.accessToken && session.role === "student"
+  const isLoggedIn = !!session.tokens?.accessToken && !!session.role
   const isTimetablePage = location.pathname === "/timetable"
   const isBoothMapPage = location.pathname === "/map"
   const isNoticePage = location.pathname === "/notice"

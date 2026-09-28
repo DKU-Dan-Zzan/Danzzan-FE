@@ -1,3 +1,4 @@
+import { authStore } from "@/store/common/authStore";
 import { getApiBaseUrl } from "@/api/common/baseUrl";
 import { createFetchWithAuth } from "@/api/common/fetchAuth";
 import { parseNoticeImagePresignContract } from "@/api/app/admin/adminContract";
@@ -8,6 +9,7 @@ import {
 } from "@/lib/app/admin/admin-auth-session";
 
 const fetchWithAuth = createFetchWithAuth({
+  getSessionEpoch: authStore.getSessionEpoch,
   getBaseUrl: getApiBaseUrl,
   getAccessToken: getAdminAccessToken,
   reissueAccessToken: reissueAdminToken,

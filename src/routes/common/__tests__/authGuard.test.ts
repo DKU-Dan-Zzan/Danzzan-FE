@@ -103,3 +103,12 @@ describe("authGuard", () => {
     ).toBe(false);
   });
 });
+
+describe("manager operations access", () => {
+  it("allows manager to use the existing admin routes and member routes", () => {
+    const payload = btoa(JSON.stringify({ role: "ROLE_MANAGER", exp: Math.floor(Date.now() / 1000) + 600 }));
+    const accessToken = `header.${payload}.signature`;
+    expect(isRoleAuthenticated({ accessToken, role: "manager", requiredRole: "admin" })).toBe(true);
+    expect(isRoleAuthenticated({ accessToken, role: "manager", requiredRole: "student" })).toBe(true);
+  });
+});

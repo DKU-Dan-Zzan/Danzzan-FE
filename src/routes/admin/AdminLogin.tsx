@@ -128,7 +128,7 @@ export default function AdminLogin() {
 
                   <p className="flex items-start gap-1.5 rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 py-2.5 text-xs font-medium leading-5 text-[var(--text-muted)]">
                     <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={2.3} />
-                    운영진 전용 인증 화면입니다. 권한 없는 계정은 접근할 수 없습니다.
+                    매니저 전용 인증 화면입니다. 권한 없는 계정은 접근할 수 없습니다.
                   </p>
                 </section>
 

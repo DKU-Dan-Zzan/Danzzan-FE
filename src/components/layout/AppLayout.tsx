@@ -15,7 +15,7 @@ const Layout = () => {
     authStore.getSnapshot,
   )
   const isMyPage = location.pathname.startsWith("/mypage")
-  const isMyPageGuest = isMyPage && !(session.tokens?.accessToken && session.role === "student")
+  const isMyPageGuest = isMyPage && !(session.tokens?.accessToken && !!session.role)
   const shouldShowFooter = isMyPage && !isMyPageGuest
   const isBoothMapPage = location.pathname === "/map"
   const rootClassName = isBoothMapPage

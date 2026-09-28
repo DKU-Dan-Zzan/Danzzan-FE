@@ -1,324 +1,123 @@
-// 역할: 앱 전역 인증 사용자 상태를 보관하고 갱신하는 Zustand 스토어를 정의한다.
-
-import { resolveRoleFromAccessToken } from "@/api/common/authCore";
-import { logAuthWarn } from "@/api/common/authLogger";
-import {
-  refreshAccessTokenWithCookie,
-  refreshAccessTokenWithToken,
-} from "@/api/common/authRefresh";
-import type {
-  AuthSession,
-  AuthTokens,
-  AuthUser,
-  UserRole,
-} from "@/types/common/auth.model";
+// JWT 역할을 기준으로 세션을 복원하며 계정 전환 전의 비동기 응답을 폐기한다.
+import { resolvePermissionsFromAccessToken, resolveRoleFromAccessToken, type AdminPermission } from "@/api/common/authCore";
+import { refreshAccessTokenWithCookie, refreshAccessTokenWithToken } from "@/api/common/authRefresh";
+import type { AuthSession, AuthTokens, AuthUser, UserRole } from "@/types/common/auth.model";
 import { env } from "@/utils/common/env";
 
 const STORAGE_KEY = "danzzan.auth";
-const LEGACY_ACCESS_TOKEN_KEYS = [
-  "danzzan.accessToken",
-  "danzzan.admin.accessToken",
-  "accessToken",
-] as const;
-
+const LEGACY_KEYS = ["danzzan.accessToken", "danzzan.admin.accessToken", "accessToken"];
 type RefreshMode = "cookie" | "token";
-
-type AuthState = {
-  tokens: AuthTokens | null;
-  user: AuthUser | null;
-  role: UserRole | null;
-  refreshMode: RefreshMode | null;
-  persisted: boolean;
-};
-
-type SerializedAuthState = {
-  tokens?: AuthTokens | null;
-  user?: AuthUser | null;
-  role?: UserRole | null;
-  refreshMode?: RefreshMode | null;
-};
-
-type SetSessionOptions = {
-  persist?: boolean;
-  refreshMode?: RefreshMode;
-};
-
-const emptyState: AuthState = {
-  tokens: null,
-  user: null,
-  role: null,
-  refreshMode: null,
-  persisted: false,
-};
-
+type AuthState = { tokens: AuthTokens | null; user: AuthUser | null; role: UserRole | null; permissions: AdminPermission[]; refreshMode: RefreshMode | null; persisted: boolean };
+type SetSessionOptions = { persist?: boolean; refreshMode?: RefreshMode };
+const emptyState: AuthState = { tokens: null, user: null, role: null, permissions: [], refreshMode: null, persisted: false };
 const listeners = new Set<() => void>();
 
-const toSerializable = (next: AuthState): SerializedAuthState => ({
-  tokens: next.tokens,
-  user: next.user,
-  role: next.role,
-  refreshMode: next.refreshMode,
-});
-
-const resolveRole = (options: {
-  roleOverride?: UserRole;
-  user?: AuthUser | null;
-  accessToken?: string;
-}): UserRole | null => {
-  if (options.roleOverride) {
-    return options.roleOverride;
-  }
-
-  if (options.user?.role === "student" || options.user?.role === "admin") {
-    return options.user.role;
-  }
-
-  const fromToken = resolveRoleFromAccessToken(options.accessToken);
-  return fromToken ?? null;
-};
-
-const resolveRefreshMode = (
-  tokens: AuthTokens | null | undefined,
-  modeOverride?: RefreshMode,
-): RefreshMode | null => {
-  if (modeOverride) {
-    return modeOverride;
-  }
-  if (!tokens) {
-    return null;
-  }
-  return tokens.refreshToken ? "token" : "cookie";
-};
-
-const buildTokenState = (accessToken: string, persisted = false): AuthState => {
+function normalize(session: AuthSession, options: SetSessionOptions = {}): AuthState {
+  const token = session.tokens?.accessToken;
+  const role = typeof token === "string" ? resolveRoleFromAccessToken(token) : null;
+  if (!role) return emptyState;
+  const tokens = { ...session.tokens, refreshToken: session.tokens.refreshToken ?? "" };
   return {
-    tokens: {
-      accessToken,
-      refreshToken: "",
-      expiresIn: null,
-    },
-    user: null,
-    role: resolveRole({
-      accessToken,
-    }),
-    refreshMode: "cookie",
-    persisted,
+    tokens, user: session.user ? { ...session.user, role } : null, role, permissions: resolvePermissionsFromAccessToken(token),
+    refreshMode: options.refreshMode ?? (tokens.refreshToken ? "token" : "cookie"),
+    persisted: options.persist ?? true,
   };
-};
-
-const loadLegacyAccessToken = (): string | null => {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  for (const key of LEGACY_ACCESS_TOKEN_KEYS) {
-    const raw = window.localStorage.getItem(key);
-    if (raw?.trim()) {
-      return raw.trim();
-    }
-  }
-  return null;
-};
-
-const loadState = (): AuthState => {
-  if (typeof window === "undefined") {
-    return emptyState;
-  }
-
+}
+function loadState(): AuthState {
+  if (typeof window === "undefined") return emptyState;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw) as SerializedAuthState;
-      const accessToken = parsed.tokens?.accessToken ?? "";
-      return {
-        tokens: parsed.tokens ?? null,
-        user: parsed.user ?? null,
-        role: resolveRole({
-          roleOverride: parsed.role ?? undefined,
-          user: parsed.user ?? null,
-          accessToken,
-        }),
-        refreshMode: resolveRefreshMode(parsed.tokens ?? null, parsed.refreshMode ?? undefined),
-        persisted: true,
-      };
+      const parsed = JSON.parse(raw);
+      if (!parsed || (parsed.schemaVersion !== undefined && parsed.schemaVersion !== 2)) return emptyState;
+      return normalize(parsed, { refreshMode: ["cookie", "token"].includes(parsed.refreshMode) ? parsed.refreshMode : undefined });
     }
-  } catch {
-    return emptyState;
-  }
-
-  const legacyAccessToken = loadLegacyAccessToken();
-  if (legacyAccessToken) {
-    logAuthWarn("legacy-token-fallback", {
-      storageKey: STORAGE_KEY,
-    });
-    return buildTokenState(legacyAccessToken, false);
-  }
-
+    for (const key of LEGACY_KEYS) {
+      const token = window.localStorage.getItem(key);
+      if (token) return normalize({ tokens: { accessToken: token, refreshToken: "", expiresIn: null }, user: null });
+    }
+  } catch { return emptyState; }
   return emptyState;
-};
-
-const persistState = (next: AuthState) => {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  if (!next.persisted) {
-    window.localStorage.removeItem(STORAGE_KEY);
-    return;
-  }
-
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(toSerializable(next)));
-};
-
-const buildDevSession = (token: string): AuthState => {
-  return {
-    ...buildTokenState(token, true),
-    role: "admin",
-  };
-};
-
-const injectDevToken = (current: AuthState): AuthState => {
-  if (!env.isDev || !env.devAccessToken) {
-    return current;
-  }
-  if (current.tokens?.accessToken) {
-    return current;
-  }
-  if (typeof window === "undefined") {
-    return current;
-  }
-
-  const nextState = buildDevSession(env.devAccessToken);
-  persistState(nextState);
-  return nextState;
-};
-
-let state: AuthState = injectDevToken(loadState());
-
-const notify = () => {
-  listeners.forEach((listener) => listener());
-};
-
-const updateState = (next: AuthState) => {
+}
+function persist(next: AuthState) {
+  if (typeof window === "undefined") return;
+  try {
+    for (const key of LEGACY_KEYS) window.localStorage.removeItem(key);
+    if (!next.persisted || !next.tokens) window.localStorage.removeItem(STORAGE_KEY);
+    else window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ schemaVersion: 2, tokens: next.tokens, user: next.user, role: next.role, permissions: next.permissions, refreshMode: next.refreshMode }));
+  } catch { /* Storage restrictions must not interrupt an in-memory logout. */ }
+}
+let state = loadState();
+if (!state.tokens && env.isDev && env.devAccessToken) {
+  state = normalize({ tokens: { accessToken: env.devAccessToken, refreshToken: "", expiresIn: null }, user: null });
+}
+persist(state);
+let sessionEpoch = 0;
+let refreshFlight: { epoch: number; promise: Promise<string | null> } | null = null;
+const notify = () => listeners.forEach(listener => listener());
+const update = (next: AuthState, newSession = false) => {
+  if (newSession) sessionEpoch += 1;
   state = next;
-  persistState(next);
+  persist(next);
+  notify();
+};
+const handleStorage = (event: StorageEvent) => {
+  if (event.key !== null && event.key !== STORAGE_KEY && !LEGACY_KEYS.includes(event.key)) return;
+  sessionEpoch += 1;
+  state = loadState();
+  persist(state);
   notify();
 };
 
 export const authStore = {
   getSnapshot: () => state,
-  subscribe: (listener: () => void) => {
-    listeners.add(listener);
-
-    if (typeof window === "undefined") {
-      return () => {
-        listeners.delete(listener);
-      };
-    }
-
-    const handleStorage = (event: StorageEvent) => {
-      if (event.key !== STORAGE_KEY) {
-        return;
-      }
-      state = injectDevToken(loadState());
-      notify();
-    };
-
-    window.addEventListener("storage", handleStorage);
-
-    return () => {
-      listeners.delete(listener);
-      window.removeEventListener("storage", handleStorage);
-    };
-  },
-  setSession: (
-    session: AuthSession,
-    roleOverride?: UserRole,
-    options: SetSessionOptions = {},
-  ) => {
-    const persist = options.persist ?? true;
-    const accessToken = session.tokens?.accessToken ?? "";
-
-    const nextState: AuthState = {
-      tokens: session.tokens,
-      user: session.user,
-      role: resolveRole({
-        roleOverride,
-        user: session.user,
-        accessToken,
-      }),
-      refreshMode: resolveRefreshMode(session.tokens, options.refreshMode),
-      persisted: persist,
-    };
-
-    updateState(nextState);
-  },
-  setAccessToken: (accessToken: string) => {
-    if (!state.tokens) {
-      return;
-    }
-
-    const nextRole =
-      resolveRoleFromAccessToken(accessToken) ??
-      state.role;
-
-    updateState({
-      ...state,
-      tokens: {
-        ...state.tokens,
-        accessToken,
-      },
-      role: nextRole,
-    });
-  },
-  clear: () => {
-    updateState(emptyState);
-  },
+  getSessionEpoch: () => sessionEpoch,
   getAccessToken: () => state.tokens?.accessToken ?? null,
   getRefreshToken: () => state.tokens?.refreshToken ?? null,
   getRole: () => state.role,
-  refreshAccessToken: async (): Promise<string | null> => {
+  getPermissions: () => state.permissions,
+  subscribe(listener: () => void) {
+    if (listeners.size === 0 && typeof window !== "undefined") window.addEventListener("storage", handleStorage);
+    listeners.add(listener);
+    return () => {
+      listeners.delete(listener);
+      if (listeners.size === 0 && typeof window !== "undefined") window.removeEventListener("storage", handleStorage);
+    };
+  },
+  setSession(session: AuthSession, options: SetSessionOptions = {}) { update(normalize(session, options), true); },
+  setAccessToken(accessToken: string) {
+    if (!state.tokens) return;
+    const next = normalize({ tokens: { ...state.tokens, accessToken }, user: state.user }, { persist: state.persisted, refreshMode: state.refreshMode ?? undefined });
+    update(next, !next.tokens);
+  },
+  updateUser(user: AuthUser, expectedEpoch: number) {
+    if (sessionEpoch !== expectedEpoch || !state.tokens || !state.role) return false;
+    update({ ...state, user: { ...user, role: state.role } });
+    return true;
+  },
+  clear() { update(emptyState, true); },
+  refreshAccessToken(): Promise<string | null> {
     const snapshot = state;
-    const refreshMode = snapshot.refreshMode ?? resolveRefreshMode(snapshot.tokens);
-    if (!refreshMode) {
-      return null;
-    }
-
-    try {
-      const refreshed =
-        refreshMode === "token" && snapshot.tokens?.refreshToken
-          ? await refreshAccessTokenWithToken(snapshot.tokens.refreshToken)
-          : await refreshAccessTokenWithCookie(snapshot.tokens?.refreshToken || undefined);
-
-      const nextTokens: AuthTokens = {
-        accessToken: refreshed.accessToken,
-        refreshToken:
-          refreshed.refreshToken ??
-          snapshot.tokens?.refreshToken ??
-          "",
-        expiresIn:
-          refreshed.expiresIn ??
-          snapshot.tokens?.expiresIn ??
-          null,
-      };
-
-      updateState({
-        ...snapshot,
-        tokens: nextTokens,
-        role:
-          snapshot.role ??
-          resolveRoleFromAccessToken(refreshed.accessToken),
-        refreshMode,
-      });
-
-      return refreshed.accessToken;
-    } catch {
-      logAuthWarn("refresh-access-token-failed", {
-        refreshMode,
-        role: snapshot.role,
-      });
-      authStore.clear();
-      return null;
-    }
+    const epoch = sessionEpoch;
+    if (!snapshot.tokens || !snapshot.refreshMode) return Promise.resolve(null);
+    if (refreshFlight?.epoch === epoch) return refreshFlight.promise;
+    const promise = (async () => {
+      try {
+        const refreshed = snapshot.refreshMode === "token"
+          ? await refreshAccessTokenWithToken(snapshot.tokens!.refreshToken, snapshot.tokens!.accessToken)
+          : await refreshAccessTokenWithCookie(snapshot.tokens!.refreshToken || undefined);
+        if (epoch !== sessionEpoch) return null;
+        const next = normalize({ tokens: { ...snapshot.tokens!, ...refreshed }, user: snapshot.user }, { persist: snapshot.persisted, refreshMode: snapshot.refreshMode! });
+        update(next, !next.tokens);
+        return next.tokens?.accessToken ?? null;
+      } catch {
+        if (epoch === sessionEpoch) authStore.clear();
+        return null;
+      } finally {
+        if (refreshFlight?.epoch === epoch) refreshFlight = null;
+      }
+    })();
+    refreshFlight = { epoch, promise };
+    return promise;
   },
 };

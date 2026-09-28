@@ -28,6 +28,7 @@ type RequestOptions = {
 
 const getClient = () =>
   createHttpClient({
+    getSessionEpoch: authStore.getSessionEpoch,
     baseUrl: requireEnv(
       env.apiBaseUrl || env.ticketingApiBaseUrl,
       "VITE_API_BASE_URL (or VITE_API_URL)",

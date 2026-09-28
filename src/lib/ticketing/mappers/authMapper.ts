@@ -9,6 +9,9 @@ const mapUserRole = (role?: string): AuthUser["role"] => {
   if (role === "admin" || role === "ROLE_ADMIN") {
     return "admin";
   }
+  if (role === "manager" || role === "ROLE_MANAGER") {
+    return "manager";
+  }
   return "unknown";
 };
 

@@ -136,7 +136,8 @@ const hasMyPageProfileGap = (user: AuthUser | null | undefined): boolean => {
 
 const prefetchMyPageTabData = async () => {
   const snapshot = authStore.getSnapshot();
-  if (!snapshot.tokens?.accessToken || snapshot.role !== "student") {
+  const epoch = authStore.getSessionEpoch();
+  if (!snapshot.tokens?.accessToken || !snapshot.role || !["student", "manager", "admin"].includes(snapshot.role)) {
     return;
   }
   if (!hasMyPageProfileGap(snapshot.user)) {
@@ -144,25 +145,19 @@ const prefetchMyPageTabData = async () => {
   }
 
   await queryClient.prefetchQuery({
-    queryKey: appQueryKeys.myPageProfile(),
+    queryKey: [...appQueryKeys.myPageProfile(), snapshot.user?.id ?? null, epoch],
     queryFn: () => studentProfileApi.me(),
     staleTime: 60_000,
   });
 
   const refreshedUser = queryClient.getQueryData<AuthUser | null>(
-    appQueryKeys.myPageProfile(),
+    [...appQueryKeys.myPageProfile(), snapshot.user?.id ?? null, epoch],
   );
   if (!refreshedUser) {
     return;
   }
 
-  authStore.setSession(
-    {
-      tokens: snapshot.tokens,
-      user: refreshedUser,
-    },
-    snapshot.role ?? undefined,
-  );
+  authStore.updateUser(refreshedUser, epoch);
 };
 
 const tabDataPrefetchers: Record<BottomNavDataPrefetchPath, () => Promise<void>> = {

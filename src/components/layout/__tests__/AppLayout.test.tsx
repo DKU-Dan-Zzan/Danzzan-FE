@@ -37,7 +37,7 @@ describe("AppLayout", () => {
     authStore.setSession(
       {
         tokens: {
-          accessToken: "student-access-token",
+          accessToken: `header.${btoa(JSON.stringify({ role: "ROLE_USER", exp: 9999999999 }))}.signature`,
           refreshToken: "",
           expiresIn: null,
         },
@@ -50,7 +50,6 @@ describe("AppLayout", () => {
           college: "소프트웨어융합대학",
         },
       },
-      "student",
       { persist: false },
     );
 

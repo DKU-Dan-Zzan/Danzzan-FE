@@ -4,6 +4,7 @@ import { authApi } from "@/api/ticketing/authApi";
 import { adminAuthApi } from "@/api/ticketing/adminAuthApi";
 import { authLogout, userLogout } from "@/api/ticketing/authLogoutApi";
 import { authStore } from "@/store/common/authStore";
+import { hasAdminPermission, resolvePermissionsFromAccessToken, resolveRoleFromAccessToken } from "@/api/common/authCore";
 import type { AuthCredentials, UserRole } from "@/types/ticketing/model/auth.model";
 
 export const useAuth = () => {
@@ -19,12 +20,15 @@ export const useAuth = () => {
     async (payload: AuthCredentials, role: UserRole) => {
       if (role === "admin") {
         const session = await adminAuthApi.login(payload);
-        authStore.setSession(session, "admin");
+        if (!hasAdminPermission(resolveRoleFromAccessToken(session.tokens.accessToken), resolvePermissionsFromAccessToken(session.tokens.accessToken), "TICKETING")) {
+          throw new Error("티켓팅 관리 권한이 없는 계정입니다.");
+        }
+        authStore.setSession(session);
         return session;
       }
 
       const session = await authApi.login(payload);
-      authStore.setSession(session, role);
+      authStore.setSession(session);
       return session;
     },
     [],

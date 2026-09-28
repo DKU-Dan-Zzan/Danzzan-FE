@@ -55,6 +55,7 @@ export const refreshAccessTokenWithCookie = async (
 
 export const refreshAccessTokenWithToken = async (
   refreshToken: string,
+  accessToken: string,
 ): Promise<RefreshedTokenSet> => {
   if (!refreshToken.trim()) {
     throw new Error("재발급 토큰이 없습니다.");
@@ -63,7 +64,7 @@ export const refreshAccessTokenWithToken = async (
   const base = getApiBaseUrl();
   const res = await fetch(`${base}/user/reissue`, {
     method: "POST",
-    headers: JSON_HEADERS,
+    headers: { ...JSON_HEADERS, Authorization: `Bearer ${accessToken}` },
     credentials: "include",
     body: JSON.stringify({ refreshToken }),
   });
