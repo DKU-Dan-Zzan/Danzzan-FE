@@ -64,7 +64,9 @@ describe("Header", () => {
     );
   });
 
-  it("로그인된 마이페이지에서는 기존 불투명 오버레이 헤더를 유지한다", () => {
+  it("로그인된 마이페이지에서는 헤더 막을 걷고 로고만 띄운다", () => {
+    // 내 정보는 포스터가 헤더 뒤까지 올라온다. 막을 깔면 로고 아래에 흰 띠가 생겨
+    // 포스터가 거기서부터 시작하는 것처럼 잘려 보인다.
     authStore.setSession(
       {
         tokens: { accessToken: "student-token", refreshToken: "", expiresIn: null },
@@ -77,8 +79,9 @@ describe("Header", () => {
     const myPageMarkup = renderHeader("/mypage");
 
     expect(myPageMarkup).toContain("bg-transparent shadow-none pt-[env(safe-area-inset-top)]");
-    expect(myPageMarkup).toContain("bg-[color-mix(in_srgb,var(--surface)_78%,transparent)]");
-    expect(myPageMarkup).toContain("shadow-[inset_0_-1px_0_color-mix(in_srgb,var(--border-base)_35%,transparent)]");
+    expect(myPageMarkup).not.toContain("bg-[color-mix(in_srgb,var(--surface)_78%,transparent)]");
+    // 어두운 포스터 위에서도 읽히도록 로고 색을 보정한다.
+    expect(myPageMarkup).toContain("app-header-logo--on-poster");
   });
 
   it("타임테이블에서는 frosted glass 헤더 오버레이를 렌더링한다", () => {

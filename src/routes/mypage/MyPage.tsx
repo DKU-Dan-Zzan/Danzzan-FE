@@ -206,20 +206,24 @@ function MyPage() {
   if (!isLoggedIn) {
     return (
       <div className="mypage-root relative flex h-[100dvh] w-full flex-col items-center justify-center overflow-hidden px-6 pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.5rem)]">
-        {/* 포스터 배경 */}
+        {/* 포스터 배경 — 가을 축제(LEGEND) 포스터 */}
         <div className="absolute inset-0 overflow-hidden">
           <img
-            src="/posters/main-poster-final-vertical.jpeg"
+            src="/posters/legend-poster-vertical.jpeg"
             alt=""
             aria-hidden
-            className="absolute inset-0 h-full w-full object-cover object-top"
-            style={{ filter: "brightness(0.82) saturate(1.08)", transform: "scale(1.03)" }}
+            className="absolute inset-0 h-full w-full object-cover object-[50%_38%]"
+            style={{ filter: "brightness(0.95) saturate(1.05)", transform: "scale(1.03)" }}
           />
+          {/*
+            포스터가 어두워서 예전의 밝은 베일을 그대로 쓰면 회색으로 죽는다.
+            위쪽은 불꽃이 비치도록 얇게, 아래쪽은 흰 카드가 떠 보이도록 짙게 덮는다.
+          */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, rgba(238,241,248,0.4) 0%, rgba(238,241,248,0.68) 38%, rgba(238,241,248,0.86) 100%)",
+                "linear-gradient(180deg, rgba(238,241,248,0.18) 0%, rgba(238,241,248,0.52) 34%, rgba(238,241,248,0.88) 100%)",
             }}
           />
         </div>
@@ -327,32 +331,42 @@ function MyPage() {
 
   return (
     <div className="mypage-root min-h-full" style={{ background: "var(--poster-bg)" }}>
-      <div className="h-[calc(env(safe-area-inset-top)+68px)]" />
-      {/* 포스터 배경 — 배너+버튼 전체 영역 커버 */}
+      {/*
+        포스터 배경 — 헤더(로고) 뒤까지 올라간다. 예전에는 헤더 높이만큼 흰 여백을 두어
+        포스터가 그 아래에서 시작했고, 로고와 배너 사이에 경계선이 보였다.
+      */}
       <div className="relative">
         <div className="absolute inset-0 overflow-hidden">
           <img
-            src="/posters/main-poster-final-vertical.jpeg"
+            src="/posters/legend-poster-vertical.jpeg"
             alt=""
             aria-hidden
-            className="h-full w-full object-cover object-top"
-            style={{ filter: "brightness(0.78) saturate(1.1)", transform: "scale(1.04)" }}
+            className="h-full w-full object-cover object-[50%_44%]"
+            // 포스터 가장자리의 날짜·주최 글씨가 배너 문구와 겹치지 않도록 불꽃 부분만 크게 쓴다.
+            style={{ filter: "brightness(0.95) saturate(1.05)", transform: "scale(1.6)" }}
           />
+          {/*
+            덮개를 남색에서 포스터의 잉크 색으로 바꾼다. 남색은 봄 포스터에 맞춘 색이라
+            가을 포스터의 붉은 불꽃과 부딪친다. 아래는 본문 배경색으로 녹여 이어 붙인다.
+          */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, rgba(28,43,106,0.3) 0%, rgba(28,43,106,0.55) 50%, var(--poster-bg) 100%)",
+                "linear-gradient(180deg, rgba(11,6,7,0.22) 0%, rgba(11,6,7,0.5) 50%, var(--poster-bg) 100%)",
             }}
           />
         </div>
 
-        {/* 배너 콘텐츠 */}
-        <div className="relative" style={{ height: 220 }}>
+        {/* 배너 콘텐츠 — 위쪽은 헤더 로고 자리로 비워 둔다. */}
+        <div
+          className="relative pt-[calc(env(safe-area-inset-top)+68px)]"
+          style={{ height: "calc(env(safe-area-inset-top) + 288px)" }}
+        >
           {/* 우상단 축제 타이틀 */}
-          <div className="absolute right-4 top-4 text-right">
+          <div className="absolute right-4 top-[calc(env(safe-area-inset-top)+72px)] text-right">
             <p className="text-[10px] font-medium tracking-widest text-white/60">2026 DANFESTA</p>
-            <p className="text-[13px] font-semibold text-white/80">落花流水 ;만개</p>
+            <p className="text-[13px] font-semibold text-white/80">LEGEND</p>
           </div>
           {/* 좌하단 프로필 */}
           <div className="absolute bottom-5 left-5 flex items-end gap-3">

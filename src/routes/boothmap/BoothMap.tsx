@@ -39,10 +39,10 @@ import {
 import { cn } from "@/components/common/ui/utils";
 import { formatDescription } from "@/utils/app/boothmap/formatDescription";
 import {
-  DEFAULT_FESTIVAL_DATE,
-  FESTIVAL_DATE_OPTIONS,
+  getDefaultFestivalDate,
   isFestivalDate,
 } from "@/utils/app/boothmap/festivalDates";
+import { useFestivalDates } from "@/hooks/app/festival/useFestivalDates";
 
 const DEFAULT_MAP_VIEWPORT: MapViewport = {
   lat: 37.32085,
@@ -57,7 +57,7 @@ function getInitialFestivalDate() {
   const date = `${today.getDate()}`.padStart(2, "0");
   const todayValue = `${year}-${month}-${date}`;
 
-  return isFestivalDate(todayValue) ? todayValue : DEFAULT_FESTIVAL_DATE;
+  return isFestivalDate(todayValue) ? todayValue : getDefaultFestivalDate();
 }
 
 const TOP_PANEL_Z_INDEX_CLASS: Record<SheetSnap, string> = {
@@ -143,6 +143,7 @@ export default function BoothMap() {
   const [sheetMode, setSheetMode] = useState<SheetMode>("LIST");
   const [sheetSnap, setSheetSnap] = useState<SheetSnap>("PEEK");
   const [isBoothExpanded, setIsBoothExpanded] = useState(false);
+  const { dateOptions: festivalDateOptions } = useFestivalDates();
   const [selectedDate, setSelectedDate] = useState<string>(getInitialFestivalDate);
   const [mapViewport, setMapViewport] = useState<MapViewport>(DEFAULT_MAP_VIEWPORT);
   const [bottomNavHeight, setBottomNavHeight] = useState(56);
@@ -552,7 +553,7 @@ export default function BoothMap() {
       >
         <div className="pointer-events-auto mt-[calc(env(safe-area-inset-top)+3.4rem)] px-3 py-2 sm:px-4 sm:pb-4">
           <FestivalDateTabs
-            dates={FESTIVAL_DATE_OPTIONS}
+            dates={festivalDateOptions}
             selectedDate={selectedDate}
             onChange={(date) => {
               startTransition(() => {

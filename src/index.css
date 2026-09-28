@@ -1504,3 +1504,14 @@ body,
   --boothmap-zone-food-truck-fill: #fbcfe8;
   --boothmap-zone-food-truck-dot: #ec4899;
 }
+
+/*
+ * 어두운 포스터 위에 놓이는 헤더 로고.
+ * 원래 로고는 짙은 붉은색이라 가을 포스터 위에서는 형체가 보이지 않는다.
+ * 안내 화면(ServiceClosedNotice)과 같은 크림색으로 바꾸고 그림자로 띄운다.
+ */
+.app-header-logo--on-poster {
+  filter: brightness(0) saturate(100%) invert(92%) sepia(28%) saturate(560%)
+    hue-rotate(328deg) brightness(103%) contrast(96%)
+    drop-shadow(0 1px 10px rgba(11, 6, 7, 0.55));
+}

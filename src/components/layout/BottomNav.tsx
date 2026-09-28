@@ -1,13 +1,17 @@
-// 역할: 앱 하단 고정 탭 내비게이션을 렌더링합니다.
+// 역할: 앱 하단 고정 탭 내비게이션을 렌더링하고 인증 상태에 따라 티켓팅 탭 경로를 결정합니다.
 import { NavLink } from "react-router-dom";
 import { Clock3, Home, Map, Megaphone, Ticket } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { cn } from "@/components/common/ui/utils";
 import type { TranslationKey } from "@/i18n";
 import { useT } from "@/i18n";
+import { hasAuthenticatedRole } from "@/lib/common/auth-access";
+import { getTicketingNavigationTarget } from "@/lib/common/ticketing-navigation";
+import { useTicketingEnabled } from "@/hooks/app/festival/useTicketingEnabled";
 import { preloadRouteByPath } from "@/lib/navigation/routePreload";
 import { markBottomNavTransitionStart } from "@/lib/perf/navTiming";
 import { prefetchTabDataByPath } from "@/lib/query/prefetchTabData";
+import { authStore } from "@/store/common/authStore";
 
 type BottomNavItem = {
   to: string;
@@ -51,9 +55,25 @@ const APP_BOTTOM_NAV_RUNTIME_OFFSET_VAR = "--app-bottom-nav-runtime-offset";
 const BottomNav = () => {
   const t = useT();
   const navRef = useRef<HTMLElement | null>(null);
+  const session = useSyncExternalStore(
+    authStore.subscribe,
+    authStore.getSnapshot,
+    authStore.getSnapshot,
+  );
+  const hasTicketingAccess = hasAuthenticatedRole({
+    accessToken: session.tokens?.accessToken,
+    role: session.role,
+    requiredRole: "student",
+  });
+  // 티켓팅이 꺼져 있으면 로그인 화면 대신 안내 화면으로 보낸다.
+  // 로그인 화면은 내 정보 때문에 항상 열려 있어 티켓 탭이 그리로 가면 혼란스럽다.
+  const ticketingEnabled = useTicketingEnabled();
+  const ticketingTarget = ticketingEnabled
+    ? getTicketingNavigationTarget(hasTicketingAccess)
+    : "/ticketing";
   const items: BottomNavItem[] = [
     ...STATIC_ITEMS,
-    { to: "/ticketing", icon: Ticket, labelKey: "nav.ticketing" },
+    { to: ticketingTarget, icon: Ticket, labelKey: "nav.ticketing" },
   ];
 
   const warmTabRoute = (routePath: string) => {

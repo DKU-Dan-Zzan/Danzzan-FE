@@ -24,6 +24,7 @@ describe("index.css global selectors", () => {
       ".font-timetable-artist",
       ".scrollbar-hide",
       ".scrollbar-hide::-webkit-scrollbar",
+      ".app-header-logo--on-poster",
     ]);
   });
 });

@@ -12,7 +12,7 @@ import ContentImageSection from "@/components/app/timetable/ContentImage"
 import DayTabs from "@/components/app/timetable/DayTabs"
 import Timeline from "@/components/app/timetable/Timeline"
 import { cn } from "@/components/common/ui/utils"
-import { FESTIVAL_DAYS } from "@/config/festivalDays"
+import { useFestivalDates } from "@/hooks/app/festival/useFestivalDates"
 import { useLanguage, useT } from "@/i18n"
 import { appQueryKeys, useAppQuery } from "@/lib/query"
 import type { Performance } from "@/types/app/timetable/timetable.types"
@@ -73,10 +73,11 @@ export default function Timetable() {
   const t = useT()
   const { language } = useLanguage()
   const [searchParams] = useSearchParams()
+  const { days: festivalDays } = useFestivalDates()
   const [activeIdx, setActiveIdx] = useState(() => {
     const queryDate = searchParams.get("date")
     const baseDate = queryDate || todayISODateLocal()
-    const targetIdx = FESTIVAL_DAYS.findIndex((d) => d.date === baseDate)
+    const targetIdx = festivalDays.findIndex((d) => d.date === baseDate)
     // 축제 기간 밖(또는 알 수 없는 date 쿼리)이면 1일차 탭을 연다.
     return targetIdx !== -1 ? targetIdx : 0
   })
@@ -89,7 +90,8 @@ export default function Timetable() {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
   const contentStartRef = useRef<HTMLDivElement | null>(null)
 
-  const activeDay = FESTIVAL_DAYS[activeIdx]
+  // 운영 날짜는 서버 설정에서 오므로 나중에 일수가 줄어들 수 있다. 범위를 벗어나면 1일차로 돌아간다.
+  const activeDay = festivalDays[activeIdx] ?? festivalDays[0]
   const activeDate = activeDay.date
   const isDay1 = activeDay.key === "DAY-1"
   const isTodayTab = activeDate === todayISODateLocal()
@@ -213,7 +215,7 @@ export default function Timetable() {
 
     if (!isHorizontalSwipe) return
 
-    if (deltaX < 0 && activeIdx < FESTIVAL_DAYS.length - 1) {
+    if (deltaX < 0 && activeIdx < festivalDays.length - 1) {
       handleChangeDay(activeIdx + 1)
     } else if (deltaX > 0 && activeIdx > 0) {
       handleChangeDay(activeIdx - 1)
@@ -247,7 +249,7 @@ export default function Timetable() {
         {/* DAY 탭만 sticky - 글로벌 헤더 바로 아래 고정 */}
         <div className="sticky top-[calc(env(safe-area-inset-top)+68px)] z-30 bg-white/85 px-4 pb-1 backdrop-blur-md">
           <DayTabs
-            days={FESTIVAL_DAYS}
+            days={festivalDays}
             activeIndex={activeIdx}
             onChange={handleChangeDay}
             compact={false}

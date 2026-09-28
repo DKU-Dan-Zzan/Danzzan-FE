@@ -1,7 +1,6 @@
 // 역할: /admin/map 의 기존 지도 편집 관리자 기능 본문을 렌더링한다.
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2, RefreshCcw } from "lucide-react";
+import {Loader2, RefreshCcw} from "lucide-react";
 import {
   clearBoothLocation,
   getAdminMap,
@@ -37,9 +36,9 @@ import type {
   KakaoMouseEvent,
 } from "@/types/app/boothmap/kakao-map";
 import {
-  DEFAULT_FESTIVAL_DATE,
-  FESTIVAL_DATES,
+  getDefaultFestivalDate,
 } from "@/utils/app/boothmap/festivalDates";
+import { useFestivalDates } from "@/hooks/app/festival/useFestivalDates";
 
 declare global {
   interface Window {
@@ -54,7 +53,6 @@ export default function AdminMapEditorPanel({
 }: {
   topSlot?: ReactNode;
 }) {
-  const navigate = useNavigate();
   const { isLoaded: isKakaoLoaded } = useKakaoMapLoader();
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -85,7 +83,8 @@ export default function AdminMapEditorPanel({
     "보기 모드입니다. 부스 또는 학과 편집 모드를 선택해 주세요.",
   );
 
-  const [selectedDate, setSelectedDate] = useState<string>(DEFAULT_FESTIVAL_DATE);
+  const { dates: festivalDates } = useFestivalDates();
+  const [selectedDate, setSelectedDate] = useState<string>(getDefaultFestivalDate);
 
   const editableBooths = useMemo(
     () => booths.filter((booth) => booth.type !== "FOOD_TRUCK"),
@@ -626,21 +625,12 @@ export default function AdminMapEditorPanel({
   return (
     <>
       <AdminShell
-        title="개발자 전용 관리자 페이지"
-        eyebrow="DEVELOPER ADMIN"
-        headerClassName="sticky top-0 z-20 border-b border-[var(--border-base)] bg-[var(--admin-header-bg)]"
+        title="부스 배치"
+        eyebrow="BOOTH LAYOUT"
+        headerClassName="border-b border-[var(--border-base)] bg-[var(--admin-header-bg)]"
         mainClassName="mx-auto grid w-full max-w-[1360px] gap-6 px-6 py-6 lg:grid-cols-[360px_minmax(0,1fr)]"
         actions={
           <>
-            <button
-              type="button"
-              onClick={() => navigate("/admin")}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
-            >
-              <ArrowLeft className="h-4 w-4" strokeWidth={2.3} />
-              관리자 홈
-            </button>
-
             <button
               type="button"
               onClick={() => void loadMapData(selectedDate)}
@@ -660,7 +650,7 @@ export default function AdminMapEditorPanel({
 
         <AdminMapSidebar
           globalError={globalError}
-          festivalDates={FESTIVAL_DATES}
+          festivalDates={festivalDates}
           selectedDate={selectedDate}
           editorMode={editorMode}
           statusMessage={statusMessage}

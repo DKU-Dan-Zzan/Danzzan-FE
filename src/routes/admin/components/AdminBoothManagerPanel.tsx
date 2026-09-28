@@ -1,6 +1,5 @@
 ﻿import { useEffect, useMemo, useState, type ChangeEvent, type ReactNode } from "react";
-import { ArrowLeft, CheckCircle2, ImagePlus, Plus, RefreshCcw, Save, Search, Star, Trash2, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import {CheckCircle2, ImagePlus, Plus, RefreshCcw, Save, Search, Star, Trash2, X} from "lucide-react";
 import { toast } from "sonner";
 import {
   createAdminBooth,
@@ -31,10 +30,10 @@ import {
 } from "@/routes/admin/adminEditorLogic";
 import { formatDescription } from "@/utils/app/boothmap/formatDescription";
 import {
-  DEFAULT_FESTIVAL_DATE,
-  FESTIVAL_DATES,
+  getDefaultFestivalDate,
   formatFestivalDateLabel,
 } from "@/utils/app/boothmap/festivalDates";
+import { useFestivalDates } from "@/hooks/app/festival/useFestivalDates";
 const FILTER_OPTIONS = [
   { value: "ALL", label: "전체" },
   { value: "EXPERIENCE", label: "체험 부스" },
@@ -146,8 +145,8 @@ export default function AdminBoothManagerPanel({
 }: {
   topSlot?: ReactNode;
 }) {
-  const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState<string>(DEFAULT_FESTIVAL_DATE);
+  const { dates: festivalDates } = useFestivalDates();
+  const [selectedDate, setSelectedDate] = useState<string>(getDefaultFestivalDate);
   const [filter, setFilter] = useState<AdminBoothFilter>("ALL");
   const [pubCollegeFilter, setPubCollegeFilter] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
@@ -222,9 +221,9 @@ export default function AdminBoothManagerPanel({
       operationStatus: selectedBooth.operationStatus,
       startTime: selectedBooth.startTime ?? "",
       endTime: selectedBooth.endTime ?? "",
-      operationDates: FESTIVAL_DATES.filter((date) => selectedBooth.operationDates.includes(date)),
+      operationDates: festivalDates.filter((date) => selectedBooth.operationDates.includes(date)),
     });
-  }, [selectedBooth]);
+  }, [selectedBooth, festivalDates]);
 
   useEffect(() => {
     if (!selectedPub) {
@@ -460,7 +459,7 @@ export default function AdminBoothManagerPanel({
 
       if (creatingBooth && boothCreateForm) {
         const trimmedName = boothCreateForm.name.trim();
-        const operationDates = FESTIVAL_DATES.filter((date) => boothCreateForm.operationDates.includes(date));
+        const operationDates = festivalDates.filter((date) => boothCreateForm.operationDates.includes(date));
 
         if (!trimmedName) {
           throw new Error("부스 이름을 입력해 주세요.");
@@ -492,7 +491,7 @@ export default function AdminBoothManagerPanel({
         setBoothCreateForm(null);
         setSelectedItem({ kind: "booth", id: createdBoothId });
       } else if (selectedBooth && boothForm) {
-        const operationDates = FESTIVAL_DATES.filter((date) => boothForm.operationDates.includes(date));
+        const operationDates = festivalDates.filter((date) => boothForm.operationDates.includes(date));
         if (operationDates.length === 0) {
           throw new Error("운영 날짜를 최소 1개 이상 선택해 주세요.");
         }
@@ -800,21 +799,12 @@ export default function AdminBoothManagerPanel({
 
   return (
     <AdminShell
-      title="개발자 전용 관리자 페이지"
-      eyebrow="DEVELOPER ADMIN"
-      headerClassName="sticky top-0 z-20 border-b border-[var(--border-base)] bg-[var(--admin-header-bg)]"
+      title="부스 정보"
+      eyebrow="BOOTH INFO"
+      headerClassName="border-b border-[var(--border-base)] bg-[var(--admin-header-bg)]"
       mainClassName="mx-auto flex w-full max-w-[1360px] flex-col gap-6 px-6 py-6"
       actions={
         <>
-          <button
-            type="button"
-            onClick={() => navigate("/admin")}
-            className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border-base)] bg-white px-3 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-subtle)]"
-          >
-            <ArrowLeft className="h-4 w-4" strokeWidth={2.3} />
-            관리자 홈
-          </button>
-
           <button
             type="button"
             onClick={() => void loadManagementData(selectedDate)}
@@ -836,7 +826,7 @@ export default function AdminBoothManagerPanel({
 
       <section className="rounded-3xl border border-[var(--border-base)] bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-center gap-2">
-          {FESTIVAL_DATES.map((date) => (
+          {festivalDates.map((date) => (
             <button
               key={date}
               type="button"
@@ -1214,7 +1204,7 @@ export default function AdminBoothManagerPanel({
                     <span className="text-xs text-[var(--text-muted)]">최소 1개 이상 선택</span>
                   </div>
                   <div className="grid gap-2 sm:grid-cols-2">
-                    {FESTIVAL_DATES.map((date) => {
+                    {festivalDates.map((date) => {
                       const checked = boothCreateForm.operationDates.includes(date);
                       return (
                         <label
@@ -1241,7 +1231,7 @@ export default function AdminBoothManagerPanel({
 
                                 return {
                                   ...prev,
-                                  operationDates: FESTIVAL_DATES.filter((festivalDate) =>
+                                  operationDates: festivalDates.filter((festivalDate) =>
                                     Array.from(new Set(nextDates)).includes(festivalDate),
                                   ),
                                 };
@@ -1380,7 +1370,7 @@ export default function AdminBoothManagerPanel({
                     <span className="text-xs text-[var(--text-muted)]">최소 1개 이상 선택</span>
                   </div>
                   <div className="grid gap-2 sm:grid-cols-2">
-                    {FESTIVAL_DATES.map((date) => {
+                    {festivalDates.map((date) => {
                       const checked = boothForm.operationDates.includes(date);
                       return (
                         <label
@@ -1407,7 +1397,7 @@ export default function AdminBoothManagerPanel({
 
                                 return {
                                   ...prev,
-                                  operationDates: FESTIVAL_DATES.filter((festivalDate) =>
+                                  operationDates: festivalDates.filter((festivalDate) =>
                                     Array.from(new Set(nextDates)).includes(festivalDate),
                                   ),
                                 };

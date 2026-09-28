@@ -1,29 +1,25 @@
-export const FESTIVAL_DATES = [
-  "2026-09-09",
-  "2026-09-10",
-] as const;
+// 역할: 부스맵이 쓰는 축제 날짜. 실제 값은 서버 설정(festivalCalendar)에서 온다.
+//
+// 예전에는 이 파일에 날짜가 박혀 있었다. 화면이 실시간으로 따라 바뀌어야 하는 곳은
+// useFestivalDates() 훅을 쓰고, 훅을 쓸 수 없는 곳(프리패치 등)만 아래 함수를 쓴다.
 
-export const DEFAULT_FESTIVAL_DATE = FESTIVAL_DATES[0];
+import {
+  formatFestivalDateLabel,
+  getDefaultFestivalDate,
+  getFestivalDates,
+  isFestivalDate,
+  toFestivalDateOptions,
+  type FestivalDateOption,
+} from "@/lib/app/festival/festivalCalendar";
 
-export type FestivalDate = (typeof FESTIVAL_DATES)[number];
+export type FestivalDate = string;
+export type { FestivalDateOption };
 
-export type FestivalDateOption = {
-  label: string;
-  value: FestivalDate;
-};
+export { formatFestivalDateLabel, isFestivalDate };
 
-export const FESTIVAL_DATE_OPTIONS: FestivalDateOption[] = FESTIVAL_DATES.map((date) => ({
-  value: date,
-  label: formatFestivalDateLabel(date),
-}));
-
-export function formatFestivalDateLabel(date: string) {
-  const [, month = "", day = ""] = date.split("-");
-  const normalizedMonth = String(Number(month));
-  const normalizedDay = String(Number(day));
-  return `${normalizedMonth}/${normalizedDay}`;
+/** 호출 시점의 운영 날짜. 모듈 로드 시점에 고정되지 않도록 함수로 둔다. */
+export function getFestivalDateOptions(): FestivalDateOption[] {
+  return toFestivalDateOptions(getFestivalDates());
 }
 
-export function isFestivalDate(date: string): date is FestivalDate {
-  return FESTIVAL_DATES.includes(date as FestivalDate);
-}
+export { getFestivalDates, getDefaultFestivalDate };

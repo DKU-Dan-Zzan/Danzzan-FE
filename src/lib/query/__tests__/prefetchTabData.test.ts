@@ -56,7 +56,7 @@ vi.mock("@/store/common/authStore", () => ({
 }));
 
 import {
-  DEFAULT_BOOTHMAP_PREFETCH_DATE,
+  getDefaultBoothmapPrefetchDate,
   prefetchBottomNavTabData,
   prefetchTabDataByPath,
 } from "@/lib/query/prefetchTabData";
@@ -102,11 +102,11 @@ describe("prefetchTabData", () => {
     await prefetchTabDataByPath("/map?date=2026-09-09#top");
 
     expect(getBoothMapMock).toHaveBeenCalledWith(
-      DEFAULT_BOOTHMAP_PREFETCH_DATE,
+      getDefaultBoothmapPrefetchDate(),
       { signal: undefined },
     );
     expect(getPubsMock).toHaveBeenCalledWith(
-      DEFAULT_BOOTHMAP_PREFETCH_DATE,
+      getDefaultBoothmapPrefetchDate(),
       { signal: undefined },
     );
   });
