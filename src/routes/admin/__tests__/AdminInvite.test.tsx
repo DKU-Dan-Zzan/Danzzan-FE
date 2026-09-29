@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import AdminInvite from "@/routes/admin/AdminInvite";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
-const state = vi.hoisted(() => ({ role: "admin", epoch: 1, user: { id: "1" } }));
+const state = vi.hoisted(() => ({ role: "admin", epoch: 1, user: { id: "1" } as { id: string } | null }));
 const api = vi.hoisted(() => ({ list: vi.fn(), candidate: vi.fn(), updateRole: vi.fn(), promoteAdmin: vi.fn(), demoteAdmin: vi.fn() }));
 vi.mock("@/api/app/admin/adminInviteApi", () => ({ adminInviteApi: api }));
 vi.mock("@/store/common/authStore", () => ({ authStore: { getSnapshot: () => state, getSessionEpoch: () => state.epoch, subscribe: () => () => {} } }));
@@ -44,7 +44,7 @@ async function search() {
   await act(async () => { container.querySelector("form")!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })); });
   await settle();
 }
-beforeEach(() => { vi.clearAllMocks(); state.role = "admin"; state.epoch = 1; api.list.mockResolvedValue({ items: [], page: 0, size: 20, totalPages: 0, totalElements: 0, managementEnabled: true }); api.candidate.mockResolvedValue(member); });
+beforeEach(() => { vi.clearAllMocks(); state.role = "admin"; state.epoch = 1; state.user = { id: "1" }; api.list.mockResolvedValue({ items: [], page: 0, size: 20, totalPages: 0, totalElements: 0, managementEnabled: true }); api.candidate.mockResolvedValue(member); });
 afterEach(async () => { if (root) await act(async () => root.unmount()); container?.remove(); });
 describe("AdminInvite", () => {
   it("shows admins alongside managers, keeping the current admin immutable", async () => {
@@ -153,5 +153,20 @@ describe("AdminInvite", () => {
     await settle();
     expect(api.demoteAdmin).toHaveBeenCalledWith(3);
     expect(toast.success).toHaveBeenCalledWith("다른관리자님을 티켓·운영 매니저로 변경했습니다.", expect.objectContaining({ duration: 5000 }));
+  });
+  it.each([null, "", "  "])("does not expose any admin demotion controls until the current admin can be identified (%s)", async userId => {
+    state.user = userId === null ? null : { id: userId };
+    api.list.mockResolvedValue({
+      items: [
+        { ...member, id: 1, name: "현재일수도있는관리자", role: "ADMIN", permissions: [] },
+        { ...member, id: 3, name: "다른관리자일수도있는계정", role: "ADMIN", permissions: [] },
+      ], page: 0, size: 20, totalPages: 1, totalElements: 2, managementEnabled: true,
+    });
+    await render();
+    expect(container.textContent).toContain("로그인 정보 확인 불가");
+    expect(container.textContent).toContain("현재 로그인 정보를 확인할 수 없어 최고 관리자 권한 회수를 제한했습니다.");
+    expect(container.textContent).toContain("다시 로그인하면 최고 관리자 권한을 관리할 수 있습니다.");
+    expect(container.querySelector('[aria-label="현재일수도있는관리자 권한 관리 메뉴"]')).toBeNull();
+    expect(container.querySelector('[aria-label="다른관리자일수도있는계정 권한 관리 메뉴"]')).toBeNull();
   });
 });
