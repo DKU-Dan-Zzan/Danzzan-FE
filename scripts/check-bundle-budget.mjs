@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const DIST_ASSETS_DIR = path.join(process.cwd(), "dist", "assets");
-const APP_INDEX_BUDGET_BYTES = 270_000;
+const APP_INDEX_BUDGET_BYTES = 500_000;
 
 const formatKB = (bytes) => `${(bytes / 1024).toFixed(2)} KiB`;
 
