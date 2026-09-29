@@ -19,8 +19,9 @@ describe("appQueryKeys", () => {
     ]);
   });
 
-  it("my-ticket 목록 키를 고정 포맷으로 제공한다", () => {
-    expect(appQueryKeys.myTicketList()).toEqual(["ticketing", "my-ticket", "list"]);
+  it("my-ticket 목록 키를 세션별로 구분한다", () => {
+    expect(appQueryKeys.myTicketList(1)).toEqual(["ticketing", "my-ticket", "list", 1]);
+    expect(appQueryKeys.myTicketList(1)).not.toEqual(appQueryKeys.myTicketList(2));
     expect(appQueryKeys.myPageProfile()).toEqual(["mypage", "profile"]);
   });
 

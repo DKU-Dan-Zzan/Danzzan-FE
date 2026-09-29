@@ -39,7 +39,7 @@ export const appQueryKeys = {
     ["boothmap", "pub-detail", language, { pubId, date }] as const,
   ticketingEvents: () => ["ticketing", "events"] as const,
   ticketingWaitingRoomAd: () => ["ticketing", "waiting-room-ad"] as const,
-  myTicketList: () => ["ticketing", "my-ticket", "list"] as const,
+  myTicketList: (sessionEpoch: number) => ["ticketing", "my-ticket", "list", sessionEpoch] as const,
   myPageProfile: () => ["mypage", "profile"] as const,
   ticketingQueueStatus: (eventId: string) => ["ticketing", "queue-status", { eventId }] as const,
   ticketingWristbandStats: (eventId: string) => ["ticketing", "wristband-stats", { eventId }] as const,

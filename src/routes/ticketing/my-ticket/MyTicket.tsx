@@ -4,17 +4,13 @@ import { MyTicketListPanel } from "@/components/ticketing/panels/MyTicketListPan
 import { adApi } from "@/api/ticketing/adApi";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
-import { ticketApi } from "@/api/ticketing/ticketApi";
+import { useMyTicketsQuery } from "@/hooks/ticketing/useMyTicketsQuery";
 
 export default function MyTicket() {
   const navigate = useNavigate();
   const { session } = useAuth();
 
-  const myTicketsQuery = useAppQuery({
-    queryKey: appQueryKeys.myTicketList(),
-    queryFn: ({ signal }) => ticketApi.getMyTickets({ signal }),
-    staleTime: 30_000,
-  });
+  const myTicketsQuery = useMyTicketsQuery();
 
   const myTicketAdQuery = useAppQuery({
     queryKey: appQueryKeys.placementAds("MY_TICKET"),
