@@ -55,6 +55,7 @@ export default function AdminSettings() {
   const canOperate = hasAdminPermission(session.role, session.permissions, "OPERATIONS")
   const canTicket = hasAdminPermission(session.role, session.permissions, "TICKETING")
   const [settings, setSettings] = useState<FestivalSettingsForm>(EMPTY_FESTIVAL_SETTINGS_FORM)
+  const [savedSettings, setSavedSettings] = useState<FestivalSettingsForm | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [draftRound, setDraftRound] = useState<TicketingRound | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -72,6 +73,7 @@ export default function AdminSettings() {
     getFestivalSettings({ signal: controller.signal })
       .then((dto) => {
         setSettings(toForm(dto))
+        setSavedSettings(toForm(dto))
         // 아직 한 번도 저장하지 않았으면 바로 입력할 수 있게 편집 모드로 연다.
         setIsEditing(dto.operationDates.length === 0)
       })
@@ -132,43 +134,65 @@ export default function AdminSettings() {
     setRoundPendingConfirm(null)
   }
 
-  const handleSaveMetadata = async () => {
-    if (!canOperate) return
-    if (!settings.festivalName.trim()) {
+  const handleSave = async () => {
+    if (isSaving || isLoading) return
+    if (canTicket && settings.ticketingEnabled && draftRound) {
+      toast.error("작성 중인 티켓팅 회차를 추가하거나 입력을 닫은 뒤 저장해 주세요.")
+      return
+    }
+    const metadataPayload = toMetadataPayload(settings)
+    const ticketingPayload = toTicketingPayload(settings, confirmedCancelIds)
+    const saveMetadata = canOperate && (!savedSettings || JSON.stringify(metadataPayload) !== JSON.stringify(toMetadataPayload(savedSettings)))
+    const saveTicketing = canTicket && (!savedSettings || JSON.stringify(ticketingPayload) !== JSON.stringify(toTicketingPayload(savedSettings)))
+    if (!saveMetadata && !saveTicketing) {
+      toast.info("변경된 내용이 없습니다.")
+      return
+    }
+    if (saveMetadata && !metadataPayload.festivalName) {
       toast.error("축제 이름을 입력해 주세요.")
       return
     }
-    if (operationDates.length === 0) {
+    if (saveMetadata && operationDates.length === 0) {
       toast.error("운영 날짜를 시작일부터 종료일까지 올바르게 선택해 주세요.")
       return
     }
+    if (settings.ticketingEnabled && settings.ticketingRounds.some((round) => !operationDates.includes(round.performanceDate))) {
+      toast.error(canTicket
+        ? "운영 날짜에 포함되지 않는 티켓팅 회차가 있습니다. 운영 날짜 또는 회차 날짜를 수정해 주세요."
+        : "일부 티켓팅 공연 날짜가 운영 기간에서 제외됩니다. 운영 기간을 다시 확인하거나 티켓 매니저에게 문의해 주세요.")
+      return
+    }
+
     setIsSaving(true)
+    let metadataSaved = false
     try {
-      const saved = await updateFestivalMetadata(toMetadataPayload(settings))
-      setSettings((previous) => ({ ...toForm(saved), ticketingEnabled: previous.ticketingEnabled, ticketingRounds: previous.ticketingRounds }))
-      // 부스맵·타임테이블의 날짜 탭이 저장 즉시 새 운영 날짜를 쓰게 한다.
-      setFestivalDates(saved.operationDates)
-      toast.success("축제 기본 정보를 저장했습니다.")
+      // 티켓팅 검증이 저장된 운영 날짜를 사용하므로 기본 정보를 먼저 저장한다.
+      if (saveMetadata) {
+        const saved = await updateFestivalMetadata(metadataPayload)
+        const metadata = toMetadataPayload(toForm(saved))
+        setSettings((previous) => ({ ...previous, ...metadata }))
+        setSavedSettings((previous) => ({ ...(previous ?? EMPTY_FESTIVAL_SETTINGS_FORM), ...metadata }))
+        setFestivalDates(saved.operationDates)
+        metadataSaved = true
+      }
+      if (saveTicketing) {
+        const saved = toForm(await updateFestivalTicketingSettings(ticketingPayload))
+        const ticketing = { ticketingEnabled: saved.ticketingEnabled, ticketingRounds: saved.ticketingRounds }
+        setSettings((previous) => ({ ...previous, ...ticketing }))
+        setSavedSettings((previous) => ({ ...(previous ?? EMPTY_FESTIVAL_SETTINGS_FORM), ...ticketing }))
+        setConfirmedCancelIds([])
+      }
+      setDraftRound(null)
+      setIsEditing(false)
+      toast.success("축제 설정을 저장했습니다.")
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "축제 설정을 저장하지 못했습니다.")
+      const detail = error instanceof Error ? ` ${error.message}` : ""
+      toast.error(metadataSaved
+        ? `기본 정보는 저장했지만 티켓팅 설정은 저장하지 못했습니다.${detail} 다시 저장하면 티켓팅 설정만 재시도합니다.`
+        : `축제 설정을 저장하지 못했습니다.${detail}`)
     } finally {
       setIsSaving(false)
     }
-  }
-
-  const handleSaveTicketing = async () => {
-    if (!canTicket) return
-    if (settings.ticketingRounds.some((round) => !operationDates.includes(round.performanceDate))) {
-      toast.error("운영 날짜에 포함되지 않는 티켓팅 회차가 있습니다. 기본 정보를 먼저 저장하거나 회차 날짜를 수정해 주세요.")
-      return
-    }
-    setIsSaving(true)
-    try {
-      const saved = await updateFestivalTicketingSettings(toTicketingPayload(settings, confirmedCancelIds))
-      setSettings((previous) => ({ ...toForm(saved), schoolName: previous.schoolName, festivalName: previous.festivalName, startDate: previous.startDate, endDate: previous.endDate }))
-      setConfirmedCancelIds([]); setDraftRound(null)
-      toast.success("티켓팅 설정을 저장했습니다.")
-    } catch (error) { toast.error(error instanceof Error ? error.message : "티켓팅 설정을 저장하지 못했습니다.") } finally { setIsSaving(false) }
   }
 
   const handleCancel = () => {
@@ -178,6 +202,7 @@ export default function AdminSettings() {
     getFestivalSettings()
       .then((dto) => {
         setSettings(toForm(dto))
+        setSavedSettings(toForm(dto))
         setIsEditing(false)
       })
       .catch(() => toast.error("저장된 설정을 불러오지 못했습니다."))
@@ -194,19 +219,18 @@ export default function AdminSettings() {
         actions={
           isEditing ? (
             <>
-              <button type="button" onClick={handleCancel} className={cn(ADMIN_SECONDARY_ACTION_BUTTON_CLASS, "text-sm")}>
+              <button type="button" disabled={isSaving || isLoading} onClick={handleCancel} className={cn(ADMIN_SECONDARY_ACTION_BUTTON_CLASS, "text-sm")}>
                 취소
               </button>
-              {canOperate && <button
+              {(canOperate || canTicket) && <button
                 type="button"
-                disabled={isSaving}
-                onClick={() => void handleSaveMetadata()}
+                disabled={isSaving || isLoading}
+                onClick={() => void handleSave()}
                 className={cn(ADMIN_PRIMARY_ACTION_BUTTON_CLASS, "inline-flex items-center gap-1.5 text-sm")}
               >
                 <Save className="h-4 w-4" strokeWidth={2.3} />
-                {isSaving ? "저장 중..." : "기본 정보 저장"}
+                {isSaving ? "저장 중..." : "저장"}
               </button>}
-              {canTicket && <button type="button" disabled={isSaving} onClick={() => void handleSaveTicketing()} className={cn(ADMIN_PRIMARY_ACTION_BUTTON_CLASS, "inline-flex items-center gap-1.5 text-sm")}><Save className="h-4 w-4" strokeWidth={2.3} />{isSaving ? "저장 중..." : "티켓팅 저장"}</button>}
             </>
           ) : (
             <button
@@ -225,7 +249,7 @@ export default function AdminSettings() {
           <p className="text-sm text-[var(--text-muted)]">불러오는 중...</p>
         )}
 
-        <section className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface)] p-5 shadow-sm">
+        {canOperate && <fieldset disabled={isSaving || isLoading} className="min-w-0 rounded-2xl border border-[var(--border-base)] bg-[var(--surface)] p-5 shadow-sm">
           <h2 className="text-sm font-bold text-[var(--text)]">축제 기본 정보</h2>
           <p className="mt-0.5 text-xs text-[var(--text-muted)]">
             여기서 정한 운영 날짜가 부스맵과 타임테이블의 날짜 탭이 됩니다.
@@ -286,9 +310,9 @@ export default function AdminSettings() {
               )}
             </div>
           </div>
-        </section>
+        </fieldset>}
 
-        <section className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface)] p-5 shadow-sm">
+        {canTicket && <fieldset disabled={isSaving || isLoading} className="min-w-0 rounded-2xl border border-[var(--border-base)] bg-[var(--surface)] p-5 shadow-sm">
           <header className="flex items-center justify-between gap-3">
             <div>
               <h2 className="text-sm font-bold text-[var(--text)]">티켓팅</h2>
@@ -377,7 +401,7 @@ export default function AdminSettings() {
                 ))}
               </ul>
 
-              {/* 추가를 누르면 이 입력 토글이 열리고, 저장하면 다시 닫힌다. */}
+              {/* 회차 추가 입력을 열고, 목록에 추가하면 다시 닫는다. */}
               {isEditing && canTicket && draftRound && (
                 <div className="rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)] p-3">
                   <div className="mb-2 flex items-center justify-between">
@@ -442,7 +466,7 @@ export default function AdminSettings() {
                       onClick={handleAddRound}
                       className={cn(ADMIN_PRIMARY_ACTION_BUTTON_CLASS, "text-sm")}
                     >
-                      회차 저장
+                      회차 추가
                     </button>
                   </div>
                 </div>
@@ -463,12 +487,12 @@ export default function AdminSettings() {
               )}
             </div>
           )}
-        </section>
+        </fieldset>}
 
       </AdminShell>
 
       <AlertDialog
-        open={Boolean(roundPendingConfirm)}
+        open={canTicket && Boolean(roundPendingConfirm)}
         onOpenChange={(open) => {
           if (!open) setRoundPendingConfirm(null)
         }}
