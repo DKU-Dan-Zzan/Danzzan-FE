@@ -107,7 +107,15 @@ export const authStore = {
           ? await refreshAccessTokenWithToken(snapshot.tokens!.refreshToken, snapshot.tokens!.accessToken)
           : await refreshAccessTokenWithCookie(snapshot.tokens!.refreshToken || undefined);
         if (epoch !== sessionEpoch) return null;
-        const next = normalize({ tokens: { ...snapshot.tokens!, ...refreshed }, user: snapshot.user }, { persist: snapshot.persisted, refreshMode: snapshot.refreshMode! });
+        const next = normalize({
+          tokens: {
+            ...snapshot.tokens!,
+            ...refreshed,
+            refreshToken: refreshed.refreshToken ?? snapshot.tokens!.refreshToken,
+            expiresIn: refreshed.expiresIn ?? snapshot.tokens!.expiresIn,
+          },
+          user: snapshot.user,
+        }, { persist: snapshot.persisted, refreshMode: snapshot.refreshMode! });
         update(next, !next.tokens);
         return next.tokens?.accessToken ?? null;
       } catch {

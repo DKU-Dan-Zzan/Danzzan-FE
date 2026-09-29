@@ -252,9 +252,17 @@ export const withAuthRetry = async <T>({
   getSessionEpoch,
 }: WithAuthRetryOptions<T>): Promise<T> => {
   const epoch = getSessionEpoch?.();
+  const assertCurrentSession = () => {
+    if (epoch !== undefined && epoch !== getSessionEpoch?.()) {
+      throw new AuthBoundaryError("세션이 변경되었습니다.", "AUTH_SESSION_EXPIRED", 401);
+    }
+  };
   try {
-    return await execute(getAccessToken(), { isRetry: false });
+    const result = await execute(getAccessToken(), { isRetry: false });
+    assertCurrentSession();
+    return result;
   } catch (firstError) {
+    assertCurrentSession();
     const firstStatus = readStatus(firstError);
 
     if (firstStatus === 403) {
@@ -266,10 +274,6 @@ export const withAuthRetry = async <T>({
       throw firstError;
     }
 
-    if (epoch !== undefined && epoch !== getSessionEpoch?.()) {
-      throwSessionExpiredError(sessionExpiredMessage, firstError);
-    }
-
     let refreshedToken: string | null = null;
     try {
       refreshedToken = await refreshIfNeeded({
@@ -278,7 +282,8 @@ export const withAuthRetry = async <T>({
         refresh: refreshAccessToken,
       });
     } catch (refreshError) {
-      if (epoch === undefined || epoch === getSessionEpoch?.()) await onSessionExpired?.();
+      assertCurrentSession();
+      await onSessionExpired?.();
       throw new AuthBoundaryError(
         sessionExpiredMessage,
         "AUTH_REFRESH_FAILED",
@@ -287,22 +292,25 @@ export const withAuthRetry = async <T>({
       );
     }
 
+    assertCurrentSession();
     if (!refreshedToken) {
-      if (epoch === undefined || epoch === getSessionEpoch?.()) await onSessionExpired?.();
+      await onSessionExpired?.();
       throwSessionExpiredError(sessionExpiredMessage, firstError);
     }
 
     try {
-      if (epoch !== undefined && epoch !== getSessionEpoch?.()) throw new AuthBoundaryError("세션이 변경되었습니다.", "AUTH_SESSION_EXPIRED", 401);
-      return await execute(refreshedToken, { isRetry: true });
+      const result = await execute(refreshedToken, { isRetry: true });
+      assertCurrentSession();
+      return result;
     } catch (retryError) {
+      assertCurrentSession();
       const retryStatus = readStatus(retryError);
       if (retryStatus === 403) {
         await onForbidden?.();
         throwForbiddenError(forbiddenMessage, retryError);
       }
       if (retryStatus === 401) {
-        if (epoch === undefined || epoch === getSessionEpoch?.()) await onSessionExpired?.();
+        await onSessionExpired?.();
         throwSessionExpiredError(sessionExpiredMessage, retryError);
       }
       throw retryError;

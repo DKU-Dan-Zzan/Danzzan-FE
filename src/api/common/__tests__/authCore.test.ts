@@ -126,6 +126,52 @@ describe("authCore", () => {
     await expect(run).rejects.toMatchObject({ status: 401 }); expect(clear).not.toHaveBeenCalled();
   });
 
+  it.each([
+    [false, null], [false, 401], [false, 403],
+    [true, null], [true, 401], [true, 403],
+  ])("세션 변경 후 응답을 폐기하고 콜백을 호출하지 않는다 (retry=%s, status=%s)", async (retry, status) => {
+    let epoch = 1;
+    let resolve!: (value: string) => void;
+    let reject!: (error: { status: number }) => void;
+    let started!: () => void;
+    const ready = new Promise<void>(done => { started = done; });
+    const delayed = new Promise<string>((yes, no) => { resolve = yes; reject = no; });
+    const expired = vi.fn();
+    const forbidden = vi.fn();
+    const refresh = vi.fn(async () => "refreshed-token");
+    const execute = vi.fn(async (_token: string | null, context: { isRetry: boolean }) => {
+      if (retry && !context.isRetry) throw { status: 401 };
+      started();
+      return delayed;
+    });
+    const pending = withAuthRetry({
+      getAccessToken: () => "old-token", getSessionEpoch: () => epoch,
+      execute, readStatus, refreshAccessToken: refresh,
+      onSessionExpired: expired, onForbidden: forbidden,
+    });
+    const rejected = expect(pending).rejects.toMatchObject({ code: "AUTH_SESSION_EXPIRED", status: 401 });
+    await ready;
+    epoch += 1;
+    if (status === null) resolve("old-account-private-data");
+    else reject({ status });
+    await rejected;
+    expect(expired).not.toHaveBeenCalled();
+    expect(forbidden).not.toHaveBeenCalled();
+    expect(refresh).toHaveBeenCalledTimes(retry ? 1 : 0);
+    expect(execute).toHaveBeenCalledTimes(retry ? 2 : 1);
+  });
+
+  it.each([false, true])("같은 세션의 성공 응답은 반환한다 (retry=%s)", async retry => {
+    await expect(withAuthRetry({
+      getAccessToken: () => "token", getSessionEpoch: () => 1,
+      readStatus, refreshAccessToken: async () => "new-token",
+      execute: async (_token, context) => {
+        if (retry && !context.isRetry) throw { status: 401 };
+        return "current-account-data";
+      },
+    })).resolves.toBe("current-account-data");
+  });
+
   it("서로 다른 epoch의 refresh는 Promise를 공유하지 않는다", async () => {
     let epoch = 1; let resolve1!: (v: string) => void; let resolve2!: (v: string) => void;
     const refresh = vi.fn(() => new Promise<string>(r => { if (refresh.mock.calls.length === 1) resolve1 = r; else resolve2 = r; }));

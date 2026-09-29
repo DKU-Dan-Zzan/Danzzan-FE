@@ -6,7 +6,7 @@ import { authStore } from "@/store/common/authStore";
 import type { AuthSession } from "@/types/common/auth.model";
 import { authLogout } from "@/api/app/auth/authApi";
 import { requireAdminRole } from "@/lib/app/admin/admin-auth-session";
-import { canAccessAdminConsole, isAccessTokenExpired, resolvePermissionsFromAccessToken, resolveRoleFromAccessToken } from "@/api/common/authCore";
+import { AuthBoundaryError, canAccessAdminConsole, isAccessTokenExpired, resolvePermissionsFromAccessToken, resolveRoleFromAccessToken } from "@/api/common/authCore";
 
 const setAdminSession = (session: AuthSession): void => {
   authStore.setSession(session, { refreshMode: "cookie" });
@@ -50,6 +50,7 @@ export function useAdminAuth() {
       throw new Error("학번과 비밀번호를 입력해 주세요.");
     }
 
+    const epoch = authStore.getSessionEpoch();
     let session: AuthSession;
     try {
       session = await adminAuthApi.login({
@@ -61,6 +62,9 @@ export function useAdminAuth() {
     }
     if (!canAccessAdminConsole(resolveRoleFromAccessToken(session.tokens.accessToken), resolvePermissionsFromAccessToken(session.tokens.accessToken))) {
       requireAdminRole(session.tokens.accessToken);
+    }
+    if (epoch !== authStore.getSessionEpoch()) {
+      throw new AuthBoundaryError("세션이 변경되었습니다.", "AUTH_SESSION_EXPIRED", 401);
     }
     setAdminSession(session);
   }, []);

@@ -38,6 +38,24 @@ describe("authStore session boundaries", () => {
     refresh.mockResolvedValue({ accessToken: token("ROLE_USER") });
     await Promise.all([authStore.refreshAccessToken(),authStore.refreshAccessToken()]); expect(refresh).toHaveBeenCalledTimes(1);
   });
+  it.each([undefined, null])("preserves omitted refresh fields across successive token refreshes (%s)", async missing => {
+    const { authStore } = await import("@/store/common/authStore");
+    const initial = session("ROLE_USER");
+    authStore.setSession({ ...initial, tokens: { ...initial.tokens, expiresIn: 3600 } });
+    refresh.mockResolvedValue({ accessToken: token("ROLE_USER"), refreshToken: missing, expiresIn: missing });
+    await authStore.refreshAccessToken();
+    expect(authStore.getSnapshot().tokens).toMatchObject({ refreshToken: "refresh", expiresIn: 3600 });
+    expect(JSON.parse(localStorage.getItem("danzzan.auth")!).tokens).toMatchObject({ refreshToken: "refresh", expiresIn: 3600 });
+    await authStore.refreshAccessToken();
+    expect(refresh).toHaveBeenLastCalledWith("refresh", token("ROLE_USER"));
+  });
+  it("replaces refresh fields when the server provides rotated values", async () => {
+    const { authStore } = await import("@/store/common/authStore");
+    authStore.setSession(session("ROLE_USER"));
+    refresh.mockResolvedValue({ accessToken: token("ROLE_USER"), refreshToken: "rotated", expiresIn: 0 });
+    await authStore.refreshAccessToken();
+    expect(authStore.getSnapshot().tokens).toMatchObject({ refreshToken: "rotated", expiresIn: 0 });
+  });
   it("invalidates epoch on a cross-tab storage change", async () => {
     const { authStore } = await import("@/store/common/authStore"); authStore.setSession(session("ROLE_USER")); const unsub=authStore.subscribe(() => {});
     localStorage.setItem("danzzan.auth", JSON.stringify(session("ROLE_MANAGER"))); window.dispatchEvent(new StorageEvent("storage", { key: "danzzan.auth" }));
