@@ -6,6 +6,7 @@ import { authStore } from "@/store/common/authStore";
 import { useAdminInvite } from "@/hooks/app/admin/useAdminInvite";
 import { Button } from "@/components/common/ui/button";
 import { Input } from "@/components/common/ui/input";
+import { cn } from "@/components/common/ui/utils";
 import {
   AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription,
   AlertDialogFooter, AlertDialogCancel,
@@ -32,7 +33,7 @@ const roleBadgeColor = {
 };
 
 function RoleBadge({ userRole }: { userRole: StaffMember["role"] }) {
-  return <span className={`inline-flex shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${roleBadgeColor[userRole]}`}>{roleLabel(userRole)}</span>;
+  return <span className={cn("inline-flex shrink-0 rounded-full px-2.5 py-1 text-xs font-medium", roleBadgeColor[userRole])}>{roleLabel(userRole)}</span>;
 }
 
 function StaffProfile({ member }: { member: StaffMember }) {
@@ -53,7 +54,11 @@ function ScopeControls({ value, onChange, disabled = false }: { value: StaffPerm
       {([
         { permission: "OPERATIONS", title: "운영 관리", description: "공지·광고, 부스맵, 타임테이블 등" },
         { permission: "TICKETING", title: "티켓팅 관리", description: "축제 티켓 설정, 현장 팔찌 배부" },
-      ] as const).map(({ permission, title, description }) => <label key={permission} className={`flex min-w-0 items-start gap-3 rounded-xl border p-3.5 transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"} ${value.includes(permission) ? "border-[var(--text)] bg-[var(--admin-panel-bg)]" : "border-[var(--admin-panel-border)] bg-[var(--admin-panel-bg)] hover:border-[var(--text-muted)]"}`}>
+      ] as const).map(({ permission, title, description }) => <label key={permission} className={cn(
+        "flex min-w-0 items-start gap-3 rounded-xl border p-3.5 transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-offset-2",
+        disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
+        value.includes(permission) ? "border-[var(--text)] bg-[var(--admin-panel-bg)]" : "border-[var(--admin-panel-border)] bg-[var(--admin-panel-bg)] hover:border-[var(--text-muted)]",
+      )}>
         <input type="checkbox" className="mt-1 h-4 w-4 shrink-0" checked={value.includes(permission)} onChange={() => toggle(permission)} />
         <span className="min-w-0"><span className="block text-sm font-semibold">{title}</span><span className="mt-1 block text-xs leading-5 text-[var(--text-muted)]">{description}</span></span>
       </label>)}
@@ -114,7 +119,7 @@ function InviteContent({ epoch, actorId }: { epoch: number; actorId: string | nu
       </dl>
     </section>
     {list && !list.managementEnabled && <p role="status" className="rounded-xl border border-[var(--admin-panel-border)] p-4 text-sm">현재 권한 변경은 준비 중입니다. 회원 조회와 매니저 목록은 확인할 수 있습니다.</p>}
-    <section id="invite-manager" className={`${panel} scroll-mt-40 sm:scroll-mt-28`} aria-labelledby="staff-search-title">
+    <section id="invite-manager" className={cn(panel, "scroll-mt-40 sm:scroll-mt-28")} aria-labelledby="staff-search-title">
       <h2 id="staff-search-title" className="flex items-center gap-2 text-lg font-semibold"><UserPlus className="h-5 w-5" />새 매니저 초대</h2>
       <form onSubmit={onSubmit} className="mt-5 space-y-2">
         <label htmlFor="staff-student-id" className="text-sm font-medium">학번</label>
@@ -138,10 +143,13 @@ function InviteContent({ epoch, actorId }: { epoch: number; actorId: string | nu
       </div>}
     </section>
     {model.message && <div aria-live="polite" role="status" className="text-sm leading-6">{model.message}{model.uncertain && <Button variant="outline" className="ml-3" onClick={() => void model.refresh()} disabled={model.list.isFetching}>현재 권한 다시 확인</Button>}</div>}
-    <section id="manager-list" className={`${panel} scroll-mt-40 sm:scroll-mt-28`} aria-labelledby="staff-list-title" aria-busy={model.list.isFetching}>
+    <section id="manager-list" className={cn(panel, "scroll-mt-40 sm:scroll-mt-28")} aria-labelledby="staff-list-title" aria-busy={model.list.isFetching}>
       <div className="flex items-center justify-between gap-3"><h2 id="staff-list-title" className="flex items-center gap-2 text-lg font-semibold"><Users className="h-5 w-5" />매니저 목록{list && <span className="text-sm font-normal text-[var(--text-muted)]">{list.totalElements}명</span>}</h2><Button variant="outline" size="sm" disabled={model.list.isFetching || model.busy} onClick={() => void model.refresh()}><RefreshCw className="mr-1 h-4 w-4" />새로고침</Button></div>
       <div role="group" aria-label="관리자 권한 필터" className="mt-5 flex flex-wrap gap-2">
-        {staffFilters.map(filter => <button key={filter.value} type="button" aria-pressed={model.filter === filter.value} disabled={model.busy} onClick={() => model.changeFilter(filter.value)} className={`rounded-full border px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50 ${model.filter === filter.value ? "border-[var(--text)] bg-[var(--text)] text-[var(--admin-panel-bg)]" : "border-[var(--admin-panel-border)] bg-[var(--admin-panel-bg)] text-[var(--text-muted)] hover:bg-[var(--surface-subtle)]"}`}>{filter.label}</button>)}
+        {staffFilters.map(filter => <button key={filter.value} type="button" aria-pressed={model.filter === filter.value} disabled={model.busy} onClick={() => model.changeFilter(filter.value)} className={cn(
+          "rounded-full border px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50",
+          model.filter === filter.value ? "border-[var(--text)] bg-[var(--text)] text-[var(--admin-panel-bg)]" : "border-[var(--admin-panel-border)] bg-[var(--admin-panel-bg)] text-[var(--text-muted)] hover:bg-[var(--surface-subtle)]",
+        )}>{filter.label}</button>)}
       </div>
       <p className="mt-2 text-xs text-[var(--text-muted)]">권한별 필터에는 최고 관리자도 포함됩니다. 티켓&운영 매니저는 두 권한을 모두 가진 계정만 표시합니다.</p>
       {model.list.isPending ? <p className="py-10 text-center text-sm text-[var(--text-muted)]">매니저 목록을 불러오는 중입니다…</p> : model.list.isError ? <p role="alert" className="py-8 text-center text-sm">매니저 목록을 불러오지 못했습니다. 새로고침해 주세요.</p> : list?.items.length === 0 ? <p className="py-10 text-center text-sm text-[var(--text-muted)]">{model.filter === "ALL" ? "등록된 관리자가 없습니다." : "선택한 권한에 해당하는 관리자가 없습니다."}</p> : <div className="mt-5">
