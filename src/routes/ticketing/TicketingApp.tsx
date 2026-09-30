@@ -12,6 +12,7 @@ import {
 } from "@/routes/common/authGuard";
 import Ticketing from "@/routes/ticketing/ticketing/Ticketing";
 import { env } from "@/utils/common/env";
+import { hasAuthenticatedAdminPermission } from "@/lib/common/auth-access";
 
 const AdminLayout = lazy(() =>
   import("@/components/ticketing/layout/AdminLayout").then((module) => ({
@@ -135,10 +136,10 @@ function RequireAdminAuth() {
   }
 
   if (
-    !isRoleAuthenticated({
+    !hasAuthenticatedAdminPermission({
       accessToken: session.tokens?.accessToken,
       role: session.role,
-      requiredRole: "admin",
+      permission: "TICKETING",
     })
   ) {
     return (

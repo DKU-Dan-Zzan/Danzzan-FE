@@ -1,6 +1,6 @@
 // 역할: 티켓팅 관리자 로그인 입력/검증/제출 플로우를 처리합니다.
 import { useState, type FormEvent } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import {
   AlertCircle,
   Eye,
@@ -16,15 +16,18 @@ import { Label } from "@/components/common/ui/label";
 import { ADMIN_LOGIN_TITLE_CLASS } from "@/lib/common/adminLoginHeadingStyles";
 import { useAuth } from "@/hooks/ticketing/useAuth";
 import { resolveScopedRedirect } from "@/routes/common/authGuard";
+import { hasAdminPermission, resolvePermissionsFromAccessToken, resolveRoleFromAccessToken } from "@/api/common/authCore";
 
 export default function AdminLogin() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { login } = useAuth();
-  const redirect = resolveScopedRedirect(searchParams.get("redirect"), {
+  const { login, role, isAuthenticated, session } = useAuth();
+  const requestedRedirect = resolveScopedRedirect(searchParams.get("redirect"), {
     scope: "/ticket/admin",
     fallback: "/ticket/admin/wristband",
   });
+  const redirect = /^\/ticket\/admin(?:\/login)?\/?(?:[?#]|$)/.test(requestedRedirect)
+    ? "/ticket/admin/wristband" : requestedRedirect;
   const [studentId, setStudentId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -38,7 +41,11 @@ export default function AdminLogin() {
     setSubmitting(true);
 
     try {
-      await login({ studentId, password }, "admin");
+      const session = await login({ studentId, password }, "admin");
+      if (!hasAdminPermission(resolveRoleFromAccessToken(session.tokens.accessToken), resolvePermissionsFromAccessToken(session.tokens.accessToken), "TICKETING")) {
+        setError("티켓팅 관리 권한이 없는 계정입니다.");
+        return;
+      }
       navigate(redirect);
     } catch (err) {
       if (err instanceof HttpError) {
@@ -57,6 +64,10 @@ export default function AdminLogin() {
       setSubmitting(false);
     }
   };
+
+  if (isAuthenticated && hasAdminPermission(role, session?.permissions ?? [], "TICKETING")) {
+    return <Navigate to={redirect} replace />;
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[var(--bg-base)] px-4 py-8 md:px-8 md:py-10">
@@ -134,7 +145,7 @@ export default function AdminLogin() {
               <div className="rounded-xl border border-[var(--admin-auth-help-border)] bg-[var(--admin-auth-help-bg)] px-3 py-2.5">
                 <p className="flex items-start gap-2 text-xs font-medium leading-5 text-[var(--admin-auth-help-text)]">
                   <TimerReset className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                  운영진 전용 인증 화면입니다. 권한 없는 계정은 접근할 수 없습니다.
+                  매니저 전용 인증 화면입니다. 권한 없는 계정은 접근할 수 없습니다.
                 </p>
               </div>
 

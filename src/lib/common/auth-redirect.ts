@@ -16,8 +16,10 @@ const isSafeInternalPath = (rawPath: string): boolean => {
     if (segment === "." || segment === "..") {
       return false;
     }
-    const decoded = decodeURIComponent(segment);
-    if (decoded === "." || decoded === "..") {
+    try {
+      const decoded = decodeURIComponent(segment);
+      if (decoded === "." || decoded === "..") return false;
+    } catch {
       return false;
     }
   }

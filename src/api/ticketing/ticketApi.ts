@@ -32,6 +32,7 @@ import { env, requireEnv } from "@/utils/common/env";
 
 const getTicketingClient = () =>
   createHttpClient({
+    getSessionEpoch: authStore.getSessionEpoch,
     baseUrl: requireEnv(
       env.ticketingApiBaseUrl,
       "VITE_TICKETING_API_BASE_URL (or VITE_API_BASE_URL)",

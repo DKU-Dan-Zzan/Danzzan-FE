@@ -8,7 +8,7 @@ import { TicketAdminShell } from "@/components/ticketing/layout/TicketAdminShell
 
 export function AdminLayout() {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, role } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -25,7 +25,7 @@ export function AdminLayout() {
             </span>
           )}
           <span className="rounded-full border border-[var(--admin-operator-badge-border)] bg-[var(--admin-operator-badge-bg)] px-2.5 py-0.5 text-xs font-semibold text-[var(--admin-operator-badge-text)]">
-            운영자: 관리자
+            운영자: {role === "manager" ? "매니저" : "최고 관리자"}
           </span>
           <Button variant="outline" onClick={handleLogout} className="h-8 px-3 text-sm">
             <LogOut className="h-4 w-4" strokeWidth={2.3} />

@@ -5,7 +5,8 @@
 
 import type {
   FestivalSettings as FestivalSettingsDto,
-  UpdateFestivalSettingsPayload,
+  UpdateFestivalMetadataPayload,
+  UpdateFestivalTicketingPayload,
 } from "@/api/app/festival/festivalSettingsApi"
 
 export type TicketingRound = {
@@ -60,15 +61,17 @@ export function toForm(dto: FestivalSettingsDto): FestivalSettingsForm {
   }
 }
 
-export function toPayload(
+export function toMetadataPayload(
+  form: FestivalSettingsForm,
+): UpdateFestivalMetadataPayload {
+  return { schoolName: form.schoolName, festivalName: form.festivalName.trim(), startDate: form.startDate, endDate: form.endDate }
+}
+
+export function toTicketingPayload(
   form: FestivalSettingsForm,
   confirmedTicketCancelRoundIds: number[] = [],
-): UpdateFestivalSettingsPayload {
+): UpdateFestivalTicketingPayload {
   return {
-    schoolName: form.schoolName,
-    festivalName: form.festivalName.trim(),
-    startDate: form.startDate,
-    endDate: form.endDate,
     ticketingEnabled: form.ticketingEnabled,
     // 저장된 회차는 id 를 같이 보내야 서버가 같은 회차로 알아보고 티켓팅 이벤트를 유지한다.
     ticketingRounds: form.ticketingEnabled

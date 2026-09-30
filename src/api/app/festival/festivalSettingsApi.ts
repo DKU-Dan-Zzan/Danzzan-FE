@@ -1,3 +1,4 @@
+import { authStore } from "@/store/common/authStore";
 // 역할: 축제 운영 정보(축제 이름/운영 날짜/티켓팅 회차) 조회·저장 API 어댑터.
 
 import axios from "axios"
@@ -11,6 +12,7 @@ import {
 } from "@/lib/app/admin/admin-auth-session"
 
 const fetchWithAuth = createFetchWithAuth({
+  getSessionEpoch: authStore.getSessionEpoch,
   getBaseUrl: getApiBaseUrl,
   getAccessToken: getAdminAccessToken,
   reissueAccessToken: reissueAdminToken,
@@ -44,11 +46,14 @@ export type FestivalSettings = {
   ticketingRounds: TicketingRound[]
 }
 
-export type UpdateFestivalSettingsPayload = {
+export type UpdateFestivalMetadataPayload = {
   schoolName: string
   festivalName: string
   startDate: string
   endDate: string
+}
+
+export type UpdateFestivalTicketingPayload = {
   ticketingEnabled: boolean
   /**
    * 이미 저장된 회차는 id 를 함께 보낸다. id 가 빠지면 서버가 새 회차로 보고 예전 회차를
@@ -80,11 +85,19 @@ export async function getFestivalSettings(options?: { signal?: AbortSignal }) {
 }
 
 /** 관리자 전용. 보낸 티켓팅 회차가 저장된 회차를 통째로 대신한다. */
-export async function updateFestivalSettings(
-  payload: UpdateFestivalSettingsPayload,
+export async function updateFestivalMetadata(
+  payload: UpdateFestivalMetadataPayload,
 ): Promise<FestivalSettings> {
-  // 실패하면 서버 메시지를 담은 Error 를 던진다(fetchWithAuth 가 처리).
   return fetchWithAuth<FestivalSettings>("/admin/festival/settings", {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  })
+}
+
+export async function updateFestivalTicketingSettings(
+  payload: UpdateFestivalTicketingPayload,
+): Promise<FestivalSettings> {
+  return fetchWithAuth<FestivalSettings>("/admin/festival/ticketing-settings", {
     method: "PUT",
     body: JSON.stringify(payload),
   })

@@ -6,6 +6,7 @@ import {
   Suspense,
   useEffect,
   useState,
+  useSyncExternalStore,
   type ComponentType,
   type LazyExoticComponent,
   type ReactNode,
@@ -21,6 +22,8 @@ import {
 import { markBottomNavTransitionComplete } from "@/lib/perf/navTiming";
 import { prefetchBottomNavTabData } from "@/lib/query/prefetchTabData";
 import { buildLoginRedirectPath, buildReturnTo } from "@/routes/common/authGuard";
+import { canManageStaff, hasAdminPermission, type AdminPermission } from "@/api/common/authCore";
+import { authStore } from "@/store/common/authStore";
 import AppLayout from "./components/layout/AppLayout";
 import Home from "./routes/home/Home";
 import Timetable from "./routes/timetable/Timetable";
@@ -90,6 +93,22 @@ function ProtectedAdminRoute() {
         replace
       />
     );
+  }
+  return <Outlet />;
+}
+
+function ProtectedStaffRoute() {
+  const session = useSyncExternalStore(authStore.subscribe, authStore.getSnapshot, authStore.getSnapshot);
+  if (!canManageStaff(session.role)) {
+    return <Navigate to="/admin" replace />;
+  }
+  return <Outlet />;
+}
+
+function ProtectedAdminPermissionRoute({ permission }: { permission: AdminPermission }) {
+  const session = useSyncExternalStore(authStore.subscribe, authStore.getSnapshot, authStore.getSnapshot);
+  if (!hasAdminPermission(session.role, session.permissions, permission)) {
+    return <Navigate to="/admin" replace />;
   }
   return <Outlet />;
 }
@@ -207,24 +226,22 @@ function App() {
         <Route element={<ProtectedAdminRoute />}>
           {/* 설정: 관리자 콘솔의 기본 페이지 */}
           <Route index element={withRouteSuspense(<AdminSettings />)} />
-          <Route path="theme" element={withRouteSuspense(<AdminTheme />)} />
+          <Route element={<ProtectedAdminPermissionRoute permission="OPERATIONS" />}>
+            <Route path="theme" element={withRouteSuspense(<AdminTheme />)} />
+            <Route path="notices" element={withRouteSuspense(<Admin section="notice" />)} />
+            <Route path="ads" element={withRouteSuspense(<Admin section="ad" />)} />
+            <Route path="boothmap" element={<Navigate to="/admin/boothmap/layout" replace />} />
+            <Route path="boothmap/layout" element={withRouteSuspense(<AdminBoothLayoutPage />)} />
+            <Route path="boothmap/booths" element={withRouteSuspense(<AdminBoothInfoPage />)} />
+            <Route path="timetable" element={withRouteSuspense(<AdminTimetablePage />)} />
+            <Route path="map" element={<Navigate to="/admin/boothmap/layout" replace />} />
+          </Route>
 
-          {/* 공지·광고 */}
-          <Route path="notices" element={withRouteSuspense(<Admin section="notice" />)} />
-          <Route path="ads" element={withRouteSuspense(<Admin section="ad" />)} />
+          <Route element={<ProtectedStaffRoute />}>
+            <Route path="invite" element={withRouteSuspense(<AdminInvite />)} />
+            <Route path="managers" element={<Navigate to="/admin/invite#manager-list" replace />} />
+          </Route>
 
-          {/* 부스맵 */}
-          <Route path="boothmap" element={<Navigate to="/admin/boothmap/layout" replace />} />
-          <Route path="boothmap/layout" element={withRouteSuspense(<AdminBoothLayoutPage />)} />
-          <Route path="boothmap/booths" element={withRouteSuspense(<AdminBoothInfoPage />)} />
-
-          {/* 타임테이블 */}
-          <Route path="timetable" element={withRouteSuspense(<AdminTimetablePage />)} />
-
-          <Route path="invite" element={withRouteSuspense(<AdminInvite />)} />
-
-          {/* 이전 주소(/admin/map)로 들어온 북마크를 새 부스맵으로 보낸다. */}
-          <Route path="map" element={<Navigate to="/admin/boothmap/layout" replace />} />
         </Route>
       </Route>
 

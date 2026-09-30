@@ -6,10 +6,10 @@ import { authStore } from "@/store/common/authStore";
 import type { AuthSession } from "@/types/common/auth.model";
 import { authLogout } from "@/api/app/auth/authApi";
 import { requireAdminRole } from "@/lib/app/admin/admin-auth-session";
-import { isAccessTokenExpired } from "@/api/common/authCore";
+import { AuthBoundaryError, canAccessAdminConsole, isAccessTokenExpired, resolvePermissionsFromAccessToken, resolveRoleFromAccessToken } from "@/api/common/authCore";
 
 const setAdminSession = (session: AuthSession): void => {
-  authStore.setSession(session, "admin", { refreshMode: "cookie" });
+  authStore.setSession(session, { refreshMode: "cookie" });
 };
 
 export function resolveAdminLoginErrorMessage(error: unknown): string {
@@ -43,13 +43,14 @@ export function useAdminAuth() {
     authStore.getSnapshot,
   );
 
-  const isAuthenticated = Boolean(state.tokens?.accessToken) && state.role === "admin";
+  const isAuthenticated = Boolean(state.tokens?.accessToken) && canAccessAdminConsole(state.role, state.permissions);
 
   const login = useCallback(async (studentNumber: string, password: string): Promise<void> => {
     if (!studentNumber.trim() || !password.trim()) {
       throw new Error("학번과 비밀번호를 입력해 주세요.");
     }
 
+    const epoch = authStore.getSessionEpoch();
     let session: AuthSession;
     try {
       session = await adminAuthApi.login({
@@ -59,16 +60,22 @@ export function useAdminAuth() {
     } catch (error) {
       throw new Error(resolveAdminLoginErrorMessage(error));
     }
-    requireAdminRole(session.tokens.accessToken);
+    if (!canAccessAdminConsole(resolveRoleFromAccessToken(session.tokens.accessToken), resolvePermissionsFromAccessToken(session.tokens.accessToken))) {
+      requireAdminRole(session.tokens.accessToken);
+    }
+    if (epoch !== authStore.getSessionEpoch()) {
+      throw new AuthBoundaryError("세션이 변경되었습니다.", "AUTH_SESSION_EXPIRED", 401);
+    }
     setAdminSession(session);
   }, []);
 
   const logout = useCallback(async () => {
+    const epoch = authStore.getSessionEpoch();
     try {
       const refreshToken = authStore.getRefreshToken() ?? undefined;
       await authLogout(refreshToken);
     } finally {
-      authStore.clear();
+      if (epoch === authStore.getSessionEpoch()) authStore.clear();
     }
   }, []);
 
@@ -77,7 +84,7 @@ export function useAdminAuth() {
     const current = authStore.getSnapshot();
     const hasValidToken =
       current.tokens?.accessToken &&
-      current.role === "admin" &&
+      canAccessAdminConsole(current.role, current.permissions) &&
       !isAccessTokenExpired(current.tokens.accessToken);
     if (hasValidToken) {
       return true;
@@ -88,7 +95,9 @@ export function useAdminAuth() {
       if (!reissued) {
         return false;
       }
-      requireAdminRole(reissued);
+      if (!canAccessAdminConsole(resolveRoleFromAccessToken(reissued), resolvePermissionsFromAccessToken(reissued))) {
+        requireAdminRole(reissued);
+      }
       return true;
     } catch {
       return false;

@@ -21,7 +21,7 @@ const getClient = () =>
   });
 
 const mapRole = (role?: string): AuthUser["role"] => {
-  if (role === "student" || role === "admin") {
+  if (role === "student" || role === "manager" || role === "admin") {
     return role;
   }
   return "unknown";

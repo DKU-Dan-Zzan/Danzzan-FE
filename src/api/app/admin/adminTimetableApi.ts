@@ -1,3 +1,4 @@
+import { authStore } from "@/store/common/authStore";
 // 역할: 관리자 타임테이블(공연/아티스트) CRUD 및 이미지 presign API 어댑터.
 
 import { getApiBaseUrl } from "@/api/common/baseUrl";
@@ -10,6 +11,7 @@ import {
 } from "@/lib/app/admin/admin-auth-session";
 
 const fetchWithAuth = createFetchWithAuth({
+  getSessionEpoch: authStore.getSessionEpoch,
   getBaseUrl: getApiBaseUrl,
   getAccessToken: getAdminAccessToken,
   reissueAccessToken: reissueAdminToken,

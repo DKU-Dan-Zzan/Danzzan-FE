@@ -12,7 +12,7 @@ export type AdminNavItem = {
 export type AdminNavMenu = {
   key: string
   label: string
-  /** 대메뉴를 눌렀을 때 이동할 경로. 하위 항목이 있으면 첫 번째 항목의 경로와 같다. */
+  /** 대메뉴를 눌렀을 때 이동할 대표 경로. */
   path: string
   external?: boolean
   items: AdminNavItem[]
@@ -67,10 +67,13 @@ export const ADMIN_NAV_MENUS: AdminNavMenu[] = [
     ],
   },
   {
-    key: "invite",
-    label: "운영진 초대",
+    key: "managers",
+    label: "운영진 관리",
     path: "/admin/invite",
-    items: [],
+    items: [
+      { label: "새 매니저 초대", path: "/admin/invite#invite-manager", description: "가입한 회원에게 관리 범위 부여" },
+      { label: "매니저 목록", path: "/admin/invite#manager-list", description: "매니저 권한과 담당 업무 확인" },
+    ],
   },
 ]
 
@@ -78,7 +81,7 @@ export const ADMIN_NAV_MENUS: AdminNavMenu[] = [
 export const findActiveAdminMenuKey = (pathname: string): string | undefined => {
   const candidates = ADMIN_NAV_MENUS.flatMap((menu) => {
     const paths = menu.items.length > 0 ? menu.items.map((item) => item.path) : [menu.path]
-    return paths.map((path) => ({ key: menu.key, path }))
+    return paths.map((path) => ({ key: menu.key, path: path.split("#")[0] }))
   })
 
   const matched = candidates

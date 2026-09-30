@@ -129,7 +129,6 @@ describe("BottomNav", () => {
         },
         user: null,
       },
-      "student",
     );
 
     const markup = renderBottomNav("/notice");
@@ -147,7 +146,6 @@ describe("BottomNav", () => {
         },
         user: null,
       },
-      "admin",
     );
 
     const markup = renderBottomNav("/notice");
@@ -168,7 +166,6 @@ describe("BottomNav", () => {
         },
         user: null,
       },
-      "admin",
     );
 
     const markup = renderBottomNav("/notice");

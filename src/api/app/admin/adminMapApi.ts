@@ -1,3 +1,4 @@
+import { authStore } from "@/store/common/authStore";
 // 역할: admin map api 관련 HTTP 요청 함수를 제공하는 API 어댑터다.
 
 import { getApiBaseUrl } from "@/api/common/baseUrl";
@@ -9,6 +10,7 @@ import {
 } from "@/lib/app/admin/admin-auth-session";
 
 const fetchWithAuth = createFetchWithAuth({
+  getSessionEpoch: authStore.getSessionEpoch,
   getBaseUrl: getApiBaseUrl,
   getAccessToken: getAdminAccessToken,
   reissueAccessToken: reissueAdminToken,

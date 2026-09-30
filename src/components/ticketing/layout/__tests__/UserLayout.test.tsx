@@ -42,7 +42,6 @@ describe("UserLayout", () => {
         },
         user: null,
       },
-      "student",
     );
 
     const markup = renderUserLayout("/ticket/ticketing");

@@ -10,7 +10,7 @@ const {
   getPubsMock,
   profileMeMock,
   getSnapshotMock,
-  setSessionMock,
+  updateUserMock,
 } = vi.hoisted(() => ({
   prefetchQueryMock: vi.fn(
     async (options: { queryFn: (ctx: { signal?: AbortSignal }) => unknown }) => {
@@ -23,7 +23,7 @@ const {
   getPubsMock: vi.fn(),
   profileMeMock: vi.fn(),
   getSnapshotMock: vi.fn(),
-  setSessionMock: vi.fn(),
+  updateUserMock: vi.fn(),
 }));
 
 vi.mock("@/lib/query/queryClient", () => ({
@@ -51,7 +51,8 @@ vi.mock("@/api/app/auth/studentProfileApi", () => ({
 vi.mock("@/store/common/authStore", () => ({
   authStore: {
     getSnapshot: getSnapshotMock,
-    setSession: setSessionMock,
+    updateUser: updateUserMock,
+    getSessionEpoch: () => 1,
   },
 }));
 
@@ -143,12 +144,9 @@ describe("prefetchTabData", () => {
     await prefetchTabDataByPath("/mypage");
 
     expect(profileMeMock).toHaveBeenCalledTimes(1);
-    expect(setSessionMock).toHaveBeenCalledWith(
-      {
-        tokens,
-        user: refreshedUser,
-      },
-      "student",
+    expect(updateUserMock).toHaveBeenCalledWith(
+      refreshedUser,
+      1,
     );
   });
 

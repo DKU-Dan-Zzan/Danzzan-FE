@@ -64,6 +64,7 @@ export const createHttpClient = (options: {
   refreshKey?: string;
   sessionExpiredMessage?: string;
   forbiddenMessage?: string;
+  getSessionEpoch?: () => number;
 }) => {
   const {
     baseUrl,
@@ -73,6 +74,7 @@ export const createHttpClient = (options: {
     refreshKey,
     sessionExpiredMessage,
     forbiddenMessage,
+    getSessionEpoch,
   } = options;
 
   if (!baseUrl) {
@@ -136,6 +138,7 @@ export const createHttpClient = (options: {
         onSessionExpired: clearSession,
         sessionExpiredMessage,
         forbiddenMessage,
+        getSessionEpoch,
         readStatus: readAxiosStatus,
         execute: async (accessToken, context) => {
           const isRetry = context.isRetry;

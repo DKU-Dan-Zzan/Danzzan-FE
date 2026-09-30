@@ -6,7 +6,7 @@ import { JSON_CONTENT_TYPE } from "@/api/common/httpConstants";
 type ApiErrorBody = {
   status?: number;
   message?: string;
-  error?: string;
+  error?: string | { error?: string; message?: string };
   errors?: unknown;
 };
 
@@ -36,7 +36,7 @@ const createApiRequestError = (
   const body = (payload ?? {}) as ApiErrorBody;
   const message =
     body.message ??
-    body.error ??
+    (typeof body.error === "object" ? body.error?.message : body.error) ??
     `요청 실패 (${res.status})`;
 
   const error = new Error(message) as ApiRequestError;
@@ -78,6 +78,7 @@ type CreateFetchWithAuthOptions = {
   refreshKey?: string;
   clearSession?: () => void | Promise<void>;
   onForbidden?: () => void | Promise<void>;
+  getSessionEpoch?: () => number;
 };
 
 export const createFetchWithAuth = ({
@@ -89,7 +90,8 @@ export const createFetchWithAuth = ({
   credentials,
   refreshKey,
   clearSession,
-  onForbidden,
+    onForbidden,
+    getSessionEpoch,
 }: CreateFetchWithAuthOptions) => {
   return async <T>(input: string, init: RequestInit = {}): Promise<T> => {
     const base = getBaseUrl();
@@ -102,6 +104,7 @@ export const createFetchWithAuth = ({
       forbiddenMessage,
       onSessionExpired: clearSession,
       onForbidden,
+      getSessionEpoch,
       readStatus: getErrorStatus,
       execute: async (accessToken) => {
         const res = await fetch(`${base}${input}`, {

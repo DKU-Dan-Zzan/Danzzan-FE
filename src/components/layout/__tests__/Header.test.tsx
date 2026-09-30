@@ -69,10 +69,9 @@ describe("Header", () => {
     // 포스터가 거기서부터 시작하는 것처럼 잘려 보인다.
     authStore.setSession(
       {
-        tokens: { accessToken: "student-token", refreshToken: "", expiresIn: null },
+        tokens: { accessToken: `header.${btoa(JSON.stringify({ role: "ROLE_USER", exp: 9999999999 }))}.signature`, refreshToken: "", expiresIn: null },
         user: null,
       },
-      "student",
       { persist: false },
     );
 

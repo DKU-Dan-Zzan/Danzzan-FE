@@ -122,7 +122,7 @@ export const normalizeAppError = (error: unknown): AppError => {
     code = readCodeFromPayload(error.response?.data);
   } else {
     status = getErrorStatus(error);
-    code = readCodeFromPayload(error);
+    code = readCodeFromPayload(asRecord(error)?.payload) ?? readCodeFromPayload(error);
   }
 
   return {

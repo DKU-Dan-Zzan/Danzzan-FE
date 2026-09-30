@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import {
   buildFestivalDateRange,
   toForm,
-  toPayload,
+  toTicketingPayload,
   type FestivalSettingsForm,
 } from "@/routes/admin/festivalSettings"
 
@@ -30,13 +30,13 @@ describe("festivalSettings 변환", () => {
   })
 
   it("저장할 때 티켓팅 시각에 초를 붙인다", () => {
-    const payload = toPayload(form({ ticketingEnabled: true }))
+    const payload = toTicketingPayload(form({ ticketingEnabled: true }))
 
     expect(payload.ticketingRounds[0].ticketingAt).toBe("2027-05-01T18:00:00")
   })
 
   it("티켓팅이 꺼져 있으면 회차를 보내지 않는다", () => {
-    const payload = toPayload(form({ ticketingEnabled: false }))
+    const payload = toTicketingPayload(form({ ticketingEnabled: false }))
 
     expect(payload.ticketingRounds).toEqual([])
   })

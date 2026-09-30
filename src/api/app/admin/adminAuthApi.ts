@@ -2,7 +2,7 @@
 
 import { getApiBaseUrl } from "@/api/common/baseUrl";
 import { createHttpClient } from "@/api/common/httpClient";
-import { hasRequiredRole, resolveRoleFromAccessToken } from "@/api/common/authCore";
+import { canAccessAdminConsole, resolvePermissionsFromAccessToken, resolveRoleFromAccessToken } from "@/api/common/authCore";
 import { authStore } from "@/store/common/authStore";
 import type { AuthCredentials, AuthSession } from "@/types/common/auth.model";
 import { env } from "@/utils/common/env";
@@ -27,7 +27,7 @@ const decodeTokenPayload = (
     return {
       id: typeof decoded.sub === "string" ? decoded.sub : "",
       name: "",
-      role: "admin",
+      role: resolveRoleFromAccessToken(accessToken) ?? "unknown",
       department: "",
       studentId:
         typeof decoded.studentId === "string"
@@ -39,7 +39,7 @@ const decodeTokenPayload = (
     return {
       id: "",
       name: "",
-      role: "admin",
+      role: resolveRoleFromAccessToken(accessToken) ?? "unknown",
       department: "",
       studentId: fallbackStudentId,
       college: "",
@@ -52,7 +52,7 @@ export const adminAuthApi = {
     if (env.apiMode === "mock") {
       return Promise.resolve({
         tokens: {
-          accessToken: "mock-admin-token",
+          accessToken: `mock.${btoa(JSON.stringify({ sub: "admin", role: "ROLE_ADMIN", exp: Math.floor(Date.now() / 1000) + 3600 }))}.mock`,
           refreshToken: "",
           expiresIn: 3600,
         },
@@ -79,8 +79,8 @@ export const adminAuthApi = {
     const accessToken = dto?.accessToken ?? "";
     const refreshToken = dto?.refreshToken ?? "";
     const role = resolveRoleFromAccessToken(accessToken);
-    if (!hasRequiredRole("admin", role)) {
-      throw new Error("관리자 권한이 없는 계정입니다.");
+    if (!canAccessAdminConsole(role, resolvePermissionsFromAccessToken(accessToken))) {
+      throw new Error("사용 가능한 관리자 권한이 없는 계정입니다.");
     }
 
     return {
