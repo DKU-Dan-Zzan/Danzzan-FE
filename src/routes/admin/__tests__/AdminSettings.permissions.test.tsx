@@ -9,14 +9,14 @@ import AdminSettings from "@/routes/admin/AdminSettings"
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
 const state = vi.hoisted(() => ({ role: "manager", permissions: ["OPERATIONS"] as string[] }))
-const api = vi.hoisted(() => ({ get: vi.fn(), metadata: vi.fn(), ticketing: vi.fn() }))
+const api = vi.hoisted(() => ({ get: vi.fn(), metadata: vi.fn(), ticketing: vi.fn(), upload: vi.fn() }))
 const toast = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() }))
 
 vi.mock("@/store/common/authStore", () => ({
   authStore: { subscribe: () => () => {}, getSnapshot: () => state },
 }))
 vi.mock("@/api/app/festival/festivalSettingsApi", () => ({
-  uploadTicketingBackground: vi.fn(),
+  uploadTicketingBackground: api.upload,
   getFestivalSettings: api.get,
   updateFestivalMetadata: api.metadata,
   updateFestivalTicketingSettings: api.ticketing,
@@ -64,6 +64,11 @@ const setInputValue = async (input: HTMLInputElement, value: string) => {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  vi.stubGlobal("URL", class extends URL {
+    static createObjectURL = vi.fn(() => "blob:background-preview")
+    static revokeObjectURL = vi.fn()
+  })
+  api.upload.mockResolvedValue({url: "https://example.com/new-background.jpg", key: "background.jpg"})
   state.role = "manager"
   state.permissions = ["OPERATIONS"]
   api.get.mockResolvedValue(settings)
@@ -81,6 +86,7 @@ beforeEach(() => {
 afterEach(async () => {
   await act(async () => root.unmount())
   container.remove()
+  vi.unstubAllGlobals()
 })
 
 async function render() {
@@ -93,6 +99,28 @@ async function startEditing() {
 }
 
 describe("AdminSettings unified save", () => {
+  it("changes the default background directly, previews the notice, and saves the uploaded URL", async () => {
+    state.permissions = ["TICKETING"]
+    api.get.mockResolvedValue({ ...settings, ticketingEnabled: false })
+    await render()
+    expect(findButton("배경 사진 변경")?.disabled).toBe(false)
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]')!
+    expect(input.disabled).toBe(false)
+    const file = new File(["image"], "new-background.jpg", { type: "image/jpeg" })
+    await act(async () => {
+      Object.defineProperty(input, "files", {value: [file], configurable: true})
+      input.dispatchEvent(new Event("change", { bubbles: true }))
+    })
+    expect(container.querySelector('img[src="blob:background-preview"]')).not.toBeNull()
+    expect(container.querySelector('img[alt="LEGEND"]')).not.toBeNull()
+    expect(findButton("저장")).toBeDefined()
+    await clickButton("저장")
+    await settle()
+    expect(api.upload).toHaveBeenCalledWith(file)
+    expect(api.ticketing).toHaveBeenCalledWith(expect.objectContaining({ ticketingBackgroundImageUrl: "https://example.com/new-background.jpg" }))
+    expect(container.querySelector('img[src="https://example.com/new-background.jpg"]')).not.toBeNull()
+  })
+
   it("shows the OFF background editor only while ticketing is OFF", async () => {
     state.permissions = ["TICKETING"]
     await render()

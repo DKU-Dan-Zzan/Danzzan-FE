@@ -113,7 +113,7 @@ const ServiceClosedNotice = ({
     >
       {/* 포스터를 배경 질감으로 깐다. 그림이 아니라 공기처럼 읽혀야 하므로
           짙게 눌러 흐리고, 가장자리를 검정으로 녹인다. */}
-      <div
+      {!customImage && <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 select-none bg-cover bg-[position:50%_34%] opacity-[0.38] blur-[6px] saturate-[1.15]"
         style={{
@@ -123,7 +123,7 @@ const ServiceClosedNotice = ({
           WebkitMaskImage:
             "radial-gradient(100% 58% at 50% 27%, black 0%, rgba(0,0,0,0.5) 55%, transparent 84%)",
         }}
-      />
+      />}
 
       {customImage && <img src={customImage} alt="" onError={() => setFailedImage(customImage)} className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-50" />}
 

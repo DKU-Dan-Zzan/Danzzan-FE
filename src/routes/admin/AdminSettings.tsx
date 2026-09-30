@@ -62,7 +62,17 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
   const [draftRound, setDraftRound] = useState<TicketingRound | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
-  const [backgroundFile, setBackgroundFile] = useState<File | null>(null)
+  const [backgroundImage, setBackgroundImage] = useState<{ file: File; previewUrl: string } | null>(null)
+  const backgroundFile = backgroundImage?.file ?? null
+
+  useEffect(() => () => {
+    if (backgroundImage) URL.revokeObjectURL(backgroundImage.previewUrl)
+  }, [backgroundImage])
+
+  const handleBackgroundFile = (file: File) => {
+    setBackgroundImage({ file, previewUrl: URL.createObjectURL(file) })
+    setIsEditing(true)
+  }
   /**
    * 발급된 티켓까지 함께 취소하기로 확인한 회차. 저장할 때 서버에 같이 보낸다.
    * 확인하지 않은 회차를 지우려 하면 서버가 거절한다.
@@ -187,7 +197,7 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
           const uploaded = await uploadTicketingBackground(backgroundFile)
           ticketingPayload.ticketingBackgroundImageUrl = uploaded.url
           updateSettings({ ticketingBackgroundImageUrl: uploaded.url })
-          setBackgroundFile(null)
+          setBackgroundImage(null)
         }
         const saved = toForm(await updateFestivalTicketingSettings(ticketingPayload))
         const ticketing = { ticketingEnabled: saved.ticketingEnabled, ticketingRounds: saved.ticketingRounds, ticketingBackgroundImageUrl: saved.ticketingBackgroundImageUrl }
@@ -211,7 +221,7 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
   }
 
   const handleCancel = () => {
-    setBackgroundFile(null)
+    setBackgroundImage(null)
     // 편집을 버리고 서버에 저장된 값으로 되돌린다.
     setDraftRound(null)
     setConfirmedCancelIds([])
@@ -524,7 +534,7 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
             </div>
           )}
           {!settings.ticketingEnabled && <p className="mt-4 rounded-xl bg-[var(--surface-subtle)] p-3 text-sm text-[var(--text-muted)]">현재 예매는 중지되어 있습니다. 기존 회차와 발급된 티켓은 유지되며, 팔찌 배부 관리도 이용할 수 있습니다.</p>}
-          {!settings.ticketingEnabled && <TicketingBackgroundField url={settings.ticketingBackgroundImageUrl} file={backgroundFile} disabled={!isEditing || isSaving || isLoading} onFile={setBackgroundFile} onReset={() => { setBackgroundFile(null); updateSettings({ ticketingBackgroundImageUrl: null }) }} />}
+          {!settings.ticketingEnabled && <TicketingBackgroundField url={settings.ticketingBackgroundImageUrl} file={backgroundFile} previewUrl={backgroundImage?.previewUrl} disabled={isSaving || isLoading} onFile={handleBackgroundFile} onReset={() => { setIsEditing(true); setBackgroundImage(null); updateSettings({ ticketingBackgroundImageUrl: null }) }} />}
         </fieldset>}
 
       </AdminShell>
