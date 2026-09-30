@@ -524,7 +524,7 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
             </div>
           )}
           {!settings.ticketingEnabled && <p className="mt-4 rounded-xl bg-[var(--surface-subtle)] p-3 text-sm text-[var(--text-muted)]">현재 예매는 중지되어 있습니다. 기존 회차와 발급된 티켓은 유지되며, 팔찌 배부 관리도 이용할 수 있습니다.</p>}
-          <TicketingBackgroundField url={settings.ticketingBackgroundImageUrl} file={backgroundFile} disabled={!isEditing || isSaving || isLoading} onFile={setBackgroundFile} onReset={() => { setBackgroundFile(null); updateSettings({ ticketingBackgroundImageUrl: null }) }} />
+          {!settings.ticketingEnabled && <TicketingBackgroundField url={settings.ticketingBackgroundImageUrl} file={backgroundFile} disabled={!isEditing || isSaving || isLoading} onFile={setBackgroundFile} onReset={() => { setBackgroundFile(null); updateSettings({ ticketingBackgroundImageUrl: null }) }} />}
         </fieldset>}
 
       </AdminShell>

@@ -14,6 +14,8 @@ type ServiceClosedNoticeProps = {
   /** 기본 아이콘 대신 다른 그림을 쓰고 싶을 때만 넘긴다. */
   icon?: ReactNode
   backgroundImageUrl?: string | null
+  /** 관리자 미리보기에서는 화면 높이와 안전 영역 대신 고정 캔버스를 사용한다. */
+  preview?: boolean
 }
 
 /**
@@ -90,6 +92,7 @@ const ServiceClosedNotice = ({
   actionTo,
   icon,
   backgroundImageUrl,
+  preview = false,
 }: ServiceClosedNoticeProps) => {
   const t = useT()
   const [failedImage, setFailedImage] = useState<string | null>(null)
@@ -100,7 +103,12 @@ const ServiceClosedNotice = ({
   return (
     <section
       aria-labelledby="service-closed-title"
-      className="relative flex min-h-dvh flex-col justify-center overflow-hidden px-6 pb-[calc(var(--app-bottom-nav-runtime-offset)+2rem)] pt-[calc(env(safe-area-inset-top)+3rem)]"
+      className={cn(
+        "relative flex flex-col justify-center overflow-hidden px-6",
+        preview
+          ? "min-h-[720px] py-10"
+          : "min-h-dvh pb-[calc(var(--app-bottom-nav-runtime-offset)+2rem)] pt-[calc(env(safe-area-inset-top)+3rem)]",
+      )}
       style={{ backgroundColor: LEGEND_INK }}
     >
       {/* 포스터를 배경 질감으로 깐다. 그림이 아니라 공기처럼 읽혀야 하므로
@@ -201,6 +209,7 @@ const ServiceClosedNotice = ({
 
         <Link
           to={actionTo}
+          tabIndex={preview ? -1 : undefined}
           className="mt-9 inline-flex h-12 w-full max-w-[15rem] items-center justify-center rounded-full text-[0.92rem] font-semibold tracking-[0.01em] text-white transition-[transform,filter] duration-150 ease-out hover:brightness-[1.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:translate-y-px motion-reduce:transition-none [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_400ms_both]"
           style={{
             background: `linear-gradient(135deg, ${LEGEND_EMBER} 0%, ${LEGEND_EMBER_DEEP} 100%)`,

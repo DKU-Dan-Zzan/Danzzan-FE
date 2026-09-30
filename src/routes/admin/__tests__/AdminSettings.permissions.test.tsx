@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { act } from "react"
+import { MemoryRouter } from "react-router-dom"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -83,7 +84,7 @@ afterEach(async () => {
 })
 
 async function render() {
-  await act(async () => root.render(<AdminSettings />))
+  await act(async () => root.render(<MemoryRouter><AdminSettings /></MemoryRouter>))
   await settle()
 }
 
@@ -92,6 +93,31 @@ async function startEditing() {
 }
 
 describe("AdminSettings unified save", () => {
+  it("shows the OFF background editor only while ticketing is OFF", async () => {
+    state.permissions = ["TICKETING"]
+    await render()
+    expect(container.textContent).not.toContain("티켓팅 OFF 안내 배경")
+    await startEditing()
+    await clickButton("OFF")
+    expect(container.textContent).toContain("티켓팅 OFF 안내 배경")
+    expect(container.querySelector('img[alt="LEGEND"]')).not.toBeNull()
+    await clickButton("ON")
+    expect(container.textContent).not.toContain("티켓팅 OFF 안내 배경")
+  })
+
+  it("restores the original OFF notice and saves a cleared custom background", async () => {
+    state.permissions = ["TICKETING"]
+    api.get.mockResolvedValue({ ...settings, ticketingEnabled: false, ticketingBackgroundImageUrl: "https://example.com/custom.png" })
+    await render()
+    await startEditing()
+    await clickButton("기본 안내 화면 사용")
+    expect(container.querySelector('img[src="https://example.com/custom.png"]')).toBeNull()
+    expect(container.querySelector('img[alt="LEGEND"]')).not.toBeNull()
+    await clickButton("저장")
+    await settle()
+    expect(api.ticketing).toHaveBeenCalledWith(expect.objectContaining({ ticketingBackgroundImageUrl: null, ticketingEnabled: false }))
+  })
+
   it("edits a saved round in place and sends its original id", async () => {
     state.permissions = ["TICKETING"]
     await render()
