@@ -24,5 +24,6 @@ export interface WristbandSession {
   dayLabel: string;
   date: string;
   status: WristbandSessionStatus;
+  ticketingStartTime?: string;
   totalCapacity: number;
 }

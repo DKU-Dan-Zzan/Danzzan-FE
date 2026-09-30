@@ -15,12 +15,13 @@ vi.mock("@/store/common/authStore", () => ({
   authStore: { subscribe: () => () => {}, getSnapshot: () => state },
 }))
 vi.mock("@/api/app/festival/festivalSettingsApi", () => ({
+  uploadTicketingBackground: vi.fn(),
   getFestivalSettings: api.get,
   updateFestivalMetadata: api.metadata,
   updateFestivalTicketingSettings: api.ticketing,
   isRequestAborted: () => false,
 }))
-vi.mock("@/lib/app/festival/festivalCalendar", () => ({ setFestivalDates: vi.fn() }))
+vi.mock("@/lib/app/festival/festivalCalendar", () => ({ setFestivalDates: vi.fn(), setTicketingEnabled: vi.fn(), setTicketingBackgroundImageUrl: vi.fn() }))
 vi.mock("sonner", () => ({ Toaster: () => null, toast }))
 
 const settings = {
@@ -91,6 +92,21 @@ async function startEditing() {
 }
 
 describe("AdminSettings unified save", () => {
+  it("edits a saved round in place and sends its original id", async () => {
+    state.permissions = ["TICKETING"]
+    await render()
+    await startEditing()
+    const capacity = container.querySelector<HTMLInputElement>('input[aria-label="1회차 티켓 수량"]')
+    expect(capacity).not.toBeNull()
+    await setInputValue(capacity!, "25")
+    await clickButton("저장")
+    await settle()
+    expect(api.ticketing).toHaveBeenCalledWith(expect.objectContaining({
+      ticketingRounds: [expect.objectContaining({id: 1, capacity: 25, performanceDate: "2027-05-15"})],
+    }))
+    expect(api.metadata).not.toHaveBeenCalled()
+  })
+
   it("operations-only saves a changed festival name through only the metadata API", async () => {
     await render()
     expect([...container.querySelectorAll("h2")].map(heading => heading.textContent)).toEqual(["축제 기본 정보"])
@@ -130,6 +146,7 @@ describe("AdminSettings unified save", () => {
     await settle()
 
     expect(api.ticketing).toHaveBeenCalledWith({
+      ticketingBackgroundImageUrl: null,
       ticketingEnabled: false,
       ticketingRounds: [],
       confirmedTicketCancelRoundIds: [],
@@ -170,6 +187,7 @@ describe("AdminSettings unified save", () => {
 
     expect(api.metadata.mock.invocationCallOrder[0]).toBeLessThan(api.ticketing.mock.invocationCallOrder[0]!)
     expect(api.ticketing).toHaveBeenCalledWith({
+      ticketingBackgroundImageUrl: null,
       ticketingEnabled: false,
       ticketingRounds: [],
       confirmedTicketCancelRoundIds: [],

@@ -1,7 +1,7 @@
 // 역할: 관리자 콘솔 상단 고정 내비게이션. 왼쪽에 학교명, 오른쪽에 대메뉴와 hover 하위 메뉴를 그린다.
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import { LogOut } from "lucide-react"
+import { ArrowUpRight, LogOut } from "lucide-react"
 
 import { ADMIN_NAV_MENUS, findActiveAdminMenuKey, type AdminNavMenu } from "@/config/adminNav"
 import { ADMIN_FOCUS_VISIBLE_RING_CLASS } from "@/lib/common/adminFocusStyles"
@@ -166,7 +166,7 @@ function AdminNavMenuButton({
         aria-haspopup={hasItems || undefined}
         aria-expanded={hasItems ? showDropdown : undefined}
         aria-controls={hasItems ? `${menu.key}-submenu` : undefined}
-        onClick={() => onNavigate(menu.path, menu.external)}
+        onClick={() => menu.openOnClick ? onOpen() : onNavigate(menu.path, menu.external)}
         className={cn(
           "inline-flex h-9 items-center rounded-md px-3 text-sm font-semibold transition-colors",
           isActive
@@ -193,7 +193,7 @@ function AdminNavMenuButton({
                     ADMIN_FOCUS_VISIBLE_RING_CLASS,
                   )}
                 >
-                  <span className="block text-sm font-semibold text-[var(--text)]">{item.label}</span>
+                  <span className="flex items-center justify-between gap-3 text-sm font-semibold text-[var(--text)]">{item.label}{item.external && <ArrowUpRight aria-hidden="true" className="h-4 w-4" />}</span>
                   {item.description && (
                     <span className="mt-0.5 block text-xs text-[var(--text-muted)]">{item.description}</span>
                   )}

@@ -30,6 +30,7 @@ export const mapEventSummaryToSession = (
   dayLabel: dto.dayLabel,
   date: dto.eventDate,
   status: mapTicketingStatus(dto.ticketingStatus),
+  ticketingStartTime: dto.ticketingStartTime,
   totalCapacity: dto.totalCapacity,
 });
 

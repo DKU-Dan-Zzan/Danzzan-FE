@@ -5,7 +5,7 @@ import { StaticRouter } from "react-router-dom/server"
 import { Route, Routes } from "react-router-dom"
 
 import TicketingGate from "@/routes/common/TicketingGate"
-import { setTicketingEnabled } from "@/lib/app/festival/festivalCalendar"
+import { setTicketingBackgroundImageUrl, setTicketingEnabled } from "@/lib/app/festival/festivalCalendar"
 
 function renderGate() {
   return renderToStaticMarkup(
@@ -20,8 +20,14 @@ function renderGate() {
 }
 
 describe("TicketingGate", () => {
+  it("uses the saved OFF image", () => {
+    setTicketingEnabled(false)
+    setTicketingBackgroundImageUrl("https://example.com/custom.png")
+    expect(renderGate()).toContain('src="https://example.com/custom.png"')
+  })
   afterEach(() => {
     setTicketingEnabled(false)
+    setTicketingBackgroundImageUrl(null)
   })
 
   it("설정에서 티켓팅을 켜면 티켓팅 화면을 보여준다", () => {

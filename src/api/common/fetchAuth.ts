@@ -110,7 +110,11 @@ export const createFetchWithAuth = ({
         const res = await fetch(`${base}${input}`, {
           ...init,
           credentials: credentials ?? init.credentials,
-          headers: buildHeaders(init.headers, accessToken ?? undefined),
+          headers: (() => {
+            const headers = buildHeaders(init.headers, accessToken ?? undefined);
+            if (init.body instanceof FormData) headers.delete("Content-Type");
+            return headers;
+          })(),
         });
         return parseFetchResponse<T>(res);
       },

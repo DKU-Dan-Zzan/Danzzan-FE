@@ -50,7 +50,8 @@ const parseTimestamp = (value: string): number | null => {
   if (!value) {
     return null;
   }
-  const parsed = Date.parse(value);
+  const normalized = /(?:Z|[+-]\d{2}:\d{2})$/.test(value) ? value : `${value}+09:00`;
+  const parsed = Date.parse(normalized);
   if (Number.isNaN(parsed)) {
     return null;
   }
@@ -96,27 +97,10 @@ const resolveViewStatus = (
   return "upcoming";
 };
 
-const formatEventDateTime = (event: TicketingEvent, openAtMs: number | null): string => {
-  const eventDateTime = [event.eventDate, event.eventTime].filter(Boolean).join(" ").replace(/예매\s*오픈/g, "").trim();
-  if (eventDateTime) {
-    return normalizeKoreanMonthDay(eventDateTime);
-  }
+const formatTicketOpenTime = (openAtMs: number | null): string => openAtMs === null
+  ? "일정 미정"
+  : new Date(openAtMs).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
 
-  if (openAtMs === null) {
-    return "오픈 일정 추후 공지";
-  }
-
-  const date = new Date(openAtMs);
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const weekday = date.toLocaleDateString("ko-KR", { weekday: "short" });
-  const time = date.toLocaleTimeString("ko-KR", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-  return `${month}월 ${day}일 (${weekday}) ${time}`;
-};
 
 export function TicketingEventListPanel({
   events,
@@ -205,8 +189,10 @@ export function TicketingEventListPanel({
                   {normalizeKoreanMonthDay(event.title || "공연 티켓팅")}
                 </h3>
                 <p className={`mt-1 ${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--accent)]`}>
-                  {formatEventDateTime(event, openAtMs)}
+                  공연 날짜: {normalizeKoreanMonthDay(event.eventDate) || "미정"}
                 </p>
+                <p className="mt-1 text-xs text-[var(--text-muted)]">티켓팅 시작: {formatTicketOpenTime(openAtMs)} (한국 시간)</p>
+                <p className="mt-1 text-xs text-[var(--text-muted)]">티켓 수량: {event.totalCount?.toLocaleString() ?? "-"}장</p>
               </div>
               <Badge
                 variant="outline"

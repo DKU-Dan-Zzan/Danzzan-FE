@@ -226,6 +226,9 @@ function App() {
         <Route element={<ProtectedAdminRoute />}>
           {/* 설정: 관리자 콘솔의 기본 페이지 */}
           <Route index element={withRouteSuspense(<AdminSettings />)} />
+          <Route element={<ProtectedAdminPermissionRoute permission="TICKETING" />}>
+            <Route path="ticketing" element={withRouteSuspense(<AdminSettings key="ticketing" ticketingOnly />)} />
+          </Route>
           <Route element={<ProtectedAdminPermissionRoute permission="OPERATIONS" />}>
             <Route path="theme" element={withRouteSuspense(<AdminTheme />)} />
             <Route path="notices" element={withRouteSuspense(<Admin section="notice" />)} />

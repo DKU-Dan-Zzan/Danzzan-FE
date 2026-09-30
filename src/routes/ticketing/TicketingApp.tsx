@@ -189,9 +189,15 @@ export default function TicketingApp() {
             <Route element={<UserLayout />}>
               <Route element={<RequireStudentAuth />}>
                 <Route path="ticketing" element={<Ticketing />} />
-                <Route path="my-ticket" element={<MyTicket />} />
-                <Route path="myticket" element={<LegacyMyTicketRedirect />} />
+
               </Route>
+            </Route>
+          </Route>
+
+          <Route element={<UserLayout />}>
+            <Route element={<RequireStudentAuth />}>
+              <Route path="my-ticket" element={<MyTicket />} />
+              <Route path="myticket" element={<LegacyMyTicketRedirect />} />
             </Route>
           </Route>
 

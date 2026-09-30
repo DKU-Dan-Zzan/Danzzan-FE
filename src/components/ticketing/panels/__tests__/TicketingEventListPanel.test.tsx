@@ -27,6 +27,10 @@ describe("TicketingEventListPanel", () => {
       />,
     );
 
+    expect(markup).toContain("공연 날짜:");
+    expect(markup).toContain("티켓팅 시작:");
+    expect(markup).toContain("티켓 수량:");
+    expect(markup).toContain("500");
     const openBadgeMatch = markup.match(/<span[^>]*>실시간 예매 중<\/span>/);
     expect(openBadgeMatch).not.toBeNull();
     const openBadgeMarkup = openBadgeMatch?.[0] ?? "";

@@ -15,6 +15,7 @@ export type AdminNavMenu = {
   /** 대메뉴를 눌렀을 때 이동할 대표 경로. */
   path: string
   external?: boolean
+  openOnClick?: boolean
   items: AdminNavItem[]
 }
 
@@ -59,11 +60,12 @@ export const ADMIN_NAV_MENUS: AdminNavMenu[] = [
   },
   {
     key: "ticketing",
+    openOnClick: true,
     label: "티켓팅",
-    path: "/ticket/admin",
-    external: true,
+    path: "/admin/ticketing",
     items: [
-      { label: "티켓팅 관리", path: "/ticket/admin", description: "티켓팅 관리자 페이지", external: true },
+      { label: "티켓 설정", path: "/admin/ticketing", description: "예매 일정·수량·안내 이미지" },
+      { label: "팔찌 배부", path: "/ticket/admin", description: "팔찌 배부 관리 화면으로 이동", external: true },
     ],
   },
   {

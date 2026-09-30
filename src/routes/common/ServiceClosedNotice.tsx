@@ -1,6 +1,6 @@
 // 역할: 가을 축제에 제공하지 않는 서비스의 안내 화면을 공통으로 렌더링한다.
 
-import type { ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 import { Link } from "react-router-dom"
 import { cn } from "@/components/common/ui/utils"
 import { useT, type TranslationKey } from "@/i18n"
@@ -13,6 +13,7 @@ type ServiceClosedNoticeProps = {
   actionTo: string
   /** 기본 아이콘 대신 다른 그림을 쓰고 싶을 때만 넘긴다. */
   icon?: ReactNode
+  backgroundImageUrl?: string | null
 }
 
 /**
@@ -88,8 +89,11 @@ const ServiceClosedNotice = ({
   actionKey,
   actionTo,
   icon,
+  backgroundImageUrl,
 }: ServiceClosedNoticeProps) => {
   const t = useT()
+  const [failedImage, setFailedImage] = useState<string | null>(null)
+  const customImage = backgroundImageUrl && failedImage !== backgroundImageUrl ? backgroundImageUrl : null
   const noticeIcon = icon ?? ICON_BY_TITLE[titleKey]
   const noteKey = NOTE_BY_TITLE[titleKey]
 
@@ -112,6 +116,8 @@ const ServiceClosedNotice = ({
             "radial-gradient(100% 58% at 50% 27%, black 0%, rgba(0,0,0,0.5) 55%, transparent 84%)",
         }}
       />
+
+      {customImage && <img src={customImage} alt="" onError={() => setFailedImage(customImage)} className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-50" />}
 
       {/* 불씨 잔광 — 로고 뒤에서 번지게 해서 워드마크가 떠 보이도록 한다. */}
       <div

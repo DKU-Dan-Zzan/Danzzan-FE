@@ -82,7 +82,9 @@ export function WristbandDashboard({
                     <h3 className="text-2xl font-bold text-foreground">
                       {session.title || `${formatDate(displayDate)} 공연 팔찌 배부`}
                     </h3>
-                    <p className="text-base text-muted-foreground">운영 일자: {displayDate}</p>
+                    <p className="text-base text-muted-foreground">공연 날짜: {displayDate}</p>
+                    <p className="text-sm text-muted-foreground">티켓팅 시작: {session.ticketingStartTime?.replace("T", " ").slice(0, 16) ?? "미설정"} (한국 시간)</p>
+                    <p className="text-sm text-muted-foreground">티켓 수량: {session.totalCapacity.toLocaleString()}장</p>
                   </div>
                   <Button className="h-12 w-full text-base" onClick={() => onSelectSession(session)}>
                     관리하기
