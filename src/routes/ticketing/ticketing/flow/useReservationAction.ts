@@ -70,6 +70,23 @@ export const useReservationAction = ({
         setActiveEventId(null);
         setReservationError(null);
         break;
+      case "RESERVE_ADMISSION_EXPIRED":
+        setActiveEventId(null);
+        setAgreementChecked(false);
+        setThirdPartyPrivacyConsentChecked(false);
+        setReservationError(null);
+        setReserveErrorMessage(null);
+        setListNotice("예매 가능 시간이 만료되었습니다. 원하는 공연을 선택해 대기열에 다시 참여해 주세요.");
+        applyQueueEventToUrl(null);
+        await moveToList({ preserveNotice: true });
+        return;
+      case "RESERVE_PROCESSING_PENDING":
+        setActiveEventId(null);
+        setReservationError(null);
+        setListNotice("발급 결과를 확인 중입니다. 잠시 후 내 티켓을 확인하거나 같은 공연을 선택해 결과를 다시 확인해 주세요.");
+        applyQueueEventToUrl(null);
+        await moveToList({ preserveNotice: true });
+        return;
       case "RESERVE_NOT_OPEN":
         setStep("in-progress");
         setReserveProcessing(false);
@@ -97,7 +114,7 @@ export const useReservationAction = ({
       void ticketApi.getMyTickets().catch(() => null);
     }
 
-    if (reserveCode !== "RESERVE_NOT_OPEN" && reserveCode !== "TEMPORARY_ERROR") {
+    if (reserveCode === "RESERVE_ALREADY_RESERVED" || reserveCode === "RESERVE_SOLD_OUT" || reserveCode === "EVENT_NOT_FOUND") {
       applyQueueEventToUrl(null);
     } else {
       applyQueueEventToUrl(eventId);
@@ -107,6 +124,8 @@ export const useReservationAction = ({
     handleUnauthorized,
     moveToList,
     setActiveEventId,
+    setAgreementChecked,
+    setThirdPartyPrivacyConsentChecked,
     setListNotice,
     setReservationError,
     setReserveErrorMessage,

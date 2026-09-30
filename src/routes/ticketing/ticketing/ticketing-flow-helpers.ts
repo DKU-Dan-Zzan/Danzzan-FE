@@ -1,5 +1,5 @@
 // 역할: 티켓팅 플로우 훅에서 재사용하는 파생 상태/오류 처리 헬퍼를 제공합니다.
-import { HttpError } from "@/api/ticketing/httpClient";
+import { normalizeAppError } from "@/lib/error/appError";
 import type { ReserveErrorCode } from "@/types/ticketing/model/ticket.model";
 
 export type ParsedApiError = {
@@ -18,44 +18,16 @@ const RESERVE_ERROR_CODE_SET = new Set<ReserveErrorCode>([
   "RESERVE_ALREADY_RESERVED",
   "RESERVE_SOLD_OUT",
   "RESERVE_NOT_OPEN",
+  "RESERVE_ADMISSION_EXPIRED",
+  "RESERVE_PROCESSING_PENDING",
   "EVENT_NOT_FOUND",
   "UNAUTHORIZED",
   "TEMPORARY_ERROR",
 ]);
 
-const toRecord = (value: unknown): Record<string, unknown> | null => {
-  if (!value || typeof value !== "object") {
-    return null;
-  }
-  return value as Record<string, unknown>;
-};
-
 export const parseApiError = (error: unknown): ParsedApiError => {
-  if (!(error instanceof HttpError)) {
-    return {
-      status: null,
-      code: null,
-    };
-  }
-
-  const payloadRecord = toRecord(error.payload);
-  const payloadError = toRecord(payloadRecord?.error);
-  const payloadData = toRecord(payloadRecord?.data);
-  const rawCode =
-    payloadRecord?.errorCode ??
-    payloadRecord?.code ??
-    payloadError?.errorCode ??
-    payloadError?.code ??
-    payloadError?.error ??
-    payloadData?.errorCode ??
-    payloadData?.code ??
-    null;
-  const parsedCode = typeof rawCode === "string" && rawCode.trim() ? rawCode.trim() : null;
-
-  return {
-    status: typeof error.status === "number" ? error.status : null,
-    code: parsedCode,
-  };
+  const { status, code } = normalizeAppError(error);
+  return { status, code };
 };
 
 export const asReserveErrorCode = (value: string | null): ReserveErrorCode | null => {

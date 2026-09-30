@@ -37,6 +37,7 @@ export interface TicketEventListResponseDto {
 
 export interface TicketQueueEnterResponseDto {
   status?: string;
+  requestId?: string;
   remaining?: string | number | null;
   queuePosition?: number | null;
   mySequence?: string | number | null;
@@ -48,6 +49,7 @@ export interface TicketQueueEnterResponseDto {
 
 export interface TicketQueueStatusResponseDto {
   status?: string;
+  requestId?: string;
   queuePosition?: number | null;
   mySequence?: string | number | null;
   aheadCount?: string | number | null;
