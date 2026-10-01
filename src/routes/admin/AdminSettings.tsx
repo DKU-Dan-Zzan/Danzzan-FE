@@ -557,7 +557,7 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
               )}
             </div>
           )}
-          {!settings.ticketingEnabled && <p className="mt-4 rounded-xl bg-[var(--surface-subtle)] p-3 text-sm text-[var(--text-muted)]">티켓팅을 OFF로 저장하면 신규 예매가 중지됩니다. 기존 회차와 발급된 티켓은 유지되며, 팔찌 배부 관리도 이용할 수 있습니다.</p>}
+          {!settings.ticketingEnabled && <p className="mt-4 rounded-xl bg-[var(--surface-subtle)] p-3 text-sm text-[var(--text-muted)]">티켓팅을 OFF로 저장하면 예매와 내 티켓 화면이 입장 안내로 바뀝니다. 로그인·회원가입·내정보와 팔찌 배부 관리는 이용할 수 있습니다. 기존 회차와 발급 티켓은 보관되며, 다시 ON으로 저장하면 조회할 수 있습니다.</p>}
           {settings.ticketingEnabled && <TicketingBackgroundField mode="ticket" festivalName={settings.festivalName} url={settings.ticketCardBackgroundImageUrl} file={ticketCardBackgroundFile} previewUrl={ticketCardBackgroundImage?.previewUrl} disabled={isSaving || isLoading} onFile={(file) => { setTicketCardBackgroundImage({ file, previewUrl: URL.createObjectURL(file) }); setIsEditing(true) }} onReset={() => { setIsEditing(true); setTicketCardBackgroundImage(null); updateSettings({ ticketCardBackgroundImageUrl: null }) }} />}
           {!settings.ticketingEnabled && <TicketingBackgroundField url={settings.ticketingBackgroundImageUrl} file={backgroundFile} previewUrl={backgroundImage?.previewUrl} disabled={isSaving || isLoading} onFile={handleBackgroundFile} onReset={() => { setIsEditing(true); setBackgroundImage(null); updateSettings({ ticketingBackgroundImageUrl: null }) }} />}
         </fieldset>}
