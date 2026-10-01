@@ -116,7 +116,7 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
       <div className="absolute inset-0 flex items-stretch">
         {/* 왼쪽 70% */}
         <div className="flex w-[70%] flex-col justify-center px-6 py-5">
-          <p className="text-[0.58rem] font-bold tracking-[0.22em]" style={{ color: "rgba(70,44,39,0.9)" }}>
+          <p className="text-[0.58rem] font-bold tracking-[0.22em]" style={{ color: "var(--accent)" }}>
             DANKOOK ZONE TICKET
           </p>
           <p className="mt-1.5 text-[2.1rem] font-bold leading-none tracking-[-0.02em]" style={{ color: "var(--accent)" }}>
@@ -138,11 +138,11 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
             { key: "예매 순번", val: `NO.${queueLabel}` },
           ].map(({ key, val }) => (
             <div key={key}>
-              <p className="text-[0.5rem] font-semibold tracking-[0.08em]" style={{ color: "rgba(70,44,39,0.9)" }}>{key}</p>
+              <p className="text-[0.5rem] font-semibold tracking-[0.08em]" style={{ color: "var(--accent)" }}>{key}</p>
               <p className={cn(
                 "mt-0.5 text-[1.05rem] font-extrabold leading-tight [font-variant-numeric:tabular-nums]",
                 key === "예매 순번" ? "font-mono" : ""
-              )} style={{ color: "var(--legend-ink)" }}>
+              )} style={{ color: "var(--accent)" }}>
                 {val}
               </p>
             </div>
