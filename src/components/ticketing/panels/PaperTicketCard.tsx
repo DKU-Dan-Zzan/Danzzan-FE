@@ -63,7 +63,7 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
   return (
     <div
       className="relative w-full"
-      style={{ filter: "drop-shadow(0 8px 28px rgba(28,43,106,0.32))" }}
+      style={{ filter: "drop-shadow(0 6px 18px rgba(70,44,39,0.14))" }}
     >
       {/* SVG 티켓 외형 */}
       <svg
@@ -74,10 +74,10 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
         aria-hidden="true"
       >
         <defs>
-          {/* 업로드 이미지의 밝기와 무관하게 티켓 정보의 대비를 유지한다. */}
+          {/* 밝은 종이 톤 위로 포스터 색감이 은은하게 비치도록 한다. */}
           <linearGradient id={overlayId} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%"   stopColor="rgba(0,0,0,0.60)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.72)" />
+            <stop offset="0%"   stopColor="rgba(255,250,246,0.90)" />
+            <stop offset="100%" stopColor="rgba(255,241,231,0.80)" />
           </linearGradient>
           <clipPath id={clipId}>
             <path d={ticketPath} />
@@ -94,29 +94,29 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
           clipPath={`url(#${clipId})`}
         />
 
-        {/* 글자 가독성을 위한 어두운 오버레이 */}
+        {/* 짙은 글자와 대비되는 밝은 오버레이 */}
         <path d={ticketPath} fill={`url(#${overlayId})`} />
 
         {/* 퍼포레이션 점선 */}
         <line
           x1="280" y1="18" x2="280" y2="162"
-          stroke="rgba(255,255,255,0.35)"
+          stroke="rgba(70,44,39,0.22)"
           strokeWidth="1.5"
           strokeDasharray="5,5"
         />
 
         {/* 테두리 */}
-        <path d={ticketPath} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
+        <path d={ticketPath} fill="none" stroke="rgba(70,44,39,0.12)" strokeWidth="1" />
       </svg>
 
       {/* 콘텐츠 오버레이 */}
       <div className="absolute inset-0 flex items-stretch">
         {/* 왼쪽 70% */}
         <div className="flex w-[70%] flex-col justify-center px-6 py-5">
-          <p className="text-[0.58rem] font-bold tracking-[0.22em]" style={{ color: "rgba(255,255,255,0.8)" }}>
+          <p className="text-[0.58rem] font-bold tracking-[0.22em]" style={{ color: "rgba(70,44,39,0.75)" }}>
             DANKOOK ZONE TICKET
           </p>
-          <p className="mt-1.5 text-[2.1rem] font-bold leading-none tracking-[-0.02em]" style={{ color: "white" }}>
+          <p className="mt-1.5 text-[2.1rem] font-bold leading-none tracking-[-0.02em]" style={{ color: "var(--poster-navy)" }}>
             {dayLabel}
           </p>
           <span
@@ -135,11 +135,11 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
             { key: "예매 순번", val: `NO.${queueLabel}` },
           ].map(({ key, val }) => (
             <div key={key}>
-              <p className="text-[0.5rem] font-semibold tracking-[0.08em]" style={{ color: "rgba(255,255,255,0.8)" }}>{key}</p>
+              <p className="text-[0.5rem] font-semibold tracking-[0.08em]" style={{ color: "rgba(70,44,39,0.75)" }}>{key}</p>
               <p className={cn(
                 "mt-0.5 text-[1.05rem] font-extrabold leading-tight [font-variant-numeric:tabular-nums]",
                 key === "예매 순번" ? "font-mono" : ""
-              )} style={{ color: "white" }}>
+              )} style={{ color: "var(--poster-navy)" }}>
                 {val}
               </p>
             </div>
