@@ -30,7 +30,7 @@ import {
   uploadTicketingBackground,
 } from "@/api/app/festival/festivalSettingsApi"
 import TicketingBackgroundField from "@/routes/admin/TicketingBackgroundField"
-import { setTicketingEnabled, setTicketingBackgroundImageUrl, setTicketingOpenBackgroundImageUrl, setFestivalDates } from "@/lib/app/festival/festivalCalendar"
+import { setTicketingEnabled, setTicketingBackgroundImageUrl, setTicketCardBackgroundImageUrl, setFestivalDates } from "@/lib/app/festival/festivalCalendar"
 import {
   buildFestivalDateRange,
   createEmptyTicketingRound,
@@ -64,11 +64,11 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
   const [isSaving, setIsSaving] = useState(false)
   const [backgroundImage, setBackgroundImage] = useState<{ file: File; previewUrl: string } | null>(null)
   const backgroundFile = backgroundImage?.file ?? null
-  const [openBackgroundImage, setOpenBackgroundImage] = useState<{ file: File; previewUrl: string } | null>(null)
-  const openBackgroundFile = openBackgroundImage?.file ?? null
+  const [ticketCardBackgroundImage, setTicketCardBackgroundImage] = useState<{ file: File; previewUrl: string } | null>(null)
+  const ticketCardBackgroundFile = ticketCardBackgroundImage?.file ?? null
   useEffect(() => () => {
-    if (openBackgroundImage) URL.revokeObjectURL(openBackgroundImage.previewUrl)
-  }, [openBackgroundImage])
+    if (ticketCardBackgroundImage) URL.revokeObjectURL(ticketCardBackgroundImage.previewUrl)
+  }, [ticketCardBackgroundImage])
 
   useEffect(() => () => {
     if (backgroundImage) URL.revokeObjectURL(backgroundImage.previewUrl)
@@ -161,7 +161,7 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
     const metadataPayload = toMetadataPayload(settings)
     const ticketingPayload = toTicketingPayload(settings, confirmedCancelIds)
     const saveMetadata = canOperate && (!savedSettings || JSON.stringify(metadataPayload) !== JSON.stringify(toMetadataPayload(savedSettings)))
-    const saveTicketing = canTicket && (backgroundFile !== null || openBackgroundFile !== null || !savedSettings || JSON.stringify(ticketingPayload) !== JSON.stringify(toTicketingPayload(savedSettings)))
+    const saveTicketing = canTicket && (backgroundFile !== null || ticketCardBackgroundFile !== null || !savedSettings || JSON.stringify(ticketingPayload) !== JSON.stringify(toTicketingPayload(savedSettings)))
     if (!saveMetadata && !saveTicketing) {
       toast.info("변경된 내용이 없습니다.")
       return
@@ -204,17 +204,17 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
           updateSettings({ ticketingBackgroundImageUrl: uploaded.url })
           setBackgroundImage(null)
         }
-        if (openBackgroundFile) {
-          const uploaded = await uploadTicketingBackground(openBackgroundFile)
-          ticketingPayload.ticketingOpenBackgroundImageUrl = uploaded.url
-          updateSettings({ ticketingOpenBackgroundImageUrl: uploaded.url })
-          setOpenBackgroundImage(null)
+        if (ticketCardBackgroundFile) {
+          const uploaded = await uploadTicketingBackground(ticketCardBackgroundFile)
+          ticketingPayload.ticketCardBackgroundImageUrl = uploaded.url
+          updateSettings({ ticketCardBackgroundImageUrl: uploaded.url })
+          setTicketCardBackgroundImage(null)
         }
         const saved = toForm(await updateFestivalTicketingSettings(ticketingPayload))
-        const ticketing = { ticketingEnabled: saved.ticketingEnabled, ticketingRounds: saved.ticketingRounds, ticketingBackgroundImageUrl: saved.ticketingBackgroundImageUrl, ticketingOpenBackgroundImageUrl: saved.ticketingOpenBackgroundImageUrl }
+        const ticketing = { ticketingEnabled: saved.ticketingEnabled, ticketingRounds: saved.ticketingRounds, ticketingBackgroundImageUrl: saved.ticketingBackgroundImageUrl, ticketCardBackgroundImageUrl: saved.ticketCardBackgroundImageUrl }
         setTicketingEnabled(saved.ticketingEnabled)
         setTicketingBackgroundImageUrl(saved.ticketingBackgroundImageUrl ?? null)
-        setTicketingOpenBackgroundImageUrl(saved.ticketingOpenBackgroundImageUrl ?? null)
+        setTicketCardBackgroundImageUrl(saved.ticketCardBackgroundImageUrl ?? null)
         setSettings((previous) => ({ ...previous, ...ticketing }))
         setSavedSettings((previous) => ({ ...(previous ?? EMPTY_FESTIVAL_SETTINGS_FORM), ...ticketing }))
         setConfirmedCancelIds([])
@@ -234,7 +234,7 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
 
   const handleCancel = () => {
     setBackgroundImage(null)
-    setOpenBackgroundImage(null)
+    setTicketCardBackgroundImage(null)
     // 편집을 버리고 서버에 저장된 값으로 되돌린다.
     setDraftRound(null)
     setConfirmedCancelIds([])
@@ -547,7 +547,7 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
             </div>
           )}
           {!settings.ticketingEnabled && <p className="mt-4 rounded-xl bg-[var(--surface-subtle)] p-3 text-sm text-[var(--text-muted)]">현재 예매는 중지되어 있습니다. 기존 회차와 발급된 티켓은 유지되며, 팔찌 배부 관리도 이용할 수 있습니다.</p>}
-          {settings.ticketingEnabled && <TicketingBackgroundField mode="open" festivalName={settings.festivalName} url={settings.ticketingOpenBackgroundImageUrl} file={openBackgroundFile} previewUrl={openBackgroundImage?.previewUrl} disabled={isSaving || isLoading} onFile={(file) => { setOpenBackgroundImage({ file, previewUrl: URL.createObjectURL(file) }); setIsEditing(true) }} onReset={() => { setIsEditing(true); setOpenBackgroundImage(null); updateSettings({ ticketingOpenBackgroundImageUrl: null }) }} />}
+          {settings.ticketingEnabled && <TicketingBackgroundField mode="ticket" festivalName={settings.festivalName} url={settings.ticketCardBackgroundImageUrl} file={ticketCardBackgroundFile} previewUrl={ticketCardBackgroundImage?.previewUrl} disabled={isSaving || isLoading} onFile={(file) => { setTicketCardBackgroundImage({ file, previewUrl: URL.createObjectURL(file) }); setIsEditing(true) }} onReset={() => { setIsEditing(true); setTicketCardBackgroundImage(null); updateSettings({ ticketCardBackgroundImageUrl: null }) }} />}
           {!settings.ticketingEnabled && <TicketingBackgroundField url={settings.ticketingBackgroundImageUrl} file={backgroundFile} previewUrl={backgroundImage?.previewUrl} disabled={isSaving || isLoading} onFile={handleBackgroundFile} onReset={() => { setIsEditing(true); setBackgroundImage(null); updateSettings({ ticketingBackgroundImageUrl: null }) }} />}
         </fieldset>}
 

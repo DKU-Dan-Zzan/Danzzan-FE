@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { Route, Routes } from "react-router-dom";
 import { StaticRouter } from "react-router-dom/server";
 import { UserLayout } from "@/components/ticketing/layout/UserLayout";
-import { setTicketingOpenBackgroundImageUrl, setTicketingBackgroundImageUrl } from "@/lib/app/festival/festivalCalendar";
+import { setTicketCardBackgroundImageUrl, setTicketingBackgroundImageUrl } from "@/lib/app/festival/festivalCalendar";
 import { authStore } from "@/store/common/authStore";
 
 const createJwtLikeToken = (payload: Record<string, unknown>): string => {
@@ -31,19 +31,19 @@ function renderUserLayout(pathname: string) {
 describe("UserLayout", () => {
   afterEach(() => {
     authStore.clear();
-    setTicketingOpenBackgroundImageUrl(null);
+    setTicketCardBackgroundImageUrl(null);
     setTicketingBackgroundImageUrl(null);
   });
 
-  it("uses the ON image on booking pages without changing login or my-ticket", () => {
-    setTicketingOpenBackgroundImageUrl("https://example.com/on.jpg");
+  it("never uses the ticket card image as a full-page background", () => {
+    setTicketCardBackgroundImageUrl("https://example.com/on.jpg");
     setTicketingBackgroundImageUrl("https://example.com/off.jpg");
-    expect(renderUserLayout("/ticket/ticketing")).toContain('src="https://example.com/on.jpg"');
+    expect(renderUserLayout("/ticket/ticketing")).not.toContain('src="https://example.com/on.jpg"');
     expect(renderUserLayout("/ticket/ticketing")).not.toContain('src="https://example.com/off.jpg"');
     expect(renderUserLayout("/ticket/login")).not.toContain('src="https://example.com/on.jpg"');
     expect(renderUserLayout("/ticket/my-ticket")).not.toContain('src="https://example.com/on.jpg"');
-    setTicketingOpenBackgroundImageUrl(null);
-    expect(renderUserLayout("/ticket/ticketing")).toContain("ticketing-legend-background.jpg");
+    setTicketCardBackgroundImageUrl(null);
+    expect(renderUserLayout("/ticket/ticketing")).not.toContain("ticketing-legend-background.jpg");
   });
 
   it("학생 인증 상태 티켓팅 페이지에서는 헤더를 전역 스타일(top fixed, z-50)로 고정한다", () => {

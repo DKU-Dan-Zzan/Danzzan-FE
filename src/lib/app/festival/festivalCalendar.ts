@@ -97,10 +97,10 @@ export function setTicketingBackgroundImageUrl(url: string | null): void {
   emit()
 }
 
-let ticketingOpenBackgroundImageUrl: string | null = null
-export function getTicketingOpenBackgroundImageUrl(): string | null { return ticketingOpenBackgroundImageUrl }
-export function setTicketingOpenBackgroundImageUrl(url: string | null): void {
-  if (ticketingOpenBackgroundImageUrl === url) return
-  ticketingOpenBackgroundImageUrl = url
+let ticketCardBackgroundImageUrl: string | null = null
+export function getTicketCardBackgroundImageUrl(): string | null { return ticketCardBackgroundImageUrl }
+export function setTicketCardBackgroundImageUrl(url: string | null): void {
+  if (ticketCardBackgroundImageUrl === url) return
+  ticketCardBackgroundImageUrl = url
   emit()
 }

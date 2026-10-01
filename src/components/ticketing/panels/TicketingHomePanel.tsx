@@ -4,6 +4,7 @@ import { ArrowRight, Check, ClipboardList, Ticket } from "lucide-react";
 import { Card } from "@/components/common/ui/card";
 import { TICKETING_CLASSES, TICKETING_MIDDLE_PANEL_CLASS } from "@/components/ticketing/panels/TicketingShared";
 import { APP_CARD_VARIANTS } from "@/components/common/ui/appCardVariants";
+import { cn } from "@/components/common/ui/utils";
 
 interface TicketingHomePanelProps {
   onOpenTicketingList: () => void;
@@ -104,7 +105,7 @@ export function TicketingHomePanel({
   ];
 
   return (
-    <div className={TICKETING_MIDDLE_PANEL_CLASS}>
+    <div className={cn(TICKETING_MIDDLE_PANEL_CLASS, "bg-[var(--bg-base)]")}>
       {quickActions.map((action) => {
         const ActionIcon = action.icon;
         return (
