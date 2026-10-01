@@ -76,8 +76,8 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
         <defs>
           {/* 밝은 종이 톤 위로 포스터 색감이 은은하게 비치도록 한다. */}
           <linearGradient id={overlayId} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%"   stopColor="rgba(255,250,246,0.90)" />
-            <stop offset="100%" stopColor="rgba(255,241,231,0.80)" />
+            <stop offset="0%"   stopColor="rgba(255,250,246,0.80)" />
+            <stop offset="100%" stopColor="rgba(255,241,231,0.68)" />
           </linearGradient>
           <clipPath id={clipId}>
             <path d={ticketPath} />
@@ -113,10 +113,10 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
       <div className="absolute inset-0 flex items-stretch">
         {/* 왼쪽 70% */}
         <div className="flex w-[70%] flex-col justify-center px-6 py-5">
-          <p className="text-[0.58rem] font-bold tracking-[0.22em]" style={{ color: "rgba(70,44,39,0.75)" }}>
+          <p className="text-[0.58rem] font-bold tracking-[0.22em]" style={{ color: "rgba(70,44,39,0.9)" }}>
             DANKOOK ZONE TICKET
           </p>
-          <p className="mt-1.5 text-[2.1rem] font-bold leading-none tracking-[-0.02em]" style={{ color: "var(--poster-navy)" }}>
+          <p className="mt-1.5 text-[2.1rem] font-bold leading-none tracking-[-0.02em]" style={{ color: "var(--legend-ink)" }}>
             {dayLabel}
           </p>
           <span
@@ -135,11 +135,11 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
             { key: "예매 순번", val: `NO.${queueLabel}` },
           ].map(({ key, val }) => (
             <div key={key}>
-              <p className="text-[0.5rem] font-semibold tracking-[0.08em]" style={{ color: "rgba(70,44,39,0.75)" }}>{key}</p>
+              <p className="text-[0.5rem] font-semibold tracking-[0.08em]" style={{ color: "rgba(70,44,39,0.9)" }}>{key}</p>
               <p className={cn(
                 "mt-0.5 text-[1.05rem] font-extrabold leading-tight [font-variant-numeric:tabular-nums]",
                 key === "예매 순번" ? "font-mono" : ""
-              )} style={{ color: "var(--poster-navy)" }}>
+              )} style={{ color: "var(--legend-ink)" }}>
                 {val}
               </p>
             </div>
