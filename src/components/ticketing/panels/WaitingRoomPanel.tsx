@@ -1,4 +1,5 @@
 // 역할: 대기열 순번, 남은 시간, 진행 상태를 실시간으로 표시하는 대기실 패널입니다.
+import { clsx } from "clsx"
 import { Ticket } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/common/ui/card";
@@ -44,7 +45,7 @@ export function WaitingRoomPanel({
 
   const hasFreshPosition = isRemainingFresh(queuePositionUpdatedAt, now);
   return (
-    <div className={`${TICKETING_NARROW_PANEL_CLASS} space-y-4`}>
+    <div className={clsx(TICKETING_NARROW_PANEL_CLASS, "space-y-4")}>
       <section className="px-1">
         <h2 className="text-[1.72rem] leading-[1.2] font-black tracking-[-0.02em] text-[var(--text)]">
           접속 인원이 많아
@@ -73,7 +74,7 @@ export function WaitingRoomPanel({
           <div className="relative">
             <div className="relative h-5 overflow-hidden rounded-full bg-[var(--surface-tint-subtle)]">
               <div
-                className={`h-full w-[38%] rounded-full bg-[var(--accent)] ${offline || !polling || !hasFreshPosition ? "opacity-40" : "animate-pulse opacity-70"}`}
+                className={clsx("h-full w-[38%] rounded-full bg-[var(--accent)]", offline || !polling || !hasFreshPosition ? "opacity-40" : "animate-pulse opacity-70")}
               />
             </div>
             <Ticket
@@ -92,7 +93,7 @@ export function WaitingRoomPanel({
 
       {errorMessage && (
         <Card className="gap-2 border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-4 py-3">
-          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--status-danger-text)]`}>
+          <p className={clsx(TICKETING_CLASSES.typography.sectionBodySm, "text-[var(--status-danger-text)]")}>
             {errorMessage}
           </p>
         </Card>

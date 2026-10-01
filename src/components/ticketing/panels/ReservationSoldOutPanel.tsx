@@ -1,4 +1,5 @@
 // 역할: 매진 상태 안내와 대체 행동을 제공하는 예매 종료 패널을 렌더링합니다.
+import { clsx } from "clsx"
 import { RotateCcw, TicketX } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
@@ -16,8 +17,8 @@ export function ReservationSoldOutPanel({
   onBackToList,
 }: ReservationSoldOutPanelProps) {
   return (
-    <div className={`${TICKETING_NARROW_PANEL_CLASS} flex min-h-[calc(100dvh-10rem)] items-center`}>
-      <Card className={`${TICKETING_CLASSES.card.success} border-[var(--status-pending-border)] px-5 py-6`}>
+    <div className={clsx(TICKETING_NARROW_PANEL_CLASS, "flex min-h-[calc(100dvh-10rem)] items-center")}>
+      <Card className={clsx(TICKETING_CLASSES.card.success, "border-[var(--status-pending-border)] px-5 py-6")}>
         <div className="relative">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--status-pending-border)] bg-[linear-gradient(145deg,var(--status-pending-bg)_0%,var(--surface-base)_100%)] px-3 py-1 text-[length:var(--ticketing-text-badge)] font-semibold tracking-[0.01em] text-[var(--status-pending-text)]">
             <TicketX className="h-3.5 w-3.5" />
@@ -30,10 +31,10 @@ export function ReservationSoldOutPanel({
             <TicketX className="h-7 w-7" />
           </div>
           <div>
-            <h2 className={`${TICKETING_CLASSES.typography.stateTitle} text-[var(--text)]`}>
+            <h2 className={clsx(TICKETING_CLASSES.typography.stateTitle, "text-[var(--text)]")}>
               티켓 매진
             </h2>
-            <p className={`mt-1 ${TICKETING_CLASSES.typography.stateBody} text-[var(--text-muted)]`}>
+            <p className={clsx("mt-1", TICKETING_CLASSES.typography.stateBody, "text-[var(--text-muted)]")}>
               {description}
             </p>
           </div>

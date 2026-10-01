@@ -1,4 +1,5 @@
 // 역할: 약관 동의/입력 검증/예매 요청 전송을 처리하는 예매 진행 패널입니다.
+import { clsx } from "clsx"
 import { useState } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
@@ -140,7 +141,7 @@ function ThirdPartyPrivacyConsentDetail({ onAgree }: { onAgree: () => void }) {
             </div>
 
             <div className="flex-1 overflow-y-auto px-5 py-4">
-              <div className={`space-y-4 ${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>
+              <div className={clsx("space-y-4", TICKETING_CLASSES.typography.sectionBodySm, "text-[var(--text-muted)]")}>
                 <p>{THIRD_PARTY_PRIVACY_CONSENT_BODY}</p>
 
                 <div className="overflow-hidden rounded-xl border border-[var(--border-subtle)]">
@@ -238,11 +239,11 @@ export function TicketingReservationPanel({
     : DEFAULT_CAUTION_ITEMS;
 
   return (
-    <div className={`${TICKETING_NARROW_PANEL_CLASS} space-y-4`}>
+    <div className={clsx(TICKETING_NARROW_PANEL_CLASS, "space-y-4")}>
       <div>
         <div>
-          <h2 className={`${TICKETING_CLASSES.typography.heroTitle} text-[var(--text)]`}>예매 진행 중</h2>
-          <p className={`mt-0.5 ${TICKETING_CLASSES.typography.sectionBody} text-[var(--text-muted)]`}>
+          <h2 className={clsx(TICKETING_CLASSES.typography.heroTitle, "text-[var(--text)]")}>예매 진행 중</h2>
+          <p className={clsx("mt-0.5", TICKETING_CLASSES.typography.sectionBody, "text-[var(--text-muted)]")}>
             주의사항과 방침을 확인한 뒤 동의 체크 후 예매를 완료하세요.
           </p>
         </div>
@@ -253,7 +254,7 @@ export function TicketingReservationPanel({
           <section className="space-y-2">
             <TicketingStepTitle step={1} title="주의사항" />
             <div className="rounded-xl border border-[var(--status-warning-border)] bg-[var(--status-warning-bg)] px-4 py-3">
-              <ul className={`space-y-1.5 ${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--status-warning-text)]`}>
+              <ul className={clsx("space-y-1.5", TICKETING_CLASSES.typography.sectionBodySm, "text-[var(--status-warning-text)]")}>
                 {cautionItems.map((item) => (
                   <li key={item}>• {item}</li>
                 ))}
@@ -264,7 +265,7 @@ export function TicketingReservationPanel({
           <section className="mt-5 space-y-2 border-t border-[var(--border-subtle)] pt-4">
             <TicketingStepTitle step={2} title="부정거래 관련 방침 안내" />
             <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-subtle)] px-4 py-3">
-              <p className={`mb-2 font-semibold ${TICKETING_CLASSES.typography.helper} text-[var(--text-muted)]`}>
+              <p className={clsx("mb-2 font-semibold", TICKETING_CLASSES.typography.helper, "text-[var(--text-muted)]")}>
                 스크롤하여 전체 방침을 확인하세요.
               </p>
               <div
@@ -306,7 +307,7 @@ export function TicketingReservationPanel({
 
           <section className="mt-5 space-y-3 border-t border-[var(--border-subtle)] pt-4">
             <TicketingStepTitle step={3} title="동의 확인" />
-            <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>
+            <p className={clsx(TICKETING_CLASSES.typography.sectionBodySm, "text-[var(--text-muted)]")}>
               주의사항과 부정거래 관련 방침을 확인한 뒤 체크해주세요.
             </p>
             <label className={cn(AGREEMENT_CARD_CLASS, "cursor-pointer")}>
@@ -324,7 +325,7 @@ export function TicketingReservationPanel({
 
           <section className="mt-5 space-y-3 border-t border-[var(--border-subtle)] pt-4">
             <TicketingStepTitle step={4} title="개인정보 제3자 제공 동의" />
-            <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>
+            <p className={clsx(TICKETING_CLASSES.typography.sectionBodySm, "text-[var(--text-muted)]")}>
               축제 행사장 입장 관리 및 팔찌 배부를 위해 아래 필수 동의를 확인해주세요.
             </p>
             <div className={cn(AGREEMENT_CARD_CLASS, "relative pr-12")}>
@@ -348,7 +349,7 @@ export function TicketingReservationPanel({
               />
             </div>
 
-            {errorMessage && <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--status-danger-text)]`}>{errorMessage}</p>}
+            {errorMessage && <p className={clsx(TICKETING_CLASSES.typography.sectionBodySm, "text-[var(--status-danger-text)]")}>{errorMessage}</p>}
 
             <Button
               className={cn(

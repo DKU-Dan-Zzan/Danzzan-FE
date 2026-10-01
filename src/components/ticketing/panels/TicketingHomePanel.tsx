@@ -1,4 +1,5 @@
 // 역할: 티켓팅 홈의 시작 안내, 유의사항, 진입 CTA를 구성하는 첫 화면 패널입니다.
+import { clsx } from "clsx"
 import type { LucideIcon } from "lucide-react";
 import { ArrowRight, Check, ClipboardList, Ticket } from "lucide-react";
 import { Card } from "@/components/common/ui/card";
@@ -116,16 +117,16 @@ export function TicketingHomePanel({
             aria-label={action.title}
             className="group block w-full text-left focus-visible:outline-none"
           >
-            <Card className={`${action.cardClassName} ${APP_CARD_VARIANTS.gradTint}`}>
+            <Card className={clsx(action.cardClassName, APP_CARD_VARIANTS.gradTint)}>
               <div className="grid min-h-[84px] grid-cols-[60px_1fr_24px] items-center gap-3.5">
-                <div className={`flex h-[60px] w-[60px] shrink-0 ${TICKETING_CLASSES.badge.iconCircle} rounded-[18px]`}>
+                <div className={clsx("flex h-[60px] w-[60px] shrink-0", TICKETING_CLASSES.badge.iconCircle, "rounded-[18px]")}>
                   <ActionIcon className="h-[30px] w-[30px] text-[var(--text)]" strokeWidth={action.iconStrokeWidth} />
                 </div>
                 <div className="flex min-h-[56px] flex-col justify-center">
-                  <h2 className={`${TICKETING_CLASSES.typography.cardTitle} !font-extrabold text-[var(--text)]`}>
+                  <h2 className={clsx(TICKETING_CLASSES.typography.cardTitle, "!font-extrabold text-[var(--text)]")}>
                     {action.title}
                   </h2>
-                  <p className={`mt-1 ${TICKETING_CLASSES.typography.heroDescription} font-normal text-[var(--text-muted)]`}>
+                  <p className={clsx("mt-1", TICKETING_CLASSES.typography.heroDescription, "font-normal text-[var(--text-muted)]")}>
                     {action.description}
                   </p>
                 </div>
@@ -139,8 +140,8 @@ export function TicketingHomePanel({
         );
       })}
 
-      <Card className={`${APP_CARD_VARIANTS.gradWhite} rounded-[24px] p-5`}>
-        <h3 className={`flex items-center gap-2 ${TICKETING_CLASSES.typography.cardSubtitle} !font-extrabold text-[var(--text)]`}>
+      <Card className={clsx(APP_CARD_VARIANTS.gradWhite, "rounded-[24px] p-5")}>
+        <h3 className={clsx("flex items-center gap-2", TICKETING_CLASSES.typography.cardSubtitle, "!font-extrabold text-[var(--text)]")}>
           <ClipboardList className="h-[17px] w-[17px] text-[var(--text-muted)]" strokeWidth={2.1} />
           티켓 예매 이용 가이드
         </h3>
@@ -158,15 +159,15 @@ export function TicketingHomePanel({
             >
               <div className="flex items-start gap-3.5">
                 <div
-                  className={`mt-0.5 flex h-10 w-10 shrink-0 ${TICKETING_CLASSES.badge.iconCircle} text-[15px] font-bold text-[var(--text-emphasis-vivid)]`}
+                  className={clsx("mt-0.5 flex h-10 w-10 shrink-0", TICKETING_CLASSES.badge.iconCircle, "text-[15px] font-bold text-[var(--text-emphasis-vivid)]")}
                 >
                   {item.step}
                 </div>
                 <div>
-                  <p className={`${TICKETING_CLASSES.typography.heroDescription} text-[17px] leading-6 font-extrabold text-[var(--text)] md:text-[18px]`}>
+                  <p className={clsx(TICKETING_CLASSES.typography.heroDescription, "text-[17px] leading-6 font-extrabold text-[var(--text)] md:text-[18px]")}>
                     {item.title}
                   </p>
-                  <p className={`mt-1 ${TICKETING_CLASSES.typography.sectionBody} text-[var(--text-muted)] opacity-60`}>
+                  <p className={clsx("mt-1", TICKETING_CLASSES.typography.sectionBody, "text-[var(--text-muted)] opacity-60")}>
                     {item.description}
                   </p>
                 </div>
@@ -175,10 +176,10 @@ export function TicketingHomePanel({
           ))}
         </div>
         <section className="border-t border-[var(--border-subtle)] pt-4">
-          <h4 className={`${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--accent)]`}>
+          <h4 className={clsx(TICKETING_CLASSES.typography.cardSubtitle, "text-[var(--accent)]")}>
             💡 유의사항
           </h4>
-          <ul className={`mt-3 list-disc space-y-2 pl-5 ${TICKETING_CLASSES.typography.sectionBody} text-[var(--accent)]`}>
+          <ul className={clsx("mt-3 list-disc space-y-2 pl-5", TICKETING_CLASSES.typography.sectionBody, "text-[var(--accent)]")}>
             {noticeItems.map((notice) => (
               <li
                 key={notice.text}

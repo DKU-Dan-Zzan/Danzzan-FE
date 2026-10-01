@@ -1,4 +1,5 @@
 // 역할: 팔찌 지급 대상 검색/테이블/지급 액션을 처리하는 관리자 운영 화면 컴포넌트입니다.
+import { clsx } from "clsx"
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/common/ui/card";
 import { Button } from "@/components/common/ui/button";
@@ -254,7 +255,7 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
         </div>
 
         <Card className="p-6">
-          <div className={`${contentMaxWidthClass} space-y-4`}>
+          <div className={clsx(contentMaxWidthClass, "space-y-4")}>
             <Label className="text-base font-bold text-foreground">학번으로 티켓 조회</Label>
             <div className="flex gap-4">
               <Input

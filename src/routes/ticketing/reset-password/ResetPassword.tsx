@@ -1,4 +1,5 @@
 // 역할: 비밀번호 재설정 단계(인증/입력/완료)를 관리하는 화면입니다.
+import { clsx } from "clsx"
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, CircleAlert, Clock3, KeyRound, MailCheck, RotateCcw } from "lucide-react";
@@ -408,7 +409,7 @@ export default function ResetPassword() {
 
             <main className={TICKETING_AUTH_MAIN_CLASS}>
           {!completed && (
-            <div className={`mb-6 px-3 py-3 ${APP_CARD_VARIANTS.gradTint}`}>
+            <div className={clsx("mb-6 px-3 py-3", APP_CARD_VARIANTS.gradTint)}>
               <p className="text-xs font-semibold text-[var(--text-muted)]">
                 <span className="text-[var(--accent)]">{stepIndex}/3 단계</span> · {currentStepLabel}
               </p>
@@ -425,22 +426,18 @@ export default function ResetPassword() {
                     return (
                       <div key={key} className="contents">
                         <span
-                          className={`inline-flex h-8 w-8 items-center justify-center rounded-full border text-[11px] font-bold ${
-                            isActive
+                          className={clsx("inline-flex h-8 w-8 items-center justify-center rounded-full border text-[11px] font-bold", isActive
                               ? "border-[var(--app-circle-border)] bg-[linear-gradient(145deg,var(--app-circle-bg-start)_0%,var(--app-circle-bg-end)_100%)] text-[var(--app-circle-fg)] shadow-[var(--app-circle-shadow)] ring-2 ring-[var(--ring)] ring-offset-1 ring-offset-[var(--bg-base)]"
                               : isDone
                                 ? "border-[var(--app-circle-border)] bg-[linear-gradient(145deg,var(--app-circle-bg-start)_0%,var(--app-circle-bg-end)_100%)] text-[var(--app-circle-fg)] shadow-[var(--app-circle-shadow)]"
-                                : "border-[var(--app-circle-border)] bg-[linear-gradient(145deg,var(--app-circle-bg-start)_0%,var(--app-circle-bg-end)_100%)] text-[var(--text-muted)] opacity-65"
-                          }`}
+                                : "border-[var(--app-circle-border)] bg-[linear-gradient(145deg,var(--app-circle-bg-start)_0%,var(--app-circle-bg-end)_100%)] text-[var(--text-muted)] opacity-65")}
                         >
                           {isDone ? "✓" : String(current).padStart(2, "0")}
                         </span>
 
                         {showConnector && (
                           <span
-                            className={`mx-3 h-px w-full ${
-                              connectorDone ? "bg-[var(--border-emphasis)]" : "bg-[var(--border-base)]"
-                            }`}
+                            className={clsx("mx-3 h-px w-full", connectorDone ? "bg-[var(--border-emphasis)]" : "bg-[var(--border-base)]")}
                           />
                         )}
                       </div>
@@ -458,13 +455,11 @@ export default function ResetPassword() {
                     return (
                       <div key={`${key}-label`} className="contents">
                         <p
-                          className={`justify-self-center text-center text-[11px] leading-4 font-semibold whitespace-nowrap ${
-                            isActive
+                          className={clsx("justify-self-center text-center text-[11px] leading-4 font-semibold whitespace-nowrap", isActive
                               ? "text-[var(--accent)]"
                               : isDone
                                 ? "text-[var(--text)]"
-                                : "text-[var(--text-muted)]"
-                          }`}
+                                : "text-[var(--text-muted)]")}
                         >
                           {label}
                         </p>
@@ -559,9 +554,7 @@ export default function ResetPassword() {
                     </p>
                   </div>
                   <p
-                    className={`inline-flex items-center gap-1 text-sm font-semibold ${
-                      isCodeExpired ? "text-[var(--status-danger-text)]" : "text-[var(--accent)]"
-                    }`}
+                    className={clsx("inline-flex items-center gap-1 text-sm font-semibold", isCodeExpired ? "text-[var(--status-danger-text)]" : "text-[var(--accent)]")}
                   >
                     <Clock3 className="h-4 w-4" />
                     {formatTimer(timerSecondsLeft)}

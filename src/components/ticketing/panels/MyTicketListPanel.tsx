@@ -1,4 +1,5 @@
 // 역할: 발급된 티켓 목록과 빈 상태/오류 상태를 보여주는 내 티켓 패널을 렌더링합니다.
+import { clsx } from "clsx"
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
 import { Megaphone, Ticket as TicketIcon } from "lucide-react";
@@ -123,26 +124,26 @@ export function MyTicketListPanel({
 
       {errorMessage && (
         <Card className="border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] p-4">
-          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--status-danger-text)]`}>{errorMessage}</p>
+          <p className={clsx(TICKETING_CLASSES.typography.sectionBodySm, "text-[var(--status-danger-text)]")}>{errorMessage}</p>
         </Card>
       )}
 
       {loading && tickets.length === 0 && (
-        <Card className={`${TICKETING_CLASSES.card.emptyState} p-6`}>
-          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>티켓을 불러오는 중입니다...</p>
+        <Card className={clsx(TICKETING_CLASSES.card.emptyState, "p-6")}>
+          <p className={clsx(TICKETING_CLASSES.typography.sectionBodySm, "text-[var(--text-muted)]")}>티켓을 불러오는 중입니다...</p>
         </Card>
       )}
 
       {!loading && tickets.length === 0 && (
-        <Card className={`${TICKETING_CLASSES.card.emptyState} p-8 text-center`}>
-          <p className={`${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--text)]`}>
+        <Card className={clsx(TICKETING_CLASSES.card.emptyState, "p-8 text-center")}>
+          <p className={clsx(TICKETING_CLASSES.typography.cardSubtitle, "text-[var(--text)]")}>
             아직 예매한 티켓이 없습니다.
           </p>
-          <p className={`mt-1 ${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>
+          <p className={clsx("mt-1", TICKETING_CLASSES.typography.sectionBodySm, "text-[var(--text-muted)]")}>
             티켓팅 페이지에서 진행 중인 공연을 확인하세요.
           </p>
           <Button
-            className={`mt-4 ${TICKETING_CLASSES.button.primaryFull}`}
+            className={clsx("mt-4", TICKETING_CLASSES.button.primaryFull)}
             onClick={onGoTicketing}
           >
             티켓팅 하러가기

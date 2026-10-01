@@ -1,4 +1,5 @@
 // 역할: home 화면에서 사용하는 Emergency Notice UI 블록을 렌더링합니다.
+import { clsx } from "clsx"
 import { useState } from "react"
 import { ChevronDown, Megaphone } from "lucide-react"
 import { useLanguage, useT } from "@/i18n"
@@ -43,11 +44,9 @@ const EmergencyNotice = ({ notice }: Props) => {
         <button
           type="button"
           onClick={() => setIsExpanded((prev) => !prev)}
-          className={`flex w-full gap-2.5 pl-[calc(12px+env(safe-area-inset-left))] pr-[calc(12px+env(safe-area-inset-right))] text-left transition-transform duration-[120ms] active:scale-[0.99] ${
-            isExpanded
+          className={clsx("flex w-full gap-2.5 pl-[calc(12px+env(safe-area-inset-left))] pr-[calc(12px+env(safe-area-inset-right))] text-left transition-transform duration-[120ms] active:scale-[0.99]", isExpanded
               ? "h-auto min-h-[var(--home-notice-trigger-height)] items-start py-2"
-              : "h-[var(--home-notice-trigger-height)] items-center py-0"
-          }`}
+              : "h-[var(--home-notice-trigger-height)] items-center py-0")}
           aria-expanded={isExpanded}
           aria-controls={contentId}
           aria-label={isExpanded ? t("home.emergencyCollapseAria") : t("home.emergencyExpandAria")}
@@ -64,11 +63,9 @@ const EmergencyNotice = ({ notice }: Props) => {
             )}
             <p
               id={contentId}
-              className={`min-w-0 text-left text-[length:var(--home-notice-body-font-size)] text-[var(--text-body-deep)] ${
-                isExpanded
+              className={clsx("min-w-0 text-left text-[length:var(--home-notice-body-font-size)] text-[var(--text-body-deep)]", isExpanded
                   ? "whitespace-pre-wrap break-words leading-6"
-                  : "overflow-hidden text-ellipsis whitespace-nowrap leading-none"
-              }`}
+                  : "overflow-hidden text-ellipsis whitespace-nowrap leading-none")}
             >
               {notice.content}
             </p>
@@ -76,7 +73,7 @@ const EmergencyNotice = ({ notice }: Props) => {
 
           <ChevronDown
             size={16}
-            className={`shrink-0 text-[var(--text-muted)] transition-transform duration-[180ms] ${isExpanded ? "rotate-180" : ""}`}
+            className={clsx("shrink-0 text-[var(--text-muted)] transition-transform duration-[180ms]", isExpanded ? "rotate-180" : "")}
             aria-hidden="true"
           />
         </button>

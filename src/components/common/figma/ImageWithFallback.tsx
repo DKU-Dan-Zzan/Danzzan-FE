@@ -1,4 +1,5 @@
 // 역할: 디자인 에셋 로딩 실패 시 대체 이미지를 표시하는 공용 컴포넌트를 제공합니다.
+import { clsx } from "clsx"
 import React, { useState } from 'react'
 
 const ERROR_IMG_SRC =
@@ -15,7 +16,7 @@ export function ImageWithFallback(props: React.ImgHTMLAttributes<HTMLImageElemen
 
   return didError ? (
     <div
-      className={`inline-block bg-[var(--surface-subtle)] text-center align-middle text-[var(--text-muted)] ${className ?? ''}`}
+      className={clsx("inline-block bg-[var(--surface-subtle)] text-center align-middle text-[var(--text-muted)]", className ?? '')}
       style={style}
     >
       <div className="flex items-center justify-center w-full h-full">
