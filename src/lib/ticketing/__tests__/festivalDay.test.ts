@@ -6,6 +6,10 @@ import {
 } from "@/lib/ticketing/festivalDay";
 
 describe("resolveTicketDayLabel", () => {
+  it("uses the configured festival DAY even when a historical month/day rule overlaps", () => {
+    expect(resolveTicketDayLabel({ eventDate: "2027-05-07", eventName: "새 축제 DAY 1" })).toBe("DAY 1");
+    expect(resolveTicketDayLabel({ eventDate: "2027-10-02", eventName: "새 축제 DAY 2" })).toBe("DAY 2");
+  });
   it("ISO 날짜로 DAY를 계산한다", () => {
     expect(resolveTicketDayLabel({ eventDate: "2026-05-07" })).toBe("DAY 2");
     expect(resolveTicketDayLabel({ eventDate: "2026-05-08T19:00:00+09:00" })).toBe("DAY 3");

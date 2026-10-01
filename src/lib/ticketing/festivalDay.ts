@@ -38,12 +38,12 @@ const extractMonthDayKey = (value: string): string | null => {
 };
 
 const getDayNumberFromEventName = (value: string): number | null => {
-  const matched = value.match(/(\d+)\s*일차/);
+  const matched = value.match(/(?:DAY\s*(\d+)|(\d+)\s*일차)/i);
   if (!matched) {
     return null;
   }
 
-  const dayNumber = Number(matched[1]);
+  const dayNumber = Number(matched[1] ?? matched[2]);
   return Number.isFinite(dayNumber) ? dayNumber : null;
 };
 
@@ -52,6 +52,9 @@ export const resolveTicketDayLabel = (input: {
   eventName?: string | null;
   rules?: FestivalDayRule[];
 }): string => {
+  // 관리자 설정으로 만든 이벤트명은 연도와 실제 축제 일차를 반영한다.
+  const configuredDay = input.eventName?.match(/DAY\s*(\d+)\s*$/i);
+  if (configuredDay) return `DAY ${Number(configuredDay[1])}`;
   const rules = input.rules ?? DEFAULT_FESTIVAL_DAY_RULES;
   const dayByMonthDayKey = new Map<string, number>();
   for (const rule of rules) {

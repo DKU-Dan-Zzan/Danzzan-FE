@@ -1,3 +1,6 @@
+import { useSyncExternalStore } from "react";
+import { getTicketingOpenBackgroundImageUrl, subscribeFestivalSettings } from "@/lib/app/festival/festivalCalendar";
+import { TicketingBackdrop } from "@/components/ticketing/layout/TicketingBackdrop";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, User } from "lucide-react";
 import { useAuth } from "@/hooks/ticketing/useAuth";
@@ -12,6 +15,7 @@ const HEADER_ICON_BUTTON_CLASS =
 
 export function UserLayout() {
   const location = useLocation();
+  const openBackgroundUrl = useSyncExternalStore(subscribeFestivalSettings, getTicketingOpenBackgroundImageUrl, getTicketingOpenBackgroundImageUrl);
   const navigate = useNavigate();
   const { session, role } = useAuth();
 
@@ -120,7 +124,7 @@ export function UserLayout() {
       bottomNav={<BottomNav />}
       rootClassName="min-h-dvh overflow-x-hidden bg-[var(--bg-base)]"
       frameClassName="mx-auto flex min-h-dvh w-full max-w-[var(--app-mobile-shell-max-width)] flex-col bg-[var(--bg-base)] pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom))]"
-      mainClassName={mainClassName}
+      mainClassName={cn(mainClassName, isTicketingPage && "relative isolate")}
     >
       <div
         className={[
@@ -131,6 +135,7 @@ export function UserLayout() {
           .filter(Boolean)
           .join(" ")}
       >
+        {isTicketingPage && <TicketingBackdrop url={openBackgroundUrl} className="fixed -z-10 mx-auto max-w-[var(--app-mobile-shell-max-width)]" />}
         <Outlet />
       </div>
     </AppShell>

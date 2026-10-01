@@ -104,7 +104,7 @@ export function TicketingHomePanel({
   ];
 
   return (
-    <div className={`${TICKETING_MIDDLE_PANEL_CLASS} bg-[var(--bg-base)]`}>
+    <div className={TICKETING_MIDDLE_PANEL_CLASS}>
       {quickActions.map((action) => {
         const ActionIcon = action.icon;
         return (

@@ -1,7 +1,7 @@
 // 역할: 서버 설정을 처음 진입/포커스 복귀/주기 갱신으로 사용자 화면에 반영한다.
 import { useEffect } from "react"
 import { getFestivalSettings } from "@/api/app/festival/festivalSettingsApi"
-import { setFestivalDates, setTicketingEnabled, setTicketingBackgroundImageUrl } from "@/lib/app/festival/festivalCalendar"
+import { setFestivalDates, setTicketingEnabled, setTicketingBackgroundImageUrl, setTicketingOpenBackgroundImageUrl } from "@/lib/app/festival/festivalCalendar"
 export function useLoadFestivalSettings(): void {
   useEffect(() => {
     const controller = new AbortController()
@@ -15,6 +15,7 @@ export function useLoadFestivalSettings(): void {
         setFestivalDates(settings.operationDates)
         setTicketingEnabled(settings.ticketingEnabled)
         setTicketingBackgroundImageUrl(settings.ticketingBackgroundImageUrl ?? null)
+        setTicketingOpenBackgroundImageUrl(settings.ticketingOpenBackgroundImageUrl ?? null)
       } catch { /* 네트워크 오류에는 마지막으로 받은 설정 유지 */ }
       finally { pending = false }
     }

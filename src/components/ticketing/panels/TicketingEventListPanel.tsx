@@ -97,10 +97,15 @@ const resolveViewStatus = (
   return "upcoming";
 };
 
-const formatTicketOpenTime = (openAtMs: number | null): string => openAtMs === null
-  ? "일정 미정"
-  : new Date(openAtMs).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
-
+const formatTicketOpenTime = (openAtMs: number | null): string => {
+  if (openAtMs === null) return "일정 미정";
+  const parts = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul", month: "numeric", day: "numeric", weekday: "short",
+    hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+  }).formatToParts(openAtMs);
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find(p => p.type === type)?.value ?? "";
+  return `${part("month")}월 ${part("day")}일 (${part("weekday")}) ${part("hour")}:${part("minute")}`;
+};
 
 export function TicketingEventListPanel({
   events,
@@ -185,14 +190,12 @@ export function TicketingEventListPanel({
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h3 className={`truncate ${TICKETING_CLASSES.typography.cardTitle} text-[var(--text)] !text-[0.95rem]`}>
+                <h3 className={cn(TICKETING_CLASSES.typography.cardTitle, "break-words text-[var(--text)] !text-[0.95rem]")}>
                   {normalizeKoreanMonthDay(event.title || "공연 티켓팅")}
                 </h3>
-                <p className={`mt-1 ${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--accent)]`}>
-                  공연 날짜: {normalizeKoreanMonthDay(event.eventDate) || "미정"}
+                <p className={cn(TICKETING_CLASSES.typography.cardSubtitle, "mt-1 font-bold text-[var(--text)]")}>
+                  <span className="sr-only">티켓팅 시작 (한국 시간): </span>{formatTicketOpenTime(openAtMs)}
                 </p>
-                <p className="mt-1 text-xs text-[var(--text-muted)]">티켓팅 시작: {formatTicketOpenTime(openAtMs)} (한국 시간)</p>
-                <p className="mt-1 text-xs text-[var(--text-muted)]">티켓 수량: {event.totalCount?.toLocaleString() ?? "-"}장</p>
               </div>
               <Badge
                 variant="outline"
@@ -208,7 +211,7 @@ export function TicketingEventListPanel({
             <div className="mt-3">
               {status === "upcoming" && openAtMs !== null && (
                 <Button
-                  className={`${TICKETING_CLASSES.button.disabledFull} h-12`}
+                  className={cn(TICKETING_CLASSES.button.disabledFull, "h-12 bg-none bg-[var(--surface-subtle)] text-[var(--text-muted)] disabled:opacity-100")}
                   variant="outline"
                   disabled
                 >
@@ -219,7 +222,7 @@ export function TicketingEventListPanel({
 
               {status === "upcoming" && openAtMs === null && (
                 <Button
-                  className={`${TICKETING_CLASSES.button.disabledCompactFull} h-12`}
+                  className={cn(TICKETING_CLASSES.button.disabledCompactFull, "h-12 bg-none bg-[var(--surface-subtle)] text-[var(--text-muted)] disabled:opacity-100")}
                   variant="outline"
                   disabled
                 >
@@ -238,7 +241,7 @@ export function TicketingEventListPanel({
 
               {status === "soldout" && (
                 <Button
-                  className={`${TICKETING_CLASSES.button.disabledSoldoutFull} h-12`}
+                  className={cn(TICKETING_CLASSES.button.disabledSoldoutFull, "h-12 bg-none bg-[var(--surface-subtle)] text-[var(--text-muted)] disabled:opacity-100")}
                   variant="outline"
                   disabled
                 >

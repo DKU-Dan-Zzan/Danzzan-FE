@@ -22,7 +22,7 @@ vi.mock("@/api/app/festival/festivalSettingsApi", () => ({
   updateFestivalTicketingSettings: api.ticketing,
   isRequestAborted: () => false,
 }))
-vi.mock("@/lib/app/festival/festivalCalendar", () => ({ setFestivalDates: vi.fn(), setTicketingEnabled: vi.fn(), setTicketingBackgroundImageUrl: vi.fn() }))
+vi.mock("@/lib/app/festival/festivalCalendar", () => ({ setFestivalDates: vi.fn(), setTicketingEnabled: vi.fn(), setTicketingBackgroundImageUrl: vi.fn(), setTicketingOpenBackgroundImageUrl: vi.fn() }))
 vi.mock("sonner", () => ({ Toaster: () => null, toast }))
 
 const settings = {
@@ -99,6 +99,26 @@ async function startEditing() {
 }
 
 describe("AdminSettings unified save", () => {
+  it("uploads an ON background while preserving the OFF background", async () => {
+    state.permissions = ["TICKETING"]
+    api.get.mockResolvedValue({ ...settings, ticketingBackgroundImageUrl: "https://example.com/off.png" })
+    await render()
+    expect(container.textContent).toContain("티켓팅 ON 배경")
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]')!
+    const file = new File(["image"], "on.jpg", { type: "image/jpeg" })
+    await act(async () => {
+      Object.defineProperty(input, "files", { value: [file], configurable: true })
+      input.dispatchEvent(new Event("change", { bubbles: true }))
+    })
+    expect(container.querySelector('img[src="blob:background-preview"]')).not.toBeNull()
+    await clickButton("저장")
+    await settle()
+    expect(api.ticketing).toHaveBeenCalledWith(expect.objectContaining({
+      ticketingOpenBackgroundImageUrl: "https://example.com/new-background.jpg",
+      ticketingBackgroundImageUrl: "https://example.com/off.png",
+    }))
+  })
+
   it("changes the default background directly, previews the notice, and saves the uploaded URL", async () => {
     state.permissions = ["TICKETING"]
     api.get.mockResolvedValue({ ...settings, ticketingEnabled: false })
@@ -201,6 +221,7 @@ describe("AdminSettings unified save", () => {
 
     expect(api.ticketing).toHaveBeenCalledWith({
       ticketingBackgroundImageUrl: null,
+      ticketingOpenBackgroundImageUrl: null,
       ticketingEnabled: false,
       ticketingRounds: [],
       confirmedTicketCancelRoundIds: [],
@@ -242,6 +263,7 @@ describe("AdminSettings unified save", () => {
     expect(api.metadata.mock.invocationCallOrder[0]).toBeLessThan(api.ticketing.mock.invocationCallOrder[0]!)
     expect(api.ticketing).toHaveBeenCalledWith({
       ticketingBackgroundImageUrl: null,
+      ticketingOpenBackgroundImageUrl: null,
       ticketingEnabled: false,
       ticketingRounds: [],
       confirmedTicketCancelRoundIds: [],
