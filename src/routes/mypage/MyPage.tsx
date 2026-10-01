@@ -16,6 +16,7 @@ import { cn } from "@/components/common/ui/utils";
 import { authLogout, withdrawUser } from "@/api/app/auth/authApi";
 import { studentProfileApi } from "@/api/app/auth/studentProfileApi";
 import { useMyTicketsQuery } from "@/hooks/ticketing/useMyTicketsQuery";
+import { useTicketingEnabled } from "@/hooks/app/festival/useTicketingEnabled";
 import { authStore } from "@/store/common/authStore";
 import {
   AlertDialog,
@@ -162,6 +163,7 @@ function ListRow({
 
 function MyPage() {
   const navigate = useNavigate();
+  const ticketingEnabled = useTicketingEnabled();
   const session = useSyncExternalStore(
     authStore.subscribe,
     authStore.getSnapshot,
@@ -202,7 +204,7 @@ function MyPage() {
     };
   }, [isLoggedIn, session.role, session.tokens, user?.college, user?.name]);
 
-  const ticketsQuery = useMyTicketsQuery(isLoggedIn);
+  const ticketsQuery = useMyTicketsQuery(isLoggedIn && ticketingEnabled);
 
   if (!isLoggedIn) {
     return (
@@ -260,7 +262,7 @@ function MyPage() {
             로그인해 주세요
           </h2>
           <p className="mb-7 text-[13px] leading-relaxed" style={{ color: "rgba(28,43,106,0.55)" }}>
-            로그인 후 예매 내역과 계정 정보를 확인할 수 있어요.
+            {ticketingEnabled ? "로그인 후 예매 내역과 계정 정보를 확인할 수 있어요." : "로그인 후 계정 정보를 확인할 수 있어요."}
           </p>
 
           <button
@@ -387,6 +389,7 @@ function MyPage() {
         </div>
 
         {/* 티켓 버튼 */}
+        {ticketingEnabled && (
         <div className="relative px-4 pb-3 pt-1">
         <button
           onClick={() => navigate("/ticket/my-ticket")}
@@ -415,6 +418,7 @@ function MyPage() {
           </div>
         </button>
       </div>
+        )}
       </div>
 
       <div className="mt-2" />
