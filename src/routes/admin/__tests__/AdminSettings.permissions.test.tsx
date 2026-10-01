@@ -102,6 +102,26 @@ async function startEditing() {
 }
 
 describe("AdminSettings unified save", () => {
+  it.each([true, false])("toggles directly from saved %s, supports cancel, and only applies on save", async (initialValue) => {
+    state.permissions = ["TICKETING"]
+    api.get.mockResolvedValue({ ...settings, ticketingEnabled: initialValue })
+    await render()
+    const target = initialValue ? "OFF" : "ON"
+    expect(findButton(target)?.disabled).toBe(false)
+    await clickButton(target)
+    expect(findButton(target)?.getAttribute("aria-pressed")).toBe("true")
+    expect(findButton("저장")).toBeDefined()
+    expect(api.ticketing).not.toHaveBeenCalled()
+    await clickButton("취소")
+    expect(findButton(initialValue ? "ON" : "OFF")?.getAttribute("aria-pressed")).toBe("true")
+    expect(api.ticketing).not.toHaveBeenCalled()
+    await clickButton(target)
+    await clickButton("저장")
+    await settle()
+    expect(api.ticketing).toHaveBeenCalledWith(expect.objectContaining({ ticketingEnabled: !initialValue }))
+    expect(api.metadata).not.toHaveBeenCalled()
+  })
+
   it("uploads an issued-ticket background and previews the actual ticket card", async () => {
     state.permissions = ["TICKETING"]
     api.get.mockResolvedValue({ ...settings, ticketingBackgroundImageUrl: "https://example.com/off.png" })

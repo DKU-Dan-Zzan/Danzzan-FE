@@ -372,8 +372,13 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
                 <button
                   key={String(value)}
                   type="button"
-                  disabled={!isEditing || !canTicket}
-                  onClick={() => updateSettings({ ticketingEnabled: value })}
+                  disabled={isSaving || isLoading || !canTicket}
+                  aria-pressed={settings.ticketingEnabled === value}
+                  onClick={() => {
+                    if (settings.ticketingEnabled === value) return
+                    setIsEditing(true)
+                    updateSettings({ ticketingEnabled: value })
+                  }}
                   className={cn(
                     "rounded-full px-3 py-1 text-xs font-bold transition-colors disabled:cursor-not-allowed",
                     settings.ticketingEnabled === value
@@ -387,6 +392,12 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
               ))}
             </div>
           </header>
+
+          {isEditing && settings.ticketingEnabled !== savedSettings?.ticketingEnabled && (
+            <p role="status" className="mt-3 text-xs font-semibold text-[var(--status-warning-text)]">
+              ON/OFF 변경은 상단의 저장을 눌러야 적용됩니다.
+            </p>
+          )}
 
           {settings.ticketingEnabled && (
             <div className="mt-4 space-y-3">
@@ -546,7 +557,7 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
               )}
             </div>
           )}
-          {!settings.ticketingEnabled && <p className="mt-4 rounded-xl bg-[var(--surface-subtle)] p-3 text-sm text-[var(--text-muted)]">현재 예매는 중지되어 있습니다. 기존 회차와 발급된 티켓은 유지되며, 팔찌 배부 관리도 이용할 수 있습니다.</p>}
+          {!settings.ticketingEnabled && <p className="mt-4 rounded-xl bg-[var(--surface-subtle)] p-3 text-sm text-[var(--text-muted)]">티켓팅을 OFF로 저장하면 신규 예매가 중지됩니다. 기존 회차와 발급된 티켓은 유지되며, 팔찌 배부 관리도 이용할 수 있습니다.</p>}
           {settings.ticketingEnabled && <TicketingBackgroundField mode="ticket" festivalName={settings.festivalName} url={settings.ticketCardBackgroundImageUrl} file={ticketCardBackgroundFile} previewUrl={ticketCardBackgroundImage?.previewUrl} disabled={isSaving || isLoading} onFile={(file) => { setTicketCardBackgroundImage({ file, previewUrl: URL.createObjectURL(file) }); setIsEditing(true) }} onReset={() => { setIsEditing(true); setTicketCardBackgroundImage(null); updateSettings({ ticketCardBackgroundImageUrl: null }) }} />}
           {!settings.ticketingEnabled && <TicketingBackgroundField url={settings.ticketingBackgroundImageUrl} file={backgroundFile} previewUrl={backgroundImage?.previewUrl} disabled={isSaving || isLoading} onFile={handleBackgroundFile} onReset={() => { setIsEditing(true); setBackgroundImage(null); updateSettings({ ticketingBackgroundImageUrl: null }) }} />}
         </fieldset>}
