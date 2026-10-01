@@ -29,7 +29,7 @@ const toCompactEventDate = (value: string): string => {
   return normalized;
 };
 
-export const DEFAULT_TICKET_CARD_BACKGROUND = "/posters/ticket-card-legend.jpg";
+export const DEFAULT_TICKET_CARD_BACKGROUND = "/posters/ticket-card-legend-light.jpg";
 
 const getGuideLines = (ticket: Ticket) => {
   const compactDate = ticket.eventDate ? toCompactEventDate(ticket.eventDate) : "미정";
@@ -74,7 +74,7 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
         aria-hidden="true"
       >
         <defs>
-          {/* 밝은 종이 톤 위로 포스터 색감이 은은하게 비치도록 한다. */}
+          {/* 관리자 업로드 이미지에만 밝은 레이어를 더해 글자 대비를 유지한다. */}
           <linearGradient id={overlayId} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%"   stopColor="rgba(255,250,246,0.80)" />
             <stop offset="100%" stopColor="rgba(255,241,231,0.68)" />
@@ -84,18 +84,21 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
           </clipPath>
         </defs>
 
-        {/* 발급 티켓 카드 안에만 배경을 적용한다. */}
+        <path d={ticketPath} fill="var(--surface)" />
+
+        {/* 가로형 기본 배경은 원래 색감을 그대로 사용한다. */}
         <image
           href={background}
           onError={() => { if (configuredBackground) setFailedUrl(configuredBackground); }}
           x="0" y="0"
           width="400" height="180"
-          preserveAspectRatio={background === DEFAULT_TICKET_CARD_BACKGROUND ? "xMidYMax slice" : "xMidYMid slice"}
+          preserveAspectRatio="xMidYMid slice"
           clipPath={`url(#${clipId})`}
         />
 
-        {/* 짙은 글자와 대비되는 밝은 오버레이 */}
-        <path d={ticketPath} fill={`url(#${overlayId})`} />
+        {background !== DEFAULT_TICKET_CARD_BACKGROUND && (
+          <path d={ticketPath} fill={`url(#${overlayId})`} />
+        )}
 
         {/* 퍼포레이션 점선 */}
         <line
@@ -116,7 +119,7 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
           <p className="text-[0.58rem] font-bold tracking-[0.22em]" style={{ color: "rgba(70,44,39,0.9)" }}>
             DANKOOK ZONE TICKET
           </p>
-          <p className="mt-1.5 text-[2.1rem] font-bold leading-none tracking-[-0.02em]" style={{ color: "var(--legend-ink)" }}>
+          <p className="mt-1.5 text-[2.1rem] font-bold leading-none tracking-[-0.02em]" style={{ color: "var(--accent)" }}>
             {dayLabel}
           </p>
           <span
