@@ -499,7 +499,7 @@ export default function AdminTimetableManagerPanel({
       {topSlot}
 
       {globalError && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] px-4 py-3 text-sm text-[var(--status-danger-text)]">
           {globalError}
         </div>
       )}
@@ -628,7 +628,7 @@ export default function AdminTimetableManagerPanel({
                               <button
                                 type="button"
                                 onClick={() => void handleDeletePerformance(performance)}
-                                className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-white px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50"
+                                className="inline-flex items-center gap-1 rounded-md border border-[var(--status-danger-border)] bg-[var(--ds-white)] px-2 py-1 text-xs font-semibold text-[var(--status-danger)] hover:bg-[var(--status-danger-bg)]"
                               >
                                 <Trash2 className="h-3 w-3" />
                                 삭제
@@ -860,7 +860,7 @@ export default function AdminTimetableManagerPanel({
                               <button
                                 type="button"
                                 onClick={() => void handleDeleteArtist(artist)}
-                                className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-white px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50"
+                                className="inline-flex items-center gap-1 rounded-md border border-[var(--status-danger-border)] bg-[var(--ds-white)] px-2 py-1 text-xs font-semibold text-[var(--status-danger)] hover:bg-[var(--status-danger-bg)]"
                               >
                                 <Trash2 className="h-3 w-3" />
                                 삭제
@@ -982,7 +982,7 @@ export default function AdminTimetableManagerPanel({
                     JPG · PNG · WEBP, 최대 5MB. 저장 시 NHN/S3에 업로드됩니다.
                   </p>
                   {artistImageError && (
-                    <p className="text-[11px] font-semibold text-red-600">{artistImageError}</p>
+                    <p className="text-[11px] font-semibold text-[var(--status-danger)]">{artistImageError}</p>
                   )}
                 </div>
               </div>

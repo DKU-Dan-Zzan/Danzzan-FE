@@ -12,8 +12,9 @@ type BoothmapColorConfig = {
 };
 
 const BOOTHMAP_COLOR_CONFIG = {
-  markerPub: { cssVar: "--boothmap-marker-pub", fallback: "#2853A9" },
-  markerFoodTruck: { cssVar: "--boothmap-marker-food-truck", fallback: "#ef4444" },
+  // Fallbacks mirror the default Theme Core and its polygon color-mix ratios in index.css.
+  markerPub: { cssVar: "--boothmap-marker-pub", fallback: "#ff642d" },
+  markerFoodTruck: { cssVar: "--boothmap-marker-food-truck", fallback: "#ec4899" },
   markerExperience: { cssVar: "--boothmap-marker-experience", fallback: "#10b981" },
   markerEvent: { cssVar: "--boothmap-marker-event", fallback: "#f6ca3b" },
   markerRestArea: { cssVar: "--boothmap-marker-rest-area", fallback: "#8b5cf6" },
@@ -29,12 +30,12 @@ const BOOTHMAP_COLOR_CONFIG = {
   collegeStrokeSelected: { cssVar: "--boothmap-college-stroke-selected", fallback: "#1d4ed8" },
   collegeFillDefault: { cssVar: "--boothmap-college-fill-default", fallback: "#eff6ff" },
   collegeFillSelected: { cssVar: "--boothmap-college-fill-selected", fallback: "#dbeafe" },
-  zonePubStroke: { cssVar: "--boothmap-zone-pub-stroke", fallback: "#1d4ed8" },
-  zonePubFill: { cssVar: "--boothmap-zone-pub-fill", fallback: "#93c5fd" },
-  zonePubDot: { cssVar: "--boothmap-zone-pub-dot", fallback: "#2563eb" },
-  zoneFoodTruckStroke: { cssVar: "--boothmap-zone-food-truck-stroke", fallback: "#dc2626" },
-  zoneFoodTruckFill: { cssVar: "--boothmap-zone-food-truck-fill", fallback: "#fca5a5" },
-  zoneFoodTruckDot: { cssVar: "--boothmap-zone-food-truck-dot", fallback: "#ef4444" },
+  zonePubStroke: { cssVar: "--boothmap-zone-pub-stroke", fallback: "#e65a29" },
+  zonePubFill: { cssVar: "--boothmap-zone-pub-fill", fallback: "#ffc1ab" },
+  zonePubDot: { cssVar: "--boothmap-zone-pub-dot", fallback: "#ff642d" },
+  zoneFoodTruckStroke: { cssVar: "--boothmap-zone-food-truck-stroke", fallback: "#bd3a7a" },
+  zoneFoodTruckFill: { cssVar: "--boothmap-zone-food-truck-fill", fallback: "#fad1e6" },
+  zoneFoodTruckDot: { cssVar: "--boothmap-zone-food-truck-dot", fallback: "#ec4899" },
   zoneSmokingStroke: { cssVar: "--boothmap-zone-smoking-stroke", fallback: "#475569" },
   zoneSmokingFill: { cssVar: "--boothmap-zone-smoking-fill", fallback: "#cbd5e1" },
   zoneSmokingDot: { cssVar: "--boothmap-zone-smoking-dot", fallback: "#334155" },

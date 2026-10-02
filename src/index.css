@@ -3,6 +3,57 @@
 @import "tailwindcss";
 
 :root {
+  /* Festival theme core: the only colors intended for a future festival payload. */
+  --theme-brand-primary: #ff642d;
+  --theme-brand-secondary: #f5e3a3;
+  --theme-brand-accent: #ff642d;
+  --theme-brand-text-emphasis: #e13600;
+  --theme-status-success: #2e7d32;
+  --theme-status-warning: #b26a00;
+  --theme-status-danger: #b3261e;
+  --theme-status-pending: #e3776a;
+  --theme-category-pub: #ff642d;
+  --theme-category-food-truck: #ec4899;
+  --theme-category-experience: #10b981;
+  --theme-category-event: #f6ca3b;
+  --theme-category-rest-area: #8b5cf6;
+  --theme-category-facility: #3b82f6;
+
+  /* Fixed structural colors. Keep neutral surfaces and opacity independent of the festival. */
+  --ds-white: #ffffff;
+  --ds-black: #000000;
+  --ds-neutral-ink: #232124;
+  --ds-neutral-muted: #91827d;
+  --ds-neutral-input: #ebe8e6;
+  --ds-overlay-scrim: rgba(0, 0, 0, 0.5);
+  --ds-shadow-color: rgba(0, 0, 0, 0.08);
+
+  /* Semantic bridge. Component tokens and existing aliases can migrate independently. */
+  --semantic-primary: var(--theme-brand-primary);
+  --semantic-secondary: var(--theme-brand-secondary);
+  --semantic-accent: var(--theme-brand-accent);
+  --semantic-text-emphasis: var(--theme-brand-text-emphasis);
+  --semantic-page-background: var(--ds-white);
+  --semantic-surface-card: var(--ds-white);
+  --semantic-surface-input: var(--ds-neutral-input);
+  --semantic-text-primary: var(--ds-neutral-ink);
+  --semantic-text-secondary: var(--ds-neutral-muted);
+  --semantic-overlay-scrim: var(--ds-overlay-scrim);
+  --semantic-shadow-color: var(--ds-shadow-color);
+  --semantic-border-base: color-mix(in srgb, var(--brand-78b) 56%, transparent);
+  --semantic-border-emphasis: color-mix(in srgb, var(--brand-78b) 82%, transparent);
+  --semantic-focus-ring: color-mix(in srgb, var(--brand-53) 45%, transparent);
+  --semantic-status-success: var(--theme-status-success);
+  --semantic-status-warning: var(--theme-status-warning);
+  --semantic-status-danger: var(--theme-status-danger);
+  --semantic-status-pending: var(--theme-status-pending);
+  --semantic-category-pub: var(--theme-category-pub);
+  --semantic-category-food-truck: var(--theme-category-food-truck);
+  --semantic-category-experience: var(--theme-category-experience);
+  --semantic-category-event: var(--theme-category-event);
+  --semantic-category-rest-area: var(--theme-category-rest-area);
+  --semantic-category-facility: var(--theme-category-facility);
+
   /* ══════════════════════════════════════════════════════════
      브랜드 원색 (Brand primitives) — 단일 진실 공급원
 
@@ -124,14 +175,14 @@
   --legend-ink: #0b0607;
   --legend-ember: #e8551f;
   --legend-ember-deep: #b3241a;
-  --legend-cream: #f5e3a3;
+  --legend-cream: var(--semantic-secondary);
   --bg-base: var(--brand-99);
   --bg-page-soft: var(--brand-99);
   --text: var(--brand-11);
   --text-muted: var(--neutral-35);
   --text-on-accent: #ffffff;
-  --accent: var(--brand-53);
-  --border-base: color-mix(in srgb, var(--brand-78b) 56%, transparent);
+  --accent: var(--semantic-accent);
+  --border-base: var(--semantic-border-base);
   --outline_variant: color-mix(in srgb, var(--brand-78b) 22%, transparent);
   --surface-subtle: rgba(255, 255, 255, 0.9);
   --surface-tint-subtle: color-mix(in srgb, var(--brand-60) 10%, transparent);
@@ -181,7 +232,7 @@
   --app-circle-border: color-mix(in srgb, var(--brand-75) 56%, transparent);
   --app-circle-bg-start: color-mix(in srgb, var(--brand-98) 98%, transparent);
   --app-circle-bg-end: color-mix(in srgb, var(--brand-95a) 96%, transparent);
-  --text-emphasis-vivid: var(--brand-41);
+  --text-emphasis-vivid: var(--semantic-text-emphasis);
   --text-emphasis-vivid-strong: var(--brand-57a);
   --text-body-deep: var(--brand-26);
   --text-bold-emphasis: var(--brand-37);
@@ -221,7 +272,7 @@
   --surface-tint-emphasis: color-mix(in srgb, var(--brand-60) 29%, transparent);
   --border-subtle: color-mix(in srgb, var(--brand-78b) 46%, transparent);
   --border-strong: color-mix(in srgb, var(--brand-78b) 66%, transparent);
-  --border-emphasis: color-mix(in srgb, var(--brand-78b) 82%, transparent);
+  --border-emphasis: var(--semantic-border-emphasis);
   --surface: var(--surface-base);
   --surface-tint: var(--surface-tint-base);
   --border: var(--border-base);
@@ -260,22 +311,22 @@
   --card-grad-tint-border: var(--card-grad-white-border);
   --card-grad-tint-shadow: var(--card-shadow-elevated);
 
-  --status-success: #2e7d32;
-  --status-success-bg: rgba(46, 125, 50, 0.12);
-  --status-success-border: rgba(46, 125, 50, 0.28);
-  --status-success-text: #1b5e20;
-  --status-warning: #b26a00;
-  --status-warning-bg: rgba(178, 106, 0, 0.12);
-  --status-warning-border: rgba(178, 106, 0, 0.28);
-  --status-warning-text: #7c4a00;
-  --status-pending: #e3776a;
-  --status-pending-bg: rgba(227, 119, 106, 0.16);
-  --status-pending-border: rgba(227, 119, 106, 0.38);
-  --status-pending-text: #a9473d;
-  --status-danger-bg: rgba(179, 38, 30, 0.1);
-  --status-danger-border: rgba(179, 38, 30, 0.26);
-  --status-danger-text: #8a1c16;
-  --status-danger: #b3261e;
+  --status-success: var(--semantic-status-success);
+  --status-success-bg: color-mix(in srgb, var(--status-success) 12%, transparent);
+  --status-success-border: color-mix(in srgb, var(--status-success) 28%, transparent);
+  --status-success-text: color-mix(in srgb, var(--status-success) 74%, var(--ds-black));
+  --status-warning: var(--semantic-status-warning);
+  --status-warning-bg: color-mix(in srgb, var(--status-warning) 12%, transparent);
+  --status-warning-border: color-mix(in srgb, var(--status-warning) 28%, transparent);
+  --status-warning-text: color-mix(in srgb, var(--status-warning) 70%, var(--ds-black));
+  --status-pending: var(--semantic-status-pending);
+  --status-pending-bg: color-mix(in srgb, var(--status-pending) 16%, transparent);
+  --status-pending-border: color-mix(in srgb, var(--status-pending) 38%, transparent);
+  --status-pending-text: color-mix(in srgb, var(--status-pending) 70%, var(--ds-black));
+  --status-danger-bg: color-mix(in srgb, var(--status-danger) 10%, transparent);
+  --status-danger-border: color-mix(in srgb, var(--status-danger) 26%, transparent);
+  --status-danger-text: color-mix(in srgb, var(--status-danger) 76%, var(--ds-black));
+  --status-danger: var(--semantic-status-danger);
   --status-info: var(--accent);
   --status-info-bg: var(--surface-tint-subtle);
   --status-info-border: var(--border-strong);
@@ -293,12 +344,12 @@
   --ticket-perf: color-mix(in srgb, var(--brand-78b) 62%, transparent);
 
   /* Boothmap palette (single source for map + sheet UI) */
-  --boothmap-marker-pub: var(--text-emphasis-vivid);
-  --boothmap-marker-food-truck: #ef4444;
-  --boothmap-marker-experience: #10b981;
-  --boothmap-marker-event: #f6ca3b;
-  --boothmap-marker-rest-area: var(--color-violet-500);
-  --boothmap-marker-facility: var(--brand-60);
+  --boothmap-marker-pub: var(--semantic-category-pub);
+  --boothmap-marker-food-truck: var(--semantic-category-food-truck);
+  --boothmap-marker-experience: var(--semantic-category-experience);
+  --boothmap-marker-event: var(--semantic-category-event);
+  --boothmap-marker-rest-area: var(--semantic-category-rest-area);
+  --boothmap-marker-facility: var(--semantic-category-facility);
 
   --boothmap-selected-shadow: color-mix(in srgb, var(--text-bold-emphasis) 28%, transparent);
   --boothmap-selected-shadow-soft: color-mix(in srgb, var(--text-bold-emphasis) 25%, transparent);
@@ -310,12 +361,12 @@
   --boothmap-college-fill-default: var(--brand-97);
   --boothmap-college-fill-selected: var(--brand-93);
 
-  --boothmap-zone-pub-stroke: var(--brand-48);
-  --boothmap-zone-pub-fill: var(--brand-78b);
-  --boothmap-zone-pub-dot: var(--brand-53);
-  --boothmap-zone-food-truck-stroke: #dc2626;
-  --boothmap-zone-food-truck-fill: #fca5a5;
-  --boothmap-zone-food-truck-dot: #ef4444;
+  --boothmap-zone-pub-stroke: color-mix(in srgb, var(--semantic-category-pub) 90%, var(--ds-black));
+  --boothmap-zone-pub-fill: color-mix(in srgb, var(--semantic-category-pub) 40%, var(--ds-white));
+  --boothmap-zone-pub-dot: var(--semantic-category-pub);
+  --boothmap-zone-food-truck-stroke: color-mix(in srgb, var(--semantic-category-food-truck) 80%, var(--ds-black));
+  --boothmap-zone-food-truck-fill: color-mix(in srgb, var(--semantic-category-food-truck) 25%, var(--ds-white));
+  --boothmap-zone-food-truck-dot: var(--semantic-category-food-truck);
   --boothmap-zone-smoking-stroke: var(--neutral-35);
   --boothmap-zone-smoking-fill: color-mix(in srgb, var(--neutral-300) 74%, var(--ink-300));
   --boothmap-zone-smoking-dot: var(--neutral-27);
@@ -379,7 +430,7 @@
   --card-foreground: var(--text);
   --popover: white;
   --popover-foreground: var(--text);
-  --primary: var(--accent);
+  --primary: var(--semantic-primary);
   --primary_container: color-mix(in srgb, var(--accent) 42%, white);
   --on-primary: var(--text-on-accent);
   --primary-foreground: var(--text-on-accent);
@@ -391,12 +442,12 @@
   --muted-foreground: var(--text-muted);
   --accent-soft: color-mix(in srgb, var(--brand-60) 16%, transparent);
   --accent-foreground: var(--accent);
-  --destructive: #b3261e;
+  --destructive: var(--semantic-status-danger);
   --destructive-foreground: var(--text-on-accent);
   --input: var(--border);
   --input-background: white;
   --switch-background: color-mix(in srgb, var(--neutral-65a) 50%, transparent);
-  --ring: color-mix(in srgb, var(--brand-53) 45%, transparent);
+  --ring: var(--semantic-focus-ring);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -428,7 +479,7 @@
   --admin-auth-card-shadow: 0 16px 34px color-mix(in srgb, var(--brand-11) 8%, transparent);
   --admin-auth-brand-text: var(--admin-accent-text);
   --admin-auth-subtext: var(--text-muted);
-  --admin-auth-input-bg: white;
+  --admin-auth-input-bg: var(--ds-white);
   --admin-auth-help-bg: var(--surface-subtle);
   --admin-auth-help-border: var(--border-subtle);
   --admin-auth-help-text: var(--text-muted);
@@ -438,24 +489,37 @@
   --admin-metric-total-bg: var(--surface-tint-base);
   --admin-metric-total-border: var(--border-base);
   --admin-metric-total-text: var(--accent);
-  --admin-metric-issued-bg: #fff2f8;
-  --admin-metric-issued-border: #f5cfe1;
-  --admin-metric-issued-text: #c84f8c;
-  --admin-metric-pending-bg: var(--status-success-bg);
-  --admin-metric-pending-border: var(--status-success-border);
-  --admin-metric-pending-text: var(--status-success);
-  --admin-table-bg: white;
+  /* Wristband state is a domain meaning, independent of generic status labels. */
+  --wristband-issued-metric-bg: color-mix(in srgb, var(--status-pending) 8%, var(--ds-white));
+  --wristband-issued-metric-border: color-mix(in srgb, var(--status-pending) 25%, var(--ds-white));
+  --wristband-issued-metric-text: var(--status-pending-text);
+  --wristband-unissued-metric-bg: var(--status-success-bg);
+  --wristband-unissued-metric-border: var(--status-success-border);
+  --wristband-unissued-metric-text: var(--status-success);
+  --admin-metric-issued-bg: var(--wristband-issued-metric-bg);
+  --admin-metric-issued-border: var(--wristband-issued-metric-border);
+  --admin-metric-issued-text: var(--wristband-issued-metric-text);
+  --admin-metric-pending-bg: var(--wristband-unissued-metric-bg);
+  --admin-metric-pending-border: var(--wristband-unissued-metric-border);
+  --admin-metric-pending-text: var(--wristband-unissued-metric-text);
+  --admin-table-bg: var(--ds-white);
   --admin-table-header-bg: var(--surface-tint-base);
   --admin-table-header-border: var(--border-base);
   --admin-table-cell-border: var(--border-subtle);
-  --admin-table-row-bg: white;
+  --admin-table-row-bg: var(--ds-white);
   --admin-table-row-alt-bg: var(--surface-subtle);
-  --admin-badge-issued-bg: #ffe6f3;
-  --admin-badge-issued-border: #f5a6cf;
-  --admin-badge-issued-text: #e6007a;
-  --admin-badge-pending-bg: var(--status-success-bg);
-  --admin-badge-pending-border: var(--status-success-border);
-  --admin-badge-pending-text: #15803d;
+  --wristband-issued-badge-bg: color-mix(in srgb, var(--status-pending) 12%, var(--ds-white));
+  --wristband-issued-badge-border: color-mix(in srgb, var(--status-pending) 38%, var(--ds-white));
+  --wristband-issued-badge-text: var(--status-pending);
+  --wristband-unissued-badge-bg: var(--status-success-bg);
+  --wristband-unissued-badge-border: var(--status-success-border);
+  --wristband-unissued-badge-text: var(--status-success);
+  --admin-badge-issued-bg: var(--wristband-issued-badge-bg);
+  --admin-badge-issued-border: var(--wristband-issued-badge-border);
+  --admin-badge-issued-text: var(--wristband-issued-badge-text);
+  --admin-badge-pending-bg: var(--wristband-unissued-badge-bg);
+  --admin-badge-pending-border: var(--wristband-unissued-badge-border);
+  --admin-badge-pending-text: var(--wristband-unissued-badge-text);
   --admin-guide-bg: var(--brand-98);
   --admin-guide-border: var(--brand-91a);
   --admin-guide-icon-bg: var(--brand-91a);
@@ -466,11 +530,11 @@
   --admin-guide-chip-text: var(--admin-accent-text);
   --admin-danger-note-bg: var(--status-danger-bg);
   --admin-danger-note-border: var(--status-danger-border);
-  --admin-danger-note-icon-bg: #fee2e2;
-  --admin-danger-note-icon-text: #b91c1c;
-  --admin-danger-note-text: #b91c1c;
+  --admin-danger-note-icon-bg: color-mix(in srgb, var(--status-danger) 12%, var(--ds-white));
+  --admin-danger-note-icon-text: var(--status-danger);
+  --admin-danger-note-text: var(--status-danger);
   --admin-danger-chip-bg: var(--status-danger-bg);
-  --admin-danger-chip-text: #b91c1c;
+  --admin-danger-chip-text: var(--status-danger);
   --admin-danger-outline-border: var(--admin-danger-note-border);
   --admin-danger-outline-text: var(--admin-danger-note-text);
   --admin-danger-outline-hover-bg: var(--admin-danger-note-bg);
@@ -479,17 +543,17 @@
   --admin-dialog-issue-bg: var(--brand-97);
   --admin-dialog-issue-border: var(--brand-87);
   --admin-dialog-issue-title: var(--brand-48);
-  --admin-dialog-cancel-bg: #fff5f5;
-  --admin-dialog-cancel-border: #fecaca;
-  --admin-dialog-cancel-title: #b91c1c;
+  --admin-dialog-cancel-bg: color-mix(in srgb, var(--status-danger) 5%, var(--ds-white));
+  --admin-dialog-cancel-border: color-mix(in srgb, var(--status-danger) 28%, var(--ds-white));
+  --admin-dialog-cancel-title: var(--status-danger);
   --admin-dialog-overlay-bg: color-mix(in srgb, var(--brand-11) 52%, transparent);
   --admin-issue-action-bg: var(--accent);
   --admin-issue-action-hover-bg: var(--brand-48);
   --admin-issue-action-border: var(--accent);
   --admin-issue-action-text: var(--text-on-accent);
-  --admin-danger-action-bg: #c62828;
-  --admin-danger-action-hover-bg: #b71c1c;
-  --admin-danger-action-border: #c62828;
+  --admin-danger-action-bg: var(--status-danger);
+  --admin-danger-action-hover-bg: color-mix(in srgb, var(--status-danger) 95%, var(--ds-black));
+  --admin-danger-action-border: var(--status-danger);
   --admin-danger-action-text: var(--text-on-accent);
 
   /* Home route tokens */
@@ -774,6 +838,10 @@
 }
 
 [data-color-scheme="webapp"] {
+  /* Preserve this scheme's border and focus strength while sharing the theme core. */
+  --semantic-border-base: color-mix(in srgb, var(--brand-91a) 92%, transparent);
+  --semantic-border-emphasis: color-mix(in srgb, var(--brand-72) 62%, transparent);
+  --semantic-focus-ring: color-mix(in srgb, var(--brand-35) 42%, transparent);
   --ink-900: var(--brand-15);
   --ink-800: var(--brand-19);
   --ink-700: var(--brand-23);
@@ -807,8 +875,8 @@
   --surface_container_high: color-mix(in srgb, var(--neutral-100) 48%, var(--neutral-300));
   --text: var(--webapp-text-main);
   --text-muted: var(--ink-400);
-  --accent: var(--webapp-button-primary);
-  --border-base: color-mix(in srgb, var(--brand-91a) 92%, transparent);
+  --accent: var(--semantic-accent);
+  --border-base: var(--semantic-border-base);
   --surface-base: rgba(247, 247, 247, 0.84);
   --surface-strong: rgba(247, 247, 247, 0.78);
   --surface-subtle: rgba(247, 247, 247, 0.9);
@@ -819,11 +887,11 @@
   --surface-tint: var(--surface-tint-base);
   --border-subtle: color-mix(in srgb, var(--brand-91a) 74%, transparent);
   --border-strong: color-mix(in srgb, var(--brand-91a) 98%, transparent);
-  --border-emphasis: color-mix(in srgb, var(--brand-72) 62%, transparent);
+  --border-emphasis: var(--semantic-border-emphasis);
   --outline_variant: color-mix(in srgb, var(--neutral-76) 34%, transparent);
   --border: var(--border-base);
   --shadow-color: color-mix(in srgb, var(--brand-26) 16%, transparent);
-  --ring: color-mix(in srgb, var(--brand-35) 42%, transparent);
+  --ring: var(--semantic-focus-ring);
   --card-surface-base: var(--brand-99);
   --card-radius: 20px;
   --card-border-width: 1px;
@@ -852,7 +920,7 @@
     linear-gradient(150deg, var(--card-grad-tint-start) 0%, var(--card-grad-tint-mid) 56%, var(--card-grad-tint-end) 100%);
   --card-grad-tint-border: var(--card-grad-white-border);
   --card-grad-tint-shadow: var(--card-shadow-elevated);
-  --primary: var(--webapp-button-primary);
+  --primary: var(--semantic-primary);
   --primary_container: color-mix(in srgb, var(--webapp-button-primary) 38%, white);
   --on-primary: var(--text-on-accent);
   --primary-soft: color-mix(in srgb, var(--brand-35) 14%, transparent);
@@ -920,9 +988,9 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.96),
     0 16px 24px -16px color-mix(in srgb, var(--brand-26) 34%, transparent);
 
-  --status-warning-bg: var(--webapp-caution-bg);
-  --status-warning-border: rgba(167, 127, 84, 0.36);
-  --status-warning-text: #855626;
+  --status-warning-bg: color-mix(in srgb, var(--status-warning) 10%, var(--ds-white));
+  --status-warning-border: color-mix(in srgb, var(--status-warning) 36%, transparent);
+  --status-warning-text: color-mix(in srgb, var(--status-warning) 75%, var(--ds-black));
   --status-info-bg: var(--webapp-surface-text-bg);
   --status-info-border: color-mix(in srgb, var(--neutral-76) 52%, transparent);
   --status-info-text: var(--webapp-text-emphasis);
@@ -1008,12 +1076,16 @@
 }
 
 [data-color-scheme="electric-curator"] {
+  /* Keep the existing component tint ratios and focus strength. */
+  --semantic-border-base: var(--outline_variant);
+  --semantic-border-emphasis: color-mix(in srgb, var(--semantic-primary) 62%, transparent);
+  --semantic-focus-ring: color-mix(in srgb, var(--semantic-primary) 40%, transparent);
   --surface: var(--brand-98);
   --surface_container: var(--neutral-93);
   --surface_container_low: var(--brand-95);
   --surface_container_lowest: #ffffff;
   --surface_container_high: var(--neutral-93);
-  --primary: var(--brand-65a);
+  --primary: var(--semantic-primary);
   --primary_container: var(--brand-89);
   --on-primary: #ffffff;
   --secondary: rgb(245 176 112);
@@ -1045,7 +1117,7 @@
   --text: var(--neutral-19);
   --text-muted: rgb(101 114 118);
   --text-on-accent: var(--on-primary);
-  --accent: var(--primary);
+  --accent: var(--semantic-accent);
   --surface-base: var(--surface_container_lowest);
   --surface-subtle: var(--surface_container_low);
   --surface-strong: var(--surface_container);
@@ -1054,13 +1126,13 @@
   --surface-tint-strong: color-mix(in srgb, var(--primary_container) 72%, transparent);
   --surface-tint-emphasis: color-mix(in srgb, var(--primary_container) 84%, transparent);
   --surface-tint: var(--surface-tint-base);
-  --border-base: var(--outline_variant);
+  --border-base: var(--semantic-border-base);
   --border-subtle: color-mix(in srgb, var(--outline_variant) 82%, transparent);
   --border-strong: color-mix(in srgb, var(--primary) 40%, transparent);
-  --border-emphasis: color-mix(in srgb, var(--primary) 62%, transparent);
+  --border-emphasis: var(--semantic-border-emphasis);
   --border: var(--border-base);
   --shadow-color: color-mix(in srgb, var(--neutral-19) 12%, transparent);
-  --ring: color-mix(in srgb, var(--primary) 40%, transparent);
+  --ring: var(--semantic-focus-ring);
 
   --background: var(--bg-base);
   --foreground: var(--text);
@@ -1156,10 +1228,10 @@
   --status-info-bg: color-mix(in srgb, var(--tertiary_container) 46%, transparent);
   --status-info-border: color-mix(in srgb, var(--outline_variant) 88%, transparent);
   --status-info-text: rgb(77 79 78);
-  --status-warning: rgb(201 133 72);
-  --status-warning-bg: color-mix(in srgb, var(--secondary_container) 42%, transparent);
-  --status-warning-border: color-mix(in srgb, var(--secondary) 34%, transparent);
-  --status-warning-text: rgb(130 86 46);
+  --status-warning: color-mix(in srgb, var(--semantic-status-warning) 70%, var(--ds-white));
+  --status-warning-bg: color-mix(in srgb, color-mix(in srgb, var(--status-warning) 20%, var(--ds-white)) 42%, transparent);
+  --status-warning-border: color-mix(in srgb, var(--status-warning) 34%, transparent);
+  --status-warning-text: color-mix(in srgb, var(--status-warning) 65%, var(--ds-black));
   --status-neutral: var(--text-muted);
   --status-neutral-bg: color-mix(in srgb, var(--surface_container_high) 90%, white);
   --status-neutral-border: var(--outline_variant);
@@ -1436,73 +1508,71 @@ body,
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* ══════════════════════════════════════════════════════════
-   시안 정확 매칭 — "웹 컬러 제안" 좌측 팔레트 (LEGEND)
-   시안이 지정한 색을 역할별로 그대로 못박는다.
-   ══════════════════════════════════════════════════════════ */
+/* Current festival compatibility aliases. The two layout selectors still own their
+   component-specific tint ratios, dimensions, gradients, and shadow geometry. */
 :root,
 [data-color-scheme="webapp"],
 [data-color-scheme="electric-curator"] {
-  --accent: #ff642d;                    /* MAIN 1 — 버튼, 활성 칩 */
-  --primary: #ff642d;
+  --accent: var(--semantic-accent);       /* 버튼, 활성 칩 */
+  --primary: var(--semantic-primary);
   --brand-main: #f0410f;                /* MAIN 2 — 얇은 라인, 활성화 */
-  --text-emphasis-vivid: #e13600;       /* 변경 컬러 — 강조 텍스트 */
-  --text-emphasis-vivid-strong: #e13600;
-  --emphasis-primary: #e13600;
-  --text: #232124;                      /* 활성화 텍스트 */
-  --text-body-deep: #232124;
-  --text-muted: #91827d;                /* 기본 텍스트 */
-  --app-nav-home-highlight: #ff642d;    /* 하단 네비 홈 버튼 */
-  --app-nav-text-active: #ff642d;
-  --app-nav-text: #91827d;              /* 기본 텍스트 (비활성 라벨) */
-  --timetable-v2-accent: #ff642d;       /* DAY 탭 활성, 타임라인 */
-  --timetable-v2-time-pill-bg: #ffece6; /* 시간 알약 배경 */
-  --timetable-v2-time-pill-fg: #ff642d;
+  --text-emphasis-vivid: var(--semantic-text-emphasis);
+  --text-emphasis-vivid-strong: var(--semantic-text-emphasis);
+  --emphasis-primary: var(--semantic-text-emphasis);
+  --text: var(--semantic-text-primary);
+  --text-body-deep: var(--semantic-text-primary);
+  --text-muted: var(--semantic-text-secondary);
+  --app-nav-home-highlight: var(--semantic-primary);
+  --app-nav-text-active: var(--semantic-primary);
+  --app-nav-text: var(--semantic-text-secondary);
+  --timetable-v2-accent: var(--semantic-primary);
+  --timetable-v2-time-pill-bg: color-mix(in srgb, var(--semantic-primary) 12%, var(--ds-white));
+  --timetable-v2-time-pill-fg: var(--semantic-primary);
 
   /* 배경 — 전부 흰색. 입력창만 회색으로 파이게 둔다 */
-  --bg-base: #ffffff;                   /* 페이지 바닥 — 헤더와 동일하게 흰색 */
-  --bg-page-soft: #ffffff;
-  --boothmap-page-bg: #ffffff;
-  --surface-subtle: #ebe8e6;            /* 입력창·연한 면 (검색창) */
-  --admin-header-bg: #ffffff;
-  --app-header-bg: #ffffff;
-  --app-overscroll-bg: #ffffff;
-  --footer-bg: #ffffff;
-  --surface: #ffffff;
-  --surface-base: #ffffff;
-  --surface-strong: #ffffff;
-  --surface_container_lowest: #ffffff;
-  --app-bottom-nav-surface: #ffffff;
-  --card-surface-base: #ffffff;
-  --card-outline-bg: #ffffff;
-  --home-card-bg: #ffffff;
-  --boothmap-paper-base: #ffffff;
-  --boothmap-paper-soft: #ffffff;
+  --bg-base: var(--semantic-page-background);
+  --bg-page-soft: var(--semantic-page-background);
+  --boothmap-page-bg: var(--semantic-page-background);
+  --surface-subtle: var(--semantic-surface-input);
+  --admin-header-bg: var(--semantic-surface-card);
+  --app-header-bg: var(--semantic-surface-card);
+  --app-overscroll-bg: var(--semantic-page-background);
+  --footer-bg: var(--semantic-surface-card);
+  --surface: var(--semantic-surface-card);
+  --surface-base: var(--semantic-surface-card);
+  --surface-strong: var(--semantic-surface-card);
+  --surface_container_lowest: var(--semantic-surface-card);
+  --app-bottom-nav-surface: var(--semantic-surface-card);
+  --card-surface-base: var(--semantic-surface-card);
+  --card-outline-bg: var(--semantic-surface-card);
+  --home-card-bg: var(--semantic-surface-card);
+  --boothmap-paper-base: var(--semantic-surface-card);
+  --boothmap-paper-soft: var(--semantic-surface-card);
 
   /* 부스맵 목록·상세 본문 — 주점명/운영시간/설명은 무채색 계열로 통일.
      브랜드 색은 마커·활성 칩·인스타 핸들 같은 강조 요소에만 남긴다. */
-  --boothmap-text: #232124;          /* 주점·부스 이름 */
+  --boothmap-text: var(--semantic-text-primary); /* 주점·부스 이름 */
   --boothmap-text-subtle: #5c5759;   /* 운영시간·설명 본문 */
   --boothmap-text-soft: #7a7476;     /* 카드 부제 — 단과대·한줄소개 */
   --boothmap-text-muted: #8f8a8c;    /* 섹션 라벨·보조 안내 */
 
   /* 한줄소개 콜아웃 — 강조는 유지하되 색은 빼고 면으로만 구분한다 */
   --boothmap-intro-bg: #f1efef;
-  --boothmap-intro-text: #232124;
+  --boothmap-intro-text: var(--semantic-text-primary);
 
   /* 카테고리 마커 — 붉은 계열에 주점/푸드트럭/편의시설이 몰려 구분이 안 되던 것을
      색상환에서 서로 떨어뜨린다. 주점만 브랜드 주황을 쓴다. */
-  --boothmap-marker-pub: #ff642d;         /* 주점 — 브랜드 주황 */
-  --boothmap-marker-food-truck: #ec4899;  /* 푸드트럭 — 핑크 */
-  --boothmap-marker-facility: #3b82f6;    /* 편의시설 — 파랑 */
+  --boothmap-marker-pub: var(--semantic-category-pub);
+  --boothmap-marker-food-truck: var(--semantic-category-food-truck);
+  --boothmap-marker-facility: var(--semantic-category-facility);
 
   /* 구역 폴리곤 — 같은 카테고리의 마커 색과 계열을 맞춘다 */
-  --boothmap-zone-pub-stroke: #e8480f;
-  --boothmap-zone-pub-fill: #ffc4a8;
-  --boothmap-zone-pub-dot: #ff642d;
-  --boothmap-zone-food-truck-stroke: #be185d;
-  --boothmap-zone-food-truck-fill: #fbcfe8;
-  --boothmap-zone-food-truck-dot: #ec4899;
+  --boothmap-zone-pub-stroke: color-mix(in srgb, var(--semantic-category-pub) 90%, var(--ds-black));
+  --boothmap-zone-pub-fill: color-mix(in srgb, var(--semantic-category-pub) 40%, var(--ds-white));
+  --boothmap-zone-pub-dot: var(--semantic-category-pub);
+  --boothmap-zone-food-truck-stroke: color-mix(in srgb, var(--semantic-category-food-truck) 80%, var(--ds-black));
+  --boothmap-zone-food-truck-fill: color-mix(in srgb, var(--semantic-category-food-truck) 25%, var(--ds-white));
+  --boothmap-zone-food-truck-dot: var(--semantic-category-food-truck);
 }
 
 /*

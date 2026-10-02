@@ -219,14 +219,14 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
             </div>
           </Card>
 
-          <Card className="border border-[var(--admin-metric-issued-border)] bg-[var(--admin-metric-issued-bg)] p-3">
+          <Card className="border border-[var(--wristband-issued-metric-border)] bg-[var(--wristband-issued-metric-bg)] p-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="mb-0.5 text-xs font-semibold text-[var(--admin-metric-issued-text)]">지급 완료</p>
+                <p className="mb-0.5 text-xs font-semibold text-[var(--wristband-issued-metric-text)]">지급 완료</p>
                 <p className="text-2xl font-bold text-foreground">
                   {statsLoading ? "-" : resolvedStats.issuedCount}
                   {!statsLoading && resolvedStats.totalTickets > 0 && (
-                    <span className="ml-1.5 text-sm text-[var(--admin-metric-issued-text)]">
+                    <span className="ml-1.5 text-sm text-[var(--wristband-issued-metric-text)]">
                       ({((resolvedStats.issuedCount / resolvedStats.totalTickets) * 100).toFixed(1)}%)
                     </span>
                   )}
@@ -236,14 +236,14 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
             </div>
           </Card>
 
-          <Card className="border border-[var(--admin-metric-pending-border)] bg-[var(--admin-metric-pending-bg)] p-3">
+          <Card className="border border-[var(--wristband-unissued-metric-border)] bg-[var(--wristband-unissued-metric-bg)] p-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="mb-0.5 text-xs font-semibold text-[var(--admin-metric-pending-text)]">미지급</p>
+                <p className="mb-0.5 text-xs font-semibold text-[var(--wristband-unissued-metric-text)]">미지급</p>
                 <p className="text-2xl font-bold text-foreground">
                   {statsLoading ? "-" : resolvedStats.pendingCount}
                   {!statsLoading && resolvedStats.totalTickets > 0 && (
-                    <span className="ml-1.5 text-sm text-[var(--admin-metric-pending-text)]">
+                    <span className="ml-1.5 text-sm text-[var(--wristband-unissued-metric-text)]">
                       ({((resolvedStats.pendingCount / resolvedStats.totalTickets) * 100).toFixed(1)}%)
                     </span>
                   )}
@@ -320,11 +320,11 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
                         <TableCell className="px-5 py-4 text-base">{student.department}</TableCell>
                         <TableCell className="px-5 py-4">
                           {student.hasWristband ? (
-                            <span className="inline-flex items-center rounded-full border border-[var(--admin-badge-issued-border)] bg-[var(--admin-badge-issued-bg)] px-3 py-1 text-sm font-semibold text-[var(--admin-badge-issued-text)]">
+                            <span className="inline-flex items-center rounded-full border border-[var(--wristband-issued-badge-border)] bg-[var(--wristband-issued-badge-bg)] px-3 py-1 text-sm font-semibold text-[var(--wristband-issued-badge-text)]">
                               지급완료
                             </span>
                           ) : (
-                            <span className="inline-flex items-center rounded-full border border-[var(--admin-badge-pending-border)] bg-[var(--admin-badge-pending-bg)] px-3 py-1 text-sm font-semibold text-[var(--admin-badge-pending-text)]">
+                            <span className="inline-flex items-center rounded-full border border-[var(--wristband-unissued-badge-border)] bg-[var(--wristband-unissued-badge-bg)] px-3 py-1 text-sm font-semibold text-[var(--wristband-unissued-badge-text)]">
                               미지급
                             </span>
                           )}
@@ -384,7 +384,7 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
                   <span className="flex-shrink-0 font-semibold text-[var(--admin-guide-step-text)]">3.</span>
                   <span>
                     학번 조회 후{" "}
-                    <span className="inline-flex items-center rounded-full border border-[var(--admin-badge-pending-border)] bg-[var(--admin-badge-pending-bg)] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--admin-badge-pending-text)]">
+                    <span className="inline-flex items-center rounded-full border border-[var(--wristband-unissued-badge-border)] bg-[var(--wristband-unissued-badge-bg)] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--wristband-unissued-badge-text)]">
                       미지급
                     </span>
                     {" "}여부 확인
@@ -412,7 +412,7 @@ export function WristbandOperationScreen({ eventId, date, dayLabel, onBack }: Wr
                 <div className="flex gap-1.5 leading-snug">
                   <span className="flex-shrink-0 font-semibold text-[var(--admin-guide-step-text)]">6.</span>
                   <span>
-                    <span className="inline-flex items-center rounded-full border border-[var(--admin-badge-issued-border)] bg-[var(--admin-badge-issued-bg)] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--admin-badge-issued-text)]">
+                    <span className="inline-flex items-center rounded-full border border-[var(--wristband-issued-badge-border)] bg-[var(--wristband-issued-badge-bg)] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--wristband-issued-badge-text)]">
                       지급완료
                     </span>
                     {" "}확인 후 팔찌 배부

@@ -29,21 +29,21 @@ describe("boothmapTheme", () => {
       iconPath: "/markers/booth-event.svg",
     });
     expect(getBoothmapMarkerTheme("PUB")).toEqual({
-      color: "#2853A9",
+      color: "#ff642d",
       iconPath: "/markers/booth-pub.svg",
     });
   });
 
   it("구역 팔레트는 타입별 색상을 제공한다", () => {
     expect(getBoothmapZonePalette("PUB")).toEqual({
-      stroke: "#1d4ed8",
-      fill: "#93c5fd",
-      dot: "#2563eb",
+      stroke: "#e65a29",
+      fill: "#ffc1ab",
+      dot: "#ff642d",
     });
     expect(getBoothmapZonePalette("FOOD_TRUCK")).toEqual({
-      stroke: "#dc2626",
-      fill: "#fca5a5",
-      dot: "#ef4444",
+      stroke: "#bd3a7a",
+      fill: "#fad1e6",
+      dot: "#ec4899",
     });
     expect(getBoothmapZonePalette("SMOKING_AREA")).toEqual({
       stroke: "#475569",
