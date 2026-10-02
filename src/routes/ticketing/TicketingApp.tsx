@@ -182,7 +182,7 @@ export default function TicketingApp() {
           </Route>
 
           {/*
-            티켓팅 화면은 축제 설정에서 티켓팅을 켠 동안만 열린다.
+            예매와 내 티켓 화면은 축제 설정에서 티켓팅을 켠 동안만 열린다.
             게이트를 UserLayout 바깥에 두어야 안내 화면이 헤더 없이 화면을 꽉 채운다.
           */}
           <Route element={<TicketingGate />}>

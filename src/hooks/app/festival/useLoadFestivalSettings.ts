@@ -1,25 +1,33 @@
-// 역할: 앱이 뜰 때 축제 설정을 한 번 받아와 운영 날짜 저장소에 넣는다.
-//
-// 실패해도 화면은 기본 날짜로 계속 동작한다. 축제 당일 설정 API 한 곳이 흔들려도
-// 부스맵·타임테이블이 빈 화면이 되지 않게 하기 위해서다.
+// 역할: 서버 설정을 처음 진입/포커스 복귀/주기 갱신으로 사용자 화면에 반영한다.
 import { useEffect } from "react"
-
 import { getFestivalSettings } from "@/api/app/festival/festivalSettingsApi"
-import { setFestivalDates, setTicketingEnabled } from "@/lib/app/festival/festivalCalendar"
-
+import { setFestivalDates, setTicketingEnabled, setTicketingBackgroundImageUrl, setTicketCardBackgroundImageUrl } from "@/lib/app/festival/festivalCalendar"
 export function useLoadFestivalSettings(): void {
   useEffect(() => {
     const controller = new AbortController()
-
-    getFestivalSettings({ signal: controller.signal })
-      .then((settings) => {
+    let pending = false
+    const refresh = async () => {
+      if (pending || document.visibilityState === "hidden") return
+      pending = true
+      try {
+        const settings = await getFestivalSettings({ signal: controller.signal })
+        if (controller.signal.aborted) return
         setFestivalDates(settings.operationDates)
         setTicketingEnabled(settings.ticketingEnabled)
-      })
-      .catch(() => {
-        // 기본 날짜를 그대로 둔다.
-      })
-
-    return () => controller.abort()
+        setTicketingBackgroundImageUrl(settings.ticketingBackgroundImageUrl ?? null)
+        setTicketCardBackgroundImageUrl(settings.ticketCardBackgroundImageUrl ?? null)
+      } catch { /* 네트워크 오류에는 마지막으로 받은 설정 유지 */ }
+      finally { pending = false }
+    }
+    void refresh()
+    window.addEventListener("focus", refresh)
+    document.addEventListener("visibilitychange", refresh)
+    const timer = window.setInterval(refresh, 30_000)
+    return () => {
+      controller.abort()
+      clearInterval(timer)
+      window.removeEventListener("focus", refresh)
+      document.removeEventListener("visibilitychange", refresh)
+    }
   }, [])
 }

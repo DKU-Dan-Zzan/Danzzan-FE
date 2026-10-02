@@ -299,7 +299,9 @@ export function useTicketingFlow() {
         handleUnauthorized();
       } else {
         setActiveEventId(null);
-        setListNotice("대기열 진입에 실패했습니다. 잠시 후 다시 시도해주세요.");
+        setListNotice(parsed.code === "RESERVE_PROCESSING_PENDING"
+          ? "발급 결과를 확인 중입니다. 잠시 후 내 티켓을 확인하거나 같은 공연을 다시 선택해 주세요."
+          : "대기열 진입에 실패했습니다. 잠시 후 다시 시도해주세요.");
         applyQueueEventToUrl(null);
         await moveToList({ preserveNotice: true });
       }

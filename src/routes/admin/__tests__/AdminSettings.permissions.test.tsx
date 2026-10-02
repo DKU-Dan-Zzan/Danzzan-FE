@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { act } from "react"
+import { MemoryRouter } from "react-router-dom"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -8,19 +9,23 @@ import AdminSettings from "@/routes/admin/AdminSettings"
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
 const state = vi.hoisted(() => ({ role: "manager", permissions: ["OPERATIONS"] as string[] }))
-const api = vi.hoisted(() => ({ get: vi.fn(), metadata: vi.fn(), ticketing: vi.fn() }))
+const api = vi.hoisted(() => ({ get: vi.fn(), metadata: vi.fn(), ticketing: vi.fn(), upload: vi.fn() }))
 const toast = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() }))
 
 vi.mock("@/store/common/authStore", () => ({
   authStore: { subscribe: () => () => {}, getSnapshot: () => state },
 }))
 vi.mock("@/api/app/festival/festivalSettingsApi", () => ({
+  uploadTicketingBackground: api.upload,
   getFestivalSettings: api.get,
   updateFestivalMetadata: api.metadata,
   updateFestivalTicketingSettings: api.ticketing,
   isRequestAborted: () => false,
 }))
-vi.mock("@/lib/app/festival/festivalCalendar", () => ({ setFestivalDates: vi.fn() }))
+vi.mock("@/lib/app/festival/festivalCalendar", async (importOriginal) => ({
+  ...await importOriginal<typeof import("@/lib/app/festival/festivalCalendar")>(),
+  setFestivalDates: vi.fn(), setTicketingEnabled: vi.fn(), setTicketingBackgroundImageUrl: vi.fn(), setTicketCardBackgroundImageUrl: vi.fn(),
+}))
 vi.mock("sonner", () => ({ Toaster: () => null, toast }))
 
 const settings = {
@@ -62,6 +67,11 @@ const setInputValue = async (input: HTMLInputElement, value: string) => {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  vi.stubGlobal("URL", class extends URL {
+    static createObjectURL = vi.fn(() => "blob:background-preview")
+    static revokeObjectURL = vi.fn()
+  })
+  api.upload.mockResolvedValue({url: "https://example.com/new-background.jpg", key: "background.jpg"})
   state.role = "manager"
   state.permissions = ["OPERATIONS"]
   api.get.mockResolvedValue(settings)
@@ -79,10 +89,11 @@ beforeEach(() => {
 afterEach(async () => {
   await act(async () => root.unmount())
   container.remove()
+  vi.unstubAllGlobals()
 })
 
 async function render() {
-  await act(async () => root.render(<AdminSettings />))
+  await act(async () => root.render(<MemoryRouter><AdminSettings /></MemoryRouter>))
   await settle()
 }
 
@@ -91,6 +102,108 @@ async function startEditing() {
 }
 
 describe("AdminSettings unified save", () => {
+  it.each([true, false])("toggles directly from saved %s, supports cancel, and only applies on save", async (initialValue) => {
+    state.permissions = ["TICKETING"]
+    api.get.mockResolvedValue({ ...settings, ticketingEnabled: initialValue })
+    await render()
+    const target = initialValue ? "OFF" : "ON"
+    expect(findButton(target)?.disabled).toBe(false)
+    await clickButton(target)
+    expect(findButton(target)?.getAttribute("aria-pressed")).toBe("true")
+    expect(findButton("저장")).toBeDefined()
+    expect(api.ticketing).not.toHaveBeenCalled()
+    await clickButton("취소")
+    expect(findButton(initialValue ? "ON" : "OFF")?.getAttribute("aria-pressed")).toBe("true")
+    expect(api.ticketing).not.toHaveBeenCalled()
+    await clickButton(target)
+    await clickButton("저장")
+    await settle()
+    expect(api.ticketing).toHaveBeenCalledWith(expect.objectContaining({ ticketingEnabled: !initialValue }))
+    expect(api.metadata).not.toHaveBeenCalled()
+  })
+
+  it("uploads an issued-ticket background and previews the actual ticket card", async () => {
+    state.permissions = ["TICKETING"]
+    api.get.mockResolvedValue({ ...settings, ticketingBackgroundImageUrl: "https://example.com/off.png" })
+    await render()
+    expect(container.textContent).toContain("발급 티켓 배경")
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]')!
+    const file = new File(["image"], "card.jpg", { type: "image/jpeg" })
+    await act(async () => {
+      Object.defineProperty(input, "files", { value: [file], configurable: true })
+      input.dispatchEvent(new Event("change", { bubbles: true }))
+    })
+    expect(container.querySelector('image[href="blob:background-preview"]')).not.toBeNull()
+    await clickButton("저장")
+    await settle()
+    expect(api.ticketing).toHaveBeenCalledWith(expect.objectContaining({
+      ticketCardBackgroundImageUrl: "https://example.com/new-background.jpg",
+      ticketingBackgroundImageUrl: "https://example.com/off.png",
+    }))
+  })
+
+  it("changes the default background directly, previews the notice, and saves the uploaded URL", async () => {
+    state.permissions = ["TICKETING"]
+    api.get.mockResolvedValue({ ...settings, ticketingEnabled: false })
+    await render()
+    expect(findButton("배경 사진 변경")?.disabled).toBe(false)
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]')!
+    expect(input.disabled).toBe(false)
+    const file = new File(["image"], "new-background.jpg", { type: "image/jpeg" })
+    await act(async () => {
+      Object.defineProperty(input, "files", {value: [file], configurable: true})
+      input.dispatchEvent(new Event("change", { bubbles: true }))
+    })
+    expect(container.querySelector('img[src="blob:background-preview"]')).not.toBeNull()
+    expect(container.querySelector('img[alt="LEGEND"]')).not.toBeNull()
+    expect(findButton("저장")).toBeDefined()
+    await clickButton("저장")
+    await settle()
+    expect(api.upload).toHaveBeenCalledWith(file)
+    expect(api.ticketing).toHaveBeenCalledWith(expect.objectContaining({ ticketingBackgroundImageUrl: "https://example.com/new-background.jpg" }))
+    expect(container.querySelector('img[src="https://example.com/new-background.jpg"]')).not.toBeNull()
+  })
+
+  it("shows the OFF background editor only while ticketing is OFF", async () => {
+    state.permissions = ["TICKETING"]
+    await render()
+    expect(container.textContent).not.toContain("티켓팅 OFF 안내 배경")
+    await startEditing()
+    await clickButton("OFF")
+    expect(container.textContent).toContain("티켓팅 OFF 안내 배경")
+    expect(container.querySelector('img[alt="LEGEND"]')).not.toBeNull()
+    await clickButton("ON")
+    expect(container.textContent).not.toContain("티켓팅 OFF 안내 배경")
+  })
+
+  it("restores the original OFF notice and saves a cleared custom background", async () => {
+    state.permissions = ["TICKETING"]
+    api.get.mockResolvedValue({ ...settings, ticketingEnabled: false, ticketingBackgroundImageUrl: "https://example.com/custom.png" })
+    await render()
+    await startEditing()
+    await clickButton("기본 안내 화면 사용")
+    expect(container.querySelector('img[src="https://example.com/custom.png"]')).toBeNull()
+    expect(container.querySelector('img[alt="LEGEND"]')).not.toBeNull()
+    await clickButton("저장")
+    await settle()
+    expect(api.ticketing).toHaveBeenCalledWith(expect.objectContaining({ ticketingBackgroundImageUrl: null, ticketingEnabled: false }))
+  })
+
+  it("edits a saved round in place and sends its original id", async () => {
+    state.permissions = ["TICKETING"]
+    await render()
+    await startEditing()
+    const capacity = container.querySelector<HTMLInputElement>('input[aria-label="1회차 티켓 수량"]')
+    expect(capacity).not.toBeNull()
+    await setInputValue(capacity!, "25")
+    await clickButton("저장")
+    await settle()
+    expect(api.ticketing).toHaveBeenCalledWith(expect.objectContaining({
+      ticketingRounds: [expect.objectContaining({id: 1, capacity: 25, performanceDate: "2027-05-15"})],
+    }))
+    expect(api.metadata).not.toHaveBeenCalled()
+  })
+
   it("operations-only saves a changed festival name through only the metadata API", async () => {
     await render()
     expect([...container.querySelectorAll("h2")].map(heading => heading.textContent)).toEqual(["축제 기본 정보"])
@@ -130,6 +243,8 @@ describe("AdminSettings unified save", () => {
     await settle()
 
     expect(api.ticketing).toHaveBeenCalledWith({
+      ticketingBackgroundImageUrl: null,
+      ticketCardBackgroundImageUrl: null,
       ticketingEnabled: false,
       ticketingRounds: [],
       confirmedTicketCancelRoundIds: [],
@@ -170,6 +285,8 @@ describe("AdminSettings unified save", () => {
 
     expect(api.metadata.mock.invocationCallOrder[0]).toBeLessThan(api.ticketing.mock.invocationCallOrder[0]!)
     expect(api.ticketing).toHaveBeenCalledWith({
+      ticketingBackgroundImageUrl: null,
+      ticketCardBackgroundImageUrl: null,
       ticketingEnabled: false,
       ticketingRounds: [],
       confirmedTicketCancelRoundIds: [],

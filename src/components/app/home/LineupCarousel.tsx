@@ -1,4 +1,5 @@
 // 역할: home 화면에서 사용하는 Lineup Carousel UI 블록을 렌더링합니다.
+import { clsx } from "clsx"
 import { useCallback, useEffect, useMemo, useRef, useState, type TouchEvent } from "react"
 import { useT } from "@/i18n"
 
@@ -166,11 +167,9 @@ export default function LineupCarousel({
             return (
               <div
                 key={`${banner.id}-${position}`}
-                className={`relative shrink-0 overflow-hidden rounded-[1.85rem] bg-[var(--surface_container_lowest)] transition-[transform,opacity] duration-500 ease-out will-change-transform ${
-                  isCenterCard
+                className={clsx("relative shrink-0 overflow-hidden rounded-[1.85rem] bg-[var(--surface_container_lowest)] transition-[transform,opacity] duration-500 ease-out will-change-transform", isCenterCard
                     ? "scale-100 opacity-100 shadow-[var(--home-lineup-card-shadow)]"
-                    : `${sideCardOriginClass} scale-[0.67] opacity-82 shadow-[0_14px_24px_-20px_rgba(44,52,54,0.14)]`
-                }`}
+                    : `${sideCardOriginClass} scale-[0.67] opacity-82 shadow-[0_14px_24px_-20px_rgba(44,52,54,0.14)]`)}
                 style={{ width: `${LINEUP_CARD_WIDTH_PX}px` }}
               >
                 <div style={{ aspectRatio: aspect }}>
@@ -206,9 +205,7 @@ export default function LineupCarousel({
                   setTrackIndex(i + 1)
                 }}
                 aria-label={t("home.lineupDotAria", { index: i + 1 })}
-                className={`h-[var(--home-dot-height)] rounded-full bg-[var(--surface_container_high)] transition-all duration-300 ${
-                  active ? "w-[var(--home-dot-active-width)] bg-[linear-gradient(135deg,var(--primary)_0%,var(--primary_container)_100%)]" : "w-[var(--home-dot-width)]"
-                }`}
+                className={clsx("h-[var(--home-dot-height)] rounded-full bg-[var(--surface_container_high)] transition-all duration-300", active ? "w-[var(--home-dot-active-width)] bg-[linear-gradient(135deg,var(--primary)_0%,var(--primary_container)_100%)]" : "w-[var(--home-dot-width)]")}
               />
             )
           })}

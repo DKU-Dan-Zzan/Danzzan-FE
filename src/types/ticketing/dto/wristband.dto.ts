@@ -19,6 +19,7 @@ export interface EventSummaryDto {
   dayLabel: string;
   eventDate: string;
   ticketingStatus: "READY" | "OPEN" | "CLOSED";
+  ticketingStartTime?: string;
   totalCapacity: number;
 }
 
@@ -31,6 +32,7 @@ export interface EventStatsResponseDto {
   eventId: number;
   title: string;
   eventDate: string;
+  ticketingStartTime?: string;
   totalCapacity: number;
   totalTickets: number;
   ticketsConfirmed: number;

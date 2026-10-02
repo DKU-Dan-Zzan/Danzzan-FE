@@ -1,4 +1,5 @@
 // 역할: 관리자 인증 정보를 입력받아 로그인 요청과 실패 메시지를 처리하는 화면입니다.
+import { clsx } from "clsx"
 import { useState, type FormEvent } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { CircleAlert, Eye, EyeOff, ShieldCheck } from "lucide-react";
@@ -107,7 +108,7 @@ export default function AdminLogin() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="비밀번호를 입력하세요"
-                        className={`${ADMIN_AUTH_INPUT_CLASS_NAME} pr-12`}
+                        className={clsx(ADMIN_AUTH_INPUT_CLASS_NAME, "pr-12")}
                         required
                         autoComplete="current-password"
                       />

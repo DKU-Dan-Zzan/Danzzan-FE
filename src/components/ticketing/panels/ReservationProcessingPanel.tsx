@@ -1,4 +1,5 @@
 // 역할: 예매 처리 중 상태와 오류/재시도 UI를 제공하는 중간 단계 패널입니다.
+import { clsx } from "clsx"
 import { LoaderCircle, RotateCcw } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { Card } from "@/components/common/ui/card";
@@ -16,10 +17,10 @@ export function ReservationProcessingPanel({
   onRetry,
 }: ReservationProcessingPanelProps) {
   return (
-    <div className={`${TICKETING_NARROW_PANEL_CLASS} flex min-h-[calc(100svh-var(--app-bottom-nav-runtime-offset)-env(safe-area-inset-top)-68px-var(--app-header-first-card-gap))] items-center`}>
-      <Card className={`${TICKETING_CLASSES.card.summaryInfo} gap-5 border-[var(--border-strong)] px-6 py-7`}>
+    <div className={clsx(TICKETING_NARROW_PANEL_CLASS, "flex min-h-[calc(100svh-var(--app-bottom-nav-runtime-offset)-env(safe-area-inset-top)-68px-var(--app-header-first-card-gap))] items-center")}>
+      <Card className={clsx(TICKETING_CLASSES.card.summaryInfo, "gap-5 border-[var(--border-strong)] px-6 py-7")}>
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[20px] bg-[var(--surface-tint-strong)] text-[var(--accent)]">
-          <LoaderCircle className={`h-9 w-9 ${processing ? "animate-spin" : ""}`} />
+          <LoaderCircle className={clsx("h-9 w-9", processing ? "animate-spin" : "")} />
         </div>
 
         <div>

@@ -1,10 +1,13 @@
 // 역할: 종이 티켓 스타일 카드의 시각 표현과 상태별 배지/정보 표시를 담당합니다.
+import { useId, useState, useSyncExternalStore } from "react";
+import { getTicketCardBackgroundImageUrl, subscribeFestivalSettings } from "@/lib/app/festival/festivalCalendar";
 import { cn } from "@/components/common/ui/utils";
 import { resolveTicketDayLabel } from "@/lib/ticketing/festivalDay";
 import type { Ticket } from "@/types/ticketing/model/ticket.model";
 
 interface PaperTicketCardProps {
   ticket: Ticket;
+  backgroundImageUrl?: string | null;
 }
 
 const statusDisplayMap: Record<Ticket["status"], { label: string; bg: string; text: string }> = {
@@ -26,24 +29,26 @@ const toCompactEventDate = (value: string): string => {
   return normalized;
 };
 
-// 티켓팅 날짜 → 실제 공연 날짜 변환 (5/7→5/12, 5/8→5/13)
-const TICKETING_TO_PERFORMANCE_DATE: Record<string, string> = {
-  "5/7": "5/13",
-  "5/8": "5/14",
-};
+export const DEFAULT_TICKET_CARD_BACKGROUND = "/posters/ticket-card-legend-light.jpg";
 
 const getGuideLines = (ticket: Ticket) => {
   const compactDate = ticket.eventDate ? toCompactEventDate(ticket.eventDate) : "미정";
-  const performanceDate = TICKETING_TO_PERFORMANCE_DATE[compactDate] ?? compactDate;
   return {
     dayLabel: resolveTicketDayLabel({ eventDate: ticket.eventDate, eventName: ticket.eventName }),
-    dateLabel: performanceDate,
+    dateLabel: compactDate,
     queueLabel: ticket.queueNumber != null ? String(ticket.queueNumber) : ticket.id.slice(-4).toUpperCase(),
     wristbandValue: "10:00~",
   };
 };
 
-export function PaperTicketCard({ ticket }: PaperTicketCardProps) {
+export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardProps) {
+  const savedBackground = useSyncExternalStore(subscribeFestivalSettings, getTicketCardBackgroundImageUrl, getTicketCardBackgroundImageUrl);
+  const configuredBackground = backgroundImageUrl === undefined ? savedBackground : backgroundImageUrl;
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const background = configuredBackground && configuredBackground !== failedUrl ? configuredBackground : DEFAULT_TICKET_CARD_BACKGROUND;
+  const cardId = useId().replace(/:/g, "");
+  const clipId = `ticket-clip-${cardId}`;
+  const overlayId = `ticket-overlay-${cardId}`;
   const { label, bg, text } = statusDisplayMap[ticket.status];
   const { dayLabel, dateLabel, queueLabel, wristbandValue } = getGuideLines(ticket);
 
@@ -58,7 +63,7 @@ export function PaperTicketCard({ ticket }: PaperTicketCardProps) {
   return (
     <div
       className="relative w-full"
-      style={{ filter: "drop-shadow(0 8px 28px rgba(28,43,106,0.32))" }}
+      style={{ filter: "drop-shadow(0 6px 18px rgba(70,44,39,0.14))" }}
     >
       {/* SVG 티켓 외형 */}
       <svg
@@ -69,48 +74,52 @@ export function PaperTicketCard({ ticket }: PaperTicketCardProps) {
         aria-hidden="true"
       >
         <defs>
-          {/* 흰 오버레이 — 최소화 */}
-          <linearGradient id="ov" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%"   stopColor="rgba(255,255,255,0.08)" />
-            <stop offset="100%" stopColor="rgba(240,238,248,0.06)" />
+          {/* 관리자 업로드 이미지에만 밝은 레이어를 더해 글자 대비를 유지한다. */}
+          <linearGradient id={overlayId} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stopColor="rgba(255,250,246,0.80)" />
+            <stop offset="100%" stopColor="rgba(255,241,231,0.68)" />
           </linearGradient>
-          <clipPath id="tc">
+          <clipPath id={clipId}>
             <path d={ticketPath} />
           </clipPath>
         </defs>
 
-        {/* 수채화 꽃 배경 */}
+        <path d={ticketPath} fill="var(--surface)" />
+
+        {/* 가로형 기본 배경은 원래 색감을 그대로 사용한다. */}
         <image
-          href="/posters/ticket_bg.webp"
+          href={background}
+          onError={() => { if (configuredBackground) setFailedUrl(configuredBackground); }}
           x="0" y="0"
           width="400" height="180"
-          preserveAspectRatio="xMaxYMid slice"
-          clipPath="url(#tc)"
+          preserveAspectRatio="xMidYMid slice"
+          clipPath={`url(#${clipId})`}
         />
 
-        {/* 흰 오버레이 — 밝고 부드러운 수채화 톤 */}
-        <path d={ticketPath} fill="url(#ov)" />
+        {background !== DEFAULT_TICKET_CARD_BACKGROUND && (
+          <path d={ticketPath} fill={`url(#${overlayId})`} />
+        )}
 
         {/* 퍼포레이션 점선 */}
         <line
           x1="280" y1="18" x2="280" y2="162"
-          stroke="rgba(28,43,106,0.2)"
+          stroke="rgba(70,44,39,0.22)"
           strokeWidth="1.5"
           strokeDasharray="5,5"
         />
 
         {/* 테두리 */}
-        <path d={ticketPath} fill="none" stroke="rgba(28,43,106,0.1)" strokeWidth="1" />
+        <path d={ticketPath} fill="none" stroke="rgba(70,44,39,0.12)" strokeWidth="1" />
       </svg>
 
       {/* 콘텐츠 오버레이 */}
       <div className="absolute inset-0 flex items-stretch">
         {/* 왼쪽 70% */}
         <div className="flex w-[70%] flex-col justify-center px-6 py-5">
-          <p className="text-[0.58rem] font-bold tracking-[0.22em]" style={{ color: "rgba(28,43,106,0.5)", textShadow: "0 1px 3px rgba(255,255,255,0.8)" }}>
+          <p className="text-[0.58rem] font-bold tracking-[0.22em]" style={{ color: "var(--accent)" }}>
             DANKOOK ZONE TICKET
           </p>
-          <p className="mt-1.5 text-[2.1rem] font-bold leading-none tracking-[-0.02em]" style={{ color: "var(--poster-navy)", textShadow: "0 1px 4px rgba(255,255,255,0.6)" }}>
+          <p className="mt-1.5 text-[2.1rem] font-bold leading-none tracking-[-0.02em]" style={{ color: "var(--accent)" }}>
             {dayLabel}
           </p>
           <span
@@ -129,11 +138,11 @@ export function PaperTicketCard({ ticket }: PaperTicketCardProps) {
             { key: "예매 순번", val: `NO.${queueLabel}` },
           ].map(({ key, val }) => (
             <div key={key}>
-              <p className="text-[0.5rem] font-semibold tracking-[0.08em]" style={{ color: "rgba(0,0,0,0.6)" }}>{key}</p>
+              <p className="text-[0.5rem] font-semibold tracking-[0.08em]" style={{ color: "var(--accent)" }}>{key}</p>
               <p className={cn(
                 "mt-0.5 text-[1.05rem] font-extrabold leading-tight [font-variant-numeric:tabular-nums]",
                 key === "예매 순번" ? "font-mono" : ""
-              )} style={{ color: "var(--poster-navy)" }}>
+              )} style={{ color: "var(--accent)" }}>
                 {val}
               </p>
             </div>

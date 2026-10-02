@@ -29,6 +29,8 @@ export type FestivalSettingsForm = {
   festivalName: string
   startDate: string
   endDate: string
+  ticketingBackgroundImageUrl?: string | null
+  ticketCardBackgroundImageUrl?: string | null
   ticketingEnabled: boolean
   ticketingRounds: TicketingRound[]
 }
@@ -48,6 +50,8 @@ export function toForm(dto: FestivalSettingsDto): FestivalSettingsForm {
     festivalName: dto.festivalName,
     startDate: dto.startDate ?? "",
     endDate: dto.endDate ?? "",
+    ticketingBackgroundImageUrl: dto.ticketingBackgroundImageUrl ?? null,
+    ticketCardBackgroundImageUrl: dto.ticketCardBackgroundImageUrl ?? null,
     ticketingEnabled: dto.ticketingEnabled,
     ticketingRounds: dto.ticketingRounds.map((round, index) => ({
       key: round.id != null ? String(round.id) : `round-${index}`,
@@ -72,6 +76,8 @@ export function toTicketingPayload(
   confirmedTicketCancelRoundIds: number[] = [],
 ): UpdateFestivalTicketingPayload {
   return {
+    ...(form.ticketingBackgroundImageUrl !== undefined ? { ticketingBackgroundImageUrl: form.ticketingBackgroundImageUrl } : {}),
+    ...(form.ticketCardBackgroundImageUrl !== undefined ? { ticketCardBackgroundImageUrl: form.ticketCardBackgroundImageUrl } : {}),
     ticketingEnabled: form.ticketingEnabled,
     // 저장된 회차는 id 를 같이 보내야 서버가 같은 회차로 알아보고 티켓팅 이벤트를 유지한다.
     ticketingRounds: form.ticketingEnabled

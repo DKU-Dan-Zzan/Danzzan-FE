@@ -1,4 +1,5 @@
 // 역할: home 화면에서 사용하는 Poster Carousel UI 블록을 렌더링합니다.
+import { clsx } from "clsx"
 import { useEffect, useMemo, useState } from "react"
 import { useT } from "@/i18n"
 
@@ -114,9 +115,7 @@ export default function PosterCarousel({
                 type="button"
                 onClick={() => setIndex(i)}
                 aria-label={t("home.posterDotAria", { index: i + 1 })}
-                className={`h-[var(--home-dot-height)] rounded-full bg-[var(--surface_container_high)] transition-all duration-300 ${
-                  active ? "w-[var(--home-dot-active-width)] bg-[linear-gradient(135deg,var(--primary)_0%,var(--primary_container)_100%)]" : "w-[var(--home-dot-width)]"
-                }`}
+                className={clsx("h-[var(--home-dot-height)] rounded-full bg-[var(--surface_container_high)] transition-all duration-300", active ? "w-[var(--home-dot-active-width)] bg-[linear-gradient(135deg,var(--primary)_0%,var(--primary_container)_100%)]" : "w-[var(--home-dot-width)]")}
               />
             )
           })}

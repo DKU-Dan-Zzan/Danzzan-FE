@@ -1,4 +1,5 @@
 // 역할: 대기열 진입·상태조회·예매·내 티켓 조회를 포함한 티켓팅 핵심 API를 제공합니다.
+import { waitForTicketIssue } from "@/api/ticketing/ticketIssueRequest";
 import { createHttpClient } from "@/api/ticketing/httpClient";
 import {
   normalizeQueueEnterContract,
@@ -254,6 +255,10 @@ export const ticketApi = {
       raw,
       `/tickets/${eventId}/queue/enter`,
     );
+    if (dto.status === "PROCESSING") {
+      await waitForTicketIssue(client, eventId, dto.requestId, signal);
+      return mapQueueEnterDtoToModel({ status: "SUCCESS" });
+    }
     const normalizedDto = normalizeQueueEnterContract(dto, `/tickets/${eventId}/queue/enter`);
     return mapQueueEnterDtoToModel(normalizedDto);
   },
@@ -312,6 +317,10 @@ export const ticketApi = {
       raw,
       `/tickets/${eventId}/queue/status`,
     );
+    if (dto.status === "PROCESSING") {
+      await waitForTicketIssue(client, eventId, dto.requestId, signal);
+      return mapQueueStatusDtoToModel({ status: "SUCCESS" });
+    }
     const normalizedDto = normalizeQueueStatusContract(dto, `/tickets/${eventId}/queue/status`);
     return mapQueueStatusDtoToModel(normalizedDto);
   },
@@ -350,7 +359,7 @@ export const ticketApi = {
   reserveTicket: async (
     eventId: string,
     signal?: AbortSignal,
-  ): Promise<TicketReservationResult> => {
+  ): Promise<TicketReservationResult | { status: "SUCCESS" }> => {
     if (env.apiMode === "mock") {
       return mapTicketReservationDtoToModel(createMockReservationDto(eventId));
     }
@@ -361,10 +370,13 @@ export const ticketApi = {
       undefined,
       { signal },
     );
-    const dto = unwrapApiObjectEnvelope<TicketReservationResponseDto>(
+    const dto = unwrapApiObjectEnvelope<TicketReservationResponseDto & { requestId?: string }>(
       raw,
       `/tickets/${eventId}/reserve`,
     );
+    if (dto.status === "PROCESSING") {
+      return waitForTicketIssue(client, eventId, dto.requestId, signal);
+    }
     const normalizedDto = normalizeReserveContract(dto, `/tickets/${eventId}/reserve`);
     return mapTicketReservationDtoToModel(normalizedDto);
   },

@@ -88,3 +88,19 @@ export function toFestivalDays(dates: string[]): FestivalDay[] {
     date,
   }))
 }
+
+let ticketingBackgroundImageUrl: string | null = null
+export function getTicketingBackgroundImageUrl(): string | null { return ticketingBackgroundImageUrl }
+export function setTicketingBackgroundImageUrl(url: string | null): void {
+  if (ticketingBackgroundImageUrl === url) return
+  ticketingBackgroundImageUrl = url
+  emit()
+}
+
+let ticketCardBackgroundImageUrl: string | null = null
+export function getTicketCardBackgroundImageUrl(): string | null { return ticketCardBackgroundImageUrl }
+export function setTicketCardBackgroundImageUrl(url: string | null): void {
+  if (ticketCardBackgroundImageUrl === url) return
+  ticketCardBackgroundImageUrl = url
+  emit()
+}

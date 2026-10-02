@@ -68,6 +68,15 @@ afterEach(async () => {
 });
 
 describe("AdminTopNav staff menu", () => {
+  it("opens ticket settings and wristband links on click for touch users", async () => {
+    await render();
+    await act(async () => button("티켓팅").click());
+    expect(button("티켓팅").getAttribute("aria-expanded")).toBe("true");
+    expect(button("티켓 설정")).toBeDefined();
+    expect(button("팔찌 배부").querySelector("svg")).not.toBeNull();
+    await act(async () => button("티켓 설정").click());
+    expect(locationPath).toBe("/admin/ticketing");
+  });
   it("previews sections on hover and navigates to the page top when the parent is clicked", async () => {
     await render("/admin/invite#manager-list");
     await openManagerMenuWithHover();

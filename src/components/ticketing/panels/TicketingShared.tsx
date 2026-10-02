@@ -1,4 +1,5 @@
 // 역할: 티켓팅 패널 공통 클래스/보조 컴포넌트/타이포그래피 토큰을 제공합니다.
+import { clsx } from "clsx"
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { cn } from "@/components/common/ui/utils";
@@ -143,7 +144,7 @@ export function TicketingStepTitle({ step, title }: TicketingStepTitleProps) {
       <span className={TICKETING_CLASSES.badge.stepIndex}>
         {step}
       </span>
-      <p className={`${TICKETING_CLASSES.typography.stepTitle} text-[var(--text)]`}>{title}</p>
+      <p className={clsx(TICKETING_CLASSES.typography.stepTitle, "text-[var(--text)]")}>{title}</p>
     </div>
   );
 }

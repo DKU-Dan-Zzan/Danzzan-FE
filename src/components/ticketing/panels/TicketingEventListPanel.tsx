@@ -1,4 +1,5 @@
 // 역할: 진행 가능한 티켓 이벤트 목록과 상태별 CTA 버튼을 표시합니다.
+import { clsx } from "clsx"
 import { useMemo } from "react";
 import { CalendarClock, Clock3 } from "lucide-react";
 import { Badge } from "@/components/common/ui/badge";
@@ -50,7 +51,8 @@ const parseTimestamp = (value: string): number | null => {
   if (!value) {
     return null;
   }
-  const parsed = Date.parse(value);
+  const normalized = /(?:Z|[+-]\d{2}:\d{2})$/.test(value) ? value : `${value}+09:00`;
+  const parsed = Date.parse(normalized);
   if (Number.isNaN(parsed)) {
     return null;
   }
@@ -96,26 +98,14 @@ const resolveViewStatus = (
   return "upcoming";
 };
 
-const formatEventDateTime = (event: TicketingEvent, openAtMs: number | null): string => {
-  const eventDateTime = [event.eventDate, event.eventTime].filter(Boolean).join(" ").replace(/예매\s*오픈/g, "").trim();
-  if (eventDateTime) {
-    return normalizeKoreanMonthDay(eventDateTime);
-  }
-
-  if (openAtMs === null) {
-    return "오픈 일정 추후 공지";
-  }
-
-  const date = new Date(openAtMs);
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const weekday = date.toLocaleDateString("ko-KR", { weekday: "short" });
-  const time = date.toLocaleTimeString("ko-KR", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-  return `${month}월 ${day}일 (${weekday}) ${time}`;
+const formatTicketOpenTime = (openAtMs: number | null): string => {
+  if (openAtMs === null) return "일정 미정";
+  const parts = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul", month: "numeric", day: "numeric", weekday: "short",
+    hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+  }).formatToParts(openAtMs);
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find(p => p.type === type)?.value ?? "";
+  return `${part("month")}월 ${part("day")}일 (${part("weekday")}) ${part("hour")}:${part("minute")}`;
 };
 
 export function TicketingEventListPanel({
@@ -152,17 +142,17 @@ export function TicketingEventListPanel({
     <div className={TICKETING_WIDE_PANEL_CLASS}>
       <div>
         <h2 className="sr-only">티켓팅</h2>
-        <Card className={`relative overflow-hidden ${APP_CARD_VARIANTS.gradTint} rounded-[28px] p-4`}>
+        <Card className={clsx("relative overflow-hidden", APP_CARD_VARIANTS.gradTint, "rounded-[28px] p-4")}>
           <div className="flex items-start justify-between gap-3">
             <div className="flex min-w-0 items-start gap-3">
-              <div className={`mt-0.5 flex h-8 w-8 shrink-0 ${TICKETING_CLASSES.badge.iconCircle}`}>
+              <div className={clsx("mt-0.5 flex h-8 w-8 shrink-0", TICKETING_CLASSES.badge.iconCircle)}>
                 <CalendarClock className="h-4 w-4" />
               </div>
               <div className="min-w-0">
-                <p className={`${TICKETING_CLASSES.typography.infoBannerTitle} text-[var(--text)]`}>
+                <p className={clsx(TICKETING_CLASSES.typography.infoBannerTitle, "text-[var(--text)]")}>
                   요일별 예매 오픈시간을 확인하여 티켓팅에 참여하세요.
                 </p>
-                <p className={`mt-1 ${TICKETING_CLASSES.typography.infoBannerBody} text-[var(--text-muted)]`}>
+                <p className={clsx("mt-1", TICKETING_CLASSES.typography.infoBannerBody, "text-[var(--text-muted)]")}>
                   오픈 시각에 맞춰 예매 버튼이 활성화됩니다.
                 </p>
               </div>
@@ -177,19 +167,19 @@ export function TicketingEventListPanel({
 
       {errorMessage && (
         <Card className="border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] p-4">
-          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--status-danger-text)]`}>{errorMessage}</p>
+          <p className={clsx(TICKETING_CLASSES.typography.sectionBodySm, "text-[var(--status-danger-text)]")}>{errorMessage}</p>
         </Card>
       )}
 
       {loading && events.length === 0 && (
-        <Card className={`${TICKETING_CLASSES.card.emptyState} p-6`}>
-          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>티켓 정보를 불러오는 중입니다...</p>
+        <Card className={clsx(TICKETING_CLASSES.card.emptyState, "p-6")}>
+          <p className={clsx(TICKETING_CLASSES.typography.sectionBodySm, "text-[var(--text-muted)]")}>티켓 정보를 불러오는 중입니다...</p>
         </Card>
       )}
 
       {!loading && events.length === 0 && (
-        <Card className={`${TICKETING_CLASSES.card.emptyState} p-6`}>
-          <p className={`${TICKETING_CLASSES.typography.sectionBodySm} text-[var(--text-muted)]`}>진행 중인 티켓팅 일정이 없습니다.</p>
+        <Card className={clsx(TICKETING_CLASSES.card.emptyState, "p-6")}>
+          <p className={clsx(TICKETING_CLASSES.typography.sectionBodySm, "text-[var(--text-muted)]")}>진행 중인 티켓팅 일정이 없습니다.</p>
         </Card>
       )}
 
@@ -197,15 +187,15 @@ export function TicketingEventListPanel({
         return (
           <Card
             key={event.id}
-            className={`relative overflow-hidden ${APP_CARD_VARIANTS.outline} rounded-[28px] px-5 py-4`}
+            className={clsx("relative overflow-hidden", APP_CARD_VARIANTS.outline, "rounded-[28px] px-5 py-4")}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h3 className={`truncate ${TICKETING_CLASSES.typography.cardTitle} text-[var(--text)] !text-[0.95rem]`}>
+                <h3 className={cn(TICKETING_CLASSES.typography.cardTitle, "break-words text-[var(--text)] !text-[0.95rem]")}>
                   {normalizeKoreanMonthDay(event.title || "공연 티켓팅")}
                 </h3>
-                <p className={`mt-1 ${TICKETING_CLASSES.typography.cardSubtitle} text-[var(--accent)]`}>
-                  {formatEventDateTime(event, openAtMs)}
+                <p className={cn(TICKETING_CLASSES.typography.cardSubtitle, "mt-1 font-bold text-[var(--text)]")}>
+                  <span className="sr-only">티켓팅 시작 (한국 시간): </span>{formatTicketOpenTime(openAtMs)}
                 </p>
               </div>
               <Badge
@@ -222,7 +212,7 @@ export function TicketingEventListPanel({
             <div className="mt-3">
               {status === "upcoming" && openAtMs !== null && (
                 <Button
-                  className={`${TICKETING_CLASSES.button.disabledFull} h-12`}
+                  className={cn(TICKETING_CLASSES.button.disabledFull, "h-12 bg-none bg-[var(--surface-subtle)] text-[var(--text-muted)] disabled:opacity-100")}
                   variant="outline"
                   disabled
                 >
@@ -233,7 +223,7 @@ export function TicketingEventListPanel({
 
               {status === "upcoming" && openAtMs === null && (
                 <Button
-                  className={`${TICKETING_CLASSES.button.disabledCompactFull} h-12`}
+                  className={cn(TICKETING_CLASSES.button.disabledCompactFull, "h-12 bg-none bg-[var(--surface-subtle)] text-[var(--text-muted)] disabled:opacity-100")}
                   variant="outline"
                   disabled
                 >
@@ -243,7 +233,7 @@ export function TicketingEventListPanel({
 
               {status === "open" && (
                 <Button
-                  className={`${TICKETING_CLASSES.button.primaryFull} h-12`}
+                  className={clsx(TICKETING_CLASSES.button.primaryFull, "h-12")}
                   onClick={() => onSelectEvent(event)}
                 >
                   단국존 선착순 예매
@@ -252,7 +242,7 @@ export function TicketingEventListPanel({
 
               {status === "soldout" && (
                 <Button
-                  className={`${TICKETING_CLASSES.button.disabledSoldoutFull} h-12`}
+                  className={cn(TICKETING_CLASSES.button.disabledSoldoutFull, "h-12 bg-none bg-[var(--surface-subtle)] text-[var(--text-muted)] disabled:opacity-100")}
                   variant="outline"
                   disabled
                 >

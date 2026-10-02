@@ -6,7 +6,7 @@ import type { TicketingEvent } from "@/types/ticketing/model/ticket.model";
 const OPEN_EVENT: TicketingEvent = {
   id: "event-open",
   title: "2026 DANFESTA DAY 2",
-  eventDate: "5월 13일 (수)",
+  eventDate: "5월 20일 (수)",
   eventTime: "18:00",
   ticketOpenAt: "2026-05-13T09:00:00Z",
   status: "open",
@@ -27,6 +27,11 @@ describe("TicketingEventListPanel", () => {
       />,
     );
 
+    expect(markup).not.toContain("공연 날짜:");
+    expect(markup).toContain("티켓팅 시작");
+    expect(markup).toContain("5월 13일 (수) 18:00");
+    expect(markup).not.toContain("티켓 수량:");
+    expect(markup).not.toContain("5월 20일");
     const openBadgeMatch = markup.match(/<span[^>]*>실시간 예매 중<\/span>/);
     expect(openBadgeMatch).not.toBeNull();
     const openBadgeMarkup = openBadgeMatch?.[0] ?? "";

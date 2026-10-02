@@ -1,6 +1,6 @@
 // 역할: 가을 축제에 제공하지 않는 서비스의 안내 화면을 공통으로 렌더링한다.
 
-import type { ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 import { Link } from "react-router-dom"
 import { cn } from "@/components/common/ui/utils"
 import { useT, type TranslationKey } from "@/i18n"
@@ -13,6 +13,9 @@ type ServiceClosedNoticeProps = {
   actionTo: string
   /** 기본 아이콘 대신 다른 그림을 쓰고 싶을 때만 넘긴다. */
   icon?: ReactNode
+  backgroundImageUrl?: string | null
+  /** 관리자 미리보기에서는 화면 높이와 안전 영역 대신 고정 캔버스를 사용한다. */
+  preview?: boolean
 }
 
 /**
@@ -88,20 +91,29 @@ const ServiceClosedNotice = ({
   actionKey,
   actionTo,
   icon,
+  backgroundImageUrl,
+  preview = false,
 }: ServiceClosedNoticeProps) => {
   const t = useT()
+  const [failedImage, setFailedImage] = useState<string | null>(null)
+  const customImage = backgroundImageUrl && failedImage !== backgroundImageUrl ? backgroundImageUrl : null
   const noticeIcon = icon ?? ICON_BY_TITLE[titleKey]
   const noteKey = NOTE_BY_TITLE[titleKey]
 
   return (
     <section
       aria-labelledby="service-closed-title"
-      className="relative flex min-h-dvh flex-col justify-center overflow-hidden px-6 pb-[calc(var(--app-bottom-nav-runtime-offset)+2rem)] pt-[calc(env(safe-area-inset-top)+3rem)]"
+      className={cn(
+        "relative flex flex-col justify-center overflow-hidden px-6",
+        preview
+          ? "min-h-[720px] py-10"
+          : "min-h-dvh pb-[calc(var(--app-bottom-nav-runtime-offset)+2rem)] pt-[calc(env(safe-area-inset-top)+3rem)]",
+      )}
       style={{ backgroundColor: LEGEND_INK }}
     >
       {/* 포스터를 배경 질감으로 깐다. 그림이 아니라 공기처럼 읽혀야 하므로
           짙게 눌러 흐리고, 가장자리를 검정으로 녹인다. */}
-      <div
+      {!customImage && <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 select-none bg-cover bg-[position:50%_34%] opacity-[0.38] blur-[6px] saturate-[1.15]"
         style={{
@@ -111,7 +123,9 @@ const ServiceClosedNotice = ({
           WebkitMaskImage:
             "radial-gradient(100% 58% at 50% 27%, black 0%, rgba(0,0,0,0.5) 55%, transparent 84%)",
         }}
-      />
+      />}
+
+      {customImage && <img src={customImage} alt="" onError={() => setFailedImage(customImage)} className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-50" />}
 
       {/* 불씨 잔광 — 로고 뒤에서 번지게 해서 워드마크가 떠 보이도록 한다. */}
       <div
@@ -195,6 +209,7 @@ const ServiceClosedNotice = ({
 
         <Link
           to={actionTo}
+          tabIndex={preview ? -1 : undefined}
           className="mt-9 inline-flex h-12 w-full max-w-[15rem] items-center justify-center rounded-full text-[0.92rem] font-semibold tracking-[0.01em] text-white transition-[transform,filter] duration-150 ease-out hover:brightness-[1.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:translate-y-px motion-reduce:transition-none [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_400ms_both]"
           style={{
             background: `linear-gradient(135deg, ${LEGEND_EMBER} 0%, ${LEGEND_EMBER_DEEP} 100%)`,

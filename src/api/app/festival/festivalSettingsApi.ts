@@ -42,6 +42,8 @@ export type FestivalSettings = {
   endDate: string | null
   /** 서버가 시작일~종료일을 하루씩 펼쳐서 내려준다. 아직 등록 전이면 빈 배열 */
   operationDates: string[]
+  ticketingBackgroundImageUrl?: string | null
+  ticketCardBackgroundImageUrl?: string | null
   ticketingEnabled: boolean
   ticketingRounds: TicketingRound[]
 }
@@ -54,6 +56,8 @@ export type UpdateFestivalMetadataPayload = {
 }
 
 export type UpdateFestivalTicketingPayload = {
+  ticketingBackgroundImageUrl?: string | null
+  ticketCardBackgroundImageUrl?: string | null
   ticketingEnabled: boolean
   /**
    * 이미 저장된 회차는 id 를 함께 보낸다. id 가 빠지면 서버가 새 회차로 보고 예전 회차를
@@ -101,4 +105,10 @@ export async function updateFestivalTicketingSettings(
     method: "PUT",
     body: JSON.stringify(payload),
   })
+}
+
+export async function uploadTicketingBackground(file: File): Promise<{ url: string }> {
+  const body = new FormData()
+  body.append("file", file)
+  return fetchWithAuth("/admin/festival/ticketing-background", { method: "POST", body })
 }

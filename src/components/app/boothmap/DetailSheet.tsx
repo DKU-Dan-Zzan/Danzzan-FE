@@ -1,3 +1,4 @@
+import { clsx } from "clsx"
 import { memo, useCallback, useRef, useState } from "react";
 import type { College, Pub, SelectedDetailItem } from "@/types/app/boothmap/boothmap.types";
 import {
@@ -305,11 +306,9 @@ function DetailSheet({
                 {imageUrls.map((_, index) => (
                   <div
                     key={index}
-                    className={`h-1.5 w-1.5 rounded-full ${
-                      currentIndex === index
+                    className={clsx("h-1.5 w-1.5 rounded-full", currentIndex === index
                         ? "bg-[var(--boothmap-accent)]"
-                        : "bg-[var(--boothmap-surface-softer)]"
-                    }`}
+                        : "bg-[var(--boothmap-surface-softer)]")}
                   />
                 ))}
               </div>

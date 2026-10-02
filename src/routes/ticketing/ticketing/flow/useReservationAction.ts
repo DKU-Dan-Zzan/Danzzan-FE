@@ -70,6 +70,23 @@ export const useReservationAction = ({
         setActiveEventId(null);
         setReservationError(null);
         break;
+      case "RESERVE_ADMISSION_EXPIRED":
+        setActiveEventId(null);
+        setAgreementChecked(false);
+        setThirdPartyPrivacyConsentChecked(false);
+        setReservationError(null);
+        setReserveErrorMessage(null);
+        setListNotice("예매 가능 시간이 만료되었습니다. 원하는 공연을 선택해 대기열에 다시 참여해 주세요.");
+        applyQueueEventToUrl(null);
+        await moveToList({ preserveNotice: true });
+        return;
+      case "RESERVE_PROCESSING_PENDING":
+        setActiveEventId(null);
+        setReservationError(null);
+        setListNotice("발급 결과를 확인 중입니다. 잠시 후 내 티켓을 확인하거나 같은 공연을 선택해 결과를 다시 확인해 주세요.");
+        applyQueueEventToUrl(null);
+        await moveToList({ preserveNotice: true });
+        return;
       case "RESERVE_NOT_OPEN":
         setStep("in-progress");
         setReserveProcessing(false);
@@ -88,8 +105,8 @@ export const useReservationAction = ({
         setStep("in-progress");
         setReserveProcessing(false);
         setReserveMessage("일시적인 오류가 발생했습니다. 네트워크 상태를 확인한 뒤 다시 시도해주세요.");
-        setReserveErrorMessage("현재 예매가 불가능한 티켓입니다. 매진, 중복 예매 또는 마감 여부를 확인해 주세요.");
-        setReservationError("현재 예매가 불가능한 티켓입니다. 매진, 중복 예매 또는 마감 여부를 확인해 주세요.");
+        setReserveErrorMessage("예매 요청 처리 중 오류가 발생했습니다. 잠시 후 티켓 목록에서 다시 시도해 주세요.");
+        setReservationError("예매 요청 처리 중 오류가 발생했습니다. 잠시 후 티켓 목록에서 다시 시도해 주세요.");
         break;
     }
 
@@ -97,7 +114,7 @@ export const useReservationAction = ({
       void ticketApi.getMyTickets().catch(() => null);
     }
 
-    if (reserveCode !== "RESERVE_NOT_OPEN" && reserveCode !== "TEMPORARY_ERROR") {
+    if (reserveCode === "RESERVE_ALREADY_RESERVED" || reserveCode === "RESERVE_SOLD_OUT" || reserveCode === "EVENT_NOT_FOUND") {
       applyQueueEventToUrl(null);
     } else {
       applyQueueEventToUrl(eventId);
@@ -107,6 +124,8 @@ export const useReservationAction = ({
     handleUnauthorized,
     moveToList,
     setActiveEventId,
+    setAgreementChecked,
+    setThirdPartyPrivacyConsentChecked,
     setListNotice,
     setReservationError,
     setReserveErrorMessage,

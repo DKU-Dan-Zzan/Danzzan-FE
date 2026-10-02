@@ -27,8 +27,10 @@ import {
   isRequestAborted,
   updateFestivalMetadata,
   updateFestivalTicketingSettings,
+  uploadTicketingBackground,
 } from "@/api/app/festival/festivalSettingsApi"
-import { setFestivalDates } from "@/lib/app/festival/festivalCalendar"
+import TicketingBackgroundField from "@/routes/admin/TicketingBackgroundField"
+import { setTicketingEnabled, setTicketingBackgroundImageUrl, setTicketCardBackgroundImageUrl, setFestivalDates } from "@/lib/app/festival/festivalCalendar"
 import {
   buildFestivalDateRange,
   createEmptyTicketingRound,
@@ -50,9 +52,9 @@ const inputClass = cn(
   ADMIN_FOCUS_VISIBLE_RING_CLASS,
 )
 
-export default function AdminSettings() {
+export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly?: boolean }) {
   const session = useSyncExternalStore(authStore.subscribe, authStore.getSnapshot, authStore.getSnapshot)
-  const canOperate = hasAdminPermission(session.role, session.permissions, "OPERATIONS")
+  const canOperate = !ticketingOnly && hasAdminPermission(session.role, session.permissions, "OPERATIONS")
   const canTicket = hasAdminPermission(session.role, session.permissions, "TICKETING")
   const [settings, setSettings] = useState<FestivalSettingsForm>(EMPTY_FESTIVAL_SETTINGS_FORM)
   const [savedSettings, setSavedSettings] = useState<FestivalSettingsForm | null>(null)
@@ -60,6 +62,22 @@ export default function AdminSettings() {
   const [draftRound, setDraftRound] = useState<TicketingRound | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [backgroundImage, setBackgroundImage] = useState<{ file: File; previewUrl: string } | null>(null)
+  const backgroundFile = backgroundImage?.file ?? null
+  const [ticketCardBackgroundImage, setTicketCardBackgroundImage] = useState<{ file: File; previewUrl: string } | null>(null)
+  const ticketCardBackgroundFile = ticketCardBackgroundImage?.file ?? null
+  useEffect(() => () => {
+    if (ticketCardBackgroundImage) URL.revokeObjectURL(ticketCardBackgroundImage.previewUrl)
+  }, [ticketCardBackgroundImage])
+
+  useEffect(() => () => {
+    if (backgroundImage) URL.revokeObjectURL(backgroundImage.previewUrl)
+  }, [backgroundImage])
+
+  const handleBackgroundFile = (file: File) => {
+    setBackgroundImage({ file, previewUrl: URL.createObjectURL(file) })
+    setIsEditing(true)
+  }
   /**
    * 발급된 티켓까지 함께 취소하기로 확인한 회차. 저장할 때 서버에 같이 보낸다.
    * 확인하지 않은 회차를 지우려 하면 서버가 거절한다.
@@ -99,7 +117,7 @@ export default function AdminSettings() {
   const handleAddRound = () => {
     if (!draftRound) return
 
-    if (!draftRound.ticketingAt || !draftRound.performanceDate || draftRound.capacity <= 0) {
+    if (!draftRound.ticketingAt || !draftRound.performanceDate || !Number.isInteger(draftRound.capacity) || draftRound.capacity <= 0) {
       toast.error("티켓팅 날짜/시간, 티켓 수량, 공연 날짜를 모두 입력해 주세요.")
       return
     }
@@ -143,7 +161,7 @@ export default function AdminSettings() {
     const metadataPayload = toMetadataPayload(settings)
     const ticketingPayload = toTicketingPayload(settings, confirmedCancelIds)
     const saveMetadata = canOperate && (!savedSettings || JSON.stringify(metadataPayload) !== JSON.stringify(toMetadataPayload(savedSettings)))
-    const saveTicketing = canTicket && (!savedSettings || JSON.stringify(ticketingPayload) !== JSON.stringify(toTicketingPayload(savedSettings)))
+    const saveTicketing = canTicket && (backgroundFile !== null || ticketCardBackgroundFile !== null || !savedSettings || JSON.stringify(ticketingPayload) !== JSON.stringify(toTicketingPayload(savedSettings)))
     if (!saveMetadata && !saveTicketing) {
       toast.info("변경된 내용이 없습니다.")
       return
@@ -163,6 +181,10 @@ export default function AdminSettings() {
       return
     }
 
+    if (saveTicketing && settings.ticketingEnabled && settings.ticketingRounds.some(round => !round.ticketingAt || !Number.isInteger(round.capacity) || round.capacity < 1)) {
+      toast.error("회차별 티켓팅 날짜/시간과 1 이상의 정수 수량을 입력해 주세요.")
+      return
+    }
     setIsSaving(true)
     let metadataSaved = false
     try {
@@ -176,8 +198,23 @@ export default function AdminSettings() {
         metadataSaved = true
       }
       if (saveTicketing) {
+        if (backgroundFile) {
+          const uploaded = await uploadTicketingBackground(backgroundFile)
+          ticketingPayload.ticketingBackgroundImageUrl = uploaded.url
+          updateSettings({ ticketingBackgroundImageUrl: uploaded.url })
+          setBackgroundImage(null)
+        }
+        if (ticketCardBackgroundFile) {
+          const uploaded = await uploadTicketingBackground(ticketCardBackgroundFile)
+          ticketingPayload.ticketCardBackgroundImageUrl = uploaded.url
+          updateSettings({ ticketCardBackgroundImageUrl: uploaded.url })
+          setTicketCardBackgroundImage(null)
+        }
         const saved = toForm(await updateFestivalTicketingSettings(ticketingPayload))
-        const ticketing = { ticketingEnabled: saved.ticketingEnabled, ticketingRounds: saved.ticketingRounds }
+        const ticketing = { ticketingEnabled: saved.ticketingEnabled, ticketingRounds: saved.ticketingRounds, ticketingBackgroundImageUrl: saved.ticketingBackgroundImageUrl, ticketCardBackgroundImageUrl: saved.ticketCardBackgroundImageUrl }
+        setTicketingEnabled(saved.ticketingEnabled)
+        setTicketingBackgroundImageUrl(saved.ticketingBackgroundImageUrl ?? null)
+        setTicketCardBackgroundImageUrl(saved.ticketCardBackgroundImageUrl ?? null)
         setSettings((previous) => ({ ...previous, ...ticketing }))
         setSavedSettings((previous) => ({ ...(previous ?? EMPTY_FESTIVAL_SETTINGS_FORM), ...ticketing }))
         setConfirmedCancelIds([])
@@ -196,6 +233,8 @@ export default function AdminSettings() {
   }
 
   const handleCancel = () => {
+    setBackgroundImage(null)
+    setTicketCardBackgroundImage(null)
     // 편집을 버리고 서버에 저장된 값으로 되돌린다.
     setDraftRound(null)
     setConfirmedCancelIds([])
@@ -212,8 +251,8 @@ export default function AdminSettings() {
     <>
       <Toaster position="top-right" closeButton richColors />
       <AdminShell
-        title="축제 설정"
-        eyebrow="FESTIVAL SETTINGS"
+        title={ticketingOnly ? "티켓 설정" : "축제 설정"}
+        eyebrow={ticketingOnly ? "TICKETING SETTINGS" : "FESTIVAL SETTINGS"}
         headerClassName="border-b border-[var(--border-base)] bg-[var(--admin-header-bg)]"
         mainClassName="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-6"
         actions={
@@ -248,6 +287,12 @@ export default function AdminSettings() {
         {isLoading && (
           <p className="text-sm text-[var(--text-muted)]">불러오는 중...</p>
         )}
+
+        {ticketingOnly && <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--surface-subtle)] p-5">
+          <p className="text-sm font-bold text-[var(--text)]">{settings.festivalName || "축제 기본 정보를 먼저 저장해 주세요."}</p>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">{settings.startDate} ~ {settings.endDate}</p>
+          <p className="mt-2 text-xs text-[var(--text-muted)]">축제 설정의 회차와 연결되어 있습니다. 저장하면 사용자 예매와 팔찌 배부 화면에도 반영됩니다. 모든 시각은 한국 시간 기준입니다.</p>
+        </div>}
 
         {canOperate && <fieldset disabled={isSaving || isLoading} className="min-w-0 rounded-2xl border border-[var(--border-base)] bg-[var(--surface)] p-5 shadow-sm">
           <h2 className="text-sm font-bold text-[var(--text)]">축제 기본 정보</h2>
@@ -327,8 +372,13 @@ export default function AdminSettings() {
                 <button
                   key={String(value)}
                   type="button"
-                  disabled={!isEditing || !canTicket}
-                  onClick={() => updateSettings({ ticketingEnabled: value })}
+                  disabled={isSaving || isLoading || !canTicket}
+                  aria-pressed={settings.ticketingEnabled === value}
+                  onClick={() => {
+                    if (settings.ticketingEnabled === value) return
+                    setIsEditing(true)
+                    updateSettings({ ticketingEnabled: value })
+                  }}
                   className={cn(
                     "rounded-full px-3 py-1 text-xs font-bold transition-colors disabled:cursor-not-allowed",
                     settings.ticketingEnabled === value
@@ -342,6 +392,12 @@ export default function AdminSettings() {
               ))}
             </div>
           </header>
+
+          {isEditing && settings.ticketingEnabled !== savedSettings?.ticketingEnabled && (
+            <p role="status" className="mt-3 text-xs font-semibold text-[var(--status-warning-text)]">
+              ON/OFF 변경은 상단의 저장을 눌러야 적용됩니다.
+            </p>
+          )}
 
           {settings.ticketingEnabled && (
             <div className="mt-4 space-y-3">
@@ -362,7 +418,7 @@ export default function AdminSettings() {
                     key={round.key}
                     className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)] px-3 py-2.5"
                   >
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-muted)]">
                         {index + 1}회차
                         {round.locked && (
@@ -376,6 +432,20 @@ export default function AdminSettings() {
                         티켓팅 {formatDateTimeLabel(round.ticketingAt)} · {round.capacity.toLocaleString()}개 · 공연{" "}
                         {formatDateLabel(round.performanceDate)}
                       </p>
+                      {isEditing && !round.locked && <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                        <label className="text-xs text-[var(--text-muted)]">티켓팅 날짜/시간
+                          <input aria-label={`${index + 1}회차 티켓팅 날짜/시간`} type="datetime-local" value={round.ticketingAt} className={inputClass} onChange={event => setSettings(previous => ({ ...previous, ticketingRounds: previous.ticketingRounds.map(item => item.key === round.key ? { ...item, ticketingAt: event.target.value } : item) }))} />
+                        </label>
+                        <label className="text-xs text-[var(--text-muted)]">티켓 수량
+                          <input aria-label={`${index + 1}회차 티켓 수량`} type="number" min={1} step={1} value={round.capacity || ""} className={inputClass} onChange={event => setSettings(previous => ({ ...previous, ticketingRounds: previous.ticketingRounds.map(item => item.key === round.key ? { ...item, capacity: Number(event.target.value) } : item) }))} />
+                        </label>
+                        <label className="text-xs text-[var(--text-muted)]">공연 날짜
+                          <select aria-label={`${index + 1}회차 공연 날짜`} value={round.performanceDate} className={inputClass} onChange={event => setSettings(previous => ({ ...previous, ticketingRounds: previous.ticketingRounds.map(item => item.key === round.key ? { ...item, performanceDate: event.target.value } : item) }))}>
+                            <option value="">선택</option>
+                            {operationDates.map((date, day) => <option key={date} value={date}>{day + 1}일차 · {formatDateLabel(date)}</option>)}
+                          </select>
+                        </label>
+                      </div>}
                       {round.locked && (
                         <p className="mt-0.5 text-[11px] text-[var(--text-muted)]">
                           {(round.issuedTicketCount ?? 0) > 0
@@ -487,6 +557,9 @@ export default function AdminSettings() {
               )}
             </div>
           )}
+          {!settings.ticketingEnabled && <p className="mt-4 rounded-xl bg-[var(--surface-subtle)] p-3 text-sm text-[var(--text-muted)]">티켓팅을 OFF로 저장하면 예매와 내 티켓 화면이 입장 안내로 바뀝니다. 로그인·회원가입·내정보와 팔찌 배부 관리는 이용할 수 있습니다. 기존 회차와 발급 티켓은 보관되며, 다시 ON으로 저장하면 조회할 수 있습니다.</p>}
+          {settings.ticketingEnabled && <TicketingBackgroundField mode="ticket" festivalName={settings.festivalName} url={settings.ticketCardBackgroundImageUrl} file={ticketCardBackgroundFile} previewUrl={ticketCardBackgroundImage?.previewUrl} disabled={isSaving || isLoading} onFile={(file) => { setTicketCardBackgroundImage({ file, previewUrl: URL.createObjectURL(file) }); setIsEditing(true) }} onReset={() => { setIsEditing(true); setTicketCardBackgroundImage(null); updateSettings({ ticketCardBackgroundImageUrl: null }) }} />}
+          {!settings.ticketingEnabled && <TicketingBackgroundField url={settings.ticketingBackgroundImageUrl} file={backgroundFile} previewUrl={backgroundImage?.previewUrl} disabled={isSaving || isLoading} onFile={handleBackgroundFile} onReset={() => { setIsEditing(true); setBackgroundImage(null); updateSettings({ ticketingBackgroundImageUrl: null }) }} />}
         </fieldset>}
 
       </AdminShell>
