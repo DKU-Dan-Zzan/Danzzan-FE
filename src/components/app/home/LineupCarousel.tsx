@@ -169,7 +169,7 @@ export default function LineupCarousel({
                 key={`${banner.id}-${position}`}
                 className={clsx("relative shrink-0 overflow-hidden rounded-[1.85rem] bg-[var(--surface_container_lowest)] transition-[transform,opacity] duration-500 ease-out will-change-transform", isCenterCard
                     ? "scale-100 opacity-100 shadow-[var(--home-lineup-card-shadow)]"
-                    : `${sideCardOriginClass} scale-[0.67] opacity-82 shadow-[0_14px_24px_-20px_rgba(44,52,54,0.14)]`)}
+                    : `${sideCardOriginClass} scale-[0.67] opacity-82 shadow-[0_14px_24px_-20px_var(--semantic-shadow-neutral-14)]`)}
                 style={{ width: `${LINEUP_CARD_WIDTH_PX}px` }}
               >
                 <div style={{ aspectRatio: aspect }}>

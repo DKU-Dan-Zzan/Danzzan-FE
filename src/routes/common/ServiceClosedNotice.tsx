@@ -81,9 +81,9 @@ const ICON_BY_TITLE: Partial<Record<TranslationKey, ReactNode>> = {
  *
  * 색은 메인 포스터에서 뽑아 src/index.css 에 전역 토큰으로 등록했다.
  */
-const LEGEND_INK = "var(--legend-ink)"
-const LEGEND_EMBER = "var(--legend-ember)"
-const LEGEND_EMBER_DEEP = "var(--legend-ember-deep)"
+const LEGEND_INK = "var(--service-closed-bg)"
+const LEGEND_EMBER = "var(--service-closed-ember)"
+const LEGEND_EMBER_DEEP = "var(--service-closed-ember-deep)"
 
 const ServiceClosedNotice = ({
   titleKey,
@@ -119,9 +119,9 @@ const ServiceClosedNotice = ({
         style={{
           backgroundImage: "url(/legend-poster.jpg)",
           maskImage:
-            "radial-gradient(100% 58% at 50% 27%, black 0%, rgba(0,0,0,0.5) 55%, transparent 84%)",
+            "radial-gradient(100% 58% at 50% 27%, var(--ds-black) 0%, var(--service-closed-mask-mid) 55%, transparent 84%)",
           WebkitMaskImage:
-            "radial-gradient(100% 58% at 50% 27%, black 0%, rgba(0,0,0,0.5) 55%, transparent 84%)",
+            "radial-gradient(100% 58% at 50% 27%, var(--ds-black) 0%, var(--service-closed-mask-mid) 55%, transparent 84%)",
         }}
       />}
 
@@ -133,7 +133,7 @@ const ServiceClosedNotice = ({
         className="pointer-events-none absolute left-1/2 top-[26%] h-[26rem] w-[26rem] -translate-x-1/2 -translate-y-1/2 select-none"
         style={{
           background:
-            "radial-gradient(circle, rgba(232,85,31,0.30) 0%, rgba(160,28,20,0.16) 38%, transparent 68%)",
+            "radial-gradient(circle, var(--service-closed-glow) 0%, var(--service-closed-glow-deep) 38%, transparent 68%)",
         }}
       />
 
@@ -142,7 +142,7 @@ const ServiceClosedNotice = ({
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%] select-none"
         style={{
-          background: `linear-gradient(to top, ${LEGEND_INK} 24%, rgba(11,6,7,0.86) 58%, transparent 100%)`,
+          background: `linear-gradient(to top, ${LEGEND_INK} 24%, var(--service-closed-fade-mid) 58%, transparent 100%)`,
         }}
       />
 
@@ -152,14 +152,14 @@ const ServiceClosedNotice = ({
           alt="LEGEND"
           className="w-[13.5rem] max-w-[74%] select-none object-contain [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_both]"
           style={{
-            filter: `brightness(0) saturate(100%) invert(92%) sepia(28%) saturate(560%) hue-rotate(328deg) brightness(103%) contrast(96%) drop-shadow(0 0 26px rgba(232,85,31,0.42))`,
+            filter: `brightness(0) saturate(100%) invert(92%) sepia(28%) saturate(560%) hue-rotate(328deg) brightness(103%) contrast(96%) drop-shadow(0 0 26px var(--service-closed-logo-shadow))`,
           }}
           draggable={false}
         />
 
         <p
           className="mt-4 text-[0.66rem] font-semibold uppercase tracking-[0.34em] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_90ms_both]"
-          style={{ color: "rgba(245,227,163,0.62)" }}
+          style={{ color: "var(--service-closed-overline)" }}
         >
           2026 Fall Festival
         </p>
@@ -181,7 +181,7 @@ const ServiceClosedNotice = ({
             className="mt-6 select-none [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_300ms_both]"
             style={{
               color: LEGEND_EMBER,
-              filter: "drop-shadow(0 0 18px rgba(232,85,31,0.35))",
+              filter: "drop-shadow(0 0 18px var(--service-closed-icon-shadow))",
             }}
           >
             {noticeIcon}
@@ -190,7 +190,7 @@ const ServiceClosedNotice = ({
 
         <p
           className="mt-6 max-w-[19.5rem] whitespace-pre-line text-balance text-[0.92rem] leading-[1.72] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_380ms_both]"
-          style={{ color: "rgba(238,224,208,0.72)" }}
+          style={{ color: "var(--service-closed-copy)" }}
         >
           {renderWithHighlight(t(descriptionKey))}
         </p>
@@ -200,7 +200,7 @@ const ServiceClosedNotice = ({
             <OrnamentDivider className="mt-6 [animation:ec-fade-in_520ms_ease-out_440ms_both]" />
             <p
               className="mt-5 max-w-[19.5rem] whitespace-pre-line text-balance text-[0.92rem] leading-[1.72] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_480ms_both]"
-              style={{ color: "rgba(238,224,208,0.72)" }}
+              style={{ color: "var(--service-closed-copy)" }}
             >
               {renderWithHighlight(t(noteKey))}
             </p>
@@ -213,8 +213,8 @@ const ServiceClosedNotice = ({
           className="mt-9 inline-flex h-12 w-full max-w-[15rem] items-center justify-center rounded-full text-[0.92rem] font-semibold tracking-[0.01em] text-white transition-[transform,filter] duration-150 ease-out hover:brightness-[1.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:translate-y-px motion-reduce:transition-none [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_400ms_both]"
           style={{
             background: `linear-gradient(135deg, ${LEGEND_EMBER} 0%, ${LEGEND_EMBER_DEEP} 100%)`,
-            boxShadow: "0 16px 38px -18px rgba(232,85,31,0.9)",
-            ["--tw-ring-color" as string]: "rgba(232,85,31,0.55)",
+            boxShadow: "0 16px 38px -18px var(--service-closed-cta-shadow)",
+            ["--tw-ring-color" as string]: "var(--service-closed-cta-ring)",
             ["--tw-ring-offset-color" as string]: LEGEND_INK,
           }}
         >

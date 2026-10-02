@@ -109,7 +109,7 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mx-4 mt-3 overflow-hidden rounded-[16px] bg-white" style={{ boxShadow: "0 1px 8px rgba(28,43,106,0.08)" }}>
+    <div className="mx-4 mt-3 overflow-hidden rounded-[16px] bg-white" style={{ boxShadow: "0 1px 8px var(--mypage-poster-ink-08)" }}>
       <p className="px-5 pb-1 pt-4 text-[16px] font-bold" style={{ color: "var(--poster-navy)" }}>
         {title}
       </p>
@@ -152,7 +152,7 @@ function ListRow({
 
   if (onClick) {
     return (
-      <button onClick={onClick} className="w-full text-left transition active:bg-gray-50">
+      <button onClick={onClick} className="w-full text-left transition active:bg-[var(--ds-neutral-hover)]">
         {content}
       </button>
     );
@@ -226,7 +226,7 @@ function MyPage() {
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, rgba(238,241,248,0.18) 0%, rgba(238,241,248,0.52) 34%, rgba(238,241,248,0.88) 100%)",
+                "linear-gradient(180deg, var(--mypage-poster-overlay-top) 0%, var(--mypage-poster-overlay-mid) 34%, var(--mypage-poster-overlay-bottom) 100%)",
             }}
           />
         </div>
@@ -235,25 +235,25 @@ function MyPage() {
         <div
           className="relative w-full max-w-sm overflow-hidden rounded-[24px] px-6 py-9 text-center"
           style={{
-            background: "rgba(255,255,255,0.75)",
+            background: "var(--mypage-poster-white-75)",
             backdropFilter: "blur(20px)",
-            border: "1px solid rgba(255,255,255,0.9)",
-            boxShadow: "0 8px 40px rgba(28,43,106,0.1)",
+            border: "1px solid var(--mypage-poster-white-90)",
+            boxShadow: "0 8px 40px var(--mypage-poster-ink-10)",
           }}
         >
           <div
             className="mx-auto mb-5 flex h-[72px] w-[72px] items-center justify-center rounded-full"
             style={{
-              background: "rgba(255,255,255,0.55)",
+              background: "var(--mypage-poster-white-55)",
               backdropFilter: "blur(8px)",
-              border: "1.5px solid rgba(28,43,106,0.15)",
-              boxShadow: "0 2px 12px rgba(28,43,106,0.12)",
+              border: "1.5px solid var(--mypage-poster-ink-15)",
+              boxShadow: "0 2px 12px var(--mypage-poster-ink-12)",
             }}
           >
             <User size={32} strokeWidth={1.8} style={{ color: "var(--poster-navy)" }} />
           </div>
 
-          <p className="mb-1 text-[10px] font-bold tracking-[0.24em]" style={{ color: "rgba(28,43,106,0.5)" }}>
+          <p className="mb-1 text-[10px] font-bold tracking-[0.24em]" style={{ color: "var(--mypage-poster-ink-50)" }}>
             STUDENT PORTAL
           </p>
           <h2 className="mb-2 text-[20px] font-bold leading-[1.3]" style={{ color: "var(--poster-navy)" }}>
@@ -261,7 +261,7 @@ function MyPage() {
             <br />
             로그인해 주세요
           </h2>
-          <p className="mb-7 text-[13px] leading-relaxed" style={{ color: "rgba(28,43,106,0.55)" }}>
+          <p className="mb-7 text-[13px] leading-relaxed" style={{ color: "var(--mypage-poster-ink-55)" }}>
             {ticketingEnabled ? "로그인 후 예매 내역과 계정 정보를 확인할 수 있어요." : "로그인 후 계정 정보를 확인할 수 있어요."}
           </p>
 
@@ -269,11 +269,11 @@ function MyPage() {
             onClick={() => navigate("/ticket/login")}
             className="h-[52px] w-full rounded-[14px] text-[15px] font-bold transition active:brightness-95"
             style={{
-              background: "rgba(28,43,106,0.12)",
+              background: "var(--mypage-poster-action-bg)",
               backdropFilter: "blur(8px)",
-              border: "1.5px solid rgba(28,43,106,0.35)",
+              border: "1.5px solid var(--mypage-poster-action-border)",
               color: "var(--poster-navy)",
-              boxShadow: "0 2px 12px rgba(28,43,106,0.08)",
+              boxShadow: "0 2px 12px var(--mypage-poster-ink-08)",
             }}
           >
             로그인 / 회원가입하러 가기
@@ -356,7 +356,7 @@ function MyPage() {
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, rgba(11,6,7,0.22) 0%, rgba(11,6,7,0.5) 50%, var(--poster-bg) 100%)",
+                "linear-gradient(180deg, color-mix(in srgb, var(--legend-ink) 22%, transparent) 0%, color-mix(in srgb, var(--legend-ink) 50%, transparent) 50%, var(--poster-bg) 100%)",
             }}
           />
         </div>
@@ -375,7 +375,7 @@ function MyPage() {
           <div className="absolute bottom-5 left-5 flex items-end gap-3">
             <div
               className="h-[80px] w-[80px] shrink-0 overflow-hidden rounded-full border-2 border-white/30"
-              style={{ background: "rgba(220,229,240,0.25)", backdropFilter: "blur(8px)" }}
+              style={{ background: "var(--mypage-poster-avatar-surface)", backdropFilter: "blur(8px)" }}
             >
               <img src={`/profiles/latte-${(parseInt(user?.id ?? "0", 10) % 8) + 1}.jpeg`} alt="프로필" className="h-full w-full object-cover object-top" />
             </div>
@@ -395,10 +395,10 @@ function MyPage() {
           onClick={() => navigate("/ticket/my-ticket")}
           className="flex w-full items-center justify-between overflow-hidden rounded-[16px] px-5 py-4 transition active:brightness-90"
           style={{
-            background: "rgba(255,255,255,0.65)",
+            background: "var(--mypage-poster-white-65)",
             backdropFilter: "blur(12px)",
-            border: "1px solid rgba(58,95,168,0.15)",
-            boxShadow: "0 2px 12px rgba(28,43,106,0.1)",
+            border: "1px solid var(--mypage-poster-blue-border)",
+            boxShadow: "0 2px 12px var(--mypage-poster-ink-10)",
           }}
         >
           <div className="flex items-center gap-3">
@@ -428,7 +428,7 @@ function MyPage() {
         <ListRow icon={<GraduationCap size={18} />} label="학과" value={user?.department || "—"} />
       </SectionCard>
 
-      <div className="mx-4 mt-3 overflow-hidden rounded-[16px] bg-white" style={{ boxShadow: "0 1px 8px rgba(28,43,106,0.08)" }}>
+      <div className="mx-4 mt-3 overflow-hidden rounded-[16px] bg-white" style={{ boxShadow: "0 1px 8px var(--mypage-poster-ink-08)" }}>
         <p className="px-5 pb-1 pt-4 text-[16px] font-bold" style={{ color: "var(--poster-navy)" }}>자주 묻는 질문</p>
         <FaqAccordion />
       </div>
@@ -502,19 +502,19 @@ function MyPage() {
           {withdrawStep === "ticket-waiver" && (
             <label
               htmlFor="withdraw-ticket-waiver"
-              className="flex items-start gap-3 rounded-[10px] border border-red-100 bg-red-50/70 px-3 py-3 text-[13px] leading-[1.5] text-red-700"
+              className="flex items-start gap-3 rounded-[10px] border border-[var(--mypage-withdraw-warning-border)] bg-[var(--mypage-withdraw-warning-bg)] px-3 py-3 text-[13px] leading-[1.5] text-[var(--mypage-withdraw-warning-text)]"
             >
               <Checkbox
                 id="withdraw-ticket-waiver"
                 checked={withdrawTicketWaiverAgreed}
                 onCheckedChange={(checked) => setWithdrawTicketWaiverAgreed(checked === true)}
-                className="mt-0.5 shrink-0 border-red-300 data-[state=checked]:border-red-600 data-[state=checked]:bg-red-600"
+                className="mt-0.5 shrink-0 border-[var(--mypage-withdraw-checkbox-border)] data-[state=checked]:border-[var(--mypage-withdraw-action)] data-[state=checked]:bg-[var(--mypage-withdraw-action)]"
               />
               <span>보유 티켓이 사라지는 것에 동의합니다.</span>
             </label>
           )}
           {withdrawError && (
-            <p className="rounded-[8px] bg-red-50 px-3 py-2 text-[13px] leading-[1.5] text-red-600">
+            <p className="rounded-[8px] bg-[var(--mypage-withdraw-warning-surface)] px-3 py-2 text-[13px] leading-[1.5] text-[var(--mypage-withdraw-action)]">
               {withdrawError}
             </p>
           )}
@@ -523,7 +523,7 @@ function MyPage() {
             {withdrawStep === "final" ? (
               <AlertDialogAction
                 disabled={withdrawing}
-                className="bg-red-600 text-white hover:bg-red-600 hover:brightness-95 disabled:opacity-60"
+                className="bg-[var(--mypage-withdraw-action)] text-white hover:bg-[var(--mypage-withdraw-action)] hover:brightness-95 disabled:opacity-60"
                 style={{
                   backgroundImage: "none",
                   boxShadow: "none",
@@ -538,7 +538,7 @@ function MyPage() {
             ) : (
               <AlertDialogAction
                 disabled={!withdrawTicketWaiverAgreed || withdrawing}
-                className="bg-red-600 text-white hover:bg-red-600 hover:brightness-95 disabled:opacity-60"
+                className="bg-[var(--mypage-withdraw-action)] text-white hover:bg-[var(--mypage-withdraw-action)] hover:brightness-95 disabled:opacity-60"
                 style={{
                   backgroundImage: "none",
                   boxShadow: "none",

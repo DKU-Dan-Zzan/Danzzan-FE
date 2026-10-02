@@ -210,7 +210,7 @@ function Notice() {
               className={cn(NOTICE_LIST_CARD_BASE_CLASS, NOTICE_LIST_CARD_PINNED_CLASS, "overflow-hidden")}
             >
               <div className="flex min-w-0 flex-1 items-start gap-2">
-                <span className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(220,38,38,0.08)", color: "var(--notice-pin-red)" }}>
+                <span className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "var(--notice-pin-bg)", color: "var(--notice-pin-red)" }}>
                   <Pin className="h-3.5 w-3.5 fill-current" strokeWidth={2.2} />
                 </span>
                 <div className="min-w-0">
@@ -484,7 +484,7 @@ function Notice() {
                   <div className="mt-4 whitespace-pre-wrap text-[13px] leading-relaxed text-[var(--text)]">
                     {detailNotice.content.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
                       /^https?:\/\//.test(part) ? (
-                        <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline break-all">
+                        <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-[var(--ds-link-text)] underline break-all">
                           {part}
                         </a>
                       ) : (

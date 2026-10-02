@@ -25,7 +25,24 @@
   --ds-neutral-ink: #232124;
   --ds-neutral-muted: #91827d;
   --ds-neutral-input: #ebe8e6;
+  --ds-poster-overlay-light: #eef1f8;
+  --ds-poster-avatar-surface: #dce5f0;
+  --ds-ticket-paper-ink: #462c27;
+  --ds-service-copy: #eee0d0;
+  --ds-service-ink: #0b0607;
+  --ds-role-admin-bg: #ede9fe;
+  --ds-role-admin-text: #5b21b6;
+  --ds-role-manager-bg: #d1fae5;
+  --ds-role-manager-text: #065f46;
+  --ds-link-text: #2563eb;
+  --ds-neutral-hover: #f9fafb;
+  --ds-shadow-slate: #0f172a;
+  --ds-shadow-neutral: #2c3436;
   --ds-overlay-scrim: rgba(0, 0, 0, 0.5);
+  --ds-overlay-scrim-40: rgba(0, 0, 0, 0.4);
+  --ds-overlay-image-control-55: rgba(0, 0, 0, 0.55);
+  --ds-overlay-image-control: rgba(0, 0, 0, 0.6);
+  --ds-overlay-image-control-hover: rgba(0, 0, 0, 0.7);
   --ds-shadow-color: rgba(0, 0, 0, 0.08);
 
   /* Semantic bridge. Component tokens and existing aliases can migrate independently. */
@@ -40,6 +57,15 @@
   --semantic-text-secondary: var(--ds-neutral-muted);
   --semantic-overlay-scrim: var(--ds-overlay-scrim);
   --semantic-shadow-color: var(--ds-shadow-color);
+  --semantic-shadow-slate-08: color-mix(in srgb, var(--ds-shadow-slate) 8%, transparent);
+  --semantic-shadow-neutral-04: color-mix(in srgb, var(--ds-shadow-neutral) 4%, transparent);
+  --semantic-shadow-neutral-06: color-mix(in srgb, var(--ds-shadow-neutral) 6%, transparent);
+  --semantic-shadow-neutral-09: color-mix(in srgb, var(--ds-shadow-neutral) 9%, transparent);
+  --semantic-shadow-neutral-14: color-mix(in srgb, var(--ds-shadow-neutral) 14%, transparent);
+  --language-toggle-shadow: color-mix(in srgb, var(--semantic-primary) 55%, transparent);
+  --not-found-action-border: color-mix(in srgb, var(--semantic-primary) 20%, transparent);
+  --not-found-action-shadow: color-mix(in srgb, var(--semantic-primary) 68%, transparent);
+  --not-found-action-ring: color-mix(in srgb, var(--semantic-primary) 38%, transparent);
   --semantic-border-base: color-mix(in srgb, var(--brand-78b) 56%, transparent);
   --semantic-border-emphasis: color-mix(in srgb, var(--brand-78b) 82%, transparent);
   --semantic-focus-ring: color-mix(in srgb, var(--brand-53) 45%, transparent);
@@ -172,10 +198,23 @@
   /* 가을 축제(2026 DANFESTA "LEGEND") 팔레트.
      메인 포스터에서 추출했으며, 티켓팅·로그인 등 이번 축제에 제공하지 않는
      서비스의 안내 화면에서만 사용한다. 앱의 기본 팔레트는 --brand-main 계열이다. */
-  --legend-ink: #0b0607;
-  --legend-ember: #e8551f;
-  --legend-ember-deep: #b3241a;
+  --legend-ink: var(--ds-service-ink);
+  --legend-ember: color-mix(in srgb, var(--semantic-primary) 90%, var(--ds-black));
+  --legend-ember-deep: color-mix(in srgb, var(--semantic-text-emphasis) 80%, var(--ds-neutral-ink));
   --legend-cream: var(--semantic-secondary);
+  --service-closed-bg: var(--legend-ink);
+  --service-closed-ember: var(--legend-ember);
+  --service-closed-ember-deep: var(--legend-ember-deep);
+  --service-closed-overline: color-mix(in srgb, var(--semantic-secondary) 62%, transparent);
+  --service-closed-copy: color-mix(in srgb, var(--ds-service-copy) 72%, transparent);
+  --service-closed-glow: color-mix(in srgb, var(--service-closed-ember) 30%, transparent);
+  --service-closed-glow-deep: color-mix(in srgb, var(--service-closed-ember-deep) 16%, transparent);
+  --service-closed-logo-shadow: color-mix(in srgb, var(--service-closed-ember) 42%, transparent);
+  --service-closed-icon-shadow: color-mix(in srgb, var(--service-closed-ember) 35%, transparent);
+  --service-closed-cta-shadow: color-mix(in srgb, var(--service-closed-ember) 90%, transparent);
+  --service-closed-cta-ring: color-mix(in srgb, var(--service-closed-ember) 55%, transparent);
+  --service-closed-mask-mid: color-mix(in srgb, var(--ds-black) 50%, transparent);
+  --service-closed-fade-mid: color-mix(in srgb, var(--service-closed-bg) 86%, transparent);
   --bg-base: var(--brand-99);
   --bg-page-soft: var(--brand-99);
   --text: var(--brand-11);
@@ -754,7 +793,7 @@
   --mypage-info-item-value: var(--brand-11);
   --mypage-logout-gap: 8px;
   --mypage-logout-text: var(--neutral-65);
-  --mypage-logout-text-hover: #ef4444;
+  --mypage-logout-text-hover: var(--status-danger);
   --mypage-logout-font-size: 14px;
   --mypage-logout-underline-thickness: 0px;
   --mypage-logout-underline-offset: 0px;
@@ -786,21 +825,60 @@
   --mypage-logout-border: transparent;
 
   /* 2026 단국대 축제 포스터 팔레트 (落花流水 ;만개) */
-  --poster-navy: var(--brand-26a);
-  --poster-blue: var(--brand-44);
-  --poster-bg: var(--brand-95b);
-  --poster-card-white: #ffffff;
+  --poster-navy: color-mix(in srgb, var(--semantic-text-emphasis) 45%, var(--ds-neutral-ink));
+  --poster-blue: var(--semantic-text-emphasis);
+  --poster-bg: color-mix(in srgb, var(--semantic-primary) 12%, var(--ds-white));
+  --poster-card-white: var(--ds-white);
+  --mypage-poster-overlay-top: color-mix(in srgb, var(--ds-poster-overlay-light) 18%, transparent);
+  --mypage-poster-overlay-mid: color-mix(in srgb, var(--ds-poster-overlay-light) 52%, transparent);
+  --mypage-poster-overlay-bottom: color-mix(in srgb, var(--ds-poster-overlay-light) 88%, transparent);
+  --mypage-poster-avatar-surface: color-mix(in srgb, var(--ds-poster-avatar-surface) 25%, transparent);
+  --mypage-poster-white-55: color-mix(in srgb, var(--ds-white) 55%, transparent);
+  --mypage-poster-white-65: color-mix(in srgb, var(--ds-white) 65%, transparent);
+  --mypage-poster-white-75: color-mix(in srgb, var(--ds-white) 75%, transparent);
+  --mypage-poster-white-90: color-mix(in srgb, var(--ds-white) 90%, transparent);
+  --mypage-poster-ink-08: color-mix(in srgb, var(--poster-navy) 8%, transparent);
+  --mypage-poster-ink-10: color-mix(in srgb, var(--poster-navy) 10%, transparent);
+  --mypage-poster-ink-12: color-mix(in srgb, var(--poster-navy) 12%, transparent);
+  --mypage-poster-ink-15: color-mix(in srgb, var(--poster-navy) 15%, transparent);
+  --mypage-poster-ink-35: color-mix(in srgb, var(--poster-navy) 35%, transparent);
+  --mypage-poster-ink-40: color-mix(in srgb, var(--poster-navy) 40%, transparent);
+  --mypage-poster-ink-45: color-mix(in srgb, var(--poster-navy) 45%, transparent);
+  --mypage-poster-ink-50: color-mix(in srgb, var(--poster-navy) 50%, transparent);
+  --mypage-poster-ink-55: color-mix(in srgb, var(--poster-navy) 55%, transparent);
+  --mypage-poster-blue-border: color-mix(in srgb, var(--poster-blue) 15%, transparent);
+  --mypage-poster-action-bg: var(--mypage-poster-ink-12);
+  --mypage-poster-action-border: var(--mypage-poster-ink-35);
+  --mypage-withdraw-warning-bg: color-mix(in srgb, color-mix(in srgb, var(--status-danger) 10%, var(--ds-white)) 70%, transparent);
+  --mypage-withdraw-warning-surface: color-mix(in srgb, var(--status-danger) 10%, var(--ds-white));
+  --mypage-withdraw-warning-border: color-mix(in srgb, var(--status-danger) 12%, var(--ds-white));
+  --mypage-withdraw-checkbox-border: color-mix(in srgb, var(--status-danger) 38%, var(--ds-white));
+  --mypage-withdraw-warning-text: var(--status-danger-text);
+  --mypage-withdraw-action: var(--status-danger);
+  --ticket-list-border: var(--mypage-poster-ink-08);
+  --ticket-list-shadow: color-mix(in srgb, var(--poster-navy) 7%, transparent);
+  --ticket-list-icon-bg: var(--mypage-poster-ink-08);
+  --ticket-list-hover-bg: color-mix(in srgb, var(--poster-navy) 5%, transparent);
+  --ticket-list-label: var(--mypage-poster-ink-50);
+  --ticket-list-overline: var(--mypage-poster-ink-40);
+  --ticket-list-meta: var(--mypage-poster-ink-45);
+  --ticket-list-copy: color-mix(in srgb, var(--ds-neutral-ink) 92%, transparent);
+  --ticket-paper-shadow: color-mix(in srgb, var(--ds-ticket-paper-ink) 14%, transparent);
+  --ticket-paper-perforation: color-mix(in srgb, var(--ds-ticket-paper-ink) 22%, transparent);
+  --ticket-paper-outline: color-mix(in srgb, var(--ds-ticket-paper-ink) 12%, transparent);
+  --ticket-card-accent: var(--semantic-accent);
   /* 티켓 상태 배지 */
-  --ticket-badge-issued-bg: #dcfce7;
-  --ticket-badge-issued-text: #15803d;
-  --ticket-badge-used-bg: #fee2e2;
-  --ticket-badge-used-text: #b91c1c;
+  --ticket-badge-issued-bg: color-mix(in srgb, var(--status-success) 14%, var(--ds-white));
+  --ticket-badge-issued-text: var(--status-success);
+  --ticket-badge-used-bg: color-mix(in srgb, var(--status-danger) 12%, var(--ds-white));
+  --ticket-badge-used-text: var(--status-danger);
   --ticket-badge-cancelled-bg: var(--neutral-96);
   --ticket-badge-cancelled-text: var(--neutral-46);
-  --ticket-badge-unknown-bg: var(--brand-95c);
-  --ticket-badge-unknown-text: var(--brand-50);
+  --ticket-badge-unknown-bg: color-mix(in srgb, var(--status-pending) 12%, var(--ds-white));
+  --ticket-badge-unknown-text: var(--status-pending-text);
   /* 공지사항 중요공지 강조 색상 */
   --notice-pin-red: #dc2626;
+  --notice-pin-bg: color-mix(in srgb, var(--notice-pin-red) 8%, transparent);
 
   /* Timetable route tokens */
   --timetable-tab-inactive: var(--neutral-63);
@@ -1515,7 +1593,7 @@ body,
 [data-color-scheme="electric-curator"] {
   --accent: var(--semantic-accent);       /* 버튼, 활성 칩 */
   --primary: var(--semantic-primary);
-  --brand-main: #f0410f;                /* MAIN 2 — 얇은 라인, 활성화 */
+  --brand-main: color-mix(in srgb, var(--semantic-primary) 50%, var(--semantic-text-emphasis)); /* MAIN 2 — 얇은 라인, 활성화 */
   --text-emphasis-vivid: var(--semantic-text-emphasis);
   --text-emphasis-vivid-strong: var(--semantic-text-emphasis);
   --emphasis-primary: var(--semantic-text-emphasis);

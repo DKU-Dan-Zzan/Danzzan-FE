@@ -110,7 +110,7 @@ export default function ContentImageSection({
             </div>
             <DialogClose
               aria-label={t("common.close")}
-              className="absolute right-4 top-[max(env(safe-area-inset-top),1rem)] inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white shadow-lg backdrop-blur-sm transition hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white/70 sm:top-4"
+              className="absolute right-4 top-[max(env(safe-area-inset-top),1rem)] inline-flex h-11 w-11 items-center justify-center rounded-full bg-[var(--ds-overlay-image-control-55)] text-white shadow-lg backdrop-blur-sm transition hover:bg-[var(--ds-overlay-image-control-hover)] focus:outline-none focus:ring-2 focus:ring-white/70 sm:top-4"
             >
               <X className="h-6 w-6" />
               <span className="sr-only">{t("common.close")}</span>

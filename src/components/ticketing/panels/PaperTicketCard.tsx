@@ -63,7 +63,7 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
   return (
     <div
       className="relative w-full"
-      style={{ filter: "drop-shadow(0 6px 18px rgba(70,44,39,0.14))" }}
+      style={{ filter: "drop-shadow(0 6px 18px var(--ticket-paper-shadow))" }}
     >
       {/* SVG 티켓 외형 */}
       <svg
@@ -103,23 +103,23 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
         {/* 퍼포레이션 점선 */}
         <line
           x1="280" y1="18" x2="280" y2="162"
-          stroke="rgba(70,44,39,0.22)"
+          stroke="var(--ticket-paper-perforation)"
           strokeWidth="1.5"
           strokeDasharray="5,5"
         />
 
         {/* 테두리 */}
-        <path d={ticketPath} fill="none" stroke="rgba(70,44,39,0.12)" strokeWidth="1" />
+        <path d={ticketPath} fill="none" stroke="var(--ticket-paper-outline)" strokeWidth="1" />
       </svg>
 
       {/* 콘텐츠 오버레이 */}
       <div className="absolute inset-0 flex items-stretch">
         {/* 왼쪽 70% */}
         <div className="flex w-[70%] flex-col justify-center px-6 py-5">
-          <p className="text-[0.58rem] font-bold tracking-[0.22em]" style={{ color: "var(--accent)" }}>
+          <p className="text-[0.58rem] font-bold tracking-[0.22em]" style={{ color: "var(--ticket-card-accent)" }}>
             DANKOOK ZONE TICKET
           </p>
-          <p className="mt-1.5 text-[2.1rem] font-bold leading-none tracking-[-0.02em]" style={{ color: "var(--accent)" }}>
+          <p className="mt-1.5 text-[2.1rem] font-bold leading-none tracking-[-0.02em]" style={{ color: "var(--ticket-card-accent)" }}>
             {dayLabel}
           </p>
           <span
@@ -138,11 +138,11 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
             { key: "예매 순번", val: `NO.${queueLabel}` },
           ].map(({ key, val }) => (
             <div key={key}>
-              <p className="text-[0.5rem] font-semibold tracking-[0.08em]" style={{ color: "var(--accent)" }}>{key}</p>
+              <p className="text-[0.5rem] font-semibold tracking-[0.08em]" style={{ color: "var(--ticket-card-accent)" }}>{key}</p>
               <p className={cn(
                 "mt-0.5 text-[1.05rem] font-extrabold leading-tight [font-variant-numeric:tabular-nums]",
                 key === "예매 순번" ? "font-mono" : ""
-              )} style={{ color: "var(--accent)" }}>
+              )} style={{ color: "var(--ticket-card-accent)" }}>
                 {val}
               </p>
             </div>

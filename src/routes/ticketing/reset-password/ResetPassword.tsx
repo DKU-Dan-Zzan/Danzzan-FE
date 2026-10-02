@@ -401,7 +401,7 @@ export default function ResetPassword() {
             : "items-start pt-[calc(env(safe-area-inset-top)+4.75rem)] sm:items-center",
         )}
       >
-        <div className="w-full rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_rgba(44,52,54,0.06)] backdrop-blur-[24px]">
+        <div className="w-full rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_var(--semantic-shadow-neutral-06)] backdrop-blur-[24px]">
           <div className="rounded-[26px] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface_container_low)_92%,white)_0%,color-mix(in_srgb,var(--surface_container_lowest)_96%,white)_100%)] px-4 py-6">
             <section className={TICKETING_AUTH_HEADER_SECTION_CLASS}>
           <TicketingAuthHeading eyebrow="2026 DANFESTA" title="비밀번호 재설정" />

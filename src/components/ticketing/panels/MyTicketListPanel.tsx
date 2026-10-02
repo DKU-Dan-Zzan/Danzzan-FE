@@ -45,16 +45,16 @@ export function MyTicketListPanel({
         className="overflow-hidden rounded-[16px] px-4 py-3"
         style={{
           background: "var(--poster-card-white)",
-          border: "1px solid rgba(28,43,106,0.08)",
-          boxShadow: "0 2px 12px rgba(28,43,106,0.07)",
+          border: "1px solid var(--ticket-list-border)",
+          boxShadow: "0 2px 12px var(--ticket-list-shadow)",
         }}
       >
         <div className="flex items-center gap-3">
-          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(28,43,106,0.08)", color: "var(--poster-navy)" }}>
+          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: "var(--ticket-list-icon-bg)", color: "var(--poster-navy)" }}>
             <TicketIcon className="h-5 w-5" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-semibold" style={{ color: "rgba(28,43,106,0.5)" }}>
+            <p className="text-[11px] font-semibold" style={{ color: "var(--ticket-list-label)" }}>
               예매 내역과 팔찌 상태
             </p>
             <h2 className="mt-0.5 text-[17px] font-extrabold tracking-tight" style={{ color: "var(--poster-navy)" }}>
@@ -65,7 +65,7 @@ export function MyTicketListPanel({
             onClick={onRefresh}
             loading={loading}
             size="sm"
-            className="h-9 w-9 rounded-lg p-0 hover:bg-[rgba(28,43,106,0.05)]"
+            className="h-9 w-9 rounded-lg p-0 hover:bg-[var(--ticket-list-hover-bg)]"
             iconClassName="h-3.5 w-3.5"
           />
         </div>
@@ -76,18 +76,18 @@ export function MyTicketListPanel({
         className="overflow-hidden rounded-[16px] px-4 py-3"
         style={{
           background: "var(--poster-card-white)",
-          border: "1px solid rgba(28,43,106,0.08)",
-          boxShadow: "0 2px 12px rgba(28,43,106,0.07)",
+          border: "1px solid var(--ticket-list-border)",
+          boxShadow: "0 2px 12px var(--ticket-list-shadow)",
         }}
       >
-        <div className="flex items-center justify-between gap-2 pb-2" style={{ borderBottom: "1px solid rgba(28,43,106,0.08)" }}>
-          <p className="text-[0.6rem] font-bold tracking-[0.15em]" style={{ color: "rgba(28,43,106,0.4)" }}>TICKET HOLDER</p>
-          <p className="text-[11px] font-medium" style={{ color: "rgba(28,43,106,0.4)" }}>티켓 소지자 정보</p>
+        <div className="flex items-center justify-between gap-2 pb-2" style={{ borderBottom: "1px solid var(--ticket-list-border)" }}>
+          <p className="text-[0.6rem] font-bold tracking-[0.15em]" style={{ color: "var(--ticket-list-overline)" }}>TICKET HOLDER</p>
+          <p className="text-[11px] font-medium" style={{ color: "var(--ticket-list-overline)" }}>티켓 소지자 정보</p>
         </div>
         <dl className="mt-2 grid grid-cols-[52px_1fr] gap-y-1.5 text-[13px]">
-          <dt className="font-medium" style={{ color: "rgba(28,43,106,0.45)" }}>학번</dt>
+          <dt className="font-medium" style={{ color: "var(--ticket-list-meta)" }}>학번</dt>
           <dd className="font-extrabold tracking-tight" style={{ color: "var(--poster-navy)" }}>{student.studentId}</dd>
-          <dt className="font-medium" style={{ color: "rgba(28,43,106,0.45)" }}>이름</dt>
+          <dt className="font-medium" style={{ color: "var(--ticket-list-meta)" }}>이름</dt>
           <dd className="font-extrabold tracking-tight" style={{ color: "var(--poster-navy)" }}>{student.name}</dd>
         </dl>
       </div>
@@ -96,8 +96,8 @@ export function MyTicketListPanel({
         className="overflow-hidden rounded-[16px] px-4 py-3"
         style={{
           background: "var(--poster-card-white)",
-          border: "1px solid rgba(28,43,106,0.08)",
-          boxShadow: "0 2px 12px rgba(28,43,106,0.07)",
+          border: "1px solid var(--ticket-list-border)",
+          boxShadow: "0 2px 12px var(--ticket-list-shadow)",
         }}
       >
         <div className="flex items-center gap-3">
@@ -109,7 +109,7 @@ export function MyTicketListPanel({
           </span>
           <p
             className="text-[10.5px] font-semibold leading-[1.65] tracking-[-0.01em]"
-            style={{ color: "rgba(17,24,39,0.92)" }}
+            style={{ color: "var(--ticket-list-copy)" }}
           >
             빠른 단국존 입장을 위해 네이버 Face Sign을 사전에 등록해주세요.
             <br />
