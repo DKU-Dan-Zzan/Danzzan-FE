@@ -56,7 +56,7 @@ const OrnamentDivider = ({ className }: { className?: string }) => (
 const renderWithHighlight = (text: string) =>
   text.split("*").map((part, index) =>
     index % 2 === 1 ? (
-      <strong key={index} className="font-bold text-[var(--brand-main)]">
+      <strong key={index} className="font-bold text-[var(--service-closed-highlight)]">
         {part}
       </strong>
     ) : (

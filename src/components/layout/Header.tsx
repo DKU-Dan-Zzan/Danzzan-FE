@@ -25,7 +25,7 @@ const HEADER_ICON_BUTTON_CLASS =
  * 나눌 필요가 없다. 값을 박지 않고 토큰을 참조해 토글과 함께 움직인다.
  */
 const HEADER_ICON_TONE_CLASS =
-  "text-[var(--brand-main)] hover:brightness-110"
+  "text-[var(--app-header-brand-text)] hover:brightness-110"
 
 const Header = () => {
   const t = useT()

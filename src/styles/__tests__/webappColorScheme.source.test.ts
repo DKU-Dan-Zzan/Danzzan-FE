@@ -8,9 +8,11 @@ const INDEX_CSS_PATH = path.resolve(__dirname, "../../index.css");
 describe("webapp color scheme source", () => {
   it("웹앱 스코프와 핵심 semantic 토큰을 선언한다", () => {
     const content = fs.readFileSync(INDEX_CSS_PATH, "utf8");
+    const scope = content.match(/\[data-color-scheme="webapp"\] \{([\s\S]*?)\n\}/)?.[1];
 
     // 스코프
-    expect(content).toContain('[data-color-scheme="webapp"]');
+    expect(scope).toBeDefined();
+    expect(scope).not.toMatch(/var\(--brand-/);
 
     // 핵심 팔레트 토큰(값 자체보다 토큰 존재/연결 확인)
     const requiredPaletteTokens = [
@@ -33,7 +35,8 @@ describe("webapp color scheme source", () => {
     expect(content).toContain("--bg-base: var(--webapp-main-bg);");
     expect(content).toContain("--bg-page-soft: var(--webapp-main-bg);");
     expect(content).toContain("--app-nav-bg: var(--webapp-bottom-bar);");
-    expect(content).toContain("--footer-bg: var(--webapp-footer-bg);");
+    expect(content).toContain("--webapp-footer-bg: var(--neutral-96);");
+    expect(content).toContain("--primary: var(--semantic-primary);");
     expect(content).toContain("--app-header-bg-gradient: none;");
     expect(content).toContain("--app-header-border: transparent;");
   });

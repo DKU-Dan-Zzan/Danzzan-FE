@@ -8,8 +8,11 @@ const INDEX_CSS_PATH = path.resolve(__dirname, "../../index.css");
 describe("electric curator color scheme source", () => {
   it("electric curator 스코프 토큰은 표면/타이포/간격 핵심 값을 선언한다", () => {
     const content = fs.readFileSync(INDEX_CSS_PATH, "utf8");
+    const scope = content.match(/\[data-color-scheme="electric-curator"\] \{([\s\S]*?)\n\}/)?.[1];
 
-    expect(content).toContain('[data-color-scheme="electric-curator"]');
+    expect(scope).toBeDefined();
+    expect(scope).not.toMatch(/var\(--brand-/);
+    expect(scope).toContain("--primary_container: color-mix(in srgb, var(--semantic-primary)");
 
     // 값 고정보다 "토큰 존재/연결" 중심으로 검증한다.
     const requiredTokens = [

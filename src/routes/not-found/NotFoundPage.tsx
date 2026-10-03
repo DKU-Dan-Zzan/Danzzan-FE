@@ -23,7 +23,7 @@ export default function NotFoundPage() {
       <div className="relative z-10 mx-auto flex w-full max-w-[320px] flex-col items-center text-center">
         <div
           aria-hidden
-          className="mb-5 text-[3.6rem] font-black leading-none tracking-[0] text-[var(--brand-main)]"
+          className="mb-5 text-[3.6rem] font-black leading-none tracking-[0] text-[var(--not-found-brand-highlight)]"
         >
           404
         </div>
@@ -41,7 +41,7 @@ export default function NotFoundPage() {
         <div className="mt-8 w-full max-w-[220px]">
           <Button
             asChild
-            className="h-11 w-full rounded-[8px] border border-[var(--not-found-action-border)] bg-[linear-gradient(135deg,var(--brand-main)_0%,var(--text-emphasis-vivid-strong)_100%)] text-[0.9rem] tracking-[0] text-white shadow-[0_18px_32px_-20px_var(--not-found-action-shadow)] hover:brightness-[1.03] focus-visible:ring-[var(--not-found-action-ring)] active:translate-y-px"
+            className="h-11 w-full rounded-[8px] border border-[var(--not-found-action-border)] bg-[linear-gradient(135deg,var(--not-found-action-start)_0%,var(--text-emphasis-vivid-strong)_100%)] text-[0.9rem] tracking-[0] text-white shadow-[0_18px_32px_-20px_var(--not-found-action-shadow)] hover:brightness-[1.03] focus-visible:ring-[var(--not-found-action-ring)] active:translate-y-px"
           >
             <Link to="/">
               <Home size={17} aria-hidden />

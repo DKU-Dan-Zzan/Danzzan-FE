@@ -29,7 +29,7 @@ const Layout = () => {
 
   return (
     <AppShell
-      colorScheme="electric-curator"
+      visualVariant="electric-curator"
       header={<Header />}
       footer={shouldShowFooter ? <Footer /> : undefined}
       bottomNav={<BottomNav />}

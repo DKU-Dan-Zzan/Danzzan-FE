@@ -39,7 +39,8 @@ describe("Common not-found route", () => {
     expect(source).toContain('to="/"');
     expect(source).toContain('src="/DAN-ZZAN.png"');
 
-    expect(source).toContain("var(--brand-main)");
+    expect(source).toContain("var(--not-found-brand-highlight)");
+    expect(source).toContain("var(--not-found-action-start)");
     expect(source).toContain("var(--text-emphasis-vivid-strong)");
 
     // 복구 액션은 홈 이동 1개만 유지한다.

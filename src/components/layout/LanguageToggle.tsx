@@ -14,7 +14,7 @@ const TOGGLE_CLASS =
   "absolute right-[7.5rem] top-1/2 flex h-[var(--app-header-ticket-btn-size)] w-[5.25rem] -translate-y-1/2 items-center rounded-full bg-[linear-gradient(145deg,var(--app-header-ticket-btn-bg-start)_0%,var(--app-header-ticket-btn-bg-end)_100%)] p-[3px] shadow-[var(--app-header-ticket-btn-shadow)] backdrop-blur-[var(--ec-glass-blur)] transition-[transform,box-shadow,filter] duration-[180ms] hover:shadow-[var(--app-header-ticket-btn-shadow-hover)] hover:brightness-[1.01] active:scale-[0.96]"
 
 const INDICATOR_CLASS =
-  "absolute left-[3px] top-1/2 h-[calc(var(--app-header-ticket-btn-size)-8px)] w-[calc(50%-3px)] -translate-y-1/2 rounded-full bg-[var(--brand-main)] shadow-[0_2px_8px_-2px_var(--language-toggle-shadow)] transition-transform duration-[220ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
+  "absolute left-[3px] top-1/2 h-[calc(var(--app-header-ticket-btn-size)-8px)] w-[calc(50%-3px)] -translate-y-1/2 rounded-full bg-[var(--language-toggle-active-bg)] shadow-[0_2px_8px_-2px_var(--language-toggle-shadow)] transition-transform duration-[220ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
 
 const LABEL_CLASS =
   "relative z-10 flex-1 text-center text-[11.5px] font-bold leading-none tracking-[0.04em] transition-colors duration-150"

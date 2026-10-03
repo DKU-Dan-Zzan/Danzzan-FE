@@ -89,8 +89,23 @@ function readCssColor(cssVar: string): string | null {
     return null;
   }
 
-  const value = window.getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim();
-  return value.length > 0 ? value : null;
+  // Map SDK colors need a resolved CSS color, not an unevaluated color-mix() custom property.
+  // Resolve against :root so a future festival theme applied there also reaches map polygons.
+  const root = document.documentElement;
+  const value = window.getComputedStyle(root).getPropertyValue(cssVar).trim();
+  if (!value) return null;
+  if (!value.includes("color-mix(") && !value.includes("var(")) return value;
+
+  const probe = document.createElement("span");
+  probe.style.color = `var(${cssVar})`;
+  probe.style.display = "none";
+  root.appendChild(probe);
+  try {
+    const resolved = window.getComputedStyle(probe).color;
+    return resolved || value;
+  } finally {
+    probe.remove();
+  }
 }
 
 export function getBoothmapColor(token: BoothmapColorToken): string {

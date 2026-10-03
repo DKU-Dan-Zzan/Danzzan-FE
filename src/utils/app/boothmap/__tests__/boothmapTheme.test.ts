@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
 import {
   getBoothmapBoothMarkerTheme,
   getBoothmapColor,
@@ -9,6 +11,12 @@ import {
 } from "@/utils/app/boothmap/boothmapTheme";
 
 describe("boothmapTheme", () => {
+  it("지도 카테고리는 전역 Theme Core alias를 읽고 스킴별 색상에 의존하지 않는다", () => {
+    const css = fs.readFileSync(path.resolve(__dirname, "../../../../index.css"), "utf8");
+    expect(css).toContain("--boothmap-marker-pub: var(--semantic-category-pub);");
+    expect(css).toContain("--boothmap-marker-food-truck: var(--semantic-category-food-truck);");
+    expect(css).toContain("--boothmap-marker-facility: var(--semantic-category-facility);");
+  });
   it("쉼터는 편의시설 subtype과 무관하게 전용 아이콘을 사용한다", () => {
     expect(parseBoothmapMarkerType("REST_AREA")).toBe("REST_AREA");
     expect(getBoothmapBoothMarkerTheme({ type: "REST_AREA", subType: "SMOKING_AREA" })).toEqual({
