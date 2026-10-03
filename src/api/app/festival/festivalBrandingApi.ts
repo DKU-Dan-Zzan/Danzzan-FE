@@ -13,6 +13,9 @@ export type FestivalBranding = {
 
 export type BrandingImageKind = "poster" | "logo";
 
+export type PosterColorCandidate = { hex: string; population: number };
+export type PosterColorResponse = { colors: PosterColorCandidate[] };
+
 const fetchWithAuth = createFetchWithAuth({
   getSessionEpoch: authStore.getSessionEpoch,
   getBaseUrl: getApiBaseUrl,
@@ -34,5 +37,8 @@ export const festivalBrandingApi = {
     const body = new FormData();
     body.append("file", file);
     return fetchWithAuth<FestivalBranding>(`/admin${brandingPath(festivalSettingId)}/${kind}`, { method: "POST", body });
+  },
+  extractPosterColors(festivalSettingId = CURRENT_FESTIVAL_SETTING_ID): Promise<PosterColorResponse> {
+    return fetchWithAuth<PosterColorResponse>(`/admin/festival/${festivalSettingId}/theme-colors/extract`, { method: "POST" });
   },
 };

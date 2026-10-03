@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AdminTheme from "@/routes/admin/AdminTheme";
 import type { ActiveThemeResponse, ThemeData } from "@/api/app/festival/activeThemeApi";
 import { adminThemeApi } from "@/api/app/admin/adminThemeApi";
+import { festivalBrandingApi } from "@/api/app/festival/festivalBrandingApi";
 import { THEME_FIELDS, validateThemeDraft } from "@/routes/admin/themeEditor";
 import { THEME_CORE_VARIABLES } from "@/lib/app/festival/activeTheme";
 
@@ -18,6 +19,7 @@ vi.mock("@/api/app/admin/adminThemeApi", () => ({ adminThemeApi: {
 vi.mock("@/api/app/festival/festivalBrandingApi", () => ({ festivalBrandingApi: {
   get: vi.fn().mockResolvedValue({ festivalSettingId: 1, posterImageUrl: null, logoImageUrl: null }),
   upload: vi.fn(),
+  extractPosterColors: vi.fn(),
 } }));
 
 const colors: ThemeData = {
@@ -45,6 +47,9 @@ async function render() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.mocked(festivalBrandingApi.get).mockResolvedValue({ festivalSettingId: 1, posterImageUrl: null, logoImageUrl: null });
+  vi.mocked(festivalBrandingApi.extractPosterColors).mockReset();
+  vi.mocked(festivalBrandingApi.upload).mockReset();
   vi.mocked(adminThemeApi.list).mockResolvedValue([active, inactive]);
   vi.mocked(adminThemeApi.get).mockImplementation(async (id) => id === 2 ? inactive : active);
   vi.mocked(adminThemeApi.create).mockImplementation(async (payload) => ({ ...inactive, id: 3, name: payload.name, themeData: payload.themeData }));
@@ -76,6 +81,54 @@ describe("AdminTheme", () => {
     expect(host.querySelector('input[aria-label="Strong · 진한 브랜드 컬러 HEX"]')).not.toBeNull();
     expect(host.querySelector('[data-testid="theme-preview"]')).not.toBeNull();
     expect(host.querySelector('[data-testid="theme-preview"]')?.textContent).toContain("강한 CTA");
+    expect(host.querySelector('[aria-label="테마 생성 출처"]')?.textContent).toContain("기반 포스터 정보 없음");
+  });
+
+  it("shows saved provenance and copies it when duplicating a theme", async () => {
+    const sourced = { ...active, sourcePosterUrl: "https://cdn.example.com/poster-a.png",
+      selectedBaseColor: "#4EB15E", sourceColors: ["#4EB15E", "#13730C"] };
+    vi.mocked(adminThemeApi.list).mockResolvedValue([sourced]);
+    vi.mocked(adminThemeApi.get).mockResolvedValue(sourced);
+    await render();
+    expect(host.querySelector<HTMLImageElement>('img[alt="테마 기반 포스터"]')?.src).toBe(sourced.sourcePosterUrl);
+    expect(host.querySelector('[aria-label="테마 생성 출처"]')?.textContent).toContain("#13730C");
+    await act(async () => { buttons("복제")[0].click(); });
+    await act(async () => { buttons("저장")[0].click(); });
+    expect(adminThemeApi.create).toHaveBeenCalledWith(expect.objectContaining({
+      sourcePosterUrl: sourced.sourcePosterUrl,
+      selectedBaseColor: sourced.selectedBaseColor,
+      sourceColors: sourced.sourceColors,
+    }));
+  });
+
+  it("snapshots each poster analysis into a newly created theme", async () => {
+    const posterA = "https://cdn.example.com/festival/1/poster/a.png";
+    const posterB = "https://cdn.example.com/festival/1/poster/b.png";
+    vi.mocked(festivalBrandingApi.get).mockResolvedValue({ festivalSettingId: 1, posterImageUrl: posterA, logoImageUrl: null });
+    vi.mocked(festivalBrandingApi.extractPosterColors)
+      .mockResolvedValueOnce({ colors: [{ hex: "#4EB15E", population: 0.4 }] })
+      .mockResolvedValueOnce({ colors: [{ hex: "#FBE44B", population: 0.5 }] });
+    vi.mocked(festivalBrandingApi.upload).mockResolvedValue({ festivalSettingId: 1, posterImageUrl: posterB, logoImageUrl: null });
+    await render();
+    await act(async () => { buttons("대표색 추출")[0].click(); });
+    await act(async () => { host.querySelector<HTMLButtonElement>('button[aria-label="기준 색상 #4EB15E 선택"]')!.click(); });
+    await act(async () => { host.querySelector<HTMLButtonElement>('[aria-label="새 테마 생성"]')!.click(); });
+    await setInput("테마 이름", "Theme A");
+    await act(async () => { buttons("저장")[0].click(); });
+    expect(vi.mocked(adminThemeApi.create).mock.calls[0][0]).toEqual(expect.objectContaining({
+      sourcePosterUrl: posterA, selectedBaseColor: "#4EB15E", sourceColors: ["#4EB15E"],
+    }));
+    const fileInput = host.querySelector<HTMLInputElement>('input[aria-label="공식 포스터 파일 선택"]')!;
+    Object.defineProperty(fileInput, "files", { configurable: true, value: [new File(["png"], "b.png", { type: "image/png" })] });
+    await act(async () => { fileInput.dispatchEvent(new Event("change", { bubbles: true })); });
+    await act(async () => { buttons("대표색 추출")[0].click(); });
+    await act(async () => { host.querySelector<HTMLButtonElement>('button[aria-label="기준 색상 #FBE44B 선택"]')!.click(); });
+    await act(async () => { host.querySelector<HTMLButtonElement>('[aria-label="새 테마 생성"]')!.click(); });
+    await setInput("테마 이름", "Theme B");
+    await act(async () => { buttons("저장")[0].click(); });
+    expect(vi.mocked(adminThemeApi.create).mock.calls[1][0]).toEqual(expect.objectContaining({
+      sourcePosterUrl: posterB, selectedBaseColor: "#FBE44B", sourceColors: ["#FBE44B"],
+    }));
   });
 
   it("keeps draft preview scoped and saves an active edit as an inactive copy", async () => {

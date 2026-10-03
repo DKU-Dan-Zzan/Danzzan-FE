@@ -9,7 +9,7 @@ import { FestivalBrandingPanel, validateBrandingImage } from "@/routes/admin/Fes
 
 const toastMock = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn() }));
 vi.mock("sonner", () => ({ toast: toastMock }));
-vi.mock("@/api/app/festival/festivalBrandingApi", () => ({ festivalBrandingApi: { get: vi.fn(), upload: vi.fn() } }));
+vi.mock("@/api/app/festival/festivalBrandingApi", () => ({ festivalBrandingApi: { get: vi.fn(), upload: vi.fn(), extractPosterColors: vi.fn() } }));
 
 let host: HTMLDivElement;
 let root: Root;
@@ -44,6 +44,7 @@ describe("FestivalBrandingPanel", () => {
     await render();
     expect(host.textContent).toContain("등록된 공식 포스터가 없습니다.");
     expect(host.textContent).toContain("등록된 축제 로고가 없습니다.");
+    expect([...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")?.disabled).toBe(true);
   });
 
   it("updates only the successful upload preview", async () => {
@@ -69,5 +70,78 @@ describe("FestivalBrandingPanel", () => {
     await render();
     await choose("공식 포스터", new File(["svg"], "logo.svg", { type: "image/svg+xml" }));
     expect(festivalBrandingApi.upload).not.toHaveBeenCalled();
+  });
+
+  it("accepts 5MB but blocks larger poster and logo uploads", async () => {
+    const boundary = new File([new Uint8Array(5 * 1024 * 1024)], "boundary.png", { type: "image/png" });
+    const oversized = new File([new Uint8Array(5 * 1024 * 1024 + 1)], "large.png", { type: "image/png" });
+    expect(validateBrandingImage(boundary)).toBeNull();
+    expect(validateBrandingImage(oversized)).toContain("5MB");
+    await render();
+    await choose("공식 포스터", oversized);
+    await choose("축제 로고", oversized);
+    expect(festivalBrandingApi.upload).not.toHaveBeenCalled();
+    expect(host.querySelector<HTMLImageElement>('img[alt="현재 공식 포스터"]')?.src).toBe(original.posterImageUrl);
+    expect(host.querySelector<HTMLImageElement>('img[alt="현재 축제 로고"]')?.src).toBe(original.logoImageUrl);
+  });
+
+  it("extracts candidates and keeps a selection local to the panel", async () => {
+    const themeBefore = document.documentElement.style.getPropertyValue("--theme-brand-primary");
+    vi.mocked(festivalBrandingApi.extractPosterColors).mockResolvedValue({ colors: [
+      { hex: "#C83218", population: 0.42 },
+      { hex: "#F2A52B", population: 0.21 },
+      { hex: "#274A83", population: 0.16 },
+      { hex: "#41A867", population: 0.11 },
+    ] });
+    await render();
+    await act(async () => [...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")!.click());
+    expect(festivalBrandingApi.extractPosterColors).toHaveBeenCalledWith(1);
+    expect(host.querySelectorAll('button[aria-label^="기준 색상 #"]')).toHaveLength(4);
+    await act(async () => host.querySelector<HTMLButtonElement>('button[aria-label="기준 색상 #274A83 선택"]')!.click());
+    expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("#274A83");
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe(themeBefore);
+  });
+
+  it("shows analysis loading until extraction completes", async () => {
+    let resolve!: (value: { colors: { hex: string; population: number }[] }) => void;
+    vi.mocked(festivalBrandingApi.extractPosterColors).mockReturnValue(new Promise((done) => { resolve = done; }));
+    await render();
+    await act(async () => [...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")!.click());
+    expect([...host.querySelectorAll("button")].find((button) => button.textContent === "분석 중…")?.disabled).toBe(true);
+    await act(async () => resolve({ colors: [{ hex: "#CC4422", population: 0.4 }] }));
+    expect(host.textContent).toContain("#CC4422");
+  });
+
+  it("discards an old extraction result after replacing the poster", async () => {
+    let resolve!: (value: { colors: { hex: string; population: number }[] }) => void;
+    vi.mocked(festivalBrandingApi.extractPosterColors).mockReturnValue(new Promise((done) => { resolve = done; }));
+    vi.mocked(festivalBrandingApi.upload).mockResolvedValue({ ...original, posterImageUrl: "https://cdn/new-poster.png" });
+    await render();
+    await act(async () => [...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")!.click());
+    await choose("공식 포스터", new File(["png"], "new-poster.png", { type: "image/png" }));
+    await act(async () => resolve({ colors: [{ hex: "#CC4422", population: 0.4 }] }));
+    expect(host.querySelectorAll('button[aria-label^="기준 색상 #"]')).toHaveLength(0);
+    expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("선택되지 않음");
+  });
+
+  it("reports extraction errors without changing existing images", async () => {
+    vi.mocked(festivalBrandingApi.extractPosterColors).mockRejectedValue(new Error("storage unavailable"));
+    await render();
+    await act(async () => [...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")!.click());
+    expect(host.querySelector('[role="alert"]')?.textContent).toContain("분석하지 못했습니다");
+    expect(host.querySelector<HTMLImageElement>('img[alt="현재 공식 포스터"]')?.src).toBe(original.posterImageUrl);
+  });
+
+  it("validates a manually entered base color", async () => {
+    await render();
+    const input = host.querySelector<HTMLInputElement>('input[aria-label="기준 색상 HEX"]')!;
+    const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!;
+    await act(async () => { setValue.call(input, "#bad"); input.dispatchEvent(new Event("input", { bubbles: true })); });
+    expect(input.getAttribute("aria-invalid")).toBe("true");
+    const chooseButton = [...host.querySelectorAll("button")].find((button) => button.textContent === "기준색으로 선택")!;
+    expect(chooseButton.disabled).toBe(true);
+    await act(async () => { setValue.call(input, "#aabbcc"); input.dispatchEvent(new Event("input", { bubbles: true })); });
+    await act(async () => chooseButton.click());
+    expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("#AABBCC");
   });
 });

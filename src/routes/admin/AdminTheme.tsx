@@ -2,13 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Copy, Plus, Save, Trash2, Check } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { getErrorStatus } from "@/api/common/fetchAuth";
-import { adminThemeApi } from "@/api/app/admin/adminThemeApi";
+import { adminThemeApi, type ThemeProvenance, type ThemeUpsertRequest } from "@/api/app/admin/adminThemeApi";
 import type { ActiveThemeResponse, ThemeData } from "@/api/app/festival/activeThemeApi";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { ADMIN_FOCUS_VISIBLE_RING_CLASS, ADMIN_PRIMARY_ACTION_BUTTON_CLASS, ADMIN_SECONDARY_ACTION_BUTTON_CLASS } from "@/routes/admin/adminStyleClasses";
 import { cloneThemeData, createPreviewStyle, getThemeColor, isHexColor, readBundledThemeData, THEME_FIELDS, type ThemeDraft, validateThemeDraft } from "@/routes/admin/themeEditor";
 import { applyThemeData } from "@/lib/app/festival/activeTheme";
-import { FestivalBrandingPanel } from "@/routes/admin/FestivalBrandingPanel";
+import { FestivalBrandingPanel, type PosterAnalysisSnapshot } from "@/routes/admin/FestivalBrandingPanel";
 
 const panel = "rounded-2xl border border-[var(--admin-panel-border)] bg-[var(--admin-panel-bg)] p-5 sm:p-6";
 const input = `h-10 w-full rounded-xl border border-[var(--border-base)] bg-[var(--surface)] px-3 text-sm text-[var(--text)] ${ADMIN_FOCUS_VISIBLE_RING_CLASS}`;
@@ -18,6 +18,23 @@ function Swatches({ colors }: { colors: string[] }) {
   return <span className="flex shrink-0 items-center -space-x-1.5" aria-hidden="true">
     {colors.map((color, index) => <span key={index} className="h-6 w-6 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: color }} />)}
   </span>;
+}
+
+const provenanceOf = (theme: ActiveThemeResponse): ThemeProvenance => ({
+  sourcePosterUrl: theme.sourcePosterUrl ?? null,
+  selectedBaseColor: theme.selectedBaseColor ?? null,
+  sourceColors: theme.sourceColors ? [...theme.sourceColors] : null,
+});
+
+function ThemeSourceDetails({ source }: { source: ThemeProvenance | null }) {
+  return <section aria-label="테마 생성 출처" className="mt-5 rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)] p-4 text-xs">
+    <h3 className="font-semibold">생성 출처</h3>
+    <div className="mt-3 flex flex-wrap gap-4">
+      <div><p className="mb-1 text-[var(--text-muted)]">기반 포스터</p>{source?.sourcePosterUrl ? <img src={source.sourcePosterUrl} alt="테마 기반 포스터" className="h-20 w-16 rounded object-contain" /> : <p>기반 포스터 정보 없음</p>}</div>
+      {source?.selectedBaseColor && <div><p className="mb-1 text-[var(--text-muted)]">기준 색상</p><span className="inline-flex items-center gap-1.5 font-mono"><span className="h-4 w-4 rounded-full border border-[var(--border-base)]" style={{ backgroundColor: source.selectedBaseColor }} />{source.selectedBaseColor}</span></div>}
+      {!!source?.sourceColors?.length && <div><p className="mb-1 text-[var(--text-muted)]">추출 색상</p><div className="flex flex-wrap gap-2">{source.sourceColors.map((color) => <span key={color} className="inline-flex items-center gap-1 font-mono"><span className="h-4 w-4 rounded-full border border-[var(--border-base)]" style={{ backgroundColor: color }} />{color}</span>)}</div></div>}
+    </div>
+  </section>;
 }
 
 function ThemePreview({ data }: { data: ThemeData }) {
@@ -45,6 +62,8 @@ export default function AdminTheme() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [draft, setDraft] = useState<ThemeDraft | null>(null);
   const [savedDraft, setSavedDraft] = useState<ThemeDraft | null>(null);
+  const [analysisSnapshot, setAnalysisSnapshot] = useState<PosterAnalysisSnapshot | null>(null);
+  const [newDraftProvenance, setNewDraftProvenance] = useState<ThemeProvenance | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,6 +77,7 @@ export default function AdminTheme() {
     setSelectedId(theme.id);
     setDraft(next);
     setSavedDraft(next);
+    setNewDraftProvenance(null);
   }, []);
 
   const loadThemes = useCallback(async (signal?: AbortSignal) => {
@@ -99,6 +119,7 @@ export default function AdminTheme() {
     ++selectionSequence.current;
     setSelectedId(null);
     const base = source ?? activeTheme;
+    setNewDraftProvenance(source ? provenanceOf(source) : null);
     setDraft({ name: source ? `${source.name} 복제` : "", themeData: cloneThemeData(base?.themeData ?? readBundledThemeData()) });
     setSavedDraft(null);
   }
@@ -113,11 +134,14 @@ export default function AdminTheme() {
     if (validationError) { toast.error(validationError); return; }
     setBusy(true);
     try {
-      const payload = { name: draft.name.trim(), themeData: cloneThemeData(draft.themeData) };
+      const payload: ThemeUpsertRequest = { name: draft.name.trim(), themeData: cloneThemeData(draft.themeData) };
       // Recheck before PUT: another admin may have activated this row since the list loaded.
       // PUT on an active row would change the live theme without an activation request.
       const latest = selectedId === null ? null : await adminThemeApi.get(selectedId);
       const create = selectedId === null || selectedTheme?.active || latest?.active;
+      if (create) Object.assign(payload, selectedId === null
+        ? (newDraftProvenance ?? analysisSnapshot ?? { sourcePosterUrl: null, selectedBaseColor: null, sourceColors: null })
+        : provenanceOf(latest ?? selectedTheme!));
       const saved = create ? await adminThemeApi.create(payload) : await adminThemeApi.update(selectedId, payload);
       setThemes((current) => create ? [saved, ...current] : current.map((item) => item.id === saved.id ? saved : item));
       selectLoadedTheme(saved);
@@ -161,7 +185,7 @@ export default function AdminTheme() {
   return <>
     <Toaster position="top-right" closeButton richColors />
     <AdminShell title="축제 테마" eyebrow="FESTIVAL THEME" mainClassName="mx-auto w-full max-w-[1360px] space-y-6 px-6 py-6">
-      <FestivalBrandingPanel />
+      <FestivalBrandingPanel onAnalysisChange={setAnalysisSnapshot} />
       {loading ? <p role="status" className="text-sm text-[var(--text-muted)]">테마를 불러오는 중입니다…</p> : error ?
         <div role="alert" className={panel}><p className="mb-3 text-sm">{error}</p><button type="button" className={ADMIN_SECONDARY_ACTION_BUTTON_CLASS} onClick={() => void loadThemes()}>다시 시도</button></div> : <>
         <section className={panel} aria-label="현재 활성 테마"><div className="flex flex-wrap items-center justify-between gap-4">
@@ -180,6 +204,7 @@ export default function AdminTheme() {
               {selectedTheme && <button type="button" className={`${ADMIN_SECONDARY_ACTION_BUTTON_CLASS} inline-flex items-center gap-1.5 text-sm`} onClick={() => createDraft(selectedTheme)} disabled={busy}><Copy className="h-4 w-4" />복제</button>}
             </div>
               <label className="block text-sm font-medium">테마 이름<input aria-label="테마 이름" className={`mt-1 ${input}`} maxLength={100} value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
+              <ThemeSourceDetails source={selectedTheme ? provenanceOf(selectedTheme) : newDraftProvenance ?? analysisSnapshot} />
               <div className="mt-6 space-y-6">{THEME_FIELDS.map((group) => <fieldset key={group.key} className="border-t border-[var(--border-base)] pt-5"><legend className="px-1 text-sm font-semibold">{group.title}</legend><div className="grid gap-3 sm:grid-cols-2">{group.colors.map(([key, label]) => {
                 const value = getThemeColor(draft.themeData, group.key, key);
                 const valid = isHexColor(value);

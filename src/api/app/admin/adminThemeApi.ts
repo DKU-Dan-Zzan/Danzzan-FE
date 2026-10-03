@@ -9,7 +9,12 @@ import {
   reissueAdminToken,
 } from "@/lib/app/admin/admin-auth-session";
 
-export type ThemeUpsertRequest = { name: string; themeData: ThemeData };
+export type ThemeProvenance = {
+  sourcePosterUrl: string | null;
+  selectedBaseColor: string | null;
+  sourceColors: string[] | null;
+};
+export type ThemeUpsertRequest = { name: string; themeData: ThemeData } & Partial<ThemeProvenance>;
 
 const request = createFetchWithAuth({
   getSessionEpoch: authStore.getSessionEpoch,

@@ -31,6 +31,10 @@ export type ActiveThemeResponse = {
   createdAt: string;
   updatedAt: string;
   active: boolean;
+  /** Admin Theme responses include provenance; the public active endpoint omits it. */
+  sourcePosterUrl?: string | null;
+  selectedBaseColor?: string | null;
+  sourceColors?: string[] | null;
 };
 
 /** A 204 response intentionally returns null, leaving the bundled Theme Core untouched. */
