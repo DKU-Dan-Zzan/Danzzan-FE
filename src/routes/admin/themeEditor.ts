@@ -7,7 +7,7 @@ export type ThemeDraft = { name: string; themeData: ThemeData };
 export const THEME_FIELDS = [
   { key: "brand", title: "브랜드", colors: [
     ["primary", "Primary"], ["secondary", "Secondary"],
-    ["accent", "Accent"], ["textEmphasis", "Text emphasis"],
+    ["accent", "Accent"], ["strong", "Strong · 진한 브랜드 컬러"],
   ] },
   { key: "status", title: "상태", colors: [
     ["success", "Success"], ["warning", "Warning"],
@@ -58,7 +58,7 @@ export function readBundledThemeData(root = document.documentElement): ThemeData
       primary: read(THEME_CORE_VARIABLES.brand.primary),
       secondary: read(THEME_CORE_VARIABLES.brand.secondary),
       accent: read(THEME_CORE_VARIABLES.brand.accent),
-      textEmphasis: read(THEME_CORE_VARIABLES.brand.textEmphasis),
+      strong: read(THEME_CORE_VARIABLES.brand.strong),
     },
     status: {
       success: read(THEME_CORE_VARIABLES.status.success),

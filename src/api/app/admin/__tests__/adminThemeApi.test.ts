@@ -7,7 +7,7 @@ const request = vi.hoisted(() => vi.fn());
 vi.mock("@/api/common/fetchAuth", () => ({ createFetchWithAuth: () => request }));
 
 const themeData: ThemeData = {
-  brand: { primary: "#111111", secondary: "#222222", accent: "#333333", textEmphasis: "#444444" },
+  brand: { primary: "#111111", secondary: "#222222", accent: "#333333", strong: "#444444" },
   status: { success: "#555555", warning: "#666666", danger: "#777777", pending: "#888888" },
   category: { pub: "#999999", foodTruck: "#AAAAAA", experience: "#BBBBBB", event: "#CCCCCC", restArea: "#DDDDDD", facility: "#EEEEEE" },
 };

@@ -6,7 +6,7 @@ const css = fs.readFileSync(path.resolve(__dirname, "../../index.css"), "utf8");
 
 describe("Theme Core legacy bridge", () => {
   it("Theme Core 브랜드 값은 root에서 한 번만 정의한다", () => {
-    for (const token of ["primary", "secondary", "accent", "text-emphasis"]) {
+    for (const token of ["primary", "secondary", "accent", "strong"]) {
       expect(css.match(new RegExp(`--theme-brand-${token}:`, "g"))).toHaveLength(1);
     }
   });

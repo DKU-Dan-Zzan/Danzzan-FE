@@ -7,7 +7,7 @@ export const THEME_CORE_VARIABLES = {
     primary: "--theme-brand-primary",
     secondary: "--theme-brand-secondary",
     accent: "--theme-brand-accent",
-    textEmphasis: "--theme-brand-text-emphasis",
+    strong: "--theme-brand-strong",
   },
   status: {
     success: "--theme-status-success",

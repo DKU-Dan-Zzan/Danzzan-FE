@@ -7,7 +7,7 @@
   --theme-brand-primary: #ff642d;
   --theme-brand-secondary: #f5e3a3;
   --theme-brand-accent: #ff642d;
-  --theme-brand-text-emphasis: #e13600;
+  --theme-brand-strong: #e13600;
   --theme-status-success: #2e7d32;
   --theme-status-warning: #b26a00;
   --theme-status-danger: #b3261e;
@@ -53,7 +53,7 @@
   --semantic-primary: var(--theme-brand-primary);
   --semantic-secondary: var(--theme-brand-secondary);
   --semantic-accent: var(--theme-brand-accent);
-  --semantic-text-emphasis: var(--theme-brand-text-emphasis);
+  --semantic-text-emphasis: var(--theme-brand-strong);
   --semantic-page-background: var(--ds-white);
   --semantic-surface-card: var(--ds-white);
   --semantic-surface-input: var(--ds-neutral-input);

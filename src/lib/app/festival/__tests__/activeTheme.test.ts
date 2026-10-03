@@ -16,7 +16,7 @@ const testTheme: ThemeData = {
     primary: "#123456",
     secondary: "#234567",
     accent: "#345678",
-    textEmphasis: "#456789",
+    strong: "#456789",
   },
   status: {
     success: "#56789A",
@@ -70,6 +70,7 @@ describe("active festival Theme", () => {
       { timeout: 5000 },
     );
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#123456");
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-strong")).toBe("#456789");
     expect(document.documentElement.style.getPropertyValue("--theme-category-facility")).toBe("#EF0123");
   });
 
@@ -105,6 +106,7 @@ describe("active festival Theme", () => {
   it("keeps the semantic and map category bridge pointed at Theme Core", () => {
     const css = fs.readFileSync(path.resolve(__dirname, "../../../../index.css"), "utf8");
     expect(css).toContain("--semantic-primary: var(--theme-brand-primary);");
+    expect(css).toContain("--semantic-text-emphasis: var(--theme-brand-strong);");
     expect(css).toContain("--primary: var(--semantic-primary);");
     expect(css).toContain("--semantic-category-pub: var(--theme-category-pub);");
     expect(css).toContain("--boothmap-marker-pub: var(--semantic-category-pub);");

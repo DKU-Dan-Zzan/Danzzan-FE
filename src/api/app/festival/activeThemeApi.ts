@@ -5,7 +5,7 @@ export type ThemeData = {
     primary: string;
     secondary: string;
     accent: string;
-    textEmphasis: string;
+    strong: string;
   };
   status: {
     success: string;

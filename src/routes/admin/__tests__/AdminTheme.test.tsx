@@ -17,7 +17,7 @@ vi.mock("@/api/app/admin/adminThemeApi", () => ({ adminThemeApi: {
 } }));
 
 const colors: ThemeData = {
-  brand: { primary: "#ff642d", secondary: "#f5e3a3", accent: "#ff642d", textEmphasis: "#e13600" },
+  brand: { primary: "#ff642d", secondary: "#f5e3a3", accent: "#ff642d", strong: "#e13600" },
   status: { success: "#2e7d32", warning: "#b26a00", danger: "#b3261e", pending: "#e3776a" },
   category: { pub: "#ff642d", foodTruck: "#ec4899", experience: "#10b981", event: "#f6ca3b", restArea: "#8b5cf6", facility: "#3b82f6" },
 };
@@ -69,7 +69,9 @@ describe("AdminTheme", () => {
     expect(host.querySelector('[aria-label="현재 활성 테마"]')?.textContent).toContain("활성 축제");
     expect(host.querySelectorAll('input[type="color"]')).toHaveLength(14);
     expect(host.querySelectorAll('input[aria-label$="HEX"]')).toHaveLength(14);
+    expect(host.querySelector('input[aria-label="Strong · 진한 브랜드 컬러 HEX"]')).not.toBeNull();
     expect(host.querySelector('[data-testid="theme-preview"]')).not.toBeNull();
+    expect(host.querySelector('[data-testid="theme-preview"]')?.textContent).toContain("강한 CTA");
   });
 
   it("keeps draft preview scoped and saves an active edit as an inactive copy", async () => {

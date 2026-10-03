@@ -28,7 +28,8 @@ function ThemePreview({ data }: { data: ThemeData }) {
         <button type="button" className="rounded-xl px-4 py-2 text-sm font-semibold text-white" style={{ backgroundColor: "var(--preview-brand-primary)" }}>주요 버튼</button>
         <span className="rounded-lg px-3 py-1.5 text-sm" style={{ backgroundColor: "var(--preview-brand-secondary)", color: "var(--ds-neutral-ink)" }}>보조 강조</span>
         <span className="h-3 w-3 rounded-full" style={{ backgroundColor: "var(--preview-brand-accent)" }} aria-label="Accent 색상" />
-        <span className="text-sm font-semibold" style={{ color: "var(--preview-brand-textEmphasis)" }}>강조 텍스트</span>
+        <span className="rounded-xl px-3 py-1.5 text-sm font-semibold text-white" style={{ backgroundColor: "var(--preview-brand-strong)" }}>강한 CTA</span>
+        <span className="text-sm font-semibold" style={{ color: "var(--preview-brand-strong)" }}>강조 텍스트</span>
       </div>
       <div className="flex flex-wrap gap-2">{badge("성공", "var(--preview-status-success)")}{badge("주의", "var(--preview-status-warning)")}{badge("오류", "var(--preview-status-danger)")}{badge("대기", "var(--preview-status-pending)")}</div>
       <div className="border-t border-[var(--border-base)] pt-3"><p className="mb-2 text-xs font-medium text-[var(--text-muted)]">지도 카테고리</p><div className="flex flex-wrap gap-x-4 gap-y-2">
