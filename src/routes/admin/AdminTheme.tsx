@@ -8,6 +8,7 @@ import { AdminShell } from "@/components/layout/AdminShell";
 import { ADMIN_FOCUS_VISIBLE_RING_CLASS, ADMIN_PRIMARY_ACTION_BUTTON_CLASS, ADMIN_SECONDARY_ACTION_BUTTON_CLASS } from "@/routes/admin/adminStyleClasses";
 import { cloneThemeData, createPreviewStyle, getThemeColor, isHexColor, readBundledThemeData, THEME_FIELDS, type ThemeDraft, validateThemeDraft } from "@/routes/admin/themeEditor";
 import { applyThemeData } from "@/lib/app/festival/activeTheme";
+import { FestivalBrandingPanel } from "@/routes/admin/FestivalBrandingPanel";
 
 const panel = "rounded-2xl border border-[var(--admin-panel-border)] bg-[var(--admin-panel-bg)] p-5 sm:p-6";
 const input = `h-10 w-full rounded-xl border border-[var(--border-base)] bg-[var(--surface)] px-3 text-sm text-[var(--text)] ${ADMIN_FOCUS_VISIBLE_RING_CLASS}`;
@@ -160,6 +161,7 @@ export default function AdminTheme() {
   return <>
     <Toaster position="top-right" closeButton richColors />
     <AdminShell title="축제 테마" eyebrow="FESTIVAL THEME" mainClassName="mx-auto w-full max-w-[1360px] space-y-6 px-6 py-6">
+      <FestivalBrandingPanel />
       {loading ? <p role="status" className="text-sm text-[var(--text-muted)]">테마를 불러오는 중입니다…</p> : error ?
         <div role="alert" className={panel}><p className="mb-3 text-sm">{error}</p><button type="button" className={ADMIN_SECONDARY_ACTION_BUTTON_CLASS} onClick={() => void loadThemes()}>다시 시도</button></div> : <>
         <section className={panel} aria-label="현재 활성 테마"><div className="flex flex-wrap items-center justify-between gap-4">

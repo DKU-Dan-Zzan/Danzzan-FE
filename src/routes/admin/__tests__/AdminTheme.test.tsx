@@ -15,6 +15,10 @@ vi.mock("sonner", () => ({ Toaster: () => null, toast: toastMock }));
 vi.mock("@/api/app/admin/adminThemeApi", () => ({ adminThemeApi: {
   list: vi.fn(), get: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), activate: vi.fn(),
 } }));
+vi.mock("@/api/app/festival/festivalBrandingApi", () => ({ festivalBrandingApi: {
+  get: vi.fn().mockResolvedValue({ festivalSettingId: 1, posterImageUrl: null, logoImageUrl: null }),
+  upload: vi.fn(),
+} }));
 
 const colors: ThemeData = {
   brand: { primary: "#ff642d", secondary: "#f5e3a3", accent: "#ff642d", strong: "#e13600" },
