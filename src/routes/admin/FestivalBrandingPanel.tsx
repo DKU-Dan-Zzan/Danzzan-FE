@@ -119,12 +119,14 @@ export function FestivalBrandingPanel({ onAnalysisChange, onRecommend, recommend
       if (version !== analysisVersion.current) return;
       setCandidates(result.colors);
       setSelectedBaseColor(null);
+      setManualHex("");
       onAnalysisChange?.({ sourcePosterUrl: branding.posterImageUrl, sourceColors: result.colors.map((color) => color.hex), selectedBaseColor: null });
       if (result.colors.length === 0) setAnalysisError("포스터에서 유효한 대표색을 찾지 못했습니다.");
     } catch {
       if (version !== analysisVersion.current) return;
       setCandidates([]);
       setSelectedBaseColor(null);
+      setManualHex("");
       onAnalysisChange?.({ sourcePosterUrl: branding.posterImageUrl, sourceColors: null, selectedBaseColor: null });
       setAnalysisError("포스터 색상을 분석하지 못했습니다. 잠시 후 다시 시도해 주세요.");
     } finally { if (version === analysisVersion.current) setAnalyzing(false); }
@@ -155,15 +157,19 @@ export function FestivalBrandingPanel({ onAnalysisChange, onRecommend, recommend
           </button>)}
         </div></div>}
         <div className="mt-4 flex flex-wrap items-end gap-3"><label className="text-sm font-medium">직접 기준색 입력
-          <input aria-label="기준 색상 HEX" value={manualHex} maxLength={7} onChange={(event) => setManualHex(event.target.value)} placeholder="#RRGGBB" aria-invalid={manualHex.length > 0 && !isHexColor(manualHex)} className={`mt-1 block h-10 w-36 rounded-xl border border-[var(--border-base)] bg-[var(--surface)] px-3 font-mono text-sm ${ADMIN_FOCUS_VISIBLE_RING_CLASS}`} />
+          <input aria-label="기준 색상 HEX" value={manualHex} maxLength={7} onChange={(event) => {
+            const value = event.target.value;
+            if (isHexColor(value)) selectColor(value);
+            else setManualHex(value);
+          }} placeholder="#RRGGBB" aria-invalid={manualHex.length > 0 && !isHexColor(manualHex)} className={`mt-1 block h-10 w-36 rounded-xl border border-[var(--border-base)] bg-[var(--surface)] px-3 font-mono text-sm ${ADMIN_FOCUS_VISIBLE_RING_CLASS}`} />
         </label><button type="button" className={`${ADMIN_SECONDARY_ACTION_BUTTON_CLASS} text-sm`} disabled={!isHexColor(manualHex)} onClick={() => selectColor(manualHex)}>기준색으로 선택</button></div>
         {manualHex && !isHexColor(manualHex) && <p className="mt-1 text-xs text-[var(--semantic-status-danger)]">#RRGGBB 형식으로 입력해 주세요.</p>}
         <p className="mt-4 text-sm" aria-label="선택한 기준 색상">기준 색상: {selectedBaseColor ? <span className="inline-flex items-center gap-2 font-mono"><span className="h-4 w-4 rounded-full border border-[var(--border-base)]" style={{ backgroundColor: selectedBaseColor }} />{selectedBaseColor}</span> : "선택되지 않음"}</p>
         <div className="mt-4 border-t border-[var(--border-base)] pt-4">
           <button type="button" className={`${ADMIN_SECONDARY_ACTION_BUTTON_CLASS} text-sm`}
-            disabled={!onRecommend || !candidates.length || !selectedBaseColor || analyzing || busyKind !== null || recommending}
+            disabled={!onRecommend || !candidates.length || !selectedBaseColor || !isHexColor(manualHex) || analyzing || busyKind !== null || recommending}
             onClick={() => {
-              if (branding?.posterImageUrl && candidates.length && selectedBaseColor && !recommending) {
+              if (branding?.posterImageUrl && candidates.length && selectedBaseColor && isHexColor(manualHex) && !recommending) {
                 onRecommend?.({ sourcePosterUrl: branding.posterImageUrl,
                   sourceColors: candidates.map((color) => color.hex), selectedBaseColor });
               }

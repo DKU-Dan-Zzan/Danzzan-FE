@@ -109,6 +109,33 @@ describe("AdminTheme", () => {
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
   });
 
+  it("uses a newly typed valid HEX as the recommendation base color", async () => {
+    await prepareRecommendation();
+    await setInput("기준 색상 HEX", "#aabbcc");
+    expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("#AABBCC");
+    expect(buttons("AI 테마 추천")[0].disabled).toBe(false);
+    await act(async () => { buttons("AI 테마 추천")[0].click(); });
+    expect(adminThemeApi.recommend).toHaveBeenCalledWith({
+      sourceColors: ["#4EB15E", "#13730C"], selectedBaseColor: "#AABBCC",
+    });
+  });
+
+  it("keeps the last valid selection while typing invalid HEX and prevents a stale request", async () => {
+    await prepareRecommendation();
+    await setInput("기준 색상 HEX", "#bad");
+    expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("#4EB15E");
+    expect(buttons("AI 테마 추천")[0].disabled).toBe(true);
+    expect(adminThemeApi.recommend).not.toHaveBeenCalled();
+
+    await act(async () => { host.querySelector<HTMLButtonElement>('button[aria-label="기준 색상 #13730C 선택"]')!.click(); });
+    expect((host.querySelector('input[aria-label="기준 색상 HEX"]') as HTMLInputElement).value).toBe("#13730C");
+    expect(buttons("AI 테마 추천")[0].disabled).toBe(false);
+    await act(async () => { buttons("AI 테마 추천")[0].click(); });
+    expect(adminThemeApi.recommend).toHaveBeenCalledWith({
+      sourceColors: ["#4EB15E", "#13730C"], selectedBaseColor: "#13730C",
+    });
+  });
+
   it("blocks duplicate AI requests and preserves the old draft on failure", async () => {
     await prepareRecommendation();
     const before = host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style");

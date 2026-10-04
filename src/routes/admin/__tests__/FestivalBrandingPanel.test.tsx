@@ -141,6 +141,7 @@ describe("FestivalBrandingPanel", () => {
     const chooseButton = [...host.querySelectorAll("button")].find((button) => button.textContent === "기준색으로 선택")!;
     expect(chooseButton.disabled).toBe(true);
     await act(async () => { setValue.call(input, "#aabbcc"); input.dispatchEvent(new Event("input", { bubbles: true })); });
+    expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("#AABBCC");
     await act(async () => chooseButton.click());
     expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("#AABBCC");
   });
