@@ -15,6 +15,7 @@ export type ThemeProvenance = {
   sourceColors: string[] | null;
 };
 export type ThemeUpsertRequest = { name: string; themeData: ThemeData } & Partial<ThemeProvenance>;
+export type ThemeRecommendationRequest = { sourceColors: string[]; selectedBaseColor: string };
 
 const request = createFetchWithAuth({
   getSessionEpoch: authStore.getSessionEpoch,
@@ -39,4 +40,7 @@ export const adminThemeApi = {
   }),
   delete: (id: number) => request<void>(`${basePath}/${id}`, { method: "DELETE" }),
   activate: (id: number) => request<ActiveThemeResponse>(`${basePath}/${id}/activate`, { method: "PUT" }),
+  recommend: (payload: ThemeRecommendationRequest) => request<ThemeData>(`${basePath}/recommend`, {
+    method: "POST", body: JSON.stringify(payload),
+  }),
 };

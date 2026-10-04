@@ -47,7 +47,12 @@ function ImageField({ kind, title, description, url, busy, onUpload }: {
   </div>;
 }
 
-export function FestivalBrandingPanel({ onAnalysisChange }: { onAnalysisChange?: (snapshot: PosterAnalysisSnapshot | null) => void } = {}) {
+export function FestivalBrandingPanel({ onAnalysisChange, onRecommend, recommending = false, recommendationError = null }: {
+  onAnalysisChange?: (snapshot: PosterAnalysisSnapshot | null) => void;
+  onRecommend?: (snapshot: PosterAnalysisSnapshot) => void;
+  recommending?: boolean;
+  recommendationError?: string | null;
+} = {}) {
   const [branding, setBranding] = useState<FestivalBranding | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -134,13 +139,13 @@ export function FestivalBrandingPanel({ onAnalysisChange }: { onAnalysisChange?:
   return <section className={panel} aria-label="축제 브랜딩">
     <div className="mb-5"><h2 className="text-lg font-semibold">축제 브랜딩</h2><p className="mt-1 text-sm text-[var(--text-muted)]">공식 원본 이미지와 로고를 관리합니다. 홈 화면용 와이드 이미지는 별도로 유지됩니다.</p></div>
     {loading ? <p role="status" className="text-sm text-[var(--text-muted)]">이미지를 불러오는 중입니다…</p> : error ? <div role="alert" className="text-sm"><p>{error}</p><button type="button" className={`${ADMIN_SECONDARY_ACTION_BUTTON_CLASS} mt-3`} onClick={() => void load()}>다시 시도</button></div> : <div className="grid gap-4 md:grid-cols-2">
-      <ImageField kind="poster" title="공식 포스터" description="공식 원본 포스터입니다. 향후 AI 테마 추천에 사용됩니다." url={branding?.posterImageUrl ?? null} busy={busyKind !== null} onUpload={(kind, file) => void upload(kind, file)} />
-      <ImageField kind="logo" title="축제 로고" description="사용자 화면과 축제 브랜딩에 사용됩니다." url={branding?.logoImageUrl ?? null} busy={busyKind !== null} onUpload={(kind, file) => void upload(kind, file)} />
+      <ImageField kind="poster" title="공식 포스터" description="공식 원본 포스터입니다. 향후 AI 테마 추천에 사용됩니다." url={branding?.posterImageUrl ?? null} busy={busyKind !== null || recommending} onUpload={(kind, file) => void upload(kind, file)} />
+      <ImageField kind="logo" title="축제 로고" description="사용자 화면과 축제 브랜딩에 사용됩니다." url={branding?.logoImageUrl ?? null} busy={busyKind !== null || recommending} onUpload={(kind, file) => void upload(kind, file)} />
     </div>}
     {!loading && !error && <div className="mt-5 border-t border-[var(--border-base)] pt-5" aria-label="포스터 색상 분석">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div><h3 className="font-semibold">포스터 색상 분석</h3><p className="mt-1 text-xs text-[var(--text-muted)]">대표색 후보에서 기준 색상을 고르거나 HEX를 직접 입력할 수 있습니다. 테마에는 적용되지 않습니다.</p></div>
-        <button type="button" className={`${ADMIN_SECONDARY_ACTION_BUTTON_CLASS} text-sm`} disabled={!branding?.posterImageUrl || analyzing || busyKind !== null} onClick={() => void extractColors()}>{analyzing ? "분석 중…" : "대표색 추출"}</button>
+        <button type="button" className={`${ADMIN_SECONDARY_ACTION_BUTTON_CLASS} text-sm`} disabled={!branding?.posterImageUrl || analyzing || busyKind !== null || recommending} onClick={() => void extractColors()}>{analyzing ? "분석 중…" : "대표색 추출"}</button>
       </div>
       {!branding?.posterImageUrl ? <p className="mt-3 text-sm text-[var(--text-muted)]">먼저 공식 포스터를 업로드해 주세요.</p> : <>
         {analysisError && <p role="alert" className="mt-3 text-sm text-[var(--semantic-status-danger)]">{analysisError}</p>}
@@ -154,6 +159,18 @@ export function FestivalBrandingPanel({ onAnalysisChange }: { onAnalysisChange?:
         </label><button type="button" className={`${ADMIN_SECONDARY_ACTION_BUTTON_CLASS} text-sm`} disabled={!isHexColor(manualHex)} onClick={() => selectColor(manualHex)}>기준색으로 선택</button></div>
         {manualHex && !isHexColor(manualHex) && <p className="mt-1 text-xs text-[var(--semantic-status-danger)]">#RRGGBB 형식으로 입력해 주세요.</p>}
         <p className="mt-4 text-sm" aria-label="선택한 기준 색상">기준 색상: {selectedBaseColor ? <span className="inline-flex items-center gap-2 font-mono"><span className="h-4 w-4 rounded-full border border-[var(--border-base)]" style={{ backgroundColor: selectedBaseColor }} />{selectedBaseColor}</span> : "선택되지 않음"}</p>
+        <div className="mt-4 border-t border-[var(--border-base)] pt-4">
+          <button type="button" className={`${ADMIN_SECONDARY_ACTION_BUTTON_CLASS} text-sm`}
+            disabled={!onRecommend || !candidates.length || !selectedBaseColor || analyzing || busyKind !== null || recommending}
+            onClick={() => {
+              if (branding?.posterImageUrl && candidates.length && selectedBaseColor && !recommending) {
+                onRecommend?.({ sourcePosterUrl: branding.posterImageUrl,
+                  sourceColors: candidates.map((color) => color.hex), selectedBaseColor });
+              }
+            }}>{recommending ? "AI 추천 생성 중…" : "AI 테마 추천"}</button>
+          <p className="mt-2 text-xs text-[var(--text-muted)]">추천 결과는 현재 편집 draft를 덮어씁니다. 저장하거나 적용하기 전까지 서비스에는 반영되지 않습니다.</p>
+          {recommendationError && <p role="alert" className="mt-2 text-sm text-[var(--semantic-status-danger)]">{recommendationError}</p>}
+        </div>
       </>}
     </div>}
   </section>;

@@ -26,6 +26,23 @@ const provenanceOf = (theme: ActiveThemeResponse): ThemeProvenance => ({
   sourceColors: theme.sourceColors ? [...theme.sourceColors] : null,
 });
 
+function recommendationMessage(cause: unknown): string {
+  const payload = (cause && typeof cause === "object" && "payload" in cause)
+    ? (cause as { payload?: { code?: string } }).payload : undefined;
+  switch (payload?.code) {
+    case "POSTER_NOT_FOUND": return "공식 포스터가 없습니다. 먼저 포스터를 업로드해 주세요.";
+    case "POSTER_UNSUPPORTED": return "저장된 포스터 형식을 읽을 수 없습니다. JPG 또는 PNG 포스터를 다시 업로드해 주세요.";
+    case "FESTIVAL_SETTING_NOT_FOUND": return "축제 설정을 찾을 수 없습니다.";
+    case "OPENAI_KEY_MISSING": return "서버에 OpenAI API 키가 설정되지 않았습니다.";
+    case "OPENAI_TIMEOUT": return "AI 추천 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.";
+    case "OPENAI_RATE_LIMIT": return "AI 요청 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.";
+    case "OPENAI_MALFORMED_OUTPUT": return "AI가 올바른 테마 데이터를 반환하지 않았습니다. 다시 시도해 주세요.";
+    case "AI_THEME_VALIDATION_FAILED": return "AI 추천 색상이 테마 기준을 충족하지 못했습니다. 다시 시도해 주세요.";
+    case "OPENAI_MODEL_ERROR": return "AI 모델 요청에 실패했습니다. 서버 설정을 확인하거나 다시 시도해 주세요.";
+    default: return "AI 테마 추천에 실패했습니다. 포스터와 서버 연결을 확인해 주세요.";
+  }
+}
+
 function ThemeSourceDetails({ source }: { source: ThemeProvenance | null }) {
   return <section aria-label="테마 생성 출처" className="mt-5 rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)] p-4 text-xs">
     <h3 className="font-semibold">생성 출처</h3>
@@ -66,11 +83,53 @@ export default function AdminTheme() {
   const [newDraftProvenance, setNewDraftProvenance] = useState<ThemeProvenance | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [recommending, setRecommending] = useState(false);
+  const [recommendationError, setRecommendationError] = useState<string | null>(null);
+  const recommendingRef = useRef(false);
+  const analysisRef = useRef<PosterAnalysisSnapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
   const selectionSequence = useRef(0);
   const activeTheme = themes.find((theme) => theme.active) ?? null;
   const selectedTheme = themes.find((theme) => theme.id === selectedId) ?? null;
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(savedDraft), [draft, savedDraft]);
+
+  function analysisChanged(snapshot: PosterAnalysisSnapshot | null) {
+    analysisRef.current = snapshot;
+    setAnalysisSnapshot(snapshot);
+    setRecommendationError(null);
+  }
+
+  async function recommend(snapshot: PosterAnalysisSnapshot) {
+    if (recommendingRef.current || busy || !snapshot.sourceColors?.length || !snapshot.selectedBaseColor) return;
+    if (!mayDiscard()) return;
+    recommendingRef.current = true;
+    setRecommending(true);
+    setBusy(true);
+    setRecommendationError(null);
+    try {
+      const themeData = await adminThemeApi.recommend({
+        sourceColors: snapshot.sourceColors, selectedBaseColor: snapshot.selectedBaseColor,
+      });
+      if (JSON.stringify(analysisRef.current) !== JSON.stringify(snapshot)) {
+        setRecommendationError("포스터 분석 정보가 변경되었습니다. 다시 추천해 주세요.");
+        return;
+      }
+      ++selectionSequence.current;
+      setSelectedId(null);
+      setDraft({ name: "AI 추천 테마", themeData: cloneThemeData(themeData) });
+      setSavedDraft(null);
+      // Capture provenance in the unsaved draft; it is sent only by the existing Save action.
+      setNewDraftProvenance({ sourcePosterUrl: snapshot.sourcePosterUrl,
+        sourceColors: [...snapshot.sourceColors], selectedBaseColor: snapshot.selectedBaseColor });
+      toast.success("AI 추천을 미저장 테마에 반영했습니다. 색상을 확인하고 직접 저장해 주세요.");
+    } catch (cause) {
+      setRecommendationError(recommendationMessage(cause));
+    } finally {
+      recommendingRef.current = false;
+      setRecommending(false);
+      setBusy(false);
+    }
+  }
 
   const selectLoadedTheme = useCallback((theme: ActiveThemeResponse) => {
     const next = { name: theme.name, themeData: cloneThemeData(theme.themeData) };
@@ -185,7 +244,8 @@ export default function AdminTheme() {
   return <>
     <Toaster position="top-right" closeButton richColors />
     <AdminShell title="축제 테마" eyebrow="FESTIVAL THEME" mainClassName="mx-auto w-full max-w-[1360px] space-y-6 px-6 py-6">
-      <FestivalBrandingPanel onAnalysisChange={setAnalysisSnapshot} />
+      <FestivalBrandingPanel onAnalysisChange={analysisChanged} onRecommend={(snapshot) => void recommend(snapshot)}
+        recommending={recommending} recommendationError={recommendationError} />
       {loading ? <p role="status" className="text-sm text-[var(--text-muted)]">테마를 불러오는 중입니다…</p> : error ?
         <div role="alert" className={panel}><p className="mb-3 text-sm">{error}</p><button type="button" className={ADMIN_SECONDARY_ACTION_BUTTON_CLASS} onClick={() => void loadThemes()}>다시 시도</button></div> : <>
         <section className={panel} aria-label="현재 활성 테마"><div className="flex flex-wrap items-center justify-between gap-4">

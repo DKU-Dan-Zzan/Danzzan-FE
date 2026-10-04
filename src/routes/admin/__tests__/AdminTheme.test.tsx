@@ -14,7 +14,7 @@ import { THEME_CORE_VARIABLES } from "@/lib/app/festival/activeTheme";
 const toastMock = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn() }));
 vi.mock("sonner", () => ({ Toaster: () => null, toast: toastMock }));
 vi.mock("@/api/app/admin/adminThemeApi", () => ({ adminThemeApi: {
-  list: vi.fn(), get: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), activate: vi.fn(),
+  list: vi.fn(), get: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), activate: vi.fn(), recommend: vi.fn(),
 } }));
 vi.mock("@/api/app/festival/festivalBrandingApi", () => ({ festivalBrandingApi: {
   get: vi.fn().mockResolvedValue({ festivalSettingId: 1, posterImageUrl: null, logoImageUrl: null }),
@@ -56,6 +56,7 @@ beforeEach(() => {
   vi.mocked(adminThemeApi.update).mockImplementation(async (id, payload) => ({ ...inactive, id, name: payload.name, themeData: payload.themeData }));
   vi.mocked(adminThemeApi.activate).mockResolvedValue({ ...inactive, active: true });
   vi.mocked(adminThemeApi.delete).mockResolvedValue(undefined);
+  vi.mocked(adminThemeApi.recommend).mockResolvedValue({ ...colors, brand: { ...colors.brand, primary: "#4EB15E" } });
   host = document.createElement("div");
   document.body.append(host);
   root = createRoot(host);
@@ -73,6 +74,55 @@ afterEach(async () => {
 });
 
 describe("AdminTheme", () => {
+  async function prepareRecommendation() {
+    vi.mocked(festivalBrandingApi.get).mockResolvedValue({ festivalSettingId: 1,
+      posterImageUrl: "https://cdn.example.com/poster.png", logoImageUrl: null });
+    vi.mocked(festivalBrandingApi.extractPosterColors).mockResolvedValue({ colors: [
+      { hex: "#4EB15E", population: 0.6 }, { hex: "#13730C", population: 0.2 },
+    ] });
+    await render();
+    expect(buttons("AI 테마 추천")[0].disabled).toBe(true);
+    await act(async () => { buttons("대표색 추출")[0].click(); });
+    expect(buttons("AI 테마 추천")[0].disabled).toBe(true);
+    await act(async () => { host.querySelector<HTMLButtonElement>('button[aria-label="기준 색상 #4EB15E 선택"]')!.click(); });
+    expect(buttons("AI 테마 추천")[0].disabled).toBe(false);
+  }
+
+  it("applies AI colors only to a new editable draft and snapshots provenance on Save", async () => {
+    await prepareRecommendation();
+    await act(async () => { buttons("AI 테마 추천")[0].click(); });
+    expect(adminThemeApi.recommend).toHaveBeenCalledWith({
+      sourceColors: ["#4EB15E", "#13730C"], selectedBaseColor: "#4EB15E",
+    });
+    expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toContain("--preview-brand-primary: #4EB15E");
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+    expect(adminThemeApi.create).not.toHaveBeenCalled();
+    expect(adminThemeApi.activate).not.toHaveBeenCalled();
+    await setInput("Primary HEX", "#123456");
+    await act(async () => { buttons("저장")[0].click(); });
+    expect(adminThemeApi.create).toHaveBeenCalledWith(expect.objectContaining({
+      themeData: expect.objectContaining({ brand: expect.objectContaining({ primary: "#123456" }) }),
+      sourcePosterUrl: "https://cdn.example.com/poster.png",
+      sourceColors: ["#4EB15E", "#13730C"], selectedBaseColor: "#4EB15E",
+    }));
+    expect(adminThemeApi.activate).not.toHaveBeenCalled();
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+  });
+
+  it("blocks duplicate AI requests and preserves the old draft on failure", async () => {
+    await prepareRecommendation();
+    const before = host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style");
+    let reject!: (reason: unknown) => void;
+    vi.mocked(adminThemeApi.recommend).mockReturnValue(new Promise((_, fail) => { reject = fail; }));
+    await act(async () => { buttons("AI 테마 추천")[0].click(); });
+    expect(buttons("AI 추천 생성 중…")[0].disabled).toBe(true);
+    await act(async () => { buttons("AI 추천 생성 중…")[0].click(); });
+    expect(adminThemeApi.recommend).toHaveBeenCalledOnce();
+    await act(async () => reject({ status: 429, payload: { code: "OPENAI_RATE_LIMIT" } }));
+    expect(host.querySelector('[role="alert"]')?.textContent).toContain("요청 한도");
+    expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toBe(before);
+  });
+
   it("shows the active theme and all 14 editable colors", async () => {
     await render();
     expect(host.querySelector('[aria-label="현재 활성 테마"]')?.textContent).toContain("활성 축제");
