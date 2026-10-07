@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Copy, Plus, Save, Trash2, Check } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { getErrorStatus } from "@/api/common/fetchAuth";
-import { adminThemeApi, type ThemeProvenance, type ThemeUpsertRequest } from "@/api/app/admin/adminThemeApi";
+import { adminThemeApi, type ThemeProvenance, type ThemeRecommendationCandidate, type ThemeUpsertRequest } from "@/api/app/admin/adminThemeApi";
 import type { ActiveThemeResponse, ThemeData } from "@/api/app/festival/activeThemeApi";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { ADMIN_FOCUS_VISIBLE_RING_CLASS, ADMIN_PRIMARY_ACTION_BUTTON_CLASS, ADMIN_SECONDARY_ACTION_BUTTON_CLASS } from "@/routes/admin/adminStyleClasses";
@@ -27,6 +27,9 @@ const provenanceOf = (theme: ActiveThemeResponse): ThemeProvenance => ({
 });
 
 function recommendationMessage(cause: unknown): string {
+  if (cause instanceof Error && cause.message === "AI_THEME_RESPONSE_INVALID") {
+    return "AI 추천 응답 형식이 현재 화면과 맞지 않습니다. 서버 응답을 확인해 주세요.";
+  }
   const payload = (cause && typeof cause === "object" && "payload" in cause)
     ? (cause as { payload?: { code?: string } }).payload : undefined;
   switch (payload?.code) {
@@ -38,6 +41,9 @@ function recommendationMessage(cause: unknown): string {
     case "OPENAI_RATE_LIMIT": return "AI 요청 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.";
     case "OPENAI_MALFORMED_OUTPUT": return "AI가 올바른 테마 데이터를 반환하지 않았습니다. 다시 시도해 주세요.";
     case "AI_THEME_VALIDATION_FAILED": return "AI 추천 색상이 테마 기준을 충족하지 못했습니다. 다시 시도해 주세요.";
+    case "AI_THEME_CANDIDATE_COUNT": return "AI가 추천 시안 3개를 완성하지 못했습니다. 다시 시도해 주세요.";
+    case "AI_THEME_DUPLICATE_CANDIDATE": return "AI 추천 시안 구성이 올바르지 않습니다. 다시 시도해 주세요.";
+    case "AI_THEME_DIVERSITY_FAILED": return "AI 추천 시안 간 색상 차이가 부족합니다. 다시 시도해 주세요.";
     case "OPENAI_MODEL_ERROR": return "AI 모델 요청에 실패했습니다. 서버 설정을 확인하거나 다시 시도해 주세요.";
     default: return "AI 테마 추천에 실패했습니다. 포스터와 서버 연결을 확인해 주세요.";
   }
@@ -74,6 +80,41 @@ function ThemePreview({ data }: { data: ThemeData }) {
   </section>;
 }
 
+function RecommendationComparison({ candidates, selectedId, onChoose, busy }: {
+  candidates: ThemeRecommendationCandidate[];
+  selectedId: ThemeRecommendationCandidate["id"] | null;
+  onChoose: (candidate: ThemeRecommendationCandidate) => void;
+  busy: boolean;
+}) {
+  const directions = { balanced: "원본형", vibrant: "라이트형", deep: "딥톤형" };
+  const order = ["balanced", "vibrant", "deep"] as const;
+  return <section className={panel} aria-label="AI 추천 시안">
+    <div className="mb-4"><h2 className="text-base font-semibold">AI 추천 시안</h2>
+      <p className="text-xs text-[var(--text-muted)]">추천 시안을 비교한 뒤 하나를 선택하세요. 선택 전에는 편집 중인 테마가 바뀌지 않습니다.</p>
+      {candidates.length === 2 && <p className="mt-1 text-xs text-[var(--text-muted)]">일부 시안이 색상 기준을 충족하지 못해 유효한 시안만 표시합니다.</p>}
+    </div>
+    <div className={`grid gap-4 ${candidates.length === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}>{[...candidates].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id)).map((candidate) => <article key={candidate.id}
+      aria-label={`${candidate.name} 시안`} className="flex flex-col rounded-xl border border-[var(--border-base)] bg-[var(--surface)] p-4"
+      style={createPreviewStyle(candidate.themeData)}>
+      <div className="flex items-center justify-between gap-2"><h3 className="font-semibold">{directions[candidate.id]} · {candidate.name}</h3>
+        {selectedId === candidate.id && <span className="text-xs font-semibold text-[var(--accent)]">편집 중</span>}</div>
+      <p className="mt-1 min-h-10 text-xs text-[var(--text-muted)]">{candidate.description}</p>
+      <div className="mt-3 rounded-xl border p-3" style={{ borderColor: "color-mix(in srgb, var(--preview-brand-primary) 24%, white)", backgroundColor: "color-mix(in srgb, var(--preview-brand-primary) 3%, white)" }}>
+        <div className="flex flex-wrap items-center gap-2"><span className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white" style={{ backgroundColor: "var(--preview-brand-primary)" }}>주요 CTA</span>
+          <span className="rounded-lg px-2 py-1 text-xs font-semibold text-white" style={{ backgroundColor: "var(--preview-brand-strong)" }}>강한 CTA</span>
+          <span className="text-xs font-semibold" style={{ color: "var(--preview-brand-strong)" }}>강조 문구</span></div>
+        <div className="mt-3 flex items-center gap-1.5" aria-label="브랜드 4색">{(["primary", "secondary", "accent", "strong"] as const).map((key) =>
+          <span key={key} title={`${key}: ${candidate.themeData.brand[key]}`} className="h-5 w-5 rounded-full border border-white shadow-sm" style={{ backgroundColor: `var(--preview-brand-${key})` }} />)}</div>
+        <div className="mt-3 flex items-center gap-1.5" aria-label="상태 4색">{(["success", "warning", "danger", "pending"] as const).map((key) =>
+          <span key={key} title={`${key}: ${candidate.themeData.status[key]}`} className="h-3 w-3 rounded-full" style={{ backgroundColor: `var(--preview-status-${key})` }} />)}</div>
+        <div className="mt-2 flex items-center gap-1.5" aria-label="지도 카테고리 6색">{THEME_FIELDS[2].colors.map(([key, label]) =>
+          <span key={key} title={`${label}: ${getThemeColor(candidate.themeData, "category", key)}`} className="h-3 w-3 rounded-full" style={{ backgroundColor: `var(--preview-category-${key})` }} />)}</div>
+      </div>
+      <button type="button" className={`${ADMIN_SECONDARY_ACTION_BUTTON_CLASS} mt-4 w-full text-sm`} onClick={() => onChoose(candidate)} disabled={busy}>이 시안 선택</button>
+    </article>)}</div>
+  </section>;
+}
+
 export default function AdminTheme() {
   const [themes, setThemes] = useState<ActiveThemeResponse[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -85,6 +126,9 @@ export default function AdminTheme() {
   const [busy, setBusy] = useState(false);
   const [recommending, setRecommending] = useState(false);
   const [recommendationError, setRecommendationError] = useState<string | null>(null);
+  const [recommendationCandidates, setRecommendationCandidates] = useState<ThemeRecommendationCandidate[]>([]);
+  const [recommendationSnapshot, setRecommendationSnapshot] = useState<PosterAnalysisSnapshot | null>(null);
+  const [selectedRecommendationId, setSelectedRecommendationId] = useState<ThemeRecommendationCandidate["id"] | null>(null);
   const recommendingRef = useRef(false);
   const analysisRef = useRef<PosterAnalysisSnapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -101,27 +145,22 @@ export default function AdminTheme() {
 
   async function recommend(snapshot: PosterAnalysisSnapshot) {
     if (recommendingRef.current || busy || !snapshot.sourceColors?.length || !snapshot.selectedBaseColor) return;
-    if (!mayDiscard()) return;
     recommendingRef.current = true;
     setRecommending(true);
     setBusy(true);
     setRecommendationError(null);
     try {
-      const themeData = await adminThemeApi.recommend({
+      const response = await adminThemeApi.recommend({
         sourceColors: snapshot.sourceColors, selectedBaseColor: snapshot.selectedBaseColor,
       });
       if (JSON.stringify(analysisRef.current) !== JSON.stringify(snapshot)) {
         setRecommendationError("포스터 분석 정보가 변경되었습니다. 다시 추천해 주세요.");
         return;
       }
-      ++selectionSequence.current;
-      setSelectedId(null);
-      setDraft({ name: "AI 추천 테마", themeData: cloneThemeData(themeData) });
-      setSavedDraft(null);
-      // Capture provenance in the unsaved draft; it is sent only by the existing Save action.
-      setNewDraftProvenance({ sourcePosterUrl: snapshot.sourcePosterUrl,
-        sourceColors: [...snapshot.sourceColors], selectedBaseColor: snapshot.selectedBaseColor });
-      toast.success("AI 추천을 미저장 테마에 반영했습니다. 색상을 확인하고 직접 저장해 주세요.");
+      setRecommendationCandidates(response.candidates);
+      setRecommendationSnapshot(snapshot);
+      setSelectedRecommendationId(null);
+      toast.success(`AI 추천 시안 ${response.candidates.length}개를 받았습니다. 비교한 뒤 편집할 시안을 선택해 주세요.`);
     } catch (cause) {
       setRecommendationError(recommendationMessage(cause));
     } finally {
@@ -131,12 +170,27 @@ export default function AdminTheme() {
     }
   }
 
+  function chooseRecommendation(candidate: ThemeRecommendationCandidate) {
+    if (!mayDiscard()) return;
+    ++selectionSequence.current;
+    setSelectedRecommendationId(candidate.id);
+    setSelectedId(null);
+    setDraft({ name: `${candidate.name} AI 추천 테마`, themeData: cloneThemeData(candidate.themeData) });
+    setSavedDraft(null);
+    setNewDraftProvenance(recommendationSnapshot ? {
+      sourcePosterUrl: recommendationSnapshot.sourcePosterUrl,
+      sourceColors: [...(recommendationSnapshot.sourceColors ?? [])],
+      selectedBaseColor: recommendationSnapshot.selectedBaseColor,
+    } : null);
+  }
+
   const selectLoadedTheme = useCallback((theme: ActiveThemeResponse) => {
     const next = { name: theme.name, themeData: cloneThemeData(theme.themeData) };
     setSelectedId(theme.id);
     setDraft(next);
     setSavedDraft(next);
     setNewDraftProvenance(null);
+    setSelectedRecommendationId(null);
   }, []);
 
   const loadThemes = useCallback(async (signal?: AbortSignal) => {
@@ -177,6 +231,7 @@ export default function AdminTheme() {
     if (!mayDiscard()) return;
     ++selectionSequence.current;
     setSelectedId(null);
+    setSelectedRecommendationId(null);
     const base = source ?? activeTheme;
     setNewDraftProvenance(source ? provenanceOf(source) : null);
     setDraft({ name: source ? `${source.name} 복제` : "", themeData: cloneThemeData(base?.themeData ?? readBundledThemeData()) });
@@ -253,6 +308,8 @@ export default function AdminTheme() {
             {!activeTheme && <p className="mt-1 text-xs text-[var(--text-muted)]">서비스는 번들 기본 색상을 사용합니다.</p>}</div>
           {activeTheme && <Swatches colors={keyColors(activeTheme.themeData)} />}
         </div></section>
+        {recommendationCandidates.length > 0 && <RecommendationComparison candidates={recommendationCandidates}
+          selectedId={selectedRecommendationId} onChoose={chooseRecommendation} busy={busy} />}
         <div className="grid items-start gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
           <section className={panel} aria-label="저장된 테마 목록"><div className="mb-4 flex items-center justify-between gap-2"><h2 className="font-semibold">저장된 테마</h2><button type="button" aria-label="새 테마 생성" className={ADMIN_SECONDARY_ACTION_BUTTON_CLASS} onClick={() => createDraft()} disabled={busy}><Plus className="h-4 w-4" /></button></div>
             {themes.length === 0 ? <p className="text-sm text-[var(--text-muted)]">저장된 테마가 없습니다. 새 테마를 만들어 주세요.</p> : <div className="space-y-2">{themes.map((theme) => <button type="button" key={theme.id} onClick={() => void selectTheme(theme.id)} disabled={busy} aria-pressed={selectedId === theme.id} className={`w-full rounded-xl border p-3 text-left ${ADMIN_FOCUS_VISIBLE_RING_CLASS} ${selectedId === theme.id ? "border-[var(--accent)] bg-[var(--surface-subtle)]" : "border-[var(--border-base)] hover:bg-[var(--surface-subtle)]"}`}>

@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AdminTheme from "@/routes/admin/AdminTheme";
 import type { ActiveThemeResponse, ThemeData } from "@/api/app/festival/activeThemeApi";
 import { adminThemeApi } from "@/api/app/admin/adminThemeApi";
+import type { ThemeRecommendationResponse } from "@/api/app/admin/adminThemeApi";
 import { festivalBrandingApi } from "@/api/app/festival/festivalBrandingApi";
 import { THEME_FIELDS, validateThemeDraft } from "@/routes/admin/themeEditor";
 import { THEME_CORE_VARIABLES } from "@/lib/app/festival/activeTheme";
@@ -29,6 +30,11 @@ const colors: ThemeData = {
 };
 const active: ActiveThemeResponse = { id: 1, festivalSettingId: 1, name: "활성 축제", themeData: colors, createdAt: "", updatedAt: "", active: true };
 const inactive: ActiveThemeResponse = { ...active, id: 2, name: "저장된 테마", active: false };
+const recommendation: ThemeRecommendationResponse = { candidates: [
+  { id: "balanced", name: "Balanced", description: "균형형", themeData: { ...colors, brand: { ...colors.brand, primary: "#4EB15E" } } },
+  { id: "vibrant", name: "Vibrant", description: "생동감형", themeData: { ...colors, brand: { ...colors.brand, primary: "#F69324" } } },
+  { id: "deep", name: "Deep", description: "딥톤형", themeData: { ...colors, brand: { ...colors.brand, primary: "#983508" } } },
+] };
 let host: HTMLDivElement;
 let root: Root;
 
@@ -56,7 +62,10 @@ beforeEach(() => {
   vi.mocked(adminThemeApi.update).mockImplementation(async (id, payload) => ({ ...inactive, id, name: payload.name, themeData: payload.themeData }));
   vi.mocked(adminThemeApi.activate).mockResolvedValue({ ...inactive, active: true });
   vi.mocked(adminThemeApi.delete).mockResolvedValue(undefined);
-  vi.mocked(adminThemeApi.recommend).mockResolvedValue({ ...colors, brand: { ...colors.brand, primary: "#4EB15E" } });
+  // Simulate JSON parsed from the real { candidates: [...] } response, not a bare ThemeData.
+  vi.mocked(adminThemeApi.recommend).mockResolvedValue(
+    JSON.parse(JSON.stringify(recommendation)) as ThemeRecommendationResponse,
+  );
   host = document.createElement("div");
   document.body.append(host);
   root = createRoot(host);
@@ -88,16 +97,22 @@ describe("AdminTheme", () => {
     expect(buttons("AI 테마 추천")[0].disabled).toBe(false);
   }
 
-  it("applies AI colors only to a new editable draft and snapshots provenance on Save", async () => {
+  it("shows three candidates without changing the draft, then applies only the chosen candidate and saves provenance", async () => {
     await prepareRecommendation();
+    const before = host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style");
     await act(async () => { buttons("AI 테마 추천")[0].click(); });
     expect(adminThemeApi.recommend).toHaveBeenCalledWith({
       sourceColors: ["#4EB15E", "#13730C"], selectedBaseColor: "#4EB15E",
     });
-    expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toContain("--preview-brand-primary: #4EB15E");
+    expect(host.querySelectorAll('[aria-label$="시안"]')).toHaveLength(4);
+    expect(host.querySelector('[aria-label="Balanced 시안"]')?.textContent).toContain("원본형");
+    expect(host.querySelector('[aria-label="Vibrant 시안"]')?.textContent).toContain("라이트형");
+    expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toBe(before);
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
     expect(adminThemeApi.create).not.toHaveBeenCalled();
     expect(adminThemeApi.activate).not.toHaveBeenCalled();
+    await act(async () => { buttons("이 시안 선택")[0].click(); });
+    expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toContain("--preview-brand-primary: #4EB15E");
     await setInput("Primary HEX", "#123456");
     await act(async () => { buttons("저장")[0].click(); });
     expect(adminThemeApi.create).toHaveBeenCalledWith(expect.objectContaining({
@@ -107,6 +122,73 @@ describe("AdminTheme", () => {
     }));
     expect(adminThemeApi.activate).not.toHaveBeenCalled();
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+  });
+
+  it("allows choosing another candidate and keeps the draft when re-recommending", async () => {
+    await prepareRecommendation();
+    await act(async () => { buttons("AI 테마 추천")[0].click(); });
+    await act(async () => { buttons("이 시안 선택")[1].click(); });
+    expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toContain("--preview-brand-primary: #F69324");
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    await act(async () => { buttons("이 시안 선택")[2].click(); });
+    expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toContain("--preview-brand-primary: #983508");
+    const replacement: ThemeRecommendationResponse = { candidates: recommendation.candidates.map((candidate) => ({
+      ...candidate, themeData: { ...candidate.themeData, brand: { ...candidate.themeData.brand, primary: "#123456" } },
+    })) };
+    vi.mocked(adminThemeApi.recommend).mockResolvedValue(replacement);
+    await act(async () => { buttons("AI 테마 추천")[0].click(); });
+    expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toContain("--preview-brand-primary: #983508");
+    expect(host.querySelectorAll('[aria-label$="시안"]')).toHaveLength(4);
+    expect(host.querySelector('[aria-label="Balanced 시안"]')?.getAttribute("style")).toContain("--preview-brand-primary: #123456");
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+  });
+
+  it.each(["balanced", "vibrant", "deep"] as const)("renders two candidates when %s is filtered out", async (missing) => {
+    vi.mocked(adminThemeApi.recommend).mockResolvedValue({
+      candidates: recommendation.candidates.filter((candidate) => candidate.id !== missing),
+    });
+    await prepareRecommendation();
+    const recommendButton = Array.from(host.querySelectorAll("button"))
+      .find((button) => button.textContent?.includes("AI 테마 추천"));
+    expect(recommendButton).toBeDefined();
+    await act(async () => { recommendButton!.click(); });
+
+    const comparison = host.querySelector('[aria-label="AI 추천 시안"]')!;
+    const cards = Array.from(comparison.querySelectorAll("article"));
+    expect(cards).toHaveLength(2);
+    expect(comparison.querySelector(".lg\\:grid-cols-2")).not.toBeNull();
+    expect(comparison.textContent).toContain("유효한 시안만 표시합니다");
+    expect(cards.map((card) => card.getAttribute("aria-label"))).not.toContain(`${missing} 시안`);
+    const expectedPrimary = recommendation.candidates.find((candidate) => candidate.id !== missing)!.themeData.brand.primary;
+    await act(async () => { cards[0].querySelector("button")!.click(); });
+    expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style"))
+      .toContain(`--preview-brand-primary: ${expectedPrimary}`);
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+    expect(adminThemeApi.activate).not.toHaveBeenCalled();
+  });
+
+  it("retains previous candidates and the current draft if a later recommendation fails", async () => {
+    await prepareRecommendation();
+    await act(async () => { buttons("AI 테마 추천")[0].click(); });
+    await act(async () => { buttons("이 시안 선택")[0].click(); });
+    const before = host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style");
+    vi.mocked(adminThemeApi.recommend).mockRejectedValue({ status: 502, payload: { code: "AI_THEME_DIVERSITY_FAILED" } });
+    await act(async () => { buttons("AI 테마 추천")[0].click(); });
+    expect(host.querySelectorAll('[aria-label$="시안"]')).toHaveLength(4);
+    expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toBe(before);
+    expect(host.querySelector('[role="alert"]')?.textContent).toContain("색상 차이");
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+  });
+
+  it("renders safely before recommendation and shows a format error for a legacy single-theme response", async () => {
+    await prepareRecommendation();
+    expect(host.querySelector('[aria-label="AI 추천 시안"]')).toBeNull();
+    // The API boundary rejects a bare ThemeData instead of putting undefined into candidate state.
+    vi.mocked(adminThemeApi.recommend).mockRejectedValueOnce(new Error("AI_THEME_RESPONSE_INVALID"));
+    await act(async () => { buttons("AI 테마 추천")[0].click(); });
+    expect(host.querySelector('[aria-label="AI 추천 시안"]')).toBeNull();
+    expect(host.querySelector('[role="alert"]')?.textContent).toContain("응답 형식");
+    expect(host.querySelector('[data-testid="theme-preview"]')).not.toBeNull();
   });
 
   it("uses a newly typed valid HEX as the recommendation base color", async () => {

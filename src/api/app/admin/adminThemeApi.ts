@@ -16,6 +16,43 @@ export type ThemeProvenance = {
 };
 export type ThemeUpsertRequest = { name: string; themeData: ThemeData } & Partial<ThemeProvenance>;
 export type ThemeRecommendationRequest = { sourceColors: string[]; selectedBaseColor: string };
+export type ThemeRecommendationCandidate = {
+  id: "balanced" | "vibrant" | "deep";
+  name: string;
+  description: string;
+  themeData: ThemeData;
+};
+export type ThemeRecommendationResponse = { candidates: ThemeRecommendationCandidate[] };
+
+const recommendationColorFields = {
+  brand: ["primary", "secondary", "accent", "strong"],
+  status: ["success", "warning", "danger", "pending"],
+  category: ["pub", "foodTruck", "experience", "event", "restArea", "facility"],
+} as const;
+
+const isObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+/** The shared fetch client only casts JSON; validate this AI response before it reaches React state. */
+export function parseThemeRecommendationResponse(value: unknown): ThemeRecommendationResponse {
+  const candidates = isObject(value) ? value.candidates : undefined;
+  const ids = new Set(["balanced", "vibrant", "deep"]);
+  if (!Array.isArray(candidates) || candidates.length < 2 || candidates.length > 3 || !candidates.every((candidate) => {
+    if (!isObject(candidate) || typeof candidate.id !== "string" || !ids.delete(candidate.id)
+      || typeof candidate.name !== "string" || !candidate.name.trim()
+      || typeof candidate.description !== "string" || !candidate.description.trim()
+      || !isObject(candidate.themeData)) return false;
+    const themeData = candidate.themeData;
+    return Object.entries(recommendationColorFields).every(([group, keys]) => {
+      const colors = themeData[group];
+      return isObject(colors) && keys.every((key) =>
+        typeof colors[key] === "string" && /^#[0-9a-fA-F]{6}$/.test(colors[key]));
+    });
+  })) {
+    throw new Error("AI_THEME_RESPONSE_INVALID");
+  }
+  return { candidates: candidates as ThemeRecommendationCandidate[] };
+}
 
 const request = createFetchWithAuth({
   getSessionEpoch: authStore.getSessionEpoch,
@@ -40,7 +77,7 @@ export const adminThemeApi = {
   }),
   delete: (id: number) => request<void>(`${basePath}/${id}`, { method: "DELETE" }),
   activate: (id: number) => request<ActiveThemeResponse>(`${basePath}/${id}/activate`, { method: "PUT" }),
-  recommend: (payload: ThemeRecommendationRequest) => request<ThemeData>(`${basePath}/recommend`, {
-    method: "POST", body: JSON.stringify(payload),
-  }),
+  recommend: async (payload: ThemeRecommendationRequest) => parseThemeRecommendationResponse(
+    await request<unknown>(`${basePath}/recommend`, { method: "POST", body: JSON.stringify(payload) }),
+  ),
 };

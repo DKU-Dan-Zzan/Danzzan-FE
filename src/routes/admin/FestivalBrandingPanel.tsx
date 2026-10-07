@@ -174,7 +174,7 @@ export function FestivalBrandingPanel({ onAnalysisChange, onRecommend, recommend
                   sourceColors: candidates.map((color) => color.hex), selectedBaseColor });
               }
             }}>{recommending ? "AI 추천 생성 중…" : "AI 테마 추천"}</button>
-          <p className="mt-2 text-xs text-[var(--text-muted)]">추천 결과는 현재 편집 draft를 덮어씁니다. 저장하거나 적용하기 전까지 서비스에는 반영되지 않습니다.</p>
+          <p className="mt-2 text-xs text-[var(--text-muted)]">새 추천 시안은 현재 편집 중인 테마를 변경하지 않습니다. 시안을 선택하면 편집 값이 해당 시안으로 바뀝니다.</p>
           {recommendationError && <p role="alert" className="mt-2 text-sm text-[var(--semantic-status-danger)]">{recommendationError}</p>}
         </div>
       </>}
