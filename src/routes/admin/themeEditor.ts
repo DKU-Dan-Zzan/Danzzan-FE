@@ -14,8 +14,8 @@ export const THEME_FIELDS = [
     ["danger", "Danger"], ["pending", "Pending"],
   ] },
   { key: "category", title: "지도 카테고리", colors: [
-    ["pub", "주점"], ["foodTruck", "푸드트럭"], ["experience", "체험"],
-    ["event", "행사"], ["restArea", "휴게"], ["facility", "시설"],
+    ["pub", "주점"], ["foodTruck", "푸드트럭"], ["experience", "부스"],
+    ["event", "이벤트"], ["restArea", "쉼터"], ["facility", "편의시설"],
   ] },
 ] as const;
 

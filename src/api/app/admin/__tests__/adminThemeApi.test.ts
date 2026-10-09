@@ -34,7 +34,7 @@ describe("adminThemeApi", () => {
       .rejects.toThrow("AI_THEME_RESPONSE_INVALID");
   });
 
-  it("accepts any unique two-candidate subset but not zero or one candidate", () => {
+  it("accepts any unique one-to-three-candidate subset but not zero candidates", () => {
     const all = (["balanced", "vibrant", "deep"] as const).map((id) => ({
       id, name: id, description: `${id} direction`, themeData,
     }));
@@ -42,8 +42,10 @@ describe("adminThemeApi", () => {
       const candidates = all.filter((candidate) => candidate.id !== missing);
       expect(parseThemeRecommendationResponse({ candidates }).candidates).toEqual(candidates);
     }
+    for (const candidate of all) {
+      expect(parseThemeRecommendationResponse({ candidates: [candidate] }).candidates).toEqual([candidate]);
+    }
     expect(() => parseThemeRecommendationResponse({ candidates: [] })).toThrow("AI_THEME_RESPONSE_INVALID");
-    expect(() => parseThemeRecommendationResponse({ candidates: [all[0]] })).toThrow("AI_THEME_RESPONSE_INVALID");
     expect(() => parseThemeRecommendationResponse({ candidates: [all[0], all[0]] })).toThrow("AI_THEME_RESPONSE_INVALID");
   });
 

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Copy, Plus, Save, Trash2, Check } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import { getErrorStatus } from "@/api/common/fetchAuth";
 import { adminThemeApi, type ThemeProvenance, type ThemeRecommendationCandidate, type ThemeUpsertRequest } from "@/api/app/admin/adminThemeApi";
@@ -9,6 +10,7 @@ import { ADMIN_FOCUS_VISIBLE_RING_CLASS, ADMIN_PRIMARY_ACTION_BUTTON_CLASS, ADMI
 import { cloneThemeData, createPreviewStyle, getThemeColor, isHexColor, readBundledThemeData, THEME_FIELDS, type ThemeDraft, validateThemeDraft } from "@/routes/admin/themeEditor";
 import { applyThemeData } from "@/lib/app/festival/activeTheme";
 import { FestivalBrandingPanel, type PosterAnalysisSnapshot } from "@/routes/admin/FestivalBrandingPanel";
+import { ThemeScreenPreview } from "@/routes/admin/ThemeScreenPreview";
 
 const panel = "rounded-2xl border border-[var(--admin-panel-border)] bg-[var(--admin-panel-bg)] p-5 sm:p-6";
 const input = `h-10 w-full rounded-xl border border-[var(--border-base)] bg-[var(--surface)] px-3 text-sm text-[var(--text)] ${ADMIN_FOCUS_VISIBLE_RING_CLASS}`;
@@ -40,7 +42,7 @@ function recommendationMessage(cause: unknown): string {
     case "OPENAI_TIMEOUT": return "AI 추천 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.";
     case "OPENAI_RATE_LIMIT": return "AI 요청 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.";
     case "OPENAI_MALFORMED_OUTPUT": return "AI가 올바른 테마 데이터를 반환하지 않았습니다. 다시 시도해 주세요.";
-    case "AI_THEME_VALIDATION_FAILED": return "AI 추천 색상이 테마 기준을 충족하지 못했습니다. 다시 시도해 주세요.";
+    case "AI_THEME_VALIDATION_FAILED": return "추천 시안 생성에 실패했습니다. AI 응답에 따라 일시적으로 색상 기준을 충족하지 못할 수 있습니다. 다시 시도하면 새로운 시안이 생성될 수 있습니다.";
     case "AI_THEME_CANDIDATE_COUNT": return "AI가 추천 시안 3개를 완성하지 못했습니다. 다시 시도해 주세요.";
     case "AI_THEME_DUPLICATE_CANDIDATE": return "AI 추천 시안 구성이 올바르지 않습니다. 다시 시도해 주세요.";
     case "AI_THEME_DIVERSITY_FAILED": return "AI 추천 시안 간 색상 차이가 부족합니다. 다시 시도해 주세요.";
@@ -62,7 +64,7 @@ function ThemeSourceDetails({ source }: { source: ThemeProvenance | null }) {
 
 function ThemePreview({ data }: { data: ThemeData }) {
   const badge = (label: string, color: string) => <span key={label} className="rounded-full px-3 py-1 text-xs font-semibold" style={{ color, backgroundColor: `color-mix(in srgb, ${color} 14%, white)` }}>{label}</span>;
-  return <section aria-label="편집 중인 테마 미리보기" className={panel} style={createPreviewStyle(data)} data-testid="theme-preview">
+  return <><section aria-label="편집 중인 테마 미리보기" className={panel} style={createPreviewStyle(data)} data-testid="theme-preview">
     <div className="mb-4"><h2 className="text-base font-semibold">미리보기</h2><p className="text-xs text-[var(--text-muted)]">이 영역만 편집 중인 색상을 사용합니다. 실제 서비스에는 적용되지 않습니다.</p></div>
     <div className="space-y-4 rounded-2xl border p-5" style={{ borderColor: "color-mix(in srgb, var(--preview-brand-primary) 24%, white)", backgroundColor: "color-mix(in srgb, var(--preview-brand-primary) 3%, white)" }}>
       <div className="flex flex-wrap items-center gap-3">
@@ -77,7 +79,7 @@ function ThemePreview({ data }: { data: ThemeData }) {
         {THEME_FIELDS[2].colors.map(([key, label]) => <span key={key} className="inline-flex items-center gap-1.5 text-xs"><span className="h-3 w-3 rounded-full" style={{ backgroundColor: `var(--preview-category-${key})` }} />{label}</span>)}
       </div></div>
     </div>
-  </section>;
+  </section><div className="mt-6"><ThemeScreenPreview data={data} /></div></>;
 }
 
 function RecommendationComparison({ candidates, selectedId, onChoose, busy }: {
@@ -86,19 +88,23 @@ function RecommendationComparison({ candidates, selectedId, onChoose, busy }: {
   onChoose: (candidate: ThemeRecommendationCandidate) => void;
   busy: boolean;
 }) {
-  const directions = { balanced: "원본형", vibrant: "라이트형", deep: "딥톤형" };
+  const directions = {
+    balanced: { title: "원본형", description: "포스터의 색감과 분위기를 가장 충실하게 반영한 시안입니다." },
+    vibrant: { title: "라이트형", description: "같은 색조를 유지하면서 더 밝고 경쾌하게 조정한 시안입니다." },
+    deep: { title: "딥톤형", description: "같은 색조를 유지하면서 더 진하고 선명한 대비를 살린 시안입니다." },
+  };
   const order = ["balanced", "vibrant", "deep"] as const;
   return <section className={panel} aria-label="AI 추천 시안">
     <div className="mb-4"><h2 className="text-base font-semibold">AI 추천 시안</h2>
       <p className="text-xs text-[var(--text-muted)]">추천 시안을 비교한 뒤 하나를 선택하세요. 선택 전에는 편집 중인 테마가 바뀌지 않습니다.</p>
-      {candidates.length === 2 && <p className="mt-1 text-xs text-[var(--text-muted)]">일부 시안이 색상 기준을 충족하지 못해 유효한 시안만 표시합니다.</p>}
+      {candidates.length < 3 && <p className="mt-1 text-xs text-[var(--text-muted)]">일부 추천 시안이 색상 기준을 충족하지 못해 유효한 시안만 표시합니다.</p>}
     </div>
-    <div className={`grid gap-4 ${candidates.length === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}>{[...candidates].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id)).map((candidate) => <article key={candidate.id}
-      aria-label={`${candidate.name} 시안`} className="flex flex-col rounded-xl border border-[var(--border-base)] bg-[var(--surface)] p-4"
+    <div className={`grid gap-4 ${candidates.length === 1 ? "" : candidates.length === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}>{[...candidates].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id)).map((candidate) => <article key={candidate.id}
+      aria-label={`${directions[candidate.id].title} 시안`} aria-selected={selectedId === candidate.id} className={`flex flex-col rounded-xl border bg-[var(--surface)] p-4 ${selectedId === candidate.id ? "border-[var(--accent)] ring-2 ring-[var(--accent)] ring-offset-2" : "border-[var(--border-base)]"}`}
       style={createPreviewStyle(candidate.themeData)}>
-      <div className="flex items-center justify-between gap-2"><h3 className="font-semibold">{directions[candidate.id]} · {candidate.name}</h3>
-        {selectedId === candidate.id && <span className="text-xs font-semibold text-[var(--accent)]">편집 중</span>}</div>
-      <p className="mt-1 min-h-10 text-xs text-[var(--text-muted)]">{candidate.description}</p>
+      <div className="flex items-center justify-between gap-2"><h3 className="font-semibold">{directions[candidate.id].title}</h3>
+        {selectedId === candidate.id && <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--accent)]"><Check className="h-3.5 w-3.5" aria-hidden="true" />편집 시안 선택됨</span>}</div>
+      <p className="mt-1 min-h-10 text-xs text-[var(--text-muted)]">{directions[candidate.id].description}</p>
       <div className="mt-3 rounded-xl border p-3" style={{ borderColor: "color-mix(in srgb, var(--preview-brand-primary) 24%, white)", backgroundColor: "color-mix(in srgb, var(--preview-brand-primary) 3%, white)" }}>
         <div className="flex flex-wrap items-center gap-2"><span className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white" style={{ backgroundColor: "var(--preview-brand-primary)" }}>주요 CTA</span>
           <span className="rounded-lg px-2 py-1 text-xs font-semibold text-white" style={{ backgroundColor: "var(--preview-brand-strong)" }}>강한 CTA</span>
@@ -116,6 +122,7 @@ function RecommendationComparison({ candidates, selectedId, onChoose, busy }: {
 }
 
 export default function AdminTheme() {
+  const location = useLocation();
   const [themes, setThemes] = useState<ActiveThemeResponse[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [draft, setDraft] = useState<ThemeDraft | null>(null);
@@ -136,6 +143,13 @@ export default function AdminTheme() {
   const activeTheme = themes.find((theme) => theme.active) ?? null;
   const selectedTheme = themes.find((theme) => theme.id === selectedId) ?? null;
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(savedDraft), [draft, savedDraft]);
+
+  useEffect(() => {
+    const id = location.hash.slice(1);
+    if (id !== "theme-ai" && id !== "theme-management") return;
+    const frame = window.requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView?.({ behavior: "smooth", block: "start" }));
+    return () => window.cancelAnimationFrame(frame);
+  }, [location.hash, location.key]);
 
   function analysisChanged(snapshot: PosterAnalysisSnapshot | null) {
     analysisRef.current = snapshot;
@@ -299,8 +313,13 @@ export default function AdminTheme() {
   return <>
     <Toaster position="top-right" closeButton richColors />
     <AdminShell title="축제 테마" eyebrow="FESTIVAL THEME" mainClassName="mx-auto w-full max-w-[1360px] space-y-6 px-6 py-6">
-      <FestivalBrandingPanel onAnalysisChange={analysisChanged} onRecommend={(snapshot) => void recommend(snapshot)}
-        recommending={recommending} recommendationError={recommendationError} />
+      <div id="theme-ai" className="space-y-6 scroll-mt-40 sm:scroll-mt-28" aria-label="AI 테마 추천 영역">
+        <FestivalBrandingPanel onAnalysisChange={analysisChanged} onRecommend={(snapshot) => void recommend(snapshot)}
+          recommending={recommending} recommendationError={recommendationError} />
+        {recommendationCandidates.length > 0 && <RecommendationComparison candidates={recommendationCandidates}
+          selectedId={selectedRecommendationId} onChoose={chooseRecommendation} busy={busy} />}
+      </div>
+      <div id="theme-management" className="space-y-6 scroll-mt-40 sm:scroll-mt-28" aria-label="테마 관리 영역">
       {loading ? <p role="status" className="text-sm text-[var(--text-muted)]">테마를 불러오는 중입니다…</p> : error ?
         <div role="alert" className={panel}><p className="mb-3 text-sm">{error}</p><button type="button" className={ADMIN_SECONDARY_ACTION_BUTTON_CLASS} onClick={() => void loadThemes()}>다시 시도</button></div> : <>
         <section className={panel} aria-label="현재 활성 테마"><div className="flex flex-wrap items-center justify-between gap-4">
@@ -308,15 +327,13 @@ export default function AdminTheme() {
             {!activeTheme && <p className="mt-1 text-xs text-[var(--text-muted)]">서비스는 번들 기본 색상을 사용합니다.</p>}</div>
           {activeTheme && <Swatches colors={keyColors(activeTheme.themeData)} />}
         </div></section>
-        {recommendationCandidates.length > 0 && <RecommendationComparison candidates={recommendationCandidates}
-          selectedId={selectedRecommendationId} onChoose={chooseRecommendation} busy={busy} />}
-        <div className="grid items-start gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
-          <section className={panel} aria-label="저장된 테마 목록"><div className="mb-4 flex items-center justify-between gap-2"><h2 className="font-semibold">저장된 테마</h2><button type="button" aria-label="새 테마 생성" className={ADMIN_SECONDARY_ACTION_BUTTON_CLASS} onClick={() => createDraft()} disabled={busy}><Plus className="h-4 w-4" /></button></div>
-            {themes.length === 0 ? <p className="text-sm text-[var(--text-muted)]">저장된 테마가 없습니다. 새 테마를 만들어 주세요.</p> : <div className="space-y-2">{themes.map((theme) => <button type="button" key={theme.id} onClick={() => void selectTheme(theme.id)} disabled={busy} aria-pressed={selectedId === theme.id} className={`w-full rounded-xl border p-3 text-left ${ADMIN_FOCUS_VISIBLE_RING_CLASS} ${selectedId === theme.id ? "border-[var(--accent)] bg-[var(--surface-subtle)]" : "border-[var(--border-base)] hover:bg-[var(--surface-subtle)]"}`}>
-              <span className="flex items-center justify-between gap-2"><span className="truncate text-sm font-semibold">{theme.name}</span>{theme.active && <span className="shrink-0 text-xs font-semibold text-[var(--accent)]">활성</span>}</span><span className="mt-2 block"><Swatches colors={keyColors(theme.themeData)} /></span>
-            </button>)}</div>}
-          </section>
-          <div className="space-y-6">{draft ? <>
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(250px,0.8fr)_minmax(0,1.7fr)]">
+        <section className={panel} aria-label="저장된 테마 목록"><div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">저장된 테마</h2><button type="button" aria-label="새 테마 생성" className={ADMIN_SECONDARY_ACTION_BUTTON_CLASS} onClick={() => createDraft()} disabled={busy}><Plus className="h-4 w-4" /></button></div>
+          {themes.length === 0 ? <p className="text-sm text-[var(--text-muted)]">저장된 테마가 없습니다. 새 테마를 만들어 주세요.</p> : <div className="grid gap-2">{themes.map((theme) => <button type="button" key={theme.id} onClick={() => void selectTheme(theme.id)} disabled={busy} aria-pressed={selectedId === theme.id} className={`w-full rounded-xl border p-3 text-left ${ADMIN_FOCUS_VISIBLE_RING_CLASS} ${selectedId === theme.id ? "border-[var(--accent)] bg-[var(--surface-subtle)] ring-1 ring-[var(--accent)]" : "border-[var(--border-base)] hover:bg-[var(--surface-subtle)]"}`}>
+            <span className="flex items-center justify-between gap-2"><span className="truncate text-sm font-semibold">{theme.name}</span>{theme.active && <span className="shrink-0 rounded-full bg-[var(--surface-subtle)] px-2 py-0.5 text-xs font-semibold text-[var(--accent)]">활성</span>}</span><span className="mt-2 block"><Swatches colors={keyColors(theme.themeData)} /></span>
+          </button>)}</div>}
+        </section>
+        <div className="min-w-0 space-y-6">{draft ? <>
             <section className={panel} aria-label="테마 편집"><div className="mb-5 flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-semibold">{selectedId === null ? "새 테마" : "테마 편집"}</h2><p className="text-xs text-[var(--text-muted)]">저장과 실제 적용은 별개입니다.{selectedTheme?.active && " 활성 테마를 수정해 저장하면 비활성 복제본이 생성됩니다."}</p></div>
               {selectedTheme && <button type="button" className={`${ADMIN_SECONDARY_ACTION_BUTTON_CLASS} inline-flex items-center gap-1.5 text-sm`} onClick={() => createDraft(selectedTheme)} disabled={busy}><Copy className="h-4 w-4" />복제</button>}
             </div>
@@ -340,6 +357,7 @@ export default function AdminTheme() {
           </> : <div className={panel}><p className="text-sm text-[var(--text-muted)]">목록에서 테마를 선택하거나 새 테마를 만들어 주세요.</p></div>}</div>
         </div>
       </>}
+      </div>
     </AdminShell>
   </>;
 }

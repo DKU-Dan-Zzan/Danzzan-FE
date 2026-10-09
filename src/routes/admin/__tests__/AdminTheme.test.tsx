@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
+import { MemoryRouter, useNavigate } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AdminTheme from "@/routes/admin/AdminTheme";
 import type { ActiveThemeResponse, ThemeData } from "@/api/app/festival/activeThemeApi";
@@ -47,8 +48,16 @@ const setInput = async (label: string, value: string) => {
   });
 };
 
-async function render() {
-  await act(async () => { root.render(<AdminTheme />); });
+function ThemeNavigationTestControls() {
+  const navigate = useNavigate();
+  return <><button type="button" onClick={() => navigate("/admin/theme#theme-ai")}>AI 영역 링크</button>
+    <button type="button" onClick={() => navigate("/admin/theme#theme-management")}>관리 영역 링크</button></>;
+}
+
+async function render(withNavigation = false) {
+  await act(async () => { root.render(<MemoryRouter initialEntries={["/admin/theme"]}>
+    {withNavigation && <ThemeNavigationTestControls />}<AdminTheme />
+  </MemoryRouter>); });
 }
 
 beforeEach(() => {
@@ -105,13 +114,22 @@ describe("AdminTheme", () => {
       sourceColors: ["#4EB15E", "#13730C"], selectedBaseColor: "#4EB15E",
     });
     expect(host.querySelectorAll('[aria-label$="시안"]')).toHaveLength(4);
-    expect(host.querySelector('[aria-label="Balanced 시안"]')?.textContent).toContain("원본형");
-    expect(host.querySelector('[aria-label="Vibrant 시안"]')?.textContent).toContain("라이트형");
+    expect(host.querySelector('[aria-label="원본형 시안"]')?.textContent).toContain("포스터의 색감과 분위기를 가장 충실하게 반영한 시안입니다.");
+    expect(host.querySelector('[aria-label="라이트형 시안"]')?.textContent).toContain("같은 색조를 유지하면서 더 밝고 경쾌하게 조정한 시안입니다.");
+    expect(host.querySelector('[aria-label="딥톤형 시안"]')?.textContent).toContain("같은 색조를 유지하면서 더 진하고 선명한 대비를 살린 시안입니다.");
+    expect(host.querySelector('[aria-label="라이트형 시안"]')?.textContent).not.toContain("Vibrant");
+    expect(host.querySelector('[aria-label="AI 추천 시안"]')?.previousElementSibling?.getAttribute("aria-label")).toBe("축제 브랜딩");
+    expect(host.querySelector('[aria-label="AI 추천 시안"]')!.compareDocumentPosition(host.querySelector('[aria-label="현재 활성 테마"]')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(host.querySelector('[aria-label="현재 활성 테마"]')!.compareDocumentPosition(host.querySelector('[aria-label="테마 편집"]')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(host.querySelector('[aria-label="저장된 테마 목록"]')!.compareDocumentPosition(host.querySelector('[aria-label="테마 편집"]')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(host.querySelector('[aria-label="저장된 테마 목록"]')?.parentElement?.className).toContain("lg:grid-cols-");
     expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toBe(before);
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
     expect(adminThemeApi.create).not.toHaveBeenCalled();
     expect(adminThemeApi.activate).not.toHaveBeenCalled();
     await act(async () => { buttons("이 시안 선택")[0].click(); });
+    expect(host.querySelector('[aria-label="원본형 시안"]')?.getAttribute("aria-selected")).toBe("true");
+    expect(host.querySelector('[aria-label="원본형 시안"]')?.textContent).toContain("편집 시안 선택됨");
     expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toContain("--preview-brand-primary: #4EB15E");
     await setInput("Primary HEX", "#123456");
     await act(async () => { buttons("저장")[0].click(); });
@@ -139,7 +157,7 @@ describe("AdminTheme", () => {
     await act(async () => { buttons("AI 테마 추천")[0].click(); });
     expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toContain("--preview-brand-primary: #983508");
     expect(host.querySelectorAll('[aria-label$="시안"]')).toHaveLength(4);
-    expect(host.querySelector('[aria-label="Balanced 시안"]')?.getAttribute("style")).toContain("--preview-brand-primary: #123456");
+    expect(host.querySelector('[aria-label="원본형 시안"]')?.getAttribute("style")).toContain("--preview-brand-primary: #123456");
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
   });
 
@@ -167,6 +185,29 @@ describe("AdminTheme", () => {
     expect(adminThemeApi.activate).not.toHaveBeenCalled();
   });
 
+  it("renders one valid candidate and preserves the draft preview and provenance when saving", async () => {
+    vi.mocked(adminThemeApi.recommend).mockResolvedValue({ candidates: [recommendation.candidates[1]] });
+    await prepareRecommendation();
+    await act(async () => { buttons("AI 테마 추천")[0].click(); });
+    const comparison = host.querySelector('[aria-label="AI 추천 시안"]')!;
+    expect(comparison.querySelectorAll("article")).toHaveLength(1);
+    expect(comparison.querySelector(".lg\\:grid-cols-3")).toBeNull();
+    expect(comparison.textContent).toContain("유효한 시안만 표시합니다");
+    await act(async () => { buttons("이 시안 선택")[0].click(); });
+    expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style"))
+      .toContain("--preview-brand-primary: #F69324");
+    expect(host.querySelector('[data-testid="theme-screen-preview"] [role="tabpanel"]')?.getAttribute("style"))
+      .toContain("--theme-brand-primary: #F69324");
+    await act(async () => { buttons("저장")[0].click(); });
+    expect(adminThemeApi.create).toHaveBeenCalledWith(expect.objectContaining({
+      themeData: expect.objectContaining({ brand: expect.objectContaining({ primary: "#F69324" }) }),
+      selectedBaseColor: "#4EB15E",
+      sourceColors: ["#4EB15E", "#13730C"],
+    }));
+    expect(adminThemeApi.activate).not.toHaveBeenCalled();
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+  });
+
   it("retains previous candidates and the current draft if a later recommendation fails", async () => {
     await prepareRecommendation();
     await act(async () => { buttons("AI 테마 추천")[0].click(); });
@@ -178,6 +219,71 @@ describe("AdminTheme", () => {
     expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toBe(before);
     expect(host.querySelector('[role="alert"]')?.textContent).toContain("색상 차이");
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+  });
+
+  it("explains a temporary AI validation failure without exposing validator rules", async () => {
+    await prepareRecommendation();
+    vi.mocked(adminThemeApi.recommend).mockRejectedValue({ status: 502, payload: { code: "AI_THEME_VALIDATION_FAILED" } });
+    await act(async () => { buttons("AI 테마 추천")[0].click(); });
+    const message = host.querySelector('[role="alert"]')?.textContent ?? "";
+    expect(message).toContain("일시적으로 색상 기준을 충족하지 못할 수 있습니다");
+    expect(message).toContain("다시 시도하면 새로운 시안");
+    expect(message).not.toContain("CATEGORY_DISTANCE");
+  });
+
+  it("keeps the mobile preview scoped while switching map and ticketing tabs", async () => {
+    await render();
+    const preview = host.querySelector('[data-testid="theme-screen-preview"]')!;
+    expect(host.querySelector('[data-testid="theme-preview"]')?.contains(preview)).toBe(false);
+    expect(preview.querySelector('[role="tabpanel"]')?.getAttribute("aria-label")).toBe("부스맵 화면 샘플");
+    expect(preview.querySelector('img[alt="LEGEND"]')).not.toBeNull();
+    expect(preview.textContent).toContain("5.14 THU");
+    expect(preview.textContent).toContain("Food Truck");
+    expect(preview.querySelector('[aria-label="부스맵 목록 샘플"]')).not.toBeNull();
+    expect(preview.querySelectorAll('[aria-label$="마커 샘플"]')).toHaveLength(6);
+    expect(preview.querySelector('[role="tabpanel"]')?.className).toContain("max-w-[430px]");
+    expect(preview.querySelector('[role="tabpanel"]')?.getAttribute("style")).toContain("--theme-brand-primary: #ff642d");
+    await act(async () => { preview.querySelectorAll<HTMLButtonElement>('[role="tab"]')[1].click(); });
+    expect(preview.querySelector('[role="tabpanel"]')?.getAttribute("aria-label")).toBe("티켓팅 화면 샘플");
+    expect(preview.querySelector('[role="tabpanel"]')?.getAttribute("data-color-scheme")).toBe("webapp");
+    expect(preview.textContent).toContain("요일별 예매 오픈시간을 확인하여 티켓팅에 참여하세요.");
+    expect(preview.textContent).toContain("DAY 1 공연 티켓팅");
+    expect(preview.textContent).toContain("DAY 2 공연 티켓팅");
+    expect(preview.textContent).toContain("실시간 예매 중");
+    expect(preview.textContent).toContain("오픈 예정");
+    expect(preview.textContent).toContain("단국존 선착순 예매");
+    expect(preview.querySelectorAll('[role="tab"][aria-selected="true"]')).toHaveLength(1);
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+    await setInput("Primary HEX", "#123456");
+    expect(host.querySelector('[data-testid="theme-screen-preview"] [role="tabpanel"]')?.getAttribute("style")).toContain("--theme-brand-primary: #123456");
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+  });
+
+  it("scrolls each theme submenu anchor below the sticky header", async () => {
+    const original = Object.getOwnPropertyDescriptor(Element.prototype, "scrollIntoView");
+    const scroll = vi.fn();
+    Object.defineProperty(Element.prototype, "scrollIntoView", { configurable: true, value: scroll });
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => { callback(0); return 1; });
+    try {
+      await render(true);
+      await act(async () => { buttons("관리 영역 링크")[0].click(); });
+      expect(scroll).toHaveBeenCalledWith({ behavior: "smooth", block: "start" });
+      expect(host.querySelector("#theme-management")?.className).toContain("scroll-mt-40");
+      await act(async () => { buttons("AI 영역 링크")[0].click(); });
+      expect(scroll).toHaveBeenCalledTimes(2);
+      expect(host.querySelector("#theme-ai")?.className).toContain("scroll-mt-40");
+    } finally {
+      if (original) Object.defineProperty(Element.prototype, "scrollIntoView", original);
+      else Reflect.deleteProperty(Element.prototype, "scrollIntoView");
+    }
+  });
+
+  it("uses booth map category labels without changing ThemeData keys", () => {
+    expect(THEME_FIELDS[2].colors).toEqual([
+      ["pub", "주점"], ["foodTruck", "푸드트럭"], ["experience", "부스"],
+      ["event", "이벤트"], ["restArea", "쉼터"], ["facility", "편의시설"],
+    ]);
+    expect(Object.keys(colors.category)).toEqual(["pub", "foodTruck", "experience", "event", "restArea", "facility"]);
   });
 
   it("renders safely before recommendation and shows a format error for a legacy single-theme response", async () => {
@@ -202,12 +308,15 @@ describe("AdminTheme", () => {
     });
   });
 
-  it("keeps the last valid selection while typing invalid HEX and prevents a stale request", async () => {
+  it("keeps the last valid selection while typing invalid HEX and recommends with the displayed selection", async () => {
     await prepareRecommendation();
     await setInput("기준 색상 HEX", "#bad");
     expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("#4EB15E");
-    expect(buttons("AI 테마 추천")[0].disabled).toBe(true);
-    expect(adminThemeApi.recommend).not.toHaveBeenCalled();
+    expect(buttons("AI 테마 추천")[0].disabled).toBe(false);
+    await act(async () => { buttons("AI 테마 추천")[0].click(); });
+    expect(adminThemeApi.recommend).toHaveBeenCalledWith({
+      sourceColors: ["#4EB15E", "#13730C"], selectedBaseColor: "#4EB15E",
+    });
 
     await act(async () => { host.querySelector<HTMLButtonElement>('button[aria-label="기준 색상 #13730C 선택"]')!.click(); });
     expect((host.querySelector('input[aria-label="기준 색상 HEX"]') as HTMLInputElement).value).toBe("#13730C");
@@ -220,11 +329,14 @@ describe("AdminTheme", () => {
 
   it("blocks duplicate AI requests and preserves the old draft on failure", async () => {
     await prepareRecommendation();
+    expect(buttons("AI 테마 추천")[0].className).toContain("bg-[var(--accent)]");
     const before = host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style");
     let reject!: (reason: unknown) => void;
     vi.mocked(adminThemeApi.recommend).mockReturnValue(new Promise((_, fail) => { reject = fail; }));
     await act(async () => { buttons("AI 테마 추천")[0].click(); });
     expect(buttons("AI 추천 생성 중…")[0].disabled).toBe(true);
+    expect(buttons("AI 추천 생성 중…")[0].className).toContain("bg-[var(--surface-subtle)]");
+    expect(buttons("AI 추천 생성 중…")[0].getAttribute("aria-busy")).toBe("true");
     await act(async () => { buttons("AI 추천 생성 중…")[0].click(); });
     expect(adminThemeApi.recommend).toHaveBeenCalledOnce();
     await act(async () => reject({ status: 429, payload: { code: "OPENAI_RATE_LIMIT" } }));
@@ -305,7 +417,13 @@ describe("AdminTheme", () => {
 
   it("uses PUT for inactive edits and activates only through the separate action", async () => {
     await render();
+    const list = host.querySelector('[aria-label="저장된 테마 목록"]')!;
+    expect(list.querySelector('[aria-pressed="true"]')?.textContent).toContain("활성 축제");
+    expect(list.textContent).toContain("활성");
     await act(async () => { buttons("저장된 테마")[0].click(); });
+    expect(list.querySelector('[aria-pressed="true"]')?.textContent).toContain("저장된 테마");
+    expect(list.querySelector('[aria-pressed="true"]')?.className).toContain("ring-1");
+    expect(host.querySelector<HTMLInputElement>('[aria-label="테마 이름"]')?.value).toBe("저장된 테마");
     await setInput("테마 이름", "수정한 테마");
     await act(async () => { buttons("저장")[0].click(); });
     expect(adminThemeApi.update).toHaveBeenCalledWith(2, expect.objectContaining({ name: "수정한 테마" }));

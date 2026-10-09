@@ -17,6 +17,11 @@ const original = { festivalSettingId: 1, posterImageUrl: "https://cdn/old-poster
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.stubGlobal("ResizeObserver", class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  });
   vi.mocked(festivalBrandingApi.get).mockResolvedValue(original);
   host = document.createElement("div");
   document.body.append(host);
@@ -26,6 +31,7 @@ beforeEach(() => {
 afterEach(async () => {
   await act(async () => root.unmount());
   host.remove();
+  vi.unstubAllGlobals();
 });
 
 async function render() {
@@ -45,6 +51,7 @@ describe("FestivalBrandingPanel", () => {
     expect(host.textContent).toContain("등록된 공식 포스터가 없습니다.");
     expect(host.textContent).toContain("등록된 축제 로고가 없습니다.");
     expect([...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")?.disabled).toBe(true);
+    expect([...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")?.className).toContain("bg-[var(--surface-subtle)]");
   });
 
   it("updates only the successful upload preview", async () => {
@@ -94,11 +101,17 @@ describe("FestivalBrandingPanel", () => {
       { hex: "#41A867", population: 0.11 },
     ] });
     await render();
+    expect([...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")?.className).toContain("bg-[var(--accent)]");
     await act(async () => [...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")!.click());
     expect(festivalBrandingApi.extractPosterColors).toHaveBeenCalledWith(1);
     expect(host.querySelectorAll('button[aria-label^="기준 색상 #"]')).toHaveLength(4);
+    expect(host.textContent).toContain("대표색을 클릭하거나 HEX를 입력하면 기준색으로 선택됩니다.");
     await act(async () => host.querySelector<HTMLButtonElement>('button[aria-label="기준 색상 #274A83 선택"]')!.click());
     expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("#274A83");
+    expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("선택된 기준색");
+    expect(host.querySelector('[aria-label="기준 색상 #274A83 선택"]')?.getAttribute("aria-pressed")).toBe("true");
+    expect(host.querySelector('[aria-label="기준 색상 #274A83 선택"]')?.className).toContain("ring-2");
+    expect(host.textContent).toContain("추출 완료");
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe(themeBefore);
   });
 
@@ -138,11 +151,27 @@ describe("FestivalBrandingPanel", () => {
     const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!;
     await act(async () => { setValue.call(input, "#bad"); input.dispatchEvent(new Event("input", { bubbles: true })); });
     expect(input.getAttribute("aria-invalid")).toBe("true");
-    const chooseButton = [...host.querySelectorAll("button")].find((button) => button.textContent === "기준색으로 선택")!;
-    expect(chooseButton.disabled).toBe(true);
+    expect([...host.querySelectorAll("button")].some((button) => button.textContent === "기준색으로 선택")).toBe(false);
     await act(async () => { setValue.call(input, "#aabbcc"); input.dispatchEvent(new Event("input", { bubbles: true })); });
     expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("#AABBCC");
-    await act(async () => chooseButton.click());
-    expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("#AABBCC");
+    expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("선택된 기준색");
+    expect(input.getAttribute("aria-invalid")).toBe("false");
+  });
+
+  it("opens AI recommendation help on focus and click without starting a recommendation", async () => {
+    await render();
+    const help = host.querySelector<HTMLButtonElement>('button[aria-label="AI 테마 추천 안내"]')!;
+    expect(help).not.toBeNull();
+    await act(async () => { help.focus(); });
+    expect(help.getAttribute("aria-expanded")).toBe("true");
+    expect(document.body.textContent).toContain("색상 기준을 통과한 1~3개의 추천 시안");
+    await act(async () => { help.blur(); });
+    const hover = new MouseEvent("pointermove", { bubbles: true });
+    Object.defineProperty(hover, "pointerType", { value: "mouse" });
+    await act(async () => { help.dispatchEvent(hover); });
+    expect(help.getAttribute("aria-expanded")).toBe("true");
+    await act(async () => { help.click(); });
+    expect(help.getAttribute("aria-expanded")).toBe("true");
+    expect(document.body.textContent).toContain("선택한 기준색과 포스터 대표색");
   });
 });

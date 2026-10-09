@@ -37,7 +37,7 @@ const isObject = (value: unknown): value is Record<string, unknown> =>
 export function parseThemeRecommendationResponse(value: unknown): ThemeRecommendationResponse {
   const candidates = isObject(value) ? value.candidates : undefined;
   const ids = new Set(["balanced", "vibrant", "deep"]);
-  if (!Array.isArray(candidates) || candidates.length < 2 || candidates.length > 3 || !candidates.every((candidate) => {
+  if (!Array.isArray(candidates) || candidates.length < 1 || candidates.length > 3 || !candidates.every((candidate) => {
     if (!isObject(candidate) || typeof candidate.id !== "string" || !ids.delete(candidate.id)
       || typeof candidate.name !== "string" || !candidate.name.trim()
       || typeof candidate.description !== "string" || !candidate.description.trim()
