@@ -1,7 +1,10 @@
 import { useState, type CSSProperties } from "react";
 import { ArrowLeft, Clock3, Home, Map, Megaphone, Ticket, User } from "lucide-react";
 import type { ThemeData } from "@/api/app/festival/activeThemeApi";
+import type { FestivalBranding } from "@/api/app/festival/festivalBrandingApi";
 import { AppTopBar } from "@/components/layout/AppTopBar";
+import { FestivalBrandingImage } from "@/components/layout/FestivalBrandingImage";
+import { FestivalBrandingContext } from "@/lib/app/festival/FestivalBrandingProvider";
 import FestivalDateTabs from "@/components/app/boothmap/FestivalDateTabs";
 import PrimaryFilterChips from "@/components/app/boothmap/PrimaryFilterChips";
 import { TicketingEventListPanel } from "@/components/ticketing/panels/TicketingEventListPanel";
@@ -92,7 +95,7 @@ function PreviewHeader({ tab }: { tab: PreviewTab }) {
   </AppTopBar>;
   return <AppTopBar showLogo={false} headerClassName="relative z-20 bg-[color:color-mix(in_srgb,var(--surface)_62%,transparent)] backdrop-blur-[24px]" containerClassName="relative h-[68px] w-full px-4">
     <ArrowLeft className="absolute left-4 top-6 h-5 w-5" aria-hidden="true" />
-    <img src="/legend-logo.png" alt="LEGEND" className="absolute left-1/2 top-1/2 h-10 w-[140px] -translate-x-1/2 -translate-y-1/2 object-contain" />
+    <FestivalBrandingImage kind="logo" className="absolute left-1/2 top-1/2 h-10 w-[140px] -translate-x-1/2 -translate-y-1/2 object-contain" />
     <User className="absolute right-4 top-6 h-5 w-5" aria-hidden="true" />
   </AppTopBar>;
 }
@@ -155,7 +158,7 @@ function PreviewTicketing() {
   </div>;
 }
 
-export function ThemeScreenPreview({ data, embedded = false }: { data: ThemeData; embedded?: boolean }) {
+export function ThemeScreenPreview({ data, branding = null, embedded = false }: { data: ThemeData; branding?: FestivalBranding | null; embedded?: boolean }) {
   const [tab, setTab] = useState<PreviewTab>("map");
   return <section aria-label="사용자 화면 미리보기" className={embedded ? "min-w-0" : "rounded-2xl border border-[var(--admin-panel-border)] bg-[var(--admin-panel-bg)] p-5 sm:p-6"} data-testid="theme-screen-preview">
     {!embedded && <><h2 className="text-base font-semibold">실제 사용자 화면 미리보기</h2>
@@ -169,9 +172,11 @@ export function ThemeScreenPreview({ data, embedded = false }: { data: ThemeData
       <div data-color-scheme={tab === "map" ? "electric-curator" : "webapp"} role="tabpanel" aria-label={`${tab === "map" ? "부스맵" : "티켓팅"} 화면 샘플`}
         className="flex aspect-[430/760] w-full max-w-[430px] flex-col overflow-hidden rounded-[2rem] border-[5px] border-[var(--ds-neutral-ink)] text-[var(--text)] shadow-lg"
         style={createScreenStyle(data)}>
-        <PreviewHeader tab={tab} />
-        {tab === "map" ? <PreviewBoothMap /> : <PreviewTicketing />}
-        <PreviewBottomNav active={tab} />
+        <FestivalBrandingContext.Provider value={branding}>
+          <PreviewHeader tab={tab} />
+          {tab === "map" ? <PreviewBoothMap /> : <PreviewTicketing />}
+          <PreviewBottomNav active={tab} />
+        </FestivalBrandingContext.Provider>
       </div>
     </div>
   </section>;

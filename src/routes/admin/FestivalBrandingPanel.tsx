@@ -44,8 +44,9 @@ function ImageField({ kind, title, description, url, busy, onUpload }: {
   </div>;
 }
 
-export function FestivalBrandingPanel({ onAnalysisChange, onRecommend, recommending = false, recommendationError = null, adminActionStyle }: {
+export function FestivalBrandingPanel({ onAnalysisChange, onBrandingChange, onRecommend, recommending = false, recommendationError = null, adminActionStyle }: {
   onAnalysisChange?: (snapshot: PosterAnalysisSnapshot | null) => void;
+  onBrandingChange?: (branding: FestivalBranding) => void;
   onRecommend?: (snapshot: PosterAnalysisSnapshot) => void;
   recommending?: boolean;
   recommendationError?: string | null;
@@ -70,6 +71,7 @@ export function FestivalBrandingPanel({ onAnalysisChange, onRecommend, recommend
       const current = await festivalBrandingApi.get(undefined, signal);
       if (!signal?.aborted) {
         setBranding(current);
+        onBrandingChange?.(current);
         onAnalysisChange?.(current.posterImageUrl ? { sourcePosterUrl: current.posterImageUrl, sourceColors: null, selectedBaseColor: null } : null);
       }
     } catch {
@@ -93,6 +95,7 @@ export function FestivalBrandingPanel({ onAnalysisChange, onRecommend, recommend
     try {
       const updated = await festivalBrandingApi.upload(kind, file);
       setBranding(updated);
+      onBrandingChange?.(updated);
       if (kind === "poster") {
         analysisVersion.current++;
         setAnalyzing(false);

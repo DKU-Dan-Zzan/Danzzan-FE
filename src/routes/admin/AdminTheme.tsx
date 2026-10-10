@@ -10,6 +10,7 @@ import { ADMIN_FOCUS_VISIBLE_RING_CLASS } from "@/routes/admin/adminStyleClasses
 import { cloneThemeData, createPreviewStyle, getThemeColor, isHexColor, readBundledThemeData, THEME_FIELDS, type ThemeDraft, validateThemeDraft } from "@/routes/admin/themeEditor";
 import { applyThemeData } from "@/lib/app/festival/activeTheme";
 import { FestivalBrandingPanel, type PosterAnalysisSnapshot } from "@/routes/admin/FestivalBrandingPanel";
+import type { FestivalBranding } from "@/api/app/festival/festivalBrandingApi";
 import { ThemeScreenPreview } from "@/routes/admin/ThemeScreenPreview";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/common/ui/dialog";
 import { ADMIN_THEME_DESTRUCTIVE_ACTION_CLASS, ADMIN_THEME_PRIMARY_ACTION_CLASS, ADMIN_THEME_SECONDARY_ACTION_CLASS } from "@/routes/admin/adminStyleClasses";
@@ -134,6 +135,7 @@ export default function AdminTheme() {
   const [draft, setDraft] = useState<ThemeDraft | null>(null);
   const [savedDraft, setSavedDraft] = useState<ThemeDraft | null>(null);
   const [analysisSnapshot, setAnalysisSnapshot] = useState<PosterAnalysisSnapshot | null>(null);
+  const [branding, setBranding] = useState<FestivalBranding | null>(null);
   const [newDraftProvenance, setNewDraftProvenance] = useState<ThemeProvenance | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -325,7 +327,7 @@ export default function AdminTheme() {
     <div style={adminActionStyle} data-testid="admin-theme-action-scope">
     <AdminShell title="축제 테마" eyebrow="FESTIVAL THEME" mainClassName="mx-auto w-full max-w-[1360px] space-y-6 px-6 py-6">
       <div id="theme-ai" className="space-y-6 scroll-mt-40 sm:scroll-mt-28" aria-label="AI 테마 추천 영역">
-        <FestivalBrandingPanel onAnalysisChange={analysisChanged} onRecommend={(snapshot) => void recommend(snapshot)}
+        <FestivalBrandingPanel onAnalysisChange={analysisChanged} onBrandingChange={setBranding} onRecommend={(snapshot) => void recommend(snapshot)}
           recommending={recommending} recommendationError={recommendationError} adminActionStyle={adminActionStyle} />
         {recommendationCandidates.length > 0 && <RecommendationComparison candidates={recommendationCandidates}
           selectedId={selectedRecommendationId} onChoose={chooseRecommendation} busy={busy} />}
@@ -350,7 +352,7 @@ export default function AdminTheme() {
               <DialogTrigger asChild><button ref={previewTriggerRef} type="button" className={`${ADMIN_THEME_SECONDARY_ACTION_CLASS} flex w-full items-center justify-center gap-2 text-sm`}><MonitorSmartphone className="h-4 w-4" />실제 사용자 화면 보기</button></DialogTrigger>
               <DialogContent showCloseButton={false} style={adminActionStyle} onCloseAutoFocus={(event) => { event.preventDefault(); previewTriggerRef.current?.focus(); }} className="flex h-[min(94dvh,960px)] max-h-[94dvh] w-[calc(100%-1rem)] max-w-[min(760px,calc(100%-1rem))] flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-[760px]">
                 <DialogHeader className="shrink-0 border-b border-[var(--border-base)] px-5 py-4 text-left sm:px-6"><div className="flex items-start justify-between gap-4"><div><DialogTitle>사용자 화면 미리보기</DialogTitle><DialogDescription className="mt-2 text-xs text-[var(--text-muted)]">현재 편집 중인 테마를 미리 보여줍니다. 실제 서비스에는 적용되지 않습니다.</DialogDescription></div><DialogClose asChild><button type="button" className={ADMIN_THEME_SECONDARY_ACTION_CLASS}>닫기</button></DialogClose></div></DialogHeader>
-                <div className="min-h-0 overflow-y-auto px-3 py-4 sm:px-6"><ThemeScreenPreview data={draft.themeData} embedded /></div>
+                <div className="min-h-0 overflow-y-auto px-3 py-4 sm:px-6"><ThemeScreenPreview data={draft.themeData} branding={branding} embedded /></div>
               </DialogContent>
             </Dialog></> : <div className={panel}><p className="text-sm text-[var(--text-muted)]">테마를 선택하면 이곳에 미리보기가 표시됩니다.</p></div>}
         </div>

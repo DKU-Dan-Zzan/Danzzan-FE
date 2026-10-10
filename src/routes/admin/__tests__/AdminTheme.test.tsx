@@ -313,6 +313,46 @@ describe("AdminTheme", () => {
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
   });
 
+  it("reuses branding for both preview tabs and updates the logo after upload without changing the draft", async () => {
+    const oldLogo = "https://cdn.example.com/old-logo.png";
+    const newLogo = "https://cdn.example.com/new-logo.png";
+    vi.mocked(festivalBrandingApi.get).mockResolvedValue({ festivalSettingId: 1, posterImageUrl: null, logoImageUrl: oldLogo });
+    vi.mocked(festivalBrandingApi.upload).mockResolvedValue({ festivalSettingId: 1, posterImageUrl: null, logoImageUrl: newLogo });
+    await render();
+    await act(async () => { host.querySelector("svg.lucide-monitor-smartphone")!.closest("button")!.click(); });
+    const preview = document.querySelector('[data-testid="theme-screen-preview"]')!;
+    const logo = () => preview.querySelector<HTMLImageElement>("header img")!;
+    expect(logo().getAttribute("src")).toBe(oldLogo);
+    expect(festivalBrandingApi.get).toHaveBeenCalledTimes(1);
+    const themeBefore = preview.querySelector('[role="tabpanel"]')?.getAttribute("style");
+
+    const logoInput = host.querySelectorAll<HTMLInputElement>('input[type="file"][accept="image/jpeg,image/png"]')[1];
+    Object.defineProperty(logoInput, "files", { configurable: true, value: [new File(["png"], "logo.png", { type: "image/png" })] });
+    await act(async () => { logoInput.dispatchEvent(new Event("change", { bubbles: true })); });
+    expect(logo().getAttribute("src")).toBe(newLogo);
+    expect(preview.querySelector('[role="tabpanel"]')?.getAttribute("style")).toBe(themeBefore);
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+    expect(adminThemeApi.update).not.toHaveBeenCalled();
+    expect(adminThemeApi.activate).not.toHaveBeenCalled();
+    expect(festivalBrandingApi.get).toHaveBeenCalledTimes(1);
+
+    await act(async () => { preview.querySelectorAll<HTMLButtonElement>('[role="tab"]')[1].click(); });
+    expect(logo().getAttribute("src")).toBe(newLogo);
+    expect(logo().className).toContain("object-contain");
+    await act(async () => { logo().dispatchEvent(new Event("error")); });
+    expect(logo().getAttribute("src")).toBe("/legend-logo.png");
+  });
+
+  it("uses the default preview logo when branding lookup fails", async () => {
+    vi.mocked(festivalBrandingApi.get).mockRejectedValue(new Error("network error"));
+    await render();
+    await act(async () => { host.querySelector("svg.lucide-monitor-smartphone")!.closest("button")!.click(); });
+    const preview = document.querySelector('[data-testid="theme-screen-preview"]')!;
+    expect(preview.querySelector("header img")?.getAttribute("src")).toBe("/legend-logo.png");
+    await act(async () => { preview.querySelectorAll<HTMLButtonElement>('[role="tab"]')[1].click(); });
+    expect(preview.querySelector("header img")?.getAttribute("src")).toBe("/legend-logo.png");
+  });
+
   it("keeps the preview modal separate from the draft and restores focus on Escape", async () => {
     await render();
     const trigger = buttons("실제 사용자 화면 보기")[0];
