@@ -1,15 +1,15 @@
-import { useState, type CSSProperties } from "react";
+import { useState, type ComponentProps, type CSSProperties } from "react";
 import { ArrowLeft, Clock3, Home, Map, Megaphone, Ticket, User } from "lucide-react";
+import { cn } from "@/components/common/ui/utils";
 import type { ThemeData } from "@/api/app/festival/activeThemeApi";
 import type { FestivalBranding } from "@/api/app/festival/festivalBrandingApi";
 import { AppTopBar } from "@/components/layout/AppTopBar";
 import { FestivalBrandingImage } from "@/components/layout/FestivalBrandingImage";
-import { FestivalBrandingContext } from "@/lib/app/festival/FestivalBrandingProvider";
+import { FestivalBrandingContext } from "@/lib/app/festival/festivalBrandingContext";
 import FestivalDateTabs from "@/components/app/boothmap/FestivalDateTabs";
 import PrimaryFilterChips from "@/components/app/boothmap/PrimaryFilterChips";
 import { TicketingEventListPanel } from "@/components/ticketing/panels/TicketingEventListPanel";
 import { BOOTHMAP_MARKER_THEME, type BoothmapMarkerType } from "@/utils/app/boothmap/boothmapTheme";
-import type { TicketingEvent } from "@/types/ticketing/model/ticket.model";
 import { THEME_CORE_VARIABLES } from "@/lib/app/festival/activeTheme";
 import { createPreviewStyle, getThemeColor, THEME_FIELDS } from "@/routes/admin/themeEditor";
 
@@ -17,7 +17,7 @@ type PreviewTab = "map" | "ticketing";
 
 const previewDates = [{ label: "5.14 THU", value: "day1" }, { label: "5.15 FRI", value: "day2" }, { label: "5.16 SAT", value: "day3" }];
 const previewNow = Date.parse("2026-05-14T18:00:00+09:00");
-const previewEvents: TicketingEvent[] = [
+const previewEvents: ComponentProps<typeof TicketingEventListPanel>["events"] = [
   { id: "day1", title: "DAY 1 공연 티켓팅", eventDate: "2026-05-14", eventTime: "19:00", ticketOpenAt: "2026-05-14T17:00:00+09:00", status: "open", remainingCount: 120, totalCount: 300 },
   { id: "day2", title: "DAY 2 공연 티켓팅", eventDate: "2026-05-15", eventTime: "19:00", ticketOpenAt: "2026-05-15T17:00:00+09:00", status: "upcoming", remainingCount: 300, totalCount: 300 },
 ];
@@ -108,7 +108,7 @@ function PreviewBottomNav({ active }: { active: PreviewTab }) {
   ] as const;
   return <nav aria-label="사용자 하단 메뉴 샘플" className="relative z-20 mt-auto h-[var(--app-bottom-nav-height,56px)] rounded-t-[1.75rem] bg-[var(--app-bottom-nav-surface)] shadow-[0_-6px_18px_var(--semantic-shadow-neutral-09)]">
     <div className="grid h-full grid-cols-5 items-end px-3 pb-1">{items.map(({ key, label, icon: Icon }) => <span key={key}
-      className={`relative flex h-full flex-col items-center justify-center gap-1 text-center text-[10px] font-semibold ${key === "home" ? "-translate-y-1" : ""}`}
+      className={cn("relative flex h-full flex-col items-center justify-center gap-1 text-center text-[10px] font-semibold", key === "home" && "-translate-y-1")}
       style={{ color: key === active ? "var(--theme-brand-strong)" : "var(--app-nav-text)" }}>
       {key === "home" ? <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--app-nav-home-highlight)] text-white"><Icon className="h-5 w-5" /></span>
         : <Icon className="h-5 w-5" />}{label}
@@ -165,7 +165,7 @@ export function ThemeScreenPreview({ data, branding = null, embedded = false }: 
     <p className="mt-1 text-xs text-[var(--text-muted)]">실제 화면 구성요소와 샘플 데이터로 편집 중인 색상을 확인합니다. 서비스에는 적용되지 않습니다.</p></>}
     <div role="tablist" aria-label="미리보기 화면 선택" className="mt-4 flex gap-2">
       {(["map", "ticketing"] as const).map((value) => <button key={value} type="button" role="tab" aria-selected={tab === value}
-        className={`rounded-xl border px-3 py-1.5 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-theme-action-focus)] ${tab === value ? "border-[var(--admin-theme-action-outline)] bg-[var(--admin-theme-action-hover)] text-[var(--admin-theme-action-outline)]" : "border-[var(--border-base)] bg-white text-[var(--ds-neutral-ink)] hover:border-[var(--admin-theme-action-outline)]"}`}
+        className={cn("rounded-xl border px-3 py-1.5 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-theme-action-focus)]", tab === value ? "border-[var(--admin-theme-action-outline)] bg-[var(--admin-theme-action-hover)] text-[var(--admin-theme-action-outline)]" : "border-[var(--border-base)] bg-white text-[var(--ds-neutral-ink)] hover:border-[var(--admin-theme-action-outline)]")}
         onClick={() => setTab(value)}>{value === "map" ? "부스맵" : "티켓팅"}</button>)}
     </div>
     <div className="mt-4 flex justify-center rounded-2xl bg-[var(--surface-subtle)] p-2 sm:p-5">

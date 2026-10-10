@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { Check, Info, LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/components/common/ui/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/common/ui/tooltip";
 import { festivalBrandingApi, type BrandingImageKind, type FestivalBranding, type PosterColorCandidate } from "@/api/app/festival/festivalBrandingApi";
 import { ADMIN_FOCUS_VISIBLE_RING_CLASS, ADMIN_THEME_PRIMARY_ACTION_CLASS, ADMIN_THEME_SECONDARY_ACTION_CLASS } from "@/routes/admin/adminStyleClasses";
@@ -29,7 +30,7 @@ function ImageField({ kind, title, description, url, busy, onUpload }: {
   return <div className="rounded-xl border border-[var(--border-base)] p-4">
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div><h3 className="font-semibold">{title}</h3><p className="mt-1 text-xs text-[var(--text-muted)]">{description}</p></div>
-      <button type="button" className={`${ADMIN_THEME_SECONDARY_ACTION_CLASS} text-sm`} disabled={busy} onClick={() => inputRef.current?.click()}>
+      <button type="button" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "text-sm")} disabled={busy} onClick={() => inputRef.current?.click()}>
         {busy ? "업로드 중…" : url ? "이미지 변경" : "이미지 업로드"}
       </button>
     </div>
@@ -64,29 +65,33 @@ export function FestivalBrandingPanel({ onAnalysisChange, onBrandingChange, onRe
   const [manualHex, setManualHex] = useState("");
   const [recommendHelpOpen, setRecommendHelpOpen] = useState(false);
   const analysisVersion = useRef(0);
+  const onBrandingChangeRef = useRef(onBrandingChange);
+  const onAnalysisChangeRef = useRef(onAnalysisChange);
+  onBrandingChangeRef.current = onBrandingChange;
+  onAnalysisChangeRef.current = onAnalysisChange;
 
-  async function load(signal?: AbortSignal) {
+  const load = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
     setError(null);
     try {
       const current = await festivalBrandingApi.get(undefined, signal);
       if (!signal?.aborted) {
         setBranding(current);
-        onBrandingChange?.(current);
-        onAnalysisChange?.(current.posterImageUrl ? { sourcePosterUrl: current.posterImageUrl, sourceColors: null, selectedBaseColor: null } : null);
+        onBrandingChangeRef.current?.(current);
+        onAnalysisChangeRef.current?.(current.posterImageUrl ? { sourcePosterUrl: current.posterImageUrl, sourceColors: null, selectedBaseColor: null } : null);
       }
     } catch {
       if (!signal?.aborted) setError("축제 브랜딩 이미지를 불러오지 못했습니다.");
     } finally {
       if (!signal?.aborted) setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
     void load(controller.signal);
     return () => controller.abort();
-  }, []);
+  }, [load]);
 
   async function upload(kind: BrandingImageKind, file: File) {
     const validationError = validateBrandingImage(file);
@@ -154,7 +159,7 @@ export function FestivalBrandingPanel({ onAnalysisChange, onBrandingChange, onRe
 
   return <section className={panel} aria-label="축제 브랜딩">
     <div className="mb-5"><h2 className="text-lg font-semibold">축제 브랜딩</h2><p className="mt-1 text-sm text-[var(--text-muted)]">공식 원본 이미지와 로고를 관리합니다. 홈 화면용 와이드 이미지는 별도로 관리합니다.</p></div>
-    {loading ? <p role="status" className="text-sm text-[var(--text-muted)]">이미지를 불러오는 중입니다…</p> : error ? <div role="alert" className="text-sm"><p>{error}</p><button type="button" className={`${ADMIN_THEME_SECONDARY_ACTION_CLASS} mt-3`} onClick={() => void load()}>다시 시도</button></div> : <div className="grid gap-4 md:grid-cols-2">
+    {loading ? <p role="status" className="text-sm text-[var(--text-muted)]">이미지를 불러오는 중입니다…</p> : error ? <div role="alert" className="text-sm"><p>{error}</p><button type="button" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "mt-3")} onClick={() => void load()}>다시 시도</button></div> : <div className="grid gap-4 md:grid-cols-2">
       <ImageField kind="poster" title="공식 포스터" description="공식 원본 포스터입니다. 향후 AI 테마 추천에 사용됩니다." url={branding?.posterImageUrl ?? null} busy={busyKind !== null || recommending} onUpload={(kind, file) => void upload(kind, file)} />
       <ImageField kind="logo" title="축제 로고" description="사용자 화면과 축제 브랜딩에 사용됩니다." url={branding?.logoImageUrl ?? null} busy={busyKind !== null || recommending} onUpload={(kind, file) => void upload(kind, file)} />
     </div>}
@@ -164,7 +169,7 @@ export function FestivalBrandingPanel({ onAnalysisChange, onBrandingChange, onRe
         <h3 className="text-sm font-semibold">AI 테마 생성 과정</h3>
         <ol aria-label="AI 추천 작업 단계" className="mt-2 flex flex-col gap-1.5 text-xs sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
           {progressSteps.map(({ label, state, status }, index) => <li key={label} data-state={state} aria-current={state === "current" || state === "extracting" || state === "ready" || state === "generating" ? "step" : undefined}
-            className={`inline-flex items-center gap-1.5 ${state === "completed" ? "text-[var(--semantic-status-success)]" : state === "waiting" ? "text-[var(--text-muted)]" : "font-semibold text-[var(--admin-theme-action-outline)]"}`}>
+            className={cn("inline-flex items-center gap-1.5", state === "completed" ? "text-[var(--semantic-status-success)]" : state === "waiting" ? "text-[var(--text-muted)]" : "font-semibold text-[var(--admin-theme-action-outline)]")}>
             {index > 0 && <span aria-hidden="true" className="mr-1 hidden text-[var(--text-muted)] sm:inline">→</span>}
             {state === "completed" && <Check className="h-3.5 w-3.5" aria-hidden="true" />}
             <span>{label}</span><span className="font-normal opacity-80">{status}</span>
@@ -179,7 +184,7 @@ export function FestivalBrandingPanel({ onAnalysisChange, onBrandingChange, onRe
       {!branding?.posterImageUrl ? <p className="mt-3 text-sm text-[var(--text-muted)]">먼저 공식 포스터를 업로드해 주세요.</p> : <>
         {analysisError && <p role="alert" className="mt-3 text-sm text-[var(--semantic-status-danger)]">{analysisError}</p>}
         {candidates.length > 0 && <div className="mt-4"><p className="mb-2 flex items-center gap-2 text-sm font-medium">대표색 후보 <span className="inline-flex items-center gap-1 text-xs text-[var(--semantic-status-success)]"><Check className="h-3.5 w-3.5" aria-hidden="true" />추출 완료</span></p><div className="flex flex-wrap gap-2">
-          {candidates.map(({ hex, population }) => <button key={hex} type="button" aria-label={`기준 색상 ${hex} 선택`} aria-pressed={selectedBaseColor?.toUpperCase() === hex.toUpperCase()} onClick={() => selectColor(hex)} className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs ${ADMIN_FOCUS_VISIBLE_RING_CLASS} ${selectedBaseColor?.toUpperCase() === hex.toUpperCase() ? "border-[var(--admin-theme-action-outline)] ring-2 ring-[var(--admin-theme-action-focus)] ring-offset-2" : "border-[var(--border-base)]"}`}>
+          {candidates.map(({ hex, population }) => <button key={hex} type="button" aria-label={`기준 색상 ${hex} 선택`} aria-pressed={selectedBaseColor?.toUpperCase() === hex.toUpperCase()} onClick={() => selectColor(hex)} className={cn("inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs", ADMIN_FOCUS_VISIBLE_RING_CLASS, selectedBaseColor?.toUpperCase() === hex.toUpperCase() ? "border-[var(--admin-theme-action-outline)] ring-2 ring-[var(--admin-theme-action-focus)] ring-offset-2" : "border-[var(--border-base)]")}>
             <span className="h-5 w-5 rounded-full border border-[var(--border-base)]" style={{ backgroundColor: hex }} aria-hidden="true" />{hex} <span className="text-[var(--text-muted)]">{Math.round(population * 100)}%</span>{selectedBaseColor?.toUpperCase() === hex.toUpperCase() && <Check className="h-3.5 w-3.5" aria-hidden="true" />}
           </button>)}
         </div></div>}
@@ -188,7 +193,7 @@ export function FestivalBrandingPanel({ onAnalysisChange, onBrandingChange, onRe
             const value = event.target.value;
             if (isHexColor(value)) selectColor(value);
             else setManualHex(value);
-          }} placeholder="#RRGGBB" aria-invalid={manualHex.length > 0 && !isHexColor(manualHex)} className={`mt-1 block h-10 w-36 rounded-xl border border-[var(--border-base)] bg-[var(--surface)] px-3 font-mono text-sm ${ADMIN_FOCUS_VISIBLE_RING_CLASS}`} />
+          }} placeholder="#RRGGBB" aria-invalid={manualHex.length > 0 && !isHexColor(manualHex)} className={cn("mt-1 block h-10 w-36 rounded-xl border border-[var(--border-base)] bg-[var(--surface)] px-3 font-mono text-sm", ADMIN_FOCUS_VISIBLE_RING_CLASS)} />
         </label></div>
         {manualHex && !isHexColor(manualHex) && <p className="mt-1 text-xs text-[var(--semantic-status-danger)]">#RRGGBB 형식으로 입력해 주세요.</p>}
         <p className="mt-4 text-sm" aria-label="선택한 기준 색상">{selectedBaseColor ? <span className="inline-flex items-center gap-2 font-medium"><Check className="h-4 w-4 text-[var(--admin-theme-action-outline)]" aria-hidden="true" />선택된 기준색 <span className="font-mono">{selectedBaseColor}</span><span className="h-4 w-4 rounded-full border border-[var(--border-base)]" style={{ backgroundColor: selectedBaseColor }} aria-hidden="true" /></span> : "기준 색상: 선택되지 않음"}</p>
@@ -204,7 +209,7 @@ export function FestivalBrandingPanel({ onAnalysisChange, onBrandingChange, onRe
             }}>{recommending && <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />}{recommending ? "AI 추천 생성 중…" : "AI 테마 추천"}</button>
           <Tooltip open={recommendHelpOpen} onOpenChange={setRecommendHelpOpen}>
             <TooltipTrigger asChild onClick={(event) => { event.preventDefault(); setRecommendHelpOpen(true); }}>
-              <button type="button" aria-label="AI 테마 추천 안내" aria-expanded={recommendHelpOpen} className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[var(--text-muted)] hover:bg-[var(--surface-subtle)] ${ADMIN_FOCUS_VISIBLE_RING_CLASS}`}>
+              <button type="button" aria-label="AI 테마 추천 안내" aria-expanded={recommendHelpOpen} className={cn("inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[var(--text-muted)] hover:bg-[var(--surface-subtle)]", ADMIN_FOCUS_VISIBLE_RING_CLASS)}>
                 <Info className="h-4 w-4" aria-hidden="true" />
               </button>
             </TooltipTrigger>

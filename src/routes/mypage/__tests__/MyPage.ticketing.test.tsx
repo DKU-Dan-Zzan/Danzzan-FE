@@ -7,7 +7,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import MyPage from "@/routes/mypage/MyPage";
 import { authStore } from "@/store/common/authStore";
 import { setTicketingEnabled } from "@/lib/app/festival/festivalCalendar";
-import { FestivalBrandingContext } from "@/lib/app/festival/FestivalBrandingProvider";
+import { FestivalBrandingContext } from "@/lib/app/festival/festivalBrandingContext";
 
 const getMyTickets = vi.hoisted(() => vi.fn());
 vi.mock("@/api/ticketing/ticketApi", () => ({ ticketApi: { getMyTickets } }));

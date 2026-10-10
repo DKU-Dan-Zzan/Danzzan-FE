@@ -1,6 +1,7 @@
 // 역할: 앱 레이아웃 레이어의 App Header Logo 구성 컴포넌트를 제공합니다.
 import { useState } from "react";
-import { useFestivalBrandingImageSource } from "@/components/layout/FestivalBrandingImage";
+import { cn } from "@/components/common/ui/utils";
+import { useFestivalBrandingImageSource } from "@/lib/app/festival/brandingImageSource";
 type AppHeaderLogoProps = {
   className?: string;
 };
@@ -21,7 +22,7 @@ export function AppHeaderLogo({ className }: AppHeaderLogoProps) {
     <img
       src={logo.src}
       alt={logo.useUploaded ? "축제 로고" : "LEGEND"}
-      className={`${BASE_CLASS_NAME} ${sizeClassName}${className ? ` ${className}` : ""}`}
+      className={cn(BASE_CLASS_NAME, sizeClassName, className)}
       onLoad={(event) => {
         const image = event.currentTarget;
         if (image.naturalHeight > 0) setLoadedImage({ src: logo.src, aspectRatio: image.naturalWidth / image.naturalHeight });

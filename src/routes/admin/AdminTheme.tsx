@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Copy, Plus, Save, Trash2, Check, MonitorSmartphone } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { Toaster, toast } from "sonner";
+import { cn } from "@/components/common/ui/utils";
 import { getErrorStatus } from "@/api/common/fetchAuth";
 import { adminThemeApi, type ThemeProvenance, type ThemeRecommendationCandidate, type ThemeUpsertRequest } from "@/api/app/admin/adminThemeApi";
 import type { ActiveThemeResponse, ThemeData } from "@/api/app/festival/activeThemeApi";
@@ -15,6 +16,7 @@ import { ThemeScreenPreview } from "@/routes/admin/ThemeScreenPreview";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/common/ui/dialog";
 import { ADMIN_THEME_DESTRUCTIVE_ACTION_CLASS, ADMIN_THEME_PRIMARY_ACTION_CLASS, ADMIN_THEME_SECONDARY_ACTION_CLASS } from "@/routes/admin/adminStyleClasses";
 import { createAdminThemeActionStyle, readActiveThemeStrong } from "@/routes/admin/adminThemeActionColors";
+import { DESIGN_SYSTEM_BLACK } from "@/lib/app/festival/themeFallbackColors";
 
 const panel = "rounded-2xl border border-[var(--admin-panel-border)] bg-[var(--admin-panel-bg)] p-5 sm:p-6";
 const input = `h-10 w-full rounded-xl border border-[var(--border-base)] bg-[var(--surface)] px-3 text-sm text-[var(--text)] ${ADMIN_FOCUS_VISIBLE_RING_CLASS}`;
@@ -106,8 +108,8 @@ function RecommendationComparison({ candidates, selectedId, onChoose, busy }: {
       <p className="text-xs text-[var(--text-muted)]">추천 시안을 비교한 뒤 하나를 선택하세요. 선택 전에는 편집 중인 테마가 바뀌지 않습니다.</p>
       {candidates.length < 3 && <p className="mt-1 text-xs text-[var(--text-muted)]">일부 추천 시안이 색상 기준을 충족하지 못해 유효한 시안만 표시합니다.</p>}
     </div>
-    <div className={`grid gap-4 ${candidates.length === 1 ? "" : candidates.length === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}>{[...candidates].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id)).map((candidate) => <article key={candidate.id}
-      aria-label={`${directions[candidate.id].title} 시안`} data-selected={selectedId === candidate.id} className={`flex flex-col rounded-xl border bg-[var(--surface)] p-4 ${selectedId === candidate.id ? "border-[var(--admin-theme-action-outline)] ring-2 ring-[var(--admin-theme-action-focus)] ring-offset-2" : "border-[var(--border-base)]"}`}
+    <div className={cn("grid gap-4", candidates.length === 2 ? "lg:grid-cols-2" : candidates.length === 3 && "lg:grid-cols-3")}>{[...candidates].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id)).map((candidate) => <article key={candidate.id}
+      aria-label={`${directions[candidate.id].title} 시안`} data-selected={selectedId === candidate.id} className={cn("flex flex-col rounded-xl border bg-[var(--surface)] p-4", selectedId === candidate.id ? "border-[var(--admin-theme-action-outline)] ring-2 ring-[var(--admin-theme-action-focus)] ring-offset-2" : "border-[var(--border-base)]")}
       style={createPreviewStyle(candidate.themeData)}>
       <div className="flex items-center justify-between gap-2"><h3 className="font-semibold">{directions[candidate.id].title}</h3>
         {selectedId === candidate.id && <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--admin-theme-action-outline)]"><Check className="h-3.5 w-3.5" aria-hidden="true" />편집 시안 선택됨</span>}</div>
@@ -123,7 +125,7 @@ function RecommendationComparison({ candidates, selectedId, onChoose, busy }: {
         <div className="mt-2 flex items-center gap-1.5" aria-label="지도 카테고리 6색">{THEME_FIELDS[2].colors.map(([key, label]) =>
           <span key={key} title={`${label}: ${getThemeColor(candidate.themeData, "category", key)}`} className="h-3 w-3 rounded-full" style={{ backgroundColor: `var(--preview-category-${key})` }} />)}</div>
       </div>
-      <button type="button" className={`${ADMIN_THEME_SECONDARY_ACTION_CLASS} mt-4 w-full text-sm`} onClick={() => onChoose(candidate)} disabled={busy}>이 시안 선택</button>
+      <button type="button" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "mt-4 w-full text-sm")} onClick={() => onChoose(candidate)} disabled={busy}>이 시안 선택</button>
     </article>)}</div>
   </section>;
 }
@@ -344,14 +346,14 @@ export default function AdminTheme() {
         </div></section>
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(280px,0.9fr)_minmax(0,1.5fr)]">
         <div className="min-w-0 space-y-6">
-          <section className={panel} aria-label="저장된 테마 목록"><div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">저장된 테마</h2><button type="button" aria-label="새 테마 생성" className={`${ADMIN_THEME_SECONDARY_ACTION_CLASS} inline-flex items-center gap-1.5 text-sm`} onClick={() => createDraft()} disabled={busy}><Plus className="h-4 w-4" />새 테마</button></div>
-            {themes.length === 0 ? <p className="text-sm text-[var(--text-muted)]">저장된 테마가 없습니다. 새 테마를 만들어 주세요.</p> : <div className="grid gap-2">{themes.map((theme) => <button type="button" key={theme.id} onClick={() => void selectTheme(theme.id)} disabled={busy} aria-pressed={selectedId === theme.id} className={`w-full rounded-xl border p-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-theme-action-focus)] disabled:cursor-not-allowed disabled:opacity-50 ${selectedId === theme.id ? "border-[var(--admin-theme-action-outline)] bg-[var(--admin-theme-action-hover)] ring-1 ring-[var(--admin-theme-action-focus)]" : "border-[var(--border-base)] bg-white hover:border-[var(--admin-theme-action-outline)] hover:bg-[var(--admin-theme-action-hover)]"}`}>
+          <section className={panel} aria-label="저장된 테마 목록"><div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">저장된 테마</h2><button type="button" aria-label="새 테마 생성" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={() => createDraft()} disabled={busy}><Plus className="h-4 w-4" />새 테마</button></div>
+            {themes.length === 0 ? <p className="text-sm text-[var(--text-muted)]">저장된 테마가 없습니다. 새 테마를 만들어 주세요.</p> : <div className="grid gap-2">{themes.map((theme) => <button type="button" key={theme.id} onClick={() => void selectTheme(theme.id)} disabled={busy} aria-pressed={selectedId === theme.id} className={cn("w-full rounded-xl border p-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-theme-action-focus)] disabled:cursor-not-allowed disabled:opacity-50", selectedId === theme.id ? "border-[var(--admin-theme-action-outline)] bg-[var(--admin-theme-action-hover)] ring-1 ring-[var(--admin-theme-action-focus)]" : "border-[var(--border-base)] bg-white hover:border-[var(--admin-theme-action-outline)] hover:bg-[var(--admin-theme-action-hover)]")}>
               <span className="flex items-center justify-between gap-2"><span className="truncate text-sm font-semibold">{theme.name}</span>{theme.active && <span className="shrink-0 rounded-full border border-[var(--admin-theme-action-outline)] bg-white px-2 py-0.5 text-xs font-semibold text-[var(--admin-theme-action-outline)]">활성</span>}</span>{theme.updatedAt && !Number.isNaN(Date.parse(theme.updatedAt)) && <span className="mt-1 block text-xs text-[var(--text-muted)]">수정 {new Date(theme.updatedAt).toLocaleDateString("ko-KR")}</span>}<span className="mt-2 block"><Swatches colors={keyColors(theme.themeData)} /></span>
             </button>)}</div>}
           </section>
           {draft ? <><ThemePreview data={draft.themeData} />
             <Dialog>
-              <DialogTrigger asChild><button ref={previewTriggerRef} type="button" className={`${ADMIN_THEME_SECONDARY_ACTION_CLASS} flex w-full items-center justify-center gap-2 text-sm`}><MonitorSmartphone className="h-4 w-4" />실제 사용자 화면 보기</button></DialogTrigger>
+              <DialogTrigger asChild><button ref={previewTriggerRef} type="button" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "flex w-full items-center justify-center gap-2 text-sm")}><MonitorSmartphone className="h-4 w-4" />실제 사용자 화면 보기</button></DialogTrigger>
               <DialogContent showCloseButton={false} style={adminActionStyle} onCloseAutoFocus={(event) => { event.preventDefault(); previewTriggerRef.current?.focus(); }} className="flex h-[min(94dvh,960px)] max-h-[94dvh] w-[calc(100%-1rem)] max-w-[min(760px,calc(100%-1rem))] flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-[760px]">
                 <DialogHeader className="shrink-0 border-b border-[var(--border-base)] px-5 py-4 text-left sm:px-6"><div className="flex items-start justify-between gap-4"><div><DialogTitle>사용자 화면 미리보기</DialogTitle><DialogDescription className="mt-2 text-xs text-[var(--text-muted)]">현재 편집 중인 테마를 미리 보여줍니다. 실제 서비스에는 적용되지 않습니다.</DialogDescription></div><DialogClose asChild><button type="button" className={ADMIN_THEME_SECONDARY_ACTION_CLASS}>닫기</button></DialogClose></div></DialogHeader>
                 <div className="min-h-0 overflow-y-auto px-3 py-4 sm:px-6"><ThemeScreenPreview data={draft.themeData} branding={branding} embedded /></div>
@@ -360,24 +362,24 @@ export default function AdminTheme() {
         </div>
         <div className="min-w-0 space-y-6">{draft ? <>
             <section className={panel} aria-label="테마 편집"><div className="mb-5"><h2 className="font-semibold">{selectedId === null ? "새 테마" : "테마 편집"}</h2><p className="text-xs text-[var(--text-muted)]">저장과 실제 적용은 별개입니다.{selectedTheme?.active && " 활성 테마를 수정해 저장하면 비활성 복제본이 생성됩니다."}</p></div>
-              <label className="block text-sm font-medium">테마 이름<input aria-label="테마 이름" className={`mt-1 ${input}`} maxLength={100} value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
+              <label className="block text-sm font-medium">테마 이름<input aria-label="테마 이름" className={cn("mt-1", input)} maxLength={100} value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
               <ThemeSourceDetails source={selectedTheme ? provenanceOf(selectedTheme) : newDraftProvenance ?? analysisSnapshot} />
               <div className="mt-5 flex flex-wrap items-center gap-2 border-y border-[var(--border-base)] py-4" aria-label="테마 편집 작업">
                 {!dirty && !busy ? <span aria-label="저장 상태" className="inline-flex items-center rounded-full border border-[var(--border-base)] bg-[var(--ds-neutral-hover)] px-3 py-1.5 text-xs font-medium text-[var(--text-muted)]">변경사항 없음</span>
-                  : <button type="button" className={`${ADMIN_THEME_PRIMARY_ACTION_CLASS} inline-flex items-center gap-1.5 text-sm`} onClick={() => void save()} disabled={busy || !dirty} aria-busy={busy}>{busy ? "처리 중…" : <><Save className="h-4 w-4" />저장</>}</button>}
+                  : <button type="button" className={cn(ADMIN_THEME_PRIMARY_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={() => void save()} disabled={busy || !dirty} aria-busy={busy}>{busy ? "처리 중…" : <><Save className="h-4 w-4" />저장</>}</button>}
                 {selectedTheme && (selectedTheme.active
                   ? <span aria-label="테마 적용 상태" className="inline-flex items-center gap-1 rounded-full border border-[var(--admin-theme-action-outline)] bg-[var(--admin-theme-action-hover)] px-3 py-1.5 text-xs font-semibold text-[var(--admin-theme-action-outline)]"><Check className="h-3.5 w-3.5" aria-hidden="true" />적용 중</span>
-                  : <button type="button" className={`${ADMIN_THEME_SECONDARY_ACTION_CLASS} inline-flex items-center gap-1.5 text-sm`} onClick={() => void activate()} disabled={busy || dirty}><Check className="h-4 w-4" />저장된 테마 적용</button>)}
-                {selectedTheme && <button type="button" className={`${ADMIN_THEME_SECONDARY_ACTION_CLASS} inline-flex items-center gap-1.5 text-sm`} onClick={() => createDraft(selectedTheme)} disabled={busy}><Copy className="h-4 w-4" />복제</button>}
-                {selectedTheme && <button type="button" className={`${ADMIN_THEME_DESTRUCTIVE_ACTION_CLASS} inline-flex items-center gap-1.5 text-sm`} onClick={() => void remove()} disabled={busy || selectedTheme.active} title={selectedTheme.active ? "활성 테마는 삭제할 수 없습니다" : undefined}><Trash2 className="h-4 w-4" />삭제</button>}
+                  : <button type="button" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={() => void activate()} disabled={busy || dirty}><Check className="h-4 w-4" />저장된 테마 적용</button>)}
+                {selectedTheme && <button type="button" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={() => createDraft(selectedTheme)} disabled={busy}><Copy className="h-4 w-4" />복제</button>}
+                {selectedTheme && <button type="button" className={cn(ADMIN_THEME_DESTRUCTIVE_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={() => void remove()} disabled={busy || selectedTheme.active} title={selectedTheme.active ? "활성 테마는 삭제할 수 없습니다" : undefined}><Trash2 className="h-4 w-4" />삭제</button>}
                 {dirty && selectedTheme && !selectedTheme.active && <p className="w-full text-xs text-[var(--text-muted)]">변경사항을 저장한 뒤 적용할 수 있습니다.</p>}
               </div>
               <div className="mt-6 space-y-6">{THEME_FIELDS.map((group) => <fieldset key={group.key} className="border-t border-[var(--border-base)] pt-5"><legend className="px-1 text-sm font-semibold">{group.title}</legend><div className="grid gap-3 sm:grid-cols-2">{group.colors.map(([key, label]) => {
                 const value = getThemeColor(draft.themeData, group.key, key);
                 const valid = isHexColor(value);
                 return <label key={key} className="flex min-w-0 items-center gap-3 rounded-xl border border-[var(--border-base)] p-3 text-sm">
-                  <input type="color" aria-label={`${label} 색상 선택`} value={valid ? value : "#000000"} onChange={(event) => changeColor(group.key, key, event.target.value)} className="h-9 w-10 shrink-0 cursor-pointer rounded border-0 bg-transparent" />
-                  <span className="min-w-0 flex-1"><span className="mb-1 block font-medium">{label}</span><input type="text" aria-label={`${label} HEX`} value={value} onChange={(event) => changeColor(group.key, key, event.target.value)} maxLength={7} spellCheck={false} aria-invalid={!valid} className={`w-full rounded-lg border px-2 py-1 font-mono text-xs ${valid ? "border-[var(--border-base)]" : "border-[var(--semantic-status-danger)]"}`} /></span>
+                  <input type="color" aria-label={`${label} 색상 선택`} value={valid ? value : DESIGN_SYSTEM_BLACK} onChange={(event) => changeColor(group.key, key, event.target.value)} className="h-9 w-10 shrink-0 cursor-pointer rounded border-0 bg-transparent" />
+                  <span className="min-w-0 flex-1"><span className="mb-1 block font-medium">{label}</span><input type="text" aria-label={`${label} HEX`} value={value} onChange={(event) => changeColor(group.key, key, event.target.value)} maxLength={7} spellCheck={false} aria-invalid={!valid} className={cn("w-full rounded-lg border px-2 py-1 font-mono text-xs", valid ? "border-[var(--border-base)]" : "border-[var(--semantic-status-danger)]")} /></span>
                   <span className="h-7 w-7 shrink-0 rounded-full border border-[var(--border-base)]" style={{ backgroundColor: valid ? value : "transparent" }} aria-hidden="true" />
                 </label>;
               })}</div></fieldset>)}</div>

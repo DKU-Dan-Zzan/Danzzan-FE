@@ -128,7 +128,7 @@ describe("AdminTheme", () => {
     await act(async () => { buttons("저장된 테마 적용")[0].click(); });
     expect(actionBackground()).toBe((createAdminThemeActionStyle("#3274d9") as Record<string, string>)["--admin-theme-action-bg"]);
     expect(document.documentElement.style.getPropertyValue("--theme-brand-strong")).toBe("#3274d9");
-    expect(buttons("삭제")[0].className).toContain("border-[#b42318]");
+    expect(buttons("삭제")[0].className).toContain("border-[var(--ds-admin-action-danger)]");
   });
 
   it("uses the bundled root Theme Core when no active theme can be loaded", async () => {
@@ -464,7 +464,7 @@ describe("AdminTheme", () => {
     await act(async () => { buttons("AI 테마 추천")[0].click(); });
     expect(buttons("AI 추천 생성 중…")[0].disabled).toBe(true);
     expect(host.querySelector('[aria-label="AI 추천 작업 단계"] li:last-child')?.getAttribute("data-state")).toBe("generating");
-    expect(buttons("AI 추천 생성 중…")[0].className).toContain("disabled:bg-[#e7e5e4]");
+    expect(buttons("AI 추천 생성 중…")[0].className).toContain("disabled:bg-[var(--ds-admin-action-disabled-bg)]");
     expect(buttons("AI 추천 생성 중…")[0].getAttribute("aria-busy")).toBe("true");
     await act(async () => { buttons("AI 추천 생성 중…")[0].click(); });
     expect(adminThemeApi.recommend).toHaveBeenCalledOnce();

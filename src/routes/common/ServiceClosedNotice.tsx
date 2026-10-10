@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 import { cn } from "@/components/common/ui/utils"
 import { useT, type TranslationKey } from "@/i18n"
 import { NoAccountIcon, StageIcon } from "@/routes/common/ServiceClosedIcons"
-import { useFestivalBrandingImageSource } from "@/components/layout/FestivalBrandingImage"
+import { useFestivalBrandingImageSource } from "@/lib/app/festival/brandingImageSource"
 
 type ServiceClosedNoticeProps = {
   titleKey: TranslationKey

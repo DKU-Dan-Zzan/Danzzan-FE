@@ -1,10 +1,9 @@
-import { createContext, useContext, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
-import { festivalBrandingApi, type FestivalBranding } from "@/api/app/festival/festivalBrandingApi";
+import { festivalBrandingApi } from "@/api/app/festival/festivalBrandingApi";
 import { CURRENT_FESTIVAL_SETTING_ID } from "@/config/festivalSetting";
-
-export const FestivalBrandingContext = createContext<FestivalBranding | null>(null);
+import { FestivalBrandingContext } from "@/lib/app/festival/festivalBrandingContext";
 
 /** One public branding lookup shared by user and ticketing routes. Admin preview stays independent. */
 export function FestivalBrandingProvider({ children }: { children: ReactNode }) {
@@ -20,8 +19,4 @@ export function FestivalBrandingProvider({ children }: { children: ReactNode }) 
   });
 
   return <FestivalBrandingContext.Provider value={isAdminRoute ? null : branding.data ?? null}>{children}</FestivalBrandingContext.Provider>;
-}
-
-export function useFestivalBranding() {
-  return useContext(FestivalBrandingContext);
 }

@@ -38,6 +38,13 @@
   --ds-neutral-hover: #f9fafb;
   --ds-shadow-slate: #0f172a;
   --ds-shadow-neutral: #2c3436;
+  --ds-admin-action-disabled-bg: #e7e5e4;
+  --ds-admin-action-disabled-border: #d6d3d1;
+  --ds-admin-action-disabled-surface: #f5f5f4;
+  --ds-admin-action-disabled-text: #78716c;
+  --ds-admin-action-disabled-primary-text: #57534e;
+  --ds-admin-action-danger: #b42318;
+  --ds-admin-action-danger-hover: #fef3f2;
   --ds-overlay-scrim: rgba(0, 0, 0, 0.5);
   --ds-overlay-scrim-40: rgba(0, 0, 0, 0.4);
   --ds-overlay-image-control-55: rgba(0, 0, 0, 0.55);

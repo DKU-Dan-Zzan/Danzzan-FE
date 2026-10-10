@@ -5,7 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import { StaticRouter } from "react-router-dom/server";
 import Header from "@/components/layout/Header";
 import { authStore } from "@/store/common/authStore";
-import { FestivalBrandingContext } from "@/lib/app/festival/FestivalBrandingProvider";
+import { FestivalBrandingContext } from "@/lib/app/festival/festivalBrandingContext";
 
 function renderHeader(pathname: string, logoImageUrl: string | null = null) {
   return renderToStaticMarkup(

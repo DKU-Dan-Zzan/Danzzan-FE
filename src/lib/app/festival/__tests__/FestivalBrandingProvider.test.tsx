@@ -5,7 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, useNavigate } from "react-router-dom";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { festivalBrandingApi } from "@/api/app/festival/festivalBrandingApi";
-import { FestivalBrandingProvider, useFestivalBranding } from "@/lib/app/festival/FestivalBrandingProvider";
+import { FestivalBrandingProvider } from "@/lib/app/festival/FestivalBrandingProvider";
+import { useFestivalBranding } from "@/lib/app/festival/festivalBrandingContext";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 vi.mock("@/api/app/festival/festivalBrandingApi", () => ({ festivalBrandingApi: { get: vi.fn() } }));

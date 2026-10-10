@@ -29,7 +29,7 @@ import {
   AlertDialogTitle,
 } from "@/components/common/ui/alert-dialog";
 import { Checkbox } from "@/components/common/ui/checkbox";
-import { useFestivalBrandingImageSource } from "@/components/layout/FestivalBrandingImage";
+import { useFestivalBrandingImageSource } from "@/lib/app/festival/brandingImageSource";
 
 type WithdrawStep = "ticket-waiver" | "final";
 
@@ -218,7 +218,7 @@ function MyPage() {
             onError={posterImage.onError}
             alt=""
             aria-hidden
-            className={`absolute inset-0 h-full w-full object-cover ${posterImage.useUploaded ? "object-top" : "object-[50%_38%]"}`}
+            className={cn("absolute inset-0 h-full w-full object-cover", posterImage.useUploaded ? "object-top" : "object-[50%_38%]")}
             style={{ filter: "brightness(0.95) saturate(1.05)", transform: posterImage.useUploaded ? "none" : "scale(1.03)" }}
           />
           {/*
@@ -348,7 +348,7 @@ function MyPage() {
             onError={posterImage.onError}
             alt=""
             aria-hidden
-            className={`h-full w-full object-cover ${posterImage.useUploaded ? "object-top" : "object-[50%_44%]"}`}
+            className={cn("h-full w-full object-cover", posterImage.useUploaded ? "object-top" : "object-[50%_44%]")}
             // 기본 포스터의 기존 크롭은 유지하고, 새 공식 포스터는 상단 픽셀이 hero 맨 위에서 시작한다.
             style={{ filter: "brightness(0.95) saturate(1.05)", transform: posterImage.useUploaded ? "none" : "scale(1.6)" }}
           />

@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { AppHeaderLogo } from "@/components/layout/AppHeaderLogo";
-import { FestivalBrandingContext } from "@/lib/app/festival/FestivalBrandingProvider";
+import { FestivalBrandingContext } from "@/lib/app/festival/festivalBrandingContext";
 
 describe("AppHeaderLogo", () => {
   it("기본 로고 이미지를 좌측 정렬된 헤더 위치로 렌더링한다", () => {

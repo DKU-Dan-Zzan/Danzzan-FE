@@ -6,7 +6,7 @@ import { StaticRouter } from "react-router-dom/server";
 import { UserLayout } from "@/components/ticketing/layout/UserLayout";
 import { setTicketCardBackgroundImageUrl, setTicketingBackgroundImageUrl } from "@/lib/app/festival/festivalCalendar";
 import { authStore } from "@/store/common/authStore";
-import { FestivalBrandingContext } from "@/lib/app/festival/FestivalBrandingProvider";
+import { FestivalBrandingContext } from "@/lib/app/festival/festivalBrandingContext";
 
 const createJwtLikeToken = (payload: Record<string, unknown>): string => {
   const encode = (value: Record<string, unknown>) =>

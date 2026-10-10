@@ -67,7 +67,7 @@ describe("FestivalBrandingPanel", () => {
     expect(host.textContent).toContain("등록된 공식 포스터가 없습니다.");
     expect(host.textContent).toContain("등록된 축제 로고가 없습니다.");
     expect([...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")?.disabled).toBe(true);
-    expect([...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")?.className).toContain("disabled:bg-[#e7e5e4]");
+    expect([...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")?.className).toContain("disabled:bg-[var(--ds-admin-action-disabled-bg)]");
   });
 
   it("requires extraction before a manually entered HEX can start a recommendation", async () => {
