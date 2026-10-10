@@ -1,6 +1,7 @@
 // 역할: home api 관련 HTTP 요청 함수를 제공하는 API 어댑터다.
 
 import { http } from "@/lib/http"
+import { CURRENT_FESTIVAL_SETTING_ID } from "@/config/festivalSetting"
 import {
   parseEmergencyNoticeContract,
   parseHomeImagesContract,
@@ -14,7 +15,7 @@ type RequestOptions = {
 }
 
 export async function getHomeImages(options?: RequestOptions) {
-  const endpoint = "/home/images"
+  const endpoint = `/home/${CURRENT_FESTIVAL_SETTING_ID}/images`
   const res = await http.get<unknown>(endpoint, {
     signal: options?.signal,
   })

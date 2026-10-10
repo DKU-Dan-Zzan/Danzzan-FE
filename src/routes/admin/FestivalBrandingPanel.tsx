@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Check, Info, LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/common/ui/tooltip";
@@ -6,6 +6,7 @@ import { festivalBrandingApi, type BrandingImageKind, type FestivalBranding, typ
 import { ADMIN_FOCUS_VISIBLE_RING_CLASS, ADMIN_THEME_PRIMARY_ACTION_CLASS, ADMIN_THEME_SECONDARY_ACTION_CLASS } from "@/routes/admin/adminStyleClasses";
 import { isHexColor } from "@/routes/admin/themeEditor";
 import { validateBrandingImage } from "@/routes/admin/festivalBrandingValidation";
+import { HomeWideImagesPanel } from "@/routes/admin/HomeWideImagesPanel";
 
 const panel = "rounded-2xl border border-[var(--admin-panel-border)] bg-[var(--admin-panel-bg)] p-5 sm:p-6";
 const actionClass = () => `${ADMIN_THEME_PRIMARY_ACTION_CLASS} inline-flex items-center justify-center gap-2 text-sm`;
@@ -43,11 +44,12 @@ function ImageField({ kind, title, description, url, busy, onUpload }: {
   </div>;
 }
 
-export function FestivalBrandingPanel({ onAnalysisChange, onRecommend, recommending = false, recommendationError = null }: {
+export function FestivalBrandingPanel({ onAnalysisChange, onRecommend, recommending = false, recommendationError = null, adminActionStyle }: {
   onAnalysisChange?: (snapshot: PosterAnalysisSnapshot | null) => void;
   onRecommend?: (snapshot: PosterAnalysisSnapshot) => void;
   recommending?: boolean;
   recommendationError?: string | null;
+  adminActionStyle?: CSSProperties;
 } = {}) {
   const [branding, setBranding] = useState<FestivalBranding | null>(null);
   const [loading, setLoading] = useState(true);
@@ -140,11 +142,12 @@ export function FestivalBrandingPanel({ onAnalysisChange, onRecommend, recommend
     && !analyzing && busyKind === null && !recommending;
 
   return <section className={panel} aria-label="축제 브랜딩">
-    <div className="mb-5"><h2 className="text-lg font-semibold">축제 브랜딩</h2><p className="mt-1 text-sm text-[var(--text-muted)]">공식 원본 이미지와 로고를 관리합니다. 홈 화면용 와이드 이미지는 별도로 유지됩니다.</p></div>
+    <div className="mb-5"><h2 className="text-lg font-semibold">축제 브랜딩</h2><p className="mt-1 text-sm text-[var(--text-muted)]">공식 원본 이미지와 로고를 관리합니다. 홈 화면용 와이드 이미지는 별도로 관리합니다.</p></div>
     {loading ? <p role="status" className="text-sm text-[var(--text-muted)]">이미지를 불러오는 중입니다…</p> : error ? <div role="alert" className="text-sm"><p>{error}</p><button type="button" className={`${ADMIN_THEME_SECONDARY_ACTION_CLASS} mt-3`} onClick={() => void load()}>다시 시도</button></div> : <div className="grid gap-4 md:grid-cols-2">
       <ImageField kind="poster" title="공식 포스터" description="공식 원본 포스터입니다. 향후 AI 테마 추천에 사용됩니다." url={branding?.posterImageUrl ?? null} busy={busyKind !== null || recommending} onUpload={(kind, file) => void upload(kind, file)} />
       <ImageField kind="logo" title="축제 로고" description="사용자 화면과 축제 브랜딩에 사용됩니다." url={branding?.logoImageUrl ?? null} busy={busyKind !== null || recommending} onUpload={(kind, file) => void upload(kind, file)} />
     </div>}
+    <HomeWideImagesPanel actionStyle={adminActionStyle} />
     {!loading && !error && <div className="mt-5 border-t border-[var(--border-base)] pt-5" aria-label="포스터 색상 분석">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div><h3 className="font-semibold">포스터 색상 분석</h3><p className="mt-1 text-xs text-[var(--text-muted)]">포스터에서 대표색을 추출합니다. 선택한 색은 테마에 바로 적용되지 않습니다.</p></div>

@@ -24,6 +24,7 @@ vi.mock("@/api/app/festival/festivalBrandingApi", () => ({ festivalBrandingApi: 
   upload: vi.fn(),
   extractPosterColors: vi.fn(),
 } }));
+vi.mock("@/routes/admin/HomeWideImagesPanel", () => ({ HomeWideImagesPanel: () => null }));
 
 const colors: ThemeData = {
   brand: { primary: "#ff642d", secondary: "#f5e3a3", accent: "#ff642d", strong: "#e13600" },

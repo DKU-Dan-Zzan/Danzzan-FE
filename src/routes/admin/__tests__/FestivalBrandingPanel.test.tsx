@@ -3,6 +3,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { festivalBrandingApi } from "@/api/app/festival/festivalBrandingApi";
+import { adminHomeImageApi } from "@/api/app/admin/adminHomeImageApi";
 import { FestivalBrandingPanel } from "@/routes/admin/FestivalBrandingPanel";
 import { validateBrandingImage } from "@/routes/admin/festivalBrandingValidation";
 
@@ -11,6 +12,7 @@ import { validateBrandingImage } from "@/routes/admin/festivalBrandingValidation
 const toastMock = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn() }));
 vi.mock("sonner", () => ({ toast: toastMock }));
 vi.mock("@/api/app/festival/festivalBrandingApi", () => ({ festivalBrandingApi: { get: vi.fn(), upload: vi.fn(), extractPosterColors: vi.fn() } }));
+vi.mock("@/api/app/admin/adminHomeImageApi", () => ({ adminHomeImageApi: { list: vi.fn(), upload: vi.fn(), delete: vi.fn(), reorder: vi.fn() } }));
 
 let host: HTMLDivElement;
 let root: Root;
@@ -24,6 +26,7 @@ beforeEach(() => {
     disconnect() {}
   });
   vi.mocked(festivalBrandingApi.get).mockResolvedValue(original);
+  vi.mocked(adminHomeImageApi.list).mockResolvedValue([]);
   host = document.createElement("div");
   document.body.append(host);
   root = createRoot(host);
@@ -46,6 +49,18 @@ async function choose(kind: "공식 포스터" | "축제 로고", file: File) {
 }
 
 describe("FestivalBrandingPanel", () => {
+  it("opens and closes home image management without changing theme analysis state", async () => {
+    const onAnalysisChange = vi.fn();
+    const themeBefore = document.documentElement.style.getPropertyValue("--theme-brand-primary");
+    await act(async () => root.render(<FestivalBrandingPanel onAnalysisChange={onAnalysisChange} />));
+    const snapshotCalls = onAnalysisChange.mock.calls.length;
+    await act(async () => [...host.querySelectorAll("button")].find((button) => button.textContent === "와이드 이미지 관리")!.click());
+    expect(document.body.textContent).toContain("홈 화면 와이드 이미지 관리");
+    await act(async () => [...document.querySelectorAll("button")].find((button) => button.textContent === "닫기")!.click());
+    expect(onAnalysisChange).toHaveBeenCalledTimes(snapshotCalls);
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe(themeBefore);
+  });
+
   it("shows empty poster and logo states", async () => {
     vi.mocked(festivalBrandingApi.get).mockResolvedValue({ festivalSettingId: 1, posterImageUrl: null, logoImageUrl: null });
     await render();

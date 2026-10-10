@@ -326,7 +326,7 @@ export default function AdminTheme() {
     <AdminShell title="축제 테마" eyebrow="FESTIVAL THEME" mainClassName="mx-auto w-full max-w-[1360px] space-y-6 px-6 py-6">
       <div id="theme-ai" className="space-y-6 scroll-mt-40 sm:scroll-mt-28" aria-label="AI 테마 추천 영역">
         <FestivalBrandingPanel onAnalysisChange={analysisChanged} onRecommend={(snapshot) => void recommend(snapshot)}
-          recommending={recommending} recommendationError={recommendationError} />
+          recommending={recommending} recommendationError={recommendationError} adminActionStyle={adminActionStyle} />
         {recommendationCandidates.length > 0 && <RecommendationComparison candidates={recommendationCandidates}
           selectedId={selectedRecommendationId} onChoose={chooseRecommendation} busy={busy} />}
       </div>
