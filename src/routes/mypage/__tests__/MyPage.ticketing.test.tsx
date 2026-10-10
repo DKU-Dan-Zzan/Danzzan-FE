@@ -7,6 +7,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import MyPage from "@/routes/mypage/MyPage";
 import { authStore } from "@/store/common/authStore";
 import { setTicketingEnabled } from "@/lib/app/festival/festivalCalendar";
+import { FestivalBrandingContext } from "@/lib/app/festival/FestivalBrandingProvider";
 
 const getMyTickets = vi.hoisted(() => vi.fn());
 vi.mock("@/api/ticketing/ticketApi", () => ({ ticketApi: { getMyTickets } }));
@@ -32,10 +33,37 @@ afterEach(async () => {
   authStore.clear();
   setTicketingEnabled(false);
 });
-async function render() {
-  await act(async () => root.render(<QueryClientProvider client={client}><MemoryRouter><MyPage /></MemoryRouter></QueryClientProvider>));
+async function render(posterImageUrl: string | null = null) {
+  await act(async () => root.render(<QueryClientProvider client={client}><MemoryRouter><FestivalBrandingContext.Provider value={{ festivalSettingId: 1, logoImageUrl: null, posterImageUrl }}><MyPage /></FestivalBrandingContext.Provider></MemoryRouter></QueryClientProvider>));
   await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
 }
+it("공식 포스터를 기존 상단 hero에 사용하고, 실패하면 정적 포스터와 기존 fade로 복귀한다", async () => {
+  await render("http://localhost:8080/uploads/festival/1/poster/new.jpg");
+  const hero = container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')!;
+  expect(hero.getAttribute("src")).toBe("http://localhost:8080/uploads/festival/1/poster/new.jpg");
+  expect(hero.className).toContain("object-cover object-top");
+  expect(hero.style.transform).toBe("none");
+  expect(hero.parentElement?.parentElement?.getAttribute("class")).toBe("relative");
+  expect(hero.nextElementSibling?.getAttribute("style")).toContain("var(--poster-bg) 100%");
+  expect(hero.nextElementSibling?.getAttribute("style")).toContain("58%");
+  expect(container.textContent).toContain("테스트 학생");
+  expect(container.textContent).toContain("내 정보");
+  await act(async () => hero.dispatchEvent(new Event("error")));
+  expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.getAttribute("src")).toBe("/posters/legend-poster-vertical.jpeg");
+  expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.className).toContain("object-[50%_44%]");
+  expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.nextElementSibling?.getAttribute("style")).toContain("22%");
+});
+it("비로그인 안내 화면도 공식 포스터와 정적 fallback을 사용한다", async () => {
+  authStore.clear();
+  await render("https://cdn.example.com/poster.jpg");
+  const poster = container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')!;
+  expect(poster.getAttribute("src")).toBe("https://cdn.example.com/poster.jpg");
+  expect(poster.className).toContain("object-cover object-top");
+  expect(poster.style.transform).toBe("none");
+  await act(async () => poster.dispatchEvent(new Event("error")));
+  expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.getAttribute("src")).toBe("/posters/legend-poster-vertical.jpeg");
+  expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.className).toContain("object-[50%_38%]");
+});
 it("OFF여도 내정보와 계정 관리는 열리지만 티켓 조회 요청과 메뉴는 없다", async () => {
   setTicketingEnabled(false);
   await render();

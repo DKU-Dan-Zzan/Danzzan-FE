@@ -8,6 +8,7 @@ import './index.css'
 import App from './App.tsx'
 import { queryClient } from "@/lib/query"
 import { loadActiveFestivalTheme } from "@/lib/app/festival/activeTheme"
+import { FestivalBrandingProvider } from "@/lib/app/festival/FestivalBrandingProvider"
 
 // PWA 서비스워커 등록
 import { registerSW } from "virtual:pwa-register"
@@ -19,7 +20,7 @@ async function bootstrap() {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <App />
+          <FestivalBrandingProvider><App /></FestivalBrandingProvider>
         </BrowserRouter>
       </QueryClientProvider>
     </StrictMode>

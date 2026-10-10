@@ -6,6 +6,7 @@ import { StaticRouter } from "react-router-dom/server";
 import { UserLayout } from "@/components/ticketing/layout/UserLayout";
 import { setTicketCardBackgroundImageUrl, setTicketingBackgroundImageUrl } from "@/lib/app/festival/festivalCalendar";
 import { authStore } from "@/store/common/authStore";
+import { FestivalBrandingContext } from "@/lib/app/festival/FestivalBrandingProvider";
 
 const createJwtLikeToken = (payload: Record<string, unknown>): string => {
   const encode = (value: Record<string, unknown>) =>
@@ -14,9 +15,9 @@ const createJwtLikeToken = (payload: Record<string, unknown>): string => {
   return `${encode({ alg: "HS256", typ: "JWT" })}.${encode(payload)}.signature`;
 };
 
-function renderUserLayout(pathname: string) {
+function renderUserLayout(pathname: string, logoImageUrl: string | null = null) {
   return renderToStaticMarkup(
-    <StaticRouter location={pathname}>
+    <FestivalBrandingContext.Provider value={{ festivalSettingId: 1, logoImageUrl, posterImageUrl: null }}><StaticRouter location={pathname}>
       <Routes>
         <Route path="/ticket/*" element={<UserLayout />}>
           <Route path="ticketing" element={<div>ticketing content</div>} />
@@ -24,11 +25,20 @@ function renderUserLayout(pathname: string) {
           <Route path="login" element={<div>login content</div>} />
         </Route>
       </Routes>
-    </StaticRouter>,
+    </StaticRouter></FestivalBrandingContext.Provider>,
   );
 }
 
 describe("UserLayout", () => {
+  it("티켓팅 헤더도 같은 축제 로고를 사용한다", () => {
+    authStore.setSession({
+      tokens: { accessToken: createJwtLikeToken({ role: "ROLE_USER" }), refreshToken: "", expiresIn: null },
+      user: null,
+    });
+    const markup = renderUserLayout("/ticket/ticketing", "https://cdn.example.com/festival-logo.png");
+    expect(markup).toContain('src="https://cdn.example.com/festival-logo.png"');
+    expect(markup).toContain("h-10 w-[140px]");
+  });
   afterEach(() => {
     authStore.clear();
     setTicketCardBackgroundImageUrl(null);

@@ -5,18 +5,24 @@ import { Route, Routes } from "react-router-dom";
 import { StaticRouter } from "react-router-dom/server";
 import Header from "@/components/layout/Header";
 import { authStore } from "@/store/common/authStore";
+import { FestivalBrandingContext } from "@/lib/app/festival/FestivalBrandingProvider";
 
-function renderHeader(pathname: string) {
+function renderHeader(pathname: string, logoImageUrl: string | null = null) {
   return renderToStaticMarkup(
-    <StaticRouter location={pathname}>
+    <FestivalBrandingContext.Provider value={{ festivalSettingId: 1, logoImageUrl, posterImageUrl: null }}><StaticRouter location={pathname}>
       <Routes>
         <Route path="*" element={<Header />} />
       </Routes>
-    </StaticRouter>,
+    </StaticRouter></FestivalBrandingContext.Provider>,
   );
 }
 
 describe("Header", () => {
+  it("부스맵과 타임테이블에서 같은 공식 로고를 표시한다", () => {
+    const logo = "https://cdn.example.com/official-logo.png";
+    expect(renderHeader("/map", logo)).toContain(`src="${logo}"`);
+    expect(renderHeader("/timetable", logo)).toContain(`src="${logo}"`);
+  });
   it("부스맵에서는 safe-area 상단을 투명 헤더로 렌더링한다", () => {
     authStore.clear();
     const mapMarkup = renderHeader("/map");

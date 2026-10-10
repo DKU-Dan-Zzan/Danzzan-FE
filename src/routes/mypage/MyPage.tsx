@@ -29,6 +29,7 @@ import {
   AlertDialogTitle,
 } from "@/components/common/ui/alert-dialog";
 import { Checkbox } from "@/components/common/ui/checkbox";
+import { useFestivalBrandingImageSource } from "@/components/layout/FestivalBrandingImage";
 
 type WithdrawStep = "ticket-waiver" | "final";
 
@@ -163,6 +164,7 @@ function ListRow({
 
 function MyPage() {
   const navigate = useNavigate();
+  const posterImage = useFestivalBrandingImageSource("poster");
   const ticketingEnabled = useTicketingEnabled();
   const session = useSyncExternalStore(
     authStore.subscribe,
@@ -209,14 +211,15 @@ function MyPage() {
   if (!isLoggedIn) {
     return (
       <div className="mypage-root relative flex h-[100dvh] w-full flex-col items-center justify-center overflow-hidden px-6 pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.5rem)]">
-        {/* 포스터 배경 — 가을 축제(LEGEND) 포스터 */}
+        {/* 공식 포스터, 미등록 또는 로딩 실패 시 기존 LEGEND 포스터 */}
         <div className="absolute inset-0 overflow-hidden">
           <img
-            src="/posters/legend-poster-vertical.jpeg"
+            src={posterImage.src}
+            onError={posterImage.onError}
             alt=""
             aria-hidden
-            className="absolute inset-0 h-full w-full object-cover object-[50%_38%]"
-            style={{ filter: "brightness(0.95) saturate(1.05)", transform: "scale(1.03)" }}
+            className={`absolute inset-0 h-full w-full object-cover ${posterImage.useUploaded ? "object-top" : "object-[50%_38%]"}`}
+            style={{ filter: "brightness(0.95) saturate(1.05)", transform: posterImage.useUploaded ? "none" : "scale(1.03)" }}
           />
           {/*
             포스터가 어두워서 예전의 밝은 베일을 그대로 쓰면 회색으로 죽는다.
@@ -341,12 +344,13 @@ function MyPage() {
       <div className="relative">
         <div className="absolute inset-0 overflow-hidden">
           <img
-            src="/posters/legend-poster-vertical.jpeg"
+            src={posterImage.src}
+            onError={posterImage.onError}
             alt=""
             aria-hidden
-            className="h-full w-full object-cover object-[50%_44%]"
-            // 포스터 가장자리의 날짜·주최 글씨가 배너 문구와 겹치지 않도록 불꽃 부분만 크게 쓴다.
-            style={{ filter: "brightness(0.95) saturate(1.05)", transform: "scale(1.6)" }}
+            className={`h-full w-full object-cover ${posterImage.useUploaded ? "object-top" : "object-[50%_44%]"}`}
+            // 기본 포스터의 기존 크롭은 유지하고, 새 공식 포스터는 상단 픽셀이 hero 맨 위에서 시작한다.
+            style={{ filter: "brightness(0.95) saturate(1.05)", transform: posterImage.useUploaded ? "none" : "scale(1.6)" }}
           />
           {/*
             덮개를 남색에서 포스터의 잉크 색으로 바꾼다. 남색은 봄 포스터에 맞춘 색이라
@@ -356,7 +360,9 @@ function MyPage() {
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, color-mix(in srgb, var(--legend-ink) 22%, transparent) 0%, color-mix(in srgb, var(--legend-ink) 50%, transparent) 50%, var(--poster-bg) 100%)",
+                posterImage.useUploaded
+                  ? "linear-gradient(180deg, color-mix(in srgb, var(--legend-ink) 58%, transparent) 0%, color-mix(in srgb, var(--legend-ink) 62%, transparent) 50%, var(--poster-bg) 100%)"
+                  : "linear-gradient(180deg, color-mix(in srgb, var(--legend-ink) 22%, transparent) 0%, color-mix(in srgb, var(--legend-ink) 50%, transparent) 50%, var(--poster-bg) 100%)",
             }}
           />
         </div>

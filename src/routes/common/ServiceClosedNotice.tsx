@@ -5,6 +5,7 @@ import { Link } from "react-router-dom"
 import { cn } from "@/components/common/ui/utils"
 import { useT, type TranslationKey } from "@/i18n"
 import { NoAccountIcon, StageIcon } from "@/routes/common/ServiceClosedIcons"
+import { useFestivalBrandingImageSource } from "@/components/layout/FestivalBrandingImage"
 
 type ServiceClosedNoticeProps = {
   titleKey: TranslationKey
@@ -95,6 +96,7 @@ const ServiceClosedNotice = ({
   preview = false,
 }: ServiceClosedNoticeProps) => {
   const t = useT()
+  const logoImage = useFestivalBrandingImageSource("logo")
   const [failedImage, setFailedImage] = useState<string | null>(null)
   const customImage = backgroundImageUrl && failedImage !== backgroundImageUrl ? backgroundImageUrl : null
   const noticeIcon = icon ?? ICON_BY_TITLE[titleKey]
@@ -148,11 +150,14 @@ const ServiceClosedNotice = ({
 
       <div className="relative z-10 mx-auto flex w-full max-w-[330px] flex-col items-center text-center">
         <img
-          src="/legend-logo.png"
-          alt="LEGEND"
+          src={preview ? "/legend-logo.png" : logoImage.src}
+          onError={preview ? undefined : logoImage.onError}
+          alt={!preview && logoImage.useUploaded ? "축제 로고" : "LEGEND"}
           className="w-[13.5rem] max-w-[74%] select-none object-contain [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_both]"
           style={{
-            filter: `brightness(0) saturate(100%) invert(92%) sepia(28%) saturate(560%) hue-rotate(328deg) brightness(103%) contrast(96%) drop-shadow(0 0 26px var(--service-closed-logo-shadow))`,
+            filter: !preview && logoImage.useUploaded
+              ? "drop-shadow(0 0 26px var(--service-closed-logo-shadow))"
+              : `brightness(0) saturate(100%) invert(92%) sepia(28%) saturate(560%) hue-rotate(328deg) brightness(103%) contrast(96%) drop-shadow(0 0 26px var(--service-closed-logo-shadow))`,
           }}
           draggable={false}
         />
