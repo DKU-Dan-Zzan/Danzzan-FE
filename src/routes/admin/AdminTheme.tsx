@@ -155,6 +155,8 @@ export default function AdminTheme() {
     [activeTheme?.themeData.brand.strong, fallbackStrong]);
   const selectedTheme = themes.find((theme) => theme.id === selectedId) ?? null;
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(savedDraft), [draft, savedDraft]);
+  const recommendationCompleted = recommendationCandidates.length > 0 && !!recommendationSnapshot && !!analysisSnapshot
+    && !recommendationError && JSON.stringify(recommendationSnapshot) === JSON.stringify(analysisSnapshot);
 
   useEffect(() => {
     const id = location.hash.slice(1);
@@ -328,7 +330,7 @@ export default function AdminTheme() {
     <AdminShell title="축제 테마" eyebrow="FESTIVAL THEME" mainClassName="mx-auto w-full max-w-[1360px] space-y-6 px-6 py-6">
       <div id="theme-ai" className="space-y-6 scroll-mt-40 sm:scroll-mt-28" aria-label="AI 테마 추천 영역">
         <FestivalBrandingPanel onAnalysisChange={analysisChanged} onBrandingChange={setBranding} onRecommend={(snapshot) => void recommend(snapshot)}
-          recommending={recommending} recommendationError={recommendationError} adminActionStyle={adminActionStyle} />
+          recommending={recommending} recommendationCompleted={recommendationCompleted} recommendationError={recommendationError} adminActionStyle={adminActionStyle} />
         {recommendationCandidates.length > 0 && <RecommendationComparison candidates={recommendationCandidates}
           selectedId={selectedRecommendationId} onChoose={chooseRecommendation} busy={busy} />}
       </div>
@@ -361,8 +363,11 @@ export default function AdminTheme() {
               <label className="block text-sm font-medium">테마 이름<input aria-label="테마 이름" className={`mt-1 ${input}`} maxLength={100} value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
               <ThemeSourceDetails source={selectedTheme ? provenanceOf(selectedTheme) : newDraftProvenance ?? analysisSnapshot} />
               <div className="mt-5 flex flex-wrap items-center gap-2 border-y border-[var(--border-base)] py-4" aria-label="테마 편집 작업">
-                <button type="button" className={`${ADMIN_THEME_PRIMARY_ACTION_CLASS} inline-flex items-center gap-1.5 text-sm`} onClick={() => void save()} disabled={busy || !dirty} aria-busy={busy}>{busy ? "처리 중…" : !dirty ? "변경사항 없음" : <><Save className="h-4 w-4" />저장</>}</button>
-                {selectedTheme && <button type="button" className={`${ADMIN_THEME_SECONDARY_ACTION_CLASS} inline-flex items-center gap-1.5 text-sm`} onClick={() => void activate()} disabled={busy || dirty || selectedTheme.active}>{selectedTheme.active ? "적용 중" : <><Check className="h-4 w-4" />저장된 테마 적용</>}</button>}
+                {!dirty && !busy ? <span aria-label="저장 상태" className="inline-flex items-center rounded-full border border-[var(--border-base)] bg-[var(--ds-neutral-hover)] px-3 py-1.5 text-xs font-medium text-[var(--text-muted)]">변경사항 없음</span>
+                  : <button type="button" className={`${ADMIN_THEME_PRIMARY_ACTION_CLASS} inline-flex items-center gap-1.5 text-sm`} onClick={() => void save()} disabled={busy || !dirty} aria-busy={busy}>{busy ? "처리 중…" : <><Save className="h-4 w-4" />저장</>}</button>}
+                {selectedTheme && (selectedTheme.active
+                  ? <span aria-label="테마 적용 상태" className="inline-flex items-center gap-1 rounded-full border border-[var(--admin-theme-action-outline)] bg-[var(--admin-theme-action-hover)] px-3 py-1.5 text-xs font-semibold text-[var(--admin-theme-action-outline)]"><Check className="h-3.5 w-3.5" aria-hidden="true" />적용 중</span>
+                  : <button type="button" className={`${ADMIN_THEME_SECONDARY_ACTION_CLASS} inline-flex items-center gap-1.5 text-sm`} onClick={() => void activate()} disabled={busy || dirty}><Check className="h-4 w-4" />저장된 테마 적용</button>)}
                 {selectedTheme && <button type="button" className={`${ADMIN_THEME_SECONDARY_ACTION_CLASS} inline-flex items-center gap-1.5 text-sm`} onClick={() => createDraft(selectedTheme)} disabled={busy}><Copy className="h-4 w-4" />복제</button>}
                 {selectedTheme && <button type="button" className={`${ADMIN_THEME_DESTRUCTIVE_ACTION_CLASS} inline-flex items-center gap-1.5 text-sm`} onClick={() => void remove()} disabled={busy || selectedTheme.active} title={selectedTheme.active ? "활성 테마는 삭제할 수 없습니다" : undefined}><Trash2 className="h-4 w-4" />삭제</button>}
                 {dirty && selectedTheme && !selectedTheme.active && <p className="w-full text-xs text-[var(--text-muted)]">변경사항을 저장한 뒤 적용할 수 있습니다.</p>}

@@ -70,6 +70,51 @@ describe("FestivalBrandingPanel", () => {
     expect([...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")?.className).toContain("disabled:bg-[#e7e5e4]");
   });
 
+  it("requires extraction before a manually entered HEX can start a recommendation", async () => {
+    const onRecommend = vi.fn();
+    vi.mocked(festivalBrandingApi.extractPosterColors).mockResolvedValue({ colors: [{ hex: "#AABBCC", population: 0.5 }] });
+    await act(async () => root.render(<FestivalBrandingPanel onRecommend={onRecommend} />));
+    const steps = () => host.querySelectorAll('[aria-label="AI 추천 작업 단계"] li[data-state]');
+    const recommend = () => [...host.querySelectorAll<HTMLButtonElement>("button")].find((button) => button.textContent === "AI 테마 추천")!;
+    expect(steps()[0].getAttribute("data-state")).toBe("current");
+    expect(steps()[1].getAttribute("data-state")).toBe("waiting");
+    expect(steps()[2].getAttribute("data-state")).toBe("waiting");
+    const process = host.querySelector('[aria-label="AI 테마 생성 과정"]')!;
+    const analysisHeading = [...host.querySelectorAll("h3")].find((heading) => heading.textContent === "포스터 색상 분석")!;
+    expect(process.compareDocumentPosition(analysisHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(process.querySelector("button")).toBeNull();
+    expect(steps()[0].className).not.toContain("rounded-full");
+    expect(host.textContent).toContain("포스터에서 대표색을 먼저 추출한 뒤");
+    expect(host.textContent?.match(/포스터에서 대표색을 먼저 추출한 뒤/g)).toHaveLength(1);
+    expect(host.querySelector('[aria-label="AI 추천 작업 단계"]')?.className).toContain("sm:flex-row");
+    const input = host.querySelector<HTMLInputElement>('input[aria-label="기준 색상 HEX"]')!;
+    const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!;
+    await act(async () => { setValue.call(input, "#112233"); input.dispatchEvent(new Event("input", { bubbles: true })); });
+    expect(recommend().disabled).toBe(true);
+    expect(host.textContent).toContain("먼저 포스터 대표색을 추출해주세요");
+    await act(async () => [...host.querySelectorAll<HTMLButtonElement>("button")].find((button) => button.textContent === "대표색 추출")!.click());
+    expect(steps()[0].getAttribute("data-state")).toBe("completed");
+    expect(steps()[1].getAttribute("data-state")).toBe("current");
+    expect(recommend().disabled).toBe(true);
+    await act(async () => { setValue.call(input, "#445566"); input.dispatchEvent(new Event("input", { bubbles: true })); });
+    expect(steps()[1].getAttribute("data-state")).toBe("completed");
+    expect(steps()[2].getAttribute("data-state")).toBe("ready");
+    expect(steps()[2].textContent).toContain("추천 가능");
+    expect(recommend().disabled).toBe(false);
+    await act(async () => recommend().click());
+    expect(onRecommend).toHaveBeenCalledWith({ sourcePosterUrl: original.posterImageUrl, sourceColors: ["#AABBCC"], selectedBaseColor: "#445566" });
+  });
+
+  it("keeps both branding image previews compact without cropping", async () => {
+    await render();
+    for (const title of ["공식 포스터", "축제 로고"]) {
+      const image = host.querySelector<HTMLImageElement>(`img[alt="현재 ${title}"]`)!;
+      expect(image.className).toContain("object-contain");
+      expect(image.className).toContain("sm:max-h-48");
+      expect(image.parentElement?.className).toContain("sm:min-h-28");
+    }
+  });
+
   it("updates only the successful upload preview", async () => {
     await render();
     vi.mocked(festivalBrandingApi.upload).mockResolvedValue({ ...original, posterImageUrl: "https://cdn/new-poster.png" });
@@ -121,7 +166,7 @@ describe("FestivalBrandingPanel", () => {
     await act(async () => [...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")!.click());
     expect(festivalBrandingApi.extractPosterColors).toHaveBeenCalledWith(1);
     expect(host.querySelectorAll('button[aria-label^="기준 색상 #"]')).toHaveLength(4);
-    expect(host.textContent).toContain("대표색을 클릭하거나 HEX를 입력하면 기준색으로 선택됩니다.");
+    expect(host.textContent).toContain("후보 색상을 선택하거나 HEX를 직접 입력해 기준색을 정해주세요.");
     await act(async () => host.querySelector<HTMLButtonElement>('button[aria-label="기준 색상 #274A83 선택"]')!.click());
     expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("#274A83");
     expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("선택된 기준색");
@@ -137,6 +182,7 @@ describe("FestivalBrandingPanel", () => {
     await render();
     await act(async () => [...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")!.click());
     expect([...host.querySelectorAll("button")].find((button) => button.textContent === "분석 중…")?.disabled).toBe(true);
+    expect(host.querySelector('[aria-label="AI 추천 작업 단계"] li[data-state]')?.getAttribute("data-state")).toBe("extracting");
     await act(async () => resolve({ colors: [{ hex: "#CC4422", population: 0.4 }] }));
     expect(host.textContent).toContain("#CC4422");
   });
@@ -151,6 +197,7 @@ describe("FestivalBrandingPanel", () => {
     await act(async () => resolve({ colors: [{ hex: "#CC4422", population: 0.4 }] }));
     expect(host.querySelectorAll('button[aria-label^="기준 색상 #"]')).toHaveLength(0);
     expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("선택되지 않음");
+    expect(host.querySelector('[aria-label="AI 추천 작업 단계"] li[data-state]')?.getAttribute("data-state")).toBe("current");
   });
 
   it("reports extraction errors without changing existing images", async () => {
@@ -158,6 +205,7 @@ describe("FestivalBrandingPanel", () => {
     await render();
     await act(async () => [...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")!.click());
     expect(host.querySelector('[role="alert"]')?.textContent).toContain("분석하지 못했습니다");
+    expect(host.querySelector('[aria-label="AI 추천 작업 단계"] li[data-state]')?.getAttribute("data-state")).toBe("current");
     expect(host.querySelector<HTMLImageElement>('img[alt="현재 공식 포스터"]')?.src).toBe(original.posterImageUrl);
   });
 

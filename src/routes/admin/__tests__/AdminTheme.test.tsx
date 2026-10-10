@@ -160,6 +160,7 @@ describe("AdminTheme", () => {
     expect(adminThemeApi.recommend).toHaveBeenCalledWith({
       sourceColors: ["#4EB15E", "#13730C"], selectedBaseColor: "#4EB15E",
     });
+    expect(host.querySelector('[aria-label="AI 추천 작업 단계"] li:last-child')?.getAttribute("data-state")).toBe("completed");
     expect(host.querySelectorAll('[aria-label$="시안"]')).toHaveLength(4);
     expect(host.querySelector('[aria-label="원본형 시안"]')?.textContent).toContain("포스터의 색감과 분위기를 가장 충실하게 반영한 시안입니다.");
     expect(host.querySelector('[aria-label="라이트형 시안"]')?.textContent).toContain("같은 색조를 유지하면서 더 밝고 경쾌하게 조정한 시안입니다.");
@@ -370,11 +371,16 @@ describe("AdminTheme", () => {
 
   it("distinguishes active and selected themes and uses readable fixed admin actions", async () => {
     await render();
-    expect(buttons("변경사항 없음")[0].disabled).toBe(true);
-    expect(buttons("적용 중")[0].disabled).toBe(true);
+    expect(buttons("변경사항 없음")).toHaveLength(0);
+    expect(buttons("적용 중")).toHaveLength(0);
+    expect(host.querySelector('[aria-label="저장 상태"]')?.textContent).toBe("변경사항 없음");
+    expect(host.querySelector('[aria-label="테마 적용 상태"]')?.textContent).toBe("적용 중");
+    expect(host.querySelector('[aria-label="테마 적용 상태"] svg')).not.toBeNull();
     expect(buttons("복제")[0].className).toContain("border-[var(--admin-theme-action-outline)]");
     await act(async () => { buttons("저장된 테마")[0].click(); });
-    expect(host.querySelector('[aria-label="저장된 테마 목록"] [aria-pressed="true"]')?.textContent).toContain("저장된 테마");
+    const selected = host.querySelector('[aria-label="저장된 테마 목록"] [aria-pressed="true"]');
+    expect(selected?.textContent).toContain("저장된 테마");
+    expect(selected?.className).toContain("border-[var(--admin-theme-action-outline)]");
     expect(host.querySelector('[aria-label="저장된 테마 목록"]')?.textContent).toContain("활성");
     expect(buttons("저장된 테마 적용")[0].disabled).toBe(false);
     await setInput("테마 이름", "수정본");
@@ -432,15 +438,13 @@ describe("AdminTheme", () => {
     });
   });
 
-  it("keeps the last valid selection while typing invalid HEX and recommends with the displayed selection", async () => {
+  it("keeps the last valid selection but blocks recommendation while HEX input is invalid", async () => {
     await prepareRecommendation();
     await setInput("기준 색상 HEX", "#bad");
     expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("#4EB15E");
-    expect(buttons("AI 테마 추천")[0].disabled).toBe(false);
+    expect(buttons("AI 테마 추천")[0].disabled).toBe(true);
     await act(async () => { buttons("AI 테마 추천")[0].click(); });
-    expect(adminThemeApi.recommend).toHaveBeenCalledWith({
-      sourceColors: ["#4EB15E", "#13730C"], selectedBaseColor: "#4EB15E",
-    });
+    expect(adminThemeApi.recommend).not.toHaveBeenCalled();
 
     await act(async () => { host.querySelector<HTMLButtonElement>('button[aria-label="기준 색상 #13730C 선택"]')!.click(); });
     expect((host.querySelector('input[aria-label="기준 색상 HEX"]') as HTMLInputElement).value).toBe("#13730C");
@@ -459,12 +463,14 @@ describe("AdminTheme", () => {
     vi.mocked(adminThemeApi.recommend).mockReturnValue(new Promise((_, fail) => { reject = fail; }));
     await act(async () => { buttons("AI 테마 추천")[0].click(); });
     expect(buttons("AI 추천 생성 중…")[0].disabled).toBe(true);
+    expect(host.querySelector('[aria-label="AI 추천 작업 단계"] li:last-child')?.getAttribute("data-state")).toBe("generating");
     expect(buttons("AI 추천 생성 중…")[0].className).toContain("disabled:bg-[#e7e5e4]");
     expect(buttons("AI 추천 생성 중…")[0].getAttribute("aria-busy")).toBe("true");
     await act(async () => { buttons("AI 추천 생성 중…")[0].click(); });
     expect(adminThemeApi.recommend).toHaveBeenCalledOnce();
     await act(async () => reject({ status: 429, payload: { code: "OPENAI_RATE_LIMIT" } }));
     expect(host.querySelector('[role="alert"]')?.textContent).toContain("요청 한도");
+    expect(host.querySelector('[aria-label="AI 추천 작업 단계"] li:last-child')?.getAttribute("data-state")).toBe("ready");
     expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toBe(before);
   });
 

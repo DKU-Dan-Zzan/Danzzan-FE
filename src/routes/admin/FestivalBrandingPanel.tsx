@@ -38,17 +38,18 @@ function ImageField({ kind, title, description, url, busy, onUpload }: {
       event.target.value = "";
       if (file) onUpload(kind, file);
     }} />
-    <div className="mt-4 flex min-h-36 items-center justify-center overflow-hidden rounded-xl bg-[var(--surface-subtle)] p-3">
-      {url ? <img src={url} alt={`현재 ${title}`} className="max-h-64 max-w-full object-contain" /> : <p className="text-sm text-[var(--text-muted)]">등록된 {title}가 없습니다.</p>}
+    <div className="mt-4 flex min-h-32 items-center justify-center overflow-hidden rounded-xl bg-[var(--surface-subtle)] p-3 sm:min-h-28">
+      {url ? <img src={url} alt={`현재 ${title}`} className="max-h-52 max-w-full object-contain sm:max-h-48" /> : <p className="text-sm text-[var(--text-muted)]">등록된 {title}가 없습니다.</p>}
     </div>
   </div>;
 }
 
-export function FestivalBrandingPanel({ onAnalysisChange, onBrandingChange, onRecommend, recommending = false, recommendationError = null, adminActionStyle }: {
+export function FestivalBrandingPanel({ onAnalysisChange, onBrandingChange, onRecommend, recommending = false, recommendationCompleted = false, recommendationError = null, adminActionStyle }: {
   onAnalysisChange?: (snapshot: PosterAnalysisSnapshot | null) => void;
   onBrandingChange?: (branding: FestivalBranding) => void;
   onRecommend?: (snapshot: PosterAnalysisSnapshot) => void;
   recommending?: boolean;
+  recommendationCompleted?: boolean;
   recommendationError?: string | null;
   adminActionStyle?: CSSProperties;
 } = {}) {
@@ -141,8 +142,15 @@ export function FestivalBrandingPanel({ onAnalysisChange, onBrandingChange, onRe
   }
 
   const canExtract = !!branding?.posterImageUrl && !analyzing && busyKind === null && !recommending;
-  const canRecommend = !!onRecommend && candidates.length > 0 && !!selectedBaseColor
+  const hasExtractedColors = !analyzing && busyKind !== "poster" && candidates.length > 0 && candidates.every(({ hex }) => isHexColor(hex));
+  const hasValidBaseColor = !!selectedBaseColor && isHexColor(selectedBaseColor) && (!manualHex || isHexColor(manualHex));
+  const canRecommend = !!onRecommend && !!branding?.posterImageUrl && hasExtractedColors && hasValidBaseColor
     && !analyzing && busyKind === null && !recommending;
+  const progressSteps = [
+    { label: "① 대표색 추출 (필수)", state: analyzing ? "extracting" : hasExtractedColors ? "completed" : "current", status: analyzing ? "추출 중" : hasExtractedColors ? "완료" : "진행 필요" },
+    { label: "② 기준색 선택 (후보 또는 HEX)", state: !hasExtractedColors ? "waiting" : hasValidBaseColor ? "completed" : "current", status: !hasExtractedColors ? "대기" : hasValidBaseColor ? "완료" : "진행 필요" },
+    { label: "③ AI 테마 추천", state: recommending ? "generating" : recommendationCompleted && hasExtractedColors && hasValidBaseColor ? "completed" : hasExtractedColors && hasValidBaseColor ? "ready" : "waiting", status: recommending ? "생성 중" : recommendationCompleted && hasExtractedColors && hasValidBaseColor ? "완료" : hasExtractedColors && hasValidBaseColor ? "추천 가능" : "대기" },
+  ] as const;
 
   return <section className={panel} aria-label="축제 브랜딩">
     <div className="mb-5"><h2 className="text-lg font-semibold">축제 브랜딩</h2><p className="mt-1 text-sm text-[var(--text-muted)]">공식 원본 이미지와 로고를 관리합니다. 홈 화면용 와이드 이미지는 별도로 관리합니다.</p></div>
@@ -152,13 +160,25 @@ export function FestivalBrandingPanel({ onAnalysisChange, onBrandingChange, onRe
     </div>}
     <HomeWideImagesPanel actionStyle={adminActionStyle} />
     {!loading && !error && <div className="mt-5 border-t border-[var(--border-base)] pt-5" aria-label="포스터 색상 분석">
+      <div aria-label="AI 테마 생성 과정" className="mb-4">
+        <h3 className="text-sm font-semibold">AI 테마 생성 과정</h3>
+        <ol aria-label="AI 추천 작업 단계" className="mt-2 flex flex-col gap-1.5 text-xs sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
+          {progressSteps.map(({ label, state, status }, index) => <li key={label} data-state={state} aria-current={state === "current" || state === "extracting" || state === "ready" || state === "generating" ? "step" : undefined}
+            className={`inline-flex items-center gap-1.5 ${state === "completed" ? "text-[var(--semantic-status-success)]" : state === "waiting" ? "text-[var(--text-muted)]" : "font-semibold text-[var(--admin-theme-action-outline)]"}`}>
+            {index > 0 && <span aria-hidden="true" className="mr-1 hidden text-[var(--text-muted)] sm:inline">→</span>}
+            {state === "completed" && <Check className="h-3.5 w-3.5" aria-hidden="true" />}
+            <span>{label}</span><span className="font-normal opacity-80">{status}</span>
+          </li>)}
+        </ol>
+        <p className="mt-2 text-xs text-[var(--text-muted)]">포스터에서 대표색을 먼저 추출한 뒤, 후보 색상을 선택하거나 HEX를 직접 입력해 기준색을 정해주세요.</p>
+      </div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div><h3 className="font-semibold">포스터 색상 분석</h3><p className="mt-1 text-xs text-[var(--text-muted)]">포스터에서 대표색을 추출합니다. 선택한 색은 테마에 바로 적용되지 않습니다.</p></div>
+        <div><h3 className="font-semibold">포스터 색상 분석</h3><p className="mt-1 text-xs text-[var(--text-muted)]">선택한 색은 테마에 바로 적용되지 않습니다.</p></div>
         <button type="button" className={actionClass()} disabled={!canExtract} aria-busy={analyzing} onClick={() => void extractColors()}>{analyzing && <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />}{analyzing ? "분석 중…" : "대표색 추출"}</button>
       </div>
       {!branding?.posterImageUrl ? <p className="mt-3 text-sm text-[var(--text-muted)]">먼저 공식 포스터를 업로드해 주세요.</p> : <>
         {analysisError && <p role="alert" className="mt-3 text-sm text-[var(--semantic-status-danger)]">{analysisError}</p>}
-        {candidates.length > 0 && <div className="mt-4"><p className="mb-1 flex items-center gap-2 text-sm font-medium">대표색 후보 <span className="inline-flex items-center gap-1 text-xs text-[var(--semantic-status-success)]"><Check className="h-3.5 w-3.5" aria-hidden="true" />추출 완료</span></p><p className="mb-2 text-xs text-[var(--text-muted)]">대표색을 클릭하거나 HEX를 입력하면 기준색으로 선택됩니다.</p><div className="flex flex-wrap gap-2">
+        {candidates.length > 0 && <div className="mt-4"><p className="mb-2 flex items-center gap-2 text-sm font-medium">대표색 후보 <span className="inline-flex items-center gap-1 text-xs text-[var(--semantic-status-success)]"><Check className="h-3.5 w-3.5" aria-hidden="true" />추출 완료</span></p><div className="flex flex-wrap gap-2">
           {candidates.map(({ hex, population }) => <button key={hex} type="button" aria-label={`기준 색상 ${hex} 선택`} aria-pressed={selectedBaseColor?.toUpperCase() === hex.toUpperCase()} onClick={() => selectColor(hex)} className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs ${ADMIN_FOCUS_VISIBLE_RING_CLASS} ${selectedBaseColor?.toUpperCase() === hex.toUpperCase() ? "border-[var(--admin-theme-action-outline)] ring-2 ring-[var(--admin-theme-action-focus)] ring-offset-2" : "border-[var(--border-base)]"}`}>
             <span className="h-5 w-5 rounded-full border border-[var(--border-base)]" style={{ backgroundColor: hex }} aria-hidden="true" />{hex} <span className="text-[var(--text-muted)]">{Math.round(population * 100)}%</span>{selectedBaseColor?.toUpperCase() === hex.toUpperCase() && <Check className="h-3.5 w-3.5" aria-hidden="true" />}
           </button>)}
@@ -177,7 +197,7 @@ export function FestivalBrandingPanel({ onAnalysisChange, onBrandingChange, onRe
           <button type="button" className={actionClass()} aria-busy={recommending}
             disabled={!canRecommend}
             onClick={() => {
-              if (branding?.posterImageUrl && candidates.length && selectedBaseColor && !recommending) {
+              if (canRecommend && branding?.posterImageUrl && selectedBaseColor) {
                 onRecommend?.({ sourcePosterUrl: branding.posterImageUrl,
                   sourceColors: candidates.map((color) => color.hex), selectedBaseColor });
               }
@@ -195,6 +215,8 @@ export function FestivalBrandingPanel({ onAnalysisChange, onBrandingChange, onRe
             </TooltipContent>
           </Tooltip>
           </div>
+          {!recommending && !analyzing && busyKind !== "poster" && branding?.posterImageUrl && !hasExtractedColors && <p className="mt-2 text-xs text-[var(--text-muted)]">AI 추천을 사용하려면 먼저 포스터 대표색을 추출해주세요.</p>}
+          {!recommending && hasExtractedColors && !hasValidBaseColor && <p className="mt-2 text-xs text-[var(--text-muted)]">추출된 대표색을 선택하거나 유효한 HEX를 입력해주세요.</p>}
           <p className="mt-2 text-xs text-[var(--text-muted)]">새 추천 시안은 현재 편집 중인 테마를 변경하지 않습니다. 시안을 선택하면 편집 값이 해당 시안으로 바뀝니다.</p>
           {recommendationError && <p role="alert" className="mt-2 text-sm text-[var(--semantic-status-danger)]">{recommendationError}</p>}
         </div>
