@@ -10,6 +10,7 @@ import type { ThemeRecommendationResponse } from "@/api/app/admin/adminThemeApi"
 import { festivalBrandingApi } from "@/api/app/festival/festivalBrandingApi";
 import { THEME_FIELDS, validateThemeDraft } from "@/routes/admin/themeEditor";
 import { THEME_CORE_VARIABLES } from "@/lib/app/festival/activeTheme";
+import { createAdminThemeActionStyle } from "@/routes/admin/adminThemeActionColors";
 
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -92,6 +93,50 @@ afterEach(async () => {
 });
 
 describe("AdminTheme", () => {
+  const actionBackground = () => host.querySelector<HTMLElement>('[data-testid="admin-theme-action-scope"]')?.style.getPropertyValue("--admin-theme-action-bg");
+
+  it.each(["#7546b7", "#3274d9"]) ("uses the active %s strong color for admin actions, not the selected draft", async (strong) => {
+    const themedActive = { ...active, themeData: { ...colors, brand: { ...colors.brand, strong } } };
+    vi.mocked(adminThemeApi.list).mockResolvedValue([themedActive, inactive]);
+    vi.mocked(adminThemeApi.get).mockImplementation(async (id) => id === 2 ? inactive : themedActive);
+    await render();
+    const expected = (createAdminThemeActionStyle(strong) as Record<string, string>)["--admin-theme-action-bg"];
+    expect(actionBackground()).toBe(expected);
+    await act(async () => { buttons("저장된 테마")[0].click(); });
+    expect(buttons("저장된 테마 적용")[0].className).toContain("border-[var(--admin-theme-action-outline)]");
+    await setInput("Primary HEX", "#123456");
+    await setInput("Strong · 진한 브랜드 컬러 HEX", "#fedcba");
+    expect(actionBackground()).toBe(expected);
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-strong")).toBe("");
+    await act(async () => { buttons("실제 사용자 화면 보기")[0].click(); });
+    expect(actionBackground()).toBe(expected);
+    await act(async () => { document.querySelector<HTMLButtonElement>('[role="dialog"] button')?.click(); });
+    expect(actionBackground()).toBe(expected);
+  });
+
+  it("updates admin action colors only after an inactive theme is activated", async () => {
+    const purple = { ...active, themeData: { ...colors, brand: { ...colors.brand, strong: "#7546b7" } } };
+    const blue = { ...inactive, themeData: { ...colors, brand: { ...colors.brand, strong: "#3274d9" } } };
+    vi.mocked(adminThemeApi.list).mockResolvedValue([purple, blue]);
+    vi.mocked(adminThemeApi.get).mockImplementation(async (id) => id === 2 ? blue : purple);
+    vi.mocked(adminThemeApi.activate).mockResolvedValue({ ...blue, active: true });
+    await render();
+    const before = actionBackground();
+    await act(async () => { buttons("저장된 테마")[0].click(); });
+    expect(actionBackground()).toBe(before);
+    await act(async () => { buttons("저장된 테마 적용")[0].click(); });
+    expect(actionBackground()).toBe((createAdminThemeActionStyle("#3274d9") as Record<string, string>)["--admin-theme-action-bg"]);
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-strong")).toBe("#3274d9");
+    expect(buttons("삭제")[0].className).toContain("border-[#b42318]");
+  });
+
+  it("uses the bundled root Theme Core when no active theme can be loaded", async () => {
+    vi.mocked(adminThemeApi.list).mockRejectedValue(new Error("offline"));
+    document.documentElement.style.setProperty("--theme-brand-strong", "#7546b7");
+    await render();
+    expect(actionBackground()).toBe((createAdminThemeActionStyle("#7546b7") as Record<string, string>)["--admin-theme-action-bg"]);
+  });
+
   async function prepareRecommendation() {
     vi.mocked(festivalBrandingApi.get).mockResolvedValue({ festivalSettingId: 1,
       posterImageUrl: "https://cdn.example.com/poster.png", logoImageUrl: null });
@@ -108,6 +153,7 @@ describe("AdminTheme", () => {
 
   it("shows three candidates without changing the draft, then applies only the chosen candidate and saves provenance", async () => {
     await prepareRecommendation();
+    const actionColorBefore = actionBackground();
     const before = host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style");
     await act(async () => { buttons("AI 테마 추천")[0].click(); });
     expect(adminThemeApi.recommend).toHaveBeenCalledWith({
@@ -122,13 +168,14 @@ describe("AdminTheme", () => {
     expect(host.querySelector('[aria-label="AI 추천 시안"]')!.compareDocumentPosition(host.querySelector('[aria-label="현재 활성 테마"]')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(host.querySelector('[aria-label="현재 활성 테마"]')!.compareDocumentPosition(host.querySelector('[aria-label="테마 편집"]')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(host.querySelector('[aria-label="저장된 테마 목록"]')!.compareDocumentPosition(host.querySelector('[aria-label="테마 편집"]')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(host.querySelector('[aria-label="저장된 테마 목록"]')?.parentElement?.className).toContain("lg:grid-cols-");
+    expect(host.querySelector('[aria-label="저장된 테마 목록"]')?.parentElement?.parentElement?.className).toContain("lg:grid-cols-");
     expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toBe(before);
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
     expect(adminThemeApi.create).not.toHaveBeenCalled();
     expect(adminThemeApi.activate).not.toHaveBeenCalled();
     await act(async () => { buttons("이 시안 선택")[0].click(); });
-    expect(host.querySelector('[aria-label="원본형 시안"]')?.getAttribute("aria-selected")).toBe("true");
+    expect(actionBackground()).toBe(actionColorBefore);
+    expect(host.querySelector('[aria-label="원본형 시안"]')?.getAttribute("data-selected")).toBe("true");
     expect(host.querySelector('[aria-label="원본형 시안"]')?.textContent).toContain("편집 시안 선택됨");
     expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toContain("--preview-brand-primary: #4EB15E");
     await setInput("Primary HEX", "#123456");
@@ -196,8 +243,10 @@ describe("AdminTheme", () => {
     await act(async () => { buttons("이 시안 선택")[0].click(); });
     expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style"))
       .toContain("--preview-brand-primary: #F69324");
-    expect(host.querySelector('[data-testid="theme-screen-preview"] [role="tabpanel"]')?.getAttribute("style"))
+    await act(async () => { buttons("실제 사용자 화면 보기")[0].click(); });
+    expect(document.querySelector('[data-testid="theme-screen-preview"] [role="tabpanel"]')?.getAttribute("style"))
       .toContain("--theme-brand-primary: #F69324");
+    await act(async () => { document.querySelector<HTMLButtonElement>('[role="dialog"] button')?.click(); });
     await act(async () => { buttons("저장")[0].click(); });
     expect(adminThemeApi.create).toHaveBeenCalledWith(expect.objectContaining({
       themeData: expect.objectContaining({ brand: expect.objectContaining({ primary: "#F69324" }) }),
@@ -233,7 +282,9 @@ describe("AdminTheme", () => {
 
   it("keeps the mobile preview scoped while switching map and ticketing tabs", async () => {
     await render();
-    const preview = host.querySelector('[data-testid="theme-screen-preview"]')!;
+    expect(host.querySelector('[data-testid="theme-screen-preview"]')).toBeNull();
+    await act(async () => { buttons("실제 사용자 화면 보기")[0].click(); });
+    const preview = document.querySelector('[data-testid="theme-screen-preview"]')!;
     expect(host.querySelector('[data-testid="theme-preview"]')?.contains(preview)).toBe(false);
     expect(preview.querySelector('[role="tabpanel"]')?.getAttribute("aria-label")).toBe("부스맵 화면 샘플");
     expect(preview.querySelector('img[alt="LEGEND"]')).not.toBeNull();
@@ -254,9 +305,41 @@ describe("AdminTheme", () => {
     expect(preview.textContent).toContain("단국존 선착순 예매");
     expect(preview.querySelectorAll('[role="tab"][aria-selected="true"]')).toHaveLength(1);
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+    await act(async () => { document.querySelector<HTMLButtonElement>('[role="dialog"] button')?.click(); });
     await setInput("Primary HEX", "#123456");
-    expect(host.querySelector('[data-testid="theme-screen-preview"] [role="tabpanel"]')?.getAttribute("style")).toContain("--theme-brand-primary: #123456");
+    await act(async () => { buttons("실제 사용자 화면 보기")[0].click(); });
+    expect(document.querySelector('[data-testid="theme-screen-preview"] [role="tabpanel"]')?.getAttribute("style")).toContain("--theme-brand-primary: #123456");
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+  });
+
+  it("keeps the preview modal separate from the draft and restores focus on Escape", async () => {
+    await render();
+    const trigger = buttons("실제 사용자 화면 보기")[0];
+    trigger.focus();
+    await act(async () => { trigger.click(); });
+    expect(document.querySelector('[role="dialog"]')).not.toBeNull();
+    expect(document.querySelector('[role="dialog"]')?.textContent).toContain("실제 서비스에는 적용되지 않습니다");
+    expect(host.querySelector('[data-testid="theme-screen-preview"]')).toBeNull();
+    await act(async () => { document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true })); });
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)); });
+    expect(document.activeElement).toBe(trigger);
+    expect(host.querySelector<HTMLInputElement>('[aria-label="테마 이름"]')?.value).toBe("활성 축제");
+  });
+
+  it("distinguishes active and selected themes and uses readable fixed admin actions", async () => {
+    await render();
+    expect(buttons("변경사항 없음")[0].disabled).toBe(true);
+    expect(buttons("적용 중")[0].disabled).toBe(true);
+    expect(buttons("복제")[0].className).toContain("border-[var(--admin-theme-action-outline)]");
+    await act(async () => { buttons("저장된 테마")[0].click(); });
+    expect(host.querySelector('[aria-label="저장된 테마 목록"] [aria-pressed="true"]')?.textContent).toContain("저장된 테마");
+    expect(host.querySelector('[aria-label="저장된 테마 목록"]')?.textContent).toContain("활성");
+    expect(buttons("저장된 테마 적용")[0].disabled).toBe(false);
+    await setInput("테마 이름", "수정본");
+    expect(buttons("저장")[0].className).toContain("bg-[var(--admin-theme-action-bg)]");
+    expect(buttons("저장된 테마 적용")[0].disabled).toBe(true);
+    expect(host.querySelector('[aria-label="테마 편집 작업"]')?.textContent).toContain("변경사항을 저장한 뒤 적용");
   });
 
   it("scrolls each theme submenu anchor below the sticky header", async () => {
@@ -329,13 +412,13 @@ describe("AdminTheme", () => {
 
   it("blocks duplicate AI requests and preserves the old draft on failure", async () => {
     await prepareRecommendation();
-    expect(buttons("AI 테마 추천")[0].className).toContain("bg-[var(--accent)]");
+    expect(buttons("AI 테마 추천")[0].className).toContain("bg-[var(--admin-theme-action-bg)]");
     const before = host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style");
     let reject!: (reason: unknown) => void;
     vi.mocked(adminThemeApi.recommend).mockReturnValue(new Promise((_, fail) => { reject = fail; }));
     await act(async () => { buttons("AI 테마 추천")[0].click(); });
     expect(buttons("AI 추천 생성 중…")[0].disabled).toBe(true);
-    expect(buttons("AI 추천 생성 중…")[0].className).toContain("bg-[var(--surface-subtle)]");
+    expect(buttons("AI 추천 생성 중…")[0].className).toContain("disabled:bg-[#e7e5e4]");
     expect(buttons("AI 추천 생성 중…")[0].getAttribute("aria-busy")).toBe("true");
     await act(async () => { buttons("AI 추천 생성 중…")[0].click(); });
     expect(adminThemeApi.recommend).toHaveBeenCalledOnce();
@@ -352,7 +435,7 @@ describe("AdminTheme", () => {
     expect(host.querySelector('input[aria-label="Strong · 진한 브랜드 컬러 HEX"]')).not.toBeNull();
     expect(host.querySelector('[data-testid="theme-preview"]')).not.toBeNull();
     expect(host.querySelector('[data-testid="theme-preview"]')?.textContent).toContain("강한 CTA");
-    expect(host.querySelector('[aria-label="테마 생성 출처"]')?.textContent).toContain("기반 포스터 정보 없음");
+    expect(host.querySelector('[aria-label="테마 생성 출처"]')?.textContent).toContain("생성 출처 정보가 없는 수동 테마");
   });
 
   it("shows saved provenance and copies it when duplicating a theme", async () => {
@@ -361,6 +444,8 @@ describe("AdminTheme", () => {
     vi.mocked(adminThemeApi.list).mockResolvedValue([sourced]);
     vi.mocked(adminThemeApi.get).mockResolvedValue(sourced);
     await render();
+    expect(host.querySelector('[aria-label="테마 생성 출처"]')?.textContent).toContain("기준색 #4EB15E");
+    await act(async () => { host.querySelector<HTMLElement>('[aria-label="테마 생성 출처"] summary')!.click(); });
     expect(host.querySelector<HTMLImageElement>('img[alt="테마 기반 포스터"]')?.src).toBe(sourced.sourcePosterUrl);
     expect(host.querySelector('[aria-label="테마 생성 출처"]')?.textContent).toContain("#13730C");
     await act(async () => { buttons("복제")[0].click(); });

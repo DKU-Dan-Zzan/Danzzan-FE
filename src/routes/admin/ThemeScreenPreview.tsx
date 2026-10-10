@@ -155,14 +155,14 @@ function PreviewTicketing() {
   </div>;
 }
 
-export function ThemeScreenPreview({ data }: { data: ThemeData }) {
+export function ThemeScreenPreview({ data, embedded = false }: { data: ThemeData; embedded?: boolean }) {
   const [tab, setTab] = useState<PreviewTab>("map");
-  return <section aria-label="사용자 화면 미리보기" className="rounded-2xl border border-[var(--admin-panel-border)] bg-[var(--admin-panel-bg)] p-5 sm:p-6" data-testid="theme-screen-preview">
-    <h2 className="text-base font-semibold">실제 사용자 화면 미리보기</h2>
-    <p className="mt-1 text-xs text-[var(--text-muted)]">실제 화면 구성요소와 샘플 데이터로 편집 중인 색상을 확인합니다. 서비스에는 적용되지 않습니다.</p>
+  return <section aria-label="사용자 화면 미리보기" className={embedded ? "min-w-0" : "rounded-2xl border border-[var(--admin-panel-border)] bg-[var(--admin-panel-bg)] p-5 sm:p-6"} data-testid="theme-screen-preview">
+    {!embedded && <><h2 className="text-base font-semibold">실제 사용자 화면 미리보기</h2>
+    <p className="mt-1 text-xs text-[var(--text-muted)]">실제 화면 구성요소와 샘플 데이터로 편집 중인 색상을 확인합니다. 서비스에는 적용되지 않습니다.</p></>}
     <div role="tablist" aria-label="미리보기 화면 선택" className="mt-4 flex gap-2">
       {(["map", "ticketing"] as const).map((value) => <button key={value} type="button" role="tab" aria-selected={tab === value}
-        className={`rounded-xl border px-3 py-1.5 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] ${tab === value ? "border-[var(--accent)] bg-[var(--surface-subtle)] text-[var(--accent)]" : "border-[var(--border-base)] text-[var(--text-muted)]"}`}
+        className={`rounded-xl border px-3 py-1.5 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-theme-action-focus)] ${tab === value ? "border-[var(--admin-theme-action-outline)] bg-[var(--admin-theme-action-hover)] text-[var(--admin-theme-action-outline)]" : "border-[var(--border-base)] bg-white text-[var(--ds-neutral-ink)] hover:border-[var(--admin-theme-action-outline)]"}`}
         onClick={() => setTab(value)}>{value === "map" ? "부스맵" : "티켓팅"}</button>)}
     </div>
     <div className="mt-4 flex justify-center rounded-2xl bg-[var(--surface-subtle)] p-2 sm:p-5">

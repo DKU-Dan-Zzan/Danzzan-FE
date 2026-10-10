@@ -3,7 +3,8 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { festivalBrandingApi } from "@/api/app/festival/festivalBrandingApi";
-import { FestivalBrandingPanel, validateBrandingImage } from "@/routes/admin/FestivalBrandingPanel";
+import { FestivalBrandingPanel } from "@/routes/admin/FestivalBrandingPanel";
+import { validateBrandingImage } from "@/routes/admin/festivalBrandingValidation";
 
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -51,7 +52,7 @@ describe("FestivalBrandingPanel", () => {
     expect(host.textContent).toContain("등록된 공식 포스터가 없습니다.");
     expect(host.textContent).toContain("등록된 축제 로고가 없습니다.");
     expect([...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")?.disabled).toBe(true);
-    expect([...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")?.className).toContain("bg-[var(--surface-subtle)]");
+    expect([...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")?.className).toContain("disabled:bg-[#e7e5e4]");
   });
 
   it("updates only the successful upload preview", async () => {
@@ -101,7 +102,7 @@ describe("FestivalBrandingPanel", () => {
       { hex: "#41A867", population: 0.11 },
     ] });
     await render();
-    expect([...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")?.className).toContain("bg-[var(--accent)]");
+    expect([...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")?.className).toContain("bg-[var(--admin-theme-action-bg)]");
     await act(async () => [...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")!.click());
     expect(festivalBrandingApi.extractPosterColors).toHaveBeenCalledWith(1);
     expect(host.querySelectorAll('button[aria-label^="기준 색상 #"]')).toHaveLength(4);
