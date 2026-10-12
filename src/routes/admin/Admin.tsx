@@ -1,5 +1,6 @@
 // 역할: 관리자 공지/광고 운영 화면을 렌더링하고 편집 액션 훅을 조합합니다.
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import {
   AlertCircle,
   ArrowDown,
@@ -53,9 +54,9 @@ const ADMIN_PINNED_NOTICE_BADGE_CLASS =
   "inline-flex items-center gap-1 rounded-full bg-[var(--status-pending)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-on-accent)]";
 
 
-export type AdminNoticeSection = "notice" | "ad";
-
-function Admin({ section = "notice" }: { section?: AdminNoticeSection }) {
+function Admin() {
+  const location = useLocation();
+  const scrolledLocation = useRef<string | null>(null);
 
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [confirmDialogState, setConfirmDialogState] = useState<AdminConfirmDialogState | null>(null);
@@ -107,6 +108,15 @@ function Admin({ section = "notice" }: { section?: AdminNoticeSection }) {
   } = useAdminAds({
     onError: handleAdminDataError,
   });
+
+  useEffect(() => {
+    if (location.hash !== "#ad-banners" || noticeLoading || adLoading || scrolledLocation.current === location.key) return;
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById("ad-banners")?.scrollIntoView?.({ block: "start" });
+      scrolledLocation.current = location.key;
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [location.hash, location.key, noticeLoading, adLoading]);
 
   const {
     emergencyMessage,
@@ -171,8 +181,8 @@ function Admin({ section = "notice" }: { section?: AdminNoticeSection }) {
     <>
       <Toaster position="top-right" closeButton richColors />
       <AdminShell
-        title={section === "ad" ? "광고 배너" : "공지사항"}
-        eyebrow={section === "ad" ? "ADVERTISEMENT" : "NOTICE"}
+        title="공지·광고"
+        eyebrow="NOTICE & ADVERTISEMENT"
         headerClassName="border-b border-[var(--border-base)] bg-[var(--admin-header-bg)]"
         mainClassName="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-5"
         actions={
@@ -188,8 +198,6 @@ function Admin({ section = "notice" }: { section?: AdminNoticeSection }) {
           </div>
         )}
 
-        {section === "notice" && (
-        <>
         {/* 긴급 공지 */}
         <section className="rounded-2xl border border-[var(--status-danger-border)] bg-[var(--status-danger-bg)] p-4 shadow-sm">
           <header className="mb-3 flex items-center justify-between">
@@ -563,16 +571,11 @@ function Admin({ section = "notice" }: { section?: AdminNoticeSection }) {
           )}
         </section>
 
-        </>
-        )}
-
-        {section === "ad" && (
-        <>
         {/* 광고 배너 관리 */}
-        <section className="mb-6 rounded-2xl border border-[var(--border-base)] bg-[var(--surface)] p-4 shadow-sm">
+        <section id="ad-banners" aria-labelledby="ad-banners-title" className="mb-6 scroll-mt-40 rounded-2xl border border-[var(--border-base)] bg-[var(--surface)] p-4 shadow-sm">
           <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-sm font-bold text-[var(--text)]">광고 배너 관리</h2>
+              <h2 id="ad-banners-title" className="text-sm font-bold text-[var(--text)]">광고 배너 관리</h2>
               <p className="mt-0.5 text-xs text-[var(--text-muted)]">
                 등록된 이미지가 홈 화면·공지사항·타임테이블·내 티켓 화면 하단에서 랜덤 순서로 5초마다
                 슬라이딩됩니다. 수량 제한 없음.
@@ -657,8 +660,6 @@ function Admin({ section = "notice" }: { section?: AdminNoticeSection }) {
             <p>• object-cover 방식으로 기기에 따라 이미지가 약간 확대되어 보일 수 있습니다.</p>
           </div>
         </section>
-        </>
-        )}
       </AdminShell>
 
       {/* 공지 작성/수정 모달 */}
