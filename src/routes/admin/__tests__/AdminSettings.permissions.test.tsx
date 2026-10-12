@@ -5,7 +5,6 @@ import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import AdminSettings from "@/routes/admin/AdminSettings"
-import { recommendPosterBackground } from "@/api/app/festival/posterBackgroundApi"
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
@@ -14,7 +13,6 @@ const api = vi.hoisted(() => ({ get: vi.fn(), metadata: vi.fn(), ticketing: vi.f
 const toast = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() }))
 
 vi.mock("@/api/app/festival/festivalBrandingApi", () => ({ festivalBrandingApi: { get: vi.fn().mockResolvedValue({ festivalSettingId: 1, posterImageUrl: null, logoImageUrl: null }) } }))
-vi.mock("@/api/app/festival/posterBackgroundApi", async (importOriginal) => ({ ...await importOriginal<typeof import("@/api/app/festival/posterBackgroundApi")>(), recommendPosterBackground: vi.fn() }))
 
 vi.mock("@/store/common/authStore", () => ({
   authStore: { subscribe: () => () => {}, getSnapshot: () => state },
@@ -127,23 +125,22 @@ describe("AdminSettings unified save", () => {
     expect(api.metadata).not.toHaveBeenCalled()
   })
 
-  it.each([true, false])("cancel aborts the visible background recommendation with ticketing %s and rejects a late result", async (enabled) => {
+  it.each([true, false])("cancel discards a manual background with ticketing %s without uploading", async (enabled) => {
     state.permissions = ["TICKETING"]
     api.get.mockResolvedValue({ ...settings, ticketingEnabled: enabled })
-    let resolve!: (value: Awaited<ReturnType<typeof recommendPosterBackground>>) => void
-    vi.mocked(recommendPosterBackground).mockImplementation(() => new Promise(done => { resolve = done }))
     await render()
-    await startEditing()
-    const buttons = [...container.querySelectorAll<HTMLButtonElement>("button")].filter(button => button.textContent === "포스터로 AI 배경 추천")
-    expect(buttons).toHaveLength(1)
-    await act(async () => buttons[0].click())
-    expect(vi.mocked(recommendPosterBackground).mock.calls[0][0]).toBe(enabled ? "ticket" : "closed")
-    const signal = vi.mocked(recommendPosterBackground).mock.calls[0][1]!
+    expect(findButton("포스터로 AI 배경 추천")).toBeUndefined()
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]')!
+    const file = new File(["image"], "discarded.png", { type: "image/png" })
+    await act(async () => {
+      Object.defineProperty(input, "files", { value: [file] })
+      input.dispatchEvent(new Event("change", { bubbles: true }))
+    })
+    expect(container.textContent).toContain("discarded.png · 저장 전 미리보기")
     await clickButton("취소")
     await settle()
-    expect(signal.aborted).toBe(true)
-    await act(async () => resolve({ target: enabled ? "ticket" : "closed", mimeType: "image/jpeg", imageBase64: "/9j/2Q==", width: 800, height: 360, focusX: .5, focusY: .5, reason: "취소한 결과" }))
-    expect(container.textContent).not.toContain("취소한 결과")
+    expect(container.textContent).not.toContain("discarded.png")
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:background-preview")
     expect(findButton("저장")).toBeUndefined()
     expect(findButton("수정")).toBeDefined()
     expect(api.upload).not.toHaveBeenCalled()

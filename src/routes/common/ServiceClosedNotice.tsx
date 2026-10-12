@@ -125,9 +125,8 @@ const ServiceClosedNotice = ({
           alt={logoImage.useUploaded ? "축제 로고" : "LEGEND"}
           className="w-[13.5rem] max-w-[74%] select-none object-contain [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_both]"
           style={{
-            filter: logoImage.useUploaded
-              ? "drop-shadow(0 0 26px var(--poster-closed-ink))"
-              : `brightness(0) saturate(100%) invert(92%) sepia(28%) saturate(560%) hue-rotate(328deg) brightness(103%) contrast(96%) drop-shadow(0 0 26px var(--poster-closed-ink))`,
+            // Recolor only this dark-context rendering; retain the asset's alpha and shape.
+            filter: "brightness(0) invert(1) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35))",
           }}
           draggable={false}
         />
