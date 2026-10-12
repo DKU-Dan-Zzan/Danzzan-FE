@@ -6,6 +6,7 @@ import { cn } from "@/components/common/ui/utils"
 import { useT, type TranslationKey } from "@/i18n"
 import { NoAccountIcon, StageIcon } from "@/routes/common/ServiceClosedIcons"
 import { useFestivalBrandingImageSource } from "@/lib/app/festival/brandingImageSource"
+import { AzureImage } from "@/components/common/AzureImage"
 
 type ServiceClosedNoticeProps = {
   titleKey: TranslationKey
@@ -127,7 +128,7 @@ const ServiceClosedNotice = ({
         }}
       />}
 
-      {customImage && <img src={customImage} alt="" onError={() => setFailedImage(customImage)} className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-50" />}
+      {customImage && <AzureImage src={customImage} alt="" onError={() => setFailedImage(customImage)} className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-50" />}
 
       {/* 불씨 잔광 — 로고 뒤에서 번지게 해서 워드마크가 떠 보이도록 한다. */}
       <div
@@ -149,7 +150,7 @@ const ServiceClosedNotice = ({
       />
 
       <div className="relative z-10 mx-auto flex w-full max-w-[330px] flex-col items-center text-center">
-        <img
+        <AzureImage
           src={preview ? "/legend-logo.png" : logoImage.src}
           onError={preview ? undefined : logoImage.onError}
           alt={!preview && logoImage.useUploaded ? "축제 로고" : "LEGEND"}

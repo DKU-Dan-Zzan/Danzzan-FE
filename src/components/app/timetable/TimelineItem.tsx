@@ -1,5 +1,6 @@
 import type { Performance } from "@/types/app/timetable/timetable.types"
 import { useT } from "@/i18n"
+import { AzureImage } from "@/components/common/AzureImage"
 
 function hashtagLabel(description: string) {
   const t = description.trim()
@@ -81,7 +82,7 @@ export default function TimelineItem({
         {/* 원형 사진 + 장르·가수명·스테이지 — 한 열에 붙여서 바로 아래 */}
         <div className="col-start-3 row-span-2 flex flex-col items-center self-start overflow-visible pl-2 pr-3 sm:pl-2">
           <div className="relative shrink-0 overflow-visible">
-            <img
+            <AzureImage
               src={item.artistImageUrl ?? "/placeholder-artist.png"}
               alt=""
               className={[

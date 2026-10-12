@@ -1,9 +1,10 @@
 // 역할: 종이 티켓 스타일 카드의 시각 표현과 상태별 배지/정보 표시를 담당합니다.
-import { useId, useState, useSyncExternalStore } from "react";
+import { useId, useState, useSyncExternalStore, type SyntheticEvent } from "react";
 import { getTicketCardBackgroundImageUrl, subscribeFestivalSettings } from "@/lib/app/festival/festivalCalendar";
 import { cn } from "@/components/common/ui/utils";
 import { resolveTicketDayLabel } from "@/lib/ticketing/festivalDay";
 import type { Ticket } from "@/types/ticketing/model/ticket.model";
+import { useAzureImageUrl } from "@/hooks/app/useAzureImageUrl";
 
 interface PaperTicketCardProps {
   ticket: Ticket;
@@ -46,6 +47,9 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
   const configuredBackground = backgroundImageUrl === undefined ? savedBackground : backgroundImageUrl;
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const background = configuredBackground && configuredBackground !== failedUrl ? configuredBackground : DEFAULT_TICKET_CARD_BACKGROUND;
+  const ticketBackground = useAzureImageUrl(background, () => {
+    if (configuredBackground) setFailedUrl(configuredBackground);
+  });
   const cardId = useId().replace(/:/g, "");
   const clipId = `ticket-clip-${cardId}`;
   const overlayId = `ticket-overlay-${cardId}`;
@@ -88,8 +92,9 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
 
         {/* 가로형 기본 배경은 원래 색감을 그대로 사용한다. */}
         <image
-          href={background}
-          onError={() => { if (configuredBackground) setFailedUrl(configuredBackground); }}
+          href={ticketBackground.src}
+          onError={ticketBackground.onError as unknown as (event: SyntheticEvent<SVGImageElement>) => void}
+          onLoad={ticketBackground.onLoad}
           x="0" y="0"
           width="400" height="180"
           preserveAspectRatio="xMidYMid slice"

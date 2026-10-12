@@ -13,6 +13,7 @@ import {
   UserX,
 } from "lucide-react";
 import { cn } from "@/components/common/ui/utils";
+import { AzureImage } from "@/components/common/AzureImage";
 import { authLogout, withdrawUser } from "@/api/app/auth/authApi";
 import { studentProfileApi } from "@/api/app/auth/studentProfileApi";
 import { useMyTicketsQuery } from "@/hooks/ticketing/useMyTicketsQuery";
@@ -213,7 +214,7 @@ function MyPage() {
       <div className="mypage-root relative flex h-[100dvh] w-full flex-col items-center justify-center overflow-hidden px-6 pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.5rem)]">
         {/* 공식 포스터, 미등록 또는 로딩 실패 시 기존 LEGEND 포스터 */}
         <div className="absolute inset-0 overflow-hidden">
-          <img
+          <AzureImage
             src={posterImage.src}
             onError={posterImage.onError}
             alt=""
@@ -343,7 +344,7 @@ function MyPage() {
       */}
       <div className="relative">
         <div className="absolute inset-0 overflow-hidden">
-          <img
+          <AzureImage
             src={posterImage.src}
             onError={posterImage.onError}
             alt=""

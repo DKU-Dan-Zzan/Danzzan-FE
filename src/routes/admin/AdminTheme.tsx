@@ -16,6 +16,7 @@ import { ThemeScreenPreview } from "@/routes/admin/ThemeScreenPreview";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/common/ui/dialog";
 import { ADMIN_THEME_DESTRUCTIVE_ACTION_CLASS, ADMIN_THEME_PRIMARY_ACTION_CLASS, ADMIN_THEME_SECONDARY_ACTION_CLASS } from "@/routes/admin/adminStyleClasses";
 import { createAdminThemeActionStyle, readActiveThemeStrong } from "@/routes/admin/adminThemeActionColors";
+import { AzureImage } from "@/components/common/AzureImage";
 import { DESIGN_SYSTEM_BLACK } from "@/lib/app/festival/themeFallbackColors";
 
 const panel = "rounded-2xl border border-[var(--admin-panel-border)] bg-[var(--admin-panel-bg)] p-5 sm:p-6";
@@ -64,7 +65,7 @@ function ThemeSourceDetails({ source }: { source: ThemeProvenance | null }) {
   return <details aria-label="테마 생성 출처" className="group mt-5 rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)] p-4 text-xs">
     <summary className="cursor-pointer font-semibold marker:text-[var(--ds-neutral-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-theme-action-focus)]">생성 출처 <span className="ml-2 font-normal text-[var(--text-muted)]">{source.selectedBaseColor ? `기준색 ${source.selectedBaseColor} · ` : ""}포스터 기반 AI 추천</span><span className="ml-2 text-[var(--admin-theme-action-outline)] group-open:hidden">상세 보기</span><span className="ml-2 hidden text-[var(--admin-theme-action-outline)] group-open:inline">접기</span></summary>
     <div className="mt-3 flex flex-wrap gap-4">
-      <div><p className="mb-1 text-[var(--text-muted)]">기반 포스터</p>{source?.sourcePosterUrl ? <img src={source.sourcePosterUrl} alt="테마 기반 포스터" className="h-20 w-16 rounded object-contain" /> : <p>기반 포스터 정보 없음</p>}</div>
+      <div><p className="mb-1 text-[var(--text-muted)]">기반 포스터</p>{source?.sourcePosterUrl ? <AzureImage src={source.sourcePosterUrl} alt="테마 기반 포스터" className="h-20 w-16 rounded object-contain" /> : <p>기반 포스터 정보 없음</p>}</div>
       {source?.selectedBaseColor && <div><p className="mb-1 text-[var(--text-muted)]">기준 색상</p><span className="inline-flex items-center gap-1.5 font-mono"><span className="h-4 w-4 rounded-full border border-[var(--border-base)]" style={{ backgroundColor: source.selectedBaseColor }} />{source.selectedBaseColor}</span></div>}
       {!!source?.sourceColors?.length && <div><p className="mb-1 text-[var(--text-muted)]">추출 색상</p><div className="flex flex-wrap gap-2">{source.sourceColors.map((color) => <span key={color} className="inline-flex items-center gap-1 font-mono"><span className="h-4 w-4 rounded-full border border-[var(--border-base)]" style={{ backgroundColor: color }} />{color}</span>)}</div></div>}
     </div>

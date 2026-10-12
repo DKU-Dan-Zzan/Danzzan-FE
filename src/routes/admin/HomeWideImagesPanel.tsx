@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { ArrowDown, ArrowUp, LoaderCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/components/common/ui/utils";
+import { AzureImage } from "@/components/common/AzureImage";
 import { adminHomeImageApi, type AdminHomeImage } from "@/api/app/admin/adminHomeImageApi";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/common/ui/dialog";
 import { ADMIN_THEME_PRIMARY_ACTION_CLASS, ADMIN_THEME_SECONDARY_ACTION_CLASS } from "@/routes/admin/adminStyleClasses";
@@ -67,7 +68,7 @@ export function HomeWideImagesPanel({ actionStyle }: { actionStyle?: CSSProperti
       onClick={(event) => showPreview(image, event.currentTarget)}>
       {failedImageIds.has(image.id)
         ? <span className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-[var(--text-muted)]">이미지를 불러올 수 없습니다.</span>
-        : <img src={image.imageUrl} alt={alt} className="h-full w-full object-cover" onError={() => setFailedImageIds((current) => new Set(current).add(image.id))} />}
+        : <AzureImage src={image.imageUrl} alt={alt} className="h-full w-full object-cover" onError={() => setFailedImageIds((current) => new Set(current).add(image.id))} />}
     </button>;
   }
 
@@ -140,7 +141,7 @@ export function HomeWideImagesPanel({ actionStyle }: { actionStyle?: CSSProperti
         <div className="flex min-h-32 max-h-[75dvh] items-center justify-center overflow-hidden rounded-lg bg-[var(--surface-subtle)]">
           {previewImage && (failedImageIds.has(previewImage.id)
             ? <p className="p-6 text-sm text-[var(--text-muted)]">이미지를 불러올 수 없습니다.</p>
-            : <img src={previewImage.imageUrl} alt="홈 화면 이미지 원본 미리보기" className="max-h-[75dvh] max-w-full object-contain" onError={() => setFailedImageIds((current) => new Set(current).add(previewImage.id))} />)}
+            : <AzureImage src={previewImage.imageUrl} alt="홈 화면 이미지 원본 미리보기" className="max-h-[75dvh] max-w-full object-contain" onError={() => setFailedImageIds((current) => new Set(current).add(previewImage.id))} />)}
         </div>
       </DialogContent>
     </Dialog>

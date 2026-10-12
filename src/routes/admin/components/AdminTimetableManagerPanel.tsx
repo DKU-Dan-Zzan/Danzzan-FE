@@ -7,6 +7,7 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
+import { AzureImage } from "@/components/common/AzureImage";
 import { Pencil, Plus, RefreshCcw, Save, Trash2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -834,7 +835,7 @@ export default function AdminTimetableManagerPanel({
                         >
                           <td className="px-3 py-2">
                             {artist.imageUrl ? (
-                              <img
+                              <AzureImage
                                 src={artist.imageUrl}
                                 alt={artist.name}
                                 className="h-10 w-10 rounded-full object-cover"
@@ -942,13 +943,13 @@ export default function AdminTimetableManagerPanel({
               <div className="flex items-start gap-3">
                 <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-dashed border-[var(--border-base)] bg-white">
                   {artistImageDraft ? (
-                    <img
+                    <AzureImage
                       src={artistImageDraft.previewUrl}
                       alt="새 이미지 미리보기"
                       className="h-full w-full object-cover"
                     />
                   ) : artistForm.imageUrl ? (
-                    <img
+                    <AzureImage
                       src={artistForm.imageUrl}
                       alt={artistForm.name || "아티스트 이미지"}
                       className="h-full w-full object-cover"
