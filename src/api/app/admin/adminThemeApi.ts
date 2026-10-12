@@ -15,6 +15,7 @@ export type ThemeProvenance = {
   sourceColors: string[] | null;
 };
 export type ThemeUpsertRequest = { name: string; themeData: ThemeData } & Partial<ThemeProvenance>;
+export type ThemeBundleRequest = ThemeUpsertRequest & { sourcePosterUrl: string; ticketCardBackgroundImageUrl: string; ticketingBackgroundImageUrl: string };
 export type ThemeRecommendationRequest = { sourceColors: string[]; selectedBaseColor: string };
 export type ThemeRecommendationCandidate = {
   id: "balanced" | "vibrant" | "deep";
@@ -77,7 +78,8 @@ export const adminThemeApi = {
   }),
   delete: (id: number) => request<void>(`${basePath}/${id}`, { method: "DELETE" }),
   activate: (id: number) => request<ActiveThemeResponse>(`${basePath}/${id}/activate`, { method: "PUT" }),
-  recommend: async (payload: ThemeRecommendationRequest) => parseThemeRecommendationResponse(
-    await request<unknown>(`${basePath}/recommend`, { method: "POST", body: JSON.stringify(payload) }),
+  applyBundle: (payload: ThemeBundleRequest) => request<ActiveThemeResponse>(`${basePath}/apply-bundle`, { method: "POST", body: JSON.stringify(payload) }),
+  recommend: async (payload: ThemeRecommendationRequest, signal?: AbortSignal) => parseThemeRecommendationResponse(
+    await request<unknown>(`${basePath}/recommend`, { method: "POST", body: JSON.stringify(payload), signal }),
   ),
 };

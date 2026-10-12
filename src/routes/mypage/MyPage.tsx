@@ -29,7 +29,7 @@ import {
   AlertDialogTitle,
 } from "@/components/common/ui/alert-dialog";
 import { Checkbox } from "@/components/common/ui/checkbox";
-import { useFestivalBrandingImageSource } from "@/lib/app/festival/brandingImageSource";
+import { useFestivalPortraitBackground } from "@/lib/app/festival/useFestivalPortraitBackground";
 
 type WithdrawStep = "ticket-waiver" | "final";
 
@@ -164,7 +164,7 @@ function ListRow({
 
 function MyPage() {
   const navigate = useNavigate();
-  const posterImage = useFestivalBrandingImageSource("poster");
+  const posterImage = useFestivalPortraitBackground();
   const ticketingEnabled = useTicketingEnabled();
   const session = useSyncExternalStore(
     authStore.subscribe,

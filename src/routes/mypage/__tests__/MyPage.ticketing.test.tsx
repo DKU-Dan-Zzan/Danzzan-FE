@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import MyPage from "@/routes/mypage/MyPage";
 import { authStore } from "@/store/common/authStore";
-import { setTicketingEnabled } from "@/lib/app/festival/festivalCalendar";
+import { setTicketingEnabled, setTicketingBackgroundImageUrl } from "@/lib/app/festival/festivalCalendar";
 import { FestivalBrandingContext } from "@/lib/app/festival/festivalBrandingContext";
 
 const getMyTickets = vi.hoisted(() => vi.fn());
@@ -20,6 +20,7 @@ beforeEach(() => {
     tokens: { accessToken: `header.${btoa(JSON.stringify({ sub: "test", role: "ROLE_USER", exp: 9999999999 }))}.signature`, refreshToken: "refresh", expiresIn: null },
     user: { id: "1", name: "테스트 학생", role: "student", department: "테스트학과", studentId: "90000001", college: "테스트대학" },
   });
+  setTicketingBackgroundImageUrl(null);
   getMyTickets.mockReset().mockResolvedValue([{ id: "ticket-1", status: "issued", eventName: "축제 DAY 1", eventDate: "2026-09-01", issuedAt: "2026-08-31", seat: "1", qrCodeUrl: "" }]);
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   container = document.createElement("div");
@@ -81,4 +82,14 @@ it("ON에서 조회한 티켓 수량도 OFF로 바뀌면 숨긴다", async () =>
   await act(async () => setTicketingEnabled(false));
   expect(container.textContent).not.toContain("내 예매 티켓");
   expect(container.textContent).toContain("테스트 학생");
+});
+
+it.each([true, false])("추천 세로 배경은 티켓팅 %s에서도 내 정보에 적용되며 실패 시 공식 포스터로 돌아간다", async (enabled) => {
+  setTicketingEnabled(enabled);
+  setTicketingBackgroundImageUrl("http://localhost:8080/uploads/recommended-portrait.jpg");
+  await render("http://localhost:8080/uploads/official-poster.jpg");
+  const hero = container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')!;
+  expect(hero.getAttribute("src")).toBe("http://localhost:8080/uploads/recommended-portrait.jpg");
+  await act(async () => hero.dispatchEvent(new Event("error")));
+  expect(hero.getAttribute("src")).toBe("http://localhost:8080/uploads/official-poster.jpg");
 });

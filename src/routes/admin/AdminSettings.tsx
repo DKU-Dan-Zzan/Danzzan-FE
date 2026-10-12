@@ -29,6 +29,7 @@ import {
   updateFestivalTicketingSettings,
   uploadTicketingBackground,
 } from "@/api/app/festival/festivalSettingsApi"
+import { HomeWideImagesPanel } from "@/routes/admin/HomeWideImagesPanel"
 import TicketingBackgroundField from "@/routes/admin/TicketingBackgroundField"
 import { setTicketingEnabled, setTicketingBackgroundImageUrl, setTicketCardBackgroundImageUrl, setFestivalDates } from "@/lib/app/festival/festivalCalendar"
 import {
@@ -59,6 +60,7 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
   const [settings, setSettings] = useState<FestivalSettingsForm>(EMPTY_FESTIVAL_SETTINGS_FORM)
   const [savedSettings, setSavedSettings] = useState<FestivalSettingsForm | null>(null)
   const [isEditing, setIsEditing] = useState(false)
+  const [backgroundEditEpoch, setBackgroundEditEpoch] = useState(0)
   const [draftRound, setDraftRound] = useState<TicketingRound | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -233,6 +235,8 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
   }
 
   const handleCancel = () => {
+    // Remount the background editors so pending AI responses cannot restore a discarded draft.
+    setBackgroundEditEpoch(epoch => epoch + 1)
     setBackgroundImage(null)
     setTicketCardBackgroundImage(null)
     // 편집을 버리고 서버에 저장된 값으로 되돌린다.
@@ -356,6 +360,8 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
             </div>
           </div>
         </fieldset>}
+
+        {canOperate && <section id="home-images" className="scroll-mt-32"><HomeWideImagesPanel /></section>}
 
         {canTicket && <fieldset disabled={isSaving || isLoading} className="min-w-0 rounded-2xl border border-[var(--border-base)] bg-[var(--surface)] p-5 shadow-sm">
           <header className="flex items-center justify-between gap-3">
@@ -557,9 +563,11 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
               )}
             </div>
           )}
-          {!settings.ticketingEnabled && <p className="mt-4 rounded-xl bg-[var(--surface-subtle)] p-3 text-sm text-[var(--text-muted)]">티켓팅을 OFF로 저장하면 예매와 내 티켓 화면이 입장 안내로 바뀝니다. 로그인·회원가입·내정보와 팔찌 배부 관리는 이용할 수 있습니다. 기존 회차와 발급 티켓은 보관되며, 다시 ON으로 저장하면 조회할 수 있습니다.</p>}
-          {settings.ticketingEnabled && <TicketingBackgroundField mode="ticket" festivalName={settings.festivalName} url={settings.ticketCardBackgroundImageUrl} file={ticketCardBackgroundFile} previewUrl={ticketCardBackgroundImage?.previewUrl} disabled={isSaving || isLoading} onFile={(file) => { setTicketCardBackgroundImage({ file, previewUrl: URL.createObjectURL(file) }); setIsEditing(true) }} onReset={() => { setIsEditing(true); setTicketCardBackgroundImage(null); updateSettings({ ticketCardBackgroundImageUrl: null }) }} />}
-          {!settings.ticketingEnabled && <TicketingBackgroundField url={settings.ticketingBackgroundImageUrl} file={backgroundFile} previewUrl={backgroundImage?.previewUrl} disabled={isSaving || isLoading} onFile={handleBackgroundFile} onReset={() => { setIsEditing(true); setBackgroundImage(null); updateSettings({ ticketingBackgroundImageUrl: null }) }} />}
+          {!settings.ticketingEnabled && <p className="mt-4 rounded-xl bg-[var(--surface-subtle)] p-3 text-sm text-[var(--text-muted)]">티켓팅을 OFF로 저장하면 예매와 내 티켓 화면이 입장 안내로 바뀝니다. 로그인·회원가입·내정보와 팔찌 배부 관리는 이용할 수 있습니다. 기존 회차와 발급 티켓은 보관되며, 다시 ON으로 저장하면 조회할 수 있습니다. 아래 배경은 입장 안내와 내 정보 화면에 함께 적용됩니다.</p>}
+          <div className="mt-6" aria-label="사용자 화면 배경 설정">
+          {settings.ticketingEnabled ? <TicketingBackgroundField key={`ticket-${backgroundEditEpoch}`} mode="ticket" festivalName={settings.festivalName} url={settings.ticketCardBackgroundImageUrl} file={ticketCardBackgroundFile} previewUrl={ticketCardBackgroundImage?.previewUrl} disabled={isSaving || isLoading} onFile={(file) => { setTicketCardBackgroundImage({ file, previewUrl: URL.createObjectURL(file) }); setIsEditing(true) }} onReset={() => { setIsEditing(true); setTicketCardBackgroundImage(null); updateSettings({ ticketCardBackgroundImageUrl: null }) }} />
+          : <TicketingBackgroundField key={`closed-${backgroundEditEpoch}`} url={settings.ticketingBackgroundImageUrl} file={backgroundFile} previewUrl={backgroundImage?.previewUrl} disabled={isSaving || isLoading} onFile={handleBackgroundFile} onReset={() => { setIsEditing(true); setBackgroundImage(null); updateSettings({ ticketingBackgroundImageUrl: null }) }} />}
+          </div>
         </fieldset>}
 
       </AdminShell>

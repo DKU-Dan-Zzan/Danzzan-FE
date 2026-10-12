@@ -5,12 +5,16 @@ import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import AdminSettings from "@/routes/admin/AdminSettings"
+import { recommendPosterBackground } from "@/api/app/festival/posterBackgroundApi"
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
 const state = vi.hoisted(() => ({ role: "manager", permissions: ["OPERATIONS"] as string[] }))
 const api = vi.hoisted(() => ({ get: vi.fn(), metadata: vi.fn(), ticketing: vi.fn(), upload: vi.fn() }))
 const toast = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() }))
+
+vi.mock("@/api/app/festival/festivalBrandingApi", () => ({ festivalBrandingApi: { get: vi.fn().mockResolvedValue({ festivalSettingId: 1, posterImageUrl: null, logoImageUrl: null }) } }))
+vi.mock("@/api/app/festival/posterBackgroundApi", async (importOriginal) => ({ ...await importOriginal<typeof import("@/api/app/festival/posterBackgroundApi")>(), recommendPosterBackground: vi.fn() }))
 
 vi.mock("@/store/common/authStore", () => ({
   authStore: { subscribe: () => () => {}, getSnapshot: () => state },
@@ -26,6 +30,7 @@ vi.mock("@/lib/app/festival/festivalCalendar", async (importOriginal) => ({
   ...await importOriginal<typeof import("@/lib/app/festival/festivalCalendar")>(),
   setFestivalDates: vi.fn(), setTicketingEnabled: vi.fn(), setTicketingBackgroundImageUrl: vi.fn(), setTicketCardBackgroundImageUrl: vi.fn(),
 }))
+vi.mock("@/api/app/admin/adminHomeImageApi", () => ({ adminHomeImageApi: { list: vi.fn().mockResolvedValue([]) } }))
 vi.mock("sonner", () => ({ Toaster: () => null, toast }))
 
 const settings = {
@@ -122,12 +127,35 @@ describe("AdminSettings unified save", () => {
     expect(api.metadata).not.toHaveBeenCalled()
   })
 
+  it.each([true, false])("cancel aborts the visible background recommendation with ticketing %s and rejects a late result", async (enabled) => {
+    state.permissions = ["TICKETING"]
+    api.get.mockResolvedValue({ ...settings, ticketingEnabled: enabled })
+    let resolve!: (value: Awaited<ReturnType<typeof recommendPosterBackground>>) => void
+    vi.mocked(recommendPosterBackground).mockImplementation(() => new Promise(done => { resolve = done }))
+    await render()
+    await startEditing()
+    const buttons = [...container.querySelectorAll<HTMLButtonElement>("button")].filter(button => button.textContent === "포스터로 AI 배경 추천")
+    expect(buttons).toHaveLength(1)
+    await act(async () => buttons[0].click())
+    expect(vi.mocked(recommendPosterBackground).mock.calls[0][0]).toBe(enabled ? "ticket" : "closed")
+    const signal = vi.mocked(recommendPosterBackground).mock.calls[0][1]!
+    await clickButton("취소")
+    await settle()
+    expect(signal.aborted).toBe(true)
+    await act(async () => resolve({ target: enabled ? "ticket" : "closed", mimeType: "image/jpeg", imageBase64: "/9j/2Q==", width: 800, height: 360, focusX: .5, focusY: .5, reason: "취소한 결과" }))
+    expect(container.textContent).not.toContain("취소한 결과")
+    expect(findButton("저장")).toBeUndefined()
+    expect(findButton("수정")).toBeDefined()
+    expect(api.upload).not.toHaveBeenCalled()
+    expect(api.ticketing).not.toHaveBeenCalled()
+  })
+
   it("uploads an issued-ticket background and previews the actual ticket card", async () => {
     state.permissions = ["TICKETING"]
     api.get.mockResolvedValue({ ...settings, ticketingBackgroundImageUrl: "https://example.com/off.png" })
     await render()
     expect(container.textContent).toContain("발급 티켓 배경")
-    const input = container.querySelector<HTMLInputElement>('input[type="file"]')!
+    const input = container.querySelector<HTMLInputElement>('input[aria-label="발급 티켓 배경 사진 선택"]')!
     const file = new File(["image"], "card.jpg", { type: "image/jpeg" })
     await act(async () => {
       Object.defineProperty(input, "files", { value: [file], configurable: true })
@@ -147,7 +175,7 @@ describe("AdminSettings unified save", () => {
     api.get.mockResolvedValue({ ...settings, ticketingEnabled: false })
     await render()
     expect(findButton("배경 사진 변경")?.disabled).toBe(false)
-    const input = container.querySelector<HTMLInputElement>('input[type="file"]')!
+    const input = container.querySelector<HTMLInputElement>('input[aria-label="입장 안내 배경 사진 선택"]')!
     expect(input.disabled).toBe(false)
     const file = new File(["image"], "new-background.jpg", { type: "image/jpeg" })
     await act(async () => {
@@ -164,16 +192,47 @@ describe("AdminSettings unified save", () => {
     expect(container.querySelector('img[src="https://example.com/new-background.jpg"]')).not.toBeNull()
   })
 
-  it("shows the OFF background editor only while ticketing is OFF", async () => {
+  it.each([true, false])("shows only the mode-appropriate editor and preserves both saved backgrounds when ticketing starts %s", async (enabled) => {
     state.permissions = ["TICKETING"]
+    const backgrounds = {
+      ticketCardBackgroundImageUrl: "https://example.com/ticket.jpg",
+      ticketingBackgroundImageUrl: "https://example.com/closed.jpg",
+    }
+    api.get.mockResolvedValue({ ...settings, ...backgrounds, ticketingEnabled: enabled })
     await render()
-    expect(container.textContent).not.toContain("티켓팅 OFF 안내 배경")
-    await startEditing()
-    await clickButton("OFF")
-    expect(container.textContent).toContain("티켓팅 OFF 안내 배경")
-    expect(container.querySelector('img[alt="LEGEND"]')).not.toBeNull()
-    await clickButton("ON")
-    expect(container.textContent).not.toContain("티켓팅 OFF 안내 배경")
+    const expectEditor = (ticketingEnabled: boolean) => {
+      expect(container.textContent?.includes("아래 배경은 입장 안내와 내 정보 화면에 함께 적용됩니다.")).toBe(!ticketingEnabled)
+      expect(container.querySelectorAll('input[type="file"]')).toHaveLength(1)
+      expect(container.querySelector('input[aria-label="발급 티켓 배경 사진 선택"]') !== null).toBe(ticketingEnabled)
+      expect(container.querySelector('input[aria-label="입장 안내 배경 사진 선택"]') !== null).toBe(!ticketingEnabled)
+    }
+    expectEditor(enabled)
+    await clickButton(enabled ? "OFF" : "ON")
+    expectEditor(!enabled)
+    await clickButton(enabled ? "ON" : "OFF")
+    expectEditor(enabled)
+    await clickButton(enabled ? "OFF" : "ON")
+    await clickButton("저장")
+    await settle()
+    expect(api.upload).not.toHaveBeenCalled()
+    expect(api.ticketing).toHaveBeenCalledWith(expect.objectContaining({ ...backgrounds, ticketingEnabled: !enabled }))
+  })
+
+  it.each([true, false])("resetting the visible background with ticketing %s does not change the hidden background", async (enabled) => {
+    state.permissions = ["TICKETING"]
+    api.get.mockResolvedValue({ ...settings, ticketingEnabled: enabled,
+      ticketCardBackgroundImageUrl: "https://example.com/ticket.jpg",
+      ticketingBackgroundImageUrl: "https://example.com/closed.jpg",
+    })
+    await render()
+    await clickButton(enabled ? "기본 티켓 배경 사용" : "기본 안내 화면 사용")
+    await clickButton("저장")
+    await settle()
+    expect(api.ticketing).toHaveBeenCalledWith(expect.objectContaining({
+      ticketCardBackgroundImageUrl: enabled ? null : "https://example.com/ticket.jpg",
+      ticketingBackgroundImageUrl: enabled ? "https://example.com/closed.jpg" : null,
+    }))
+    expect(api.upload).not.toHaveBeenCalled()
   })
 
   it("restores the original OFF notice and saves a cleared custom background", async () => {
@@ -207,6 +266,7 @@ describe("AdminSettings unified save", () => {
   it("operations-only saves a changed festival name through only the metadata API", async () => {
     await render()
     expect([...container.querySelectorAll("h2")].map(heading => heading.textContent)).toEqual(["축제 기본 정보"])
+    expect(findButton("홈 배너 관리")).toBeDefined()
     expect(findButton("ON")).toBeUndefined()
     expect(findButton("OFF")).toBeUndefined()
     await startEditing()
@@ -232,6 +292,7 @@ describe("AdminSettings unified save", () => {
     state.permissions = ["TICKETING"]
     await render()
     expect([...container.querySelectorAll("h2")].map(heading => heading.textContent)).toEqual(["티켓팅"])
+    expect(findButton("홈 배너 관리")).toBeUndefined()
     await startEditing()
     expect(container.querySelector('input[type="text"]')).toBeNull()
     expect(container.querySelector('input[type="date"]')).toBeNull()
