@@ -68,6 +68,16 @@ afterEach(async () => {
 });
 
 describe("AdminTopNav staff menu", () => {
+  it("keeps theme recommendation and management on one anchored page", async () => {
+    await render("/admin/theme");
+    await act(async () => button("테마").dispatchEvent(new MouseEvent("mouseover", { bubbles: true })));
+    expect(button("테마").getAttribute("aria-expanded")).toBe("true");
+    await act(async () => button("AI 테마 추천").click());
+    expect(locationPath).toBe("/admin/theme#theme-ai");
+    await act(async () => button("테마").dispatchEvent(new MouseEvent("mouseover", { bubbles: true })));
+    await act(async () => button("테마 관리").click());
+    expect(locationPath).toBe("/admin/theme#theme-management");
+  });
   it("opens ticket settings and wristband links on click for touch users", async () => {
     await render();
     await act(async () => button("티켓팅").click());

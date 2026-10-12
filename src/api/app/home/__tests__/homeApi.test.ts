@@ -15,7 +15,7 @@ describe("homeApi", () => {
 
     await getHomeImages({ signal });
 
-    expect(spy).toHaveBeenLastCalledWith("/home/images", { signal });
+    expect(spy).toHaveBeenLastCalledWith("/home/1/images", { signal });
   });
 
   it("getLineupImages는 AbortSignal을 전달한다", async () => {

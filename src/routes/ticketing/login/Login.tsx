@@ -81,14 +81,14 @@ export default function Login() {
       </div>
 
       <div className="relative mx-auto flex h-full w-full max-w-[var(--ticketing-mobile-shell-max-width)] items-center justify-center px-5 py-3 sm:px-6 sm:py-4">
-        <div className="w-full rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_rgba(44,52,54,0.06)] backdrop-blur-[24px]">
+        <div className="w-full rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_var(--semantic-shadow-neutral-06)] backdrop-blur-[24px]">
           <div className="rounded-[26px] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface_container_low)_92%,white)_0%,color-mix(in_srgb,var(--surface_container_lowest)_96%,white)_100%)] px-4 py-5">
             <section className={TICKETING_AUTH_HEADER_SECTION_CLASS}>
               <TicketingAuthHeading eyebrow={FESTIVAL_EYEBROW} title={LOGIN_TITLE} />
             </section>
 
             <main className={TICKETING_AUTH_MAIN_CLASS}>
-              <div className="rounded-[24px] bg-[var(--surface_container_lowest)] px-3 py-3.5 shadow-[0_12px_30px_rgba(44,52,54,0.04)]">
+              <div className="rounded-[24px] bg-[var(--surface_container_lowest)] px-3 py-3.5 shadow-[0_12px_30px_var(--semantic-shadow-neutral-04)]">
                 <form className="space-y-4" onSubmit={handleSubmit}>
                   <section className="space-y-3">
                     <div className="space-y-1.5">

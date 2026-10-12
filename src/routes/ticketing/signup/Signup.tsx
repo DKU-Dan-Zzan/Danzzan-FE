@@ -368,7 +368,7 @@ function ConsentModal({
 }) {
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-end justify-center bg-black/40 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-end justify-center bg-[var(--ds-overlay-scrim-40)] backdrop-blur-sm"
       role="button"
       tabIndex={-1}
       onClick={onClose}
@@ -697,7 +697,7 @@ export default function Signup() {
           <div className="absolute bottom-[-4rem] left-1/4 h-64 w-64 rounded-full bg-[color:color-mix(in_srgb,var(--tertiary_container)_32%,white)] opacity-70 blur-3xl" />
         </div>
         <div className="relative mx-auto flex min-h-screen w-full max-w-[var(--ticketing-mobile-shell-max-width)] flex-col items-center justify-center px-5 pb-[calc(env(safe-area-inset-bottom)+5rem)] pt-[calc(env(safe-area-inset-top)+5rem)] sm:px-6">
-          <div className="w-full rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_rgba(44,52,54,0.06)] backdrop-blur-[24px]">
+          <div className="w-full rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_var(--semantic-shadow-neutral-06)] backdrop-blur-[24px]">
             <div className="flex flex-col items-center gap-6 rounded-[26px] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface_container_low)_92%,white)_0%,color-mix(in_srgb,var(--surface_container_lowest)_96%,white)_100%)] px-6 py-10">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(145deg,var(--ticketing-action-bg-start)_0%,var(--ticketing-action-bg-end)_100%)] shadow-[var(--ticketing-action-shadow)]">
                 <CheckCircle2 className="h-8 w-8 text-white" strokeWidth={2.2} />
@@ -741,7 +741,7 @@ export default function Signup() {
       </div>
 
       <div className="relative mx-auto w-full max-w-[var(--ticketing-mobile-shell-max-width)] px-5 pb-8 pt-[calc(env(safe-area-inset-top)+5.25rem)] sm:px-6">
-        <div className="w-full rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_rgba(44,52,54,0.06)] backdrop-blur-[24px]">
+        <div className="w-full rounded-[30px] bg-[color:color-mix(in_srgb,var(--surface)_74%,transparent)] p-1 shadow-[0_20px_50px_var(--semantic-shadow-neutral-06)] backdrop-blur-[24px]">
           <div className="rounded-[26px] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface_container_low)_92%,white)_0%,color-mix(in_srgb,var(--surface_container_lowest)_96%,white)_100%)] px-4 py-6">
             <section className={TICKETING_AUTH_HEADER_SECTION_CLASS}>
               <TicketingAuthHeading eyebrow={EYEBROW} title={PAGE_TITLE} />
@@ -750,7 +750,7 @@ export default function Signup() {
             <StepIndicator current={step} />
 
             <main className={TICKETING_AUTH_MAIN_CLASS}>
-              <div className="rounded-[24px] bg-[var(--surface_container_lowest)] px-3 py-4 shadow-[0_12px_30px_rgba(44,52,54,0.04)]">
+              <div className="rounded-[24px] bg-[var(--surface_container_lowest)] px-3 py-4 shadow-[0_12px_30px_var(--semantic-shadow-neutral-04)]">
                 {/* ── Step 1: 단국대 인증 ── */}
                 {step === 1 && (
                   <form className="space-y-5" onSubmit={handleStep1Submit}>

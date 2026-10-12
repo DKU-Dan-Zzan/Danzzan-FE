@@ -811,6 +811,9 @@ function run() {
         : readFileLines(file).map((text, idx) => ({ line: idx + 1, text }))
 
       for (const item of lineObjects) {
+        // Theme Core and fixed Design System declarations are the intentional
+        // central source of literal colors; consuming styles must use tokens.
+        if (file === "src/index.css" && /^\s*--(?:theme|ds)-[\w-]+:\s*#[0-9a-fA-F]{3,8}\s*;\s*$/.test(item.text)) continue
         const matches = item.text.match(hexPattern)
         if (!matches) continue
 

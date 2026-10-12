@@ -6,6 +6,7 @@ import { AppTopBar } from "@/components/layout/AppTopBar";
 import { AppShell } from "@/components/layout/AppShell";
 import { shouldShowTicketingHeader } from "@/lib/ticketing/navigation/headerVisibility";
 import { cn } from "@/components/common/ui/utils";
+import { FestivalBrandingImage } from "@/components/layout/FestivalBrandingImage";
 
 const HEADER_ICON_BUTTON_CLASS =
   "absolute top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center text-[color:color-mix(in_srgb,var(--text)_96%,black)] transition-colors duration-150 hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent";
@@ -76,7 +77,7 @@ export function UserLayout() {
 
   return (
     <AppShell
-      colorScheme="webapp"
+      visualVariant="webapp"
       header={
         showHeader ? (
           <AppTopBar
@@ -86,11 +87,9 @@ export function UserLayout() {
             headerClassName="fixed inset-x-0 top-0 z-50 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_62%,transparent)_0%,color-mix(in_srgb,var(--surface)_40%,transparent)_36%,color-mix(in_srgb,var(--surface)_18%,transparent)_72%,color-mix(in_srgb,var(--surface)_0%,transparent)_100%)] backdrop-blur-[24px] shadow-none pt-[env(safe-area-inset-top)]"
             containerClassName="relative mx-auto h-[68px] w-full max-w-[430px] px-4"
           >
-            <img
-              src="/legend-logo.png"
-              alt="LEGEND"
+            <FestivalBrandingImage
+              kind="logo"
               className="pointer-events-none absolute left-1/2 top-1/2 h-10 w-[140px] -translate-x-1/2 -translate-y-1/2 object-contain select-none"
-              draggable={false}
             />
 
             {showBackButton && (

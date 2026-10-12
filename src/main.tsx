@@ -7,17 +7,24 @@ import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
 import { queryClient } from "@/lib/query"
+import { loadActiveFestivalTheme } from "@/lib/app/festival/activeTheme"
+import { FestivalBrandingProvider } from "@/lib/app/festival/FestivalBrandingProvider"
 
 // PWA 서비스워커 등록
 import { registerSW } from "virtual:pwa-register"
 registerSW({ immediate: true })
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </QueryClientProvider>
-  </StrictMode>
-)
+async function bootstrap() {
+  await loadActiveFestivalTheme()
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <FestivalBrandingProvider><App /></FestivalBrandingProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </StrictMode>
+  )
+}
+
+void bootstrap()

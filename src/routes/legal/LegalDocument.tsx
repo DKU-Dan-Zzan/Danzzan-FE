@@ -117,7 +117,7 @@ const LegalDocument = ({ documentType }: LegalDocumentProps) => {
 
   return (
     <AppShell
-      colorScheme="electric-curator"
+      visualVariant="electric-curator"
       rootClassName="min-h-dvh bg-[var(--bg-page-soft)]"
       frameClassName="mx-auto flex h-dvh max-w-[430px] flex-col bg-[var(--bg-page-soft)]"
       mainClassName="flex-1 overflow-y-auto"

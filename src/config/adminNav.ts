@@ -30,7 +30,10 @@ export const ADMIN_NAV_MENUS: AdminNavMenu[] = [
     key: "theme",
     label: "테마",
     path: "/admin/theme",
-    items: [],
+    items: [
+      { label: "AI 테마 추천", path: "/admin/theme#theme-ai", description: "포스터 분석과 추천 시안" },
+      { label: "테마 관리", path: "/admin/theme#theme-management", description: "편집·저장·활성화" },
+    ],
   },
   {
     key: "notices",

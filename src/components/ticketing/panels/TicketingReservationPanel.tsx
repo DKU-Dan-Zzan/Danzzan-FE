@@ -114,7 +114,7 @@ function ThirdPartyPrivacyConsentDetail({ onAgree }: { onAgree: () => void }) {
 
       {isOpen && (
         <div
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] flex items-end justify-center bg-[var(--ds-overlay-scrim-40)] backdrop-blur-sm"
           role="button"
           tabIndex={-1}
           aria-label="개인정보 제3자 제공 동의 상세 닫기"

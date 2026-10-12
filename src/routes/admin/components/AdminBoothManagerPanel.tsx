@@ -1676,7 +1676,7 @@ export default function AdminBoothManagerPanel({
                                 <button
                                   type="button"
                                   onClick={() => handleRemovePendingPubImage(image.id)}
-                                  className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white"
+                                  className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--ds-overlay-image-control)] text-white"
                                 >
                                   <X className="h-4 w-4" strokeWidth={2.4} />
                                 </button>

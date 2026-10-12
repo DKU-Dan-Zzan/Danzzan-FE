@@ -27,8 +27,8 @@ const staffFilters: { value: StaffFilter; label: string }[] = [
 const panel = "rounded-2xl border border-[var(--admin-panel-border)] bg-[var(--admin-panel-bg)] p-5 sm:p-6";
 const roleLabel = (role: StaffMember["role"]) => role === "ADMIN" ? "최고 관리자" : role === "MANAGER" ? "매니저" : "일반 회원";
 const roleBadgeColor = {
-  ADMIN: "bg-violet-100 text-violet-800",
-  MANAGER: "bg-emerald-100 text-emerald-800",
+  ADMIN: "bg-[var(--ds-role-admin-bg)] text-[var(--ds-role-admin-text)]",
+  MANAGER: "bg-[var(--ds-role-manager-bg)] text-[var(--ds-role-manager-text)]",
   USER: "bg-slate-100 text-slate-700",
 };
 

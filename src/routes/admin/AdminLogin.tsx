@@ -54,7 +54,7 @@ export default function AdminLogin() {
       </div>
 
       <div className="relative mx-auto w-full max-w-[560px]">
-        <div className="rounded-[28px] border border-[var(--border-base)] bg-[var(--bg-base)] shadow-[0_16px_34px_rgba(15,23,42,0.08)]">
+        <div className="rounded-[28px] border border-[var(--border-base)] bg-[var(--bg-base)] shadow-[0_16px_34px_var(--semantic-shadow-slate-08)]">
           <div className="space-y-7 px-6 py-7 md:px-8 md:py-9">
             <div className="space-y-3">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
