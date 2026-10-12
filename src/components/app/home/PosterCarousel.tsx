@@ -1,4 +1,5 @@
 // 역할: home 화면에서 사용하는 Poster Carousel UI 블록을 렌더링합니다.
+import { HomePosterImage } from "@/components/app/home/HomePosterImage"
 import { clsx } from "clsx"
 import { useEffect, useMemo, useState } from "react"
 import { useT } from "@/i18n"
@@ -90,12 +91,12 @@ export default function PosterCarousel({
           >
             {posters.map((p) => (
               <div key={p.id} className="relative h-full min-w-full">
-                <img
+                {fillViewport ? <HomePosterImage src={p.imageUrl} alt={p.alt ?? t("home.posterFallbackAlt")} safeArea /> : <img
                   src={p.imageUrl}
                   alt={p.alt ?? t("home.posterFallbackAlt")}
                   className="h-full w-full object-cover"
                   draggable={false}
-                />
+                />}
                 {/* 텍스트 올릴 때 가독성용(선택) */}
                 <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgb(0_0_0_/_0.2),rgb(0_0_0_/_0),rgb(0_0_0_/_0.1))]" />
               </div>

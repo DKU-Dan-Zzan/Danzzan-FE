@@ -15,7 +15,7 @@ export type ThemeProvenance = {
   sourceColors: string[] | null;
 };
 export type ThemeUpsertRequest = { name: string; themeData: ThemeData } & Partial<ThemeProvenance>;
-export type ThemeBundleRequest = ThemeUpsertRequest & { sourcePosterUrl: string; ticketCardBackgroundImageUrl: string; ticketingBackgroundImageUrl: string };
+export type ThemeBundleRequest = ThemeUpsertRequest & { sourcePosterUrl: string; ticketCardBackgroundImageUrl: string; ticketingBackgroundImageUrl: string; homeBanner?: { imageUrl: string; expectedFirstImageId: number | null; expectedFirstImageUrl: string | null } };
 export type ThemeRecommendationRequest = { sourceColors: string[]; selectedBaseColor: string };
 export type ThemeRecommendationCandidate = {
   id: "balanced" | "vibrant" | "deep";

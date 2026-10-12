@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode, type CSSProperties } from "react";
 import { Check, Info, LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/components/common/ui/utils";
@@ -46,7 +46,8 @@ function ImageField({ kind, title, description, url, busy, uploading, onUpload }
   </div>;
 }
 
-export function FestivalBrandingPanel({ onAnalysisChange, onBrandingChange, onRecommend, recommending = false, autoRecommend = false, locked = false, recommendationCompleted = false, recommendationError = null }: {
+export function FestivalBrandingPanel({ onAnalysisChange, onBrandingChange, onRecommend, recommending = false, autoRecommend = false, locked = false, recommendationCompleted = false, recommendationError = null, homeBanner }: {
+  homeBanner?: ReactNode;
   onAnalysisChange?: (snapshot: PosterAnalysisSnapshot | null) => void;
   onBrandingChange?: (branding: FestivalBranding) => void;
   onRecommend?: (snapshot: PosterAnalysisSnapshot) => void;
@@ -162,16 +163,17 @@ export function FestivalBrandingPanel({ onAnalysisChange, onBrandingChange, onRe
 
   return <section className={panel} aria-label="축제 브랜딩">
 
-    <div className="grid items-start gap-8 lg:grid-cols-[minmax(240px,0.8fr)_minmax(0,1.4fr)]">
-    <div id="theme-assets" className="scroll-mt-40 sm:scroll-mt-28"><h2 className="mb-4 text-lg font-semibold">1. 포스터와 로고</h2>
-    {loading ? <p role="status" className="text-sm text-[var(--text-muted)]">이미지를 불러오는 중입니다…</p> : error ? <div role="alert" className="text-sm"><p>{error}</p><button type="button" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "mt-3")} onClick={() => void load()}>다시 시도</button></div> : <div className="space-y-3">
+    <div className={homeBanner ? "space-y-8" : "grid items-start gap-8 lg:grid-cols-[minmax(240px,0.8fr)_minmax(0,1.4fr)]"}>
+    <div id="theme-assets" className="scroll-mt-40 sm:scroll-mt-28"><h2 className="mb-4 text-lg font-semibold">{homeBanner ? "1. 축제 이미지 준비" : "1. 포스터와 로고"}</h2>
+    {loading ? <p role="status" className="text-sm text-[var(--text-muted)]">이미지를 불러오는 중입니다…</p> : error ? <div role="alert" className="text-sm"><p>{error}</p><button type="button" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "mt-3")} onClick={() => void load()}>다시 시도</button></div> : <div className={homeBanner ? "grid items-start gap-4 lg:grid-cols-3" : "space-y-3"}>
       <ImageField kind="poster" title="공식 포스터" description="색상과 배경 추천에 사용할 포스터입니다." url={branding?.posterImageUrl ?? null} busy={busyKind !== null || recommending || locked} uploading={busyKind === "poster"} onUpload={(kind, file) => void upload(kind, file)} />
 
       <ImageField kind="logo" title="축제 로고" description="화면에 표시할 로고입니다. 색상 분석에는 사용하지 않아요." url={branding?.logoImageUrl ?? null} busy={busyKind !== null || recommending || locked} uploading={busyKind === "logo"} onUpload={(kind, file) => void upload(kind, file)} />
+      {homeBanner}
     </div>}
-    <p className="mt-3 text-xs text-[var(--text-muted)]">이미지 변경은 바로 저장됩니다. 홈 배너 이미지는 <a href="/admin#home-images" className="font-semibold underline underline-offset-4">축제 설정</a>에서 관리하세요.</p>
+    <p className="mt-3 text-xs text-[var(--text-muted)]">포스터·로고 변경은 바로 저장됩니다. 추가 홈 이미지와 순서는 <a href="/admin#home-images" className="font-semibold underline underline-offset-4">축제 설정</a>에서 관리하세요.</p>
     </div>
-    {!loading && !error && <div id="theme-colors" className="min-w-0 scroll-mt-40 sm:scroll-mt-28 lg:border-l lg:border-[var(--border-base)] lg:pl-8" aria-label="포스터 색상 분석"><h2 className="text-lg font-semibold">2. 대표색을 골라 주세요</h2><p className="mb-5 mt-2 text-sm leading-6 text-[var(--text-muted)]">포스터에서 색을 뽑고 하나를 선택하면, 어울리는 테마와 배경을 자동으로 추천해요.</p>
+    {!loading && !error && <div id="theme-colors" className={cn("min-w-0 scroll-mt-40 sm:scroll-mt-28", homeBanner ? "border-t border-[var(--border-base)] pt-6" : "lg:border-l lg:border-[var(--border-base)] lg:pl-8")} aria-label="포스터 색상 분석"><h2 className="text-lg font-semibold">2. 대표색을 골라 주세요</h2><p className="mb-5 mt-2 text-sm leading-6 text-[var(--text-muted)]">포스터에서 색을 뽑고 하나를 선택하면, 어울리는 테마와 배경을 자동으로 추천해요.</p>
       <details aria-label="AI 테마 생성 과정" className="mb-4 text-xs text-[var(--text-muted)]"><summary className="cursor-pointer">추천 진행 상태</summary>
         <ol aria-label="AI 추천 작업 단계" className="mt-2 flex flex-col gap-1.5 text-xs sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
           {progressSteps.map(({ label, state, status }, index) => <li key={label} data-state={state} aria-current={state === "current" || state === "extracting" || state === "ready" || state === "generating" ? "step" : undefined}

@@ -4,6 +4,14 @@ import { renderToStaticMarkup } from "react-dom/server";
 import PosterCarousel from "@/components/app/home/PosterCarousel";
 
 describe("PosterCarousel", () => {
+  it("keeps the complete home poster visible above a blurred backdrop in fullscreen mode", () => {
+    const markup = renderToStaticMarkup(<PosterCarousel posters={[{ id: "p1", imageUrl: "/whole-poster.jpg", alt: "공식 포스터 전체" }]} fillViewport />);
+    expect(markup).toContain('object-contain');
+    expect(markup).toContain('aria-hidden="true"');
+    expect(markup).toContain('blur-2xl');
+    expect(markup.match(/alt="공식 포스터 전체"/g)).toHaveLength(1);
+  });
+
   it("포스터가 있을 때 래퍼에 home-card-border 보더를 적용하지 않는다", () => {
     const markup = renderToStaticMarkup(
       <PosterCarousel posters={[{ id: "p1", imageUrl: "/poster-1.jpg", alt: "poster 1" }]} />,

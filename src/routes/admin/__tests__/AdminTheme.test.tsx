@@ -8,6 +8,7 @@ import { recommendPosterBackground } from "@/api/app/festival/posterBackgroundAp
 import { uploadTicketingBackground } from "@/api/app/festival/festivalSettingsApi";
 import AdminTheme from "@/routes/admin/AdminTheme";
 import type { ActiveThemeResponse, ThemeData } from "@/api/app/festival/activeThemeApi";
+import { adminHomeImageApi } from "@/api/app/admin/adminHomeImageApi";
 import { adminThemeApi } from "@/api/app/admin/adminThemeApi";
 import type { ThemeRecommendationResponse } from "@/api/app/admin/adminThemeApi";
 import { festivalBrandingApi } from "@/api/app/festival/festivalBrandingApi";
@@ -31,6 +32,7 @@ vi.mock("@/api/app/festival/festivalBrandingApi", () => ({ festivalBrandingApi: 
   upload: vi.fn(),
   extractPosterColors: vi.fn(),
 } }));
+vi.mock("@/api/app/admin/adminHomeImageApi", () => ({ adminHomeImageApi: { list: vi.fn(), preview: vi.fn(), stageUpload: vi.fn() } }));
 vi.mock("@/routes/admin/HomeWideImagesPanel", () => ({ HomeWideImagesPanel: () => null }));
 
 const colors: ThemeData = {
@@ -71,6 +73,9 @@ async function render(withNavigation = false) {
 
 beforeEach(() => {
   setTicketingEnabled(true);
+  vi.mocked(adminHomeImageApi.list).mockResolvedValue([{ id: 7, imageUrl: "/existing-home.jpg", displayOrder: 0 }]);
+  vi.mocked(adminHomeImageApi.preview).mockResolvedValue({ mimeType: "image/jpeg", imageBase64: "/9j/2Q==", width: 900, height: 1600, sourcePosterUrl: "https://cdn.example.com/poster.png" });
+  vi.mocked(adminHomeImageApi.stageUpload).mockResolvedValue({ url: "https://cdn.example.com/new-home.jpg" });
   vi.clearAllMocks();
   permissions.role = "admin";
   permissions.permissions = ["OPERATIONS", "TICKETING"];
@@ -185,9 +190,55 @@ describe("AdminTheme", () => {
     expect(buttons("전체 적용")[0].disabled).toBe(false);
     await act(async () => buttons("전체 적용")[0].click());
     expect(adminThemeApi.applyBundle).toHaveBeenCalledWith(expect.objectContaining({ selectedBaseColor: "#13730C", sourcePosterUrl: "https://cdn.example.com/poster.png", ticketCardBackgroundImageUrl: "https://cdn.example.com/poster-ai-ticket.jpg", ticketingBackgroundImageUrl: "https://cdn.example.com/poster-ai-closed.jpg" }));
+    expect(vi.mocked(adminThemeApi.applyBundle).mock.calls[0][0]).not.toHaveProperty("homeBanner");
     expect(getTicketingBackgroundImageUrl()).toBe("https://cdn.example.com/poster-ai-closed.jpg");
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#4EB15E");
     expect(adminThemeApi.activate).not.toHaveBeenCalled();
+  });
+
+  it("stages a home image only on whole apply and sends the first-image snapshot atomically", async () => {
+    await prepareRecommendation();
+    await act(async () => buttons("다시 추천받기")[0].click());
+    await act(async () => buttons("이 시안 선택")[0].click());
+    const makeHome = buttons("이 포스터로 만들기")[0];
+    expect(makeHome).toBeDefined();
+    await act(async () => makeHome.click());
+    expect(adminHomeImageApi.stageUpload).not.toHaveBeenCalled();
+    expect(adminThemeApi.applyBundle).not.toHaveBeenCalled();
+    await act(async () => buttons("전체 적용")[0].click());
+    expect(adminHomeImageApi.stageUpload).toHaveBeenCalledOnce();
+    expect(adminThemeApi.applyBundle).toHaveBeenCalledWith(expect.objectContaining({
+      homeBanner: { imageUrl: "https://cdn.example.com/new-home.jpg", expectedFirstImageId: 7, expectedFirstImageUrl: "/existing-home.jpg" },
+    }));
+  });
+
+  it("leaves live colors and backgrounds unchanged when staging the home image fails", async () => {
+    await prepareRecommendation();
+    await act(async () => buttons("다시 추천받기")[0].click());
+    await act(async () => buttons("이 시안 선택")[0].click());
+    expect(buttons("이 포스터로 만들기")[0]).toBeDefined();
+    await act(async () => buttons("이 포스터로 만들기")[0].click());
+    vi.mocked(adminHomeImageApi.stageUpload).mockRejectedValueOnce(new Error("upload failed"));
+    await act(async () => buttons("전체 적용")[0].click());
+    expect(adminThemeApi.applyBundle).not.toHaveBeenCalled();
+    expect(getTicketingBackgroundImageUrl()).toBeNull();
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+    await act(async () => buttons("전체 적용")[0].click());
+    expect(adminThemeApi.applyBundle).toHaveBeenCalledOnce();
+  });
+
+  it("reuses the staged home upload on atomic apply retry and preserves the snapshot", async () => {
+    await prepareRecommendation();
+    await act(async () => buttons("다시 추천받기")[0].click());
+    await act(async () => buttons("이 시안 선택")[0].click());
+    await act(async () => buttons("이 포스터로 만들기")[0].click());
+    vi.mocked(adminThemeApi.applyBundle).mockRejectedValueOnce({ status: 409 });
+    await act(async () => buttons("전체 적용")[0].click());
+    expect(toastMock.error).toHaveBeenCalledWith("포스터 또는 홈 대표 이미지가 변경되었습니다. 새로고침 후 다시 확인해 주세요.");
+    expect(getTicketingBackgroundImageUrl()).toBeNull();
+    await act(async () => buttons("전체 적용")[0].click());
+    expect(adminHomeImageApi.stageUpload).toHaveBeenCalledOnce();
+    expect(vi.mocked(adminThemeApi.applyBundle).mock.calls[1][0]).toEqual(vi.mocked(adminThemeApi.applyBundle).mock.calls[0][0]);
   });
 
   it.each(["apply", "switch"] as const)("preserves the edited recommendation bundle on Save, then handles %s", async nextAction => {
@@ -269,11 +320,11 @@ describe("AdminTheme", () => {
     await act(async () => buttons("추천 화면 확인")[0].click());
     const preview = document.querySelector('[data-testid="theme-screen-preview"]')!;
     const tabs = () => [...preview.querySelectorAll('[role="tab"]')].map(tab => tab.textContent);
-    expect(tabs()).toEqual(["부스맵", "티켓팅", "발급 티켓", "내 정보"]);
+    expect(tabs()).toEqual(["홈", "부스맵", "티켓팅", "발급 티켓", "내 정보"]);
     await act(async () => setTicketingEnabled(false));
-    expect(tabs()).toEqual(["부스맵", "OFF 안내", "내 정보"]);
+    expect(tabs()).toEqual(["홈", "부스맵", "OFF 안내", "내 정보"]);
     await act(async () => setTicketingEnabled(true));
-    expect(tabs()).toEqual(["부스맵", "티켓팅", "발급 티켓", "내 정보"]);
+    expect(tabs()).toEqual(["홈", "부스맵", "티켓팅", "발급 티켓", "내 정보"]);
     await act(async () => document.querySelector<HTMLButtonElement>('[role="dialog"] button')!.click());
     expect(recommendPosterBackground).toHaveBeenCalledTimes(2);
     await act(async () => buttons("전체 적용")[0].click());
@@ -310,7 +361,7 @@ describe("AdminTheme", () => {
     await act(async () => issued.click());
     expect(preview.querySelector('[role="tabpanel"]')?.getAttribute("aria-label")).toBe("발급 티켓 화면 샘플");
     await act(async () => setTicketingEnabled(false));
-    expect([...preview.querySelectorAll('[role="tab"]')].map(tab => tab.textContent)).toEqual(["부스맵", "OFF 안내", "내 정보"]);
+    expect([...preview.querySelectorAll('[role="tab"]')].map(tab => tab.textContent)).toEqual(["홈", "부스맵", "OFF 안내", "내 정보"]);
     expect(preview.querySelector('[role="tabpanel"]')?.getAttribute("aria-label")).toBe("부스맵 화면 샘플");
     expect(preview.querySelector('[role="tab"][aria-selected="true"]')?.textContent).toBe("부스맵");
     expect(preview.textContent).not.toContain("발급 예시");
@@ -503,11 +554,11 @@ describe("AdminTheme", () => {
     await render();
     await act(async () => { buttons("편집 중인 화면 확인")[0].click(); });
     const preview = document.querySelector('[data-testid="theme-screen-preview"]')!;
-    await act(async () => { preview.querySelectorAll<HTMLButtonElement>('[role="tab"]')[1].click(); });
+    await act(async () => { [...preview.querySelectorAll<HTMLButtonElement>('[role="tab"]')].find(tab => tab.textContent === "OFF 안내")!.click(); });
     expect(preview.querySelector('section[aria-labelledby="service-closed-title"] img[alt="축제 로고"]')?.getAttribute("src")).toBe("/official-logo.png");
     expect(preview.textContent).toContain("현재 티켓팅 OFF");
     expect(preview.textContent).not.toContain("DAY 1 공연 티켓팅");
-    expect([...preview.querySelectorAll('[role="tab"]')].map(tab => tab.textContent)).toEqual(["부스맵", "OFF 안내", "내 정보"]);
+    expect([...preview.querySelectorAll('[role="tab"]')].map(tab => tab.textContent)).toEqual(["홈", "부스맵", "OFF 안내", "내 정보"]);
   });
 
   it("keeps the mobile preview scoped while switching map and ticketing tabs", async () => {
@@ -515,7 +566,7 @@ describe("AdminTheme", () => {
     expect(host.querySelector('[data-testid="theme-screen-preview"]')).toBeNull();
     await act(async () => { buttons("편집 중인 화면 확인")[0].click(); });
     const preview = document.querySelector('[data-testid="theme-screen-preview"]')!;
-    expect([...preview.querySelectorAll('[role="tab"]')].map(tab => tab.textContent)).toEqual(["부스맵", "티켓팅", "발급 티켓", "내 정보"]);
+    expect([...preview.querySelectorAll('[role="tab"]')].map(tab => tab.textContent)).toEqual(["홈", "부스맵", "티켓팅", "발급 티켓", "내 정보"]);
     expect(host.querySelector('[data-testid="theme-preview"]')?.contains(preview)).toBe(false);
     expect(preview.querySelector('[role="tabpanel"]')?.getAttribute("aria-label")).toBe("부스맵 화면 샘플");
     expect(preview.querySelector('img[alt="LEGEND"]')).not.toBeNull();
@@ -525,7 +576,7 @@ describe("AdminTheme", () => {
     expect(preview.querySelectorAll('[aria-label$="마커 샘플"]')).toHaveLength(6);
     expect(preview.querySelector('[role="tabpanel"]')?.className).toContain("max-w-[430px]");
     expect(preview.querySelector('[role="tabpanel"]')?.getAttribute("style")).toContain("--theme-brand-primary: #ff642d");
-    await act(async () => { preview.querySelectorAll<HTMLButtonElement>('[role="tab"]')[1].click(); });
+    await act(async () => { [...preview.querySelectorAll<HTMLButtonElement>('[role="tab"]')].find(tab => tab.textContent === "티켓팅")!.click(); });
     expect(preview.querySelector('[role="tabpanel"]')?.getAttribute("aria-label")).toBe("티켓팅 화면 샘플");
     expect(preview.querySelector('[role="tabpanel"]')?.getAttribute("data-color-scheme")).toBe("webapp");
     expect(preview.textContent).toContain("요일별 예매 오픈시간을 확인하여 티켓팅에 참여하세요.");
@@ -566,7 +617,7 @@ describe("AdminTheme", () => {
     expect(adminThemeApi.activate).not.toHaveBeenCalled();
     expect(festivalBrandingApi.get).toHaveBeenCalledTimes(1);
 
-    await act(async () => { preview.querySelectorAll<HTMLButtonElement>('[role="tab"]')[1].click(); });
+    await act(async () => { [...preview.querySelectorAll<HTMLButtonElement>('[role="tab"]')].find(tab => tab.textContent === "티켓팅")!.click(); });
     expect(logo().getAttribute("src")).toBe(newLogo);
     expect(logo().className).toContain("object-contain");
     await act(async () => { logo().dispatchEvent(new Event("error")); });
@@ -579,7 +630,7 @@ describe("AdminTheme", () => {
     await act(async () => { host.querySelector("svg.lucide-monitor-smartphone")!.closest("button")!.click(); });
     const preview = document.querySelector('[data-testid="theme-screen-preview"]')!;
     expect(preview.querySelector("header img")?.getAttribute("src")).toBe("/legend-logo.png");
-    await act(async () => { preview.querySelectorAll<HTMLButtonElement>('[role="tab"]')[1].click(); });
+    await act(async () => { [...preview.querySelectorAll<HTMLButtonElement>('[role="tab"]')].find(tab => tab.textContent === "티켓팅")!.click(); });
     expect(preview.querySelector("header img")?.getAttribute("src")).toBe("/legend-logo.png");
   });
 
