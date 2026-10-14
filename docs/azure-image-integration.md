@@ -80,6 +80,8 @@ FE의 기본 항목 ID `0`은 화면 내부에서만 사용한다. 적용 요청
 
 `Tangerine Cream`(주황·크림) 다음에 `Coastal Sunset`(남색·청회색·살구색)가 항상 표시된다. 표시 이름은 색상 분위기를 나타내며, 아래 5월 표기는 색상 출처를 뜻한다. 색상 출처는 [FE PR #103](https://github.com/DKU-Dan-Zzan/Danzzan-FE/pull/103)의 마지막 커밋 `cf71c7acc4951bfd216d88ce297416cd26702666`이다. PR 병합 시각은 2026-05-11이며 병합 커밋은 `aaf5a0444536cdc571a2ee205baadc39eacd51b6`이다.
 
+**후속 Azure 배포(2026-10-14, `20261014-theme-policy`):** 새 [테마 제작 색상 규칙](theme-color-policy.md)은 아래 역사적 브랜드 색상을 유지하되, 상태색·지도색에는 공통 기본값을 쓰고 주점은 Primary와 연결한다. 아래 표와 배포 기록은 해당 변경 이전의 출처·검증 기록이다.
+
 당시 `AppLayout`이 사용한 `electric-curator` 일반 화면의 색상을 현재 Theme Core 14개 항목으로 옮겼다. 원본 `src/index.css`의 대응 관계는 다음과 같다.
 
 | 현재 항목 | 색상 | 당시 출처 |
