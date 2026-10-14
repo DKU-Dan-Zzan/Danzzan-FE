@@ -10,7 +10,6 @@ import {
   THEME_CORE_VARIABLES,
 } from "@/lib/app/festival/activeTheme";
 import { getDefaultThemeData } from "@/lib/app/festival/defaultTheme";
-import { readBundledThemeData } from "@/routes/admin/themeEditor";
 import type { ThemeData } from "@/api/app/festival/activeThemeApi";
 
 const testTheme: ThemeData = {
@@ -44,10 +43,10 @@ afterEach(() => {
 });
 
 describe("active festival Theme", () => {
-  it("keeps the selectable default equal to all 14 original CSS colors, independent of active overrides", () => {
+  it("keeps the bundled default equal to all 14 original CSS colors, independent of active overrides", () => {
     const css = fs.readFileSync(path.resolve(__dirname, "../../../../index.css"), "utf8");
     applyThemeData(testTheme);
-    const defaults = readBundledThemeData();
+    const defaults = getDefaultThemeData();
     for (const group of Object.keys(THEME_CORE_VARIABLES) as Array<keyof ThemeData>) {
       for (const [key, variable] of Object.entries(THEME_CORE_VARIABLES[group])) {
         const cssValue = css.match(new RegExp(`${variable}:\\s*(#[a-fA-F0-9]{6});`))?.[1];

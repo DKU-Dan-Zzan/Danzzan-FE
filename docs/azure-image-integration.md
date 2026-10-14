@@ -142,3 +142,13 @@ HTTPS 홈·공지·테마 관리·health는 200, Nginx 설정 검사는 성공�
 - 앞서 DB에 반영한 11/27·28 일정도 재확인했다. 공연 7·9건, 부스 58·57건, 주점 5·5건이며 기존 9/9·10 조회는 0건이다. 축제 전체 기간 11/26~28은 유지한다.
 
 복구 자료는 VM `/opt/danzzan/deployment-backups/20261014-coastal-sunset/`에 보관한다. 이전 FE 이미지 태그는 `danzzan-fe:rollback-20261014-coastal-sunset`이다. 앱·DB를 되돌리지 않고 FE 이미지와 필요시 소스만 복구한다. 비밀 환경 파일과 DB 덤프는 Git에 포함하지 않는다.
+
+## PR #124 CI 구조 검사·홈 미리보기 테스트 보정 (2026-10-14)
+
+GitHub `quality-check`와 `structure-check`는 테스트 실행 전 `LAYER_LIB_NO_ROUTES_IMPORT`에서 중단됐다. `lib`의 `activeTheme.test.ts`가 관리자 `routes`의 단순 래퍼를 가져왔기 때문이다. 같은 기본값을 제공하는 `getDefaultThemeData()`를 직접 사용해 계층 규칙을 지키면서 CSS 14색 일치·활성 테마 영향 격리·복사본 독립성 검증을 유지했다. 검사 규칙이나 예외 목록은 변경하지 않았다.
+
+이후 전체 커버리지 실행에서 홈 미리보기 테스트 2건이 변경 전 `object-contain`을 기대하는 것을 확인했다. 5월 운영 방식으로 맞춘 실제 홈과 공통 `HomePosterImage`의 `object-cover`를 검증하도록 기대값과 테스트 이름을 갱신했다. 티켓팅 ON/OFF 각각에서 초안 이미지 표시와 전역 테마 불변 검증을 유지한다.
+
+로컬 검증은 전체 130개 파일·670개 테스트 및 커버리지 기준을 통과했다. 커버리지는 statements 49.46%, branches 47.41%, functions 46.74%, lines 49.24%다. 전체 ESLint, 전체/변경 파일 구조 검사, 순환 의존성 검사, 앱·테스트 타입 검사, 프로덕션 빌드 및 번들 예산 검사도 통과했다. 앱 엔트리 번들은 278.52 KiB / 488.28 KiB다. 기존 allowlist 만료 경고는 남아 있지만 구조 위반은 0건이다.
+
+이번 수정은 테스트와 문서만 변경하며 서비스 코드·Azure 설정·운영 데이터는 변경하지 않는다. 원격 GitHub 검사 결과는 PR의 최신 커밋 상태를 기준으로 확인한다.
