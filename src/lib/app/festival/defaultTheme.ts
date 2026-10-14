@@ -8,13 +8,11 @@ export const MAY_THEME_NAME = "Coastal Sunset";
 
 /** PR #103 head cf71c7a: public electric-curator palette mapped to today's Theme Core. */
 export function getMayThemeData(): ThemeData {
-  return {
-    // BottomNav used app-nav-home-highlight, not the historical general primary token.
+  return normalizeThemeColors({
+    ...getDefaultThemeData(),
+    // May's HOME highlight is preserved; semantic colors use today's fixed policy.
     brand: { primary: "#073161", secondary: "#f5b070", accent: "#8fa9be", strong: "#8fa9be" },
-    status: { success: "#2e7d32", warning: "#c98548", danger: "#b3261e", pending: "#e3776a" },
-    // Map markers were read from :root; May had no separate rest-area category.
-    category: { pub: "#2853a9", foodTruck: "#ef4444", experience: "#10b981", event: "#f6ca3b", restArea: "#8b5cf6", facility: "#3b82f6" },
-  };
+  });
 }
 
 export function createMayTheme(active: boolean): ActiveThemeResponse {
@@ -48,5 +46,15 @@ export function createDefaultTheme(active: boolean): ActiveThemeResponse {
     id: DEFAULT_THEME_ID, festivalSettingId: CURRENT_FESTIVAL_SETTING_ID,
     name: "Tangerine Cream", themeData: getDefaultThemeData(), active,
     createdAt: "", updatedAt: "",
+  };
+}
+
+/** Shared authoring policy; loading a saved theme must not rewrite its palette. */
+export function normalizeThemeColors(data: ThemeData): ThemeData {
+  const defaults = getDefaultThemeData();
+  return {
+    brand: { ...data.brand },
+    status: defaults.status,
+    category: { ...defaults.category, pub: data.brand.primary },
   };
 }

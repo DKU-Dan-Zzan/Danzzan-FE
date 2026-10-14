@@ -21,7 +21,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, Di
 import { ADMIN_THEME_DESTRUCTIVE_ACTION_CLASS, ADMIN_THEME_PRIMARY_ACTION_CLASS, ADMIN_THEME_SECONDARY_ACTION_CLASS } from "@/routes/admin/adminStyleClasses";
 import { createAdminThemeActionStyle, readActiveThemeStrong } from "@/routes/admin/adminThemeActionColors";
 import { AzureImage } from "@/components/common/AzureImage";
-import { createDefaultTheme, createMayTheme, DEFAULT_THEME_ID, MAY_THEME_ID, getDefaultThemeData, getMayThemeData, isSavedMayTheme } from "@/lib/app/festival/defaultTheme";
+import { createDefaultTheme, createMayTheme, DEFAULT_THEME_ID, MAY_THEME_ID, getDefaultThemeData, getMayThemeData, normalizeThemeColors, isSavedMayTheme } from "@/lib/app/festival/defaultTheme";
 import { DESIGN_SYSTEM_BLACK } from "@/lib/app/festival/themeFallbackColors";
 
 import { authStore } from "@/store/common/authStore";
@@ -251,7 +251,7 @@ export default function AdminTheme() {
     try {
       const response = await adminThemeApi.recommend({ sourceColors: snapshot.sourceColors, selectedBaseColor: snapshot.selectedBaseColor }, controller.signal);
       if (!current()) return;
-      setRecommendationCandidates(response.candidates);
+      setRecommendationCandidates(response.candidates.map(candidate => ({ ...candidate, themeData: normalizeThemeColors(candidate.themeData) })));
       setRecommendationSnapshot(snapshot);
       toast.success("색상 시안이 준비됐습니다. 하나를 선택하고 배경과 함께 확인하세요.");
     } catch (cause) {
@@ -291,7 +291,7 @@ export default function AdminTheme() {
         return { imageUrl, expectedFirstImageId: homeBanner.expectedFirstImageId, expectedFirstImageUrl: homeBanner.expectedFirstImageUrl };
       };
       const [ticketCardBackgroundImageUrl, ticketingBackgroundImageUrl, homeBannerUpdate] = await Promise.all([upload("ticket"), upload("closed"), stageHome()]);
-      const active = await adminThemeApi.applyBundle({ name: draft.name.trim(), themeData: cloneThemeData(draft.themeData),
+      const active = await adminThemeApi.applyBundle({ name: draft.name.trim(), themeData: normalizeThemeColors(draft.themeData),
         sourcePosterUrl: bundle.poster, sourceColors: recommendationSnapshot.sourceColors,
         selectedBaseColor: recommendationSnapshot.selectedBaseColor, ticketCardBackgroundImageUrl, ticketingBackgroundImageUrl,
         ...(homeBannerUpdate ? { homeBanner: homeBannerUpdate } : {}) });
@@ -315,7 +315,7 @@ export default function AdminTheme() {
     ++selectionSequence.current;
     setSelectedRecommendationId(candidate.id);
     setSelectedId(null);
-    setDraft({ name: `${candidate.name} AI 추천 테마`, themeData: cloneThemeData(candidate.themeData) });
+    setDraft({ name: `${candidate.name} AI 추천 테마`, themeData: normalizeThemeColors(candidate.themeData) });
     setSavedDraft(null);
     setNewDraftProvenance(recommendationSnapshot ? {
       sourcePosterUrl: recommendationSnapshot.sourcePosterUrl,
@@ -375,12 +375,13 @@ export default function AdminTheme() {
     setSelectedRecommendationId(null);
     const base = source ?? activeTheme;
     setNewDraftProvenance(source ? provenanceOf(source) : null);
-    setDraft({ name: source ? `${source.name} 복제` : "", themeData: cloneThemeData(base?.themeData ?? readBundledThemeData()) });
+    setDraft({ name: source ? `${source.name} 복제` : "", themeData: normalizeThemeColors(base?.themeData ?? readBundledThemeData()) });
     setSavedDraft(null);
   }
 
   function changeColor(group: keyof ThemeData, key: string, value: string) {
-    setDraft((current) => current && ({ ...current, themeData: { ...current.themeData, [group]: { ...current.themeData[group], [key]: value } } }));
+    if (group !== "brand") return;
+    setDraft((current) => current && ({ ...current, themeData: normalizeThemeColors({ ...current.themeData, brand: { ...current.themeData.brand, [key]: value } }) }));
   }
 
   async function save() {
@@ -389,7 +390,7 @@ export default function AdminTheme() {
     if (validationError) { toast.error(validationError); return; }
     setBusy(true);
     try {
-      const payload: ThemeUpsertRequest = { name: draft.name.trim(), themeData: cloneThemeData(draft.themeData) };
+      const payload: ThemeUpsertRequest = { name: draft.name.trim(), themeData: normalizeThemeColors(draft.themeData) };
       // Recheck before PUT: another admin may have activated this row since the list loaded.
       // PUT on an active row would change the live theme without an activation request.
       const latest = selectedId === null ? null : await adminThemeApi.get(selectedId);
@@ -517,7 +518,7 @@ export default function AdminTheme() {
         </div>
         <div className="min-w-0 space-y-6">{draft ? <>
             <section className={panel} aria-label="테마 편집"><div className="mb-5"><h2 className="font-semibold">{selectedId === null ? "새 테마" : "테마 편집"}</h2><p className="text-xs text-[var(--text-muted)]">저장과 실제 적용은 별개입니다.{selectedTheme?.active && !isBuiltInSelected && " 활성 테마를 수정해 저장하면 비활성 복제본이 생성됩니다."}</p></div>
-              <label className="block text-sm font-medium">테마 이름<input disabled={busy || isBuiltInSelected} aria-label="테마 이름" className={cn("mt-1", input)} maxLength={100} value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
+              <label className="block text-sm font-medium">테마 이름<input disabled={busy || isBuiltInSelected} aria-label="테마 이름" className={cn("mt-1", input)} maxLength={100} value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value, themeData: normalizeThemeColors(draft.themeData) })} /></label>
               {isBuiltInSelected ? <p className="mt-4 text-xs text-[var(--text-muted)]">{isMaySelected ? "2026년 5월 일반 화면의 색상을 현재 테마 형식에 맞춘 기본 시안입니다. 쉼터는 현재 기본색을 유지합니다." : "처음 제공된 색상입니다."} 수정하려면 복제해 주세요. 적용해도 포스터·로고·배경 이미지는 바뀌지 않습니다.</p> : <ThemeSourceDetails source={selectedTheme ? provenanceOf(selectedTheme) : newDraftProvenance ?? analysisSnapshot} />}
               <div className="mt-5 flex flex-wrap items-center gap-2 border-y border-[var(--border-base)] py-4" aria-label="테마 편집 작업">
                 {!dirty && !busy ? <span aria-label="저장 상태" className="inline-flex items-center rounded-full border border-[var(--border-base)] bg-[var(--ds-neutral-hover)] px-3 py-1.5 text-xs font-medium text-[var(--text-muted)]">변경사항 없음</span>
@@ -529,12 +530,14 @@ export default function AdminTheme() {
                 {selectedTheme && !isBuiltInSelected && <button type="button" className={cn(ADMIN_THEME_DESTRUCTIVE_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={() => void remove()} disabled={busy || recommending || selectedTheme.active} title={selectedTheme.active ? "활성 테마는 삭제할 수 없습니다" : undefined}><Trash2 className="h-4 w-4" />삭제</button>}
                 {dirty && selectedTheme && !selectedTheme.active && <p className="w-full text-xs text-[var(--text-muted)]">변경사항을 저장한 뒤 적용할 수 있습니다.</p>}
               </div>
+              <p className="mt-4 text-xs text-[var(--text-muted)]">주점은 메인 색상(Primary)을 따릅니다. 상태색과 나머지 지도 색상은 고정입니다. 기존 테마도 수정해 저장하면 이 규칙이 적용됩니다.</p>
               <div className="mt-6 space-y-6">{THEME_FIELDS.map((group) => <details key={group.key} open={group.key === "brand"} className="rounded-xl border border-[var(--border-base)] p-4"><summary className="cursor-pointer text-sm font-semibold">{group.title}<span className="ml-2 text-xs font-normal text-[var(--text-muted)]">{group.colors.length}가지 색상</span></summary><div className="mt-4 grid gap-3 sm:grid-cols-2">{group.colors.map(([key, label]) => {
                 const value = getThemeColor(draft.themeData, group.key, key);
                 const valid = isHexColor(value);
+                const locked = group.key !== "brand";
                 return <label key={key} className="flex min-w-0 items-center gap-3 rounded-xl border border-[var(--border-base)] p-3 text-sm">
-                  <input disabled={busy || isBuiltInSelected} type="color" aria-label={`${label} 색상 선택`} value={valid ? value : DESIGN_SYSTEM_BLACK} onChange={(event) => changeColor(group.key, key, event.target.value)} className="h-9 w-10 shrink-0 cursor-pointer rounded border-0 bg-transparent" />
-                  <span className="min-w-0 flex-1"><span className="mb-1 block font-medium">{label}</span><input disabled={busy || isBuiltInSelected} type="text" aria-label={`${label} HEX`} value={value} onChange={(event) => changeColor(group.key, key, event.target.value)} maxLength={7} spellCheck={false} aria-invalid={!valid} className={cn("w-full rounded-lg border px-2 py-1 font-mono text-xs", valid ? "border-[var(--border-base)]" : "border-[var(--semantic-status-danger)]")} /></span>
+                  <input disabled={busy || isBuiltInSelected || locked} type="color" aria-label={`${label} 색상 선택`} value={valid ? value : DESIGN_SYSTEM_BLACK} onChange={(event) => changeColor(group.key, key, event.target.value)} className="h-9 w-10 shrink-0 cursor-pointer rounded border-0 bg-transparent" />
+                  <span className="min-w-0 flex-1"><span className="mb-1 block font-medium">{label}</span><input disabled={busy || isBuiltInSelected || locked} type="text" aria-label={`${label} HEX`} value={value} onChange={(event) => changeColor(group.key, key, event.target.value)} maxLength={7} spellCheck={false} aria-invalid={!valid} className={cn("w-full rounded-lg border px-2 py-1 font-mono text-xs", valid ? "border-[var(--border-base)]" : "border-[var(--semantic-status-danger)]")} /></span>
                   <span className="h-7 w-7 shrink-0 rounded-full border border-[var(--border-base)]" style={{ backgroundColor: valid ? value : "transparent" }} aria-hidden="true" />
                 </label>;
               })}</div></details>)}</div>

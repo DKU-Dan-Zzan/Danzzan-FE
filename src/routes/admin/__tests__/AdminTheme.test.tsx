@@ -256,7 +256,7 @@ describe("AdminTheme", () => {
     await setInput("Primary HEX", "#123456");
     await act(async () => { buttons("저장")[0].click(); });
     expect(adminThemeApi.create).toHaveBeenCalledWith(expect.objectContaining({name: "Tangerine Cream 복제", themeData: {
-      ...getDefaultThemeData(), brand: { ...getDefaultThemeData().brand, primary: "#123456" },
+      ...getDefaultThemeData(), brand: { ...getDefaultThemeData().brand, primary: "#123456" }, category: { ...getDefaultThemeData().category, pub: "#123456" },
     }}));
     expect(adminThemeApi.update).not.toHaveBeenCalled();
     expect(adminThemeApi.activateDefault).not.toHaveBeenCalled();
@@ -340,6 +340,9 @@ describe("AdminTheme", () => {
     await act(async () => buttons("전체 적용")[0].click());
     expect(adminThemeApi.applyBundle).toHaveBeenCalledWith(expect.objectContaining({ selectedBaseColor: "#13730C", sourcePosterUrl: "https://cdn.example.com/poster.png", ticketCardBackgroundImageUrl: "https://cdn.example.com/poster-ai-ticket.jpg", ticketingBackgroundImageUrl: "https://cdn.example.com/poster-ai-closed.jpg" }));
     expect(vi.mocked(adminThemeApi.applyBundle).mock.calls[0][0]).not.toHaveProperty("homeBanner");
+    const appliedColors = vi.mocked(adminThemeApi.applyBundle).mock.calls[0][0].themeData;
+    expect(appliedColors.category).toEqual({ ...colors.category, pub: appliedColors.brand.primary });
+    expect(appliedColors.status).toEqual(colors.status);
     expect(getTicketingBackgroundImageUrl()).toBe("https://cdn.example.com/poster-ai-closed.jpg");
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#4EB15E");
     expect(adminThemeApi.activate).not.toHaveBeenCalled();
@@ -432,7 +435,8 @@ describe("AdminTheme", () => {
     await prepareRecommendation();
     await act(async () => buttons("다시 추천받기")[0].click());
     await act(async () => buttons("이 시안 선택")[0].click());
-    const editableInputs = () => Array.from(host.querySelectorAll<HTMLInputElement>('[aria-label="테마 편집"] input'));
+    const editableLabels = ["테마 이름", ...THEME_FIELDS[0].colors.flatMap(([, label]) => [`${label} HEX`, `${label} 색상 선택`])];
+    const editableInputs = () => Array.from(host.querySelectorAll<HTMLInputElement>('[aria-label="테마 편집"] input')).filter(input => editableLabels.includes(input.getAttribute("aria-label") ?? ""));
     expect(editableInputs().length).toBeGreaterThan(3);
     expect(editableInputs().every(input => !input.disabled)).toBe(true);
     const uploads: Array<() => void> = [];
@@ -903,15 +907,38 @@ describe("AdminTheme", () => {
     expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toBe(before);
   });
 
-  it("shows the active theme and all 14 editable colors", async () => {
+  it("shows all 14 colors but only allows brand color editing", async () => {
     await render();
     expect(host.querySelector('[aria-label="현재 활성 테마"]')?.textContent).toContain("활성 축제");
     expect(host.querySelectorAll('input[type="color"]')).toHaveLength(14);
+    expect(host.querySelectorAll('input[type="color"]:not(:disabled)')).toHaveLength(4);
     expect(host.querySelectorAll('input[aria-label$="HEX"]')).toHaveLength(14);
     expect(host.querySelector('input[aria-label="Strong · 진한 브랜드 컬러 HEX"]')).not.toBeNull();
     expect(host.querySelector('[data-testid="theme-preview"]')).not.toBeNull();
     expect(host.querySelector('[data-testid="theme-preview"]')?.textContent).toContain("강조 버튼");
     expect(host.querySelector('[aria-label="테마 생성 출처"]')?.textContent).toContain("생성 출처 정보가 없는 수동 테마");
+  });
+
+  it("preserves a legacy theme on load but normalizes its edited copy before saving", async () => {
+    const legacy = { ...active, themeData: { ...colors,
+      status: { ...colors.status, success: "#000000" },
+      category: { ...colors.category, foodTruck: "#ffffff", pub: "#111111" },
+    } };
+    vi.mocked(adminThemeApi.list).mockResolvedValue([legacy]);
+    vi.mocked(adminThemeApi.get).mockResolvedValue(legacy);
+    await render();
+    expect(host.querySelector<HTMLInputElement>('input[aria-label="Success HEX"]')?.value).toBe("#000000");
+    expect(adminThemeApi.update).not.toHaveBeenCalled();
+    await setInput("Primary HEX", "#3b82f6");
+    expect(host.querySelector<HTMLInputElement>('input[aria-label="주점 HEX"]')?.value).toBe("#3b82f6");
+    expect(host.querySelector<HTMLInputElement>('input[aria-label="Success HEX"]')?.value).toBe("#2e7d32");
+    await act(async () => buttons("저장")[0].click());
+    const payload = vi.mocked(adminThemeApi.create).mock.calls[0][0];
+    expect(payload.themeData.status).toEqual(colors.status);
+    expect(payload.themeData.category).toEqual({ ...colors.category, pub: "#3b82f6" });
+    expect(legacy.themeData.status.success).toBe("#000000");
+    expect(adminThemeApi.update).not.toHaveBeenCalled();
+    expect(adminThemeApi.activate).not.toHaveBeenCalled();
   });
 
   it("shows saved provenance and copies it when duplicating a theme", async () => {
@@ -967,6 +994,8 @@ describe("AdminTheme", () => {
     await render();
     await setInput("Primary HEX", "#123456");
     expect(host.querySelector('[data-testid="theme-preview"]')?.getAttribute("style")).toContain("--preview-brand-primary: #123456");
+    expect(host.querySelector<HTMLInputElement>('input[aria-label="주점 HEX"]')?.value).toBe("#123456");
+    expect(host.querySelector<HTMLInputElement>('input[aria-label="주점 HEX"]')?.disabled).toBe(true);
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
     await act(async () => { buttons("저장")[0].click(); });
     expect(adminThemeApi.create).toHaveBeenCalledOnce();

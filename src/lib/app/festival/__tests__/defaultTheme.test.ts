@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { createMayTheme, getDefaultThemeData, getMayThemeData, isSavedMayTheme } from "../defaultTheme";
+import { createMayTheme, getDefaultThemeData, getMayThemeData, isSavedMayTheme, normalizeThemeColors } from "../defaultTheme";
 
 describe("May built-in theme", () => {
-  it("maps the PR #103 public palette and root map markers, with a current rest-area fallback", () => {
+  it("keeps the PR #103 brand palette with the shared status and map policy", () => {
     // cf71c7a src/index.css: electric-curator HOME highlight rgb(7 49 97), secondary/warning,
-    // inherited root statuses, and root markers read by the historical map helper.
+    // Status and category colors follow the current shared authoring policy.
     const theme = getMayThemeData();
     expect(theme.brand).toEqual({ primary: "#073161", secondary: "#f5b070", accent: "#8fa9be", strong: "#8fa9be" });
-    expect(theme.status).toEqual({ success: "#2e7d32", warning: "#c98548", danger: "#b3261e", pending: "#e3776a" });
-    expect(theme.category).toEqual({ pub: "#2853a9", foodTruck: "#ef4444", experience: "#10b981", event: "#f6ca3b", facility: "#3b82f6", restArea: getDefaultThemeData().category.restArea });
+    expect(theme.status).toEqual({ success: "#2e7d32", warning: "#b26a00", danger: "#b3261e", pending: "#e3776a" });
+    expect(theme.category).toEqual({ pub: "#073161", foodTruck: "#ec4899", experience: "#10b981", event: "#f6ca3b", facility: "#3b82f6", restArea: getDefaultThemeData().category.restArea });
   });
 
   it("returns independent palette copies", () => {
@@ -38,5 +38,21 @@ describe("May built-in theme", () => {
     expect(isSavedMayTheme({ ...theme, sourcePosterUrl: "/poster.jpg" })).toBe(false);
     expect(isSavedMayTheme({ ...theme, selectedBaseColor: "#8fa9be" })).toBe(false);
     expect(isSavedMayTheme({ ...theme, sourceColors: ["#8fa9be"] })).toBe(false);
+  });
+});
+
+describe("theme authoring color policy", () => {
+  it("fixes semantic colors and links pub to primary without changing the source", () => {
+    const source = getDefaultThemeData();
+    source.brand.primary = "#3b82f6";
+    source.status.success = "#000000";
+    source.category.foodTruck = "#ffffff";
+    const result = normalizeThemeColors(source);
+    expect(result.brand).toEqual(source.brand);
+    expect(result.status).toEqual({ success: "#2e7d32", warning: "#b26a00", danger: "#b3261e", pending: "#e3776a" });
+    expect(result.category).toEqual({ pub: "#3b82f6", foodTruck: "#ec4899", experience: "#10b981", event: "#f6ca3b", restArea: "#8b5cf6", facility: "#3b82f6" });
+    expect(source.status.success).toBe("#000000");
+    expect(source.category.foodTruck).toBe("#ffffff");
+    expect(normalizeThemeColors(result)).toEqual(result);
   });
 });
