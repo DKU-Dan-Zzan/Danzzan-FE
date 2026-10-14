@@ -126,7 +126,7 @@ describe("AdminTheme", () => {
     await chooseMay();
     expect(adminThemeApi.get).not.toHaveBeenCalled();
     expect(adminThemeApi.create).not.toHaveBeenCalled();
-    expect(host.querySelector<HTMLInputElement>('[aria-label="Primary HEX"]')?.value).toBe("#8fa9be");
+    expect(host.querySelector<HTMLInputElement>('[aria-label="Primary HEX"]')?.value).toBe("#073161");
     expect(host.querySelector<HTMLInputElement>('[aria-label="Primary HEX"]')?.disabled).toBe(true);
     expect(buttons("삭제")).toHaveLength(0);
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
@@ -134,7 +134,7 @@ describe("AdminTheme", () => {
     await act(async () => { buttons("Coastal Sunset 적용")[0].click(); });
     expect(adminThemeApi.create).toHaveBeenCalledWith({ name: "Coastal Sunset", themeData: getMayThemeData(), sourcePosterUrl: null, selectedBaseColor: null, sourceColors: null });
     expect(adminThemeApi.activate).toHaveBeenCalledWith(3);
-    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#8fa9be");
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#073161");
     expect(host.querySelector('[aria-label="현재 활성 테마"]')?.textContent).toContain("Coastal Sunset");
     expect(host.querySelectorAll('[aria-label="Coastal Sunset 선택"]')).toHaveLength(1);
     expect(getTicketCardBackgroundImageUrl()).toBe("/existing-ticket.jpg");
@@ -171,7 +171,7 @@ describe("AdminTheme", () => {
     await act(async () => { buttons("Coastal Sunset 적용")[0].click(); });
     expect(adminThemeApi.create).toHaveBeenCalledOnce();
     expect(adminThemeApi.activate).toHaveBeenNthCalledWith(2, 42);
-    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#8fa9be");
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#073161");
   });
 
   it("does not activate anything if saving the May preset fails", async () => {

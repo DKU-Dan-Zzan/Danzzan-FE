@@ -9,7 +9,8 @@ export const MAY_THEME_NAME = "Coastal Sunset";
 /** PR #103 head cf71c7a: public electric-curator palette mapped to today's Theme Core. */
 export function getMayThemeData(): ThemeData {
   return {
-    brand: { primary: "#8fa9be", secondary: "#f5b070", accent: "#8fa9be", strong: "#8fa9be" },
+    // BottomNav used app-nav-home-highlight, not the historical general primary token.
+    brand: { primary: "#073161", secondary: "#f5b070", accent: "#8fa9be", strong: "#8fa9be" },
     status: { success: "#2e7d32", warning: "#c98548", danger: "#b3261e", pending: "#e3776a" },
     // Map markers were read from :root; May had no separate rest-area category.
     category: { pub: "#2853a9", foodTruck: "#ef4444", experience: "#10b981", event: "#f6ca3b", restArea: "#8b5cf6", facility: "#3b82f6" },

@@ -78,13 +78,14 @@ FE의 기본 항목 ID `0`은 화면 내부에서만 사용한다. 적용 요청
 
 ## 8. 5월 운영 색상 프리셋 (2026-10-14 Azure 반영)
 
-`Tangerine Cream`(주황·크림) 다음에 `Coastal Sunset`(청회색·살구색)가 항상 표시된다. 표시 이름은 색상 분위기를 나타내며, 아래 5월 표기는 색상 출처를 뜻한다. 색상 출처는 [FE PR #103](https://github.com/DKU-Dan-Zzan/Danzzan-FE/pull/103)의 마지막 커밋 `cf71c7acc4951bfd216d88ce297416cd26702666`이다. PR 병합 시각은 2026-05-11이며 병합 커밋은 `aaf5a0444536cdc571a2ee205baadc39eacd51b6`이다.
+`Tangerine Cream`(주황·크림) 다음에 `Coastal Sunset`(남색·청회색·살구색)가 항상 표시된다. 표시 이름은 색상 분위기를 나타내며, 아래 5월 표기는 색상 출처를 뜻한다. 색상 출처는 [FE PR #103](https://github.com/DKU-Dan-Zzan/Danzzan-FE/pull/103)의 마지막 커밋 `cf71c7acc4951bfd216d88ce297416cd26702666`이다. PR 병합 시각은 2026-05-11이며 병합 커밋은 `aaf5a0444536cdc571a2ee205baadc39eacd51b6`이다.
 
 당시 `AppLayout`이 사용한 `electric-curator` 일반 화면의 색상을 현재 Theme Core 14개 항목으로 옮겼다. 원본 `src/index.css`의 대응 관계는 다음과 같다.
 
 | 현재 항목 | 색상 | 당시 출처 |
 | --- | --- | --- |
-| brand.primary / accent / strong | `#8fa9be` | electric-curator의 primary, accent, text-emphasis-vivid |
+| brand.primary | `#073161` | electric-curator의 app-nav-home-highlight: rgb(7 49 97), 하단 HOME 버튼 배경 |
+| brand.accent / strong | `#8fa9be` | electric-curator의 accent, text-emphasis-vivid → 당시 일반 primary |
 | brand.secondary | `#f5b070` | electric-curator의 secondary |
 | status.success | `#2e7d32` | root의 status-success |
 | status.warning | `#c98548` | electric-curator의 status-warning |
@@ -107,7 +108,15 @@ FE의 기본 항목 ID `0`은 화면 내부에서만 사용한다. 적용 요청
 
 2026-10-14 로컬 검증: FE 전체 130개 파일·660개 테스트, `npm run build`(애플리케이션 타입 검사 포함), `npm run typecheck:test`, `npm run lint` 통과. 프리셋 선택 시 쓰기 없음, 실제 ID로 저장·활성화, 재조회 후 재사용, 생성·활성화 실패 시 기존 색상 유지, 초기 테마 복원과 이미지 유지, 복제 편집을 테스트했다. Azure DB 쓰기나 실제 브라우저에서의 배포 후 색상 확인은 실행하지 않았다. 빌드에는 기존 Browserslist 데이터 갱신 안내가 남아 있다.
 
-### Azure 반영 확인 (2026-10-14)
+### HOME 버튼 기준 메인색 보정 (2026-10-14, Azure 반영)
+
+최초 프리셋은 일반 `--primary: rgb(143 169 190)`를 메인색으로 옮겨 청회색이 표시됐다. PR #103의 `BottomNav.tsx`에서 실제 HOME 버튼 배경은 `--app-nav-home-highlight`를 사용했고, `electric-curator` 스킴은 이를 `rgb(7 49 97)`로 별도 지정했다. 사용자가 의도한 HOME 버튼 색을 반영하기 위해 `brand.primary`만 `#073161`로 보정했다. 현재 CSS의 연결은 `--theme-brand-primary` → `--semantic-primary` → `--app-nav-home-highlight`이다. 나머지 13색은 유지한다.
+
+기존 청회색 프리셋 저장본은 새 프리셋과 색이 다르므로 일반 저장 테마로 남는다. 현재 활성 테마나 DB 레코드를 자동으로 덮어쓰지 않는다. 배포 후 기본 선택지의 `Coastal Sunset`을 선택하고 적용해야 보정된 색으로 변경된다. 아래 첫 Azure 반영 기록은 보정 전 배포의 기록이다. 이번 보정의 배포 결과는 이어지는 추가 배포 기록을 따른다.
+
+보정 검증: 관련 4개 파일의 테스트 75개, 애플리케이션 타입 검사, 변경된 TypeScript 파일 ESLint, `git diff --check` 통과. 선택·저장·적용 시 새 메인색 전달과 이전 청회색 저장본 보존을 확인했다. 이후 실제 Azure 화면 검증은 아래 추가 배포 기록에 남겼다.
+
+### Azure 반영 확인 (2026-10-14, 메인색 보정 전)
 
 `20261014-theme-presets` 배포로 기본 테마 복원 BE API와 FE의 `Tangerine Cream`, `Coastal Sunset` 선택지를 반영했다. 마지막 이름 변경 후 관련 테스트 64개를 다시 통과했으며 VM의 FE 빌드(타입 검사 포함)도 성공했다. 실제 로그인된 관리자 브라우저에서 두 선택지와 각각 `#ff642d`·`#8fa9be` 미리보기를 확인했다. 기존 활성 `Balanced AI 추천 테마`는 그대로 유지했다. 운영 데이터 변경을 피하기 위해 실제 적용·복제·삭제 버튼은 누르지 않았다. 이 동작들은 로컬 테스트로 검증했으며 이번 운영 검증은 조회·미리보기까지다.
 
@@ -118,3 +127,16 @@ HTTPS 홈·공지·테마 관리·health는 200, Nginx 설정 검사는 성공�
 초기 VM 점검에서 같은 VM의 OpenAI 모델 조회는 엔드포인트·인증·모델 도달 여부만 확인한 것이다. 관리자 화면의 포스터 전송, 테마 생성, 티켓·마감 배경 생성까지 성공했다는 검증은 아니었다.
 
 이후 BE에 요청 식별자·처리 시간·HTTP 상태·오류 종류만 남기는 진단 로그를 반영했다. API 키, 인증 헤더, SAS URL, 포스터 본문·Base64 값은 로그에 남기지 않는다. 실제 로그인된 관리자 화면에서 테마 추천과 두 배경 추천을 실행해 200 응답을 확인했다. 재배포 후 정상화된 상태이므로 이전 시간 초과의 단일 원인은 확정하지 않았다. 상세 진단 기록과 재현 절차는 [BE AI 추천 진단 문서](../../Danzzan-BE/docs/azure-ai-recommendation-diagnostics.md)를 따른다.
+
+
+## 10. Coastal Sunset 메인색·포스터 자산 추가 배포 (2026-10-14)
+
+`20261014-coastal-sunset`으로 FE만 배포했다. 로컬 기준 커밋 `c300d4bf`의 포스터 자산/경로 변경과 배포 당시 미커밋이었던 메인색 보정을 포함한다. VM과 로컬 소스 해시를 비교해 차이가 있는 15개 파일만 전송했다. 실제 전송 파일별 SHA-256은 VM 복구 디렉터리의 `source-manifest.json`에 기록했다. 이전 정적 이미지 경로 파일은 삭제하지 않아 기존 참조를 보존했다.
+
+- 관련 7개 파일의 테스트 87개 통과. VM Docker 빌드의 TypeScript 검사·Vite 빌드 성공 후 frontend 컨테이너만 교체했다.
+- 관리자 브라우저를 새로고침하고 기본 `Coastal Sunset` 선택지에서 Primary HEX `#073161`을 확인했다. 기존 활성 청회색 저장본은 일반 저장 테마로 남아 있다. 선택·미리보기만 했으며 적용·저장·삭제·AI 요청은 실행하지 않았다.
+- 새/이름 변경된 JPEG 4개는 HTTPS 200이며 응답 바이트 해시가 로컬 파일과 모두 일치했다. DB에 저장된 홈 이미지나 Blob 파일을 교체한 것은 아니다.
+- HTTPS 홈·공지·테마 관리·health, Nginx 설정 검사 성공. BE·MySQL·Redis·Kafka 컨테이너 ID는 유지했고, 콘텐츠·일정·축제 설정·테마를 포함한 20개 테이블의 정규화 덤프 해시는 배포 전후 일치했다.
+- 앞서 DB에 반영한 11/27·28 일정도 재확인했다. 공연 7·9건, 부스 58·57건, 주점 5·5건이며 기존 9/9·10 조회는 0건이다. 축제 전체 기간 11/26~28은 유지한다.
+
+복구 자료는 VM `/opt/danzzan/deployment-backups/20261014-coastal-sunset/`에 보관한다. 이전 FE 이미지 태그는 `danzzan-fe:rollback-20261014-coastal-sunset`이다. 앱·DB를 되돌리지 않고 FE 이미지와 필요시 소스만 복구한다. 비밀 환경 파일과 DB 덤프는 Git에 포함하지 않는다.
