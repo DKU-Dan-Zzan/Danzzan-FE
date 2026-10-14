@@ -92,7 +92,7 @@ export default function PosterCarousel({
           >
             {posters.map((p) => (
               <div key={p.id} className="relative h-full min-w-full">
-                {fillViewport ? <HomePosterImage src={p.imageUrl} alt={p.alt ?? t("home.posterFallbackAlt")} safeArea /> : <AzureImage
+                {fillViewport ? <HomePosterImage src={p.imageUrl} alt={p.alt ?? t("home.posterFallbackAlt")} /> : <AzureImage
                   src={p.imageUrl}
                   alt={p.alt ?? t("home.posterFallbackAlt")}
                   className="h-full w-full object-cover"
