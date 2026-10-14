@@ -53,6 +53,8 @@ Node는 현재 Dockerfile에서 22 계열을 사용한다. BE CORS 허용 출처
 
 ## 6. Azure VM 배포 (2026-10-14)
 
+같은 날 main 병합 커밋 `3bb6bf5d`를 Azure에 추가 반영했다. 병합 후 129개 파일·647개 테스트와 lint/typecheck/build가 통과한 동일 소스를 VM에서 다시 Docker 빌드했다. BE와 FE만 교체했고 데이터 컨테이너는 유지했다. HTTPS 공지 목록의 실제 브라우저 렌더링을 확인했다. 외부 서비스 비밀값은 BE의 비공개 환경 파일에만 주입했으며 FE에 추가하지 않았다. 이 배포에서 이미지 업로드·삭제·SAS 갱신을 다시 실행하지는 않았다. 정확한 배포 파일 목록과 복구 기록은 BE의 `docs/azure-vm-deployment.md`를 참고한다.
+
 현재 시연 주소는 https://danzzan.koreacentral.cloudapp.azure.com 이다. FE는 [Dockerfile.azure](../Dockerfile.azure)로 빌드하고 [nginx.azure.conf](../nginx.azure.conf)로 HTTPS와 SPA 경로를 제공한다. BE 저장소의 `docker-compose.azure.yml`이 FE/Nginx·BE·MySQL·Redis·Kafka를 함께 실행한다. 전체 초기 설정과 운영 절차는 BE의 `docs/azure-vm-deployment.md`를 따른다.
 
 - 빌드 기본값: `VITE_API_BASE_URL=/api`, `VITE_TICKETING_API_BASE_URL=/api`, `VITE_API_MODE=live`.
@@ -110,3 +112,9 @@ FE의 기본 항목 ID `0`은 화면 내부에서만 사용한다. 적용 요청
 `20261014-theme-presets` 배포로 기본 테마 복원 BE API와 FE의 `Tangerine Cream`, `Coastal Sunset` 선택지를 반영했다. 마지막 이름 변경 후 관련 테스트 64개를 다시 통과했으며 VM의 FE 빌드(타입 검사 포함)도 성공했다. 실제 로그인된 관리자 브라우저에서 두 선택지와 각각 `#ff642d`·`#8fa9be` 미리보기를 확인했다. 기존 활성 `Balanced AI 추천 테마`는 그대로 유지했다. 운영 데이터 변경을 피하기 위해 실제 적용·복제·삭제 버튼은 누르지 않았다. 이 동작들은 로컬 테스트로 검증했으며 이번 운영 검증은 조회·미리보기까지다.
 
 HTTPS 홈·공지·테마 관리·health는 200, Nginx 설정 검사는 성공했다. 게시물·이미지 참조·축제 설정·테마를 포함한 20개 테이블의 데이터 해시는 배포 전후와 브라우저 확인 후 모두 일치했다. Blob 쓰기는 실행하지 않았다. 복구 이미지와 소스·해시 목록은 BE 배포 문서의 같은 배포 기록을 참고한다.
+
+## 9. AI 테마 추천 진단 반영 (2026-10-14)
+
+초기 VM 점검에서 같은 VM의 OpenAI 모델 조회는 엔드포인트·인증·모델 도달 여부만 확인한 것이다. 관리자 화면의 포스터 전송, 테마 생성, 티켓·마감 배경 생성까지 성공했다는 검증은 아니었다.
+
+이후 BE에 요청 식별자·처리 시간·HTTP 상태·오류 종류만 남기는 진단 로그를 반영했다. API 키, 인증 헤더, SAS URL, 포스터 본문·Base64 값은 로그에 남기지 않는다. 실제 로그인된 관리자 화면에서 테마 추천과 두 배경 추천을 실행해 200 응답을 확인했다. 재배포 후 정상화된 상태이므로 이전 시간 초과의 단일 원인은 확정하지 않았다. 상세 진단 기록과 재현 절차는 [BE AI 추천 진단 문서](../../Danzzan-BE/docs/azure-ai-recommendation-diagnostics.md)를 따른다.
