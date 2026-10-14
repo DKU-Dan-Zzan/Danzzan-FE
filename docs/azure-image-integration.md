@@ -53,7 +53,7 @@ Node는 현재 Dockerfile에서 22 계열을 사용한다. BE CORS 허용 출처
 
 ## 6. Azure VM 배포 (2026-10-14)
 
-현재 시연 주소는 https://danzzan-demo-2026.koreacentral.cloudapp.azure.com 이다. FE는 [Dockerfile.azure](../Dockerfile.azure)로 빌드하고 [nginx.azure.conf](../nginx.azure.conf)로 HTTPS와 SPA 경로를 제공한다. BE 저장소의 `docker-compose.azure.yml`이 FE/Nginx·BE·MySQL·Redis·Kafka를 함께 실행한다. 전체 초기 설정과 운영 절차는 BE의 `docs/azure-vm-deployment.md`를 따른다.
+현재 시연 주소는 https://danzzan.koreacentral.cloudapp.azure.com 이다. FE는 [Dockerfile.azure](../Dockerfile.azure)로 빌드하고 [nginx.azure.conf](../nginx.azure.conf)로 HTTPS와 SPA 경로를 제공한다. BE 저장소의 `docker-compose.azure.yml`이 FE/Nginx·BE·MySQL·Redis·Kafka를 함께 실행한다. 전체 초기 설정과 운영 절차는 BE의 `docs/azure-vm-deployment.md`를 따른다.
 
 - 빌드 기본값: `VITE_API_BASE_URL=/api`, `VITE_TICKETING_API_BASE_URL=/api`, `VITE_API_MODE=live`.
 - `.env*`는 Docker 빌드에서 제외한다(`.env.example` 제외). 카카오 JavaScript 공개 키는 `VITE_KAKAO_MAP_JS_KEY` build arg로 명시적으로 전달한다. Azure 자격 증명이나 서버 비밀키는 FE에 넣지 않는다.
@@ -64,4 +64,4 @@ Node는 현재 Dockerfile에서 22 계열을 사용한다. BE CORS 허용 출처
 
 VM에서 홈페이지·공지와 테스트 Azure 이미지의 실제 브라우저 표시, 관리자/일반 사용자 HTTP 로그인, 권한 차단, SAS 만료·재발급을 확인했다. 테스트 공지·이미지는 정리했다. 이번 VM 검증이 전체 화면·부하 테스트까지 통과했다는 뜻은 아니다.
 
-카카오 SDK는 새 Azure 주소를 Referer로 요청하면 HTTP 401을 반환했다. 동료가 관리하는 같은 앱의 JavaScript SDK 도메인에 `https://danzzan-demo-2026.koreacentral.cloudapp.azure.com`을 등록하고 `/map`을 다시 확인해야 한다. 도메인 미등록이 유력하지만 키 비활성 여부까지 확인한 것은 아니다. [카카오 지도 공식 안내](https://apis.map.kakao.com/web/guide/)
+카카오 SDK는 변경 전 Azure 주소를 Referer로 요청했을 때 HTTP 401을 반환했다. 동료가 관리하는 같은 앱의 JavaScript SDK 도메인에 `https://danzzan.koreacentral.cloudapp.azure.com`을 등록하고 `/map`을 다시 확인해야 한다. 도메인 미등록이 유력하지만 키 비활성 여부까지 확인한 것은 아니다. [카카오 지도 공식 안내](https://apis.map.kakao.com/web/guide/)
