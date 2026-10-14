@@ -66,9 +66,9 @@ function ThemeNavigationTestControls() {
     <button type="button" onClick={() => navigate("/admin/theme#theme-management")}>관리 영역 링크</button></>;
 }
 
-async function render(withNavigation = false) {
-  await act(async () => { root.render(<MemoryRouter initialEntries={["/admin/theme"]}>
-    {withNavigation && <ThemeNavigationTestControls />}<AdminTheme />
+async function render(withNavigation = false, mode: "manage" | "select" = "manage") {
+  await act(async () => { root.render(<MemoryRouter initialEntries={[mode === "select" ? "/admin/theme/select" : "/admin/theme"]}>
+    {withNavigation && <ThemeNavigationTestControls />}<AdminTheme mode={mode} />
   </MemoryRouter>); });
 }
 
@@ -230,6 +230,38 @@ describe("AdminTheme", () => {
     await act(async () => { buttons("저장된 테마")[0].click(); });
     await act(async () => { buttons("저장된 테마 적용")[0].click(); });
     expect(adminThemeApi.activate).toHaveBeenCalledWith(2);
+  });
+
+  it("shows only saved and built-in themes on the selection screen and applies each selection", async () => {
+    vi.mocked(adminThemeApi.activate).mockResolvedValue({ ...inactive, active: true });
+    await render(false, "select");
+    expect(host.textContent).toContain("사용할 테마를 선택하세요");
+    expect(host.querySelector('[aria-label="AI 테마 추천 영역"]')).toBeNull();
+    expect(host.querySelector('[aria-label="테마 편집"]')).toBeNull();
+    expect(host.querySelector('[aria-label="새 테마 생성"]')).toBeNull();
+    expect(host.querySelector('[data-testid="theme-preview"]')).not.toBeNull();
+    expect(host.textContent).toContain("Tangerine Cream");
+    expect(host.textContent).toContain("Coastal Sunset");
+    expect(host.textContent).toContain("저장된 테마");
+    expect(festivalBrandingApi.get).not.toHaveBeenCalled();
+    expect(adminHomeImageApi.list).not.toHaveBeenCalled();
+    expect(adminHomeImageApi.preview).not.toHaveBeenCalled();
+    expect(adminHomeImageApi.stageUpload).not.toHaveBeenCalled();
+    expect(adminHomeImageApi.replaceFirst).not.toHaveBeenCalled();
+    expect(adminThemeApi.recommend).not.toHaveBeenCalled();
+
+    await act(async () => [...host.querySelectorAll<HTMLButtonElement>('button[aria-pressed]')].find(button => button.textContent?.includes("저장된 테마"))!.click());
+    await act(async () => buttons("저장된 테마 적용")[0].click());
+    expect(adminThemeApi.activate).toHaveBeenCalledWith(2);
+
+    await chooseDefault();
+    await act(async () => buttons("Tangerine Cream 적용")[0].click());
+    expect(adminThemeApi.activateDefault).toHaveBeenCalledOnce();
+
+    await chooseMay();
+    await act(async () => buttons("Coastal Sunset 적용")[0].click());
+    expect(adminThemeApi.create).toHaveBeenCalledOnce();
+    expect(adminThemeApi.activate).toHaveBeenCalledTimes(2);
   });
 
   it("keeps the active theme and colors if default activation fails", async () => {

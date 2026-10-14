@@ -1,7 +1,7 @@
 import { imageReferenceKey, sameImageReference } from "@/lib/app/azure/azureReadUrl";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Copy, Plus, Save, Trash2, Check, MonitorSmartphone } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import { cn } from "@/components/common/ui/utils";
 import { getErrorStatus } from "@/api/common/fetchAuth";
@@ -104,6 +104,21 @@ function ThemePreview({ data }: { data: ThemeData }) {
   </section>;
 }
 
+function ThemeSelectionList({ themes, selectedId, disabled, onSelect, allowCreate = false, onCreate }: {
+  themes: ActiveThemeResponse[];
+  selectedId: number | null;
+  disabled: boolean;
+  onSelect: (id: number) => void;
+  allowCreate?: boolean;
+  onCreate?: () => void;
+}) {
+  return <section className={panel} aria-label="저장된 테마 목록"><div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">저장된 테마</h2>{allowCreate && <button type="button" aria-label="새 테마 생성" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={onCreate} disabled={disabled}><Plus className="h-4 w-4" />새 테마</button>}</div>
+    <div className="grid gap-2">{themes.map((theme) => <button type="button" key={theme.id} aria-label={theme.id === DEFAULT_THEME_ID ? "Tangerine Cream 선택" : theme.id === MAY_THEME_ID ? "Coastal Sunset 선택" : undefined} onClick={() => onSelect(theme.id)} disabled={disabled} aria-pressed={selectedId === theme.id} className={cn("w-full rounded-xl border p-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-theme-action-focus)] disabled:cursor-not-allowed disabled:opacity-50", selectedId === theme.id ? "border-[var(--admin-theme-action-outline)] bg-[var(--admin-theme-action-hover)] ring-1 ring-[var(--admin-theme-action-focus)]" : "border-[var(--border-base)] bg-white hover:border-[var(--admin-theme-action-outline)] hover:bg-[var(--admin-theme-action-hover)]")}>
+      <span className="flex items-center justify-between gap-2"><span className="truncate text-sm font-semibold">{theme.name}</span>{theme.active && <span className="shrink-0 rounded-full border border-[var(--admin-theme-action-outline)] bg-white px-2 py-0.5 text-xs font-semibold text-[var(--admin-theme-action-outline)]">활성</span>}</span>{theme.updatedAt && !Number.isNaN(Date.parse(theme.updatedAt)) && <span className="mt-1 block text-xs text-[var(--text-muted)]">수정 {new Date(theme.updatedAt).toLocaleDateString("ko-KR")}</span>}<span className="mt-2 block"><Swatches colors={keyColors(theme.themeData)} /></span>
+    </button>)}</div>
+  </section>;
+}
+
 function RecommendationComparison({ candidates, selectedId, onChoose, busy }: {
   candidates: ThemeRecommendationCandidate[];
   selectedId: ThemeRecommendationCandidate["id"] | null;
@@ -143,7 +158,8 @@ function RecommendationComparison({ candidates, selectedId, onChoose, busy }: {
   </section>;
 }
 
-export default function AdminTheme() {
+export default function AdminTheme({ mode = "manage" }: { mode?: "manage" | "select" }) {
+  const selectionOnly = mode === "select";
   const location = useLocation();
   const ticketingEnabled = useSyncExternalStore(subscribeFestivalSettings, getTicketingEnabled, getTicketingEnabled);
   const session = useSyncExternalStore(authStore.subscribe, authStore.getSnapshot, authStore.getSnapshot);
@@ -464,6 +480,26 @@ export default function AdminTheme() {
     } finally { setBusy(false); }
   }
 
+  if (selectionOnly) {
+    return <>
+      <Toaster position="top-right" closeButton richColors />
+      <div style={adminActionStyle} data-testid="admin-theme-action-scope">
+        <AdminShell title="테마 선택" mainClassName="mx-auto w-full max-w-[1120px] space-y-6 px-4 py-6 sm:px-8">
+          <section className="flex flex-col gap-3 border-b border-[var(--border-base)] pb-6 sm:flex-row sm:items-center sm:justify-between">
+            <div><h2 className="text-xl font-semibold tracking-tight">사용할 테마를 선택하세요</h2><p className="mt-2 text-sm text-[var(--text-muted)]">기본 테마와 저장된 테마를 미리 본 뒤 바로 적용할 수 있습니다.</p></div>
+            <Link to="/admin/theme" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex w-fit")}>테마 제작·관리 화면으로</Link>
+          </section>
+          {loading ? <p role="status" className="text-sm text-[var(--text-muted)]">테마를 불러오는 중입니다…</p> : error ?
+            <div role="alert" className={panel}><p className="mb-3 text-sm">{error}</p><button type="button" className={ADMIN_THEME_SECONDARY_ACTION_CLASS} onClick={() => void loadThemes()}>다시 시도</button></div> :
+            <div className="grid items-start gap-6 lg:grid-cols-[minmax(280px,0.9fr)_minmax(0,1.5fr)]">
+              <ThemeSelectionList themes={availableThemes} selectedId={selectedId} disabled={busy} onSelect={(id) => void selectTheme(id)} />
+              <div className="min-w-0 space-y-6">{draft ? <><ThemePreview data={draft.themeData} /><section className={panel} aria-label="테마 선택 적용"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-semibold">{selectedTheme?.name ?? "선택한 테마"}</h2><p className="mt-1 text-xs text-[var(--text-muted)]">적용하면 새로 접속하는 사용자 화면의 색상이 바뀝니다. 홈화면 이미지와 배경 이미지는 유지됩니다.</p></div>{selectedTheme?.active ? <span aria-label="테마 적용 상태" className="inline-flex items-center gap-1 rounded-full border border-[var(--admin-theme-action-outline)] bg-[var(--admin-theme-action-hover)] px-3 py-1.5 text-xs font-semibold text-[var(--admin-theme-action-outline)]"><Check className="h-3.5 w-3.5" aria-hidden="true" />적용 중</span> : <button type="button" className={cn(ADMIN_THEME_PRIMARY_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={() => void activate()} disabled={busy}><Check className="h-4 w-4" />{isDefaultSelected ? "Tangerine Cream 적용" : isMaySelected ? "Coastal Sunset 적용" : "저장된 테마 적용"}</button>}</div></section></> : <div className={panel}><p className="text-sm text-[var(--text-muted)]">테마를 선택하면 미리보기가 표시됩니다.</p></div>}</div>
+            </div>}
+        </AdminShell>
+      </div>
+    </>;
+  }
+
   return <>
     <Toaster position="top-right" closeButton richColors />
     <div style={adminActionStyle} data-testid="admin-theme-action-scope">
@@ -511,11 +547,7 @@ export default function AdminTheme() {
         </div></section>
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(280px,0.9fr)_minmax(0,1.5fr)]">
         <div className="min-w-0 space-y-6">
-          <section className={panel} aria-label="저장된 테마 목록"><div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">저장된 테마</h2><button type="button" aria-label="새 테마 생성" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={() => createDraft()} disabled={busy || recommending}><Plus className="h-4 w-4" />새 테마</button></div>
-            <div className="grid gap-2">{availableThemes.map((theme) => <button type="button" key={theme.id} aria-label={theme.id === DEFAULT_THEME_ID ? "Tangerine Cream 선택" : theme.id === MAY_THEME_ID ? "Coastal Sunset 선택" : undefined} onClick={() => void selectTheme(theme.id)} disabled={busy || recommending} aria-pressed={selectedId === theme.id} className={cn("w-full rounded-xl border p-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-theme-action-focus)] disabled:cursor-not-allowed disabled:opacity-50", selectedId === theme.id ? "border-[var(--admin-theme-action-outline)] bg-[var(--admin-theme-action-hover)] ring-1 ring-[var(--admin-theme-action-focus)]" : "border-[var(--border-base)] bg-white hover:border-[var(--admin-theme-action-outline)] hover:bg-[var(--admin-theme-action-hover)]")}>
-              <span className="flex items-center justify-between gap-2"><span className="truncate text-sm font-semibold">{theme.name}</span>{theme.active && <span className="shrink-0 rounded-full border border-[var(--admin-theme-action-outline)] bg-white px-2 py-0.5 text-xs font-semibold text-[var(--admin-theme-action-outline)]">활성</span>}</span>{theme.updatedAt && !Number.isNaN(Date.parse(theme.updatedAt)) && <span className="mt-1 block text-xs text-[var(--text-muted)]">수정 {new Date(theme.updatedAt).toLocaleDateString("ko-KR")}</span>}<span className="mt-2 block"><Swatches colors={keyColors(theme.themeData)} /></span>
-            </button>)}</div>
-          </section>
+          <ThemeSelectionList themes={availableThemes} selectedId={selectedId} disabled={busy || recommending} onSelect={(id) => void selectTheme(id)} allowCreate onCreate={() => createDraft()} />
           {draft ? <ThemePreview data={draft.themeData} /> : <div className={panel}><p className="text-sm text-[var(--text-muted)]">테마를 선택하면 이곳에 미리보기가 표시됩니다.</p></div>}
         </div>
         <div className="min-w-0 space-y-6">{draft ? <>
