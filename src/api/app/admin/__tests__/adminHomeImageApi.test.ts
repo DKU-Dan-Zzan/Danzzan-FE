@@ -9,6 +9,11 @@ vi.mock("@/api/common/fetchAuth", () => ({ createFetchWithAuth: () => request })
 beforeEach(() => request.mockReset().mockResolvedValue([]));
 
 describe("adminHomeImageApi", () => {
+  it("replaces only the first image with a concurrency fingerprint", async () => {
+    const payload = { imageUrl: "azure:images/festival/home/staged/new.jpg", expectedFirstImageId: 7, expectedFirstImageUrl: "azure:images/old.jpg", sourcePosterUrl: null };
+    await adminHomeImageApi.replaceFirst(payload);
+    expect(request).toHaveBeenCalledWith(`/admin/festival/${CURRENT_FESTIVAL_SETTING_ID}/home-images/first`, { method: "PUT", body: JSON.stringify(payload) });
+  });
   it("previews and stages without using the live home-image creation endpoint", async () => {
     const signal = new AbortController().signal;
     const payload = { sourcePosterUrl: "https://cdn/poster.png", layout: "cover" as const, focusX: .2, focusY: .7 };

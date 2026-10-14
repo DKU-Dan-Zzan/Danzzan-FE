@@ -147,9 +147,9 @@ export default function AdminTheme() {
   const location = useLocation();
   const ticketingEnabled = useSyncExternalStore(subscribeFestivalSettings, getTicketingEnabled, getTicketingEnabled);
   const session = useSyncExternalStore(authStore.subscribe, authStore.getSnapshot, authStore.getSnapshot);
+  const canManageHome = hasAdminPermission(session.role, session.permissions, "OPERATIONS");
   const canBundle = hasAdminPermission(session.role, session.permissions, "TICKETING") && hasAdminPermission(session.role, session.permissions, "OPERATIONS");
   const [homeBanner, setHomeBanner] = useState<HomeBannerDraftSelection | null>(null);
-  const [homeBannerVersion, setHomeBannerVersion] = useState(0);
   const homeUploads = useRef(new WeakMap<File, string>());
   const [bundle, setBundle] = useState<{ poster: string; data: PosterBundle } | null>(null);
   const [bundleError, setBundleError] = useState<string | null>(null);
@@ -262,9 +262,26 @@ export default function AdminTheme() {
     }
   }
 
-  const homeBannerReady = !!homeBanner?.ready && (!homeBanner.sourcePosterUrl || sameImageReference(homeBanner.sourcePosterUrl, branding?.posterImageUrl));
-  const bundleReady = homeBannerReady && canBundle && !!selectedRecommendationId && !!draft && !!bundle
+  const bundleReady = canBundle && !!selectedRecommendationId && !!draft && !!bundle
     && sameImageReference(bundle.poster, analysisSnapshot?.sourcePosterUrl) && recommendationCompleted && !backgroundPending && !bundleError;
+
+  async function saveHomeBanner(selection: HomeBannerDraftSelection) {
+    if (busy || !canManageHome || !selection.ready || !selection.file) throw new Error("HOME_IMAGE_NOT_READY");
+    setBusy(true);
+    try {
+      let imageUrl = homeUploads.current.get(selection.file);
+      if (!imageUrl) {
+        imageUrl = (await adminHomeImageApi.stageUpload(selection.file)).url;
+        homeUploads.current.set(selection.file, imageUrl);
+      }
+      const saved = await adminHomeImageApi.replaceFirst({ imageUrl,
+        expectedFirstImageId: selection.expectedFirstImageId,
+        expectedFirstImageUrl: selection.expectedFirstImageUrl,
+        sourcePosterUrl: selection.sourcePosterUrl });
+      void queryClient.invalidateQueries({ queryKey: appQueryKeys.homeImages() });
+      return saved;
+    } finally { setBusy(false); }
+  }
 
   async function applyBundle() {
     if (!bundleReady || !draft || !bundle || !recommendationSnapshot || busy) return;
@@ -281,32 +298,18 @@ export default function AdminTheme() {
         uploadedBackgrounds.current.set(key, url);
         return url;
       };
-      const stageHome = async () => {
-        if (!homeBanner?.file) return undefined;
-        let imageUrl = homeUploads.current.get(homeBanner.file);
-        if (!imageUrl) {
-          imageUrl = (await adminHomeImageApi.stageUpload(homeBanner.file)).url;
-          homeUploads.current.set(homeBanner.file, imageUrl);
-        }
-        return { imageUrl, expectedFirstImageId: homeBanner.expectedFirstImageId, expectedFirstImageUrl: homeBanner.expectedFirstImageUrl };
-      };
-      const [ticketCardBackgroundImageUrl, ticketingBackgroundImageUrl, homeBannerUpdate] = await Promise.all([upload("ticket"), upload("closed"), stageHome()]);
+      const [ticketCardBackgroundImageUrl, ticketingBackgroundImageUrl] = await Promise.all([upload("ticket"), upload("closed")]);
       const active = await adminThemeApi.applyBundle({ name: draft.name.trim(), themeData: normalizeThemeColors(draft.themeData),
         sourcePosterUrl: bundle.poster, sourceColors: recommendationSnapshot.sourceColors,
-        selectedBaseColor: recommendationSnapshot.selectedBaseColor, ticketCardBackgroundImageUrl, ticketingBackgroundImageUrl,
-        ...(homeBannerUpdate ? { homeBanner: homeBannerUpdate } : {}) });
+        selectedBaseColor: recommendationSnapshot.selectedBaseColor, ticketCardBackgroundImageUrl, ticketingBackgroundImageUrl });
       setThemes(themes => [active, ...themes.filter(theme => theme.id !== active.id).map(theme => ({ ...theme, active: false }))]);
       selectLoadedTheme(active);
       applyThemeData(active.themeData);
       setTicketCardBackgroundImageUrl(ticketCardBackgroundImageUrl);
       setTicketingBackgroundImageUrl(ticketingBackgroundImageUrl);
-      if (homeBannerUpdate) {
-        void queryClient.invalidateQueries({ queryKey: appQueryKeys.homeImages() });
-        setHomeBannerVersion(value => value + 1);
-      }
-      toast.success(homeBannerUpdate ? "홈 대표 이미지와 테마·배경을 함께 적용했습니다." : "테마와 배경을 적용했습니다. 홈 대표 이미지는 유지됩니다.");
+      toast.success("테마와 배경을 적용했습니다. 홈화면 이미지는 유지됩니다.");
     } catch (cause) {
-      toast.error(getErrorStatus(cause) === 409 ? "포스터 또는 홈 대표 이미지가 변경되었습니다. 새로고침 후 다시 확인해 주세요." : cause instanceof Error ? `전체 적용에 실패했습니다. ${cause.message}` : "전체 적용에 실패했습니다. 다시 시도해 주세요.");
+      toast.error(getErrorStatus(cause) === 409 ? "공식 포스터가 변경되었습니다. 새로고침 후 다시 확인해 주세요." : cause instanceof Error ? `전체 적용에 실패했습니다. ${cause.message}` : "전체 적용에 실패했습니다. 다시 시도해 주세요.");
     } finally { setBusy(false); }
   }
 
@@ -477,22 +480,21 @@ export default function AdminTheme() {
       <div id="theme-ai" className="space-y-6 scroll-mt-40 sm:scroll-mt-28" aria-label="AI 테마 추천 영역">
         <FestivalBrandingPanel onAnalysisChange={analysisChanged} onBrandingChange={setBranding} onRecommend={(snapshot) => void recommend(snapshot)}
           recommending={recommending} autoRecommend locked={busy} recommendationCompleted={recommendationCompleted} recommendationError={recommendationError} adminActionStyle={adminActionStyle}
-          homeBanner={<HomeBannerDraftPanel key={homeBannerVersion} posterUrl={branding?.posterImageUrl ?? null} disabled={busy || !canBundle} onChange={setHomeBanner} />} />
+          homeBanner={<HomeBannerDraftPanel posterUrl={branding?.posterImageUrl ?? null} disabled={busy || !canManageHome} onChange={setHomeBanner} onSave={saveHomeBanner} />} />
         {recommendationCandidates.length > 0 && <RecommendationComparison candidates={recommendationCandidates}
           selectedId={selectedRecommendationId} onChoose={chooseRecommendation} busy={busy || recommending} />}
         <section id="theme-apply" className={cn(panel, "scroll-mt-40 sm:scroll-mt-28")} aria-label="통합 추천과 적용">
           <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-lg font-semibold">3. 확인하고 전체 적용</h2><span className="rounded-full bg-[var(--surface-subtle)] px-3 py-1 text-xs text-[var(--text-muted)]">티켓팅 {ticketingEnabled ? "ON" : "OFF"}</span></div>
-          <p className="mt-2 text-sm text-[var(--text-muted)]">홈 대표 이미지와 내 정보·티켓 화면을 확인한 뒤 한 번에 적용하세요.</p>
+          <p className="mt-2 text-sm text-[var(--text-muted)]">선택한 색상 테마와 내 정보·티켓 화면 배경을 확인한 뒤 한 번에 적용하세요.</p>
           {!canBundle ? <p className="mt-3 text-sm">전체 추천·적용에는 축제 운영과 티켓팅 권한이 모두 필요합니다. 현재 권한으로 색상 테마는 추천받을 수 있습니다.</p> : <>
             {backgroundPending && <p role="status" className="mt-3 text-sm">포스터에서 두 배경을 준비하고 있습니다…</p>}
             {bundleError && <div role="alert" className="mt-3 text-sm"><p>{bundleError}</p><button className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "mt-2")} onClick={() => { if (analysisSnapshot) loadBackgrounds(analysisSnapshot, recommendationVersion.current); }} disabled={busy || backgroundPending}>배경만 다시 추천</button></div>}
             {!selectedRecommendationId && <p className="mt-4 rounded-xl bg-[var(--surface-subtle)] p-4 text-sm text-[var(--text-muted)]">위에서 대표색을 고른 뒤, 추천 시안을 선택해 주세요.</p>}
-            {!homeBannerReady && <p role="status" className="mt-3 text-sm">홈 대표 이미지 준비 상태를 확인해 주세요.</p>}
             {bundleReady && <div className="mt-5 flex flex-wrap gap-3">
               <DialogTrigger asChild><button ref={previewTriggerRef} type="button" disabled={busy || recommending} className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex items-center gap-2")}><MonitorSmartphone className="h-4 w-4" />추천 화면 확인</button></DialogTrigger>
               <button type="button" onClick={() => void applyBundle()} disabled={busy || recommending} className={ADMIN_THEME_PRIMARY_ACTION_CLASS} aria-busy={busy}>전체 적용</button>
             </div>}
-            <p className="mt-2 text-xs text-[var(--text-muted)]">전체 적용하면 선택한 홈 대표 이미지와 색상·배경이 함께 저장됩니다. 추가 홈 이미지는 유지됩니다. 내 정보는 항상, 발급 티켓·입장 안내는 ON/OFF에 맞춰 표시됩니다. 팔찌 배부 색상도 함께 반영됩니다.</p>
+            <p className="mt-2 text-xs text-[var(--text-muted)]">전체 적용하면 선택한 색상 테마와 내 정보·티켓 배경이 함께 저장됩니다. 홈화면 이미지는 별도 저장으로만 바뀌며 추가 홈 이미지는 유지됩니다. 내 정보는 항상, 발급 티켓·입장 안내는 ON/OFF에 맞춰 표시됩니다. 팔찌 배부 색상도 함께 반영됩니다.</p>
           </>}
         </section>
       </div>
@@ -549,7 +551,7 @@ export default function AdminTheme() {
     </AdminShell>
               <DialogContent showCloseButton={false} style={adminActionStyle} onCloseAutoFocus={(event) => { event.preventDefault(); previewTriggerRef.current?.focus(); }} className="flex h-[min(94dvh,960px)] max-h-[94dvh] w-[calc(100%-1rem)] max-w-[min(760px,calc(100%-1rem))] flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-[760px]">
                 <DialogHeader className="shrink-0 border-b border-[var(--border-base)] px-5 py-4 text-left sm:px-6"><div className="flex items-start justify-between gap-4"><div><DialogTitle>사용자 화면 미리보기</DialogTitle><DialogDescription className="mt-2 text-xs text-[var(--text-muted)]">선택한 색상과 배경을 미리 확인하세요. 전체 적용 전에는 사용자 화면이 바뀌지 않습니다.</DialogDescription></div><DialogClose asChild><button type="button" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "shrink-0 whitespace-nowrap")}>닫기</button></DialogClose></div></DialogHeader>
-                <div className="min-h-0 overflow-y-auto px-3 py-4 sm:px-6"><ThemeScreenPreview homeImageUrl={homeBanner?.ready ? homeBanner.previewUrl : homeBanner?.previewUrl ?? undefined} data={draft?.themeData ?? activeTheme?.themeData ?? readBundledThemeData()} branding={branding} backgrounds={selectedRecommendationId && bundle && sameImageReference(bundle.poster, analysisSnapshot?.sourcePosterUrl) ? { ticket: posterBundleImage(bundle.data.ticket), closed: posterBundleImage(bundle.data.closed) } : undefined} embedded /></div>
+                <div className="min-h-0 overflow-y-auto px-3 py-4 sm:px-6"><ThemeScreenPreview homeImageUrl={homeBanner?.expectedFirstImageUrl ?? null} data={draft?.themeData ?? activeTheme?.themeData ?? readBundledThemeData()} branding={branding} backgrounds={selectedRecommendationId && bundle && sameImageReference(bundle.poster, analysisSnapshot?.sourcePosterUrl) ? { ticket: posterBundleImage(bundle.data.ticket), closed: posterBundleImage(bundle.data.closed) } : undefined} embedded /></div>
               </DialogContent>
     </Dialog>
     </div>

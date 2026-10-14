@@ -5,6 +5,7 @@ import { clearAdminSession, getAdminAccessToken, reissueAdminToken } from "@/lib
 import { authStore } from "@/store/common/authStore";
 
 export type AdminHomeImage = { id: number; imageUrl: string; displayOrder: number };
+export type ReplaceFirstHomeImageRequest = { imageUrl: string; expectedFirstImageId: number | null; expectedFirstImageUrl: string | null; sourcePosterUrl: string | null };
 export type HomeImagePreviewRequest = { sourcePosterUrl: string; layout: "contain" | "cover"; focusX?: number; focusY?: number };
 export type HomeImagePreview = { mimeType: string; imageBase64: string; width: number; height: number; sourcePosterUrl: string };
 
@@ -21,6 +22,8 @@ const request = createFetchWithAuth({
 const path = (festivalSettingId: number) => `/admin/festival/${festivalSettingId}/home-images`;
 
 export const adminHomeImageApi = {
+  replaceFirst: (payload: ReplaceFirstHomeImageRequest, festivalSettingId = CURRENT_FESTIVAL_SETTING_ID) =>
+    request<AdminHomeImage>(`${path(festivalSettingId)}/first`, { method: "PUT", body: JSON.stringify(payload) }),
   preview: (payload: HomeImagePreviewRequest, festivalSettingId = CURRENT_FESTIVAL_SETTING_ID, signal?: AbortSignal) =>
     request<HomeImagePreview>(`${path(festivalSettingId)}/preview`, { method: "POST", body: JSON.stringify(payload), signal }),
   stageUpload: (file: File, festivalSettingId = CURRENT_FESTIVAL_SETTING_ID, signal?: AbortSignal) => {

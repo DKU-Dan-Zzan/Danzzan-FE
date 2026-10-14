@@ -33,7 +33,7 @@ vi.mock("@/api/app/festival/festivalBrandingApi", () => ({ festivalBrandingApi: 
   upload: vi.fn(),
   extractPosterColors: vi.fn(),
 } }));
-vi.mock("@/api/app/admin/adminHomeImageApi", () => ({ adminHomeImageApi: { list: vi.fn(), preview: vi.fn(), stageUpload: vi.fn() } }));
+vi.mock("@/api/app/admin/adminHomeImageApi", () => ({ adminHomeImageApi: { list: vi.fn(), preview: vi.fn(), stageUpload: vi.fn(), replaceFirst: vi.fn() } }));
 vi.mock("@/routes/admin/HomeWideImagesPanel", () => ({ HomeWideImagesPanel: () => null }));
 
 const colors: ThemeData = {
@@ -348,49 +348,65 @@ describe("AdminTheme", () => {
     expect(adminThemeApi.activate).not.toHaveBeenCalled();
   });
 
-  it("stages a home image only on whole apply and sends the first-image snapshot atomically", async () => {
+  it("saves only the first home image without recommendations or ticketing permission and reuses staged upload after failure", async () => {
+    permissions.role = "manager"; permissions.permissions = ["OPERATIONS"];
+    vi.mocked(festivalBrandingApi.get).mockResolvedValue({ festivalSettingId: 1, posterImageUrl: "https://cdn.example.com/poster.png", logoImageUrl: null });
+    vi.mocked(adminHomeImageApi.replaceFirst).mockRejectedValueOnce(new Error("offline")).mockResolvedValue({ id: 7, imageUrl: "https://cdn.example.com/new-home.jpg", displayOrder: 0 });
+    await render();
+    await act(async () => buttons("공식 포스터로 편집")[0].click());
+    await act(async () => buttons("편집 결과 미리보기")[0].click());
+    await act(async () => buttons("홈화면 이미지 저장")[0].click());
+    expect(host.textContent).toContain("선택한 이미지는 유지됩니다");
+    await act(async () => buttons("홈화면 이미지 저장")[0].click());
+    expect(adminHomeImageApi.stageUpload).toHaveBeenCalledOnce();
+    expect(adminHomeImageApi.replaceFirst).toHaveBeenCalledTimes(2);
+    expect(adminHomeImageApi.replaceFirst).toHaveBeenLastCalledWith({ imageUrl: "https://cdn.example.com/new-home.jpg", expectedFirstImageId: 7, expectedFirstImageUrl: "/existing-home.jpg", sourcePosterUrl: "https://cdn.example.com/poster.png" });
+    expect(adminThemeApi.recommend).not.toHaveBeenCalled();
+    expect(adminThemeApi.applyBundle).not.toHaveBeenCalled();
+    expect(uploadTicketingBackground).not.toHaveBeenCalled();
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+    expect(buttons("홈화면 이미지 저장")).toHaveLength(0);
+    expect(host.textContent).toContain("홈 이미지가 저장되었습니다");
+  });
+
+  it("does not stage or save an unsaved home image when applying a recommendation bundle", async () => {
     await prepareRecommendation();
     await act(async () => buttons("다시 추천받기")[0].click());
     await act(async () => buttons("이 시안 선택")[0].click());
-    const makeHome = buttons("이 포스터로 만들기")[0];
-    expect(makeHome).toBeDefined();
-    await act(async () => makeHome.click());
+    await act(async () => buttons("공식 포스터로 편집")[0].click());
+    await act(async () => buttons("편집 결과 미리보기")[0].click());
     expect(adminHomeImageApi.stageUpload).not.toHaveBeenCalled();
     expect(adminThemeApi.applyBundle).not.toHaveBeenCalled();
+    await act(async () => buttons("추천 화면 확인")[0].click());
+    const preview = document.querySelector('[role="dialog"]')!;
+    await act(async () => [...preview.querySelectorAll<HTMLButtonElement>('[role="tab"]')].find(tab => tab.textContent === "홈")!.click());
+    expect(preview.querySelector<HTMLImageElement>('img[alt="홈 대표 이미지 미리보기"]')?.getAttribute("src")).toBe("/existing-home.jpg");
+    await act(async () => [...preview.querySelectorAll<HTMLButtonElement>("button")].find(button => button.textContent?.trim() === "닫기")!.click());
     await act(async () => buttons("전체 적용")[0].click());
-    expect(adminHomeImageApi.stageUpload).toHaveBeenCalledOnce();
-    expect(adminThemeApi.applyBundle).toHaveBeenCalledWith(expect.objectContaining({
-      homeBanner: { imageUrl: "https://cdn.example.com/new-home.jpg", expectedFirstImageId: 7, expectedFirstImageUrl: "/existing-home.jpg" },
-    }));
+    expect(adminHomeImageApi.stageUpload).not.toHaveBeenCalled();
+    expect(vi.mocked(adminThemeApi.applyBundle).mock.calls[0][0]).not.toHaveProperty("homeBanner");
+    expect(buttons("홈화면 이미지 저장")).toHaveLength(1);
   });
 
-  it("leaves live colors and backgrounds unchanged when staging the home image fails", async () => {
+  it("does not block full apply when the home image list cannot be loaded", async () => {
+    vi.mocked(adminHomeImageApi.list).mockRejectedValueOnce(new Error("home images unavailable"));
     await prepareRecommendation();
     await act(async () => buttons("다시 추천받기")[0].click());
     await act(async () => buttons("이 시안 선택")[0].click());
-    expect(buttons("이 포스터로 만들기")[0]).toBeDefined();
-    await act(async () => buttons("이 포스터로 만들기")[0].click());
-    vi.mocked(adminHomeImageApi.stageUpload).mockRejectedValueOnce(new Error("upload failed"));
-    await act(async () => buttons("전체 적용")[0].click());
-    expect(adminThemeApi.applyBundle).not.toHaveBeenCalled();
-    expect(getTicketingBackgroundImageUrl()).toBeNull();
-    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
     await act(async () => buttons("전체 적용")[0].click());
     expect(adminThemeApi.applyBundle).toHaveBeenCalledOnce();
+    expect(adminHomeImageApi.stageUpload).not.toHaveBeenCalled();
   });
 
-  it("reuses the staged home upload on atomic apply retry and preserves the snapshot", async () => {
+  it("reports only the official poster when bundle apply detects a conflict", async () => {
     await prepareRecommendation();
     await act(async () => buttons("다시 추천받기")[0].click());
     await act(async () => buttons("이 시안 선택")[0].click());
-    await act(async () => buttons("이 포스터로 만들기")[0].click());
     vi.mocked(adminThemeApi.applyBundle).mockRejectedValueOnce({ status: 409 });
     await act(async () => buttons("전체 적용")[0].click());
-    expect(toastMock.error).toHaveBeenCalledWith("포스터 또는 홈 대표 이미지가 변경되었습니다. 새로고침 후 다시 확인해 주세요.");
+    expect(toastMock.error).toHaveBeenCalledWith("공식 포스터가 변경되었습니다. 새로고침 후 다시 확인해 주세요.");
     expect(getTicketingBackgroundImageUrl()).toBeNull();
-    await act(async () => buttons("전체 적용")[0].click());
-    expect(adminHomeImageApi.stageUpload).toHaveBeenCalledOnce();
-    expect(vi.mocked(adminThemeApi.applyBundle).mock.calls[1][0]).toEqual(vi.mocked(adminThemeApi.applyBundle).mock.calls[0][0]);
+    expect(adminHomeImageApi.stageUpload).not.toHaveBeenCalled();
   });
 
   it.each(["apply", "switch"] as const)("preserves the edited recommendation bundle on Save, then handles %s", async nextAction => {
