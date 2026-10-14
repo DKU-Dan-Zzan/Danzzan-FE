@@ -1,6 +1,8 @@
 // 역할: 가을 축제에 제공하지 않는 서비스의 안내 화면을 공통으로 렌더링한다.
 
-import { useState, type ReactNode } from "react"
+import { type CSSProperties, type ReactNode } from "react"
+import { usePosterBackground } from "@/lib/app/festival/usePosterBackground"
+import { DEFAULT_FESTIVAL_POSTER } from "@/lib/app/festival/brandingImageSource"
 import { Link } from "react-router-dom"
 import { cn } from "@/components/common/ui/utils"
 import { useT, type TranslationKey } from "@/i18n"
@@ -44,12 +46,12 @@ const OrnamentDivider = ({ className }: { className?: string }) => (
   >
     <span
       className="block h-px flex-1 max-w-[3.5rem]"
-      style={{ background: `linear-gradient(to right, transparent, ${LEGEND_EMBER})` }}
+      style={{ background: `linear-gradient(to right, transparent, var(--poster-closed-accent))` }}
     />
-    <span className="block h-[5px] w-[5px] rotate-45" style={{ backgroundColor: LEGEND_EMBER }} />
+    <span className="block h-[5px] w-[5px] rotate-45" style={{ backgroundColor: "var(--poster-closed-accent)" }} />
     <span
       className="block h-px flex-1 max-w-[3.5rem]"
-      style={{ background: `linear-gradient(to left, transparent, ${LEGEND_EMBER})` }}
+      style={{ background: `linear-gradient(to left, transparent, var(--poster-closed-accent))` }}
     />
   </div>
 )
@@ -57,7 +59,7 @@ const OrnamentDivider = ({ className }: { className?: string }) => (
 const renderWithHighlight = (text: string) =>
   text.split("*").map((part, index) =>
     index % 2 === 1 ? (
-      <strong key={index} className="font-bold text-[var(--service-closed-highlight)]">
+      <strong key={index} className="font-bold" style={{ color: "var(--poster-closed-accent)" }}>
         {part}
       </strong>
     ) : (
@@ -75,16 +77,8 @@ const ICON_BY_TITLE: Partial<Record<TranslationKey, ReactNode>> = {
   "closed.mypage.title": <NoAccountIcon />,
 }
 
-/**
- * 봄 축제의 남색 팔레트가 아니라 가을 축제 "LEGEND" 아이덴티티를 따른다.
- * 이 화면들은 "서비스가 사라진 자리"라서, 앱의 나머지와 다르게 보이는 편이
- * 오히려 "이번 축제는 다르다"를 전달한다.
- *
- * 색은 메인 포스터에서 뽑아 src/index.css 에 전역 토큰으로 등록했다.
- */
-const LEGEND_INK = "var(--service-closed-bg)"
-const LEGEND_EMBER = "var(--service-closed-ember)"
-const LEGEND_EMBER_DEEP = "var(--service-closed-ember-deep)"
+// Keep the neutral veil fixed; only the foreground inherits the current/preview theme.
+const LEGEND_INK = "var(--legend-ink)"
 
 const ServiceClosedNotice = ({
   titleKey,
@@ -97,8 +91,7 @@ const ServiceClosedNotice = ({
 }: ServiceClosedNoticeProps) => {
   const t = useT()
   const logoImage = useFestivalBrandingImageSource("logo")
-  const [failedImage, setFailedImage] = useState<string | null>(null)
-  const customImage = backgroundImageUrl && failedImage !== backgroundImageUrl ? backgroundImageUrl : null
+  const background = usePosterBackground(backgroundImageUrl, DEFAULT_FESTIVAL_POSTER)
   const noticeIcon = icon ?? ICON_BY_TITLE[titleKey]
   const noteKey = NOTE_BY_TITLE[titleKey]
 
@@ -111,60 +104,36 @@ const ServiceClosedNotice = ({
           ? "min-h-[720px] py-10"
           : "min-h-dvh pb-[calc(var(--app-bottom-nav-runtime-offset)+2rem)] pt-[calc(env(safe-area-inset-top)+3rem)]",
       )}
-      style={{ backgroundColor: LEGEND_INK }}
+      style={{
+        "--poster-closed-copy": "color-mix(in srgb, var(--theme-brand-primary, white) 15%, white 85%)",
+        "--poster-closed-accent": "color-mix(in srgb, var(--theme-brand-accent, white) 25%, white 75%)",
+        "--poster-closed-button-bg": "color-mix(in srgb, var(--theme-brand-accent, white) 15%, white 85%)",
+        "--poster-closed-ink": "color-mix(in srgb, var(--theme-brand-strong, black) 20%, black 80%)",
+        backgroundColor: LEGEND_INK,
+        color: "var(--poster-closed-copy)",
+      } as CSSProperties}
     >
-      {/* 포스터를 배경 질감으로 깐다. 그림이 아니라 공기처럼 읽혀야 하므로
-          짙게 눌러 흐리고, 가장자리를 검정으로 녹인다. */}
-      {!customImage && <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 select-none bg-cover bg-[position:50%_34%] opacity-[0.38] blur-[6px] saturate-[1.15]"
-        style={{
-          backgroundImage: "url(/legend-poster.jpg)",
-          maskImage:
-            "radial-gradient(100% 58% at 50% 27%, var(--ds-black) 0%, var(--service-closed-mask-mid) 55%, transparent 84%)",
-          WebkitMaskImage:
-            "radial-gradient(100% 58% at 50% 27%, var(--ds-black) 0%, var(--service-closed-mask-mid) 55%, transparent 84%)",
-        }}
-      />}
-
-      {customImage && <img src={customImage} alt="" onError={() => setFailedImage(customImage)} className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-50" />}
-
-      {/* 불씨 잔광 — 로고 뒤에서 번지게 해서 워드마크가 떠 보이도록 한다. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-[26%] h-[26rem] w-[26rem] -translate-x-1/2 -translate-y-1/2 select-none"
-        style={{
-          background:
-            "radial-gradient(circle, var(--service-closed-glow) 0%, var(--service-closed-glow-deep) 38%, transparent 68%)",
-        }}
-      />
-
-      {/* 아래쪽을 잉크로 덮어 본문 대비를 확보한다. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%] select-none"
-        style={{
-          background: `linear-gradient(to top, ${LEGEND_INK} 24%, var(--service-closed-fade-mid) 58%, transparent 100%)`,
-        }}
-      />
+      {background.src && <img aria-hidden="true" src={background.src} alt="" onError={background.onError}
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover" />}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0"
+        style={{ background: "linear-gradient(to bottom, rgba(9,12,20,0.76), rgba(9,12,20,0.90))" }} />
 
       <div className="relative z-10 mx-auto flex w-full max-w-[330px] flex-col items-center text-center">
         <img
-          src={preview ? "/legend-logo.png" : logoImage.src}
-          onError={preview ? undefined : logoImage.onError}
-          alt={!preview && logoImage.useUploaded ? "축제 로고" : "LEGEND"}
+          src={logoImage.src}
+          onError={logoImage.onError}
+          alt={logoImage.useUploaded ? "축제 로고" : "LEGEND"}
           className="w-[13.5rem] max-w-[74%] select-none object-contain [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_both]"
           style={{
-            filter: !preview && logoImage.useUploaded
-              ? "drop-shadow(0 0 26px var(--service-closed-logo-shadow))"
-              : `brightness(0) saturate(100%) invert(92%) sepia(28%) saturate(560%) hue-rotate(328deg) brightness(103%) contrast(96%) drop-shadow(0 0 26px var(--service-closed-logo-shadow))`,
+            // Recolor only this dark-context rendering; retain the asset's alpha and shape.
+            filter: "brightness(0) invert(1) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35))",
           }}
           draggable={false}
         />
 
         <p
           className="mt-4 text-[0.66rem] font-semibold uppercase tracking-[0.34em] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_90ms_both]"
-          style={{ color: "var(--service-closed-overline)" }}
+          style={{ color: "var(--poster-closed-copy)" }}
         >
           2026 Fall Festival
         </p>
@@ -185,8 +154,8 @@ const ServiceClosedNotice = ({
             aria-hidden="true"
             className="mt-6 select-none [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_300ms_both]"
             style={{
-              color: LEGEND_EMBER,
-              filter: "drop-shadow(0 0 18px var(--service-closed-icon-shadow))",
+              color: "var(--poster-closed-accent)",
+              filter: "drop-shadow(0 0 18px var(--poster-closed-ink))",
             }}
           >
             {noticeIcon}
@@ -195,7 +164,7 @@ const ServiceClosedNotice = ({
 
         <p
           className="mt-6 max-w-[19.5rem] whitespace-pre-line text-balance text-[0.92rem] leading-[1.72] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_380ms_both]"
-          style={{ color: "var(--service-closed-copy)" }}
+          style={{ color: "var(--poster-closed-copy)" }}
         >
           {renderWithHighlight(t(descriptionKey))}
         </p>
@@ -205,7 +174,7 @@ const ServiceClosedNotice = ({
             <OrnamentDivider className="mt-6 [animation:ec-fade-in_520ms_ease-out_440ms_both]" />
             <p
               className="mt-5 max-w-[19.5rem] whitespace-pre-line text-balance text-[0.92rem] leading-[1.72] [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_480ms_both]"
-              style={{ color: "var(--service-closed-copy)" }}
+              style={{ color: "var(--poster-closed-copy)" }}
             >
               {renderWithHighlight(t(noteKey))}
             </p>
@@ -215,11 +184,12 @@ const ServiceClosedNotice = ({
         <Link
           to={actionTo}
           tabIndex={preview ? -1 : undefined}
-          className="mt-9 inline-flex h-12 w-full max-w-[15rem] items-center justify-center rounded-full text-[0.92rem] font-semibold tracking-[0.01em] text-white transition-[transform,filter] duration-150 ease-out hover:brightness-[1.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:translate-y-px motion-reduce:transition-none [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_400ms_both]"
+          className="mt-9 inline-flex h-12 w-full max-w-[15rem] items-center justify-center rounded-full text-[0.92rem] font-semibold tracking-[0.01em] transition-[transform,filter] duration-150 ease-out hover:brightness-[1.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:translate-y-px motion-reduce:transition-none [animation:ec-fade-up_520ms_cubic-bezier(0.22,1,0.36,1)_400ms_both]"
           style={{
-            background: `linear-gradient(135deg, ${LEGEND_EMBER} 0%, ${LEGEND_EMBER_DEEP} 100%)`,
-            boxShadow: "0 16px 38px -18px var(--service-closed-cta-shadow)",
-            ["--tw-ring-color" as string]: "var(--service-closed-cta-ring)",
+            background: "var(--poster-closed-button-bg)",
+            color: "var(--poster-closed-ink)",
+            boxShadow: "0 16px 38px -18px var(--poster-closed-ink)",
+            ["--tw-ring-color" as string]: "var(--poster-closed-accent)",
             ["--tw-ring-offset-color" as string]: LEGEND_INK,
           }}
         >

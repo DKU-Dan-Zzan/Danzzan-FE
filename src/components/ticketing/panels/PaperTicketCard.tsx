@@ -1,6 +1,7 @@
 // 역할: 종이 티켓 스타일 카드의 시각 표현과 상태별 배지/정보 표시를 담당합니다.
-import { useId, useState, useSyncExternalStore } from "react";
+import { useId, useSyncExternalStore, type CSSProperties } from "react";
 import { getTicketCardBackgroundImageUrl, subscribeFestivalSettings } from "@/lib/app/festival/festivalCalendar";
+import { usePosterBackground } from "@/lib/app/festival/usePosterBackground";
 import { cn } from "@/components/common/ui/utils";
 import { resolveTicketDayLabel } from "@/lib/ticketing/festivalDay";
 import type { Ticket } from "@/types/ticketing/model/ticket.model";
@@ -44,8 +45,7 @@ const getGuideLines = (ticket: Ticket) => {
 export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardProps) {
   const savedBackground = useSyncExternalStore(subscribeFestivalSettings, getTicketCardBackgroundImageUrl, getTicketCardBackgroundImageUrl);
   const configuredBackground = backgroundImageUrl === undefined ? savedBackground : backgroundImageUrl;
-  const [failedUrl, setFailedUrl] = useState<string | null>(null);
-  const background = configuredBackground && configuredBackground !== failedUrl ? configuredBackground : DEFAULT_TICKET_CARD_BACKGROUND;
+  const background = usePosterBackground(configuredBackground, DEFAULT_TICKET_CARD_BACKGROUND);
   const cardId = useId().replace(/:/g, "");
   const clipId = `ticket-clip-${cardId}`;
   const overlayId = `ticket-overlay-${cardId}`;
@@ -63,7 +63,12 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
   return (
     <div
       className="relative w-full"
-      style={{ filter: "drop-shadow(0 6px 18px var(--ticket-paper-shadow))" }}
+      style={{
+        // Define here so a surrounding theme preview supplies its own brand colors.
+        "--poster-ticket-ink": "color-mix(in srgb, var(--theme-brand-strong, black) 20%, black 80%)",
+        color: "var(--poster-ticket-ink)",
+        filter: "drop-shadow(0 6px 18px var(--ticket-paper-shadow))",
+      } as CSSProperties}
     >
       {/* SVG 티켓 외형 */}
       <svg
@@ -74,52 +79,53 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
         aria-hidden="true"
       >
         <defs>
-          {/* 관리자 업로드 이미지에만 밝은 레이어를 더해 글자 대비를 유지한다. */}
+          {/* 커스텀 이미지와 공식 포스터 위에 흰 레이어를 더해 대비를 유지한다. */}
           <linearGradient id={overlayId} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%"   stopColor="rgba(255,250,246,0.80)" />
-            <stop offset="100%" stopColor="rgba(255,241,231,0.68)" />
+            <stop offset="0%"   stopColor="rgba(255,255,255,0.70)" />
+            <stop offset="100%" stopColor="rgba(255,255,255,0.64)" />
           </linearGradient>
           <clipPath id={clipId}>
             <path d={ticketPath} />
           </clipPath>
         </defs>
 
-        <path d={ticketPath} fill="var(--surface)" />
+        <path d={ticketPath} fill="white" />
 
         {/* 가로형 기본 배경은 원래 색감을 그대로 사용한다. */}
-        <image
-          href={background}
-          onError={() => { if (configuredBackground) setFailedUrl(configuredBackground); }}
+        {background.src && <image
+          href={background.src}
+          onError={background.onError}
           x="0" y="0"
           width="400" height="180"
           preserveAspectRatio="xMidYMid slice"
           clipPath={`url(#${clipId})`}
-        />
+        />}
 
-        {background !== DEFAULT_TICKET_CARD_BACKGROUND && (
+        {background.src !== DEFAULT_TICKET_CARD_BACKGROUND && (
           <path d={ticketPath} fill={`url(#${overlayId})`} />
         )}
 
         {/* 퍼포레이션 점선 */}
         <line
           x1="280" y1="18" x2="280" y2="162"
-          stroke="var(--ticket-paper-perforation)"
+          stroke="var(--poster-ticket-ink)"
+          strokeOpacity="0.35"
           strokeWidth="1.5"
           strokeDasharray="5,5"
         />
 
         {/* 테두리 */}
-        <path d={ticketPath} fill="none" stroke="var(--ticket-paper-outline)" strokeWidth="1" />
+        <path d={ticketPath} fill="none" stroke="var(--poster-ticket-ink)" strokeOpacity="0.2" strokeWidth="1" />
       </svg>
 
       {/* 콘텐츠 오버레이 */}
       <div className="absolute inset-0 flex items-stretch">
         {/* 왼쪽 70% */}
         <div className="flex w-[70%] flex-col justify-center px-6 py-5">
-          <p className="text-[0.58rem] font-bold tracking-[0.22em]" style={{ color: "var(--ticket-card-accent)" }}>
+          <p className="text-[0.58rem] font-bold tracking-[0.22em]" style={{ color: "var(--poster-ticket-ink)" }}>
             DANKOOK ZONE TICKET
           </p>
-          <p className="mt-1.5 text-[2.1rem] font-bold leading-none tracking-[-0.02em]" style={{ color: "var(--ticket-card-accent)" }}>
+          <p className="mt-1.5 text-[2.1rem] font-bold leading-none tracking-[-0.02em]" style={{ color: "var(--poster-ticket-ink)" }}>
             {dayLabel}
           </p>
           <span
@@ -138,11 +144,11 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
             { key: "예매 순번", val: `NO.${queueLabel}` },
           ].map(({ key, val }) => (
             <div key={key}>
-              <p className="text-[0.5rem] font-semibold tracking-[0.08em]" style={{ color: "var(--ticket-card-accent)" }}>{key}</p>
+              <p className="text-[0.5rem] font-semibold tracking-[0.08em]" style={{ color: "var(--poster-ticket-ink)" }}>{key}</p>
               <p className={cn(
                 "mt-0.5 text-[1.05rem] font-extrabold leading-tight [font-variant-numeric:tabular-nums]",
                 key === "예매 순번" ? "font-mono" : ""
-              )} style={{ color: "var(--ticket-card-accent)" }}>
+              )} style={{ color: "var(--poster-ticket-ink)" }}>
                 {val}
               </p>
             </div>

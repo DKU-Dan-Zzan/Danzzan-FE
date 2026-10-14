@@ -39,10 +39,7 @@ export const ADMIN_NAV_MENUS: AdminNavMenu[] = [
     key: "notices",
     label: "공지·광고",
     path: "/admin/notices",
-    items: [
-      { label: "공지사항", path: "/admin/notices", description: "긴급 공지와 일반 공지" },
-      { label: "광고 배너", path: "/admin/ads", description: "홈·티켓 화면 배너" },
-    ],
+    items: [],
   },
   {
     key: "boothmap",

@@ -49,16 +49,12 @@ async function choose(kind: "공식 포스터" | "축제 로고", file: File) {
 }
 
 describe("FestivalBrandingPanel", () => {
-  it("opens and closes home image management without changing theme analysis state", async () => {
-    const onAnalysisChange = vi.fn();
-    const themeBefore = document.documentElement.style.getPropertyValue("--theme-brand-primary");
-    await act(async () => root.render(<FestivalBrandingPanel onAnalysisChange={onAnalysisChange} />));
-    const snapshotCalls = onAnalysisChange.mock.calls.length;
-    await act(async () => [...host.querySelectorAll("button")].find((button) => button.textContent === "와이드 이미지 관리")!.click());
-    expect(document.body.textContent).toContain("홈 화면 와이드 이미지 관리");
-    await act(async () => [...document.querySelectorAll("button")].find((button) => button.textContent === "닫기")!.click());
-    expect(onAnalysisChange).toHaveBeenCalledTimes(snapshotCalls);
-    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe(themeBefore);
+  it("links to home banner settings separately from poster analysis", async () => {
+    await render();
+    expect(host.querySelector('a[href="/admin#home-images"]')?.textContent).toBe("축제 설정");
+    expect(host.textContent).toContain("공식 포스터만 분석합니다");
+    expect(host.textContent).toContain("로고와 홈 배너는 분석하지 않습니다");
+    expect(host.querySelector('[aria-label="홈 배너 관리"]')).toBeNull();
   });
 
   it("shows empty poster and logo states", async () => {
@@ -80,12 +76,12 @@ describe("FestivalBrandingPanel", () => {
     expect(steps()[1].getAttribute("data-state")).toBe("waiting");
     expect(steps()[2].getAttribute("data-state")).toBe("waiting");
     const process = host.querySelector('[aria-label="AI 테마 생성 과정"]')!;
-    const analysisHeading = [...host.querySelectorAll("h3")].find((heading) => heading.textContent === "포스터 색상 분석")!;
+    const analysisHeading = [...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")!;
     expect(process.compareDocumentPosition(analysisHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(process.querySelector("button")).toBeNull();
     expect(steps()[0].className).not.toContain("rounded-full");
-    expect(host.textContent).toContain("포스터에서 대표색을 먼저 추출한 뒤");
-    expect(host.textContent?.match(/포스터에서 대표색을 먼저 추출한 뒤/g)).toHaveLength(1);
+    expect(host.textContent).toContain("공식 포스터만 분석합니다");
+    expect(host.textContent?.match(/공식 포스터만 분석합니다/g)).toHaveLength(1);
     expect(host.querySelector('[aria-label="AI 추천 작업 단계"]')?.className).toContain("sm:flex-row");
     const input = host.querySelector<HTMLInputElement>('input[aria-label="기준 색상 HEX"]')!;
     const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!;
@@ -166,7 +162,7 @@ describe("FestivalBrandingPanel", () => {
     await act(async () => [...host.querySelectorAll("button")].find((button) => button.textContent === "대표색 추출")!.click());
     expect(festivalBrandingApi.extractPosterColors).toHaveBeenCalledWith(1);
     expect(host.querySelectorAll('button[aria-label^="기준 색상 #"]')).toHaveLength(4);
-    expect(host.textContent).toContain("후보 색상을 선택하거나 HEX를 직접 입력해 기준색을 정해주세요.");
+    expect(host.textContent).toContain("추출된 색 중 원하는 색을 하나 고르세요.");
     await act(async () => host.querySelector<HTMLButtonElement>('button[aria-label="기준 색상 #274A83 선택"]')!.click());
     expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("#274A83");
     expect(host.querySelector('[aria-label="선택한 기준 색상"]')?.textContent).toContain("선택된 기준색");
