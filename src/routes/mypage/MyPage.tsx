@@ -13,7 +13,6 @@ import {
   UserX,
 } from "lucide-react";
 import { cn } from "@/components/common/ui/utils";
-import { AzureImage } from "@/components/common/AzureImage";
 import { authLogout, withdrawUser } from "@/api/app/auth/authApi";
 import { studentProfileApi } from "@/api/app/auth/studentProfileApi";
 import { useMyTicketsQuery } from "@/hooks/ticketing/useMyTicketsQuery";
@@ -30,7 +29,7 @@ import {
   AlertDialogTitle,
 } from "@/components/common/ui/alert-dialog";
 import { Checkbox } from "@/components/common/ui/checkbox";
-import { useFestivalBrandingImageSource } from "@/lib/app/festival/brandingImageSource";
+import { useFestivalPortraitBackground } from "@/lib/app/festival/useFestivalPortraitBackground";
 
 type WithdrawStep = "ticket-waiver" | "final";
 
@@ -165,7 +164,7 @@ function ListRow({
 
 function MyPage() {
   const navigate = useNavigate();
-  const posterImage = useFestivalBrandingImageSource("poster");
+  const posterImage = useFestivalPortraitBackground();
   const ticketingEnabled = useTicketingEnabled();
   const session = useSyncExternalStore(
     authStore.subscribe,
@@ -214,9 +213,10 @@ function MyPage() {
       <div className="mypage-root relative flex h-[100dvh] w-full flex-col items-center justify-center overflow-hidden px-6 pb-[calc(var(--app-bottom-nav-height)+env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.5rem)]">
         {/* 공식 포스터, 미등록 또는 로딩 실패 시 기존 LEGEND 포스터 */}
         <div className="absolute inset-0 overflow-hidden">
-          <AzureImage
+          <img
             src={posterImage.src}
             onError={posterImage.onError}
+            onLoad={posterImage.onLoad}
             alt=""
             aria-hidden
             className={cn("absolute inset-0 h-full w-full object-cover", posterImage.useUploaded ? "object-top" : "object-[50%_38%]")}
@@ -344,9 +344,10 @@ function MyPage() {
       */}
       <div className="relative">
         <div className="absolute inset-0 overflow-hidden">
-          <AzureImage
+          <img
             src={posterImage.src}
             onError={posterImage.onError}
+            onLoad={posterImage.onLoad}
             alt=""
             aria-hidden
             className={cn("h-full w-full object-cover", posterImage.useUploaded ? "object-top" : "object-[50%_44%]")}

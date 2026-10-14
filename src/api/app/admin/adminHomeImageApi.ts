@@ -5,6 +5,8 @@ import { clearAdminSession, getAdminAccessToken, reissueAdminToken } from "@/lib
 import { authStore } from "@/store/common/authStore";
 
 export type AdminHomeImage = { id: number; imageUrl: string; displayOrder: number };
+export type HomeImagePreviewRequest = { sourcePosterUrl: string; layout: "contain" | "cover"; focusX?: number; focusY?: number };
+export type HomeImagePreview = { mimeType: string; imageBase64: string; width: number; height: number; sourcePosterUrl: string };
 
 const request = createFetchWithAuth({
   getSessionEpoch: authStore.getSessionEpoch,
@@ -19,6 +21,13 @@ const request = createFetchWithAuth({
 const path = (festivalSettingId: number) => `/admin/festival/${festivalSettingId}/home-images`;
 
 export const adminHomeImageApi = {
+  preview: (payload: HomeImagePreviewRequest, festivalSettingId = CURRENT_FESTIVAL_SETTING_ID, signal?: AbortSignal) =>
+    request<HomeImagePreview>(`${path(festivalSettingId)}/preview`, { method: "POST", body: JSON.stringify(payload), signal }),
+  stageUpload: (file: File, festivalSettingId = CURRENT_FESTIVAL_SETTING_ID, signal?: AbortSignal) => {
+    const body = new FormData();
+    body.append("file", file);
+    return request<{ url: string }>(`${path(festivalSettingId)}/staged`, { method: "POST", body, signal });
+  },
   list: (festivalSettingId = CURRENT_FESTIVAL_SETTING_ID, signal?: AbortSignal) =>
     request<AdminHomeImage[]>(path(festivalSettingId), { signal }),
   upload: (file: File, festivalSettingId = CURRENT_FESTIVAL_SETTING_ID) => {

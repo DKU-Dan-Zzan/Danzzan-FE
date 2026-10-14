@@ -15,6 +15,7 @@ vi.mock("@/lib/app/admin/admin-auth-session", () => ({
 vi.mock("@/store/common/authStore", () => ({ authStore: { getSessionEpoch: () => 0 } }));
 
 import {
+  sameImageReference,
   isAzureBlobReadUrl,
   isAzureReadUrlExpiringSoon,
   renewAzureReadUrl,
@@ -83,5 +84,22 @@ describe("Azure read URL renewal", () => {
 
     const headers = new Headers(fetchMock.mock.calls[0]?.[1]?.headers);
     expect(headers.get("Authorization")).toBeNull();
+  });
+});
+
+
+describe("image identity across SAS rotation", () => {
+  it("matches the same blob while retaining account, path, and version boundaries", () => {
+    expect(sameImageReference(currentUrl, nextUrl)).toBe(true);
+    expect(sameImageReference(currentUrl, nextUrl.replace("poster.png", "other.png"))).toBe(false);
+    expect(sameImageReference(currentUrl, nextUrl.replace("danzzandemo2026", "anotheraccount"))).toBe(false);
+    expect(sameImageReference(currentUrl, `${nextUrl}&versionid=another`)).toBe(false);
+    expect(sameImageReference(currentUrl, `${nextUrl}&snapshot=another`)).toBe(false);
+  });
+  it("keeps exact comparison for legacy URLs and empty values", () => {
+    expect(sameImageReference("https://cdn.test/a?q=1", "https://cdn.test/a?q=2")).toBe(false);
+    expect(sameImageReference("poster-a", "poster-a")).toBe(true);
+    expect(sameImageReference(null, null)).toBe(true);
+    expect(sameImageReference(null, "poster-a")).toBe(false);
   });
 });

@@ -32,6 +32,16 @@ export const isAzureBlobReadUrl = (value: string | null | undefined): value is s
   }
 };
 
+/** SAS rotation changes access credentials, not the identity of the image. */
+export const imageReferenceKey = (value: string | null | undefined): string | null | undefined => {
+  if (!isAzureBlobReadUrl(value)) return value;
+  const url = new URL(value);
+  return JSON.stringify([url.origin, url.pathname, url.searchParams.get("versionid"), url.searchParams.get("snapshot")]);
+};
+
+export const sameImageReference = (left: string | null | undefined, right: string | null | undefined): boolean =>
+  imageReferenceKey(left) === imageReferenceKey(right);
+
 export const isAzureReadUrlExpiringSoon = (value: string, now = Date.now()): boolean => {
   if (!isAzureBlobReadUrl(value)) return false;
   const expiry = new URL(value).searchParams.get("se");

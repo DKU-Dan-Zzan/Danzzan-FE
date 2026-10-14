@@ -68,6 +68,30 @@ afterEach(async () => {
 });
 
 describe("AdminTopNav staff menu", () => {
+  it("opens the unified notice/ad page directly with no dropdown", async () => {
+    await render("/admin/notices#ad-banners");
+    const trigger = button("공지·광고");
+    expect(trigger.className).toContain("bg-[var(--surface-subtle)]");
+    await act(async () => trigger.dispatchEvent(new MouseEvent("mouseover", { bubbles: true })));
+    await act(async () => trigger.focus());
+    expect(trigger.hasAttribute("aria-haspopup")).toBe(false);
+    expect(container.querySelector("#notices-submenu")).toBeNull();
+    await act(async () => trigger.click());
+    expect(locationPath).toBe("/admin/notices");
+  });
+
+  it("retains OPERATIONS permission for the unified notice/ad menu", async () => {
+    state.role = "manager";
+    state.permissions = ["TICKETING"];
+    await render();
+    expect(button("공지·광고")).toBeUndefined();
+    await act(async () => root.unmount());
+    container.remove();
+    state.permissions = ["OPERATIONS"];
+    await render();
+    expect(button("공지·광고")).toBeDefined();
+  });
+
   it("keeps theme recommendation and management on one anchored page", async () => {
     await render("/admin/theme");
     await act(async () => button("테마").dispatchEvent(new MouseEvent("mouseover", { bubbles: true })));

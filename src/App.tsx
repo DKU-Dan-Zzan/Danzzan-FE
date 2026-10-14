@@ -231,8 +231,8 @@ function App() {
           </Route>
           <Route element={<ProtectedAdminPermissionRoute permission="OPERATIONS" />}>
             <Route path="theme" element={withRouteSuspense(<AdminTheme />)} />
-            <Route path="notices" element={withRouteSuspense(<Admin section="notice" />)} />
-            <Route path="ads" element={withRouteSuspense(<Admin section="ad" />)} />
+            <Route path="notices" element={withRouteSuspense(<Admin />)} />
+            <Route path="ads" element={<Navigate to="/admin/notices#ad-banners" replace />} />
             <Route path="boothmap" element={<Navigate to="/admin/boothmap/layout" replace />} />
             <Route path="boothmap/layout" element={withRouteSuspense(<AdminBoothLayoutPage />)} />
             <Route path="boothmap/booths" element={withRouteSuspense(<AdminBoothInfoPage />)} />

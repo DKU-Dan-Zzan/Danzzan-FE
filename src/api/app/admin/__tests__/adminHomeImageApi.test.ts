@@ -9,6 +9,16 @@ vi.mock("@/api/common/fetchAuth", () => ({ createFetchWithAuth: () => request })
 beforeEach(() => request.mockReset().mockResolvedValue([]));
 
 describe("adminHomeImageApi", () => {
+  it("previews and stages without using the live home-image creation endpoint", async () => {
+    const signal = new AbortController().signal;
+    const payload = { sourcePosterUrl: "https://cdn/poster.png", layout: "cover" as const, focusX: .2, focusY: .7 };
+    await adminHomeImageApi.preview(payload, 2, signal);
+    expect(request).toHaveBeenLastCalledWith("/admin/festival/2/home-images/preview", { method: "POST", body: JSON.stringify(payload), signal });
+    const file = new File(["image"], "banner.png", { type: "image/png" });
+    await adminHomeImageApi.stageUpload(file, undefined, signal);
+    expect(request).toHaveBeenLastCalledWith(`/admin/festival/${CURRENT_FESTIVAL_SETTING_ID}/home-images/staged`, { method: "POST", body: expect.any(FormData), signal });
+    expect((request.mock.calls.at(-1)![1].body as FormData).get("file")).toBe(file);
+  });
   it("uses festival-scoped authenticated endpoints and preserves upload FormData", async () => {
     const base = `/admin/festival/${CURRENT_FESTIVAL_SETTING_ID}/home-images`;
     const signal = new AbortController().signal;
