@@ -70,7 +70,7 @@ export function HomeWideImagesPanel({ actionStyle }: { actionStyle?: CSSProperti
       onClick={(event) => showPreview(image, event.currentTarget)}>
       {failedImageIds.has(image.id)
         ? <span className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-[var(--text-muted)]">이미지를 불러올 수 없습니다.</span>
-        : <AzureImage src={image.imageUrl} alt={alt} className="h-full w-full object-cover" onError={() => setFailedImageIds((current) => new Set(current).add(image.id))} />}
+        : <AzureImage src={image.imageUrl} alt={alt} className="h-full w-full object-contain" onError={() => setFailedImageIds((current) => new Set(current).add(image.id))} />}
     </button>;
   }
 
@@ -120,7 +120,7 @@ export function HomeWideImagesPanel({ actionStyle }: { actionStyle?: CSSProperti
             {images.length === 0 && !loading && !error && <p className="mt-5 rounded-xl bg-[var(--surface-subtle)] p-4 text-sm text-[var(--text-muted)]">등록된 홈 배너 이미지가 없습니다.</p>}
             <ol className="mt-4 space-y-3">
               {images.map((image, index) => <li key={image.id} className="flex flex-col gap-3 rounded-xl border border-[var(--border-base)] p-3 sm:flex-row sm:items-center">
-                {thumbnail(image, index, "aspect-[16/7] w-full shrink-0 sm:w-40", `${index + 1}번 홈 배너 이미지`)}
+                {thumbnail(image, index, "aspect-[9/16] w-32 shrink-0", `${index + 1}번 홈 배너 이미지`)}
                 <span className="text-sm font-medium">{index + 1}번</span>
                 <div className="flex flex-wrap gap-2 sm:ml-auto">
                   <button type="button" aria-label={`${index + 1}번 이미지 위로 이동`} className={ADMIN_THEME_SECONDARY_ACTION_CLASS} disabled={busy || index === 0} onClick={() => void move(index, -1)}><ArrowUp className="h-4 w-4" /></button>
@@ -134,7 +134,7 @@ export function HomeWideImagesPanel({ actionStyle }: { actionStyle?: CSSProperti
       </Dialog>
     </div>
     {loading ? <p role="status" className="mt-4 text-sm text-[var(--text-muted)]">이미지를 불러오는 중입니다…</p> : error ? <div role="alert" className="mt-4 text-sm"><p>{error}</p><button type="button" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "mt-2")} onClick={() => void load()}>다시 시도</button></div> : <>
-      {images.length === 0 ? <p className="mt-4 text-sm text-[var(--text-muted)]">등록된 홈 배너 이미지가 없습니다.</p> : <div className="mt-4 flex gap-2 sm:max-w-lg">{images.slice(0, 3).map((image, index) => thumbnail(image, index, "aspect-[16/7] w-[calc((100%-1rem)/3)] max-w-40 shrink-0", `${index + 1}번 홈 배너 이미지 미리보기`))}</div>}
+      {images.length === 0 ? <p className="mt-4 text-sm text-[var(--text-muted)]">등록된 홈 배너 이미지가 없습니다.</p> : <div className="mt-4 flex gap-2">{images.slice(0, 3).map((image, index) => thumbnail(image, index, "aspect-[9/16] w-[calc((100%-1rem)/3)] max-w-24 shrink-0", `${index + 1}번 홈 배너 이미지 미리보기`))}</div>}
       <p className="mt-2 text-xs text-[var(--text-muted)]">총 {images.length}개 등록됨</p>
     </>}
     <Dialog open={previewImage !== null} onOpenChange={(isOpen) => { if (!isOpen) setPreviewImage(null); }}>
