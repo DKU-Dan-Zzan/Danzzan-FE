@@ -496,7 +496,7 @@ export default function AdminTheme() {
           </>}
         </section>
       </div>
-      <details id="theme-management" className="space-y-6 scroll-mt-40 sm:scroll-mt-28" aria-label="테마 관리 영역">
+      <details id="theme-management" open className="space-y-6 scroll-mt-40 sm:scroll-mt-28" aria-label="테마 관리 영역">
       <summary className="cursor-pointer border-t border-[var(--border-base)] py-5 text-sm font-semibold">고급 설정 <span className="ml-2 font-normal text-[var(--text-muted)]">저장된 테마 · 색상 직접 수정</span></summary>
       {!bundleReady && <DialogTrigger asChild><button ref={previewTriggerRef} type="button" disabled={busy} className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex items-center gap-2 text-sm")}><MonitorSmartphone className="h-4 w-4" />편집 중인 화면 확인</button></DialogTrigger>}
       <p className="text-xs text-[var(--text-muted)]">저장된 테마는 색상만 관리합니다. 배경까지 바꾸려면 위의 추천 과정을 진행하세요.</p>
@@ -531,7 +531,7 @@ export default function AdminTheme() {
                 {dirty && selectedTheme && !selectedTheme.active && <p className="w-full text-xs text-[var(--text-muted)]">변경사항을 저장한 뒤 적용할 수 있습니다.</p>}
               </div>
               <p className="mt-4 text-xs text-[var(--text-muted)]">주점은 메인 색상(Primary)을 따릅니다. 상태색과 나머지 지도 색상은 고정입니다. 기존 테마도 수정해 저장하면 이 규칙이 적용됩니다.</p>
-              <div className="mt-6 space-y-6">{THEME_FIELDS.map((group) => <details key={group.key} open={group.key === "brand"} className="rounded-xl border border-[var(--border-base)] p-4"><summary className="cursor-pointer text-sm font-semibold">{group.title}<span className="ml-2 text-xs font-normal text-[var(--text-muted)]">{group.colors.length}가지 색상</span></summary><div className="mt-4 grid gap-3 sm:grid-cols-2">{group.colors.map(([key, label]) => {
+              <div className="mt-6 space-y-6">{THEME_FIELDS.map((group) => <details key={group.key} open className="rounded-xl border border-[var(--border-base)] p-4"><summary className="cursor-pointer text-sm font-semibold">{group.title}<span className="ml-2 text-xs font-normal text-[var(--text-muted)]">{group.colors.length}가지 색상</span></summary><div className="mt-4 grid gap-3 sm:grid-cols-2">{group.colors.map(([key, label]) => {
                 const value = getThemeColor(draft.themeData, group.key, key);
                 const valid = isHexColor(value);
                 const locked = group.key !== "brand";

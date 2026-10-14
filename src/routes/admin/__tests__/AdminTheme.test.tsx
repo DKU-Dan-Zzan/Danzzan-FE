@@ -328,7 +328,7 @@ describe("AdminTheme", () => {
     expect(adminThemeApi.applyBundle).not.toHaveBeenCalled();
     expect(buttons("추천 화면 확인")).toHaveLength(0);
     expect(host.querySelector('[aria-label="화면 확인과 테마 작업 안내"] button')).toBeNull();
-    expect((host.querySelector("#theme-management") as HTMLDetailsElement).open).toBe(false);
+    expect((host.querySelector("#theme-management") as HTMLDetailsElement).open).toBe(true);
     expect(getTicketCardBackgroundImageUrl()).toBeNull();
     await act(async () => host.querySelector<HTMLButtonElement>('button[aria-label="기준 색상 #13730C 선택"]')!.click());
     await act(async () => { await new Promise(resolve => setTimeout(resolve, 650)); });
