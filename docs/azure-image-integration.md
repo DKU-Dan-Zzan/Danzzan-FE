@@ -51,4 +51,17 @@ Node는 현재 Dockerfile에서 22 계열을 사용한다. BE CORS 허용 출처
 
 동료 환경에서는 새 테스트 공지·새 이미지로 같은 흐름을 확인하고 본인이 만든 대상만 정리한다. **BE의 Azure SDK smoke 테스트는 현재 `danzzandemo2026/images`가 하드코딩되어 있으므로 새 저장소 검증에 그대로 사용하면 안 된다.**
 
-VM 전체 배포·HTTPS·Nginx 업로드 크기·운영 관리 ID 인증은 아직 준비 단계다.
+## 6. Azure VM 배포 (2026-10-14)
+
+현재 시연 주소는 https://danzzan-demo-2026.koreacentral.cloudapp.azure.com 이다. FE는 [Dockerfile.azure](../Dockerfile.azure)로 빌드하고 [nginx.azure.conf](../nginx.azure.conf)로 HTTPS와 SPA 경로를 제공한다. BE 저장소의 `docker-compose.azure.yml`이 FE/Nginx·BE·MySQL·Redis·Kafka를 함께 실행한다. 전체 초기 설정과 운영 절차는 BE의 `docs/azure-vm-deployment.md`를 따른다.
+
+- 빌드 기본값: `VITE_API_BASE_URL=/api`, `VITE_TICKETING_API_BASE_URL=/api`, `VITE_API_MODE=live`.
+- `.env*`는 Docker 빌드에서 제외한다(`.env.example` 제외). 카카오 JavaScript 공개 키는 `VITE_KAKAO_MAP_JS_KEY` build arg로 명시적으로 전달한다. Azure 자격 증명이나 서버 비밀키는 FE에 넣지 않는다.
+- Nginx는 `/api/` 한 단계만 제거한다. BE 관리자 경로에 이미 `/api`가 포함되는 경우 외부 요청의 `/api/api/admin/...`은 기존 FE 경로 계약에 따른 것이다.
+- HTTP는 HTTPS로 이동하며 ACME HTTP-01 경로만 인증서 갱신용 webroot로 제공한다. 인증서는 VM의 `/etc/letsencrypt`를 읽기 전용으로 마운트한다. 인증서 최초 발급 전에는 HTTPS Nginx가 시작되지 않는다.
+- 업로드 본문 상한은 Nginx 11m이며 실제 파일 허용 범위는 BE의 MIME·파일 크기 검증을 따른다. 운영 actuator 경로는 공개 프록시에서 차단한다.
+- 새 VM으로 옮길 때 `server_name`, 인증서 경로, BE CORS와 인증서 발급 도메인을 함께 변경한다.
+
+VM에서 홈페이지·공지와 테스트 Azure 이미지의 실제 브라우저 표시, 관리자/일반 사용자 HTTP 로그인, 권한 차단, SAS 만료·재발급을 확인했다. 테스트 공지·이미지는 정리했다. 이번 VM 검증이 전체 화면·부하 테스트까지 통과했다는 뜻은 아니다.
+
+카카오 SDK는 새 Azure 주소를 Referer로 요청하면 HTTP 401을 반환했다. 동료가 관리하는 같은 앱의 JavaScript SDK 도메인에 `https://danzzan-demo-2026.koreacentral.cloudapp.azure.com`을 등록하고 `/map`을 다시 확인해야 한다. 도메인 미등록이 유력하지만 키 비활성 여부까지 확인한 것은 아니다. [카카오 지도 공식 안내](https://apis.map.kakao.com/web/guide/)

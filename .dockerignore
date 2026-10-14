@@ -2,5 +2,6 @@ node_modules
 dist
 coverage
 .git
-.env.development.local
+.env*
+!.env.example
 *.log
