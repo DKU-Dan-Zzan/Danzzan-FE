@@ -13,6 +13,7 @@ import { adminThemeApi } from "@/api/app/admin/adminThemeApi";
 import type { ThemeRecommendationResponse } from "@/api/app/admin/adminThemeApi";
 import { festivalBrandingApi } from "@/api/app/festival/festivalBrandingApi";
 import { THEME_FIELDS, validateThemeDraft } from "@/routes/admin/themeEditor";
+import { createMayTheme, getDefaultThemeData, getMayThemeData } from "@/lib/app/festival/defaultTheme";
 import { THEME_CORE_VARIABLES } from "@/lib/app/festival/activeTheme";
 import { createAdminThemeActionStyle } from "@/routes/admin/adminThemeActionColors";
 
@@ -25,7 +26,7 @@ vi.mock("@/api/app/festival/festivalSettingsApi", () => ({ uploadTicketingBackgr
 const toastMock = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn() }));
 vi.mock("sonner", () => ({ Toaster: () => null, toast: toastMock }));
 vi.mock("@/api/app/admin/adminThemeApi", () => ({ adminThemeApi: {
-  list: vi.fn(), get: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), activate: vi.fn(), recommend: vi.fn(), applyBundle: vi.fn(),
+  list: vi.fn(), get: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), activate: vi.fn(), activateDefault: vi.fn(), recommend: vi.fn(), applyBundle: vi.fn(),
 } }));
 vi.mock("@/api/app/festival/festivalBrandingApi", () => ({ festivalBrandingApi: {
   get: vi.fn().mockResolvedValue({ festivalSettingId: 1, posterImageUrl: null, logoImageUrl: null }),
@@ -92,6 +93,7 @@ beforeEach(() => {
   vi.mocked(adminThemeApi.update).mockImplementation(async (id, payload) => ({ ...inactive, id, name: payload.name, themeData: payload.themeData }));
   vi.mocked(adminThemeApi.activate).mockResolvedValue({ ...inactive, active: true });
   vi.mocked(adminThemeApi.delete).mockResolvedValue(undefined);
+  vi.mocked(adminThemeApi.activateDefault).mockReset().mockResolvedValue(undefined);
   // Simulate JSON parsed from the real { candidates: [...] } response, not a bare ThemeData.
   vi.mocked(adminThemeApi.recommend).mockResolvedValue(
     JSON.parse(JSON.stringify(recommendation)) as ThemeRecommendationResponse,
@@ -113,6 +115,153 @@ afterEach(async () => {
 });
 
 describe("AdminTheme", () => {
+  const chooseMay = async () => {
+    await act(async () => { host.querySelector<HTMLButtonElement>('[aria-label="Coastal Sunset 선택"]')!.click(); });
+  };
+  const savedMay: ActiveThemeResponse = { ...createMayTheme(false), id: 42 };
+
+  it("offers the May palette without writing, then persists and activates a real theme ID", async () => {
+    vi.mocked(adminThemeApi.activate).mockResolvedValue({ ...savedMay, id: 3, active: true });
+    await render();
+    await chooseMay();
+    expect(adminThemeApi.get).not.toHaveBeenCalled();
+    expect(adminThemeApi.create).not.toHaveBeenCalled();
+    expect(host.querySelector<HTMLInputElement>('[aria-label="Primary HEX"]')?.value).toBe("#8fa9be");
+    expect(host.querySelector<HTMLInputElement>('[aria-label="Primary HEX"]')?.disabled).toBe(true);
+    expect(buttons("삭제")).toHaveLength(0);
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+    setTicketCardBackgroundImageUrl("/existing-ticket.jpg");
+    await act(async () => { buttons("Coastal Sunset 적용")[0].click(); });
+    expect(adminThemeApi.create).toHaveBeenCalledWith({ name: "Coastal Sunset", themeData: getMayThemeData(), sourcePosterUrl: null, selectedBaseColor: null, sourceColors: null });
+    expect(adminThemeApi.activate).toHaveBeenCalledWith(3);
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#8fa9be");
+    expect(host.querySelector('[aria-label="현재 활성 테마"]')?.textContent).toContain("Coastal Sunset");
+    expect(host.querySelectorAll('[aria-label="Coastal Sunset 선택"]')).toHaveLength(1);
+    expect(getTicketCardBackgroundImageUrl()).toBe("/existing-ticket.jpg");
+  });
+
+  it("recognizes the persisted active May palette after reload and reuses it on apply", async () => {
+    vi.mocked(adminThemeApi.list).mockResolvedValue([{ ...active, active: false }, { ...savedMay, active: true }]);
+    vi.mocked(adminThemeApi.activate).mockResolvedValue({ ...savedMay, active: true });
+    await render();
+    expect(host.querySelector('[aria-label="현재 활성 테마"]')?.textContent).toContain("Coastal Sunset");
+    expect(host.querySelectorAll('[aria-label="Coastal Sunset 선택"]')).toHaveLength(1);
+    expect(buttons("삭제")).toHaveLength(0);
+    expect(host.querySelector('[aria-label="테마 적용 상태"]')?.textContent).toContain("적용 중");
+    await chooseDefault();
+    await act(async () => { buttons("Tangerine Cream 적용")[0].click(); });
+    expect(adminThemeApi.activateDefault).toHaveBeenCalledOnce();
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("");
+    vi.mocked(adminThemeApi.list).mockResolvedValue([{ ...active, active: false }, savedMay]);
+    await chooseMay();
+    await act(async () => { buttons("Coastal Sunset 적용")[0].click(); });
+    expect(adminThemeApi.create).not.toHaveBeenCalled();
+    expect(adminThemeApi.activate).toHaveBeenCalledWith(42);
+  });
+
+  it("keeps colors on failed activation and reuses the saved May copy when retried", async () => {
+    vi.mocked(adminThemeApi.create).mockResolvedValue(savedMay);
+    vi.mocked(adminThemeApi.activate).mockRejectedValueOnce(new Error("offline")).mockResolvedValue({ ...savedMay, active: true });
+    await render();
+    await chooseMay();
+    await act(async () => { buttons("Coastal Sunset 적용")[0].click(); });
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+    expect(host.querySelector('[aria-label="현재 활성 테마"]')?.textContent).toContain("활성 축제");
+    vi.mocked(adminThemeApi.list).mockResolvedValue([active, inactive, savedMay]);
+    await act(async () => { buttons("Coastal Sunset 적용")[0].click(); });
+    expect(adminThemeApi.create).toHaveBeenCalledOnce();
+    expect(adminThemeApi.activate).toHaveBeenNthCalledWith(2, 42);
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#8fa9be");
+  });
+
+  it("does not activate anything if saving the May preset fails", async () => {
+    vi.mocked(adminThemeApi.create).mockRejectedValueOnce(new Error("offline"));
+    await render();
+    await chooseMay();
+    await act(async () => { buttons("Coastal Sunset 적용")[0].click(); });
+    expect(adminThemeApi.activate).not.toHaveBeenCalled();
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
+  });
+
+  it("preserves edited same-named themes and makes May copies editable", async () => {
+    const edited = { ...savedMay, themeData: { ...getMayThemeData(), brand: { ...getMayThemeData().brand, primary: "#123456" } } };
+    vi.mocked(adminThemeApi.list).mockResolvedValue([active, edited]);
+    await render();
+    // One built-in plus the independently edited saved theme.
+    expect(host.querySelector('[aria-label="저장된 테마 목록"]')?.textContent?.match(/Coastal Sunset/g)).toHaveLength(2);
+    await chooseMay();
+    await act(async () => { buttons("복제")[0].click(); });
+    expect(host.querySelector<HTMLInputElement>('[aria-label="테마 이름"]')?.value).toBe("Coastal Sunset 복제");
+    expect(host.querySelector<HTMLInputElement>('[aria-label="Primary HEX"]')?.disabled).toBe(false);
+    await act(async () => { buttons("저장")[0].click(); });
+    expect(adminThemeApi.create).toHaveBeenCalledWith(expect.objectContaining({ name: "Coastal Sunset 복제", themeData: getMayThemeData() }));
+    expect(adminThemeApi.update).not.toHaveBeenCalled();
+  });
+
+  const chooseDefault = async () => {
+    await act(async () => { host.querySelector<HTMLButtonElement>('[aria-label="Tangerine Cream 선택"]')!.click(); });
+  };
+
+  it("always offers an immutable original palette and only restores it on successful apply", async () => {
+    document.documentElement.style.setProperty("--theme-brand-primary", "#123456");
+    document.documentElement.style.setProperty("--theme-brand-strong", "#7546b7");
+    setTicketCardBackgroundImageUrl("/existing-ticket.jpg");
+    setTicketingBackgroundImageUrl("/existing-background.jpg");
+    await render();
+    await chooseDefault();
+    expect(adminThemeApi.get).not.toHaveBeenCalled();
+    expect(adminThemeApi.activateDefault).not.toHaveBeenCalled();
+    expect(host.querySelector<HTMLInputElement>('[aria-label="Primary HEX"]')?.value).toBe("#ff642d");
+    expect(host.querySelector<HTMLInputElement>('[aria-label="Primary HEX"]')?.disabled).toBe(true);
+    expect(host.querySelector<HTMLInputElement>('[aria-label="테마 이름"]')?.disabled).toBe(true);
+    expect(buttons("저장")).toHaveLength(0);
+    expect(buttons("삭제")).toHaveLength(0);
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#123456");
+    await act(async () => { buttons("Tangerine Cream 적용")[0].click(); });
+    expect(adminThemeApi.activateDefault).toHaveBeenCalledOnce();
+    expect(adminThemeApi.activate).not.toHaveBeenCalled();
+    expect(adminThemeApi.create).not.toHaveBeenCalled();
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("");
+    expect(host.querySelector('[aria-label="현재 활성 테마"]')?.textContent).toContain("Tangerine Cream");
+    expect(getTicketCardBackgroundImageUrl()).toBe("/existing-ticket.jpg");
+    expect(getTicketingBackgroundImageUrl()).toBe("/existing-background.jpg");
+    expect(host.querySelector<HTMLElement>('[data-testid="admin-theme-action-scope"]')?.style.getPropertyValue("--admin-theme-action-bg"))
+      .toBe((createAdminThemeActionStyle(getDefaultThemeData().brand.strong) as Record<string, string>)["--admin-theme-action-bg"]);
+    await act(async () => { buttons("저장된 테마")[0].click(); });
+    await act(async () => { buttons("저장된 테마 적용")[0].click(); });
+    expect(adminThemeApi.activate).toHaveBeenCalledWith(2);
+  });
+
+  it("keeps the active theme and colors if default activation fails", async () => {
+    vi.mocked(adminThemeApi.activateDefault).mockRejectedValue(new Error("offline"));
+    document.documentElement.style.setProperty("--theme-brand-primary", "#123456");
+    await render();
+    await chooseDefault();
+    await act(async () => { buttons("Tangerine Cream 적용")[0].click(); });
+    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#123456");
+    expect(host.querySelector('[aria-label="현재 활성 테마"]')?.textContent).toContain("활성 축제");
+    expect(toastMock.error).toHaveBeenCalledWith("테마 적용에 실패했습니다.");
+  });
+
+  it("can copy the default without updating it and respects unsaved edits when selecting it", async () => {
+    await render();
+    await setInput("Primary HEX", "#123456");
+    vi.spyOn(window, "confirm").mockReturnValue(false);
+    await chooseDefault();
+    expect(host.querySelector<HTMLInputElement>('[aria-label="Primary HEX"]')?.value).toBe("#123456");
+    vi.mocked(window.confirm).mockReturnValue(true);
+    await chooseDefault();
+    await act(async () => { buttons("복제")[0].click(); });
+    expect(host.querySelector<HTMLInputElement>('[aria-label="테마 이름"]')?.value).toBe("Tangerine Cream 복제");
+    await setInput("Primary HEX", "#123456");
+    await act(async () => { buttons("저장")[0].click(); });
+    expect(adminThemeApi.create).toHaveBeenCalledWith(expect.objectContaining({name: "Tangerine Cream 복제", themeData: {
+      ...getDefaultThemeData(), brand: { ...getDefaultThemeData().brand, primary: "#123456" },
+    }}));
+    expect(adminThemeApi.update).not.toHaveBeenCalled();
+    expect(adminThemeApi.activateDefault).not.toHaveBeenCalled();
+  });
+
   const actionBackground = () => host.querySelector<HTMLElement>('[data-testid="admin-theme-action-scope"]')?.style.getPropertyValue("--admin-theme-action-bg");
 
   it.each(["#7546b7", "#3274d9"]) ("uses the active %s strong color for admin actions, not the selected draft", async (strong) => {
@@ -869,7 +1018,8 @@ describe("AdminTheme", () => {
       }
     }
     await render();
-    expect(host.textContent).toContain("저장된 테마가 없습니다");
+    expect(host.querySelector('[aria-label="Tangerine Cream 선택"]')?.getAttribute("aria-pressed")).toBe("true");
+    expect(buttons("삭제")).toHaveLength(0);
     await act(async () => { host.querySelector<HTMLButtonElement>('[aria-label="새 테마 생성"]')!.click(); });
     await setInput("테마 이름", "첫 테마");
     await act(async () => { buttons("저장")[0].click(); });

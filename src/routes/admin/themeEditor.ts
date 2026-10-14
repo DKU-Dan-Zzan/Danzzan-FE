@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type { ThemeData } from "@/api/app/festival/activeThemeApi";
-import { THEME_CORE_VARIABLES } from "@/lib/app/festival/activeTheme";
+import { getDefaultThemeData } from "@/lib/app/festival/defaultTheme";
 
 export type ThemeDraft = { name: string; themeData: ThemeData };
 
@@ -50,31 +50,8 @@ export function cloneThemeData(data: ThemeData): ThemeData {
   };
 }
 
-export function readBundledThemeData(root = document.documentElement): ThemeData {
-  const styles = getComputedStyle(root);
-  const read = (variable: string) => styles.getPropertyValue(variable).trim();
-  return {
-    brand: {
-      primary: read(THEME_CORE_VARIABLES.brand.primary),
-      secondary: read(THEME_CORE_VARIABLES.brand.secondary),
-      accent: read(THEME_CORE_VARIABLES.brand.accent),
-      strong: read(THEME_CORE_VARIABLES.brand.strong),
-    },
-    status: {
-      success: read(THEME_CORE_VARIABLES.status.success),
-      warning: read(THEME_CORE_VARIABLES.status.warning),
-      danger: read(THEME_CORE_VARIABLES.status.danger),
-      pending: read(THEME_CORE_VARIABLES.status.pending),
-    },
-    category: {
-      pub: read(THEME_CORE_VARIABLES.category.pub),
-      foodTruck: read(THEME_CORE_VARIABLES.category.foodTruck),
-      experience: read(THEME_CORE_VARIABLES.category.experience),
-      event: read(THEME_CORE_VARIABLES.category.event),
-      restArea: read(THEME_CORE_VARIABLES.category.restArea),
-      facility: read(THEME_CORE_VARIABLES.category.facility),
-    },
-  };
+export function readBundledThemeData(): ThemeData {
+  return getDefaultThemeData();
 }
 
 /** Scoped preview aliases avoid inherited, already-computed semantic variables on :root. */

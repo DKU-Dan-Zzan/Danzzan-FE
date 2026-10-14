@@ -65,3 +65,48 @@ Node는 현재 Dockerfile에서 22 계열을 사용한다. BE CORS 허용 출처
 VM에서 홈페이지·공지와 테스트 Azure 이미지의 실제 브라우저 표시, 관리자/일반 사용자 HTTP 로그인, 권한 차단, SAS 만료·재발급을 확인했다. 테스트 공지·이미지는 정리했다. 이번 VM 검증이 전체 화면·부하 테스트까지 통과했다는 뜻은 아니다.
 
 카카오 SDK는 변경 전 Azure 주소를 Referer로 요청했을 때 HTTP 401을 반환했다. 동료가 관리하는 같은 앱의 JavaScript SDK 도메인에 `https://danzzan.koreacentral.cloudapp.azure.com`을 등록하고 `/map`을 다시 확인해야 한다. 도메인 미등록이 유력하지만 키 비활성 여부까지 확인한 것은 아니다. [카카오 지도 공식 안내](https://apis.map.kakao.com/web/guide/)
+
+## 7. 기본 색상 테마 복원 (2026-10-14 Azure 반영)
+
+테마 관리 목록은 저장된 테마 앞에 `Tangerine Cream`를 항상 표시한다. 초기 Theme Core 14색을 미리 보고 `Tangerine Cream 적용`을 누르면 초기 색상으로 복원된다. 기본 항목은 수정·삭제되지 않으며 `복제`로 별도 테마를 만들 수 있다. 포스터·로고·홈 이미지·티켓 배경은 유지된다.
+
+FE의 기본 항목 ID `0`은 화면 내부에서만 사용한다. 적용 요청은 BE의 `PUT /admin/festival/{festivalSettingId}/themes/default/activate`이며 기존 테마 CRUD에 ID `0`을 보내지 않는다. BE는 기존 운영 권한 검사와 축제 설정 잠금을 사용하고 `active_theme_id`만 `NULL`로 바꾼 뒤 204를 반환한다. 테마 레코드 생성이나 DB 스키마 변경은 없다. 공개 활성 테마 조회의 204는 기본 색상 사용을 뜻하며 FE가 이전 inline 색상 덮어쓰기를 제거한다.
+
+이 기능은 새 BE API가 필요하므로 배포 시 BE를 먼저 반영한 뒤 FE를 반영한다. 기존 BE만 실행 중일 때는 기본 테마 적용이 실패하며 FE는 기존 활성 색상을 유지한다. 자동으로 현재 테마를 복원하거나 기존 테마를 삭제하지 않는다.
+
+## 8. 5월 운영 색상 프리셋 (2026-10-14 Azure 반영)
+
+`Tangerine Cream`(주황·크림) 다음에 `Coastal Sunset`(청회색·살구색)가 항상 표시된다. 표시 이름은 색상 분위기를 나타내며, 아래 5월 표기는 색상 출처를 뜻한다. 색상 출처는 [FE PR #103](https://github.com/DKU-Dan-Zzan/Danzzan-FE/pull/103)의 마지막 커밋 `cf71c7acc4951bfd216d88ce297416cd26702666`이다. PR 병합 시각은 2026-05-11이며 병합 커밋은 `aaf5a0444536cdc571a2ee205baadc39eacd51b6`이다.
+
+당시 `AppLayout`이 사용한 `electric-curator` 일반 화면의 색상을 현재 Theme Core 14개 항목으로 옮겼다. 원본 `src/index.css`의 대응 관계는 다음과 같다.
+
+| 현재 항목 | 색상 | 당시 출처 |
+| --- | --- | --- |
+| brand.primary / accent / strong | `#8fa9be` | electric-curator의 primary, accent, text-emphasis-vivid |
+| brand.secondary | `#f5b070` | electric-curator의 secondary |
+| status.success | `#2e7d32` | root의 status-success |
+| status.warning | `#c98548` | electric-curator의 status-warning |
+| status.danger | `#b3261e` | root의 status-danger |
+| status.pending | `#e3776a` | root의 status-pending |
+| category.pub | `#2853a9` | root의 boothmap-marker-pub → text-emphasis-vivid |
+| category.foodTruck | `#ef4444` | root의 boothmap-marker-foodtruck |
+| category.experience | `#10b981` | root의 boothmap-marker-experience |
+| category.event | `#f6ca3b` | root의 boothmap-marker-event |
+| category.facility | `#3b82f6` | root의 boothmap-marker-facility |
+| category.restArea | `#8b5cf6` | 당시 항목이 없어 현재 기본 테마 값 유지 |
+
+당시 색상 스킴은 문서 루트가 아닌 AppShell의 div에 붙었다. 지도 색상 도우미는 `document.documentElement`에서 값을 읽었으므로 지도 마커에는 root 값을 사용한다. 티켓 화면의 별도 `webapp` 팔레트, 당시 배경·레이아웃·이미지 전체를 복원하는 기능은 아니다.
+
+가상 ID `-1`은 FE 내부에서만 사용한다. 단순 조회·선택 시 DB에 쓰지 않는다. `Coastal Sunset 적용`을 누르면 최신 목록에서 이름·14색·출처 정보가 프리셋과 일치하는 저장본을 재사용하며, 없을 때만 기존 테마 생성 API로 저장한다. 활성화 요청에는 실제 양수 ID를 보낸다. 저장 후 활성화가 실패해도 저장본은 남겨 재시도에 재사용하고, 화면의 적용 색상은 성공 후에만 바꾼다.
+
+동일 저장본은 기본 선택지로 묶어 표시한다. 색상·이름이 바뀌었거나 포스터 출처가 있는 테마는 별도로 유지한다. 기본 선택지는 직접 수정·삭제할 수 없으며 `복제`로 편집한다. 포스터·로고·홈 이미지·티켓 배경과 다른 테마 레코드는 변경하지 않는다. 이름·색상·출처가 완전히 같은 수동 테마도 프리셋으로 인식되며, 여러 관리자의 동시 최초 적용에 대한 중복 생성 방지는 제공하지 않는다.
+
+5월 프리셋 자체에는 BE API나 DB 스키마 변경이 필요 없다. 함께 추가한 초기 기본 테마 복원은 앞 절의 새 BE API가 필요하다.
+
+2026-10-14 로컬 검증: FE 전체 130개 파일·660개 테스트, `npm run build`(애플리케이션 타입 검사 포함), `npm run typecheck:test`, `npm run lint` 통과. 프리셋 선택 시 쓰기 없음, 실제 ID로 저장·활성화, 재조회 후 재사용, 생성·활성화 실패 시 기존 색상 유지, 초기 테마 복원과 이미지 유지, 복제 편집을 테스트했다. Azure DB 쓰기나 실제 브라우저에서의 배포 후 색상 확인은 실행하지 않았다. 빌드에는 기존 Browserslist 데이터 갱신 안내가 남아 있다.
+
+### Azure 반영 확인 (2026-10-14)
+
+`20261014-theme-presets` 배포로 기본 테마 복원 BE API와 FE의 `Tangerine Cream`, `Coastal Sunset` 선택지를 반영했다. 마지막 이름 변경 후 관련 테스트 64개를 다시 통과했으며 VM의 FE 빌드(타입 검사 포함)도 성공했다. 실제 로그인된 관리자 브라우저에서 두 선택지와 각각 `#ff642d`·`#8fa9be` 미리보기를 확인했다. 기존 활성 `Balanced AI 추천 테마`는 그대로 유지했다. 운영 데이터 변경을 피하기 위해 실제 적용·복제·삭제 버튼은 누르지 않았다. 이 동작들은 로컬 테스트로 검증했으며 이번 운영 검증은 조회·미리보기까지다.
+
+HTTPS 홈·공지·테마 관리·health는 200, Nginx 설정 검사는 성공했다. 게시물·이미지 참조·축제 설정·테마를 포함한 20개 테이블의 데이터 해시는 배포 전후와 브라우저 확인 후 모두 일치했다. Blob 쓰기는 실행하지 않았다. 복구 이미지와 소스·해시 목록은 BE 배포 문서의 같은 배포 기록을 참고한다.

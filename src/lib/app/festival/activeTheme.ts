@@ -45,11 +45,19 @@ export function applyThemeData(themeData: ThemeData, root = document.documentEle
   for (const [variable, value] of colors) root.style.setProperty(variable, value);
 }
 
+/** Remove only theme overrides, restoring the bundled CSS without touching branding images. */
+export function resetThemeData(root = document.documentElement): void {
+  for (const group of Object.values(THEME_CORE_VARIABLES)) {
+    for (const variable of Object.values(group)) root.style.removeProperty(variable);
+  }
+}
+
 /** Run before React mounts so every route, including ticketing and admin, shares the same colors. */
 export async function loadActiveFestivalTheme(): Promise<void> {
   try {
     const activeTheme = await getActiveTheme(CURRENT_FESTIVAL_SETTING_ID);
     if (activeTheme) applyThemeData(activeTheme.themeData);
+    else resetThemeData();
   } catch (error) {
     console.warn("Active festival theme unavailable; using bundled colors.", error);
   }

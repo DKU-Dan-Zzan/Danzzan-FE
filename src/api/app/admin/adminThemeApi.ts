@@ -78,6 +78,7 @@ export const adminThemeApi = {
   }),
   delete: (id: number) => request<void>(`${basePath}/${id}`, { method: "DELETE" }),
   activate: (id: number) => request<ActiveThemeResponse>(`${basePath}/${id}/activate`, { method: "PUT" }),
+  activateDefault: () => request<void>(`${basePath}/default/activate`, { method: "PUT" }),
   applyBundle: (payload: ThemeBundleRequest) => request<ActiveThemeResponse>(`${basePath}/apply-bundle`, { method: "POST", body: JSON.stringify(payload) }),
   recommend: async (payload: ThemeRecommendationRequest, signal?: AbortSignal) => parseThemeRecommendationResponse(
     await request<unknown>(`${basePath}/recommend`, { method: "POST", body: JSON.stringify(payload), signal }),
