@@ -50,7 +50,7 @@ it("공식 포스터를 기존 상단 hero에 사용하고, 실패하면 정적 
   expect(container.textContent).toContain("테스트 학생");
   expect(container.textContent).toContain("내 정보");
   await act(async () => hero.dispatchEvent(new Event("error")));
-  expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.getAttribute("src")).toBe("/posters/legend-poster-vertical.jpeg");
+  expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.getAttribute("src")).toBe("/posters/legend-poster-홈화면와이드규격.jpeg");
   expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.className).toContain("object-[50%_44%]");
   expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.nextElementSibling?.getAttribute("style")).toContain("22%");
 });
@@ -62,7 +62,7 @@ it("비로그인 안내 화면도 공식 포스터와 정적 fallback을 사용�
   expect(poster.className).toContain("object-cover object-top");
   expect(poster.style.transform).toBe("none");
   await act(async () => poster.dispatchEvent(new Event("error")));
-  expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.getAttribute("src")).toBe("/posters/legend-poster-vertical.jpeg");
+  expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.getAttribute("src")).toBe("/posters/legend-poster-홈화면와이드규격.jpeg");
   expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.className).toContain("object-[50%_38%]");
 });
 it("OFF여도 내정보와 계정 관리는 열리지만 티켓 조회 요청과 메뉴는 없다", async () => {

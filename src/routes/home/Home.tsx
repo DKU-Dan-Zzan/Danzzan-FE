@@ -50,7 +50,7 @@ function Home() {
 
   const dummyPosters = useMemo<Poster[]>(
     () => [
-      { id: "p1", imageUrl: "/posters/legend-poster-vertical.jpeg", alt: t("home.dummyPosterAlt") },
+      { id: "p1", imageUrl: "/posters/legend-poster-홈화면와이드규격.jpeg", alt: t("home.dummyPosterAlt") },
     ],
     [t],
   )

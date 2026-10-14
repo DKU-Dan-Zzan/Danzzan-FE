@@ -13,7 +13,7 @@ describe("home theme preview", () => {
     try {
       await act(async () => root.render(<MemoryRouter><ThemeScreenPreview data={readBundledThemeData()} homeImageUrl={null} /></MemoryRouter>));
       await act(async () => [...host.querySelectorAll<HTMLButtonElement>('[role="tab"]')].find(tab => tab.textContent === "홈")!.click());
-      expect(host.querySelector('img[alt="홈 대표 이미지 미리보기"]')?.getAttribute('src')).toBe('/posters/legend-poster-vertical.jpeg');
+      expect(host.querySelector('img[alt="홈 대표 이미지 미리보기"]')?.getAttribute('src')).toBe('/posters/legend-poster-홈화면와이드규격.jpeg');
     } finally { await act(async () => root.unmount()); }
   });
 
