@@ -78,7 +78,7 @@ const ICON_BY_TITLE: Partial<Record<TranslationKey, ReactNode>> = {
   "closed.mypage.title": <NoAccountIcon />,
 }
 
-// Keep the neutral veil fixed; only the foreground inherits the current/preview theme.
+// Keep the veil neutral so it does not shift the poster's colors.
 const LEGEND_INK = "var(--legend-ink)"
 
 const ServiceClosedNotice = ({
@@ -95,6 +95,7 @@ const ServiceClosedNotice = ({
   const background = usePosterBackground(backgroundImageUrl, DEFAULT_FESTIVAL_POSTER)
   const noticeIcon = icon ?? ICON_BY_TITLE[titleKey]
   const noteKey = NOTE_BY_TITLE[titleKey]
+  const isTicketingNotice = titleKey === "closed.ticketing.title"
 
   return (
     <section
@@ -117,9 +118,12 @@ const ServiceClosedNotice = ({
       {background.src && <img aria-hidden="true" src={background.src} alt="" onError={background.onError} onLoad={background.onLoad}
         className="pointer-events-none absolute inset-0 h-full w-full object-cover" />}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0"
-        style={{ background: "linear-gradient(to bottom, rgba(9,12,20,0.76), rgba(9,12,20,0.90))" }} />
+        style={{ background: isTicketingNotice
+          ? "linear-gradient(to bottom, rgba(9,12,20,0.12), rgba(9,12,20,0.16))"
+          : "linear-gradient(to bottom, rgba(9,12,20,0.76), rgba(9,12,20,0.90))" }} />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[330px] flex-col items-center text-center">
+      <div className="relative z-10 mx-auto flex w-full max-w-[330px] flex-col items-center text-center"
+        style={isTicketingNotice ? { textShadow: "0 1px 2px rgba(0,0,0,0.25)" } : undefined}>
         <AzureImage
           src={logoImage.src}
           onError={logoImage.onError}
@@ -189,6 +193,7 @@ const ServiceClosedNotice = ({
           style={{
             background: "var(--poster-closed-button-bg)",
             color: "var(--poster-closed-ink)",
+            textShadow: "none",
             boxShadow: "0 16px 38px -18px var(--poster-closed-ink)",
             ["--tw-ring-color" as string]: "var(--poster-closed-accent)",
             ["--tw-ring-offset-color" as string]: LEGEND_INK,

@@ -97,19 +97,20 @@ describe("poster background source priority and failures", () => {
     expect(container.querySelector("span")?.style.color).toBe("var(--ticket-badge-issued-text)")
     expect(container.querySelector("span")?.style.background).toBe("var(--ticket-badge-issued-bg)")
   })
-  it("keeps closed copy, accent and CTA above 4.5:1 for every theme and poster", async () => {
+  it("keeps closed artwork unobstructed and the CTA above 4.5:1 for every theme", async () => {
     await render("closed", "https://example.com/custom.jpg")
     const section = container.querySelector("section")!
     const veil = section.querySelector<HTMLElement>(":scope > div[aria-hidden]")!
     const veils = [...veil.style.background.matchAll(/rgba\(([^)]+)\)/g)].map(match => match[1].split(",").map(Number))
     expect(veils).toHaveLength(2)
-    for (const [r, g, b, alpha] of veils) {
-      // White image under the veil is the lightest possible background.
-      const lightestBackground = [r, g, b].map(value => value * alpha + 255 * (1 - alpha))
-      for (const variable of ["--poster-closed-copy", "--poster-closed-accent"]) {
-        const darkestText = mixExtreme(section.style.getPropertyValue(variable), 0)
-        expect(contrast(darkestText, lightestBackground)).toBeGreaterThanOrEqual(4.5)
-      }
+    expect(section.querySelector("[data-closed-copy-shade]")).toBeNull()
+    const content = section.querySelector("a")!.parentElement!
+    expect(content.style.background).toBe("")
+    expect(content.style.boxShadow).toBe("")
+    expect(content.style.textShadow).not.toBe("")
+    for (const [, , , alpha] of veils) {
+      // A light full-screen veil preserves the artwork without a separate dark content panel.
+      expect(alpha).toBeLessThanOrEqual(.2)
     }
     const darkestButton = mixExtreme(section.style.getPropertyValue("--poster-closed-button-bg"), 0)
     const brightestInk = mixExtreme(section.style.getPropertyValue("--poster-closed-ink"), 255)
