@@ -3,7 +3,7 @@ import { createPosterBundleCache } from "@/routes/admin/posterBundle";
 
 const result = (target: "ticket" | "closed") => ({ target, mimeType: "image/jpeg" as const, imageBase64: "/9j/2Q==", width: 800, height: 360, focusX: .5, focusY: .5, reason: "여백", sourcePosterUrl: "poster-a" });
 describe("poster recommendation reuse", () => {
-  it("shares in-flight work and reuses both crops when only the theme color changes", async () => {
+  it("shares in-flight work and reuses both backgrounds when only the theme color changes", async () => {
     const fetch = vi.fn(async (target: "ticket" | "closed") => result(target));
     const cache = createPosterBundleCache(fetch);
     const a = cache.get("poster-a"), b = cache.get("poster-a");
@@ -13,7 +13,7 @@ describe("poster recommendation reuse", () => {
     expect(fetch).toHaveBeenCalledTimes(2);
     await expect(cache.get("poster-b")).rejects.toThrow();
   });
-  it("retries only failed crops and never caches a mismatched poster", async () => {
+  it("retries only failed backgrounds and never caches a mismatched poster", async () => {
     let fail = true;
     const fetch = vi.fn(async (target: "ticket" | "closed") => {
       if (target === "closed" && fail) throw new Error("temporary");
@@ -36,7 +36,7 @@ describe("poster recommendation reuse", () => {
   });
 });
 
-it("accepts rotated SAS provenance and reuses crops for the same Azure blob", async () => {
+it("accepts rotated SAS provenance and reuses backgrounds for the same Azure blob", async () => {
   const poster = "https://demo.blob.core.windows.net/images/poster.png?sig=old";
   const renewed = poster.replace("sig=old", "sig=new");
   const fetch = vi.fn(async (target: "ticket" | "closed") => ({ ...result(target), sourcePosterUrl: renewed }));
@@ -46,4 +46,23 @@ it("accepts rotated SAS provenance and reuses crops for the same Azure blob", as
   expect(fetch).toHaveBeenCalledTimes(2);
   await expect(cache.get(poster.replace("poster.png", "another.png"))).rejects.toThrow("포스터가 변경");
   cache.dispose();
+});
+
+it("allows image generation beyond a minute but aborts stalled requests after three minutes", async () => {
+  vi.useFakeTimers();
+  const signals: AbortSignal[] = [];
+  const cache = createPosterBundleCache((_target, signal) => {
+    signals.push(signal!);
+    return new Promise(() => {});
+  });
+  try {
+    void cache.get("poster-a");
+    await vi.advanceTimersByTimeAsync(75_000);
+    expect(signals.every(signal => !signal.aborted)).toBe(true);
+    await vi.advanceTimersByTimeAsync(105_000);
+    expect(signals.every(signal => signal.aborted)).toBe(true);
+  } finally {
+    cache.dispose();
+    vi.useRealTimers();
+  }
 });

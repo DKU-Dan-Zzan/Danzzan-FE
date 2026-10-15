@@ -523,7 +523,7 @@ export default function AdminTheme({ mode = "manage" }: { mode?: "manage" | "sel
           <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-lg font-semibold">3. 확인하고 전체 적용</h2><span className="rounded-full bg-[var(--surface-subtle)] px-3 py-1 text-xs text-[var(--text-muted)]">티켓팅 {ticketingEnabled ? "ON" : "OFF"}</span></div>
           <p className="mt-2 text-sm text-[var(--text-muted)]">선택한 색상 테마와 내 정보·티켓 화면 배경을 확인한 뒤 한 번에 적용하세요.</p>
           {!canBundle ? <p className="mt-3 text-sm">전체 추천·적용에는 축제 운영과 티켓팅 권한이 모두 필요합니다. 현재 권한으로 색상 테마는 추천받을 수 있습니다.</p> : <>
-            {backgroundPending && <p role="status" className="mt-3 text-sm">포스터에서 두 배경을 준비하고 있습니다…</p>}
+            {backgroundPending && <p role="status" className="mt-3 text-sm">AI가 포스터 분위기에 맞는 티켓·입장 안내 배경을 만들고 있습니다. 최대 3분 정도 걸릴 수 있어요…</p>}
             {bundleError && <div role="alert" className="mt-3 text-sm"><p>{bundleError}</p><button className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "mt-2")} onClick={() => { if (analysisSnapshot) loadBackgrounds(analysisSnapshot, recommendationVersion.current); }} disabled={busy || backgroundPending}>배경만 다시 추천</button></div>}
             {!selectedRecommendationId && <p className="mt-4 rounded-xl bg-[var(--surface-subtle)] p-4 text-sm text-[var(--text-muted)]">위에서 대표색을 고른 뒤, 추천 시안을 선택해 주세요.</p>}
             {bundleReady && <div className="mt-5 flex flex-wrap gap-3">
