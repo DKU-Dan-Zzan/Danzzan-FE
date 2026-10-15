@@ -77,12 +77,16 @@ export const signupApi = {
     signupToken: string,
     password: string,
     confirmPassword: string,
+    naverId: string,
+    confirmNaverId: string,
     phoneVerificationSessionId: string,
   ): Promise<void> => {
     const client = getClient();
     await client.post(`/user/${signupToken}`, {
       password,
       confirmPassword,
+      naverId,
+      confirmNaverId,
       phoneVerificationSessionId,
     });
   },
