@@ -1,3 +1,4 @@
+import { AzureImage } from "@/components/common/AzureImage";
 // 역할: 관리자 공지/광고 운영 화면을 렌더링하고 편집 액션 훅을 조합합니다.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -382,7 +383,7 @@ function Admin() {
                           <span>상단 고정</span>
                         </span>
                         {notice.thumbnailImageUrl && (
-                          <img
+                          <AzureImage
                             src={notice.thumbnailImageUrl}
                             alt={notice.title}
                             className="h-8 w-8 flex-shrink-0 rounded-lg object-cover"
@@ -469,7 +470,7 @@ function Admin() {
                     <td className="border-r border-[var(--border-base)] px-4 py-2 align-middle">
                       <div className="flex items-center gap-2">
                         {notice.thumbnailImageUrl && (
-                          <img
+                          <AzureImage
                             src={notice.thumbnailImageUrl}
                             alt={notice.title}
                             className="h-8 w-8 flex-shrink-0 rounded-lg object-cover"
@@ -604,7 +605,7 @@ function Admin() {
                   key={ad.id}
                   className="overflow-hidden rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)]"
                 >
-                  <img
+                  <AzureImage
                     src={ad.imageUrl}
                     alt={ad.title}
                     className="h-[70px] w-full object-cover"
@@ -784,7 +785,7 @@ function Admin() {
                                 : "border-[var(--border-base)]",
                             )}
                           >
-                            <img src={url} alt="공지 이미지" className="h-full w-full object-cover" />
+                            <AzureImage src={url} alt="공지 이미지" className="h-full w-full object-cover" />
                             <button
                               type="button"
                               onClick={() =>
@@ -1021,7 +1022,7 @@ function Admin() {
 
                 {editingAd.imageUrl && (
                   <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-xl border border-[var(--border-base)]">
-                    <img
+                    <AzureImage
                       src={editingAd.imageUrl}
                       alt="업로드된 광고 미리보기"
                       className="h-[70px] w-full object-cover"

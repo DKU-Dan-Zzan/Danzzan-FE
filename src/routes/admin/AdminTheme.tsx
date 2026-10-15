@@ -1,6 +1,7 @@
+import { imageReferenceKey, sameImageReference } from "@/lib/app/azure/azureReadUrl";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Copy, Plus, Save, Trash2, Check, MonitorSmartphone } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import { cn } from "@/components/common/ui/utils";
 import { getErrorStatus } from "@/api/common/fetchAuth";
@@ -9,7 +10,7 @@ import type { ActiveThemeResponse, ThemeData } from "@/api/app/festival/activeTh
 import { AdminShell } from "@/components/layout/AdminShell";
 import { ADMIN_FOCUS_VISIBLE_RING_CLASS } from "@/routes/admin/adminStyleClasses";
 import { cloneThemeData, createPreviewStyle, getThemeColor, isHexColor, readBundledThemeData, THEME_FIELDS, type ThemeDraft, validateThemeDraft } from "@/routes/admin/themeEditor";
-import { applyThemeData } from "@/lib/app/festival/activeTheme";
+import { applyThemeData, resetThemeData } from "@/lib/app/festival/activeTheme";
 import { FestivalBrandingPanel, type PosterAnalysisSnapshot } from "@/routes/admin/FestivalBrandingPanel";
 import type { FestivalBranding } from "@/api/app/festival/festivalBrandingApi";
 import { adminHomeImageApi } from "@/api/app/admin/adminHomeImageApi";
@@ -19,6 +20,8 @@ import { ThemeScreenPreview } from "@/routes/admin/ThemeScreenPreview";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/common/ui/dialog";
 import { ADMIN_THEME_DESTRUCTIVE_ACTION_CLASS, ADMIN_THEME_PRIMARY_ACTION_CLASS, ADMIN_THEME_SECONDARY_ACTION_CLASS } from "@/routes/admin/adminStyleClasses";
 import { createAdminThemeActionStyle, readActiveThemeStrong } from "@/routes/admin/adminThemeActionColors";
+import { AzureImage } from "@/components/common/AzureImage";
+import { createDefaultTheme, createMayTheme, DEFAULT_THEME_ID, MAY_THEME_ID, getDefaultThemeData, getMayThemeData, normalizeThemeColors, isSavedMayTheme } from "@/lib/app/festival/defaultTheme";
 import { DESIGN_SYSTEM_BLACK } from "@/lib/app/festival/themeFallbackColors";
 
 import { authStore } from "@/store/common/authStore";
@@ -74,7 +77,7 @@ function ThemeSourceDetails({ source }: { source: ThemeProvenance | null }) {
   return <details aria-label="테마 생성 출처" className="group mt-5 rounded-xl border border-[var(--border-base)] bg-[var(--surface-subtle)] p-4 text-xs">
     <summary className="cursor-pointer font-semibold marker:text-[var(--ds-neutral-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-theme-action-focus)]">생성 출처 <span className="ml-2 font-normal text-[var(--text-muted)]">{source.selectedBaseColor ? `기준색 ${source.selectedBaseColor} · ` : ""}포스터 기반 AI 추천</span><span className="ml-2 text-[var(--admin-theme-action-outline)] group-open:hidden">상세 보기</span><span className="ml-2 hidden text-[var(--admin-theme-action-outline)] group-open:inline">접기</span></summary>
     <div className="mt-3 flex flex-wrap gap-4">
-      <div><p className="mb-1 text-[var(--text-muted)]">기반 포스터</p>{source?.sourcePosterUrl ? <img src={source.sourcePosterUrl} alt="테마 기반 포스터" className="h-20 w-16 rounded object-contain" /> : <p>기반 포스터 정보 없음</p>}</div>
+      <div><p className="mb-1 text-[var(--text-muted)]">기반 포스터</p>{source?.sourcePosterUrl ? <AzureImage src={source.sourcePosterUrl} alt="테마 기반 포스터" className="h-20 w-16 rounded object-contain" /> : <p>기반 포스터 정보 없음</p>}</div>
       {source?.selectedBaseColor && <div><p className="mb-1 text-[var(--text-muted)]">기준 색상</p><span className="inline-flex items-center gap-1.5 font-mono"><span className="h-4 w-4 rounded-full border border-[var(--border-base)]" style={{ backgroundColor: source.selectedBaseColor }} />{source.selectedBaseColor}</span></div>}
       {!!source?.sourceColors?.length && <div><p className="mb-1 text-[var(--text-muted)]">추출 색상</p><div className="flex flex-wrap gap-2">{source.sourceColors.map((color) => <span key={color} className="inline-flex items-center gap-1 font-mono"><span className="h-4 w-4 rounded-full border border-[var(--border-base)]" style={{ backgroundColor: color }} />{color}</span>)}</div></div>}
     </div>
@@ -98,6 +101,21 @@ function ThemePreview({ data }: { data: ThemeData }) {
         {THEME_FIELDS[2].colors.map(([key, label]) => <span key={key} className="inline-flex items-center gap-1.5 text-xs"><span className="h-3 w-3 rounded-full" style={{ backgroundColor: `var(--preview-category-${key})` }} />{label}</span>)}
       </div></div>
     </div>
+  </section>;
+}
+
+function ThemeSelectionList({ themes, selectedId, disabled, onSelect, allowCreate = false, onCreate }: {
+  themes: ActiveThemeResponse[];
+  selectedId: number | null;
+  disabled: boolean;
+  onSelect: (id: number) => void;
+  allowCreate?: boolean;
+  onCreate?: () => void;
+}) {
+  return <section className={panel} aria-label="저장된 테마 목록"><div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">저장된 테마</h2>{allowCreate && <button type="button" aria-label="새 테마 생성" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={onCreate} disabled={disabled}><Plus className="h-4 w-4" />새 테마</button>}</div>
+    <div className="grid gap-2">{themes.map((theme) => <button type="button" key={theme.id} aria-label={theme.id === DEFAULT_THEME_ID ? "Tangerine Cream 선택" : theme.id === MAY_THEME_ID ? "Coastal Sunset 선택" : undefined} onClick={() => onSelect(theme.id)} disabled={disabled} aria-pressed={selectedId === theme.id} className={cn("w-full rounded-xl border p-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-theme-action-focus)] disabled:cursor-not-allowed disabled:opacity-50", selectedId === theme.id ? "border-[var(--admin-theme-action-outline)] bg-[var(--admin-theme-action-hover)] ring-1 ring-[var(--admin-theme-action-focus)]" : "border-[var(--border-base)] bg-white hover:border-[var(--admin-theme-action-outline)] hover:bg-[var(--admin-theme-action-hover)]")}>
+      <span className="flex items-center justify-between gap-2"><span className="truncate text-sm font-semibold">{theme.name}</span>{theme.active && <span className="shrink-0 rounded-full border border-[var(--admin-theme-action-outline)] bg-white px-2 py-0.5 text-xs font-semibold text-[var(--admin-theme-action-outline)]">활성</span>}</span>{theme.updatedAt && !Number.isNaN(Date.parse(theme.updatedAt)) && <span className="mt-1 block text-xs text-[var(--text-muted)]">수정 {new Date(theme.updatedAt).toLocaleDateString("ko-KR")}</span>}<span className="mt-2 block"><Swatches colors={keyColors(theme.themeData)} /></span>
+    </button>)}</div>
   </section>;
 }
 
@@ -140,13 +158,14 @@ function RecommendationComparison({ candidates, selectedId, onChoose, busy }: {
   </section>;
 }
 
-export default function AdminTheme() {
+export default function AdminTheme({ mode = "manage" }: { mode?: "manage" | "select" }) {
+  const selectionOnly = mode === "select";
   const location = useLocation();
   const ticketingEnabled = useSyncExternalStore(subscribeFestivalSettings, getTicketingEnabled, getTicketingEnabled);
   const session = useSyncExternalStore(authStore.subscribe, authStore.getSnapshot, authStore.getSnapshot);
+  const canManageHome = hasAdminPermission(session.role, session.permissions, "OPERATIONS");
   const canBundle = hasAdminPermission(session.role, session.permissions, "TICKETING") && hasAdminPermission(session.role, session.permissions, "OPERATIONS");
   const [homeBanner, setHomeBanner] = useState<HomeBannerDraftSelection | null>(null);
-  const [homeBannerVersion, setHomeBannerVersion] = useState(0);
   const homeUploads = useRef(new WeakMap<File, string>());
   const [bundle, setBundle] = useState<{ poster: string; data: PosterBundle } | null>(null);
   const [bundleError, setBundleError] = useState<string | null>(null);
@@ -176,13 +195,17 @@ export default function AdminTheme() {
   const [error, setError] = useState<string | null>(null);
   const selectionSequence = useRef(0);
   const activeTheme = themes.find((theme) => theme.active) ?? null;
+  const availableThemes = [createDefaultTheme(!activeTheme), createMayTheme(!!activeTheme && isSavedMayTheme(activeTheme)), ...themes.filter((theme) => !isSavedMayTheme(theme))];
+  const isDefaultSelected = selectedId === DEFAULT_THEME_ID;
+  const isMaySelected = selectedId === MAY_THEME_ID;
+  const isBuiltInSelected = isDefaultSelected || isMaySelected;
   const [fallbackStrong] = useState(readActiveThemeStrong);
-  const adminActionStyle = useMemo(() => createAdminThemeActionStyle(activeTheme?.themeData.brand.strong ?? fallbackStrong),
-    [activeTheme?.themeData.brand.strong, fallbackStrong]);
-  const selectedTheme = themes.find((theme) => theme.id === selectedId) ?? null;
+  const adminActionStyle = useMemo(() => createAdminThemeActionStyle(activeTheme?.themeData.brand.strong ?? (loading || error ? fallbackStrong : getDefaultThemeData().brand.strong)),
+    [activeTheme?.themeData.brand.strong, fallbackStrong, loading, error]);
+  const selectedTheme = availableThemes.find((theme) => theme.id === selectedId) ?? null;
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(savedDraft), [draft, savedDraft]);
   const recommendationCompleted = recommendationCandidates.length > 0 && !!recommendationSnapshot && !!analysisSnapshot
-    && !recommendationError && JSON.stringify(recommendationSnapshot) === JSON.stringify(analysisSnapshot);
+    && !recommendationError && analysisKey(recommendationSnapshot) === analysisKey(analysisSnapshot);
 
   useEffect(() => {
     const id = location.hash.slice(1);
@@ -194,7 +217,7 @@ export default function AdminTheme() {
   }, [location.hash, location.key]);
 
   function analysisChanged(snapshot: PosterAnalysisSnapshot | null) {
-    if (JSON.stringify(analysisRef.current) === JSON.stringify(snapshot)) return;
+    if (analysisKey(analysisRef.current) === analysisKey(snapshot)) return;
     clearTimeout(autoTimer.current);
     recommendationRequest.current?.abort();
     ++recommendationVersion.current;
@@ -206,7 +229,7 @@ export default function AdminTheme() {
     setSelectedRecommendationId(null);
     setRecommending(false);
     setBackgroundPending(false);
-    if (bundle?.poster !== snapshot?.sourcePosterUrl) setBundle(null);
+    if (!sameImageReference(bundle?.poster, snapshot?.sourcePosterUrl)) setBundle(null);
     setBundleError(null);
     if (snapshot?.sourceColors?.length && snapshot.selectedBaseColor && isHexColor(snapshot.selectedBaseColor)) {
       autoTimer.current = setTimeout(() => void recommend(snapshot), 600);
@@ -244,7 +267,7 @@ export default function AdminTheme() {
     try {
       const response = await adminThemeApi.recommend({ sourceColors: snapshot.sourceColors, selectedBaseColor: snapshot.selectedBaseColor }, controller.signal);
       if (!current()) return;
-      setRecommendationCandidates(response.candidates);
+      setRecommendationCandidates(response.candidates.map(candidate => ({ ...candidate, themeData: normalizeThemeColors(candidate.themeData) })));
       setRecommendationSnapshot(snapshot);
       toast.success("색상 시안이 준비됐습니다. 하나를 선택하고 배경과 함께 확인하세요.");
     } catch (cause) {
@@ -255,9 +278,26 @@ export default function AdminTheme() {
     }
   }
 
-  const homeBannerReady = !!homeBanner?.ready && (!homeBanner.sourcePosterUrl || homeBanner.sourcePosterUrl === branding?.posterImageUrl);
-  const bundleReady = homeBannerReady && canBundle && !!selectedRecommendationId && !!draft && !!bundle
-    && bundle.poster === analysisSnapshot?.sourcePosterUrl && recommendationCompleted && !backgroundPending && !bundleError;
+  const bundleReady = canBundle && !!selectedRecommendationId && !!draft && !!bundle
+    && sameImageReference(bundle.poster, analysisSnapshot?.sourcePosterUrl) && recommendationCompleted && !backgroundPending && !bundleError;
+
+  async function saveHomeBanner(selection: HomeBannerDraftSelection) {
+    if (busy || !canManageHome || !selection.ready || !selection.file) throw new Error("HOME_IMAGE_NOT_READY");
+    setBusy(true);
+    try {
+      let imageUrl = homeUploads.current.get(selection.file);
+      if (!imageUrl) {
+        imageUrl = (await adminHomeImageApi.stageUpload(selection.file)).url;
+        homeUploads.current.set(selection.file, imageUrl);
+      }
+      const saved = await adminHomeImageApi.replaceFirst({ imageUrl,
+        expectedFirstImageId: selection.expectedFirstImageId,
+        expectedFirstImageUrl: selection.expectedFirstImageUrl,
+        sourcePosterUrl: selection.sourcePosterUrl });
+      void queryClient.invalidateQueries({ queryKey: appQueryKeys.homeImages() });
+      return saved;
+    } finally { setBusy(false); }
+  }
 
   async function applyBundle() {
     if (!bundleReady || !draft || !bundle || !recommendationSnapshot || busy) return;
@@ -274,32 +314,18 @@ export default function AdminTheme() {
         uploadedBackgrounds.current.set(key, url);
         return url;
       };
-      const stageHome = async () => {
-        if (!homeBanner?.file) return undefined;
-        let imageUrl = homeUploads.current.get(homeBanner.file);
-        if (!imageUrl) {
-          imageUrl = (await adminHomeImageApi.stageUpload(homeBanner.file)).url;
-          homeUploads.current.set(homeBanner.file, imageUrl);
-        }
-        return { imageUrl, expectedFirstImageId: homeBanner.expectedFirstImageId, expectedFirstImageUrl: homeBanner.expectedFirstImageUrl };
-      };
-      const [ticketCardBackgroundImageUrl, ticketingBackgroundImageUrl, homeBannerUpdate] = await Promise.all([upload("ticket"), upload("closed"), stageHome()]);
-      const active = await adminThemeApi.applyBundle({ name: draft.name.trim(), themeData: cloneThemeData(draft.themeData),
+      const [ticketCardBackgroundImageUrl, ticketingBackgroundImageUrl] = await Promise.all([upload("ticket"), upload("closed")]);
+      const active = await adminThemeApi.applyBundle({ name: draft.name.trim(), themeData: normalizeThemeColors(draft.themeData),
         sourcePosterUrl: bundle.poster, sourceColors: recommendationSnapshot.sourceColors,
-        selectedBaseColor: recommendationSnapshot.selectedBaseColor, ticketCardBackgroundImageUrl, ticketingBackgroundImageUrl,
-        ...(homeBannerUpdate ? { homeBanner: homeBannerUpdate } : {}) });
+        selectedBaseColor: recommendationSnapshot.selectedBaseColor, ticketCardBackgroundImageUrl, ticketingBackgroundImageUrl });
       setThemes(themes => [active, ...themes.filter(theme => theme.id !== active.id).map(theme => ({ ...theme, active: false }))]);
       selectLoadedTheme(active);
       applyThemeData(active.themeData);
       setTicketCardBackgroundImageUrl(ticketCardBackgroundImageUrl);
       setTicketingBackgroundImageUrl(ticketingBackgroundImageUrl);
-      if (homeBannerUpdate) {
-        void queryClient.invalidateQueries({ queryKey: appQueryKeys.homeImages() });
-        setHomeBannerVersion(value => value + 1);
-      }
-      toast.success(homeBannerUpdate ? "홈 대표 이미지와 테마·배경을 함께 적용했습니다." : "테마와 배경을 적용했습니다. 홈 대표 이미지는 유지됩니다.");
+      toast.success("테마와 배경을 적용했습니다. 홈화면 이미지는 유지됩니다.");
     } catch (cause) {
-      toast.error(getErrorStatus(cause) === 409 ? "포스터 또는 홈 대표 이미지가 변경되었습니다. 새로고침 후 다시 확인해 주세요." : cause instanceof Error ? `전체 적용에 실패했습니다. ${cause.message}` : "전체 적용에 실패했습니다. 다시 시도해 주세요.");
+      toast.error(getErrorStatus(cause) === 409 ? "공식 포스터가 변경되었습니다. 새로고침 후 다시 확인해 주세요." : cause instanceof Error ? `전체 적용에 실패했습니다. ${cause.message}` : "전체 적용에 실패했습니다. 다시 시도해 주세요.");
     } finally { setBusy(false); }
   }
 
@@ -308,7 +334,7 @@ export default function AdminTheme() {
     ++selectionSequence.current;
     setSelectedRecommendationId(candidate.id);
     setSelectedId(null);
-    setDraft({ name: `${candidate.name} AI 추천 테마`, themeData: cloneThemeData(candidate.themeData) });
+    setDraft({ name: `${candidate.name} AI 추천 테마`, themeData: normalizeThemeColors(candidate.themeData) });
     setSavedDraft(null);
     setNewDraftProvenance(recommendationSnapshot ? {
       sourcePosterUrl: recommendationSnapshot.sourcePosterUrl,
@@ -319,7 +345,7 @@ export default function AdminTheme() {
 
   const selectLoadedTheme = useCallback((theme: ActiveThemeResponse, preserveRecommendation = false) => {
     const next = { name: theme.name, themeData: cloneThemeData(theme.themeData) };
-    setSelectedId(theme.id);
+    setSelectedId(isSavedMayTheme(theme) ? MAY_THEME_ID : theme.id);
     setDraft(next);
     setSavedDraft(next);
     setNewDraftProvenance(null);
@@ -333,9 +359,8 @@ export default function AdminTheme() {
       const list = await adminThemeApi.list(signal);
       if (signal?.aborted) return;
       setThemes(list);
-      const first = list.find((theme) => theme.active) ?? list[0];
-      if (first) selectLoadedTheme(first);
-      else { setSelectedId(null); setDraft(null); setSavedDraft(null); }
+      const first = list.find((theme) => theme.active) ?? createDefaultTheme(true);
+      selectLoadedTheme(first);
     } catch {
       if (!signal?.aborted) setError("저장된 테마를 불러오지 못했습니다. 다시 시도해 주세요.");
     } finally { if (!signal?.aborted) setLoading(false); }
@@ -354,7 +379,9 @@ export default function AdminTheme() {
     const sequence = ++selectionSequence.current;
     setBusy(true);
     try {
-      const theme = await adminThemeApi.get(id);
+      const theme = id === DEFAULT_THEME_ID ? createDefaultTheme(!activeTheme)
+        : id === MAY_THEME_ID ? createMayTheme(!!activeTheme && isSavedMayTheme(activeTheme))
+        : await adminThemeApi.get(id);
       if (sequence === selectionSequence.current) selectLoadedTheme(theme);
     } catch { toast.error("테마 상세 정보를 불러오지 못했습니다."); }
     finally { if (sequence === selectionSequence.current) setBusy(false); }
@@ -367,21 +394,22 @@ export default function AdminTheme() {
     setSelectedRecommendationId(null);
     const base = source ?? activeTheme;
     setNewDraftProvenance(source ? provenanceOf(source) : null);
-    setDraft({ name: source ? `${source.name} 복제` : "", themeData: cloneThemeData(base?.themeData ?? readBundledThemeData()) });
+    setDraft({ name: source ? `${source.name} 복제` : "", themeData: normalizeThemeColors(base?.themeData ?? readBundledThemeData()) });
     setSavedDraft(null);
   }
 
   function changeColor(group: keyof ThemeData, key: string, value: string) {
-    setDraft((current) => current && ({ ...current, themeData: { ...current.themeData, [group]: { ...current.themeData[group], [key]: value } } }));
+    if (group !== "brand") return;
+    setDraft((current) => current && ({ ...current, themeData: normalizeThemeColors({ ...current.themeData, brand: { ...current.themeData.brand, [key]: value } }) }));
   }
 
   async function save() {
-    if (!draft || busy) return;
+    if (!draft || busy || isBuiltInSelected) return;
     const validationError = validateThemeDraft(draft);
     if (validationError) { toast.error(validationError); return; }
     setBusy(true);
     try {
-      const payload: ThemeUpsertRequest = { name: draft.name.trim(), themeData: cloneThemeData(draft.themeData) };
+      const payload: ThemeUpsertRequest = { name: draft.name.trim(), themeData: normalizeThemeColors(draft.themeData) };
       // Recheck before PUT: another admin may have activated this row since the list loaded.
       // PUT on an active row would change the live theme without an activation request.
       const latest = selectedId === null ? null : await adminThemeApi.get(selectedId);
@@ -400,11 +428,33 @@ export default function AdminTheme() {
   }
 
   async function activate() {
-    if (!selectedId || !selectedTheme || busy) return;
+    if (selectedId === null || !selectedTheme || busy) return;
     if (dirty) { toast.error("변경사항을 먼저 저장한 뒤 적용해 주세요."); return; }
     setBusy(true);
     try {
-      const active = await adminThemeApi.activate(selectedId);
+      if (isDefaultSelected) {
+        await adminThemeApi.activateDefault();
+        setThemes((current) => current.map((item) => ({ ...item, active: false })));
+        selectLoadedTheme(createDefaultTheme(true));
+        resetThemeData();
+        toast.success("Tangerine Cream 테마를 적용했습니다. 색상만 초기 상태로 돌아가며 이미지는 유지됩니다.");
+        return;
+      }
+      let themeId = selectedId;
+      if (isMaySelected) {
+        // Refresh before reuse: another admin may have edited a previously saved preset.
+        const latest = await adminThemeApi.list();
+        let saved = latest.find((theme) => theme.active && isSavedMayTheme(theme)) ?? latest.find(isSavedMayTheme);
+        if (!saved) {
+          saved = await adminThemeApi.create({ name: selectedTheme.name, themeData: getMayThemeData(),
+            sourcePosterUrl: null, selectedBaseColor: null, sourceColors: null });
+          latest.unshift(saved);
+        }
+        // Retain a successful save if activation fails, so retries can reuse it.
+        setThemes(latest);
+        themeId = saved.id;
+      }
+      const active = await adminThemeApi.activate(themeId);
       setThemes((current) => current.map((item) => item.id === active.id ? active : { ...item, active: false }));
       selectLoadedTheme(active);
       applyThemeData(active.themeData);
@@ -414,7 +464,7 @@ export default function AdminTheme() {
   }
 
   async function remove() {
-    if (!selectedId || !selectedTheme || busy) return;
+    if (selectedId === null || isBuiltInSelected || !selectedTheme || busy) return;
     if (selectedTheme.active) { toast.error("현재 활성 테마는 삭제할 수 없습니다."); return; }
     if (!window.confirm(`‘${selectedTheme.name}’ 테마를 삭제하시겠습니까?`)) return;
     setBusy(true);
@@ -422,13 +472,32 @@ export default function AdminTheme() {
       await adminThemeApi.delete(selectedId);
       const remaining = themes.filter((item) => item.id !== selectedId);
       setThemes(remaining);
-      const next = remaining.find((item) => item.active) ?? remaining[0];
-      if (next) selectLoadedTheme(next);
-      else { setSelectedId(null); setDraft(null); setSavedDraft(null); }
+      const next = remaining.find((item) => item.active) ?? createDefaultTheme(true);
+      selectLoadedTheme(next);
       toast.success("테마를 삭제했습니다.");
     } catch (cause) {
       toast.error(getErrorStatus(cause) === 409 ? "현재 활성 테마는 삭제할 수 없습니다. 다른 테마를 적용한 뒤 다시 시도해 주세요." : "테마 삭제에 실패했습니다.");
     } finally { setBusy(false); }
+  }
+
+  if (selectionOnly) {
+    return <>
+      <Toaster position="top-right" closeButton richColors />
+      <div style={adminActionStyle} data-testid="admin-theme-action-scope">
+        <AdminShell title="테마 선택" mainClassName="mx-auto w-full max-w-[1120px] space-y-6 px-4 py-6 sm:px-8">
+          <section className="flex flex-col gap-3 border-b border-[var(--border-base)] pb-6 sm:flex-row sm:items-center sm:justify-between">
+            <div><h2 className="text-xl font-semibold tracking-tight">사용할 테마를 선택하세요</h2><p className="mt-2 text-sm text-[var(--text-muted)]">기본 테마와 저장된 테마를 미리 본 뒤 바로 적용할 수 있습니다.</p></div>
+            <Link to="/admin/theme" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex w-fit")}>테마 제작·관리 화면으로</Link>
+          </section>
+          {loading ? <p role="status" className="text-sm text-[var(--text-muted)]">테마를 불러오는 중입니다…</p> : error ?
+            <div role="alert" className={panel}><p className="mb-3 text-sm">{error}</p><button type="button" className={ADMIN_THEME_SECONDARY_ACTION_CLASS} onClick={() => void loadThemes()}>다시 시도</button></div> :
+            <div className="grid items-start gap-6 lg:grid-cols-[minmax(280px,0.9fr)_minmax(0,1.5fr)]">
+              <ThemeSelectionList themes={availableThemes} selectedId={selectedId} disabled={busy} onSelect={(id) => void selectTheme(id)} />
+              <div className="min-w-0 space-y-6">{draft ? <><ThemePreview data={draft.themeData} /><section className={panel} aria-label="테마 선택 적용"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-semibold">{selectedTheme?.name ?? "선택한 테마"}</h2><p className="mt-1 text-xs text-[var(--text-muted)]">적용하면 새로 접속하는 사용자 화면의 색상이 바뀝니다. 홈화면 이미지와 배경 이미지는 유지됩니다.</p></div>{selectedTheme?.active ? <span aria-label="테마 적용 상태" className="inline-flex items-center gap-1 rounded-full border border-[var(--admin-theme-action-outline)] bg-[var(--admin-theme-action-hover)] px-3 py-1.5 text-xs font-semibold text-[var(--admin-theme-action-outline)]"><Check className="h-3.5 w-3.5" aria-hidden="true" />적용 중</span> : <button type="button" className={cn(ADMIN_THEME_PRIMARY_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={() => void activate()} disabled={busy}><Check className="h-4 w-4" />{isDefaultSelected ? "Tangerine Cream 적용" : isMaySelected ? "Coastal Sunset 적용" : "저장된 테마 적용"}</button>}</div></section></> : <div className={panel}><p className="text-sm text-[var(--text-muted)]">테마를 선택하면 미리보기가 표시됩니다.</p></div>}</div>
+            </div>}
+        </AdminShell>
+      </div>
+    </>;
   }
 
   return <>
@@ -438,7 +507,7 @@ export default function AdminTheme() {
     <AdminShell title="축제 테마" mainClassName="mx-auto w-full max-w-[1120px] space-y-6 px-4 py-6 sm:px-8">
       <section className="flex flex-col gap-4 border-b border-[var(--border-base)] pb-6 sm:flex-row sm:items-center sm:justify-between" aria-label="화면 확인과 테마 작업 안내">
         <div><h2 className="text-xl font-semibold tracking-tight">포스터로 축제 화면을 완성하세요</h2>
-          <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">포스터와 로고를 넣고, 마음에 드는 색을 골라 주세요.</p><p className="mt-2 text-xs text-[var(--text-muted)]">현재 적용: <span className="font-medium text-[var(--text)]">{activeTheme?.name ?? "기본 테마"}</span></p></div>
+          <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">포스터와 로고를 넣고, 마음에 드는 색을 골라 주세요.</p><p className="mt-2 text-xs text-[var(--text-muted)]">현재 적용: <span className="font-medium text-[var(--text)]">{activeTheme?.name ?? "Tangerine Cream"}</span></p></div>
 
       </section>
       <nav aria-label="테마 작업 순서" className="grid grid-cols-3 border-b border-[var(--border-base)] text-xs sm:text-sm">
@@ -447,65 +516,62 @@ export default function AdminTheme() {
       <div id="theme-ai" className="space-y-6 scroll-mt-40 sm:scroll-mt-28" aria-label="AI 테마 추천 영역">
         <FestivalBrandingPanel onAnalysisChange={analysisChanged} onBrandingChange={setBranding} onRecommend={(snapshot) => void recommend(snapshot)}
           recommending={recommending} autoRecommend locked={busy} recommendationCompleted={recommendationCompleted} recommendationError={recommendationError} adminActionStyle={adminActionStyle}
-          homeBanner={<HomeBannerDraftPanel key={homeBannerVersion} posterUrl={branding?.posterImageUrl ?? null} disabled={busy || !canBundle} onChange={setHomeBanner} />} />
+          homeBanner={<HomeBannerDraftPanel posterUrl={branding?.posterImageUrl ?? null} disabled={busy || !canManageHome} onChange={setHomeBanner} onSave={saveHomeBanner} />} />
         {recommendationCandidates.length > 0 && <RecommendationComparison candidates={recommendationCandidates}
           selectedId={selectedRecommendationId} onChoose={chooseRecommendation} busy={busy || recommending} />}
         <section id="theme-apply" className={cn(panel, "scroll-mt-40 sm:scroll-mt-28")} aria-label="통합 추천과 적용">
           <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-lg font-semibold">3. 확인하고 전체 적용</h2><span className="rounded-full bg-[var(--surface-subtle)] px-3 py-1 text-xs text-[var(--text-muted)]">티켓팅 {ticketingEnabled ? "ON" : "OFF"}</span></div>
-          <p className="mt-2 text-sm text-[var(--text-muted)]">홈 대표 이미지와 내 정보·티켓 화면을 확인한 뒤 한 번에 적용하세요.</p>
+          <p className="mt-2 text-sm text-[var(--text-muted)]">선택한 색상 테마와 내 정보·티켓 화면 배경을 확인한 뒤 한 번에 적용하세요.</p>
           {!canBundle ? <p className="mt-3 text-sm">전체 추천·적용에는 축제 운영과 티켓팅 권한이 모두 필요합니다. 현재 권한으로 색상 테마는 추천받을 수 있습니다.</p> : <>
-            {backgroundPending && <p role="status" className="mt-3 text-sm">포스터에서 두 배경을 준비하고 있습니다…</p>}
+            {backgroundPending && <p role="status" className="mt-3 text-sm">AI가 포스터 분위기에 맞는 티켓·입장 안내 배경을 만들고 있습니다. 최대 3분 정도 걸릴 수 있어요…</p>}
             {bundleError && <div role="alert" className="mt-3 text-sm"><p>{bundleError}</p><button className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "mt-2")} onClick={() => { if (analysisSnapshot) loadBackgrounds(analysisSnapshot, recommendationVersion.current); }} disabled={busy || backgroundPending}>배경만 다시 추천</button></div>}
             {!selectedRecommendationId && <p className="mt-4 rounded-xl bg-[var(--surface-subtle)] p-4 text-sm text-[var(--text-muted)]">위에서 대표색을 고른 뒤, 추천 시안을 선택해 주세요.</p>}
-            {!homeBannerReady && <p role="status" className="mt-3 text-sm">홈 대표 이미지 준비 상태를 확인해 주세요.</p>}
             {bundleReady && <div className="mt-5 flex flex-wrap gap-3">
               <DialogTrigger asChild><button ref={previewTriggerRef} type="button" disabled={busy || recommending} className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex items-center gap-2")}><MonitorSmartphone className="h-4 w-4" />추천 화면 확인</button></DialogTrigger>
               <button type="button" onClick={() => void applyBundle()} disabled={busy || recommending} className={ADMIN_THEME_PRIMARY_ACTION_CLASS} aria-busy={busy}>전체 적용</button>
             </div>}
-            <p className="mt-2 text-xs text-[var(--text-muted)]">전체 적용하면 선택한 홈 대표 이미지와 색상·배경이 함께 저장됩니다. 추가 홈 이미지는 유지됩니다. 내 정보는 항상, 발급 티켓·입장 안내는 ON/OFF에 맞춰 표시됩니다. 팔찌 배부 색상도 함께 반영됩니다.</p>
+            <p className="mt-2 text-xs text-[var(--text-muted)]">전체 적용하면 선택한 색상 테마와 내 정보·티켓 배경이 함께 저장됩니다. 홈화면 이미지는 별도 저장으로만 바뀌며 추가 홈 이미지는 유지됩니다. 내 정보는 항상, 발급 티켓·입장 안내는 ON/OFF에 맞춰 표시됩니다. 팔찌 배부 색상도 함께 반영됩니다.</p>
           </>}
         </section>
       </div>
-      <details id="theme-management" className="space-y-6 scroll-mt-40 sm:scroll-mt-28" aria-label="테마 관리 영역">
+      <details id="theme-management" open className="space-y-6 scroll-mt-40 sm:scroll-mt-28" aria-label="테마 관리 영역">
       <summary className="cursor-pointer border-t border-[var(--border-base)] py-5 text-sm font-semibold">고급 설정 <span className="ml-2 font-normal text-[var(--text-muted)]">저장된 테마 · 색상 직접 수정</span></summary>
       {!bundleReady && <DialogTrigger asChild><button ref={previewTriggerRef} type="button" disabled={busy} className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex items-center gap-2 text-sm")}><MonitorSmartphone className="h-4 w-4" />편집 중인 화면 확인</button></DialogTrigger>}
       <p className="text-xs text-[var(--text-muted)]">저장된 테마는 색상만 관리합니다. 배경까지 바꾸려면 위의 추천 과정을 진행하세요.</p>
       {loading ? <p role="status" className="text-sm text-[var(--text-muted)]">테마를 불러오는 중입니다…</p> : error ?
         <div role="alert" className={panel}><p className="mb-3 text-sm">{error}</p><button type="button" className={ADMIN_THEME_SECONDARY_ACTION_CLASS} onClick={() => void loadThemes()}>다시 시도</button></div> : <>
         <section className={panel} aria-label="현재 활성 테마"><div className="flex flex-wrap items-center justify-between gap-4">
-          <div><p className="text-xs font-medium text-[var(--text-muted)]">현재 활성 테마</p><div className="mt-1 flex items-center gap-2"><h2 className="text-lg font-semibold">{activeTheme?.name ?? "적용된 테마 없음"}</h2>{activeTheme && <span className="rounded-full border border-[var(--admin-theme-action-outline)] bg-white px-2 py-0.5 text-xs font-semibold text-[var(--admin-theme-action-outline)]">활성</span>}</div>
-            {!activeTheme && <p className="mt-1 text-xs text-[var(--text-muted)]">서비스는 번들 기본 색상을 사용합니다.</p>}</div>
+          <div><p className="text-xs font-medium text-[var(--text-muted)]">현재 활성 테마</p><div className="mt-1 flex items-center gap-2"><h2 className="text-lg font-semibold">{activeTheme?.name ?? "Tangerine Cream"}</h2>{activeTheme && <span className="rounded-full border border-[var(--admin-theme-action-outline)] bg-white px-2 py-0.5 text-xs font-semibold text-[var(--admin-theme-action-outline)]">활성</span>}</div>
+            {!activeTheme && <p className="mt-1 text-xs text-[var(--text-muted)]">처음 제공된 기본 색상을 사용 중입니다.</p>}</div>
           {activeTheme && <Swatches colors={keyColors(activeTheme.themeData)} />}
         </div></section>
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(280px,0.9fr)_minmax(0,1.5fr)]">
         <div className="min-w-0 space-y-6">
-          <section className={panel} aria-label="저장된 테마 목록"><div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">저장된 테마</h2><button type="button" aria-label="새 테마 생성" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={() => createDraft()} disabled={busy || recommending}><Plus className="h-4 w-4" />새 테마</button></div>
-            {themes.length === 0 ? <p className="text-sm text-[var(--text-muted)]">저장된 테마가 없습니다. 새 테마를 만들어 주세요.</p> : <div className="grid gap-2">{themes.map((theme) => <button type="button" key={theme.id} onClick={() => void selectTheme(theme.id)} disabled={busy || recommending} aria-pressed={selectedId === theme.id} className={cn("w-full rounded-xl border p-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-theme-action-focus)] disabled:cursor-not-allowed disabled:opacity-50", selectedId === theme.id ? "border-[var(--admin-theme-action-outline)] bg-[var(--admin-theme-action-hover)] ring-1 ring-[var(--admin-theme-action-focus)]" : "border-[var(--border-base)] bg-white hover:border-[var(--admin-theme-action-outline)] hover:bg-[var(--admin-theme-action-hover)]")}>
-              <span className="flex items-center justify-between gap-2"><span className="truncate text-sm font-semibold">{theme.name}</span>{theme.active && <span className="shrink-0 rounded-full border border-[var(--admin-theme-action-outline)] bg-white px-2 py-0.5 text-xs font-semibold text-[var(--admin-theme-action-outline)]">활성</span>}</span>{theme.updatedAt && !Number.isNaN(Date.parse(theme.updatedAt)) && <span className="mt-1 block text-xs text-[var(--text-muted)]">수정 {new Date(theme.updatedAt).toLocaleDateString("ko-KR")}</span>}<span className="mt-2 block"><Swatches colors={keyColors(theme.themeData)} /></span>
-            </button>)}</div>}
-          </section>
+          <ThemeSelectionList themes={availableThemes} selectedId={selectedId} disabled={busy || recommending} onSelect={(id) => void selectTheme(id)} allowCreate onCreate={() => createDraft()} />
           {draft ? <ThemePreview data={draft.themeData} /> : <div className={panel}><p className="text-sm text-[var(--text-muted)]">테마를 선택하면 이곳에 미리보기가 표시됩니다.</p></div>}
         </div>
         <div className="min-w-0 space-y-6">{draft ? <>
-            <section className={panel} aria-label="테마 편집"><div className="mb-5"><h2 className="font-semibold">{selectedId === null ? "새 테마" : "테마 편집"}</h2><p className="text-xs text-[var(--text-muted)]">저장과 실제 적용은 별개입니다.{selectedTheme?.active && " 활성 테마를 수정해 저장하면 비활성 복제본이 생성됩니다."}</p></div>
-              <label className="block text-sm font-medium">테마 이름<input disabled={busy} aria-label="테마 이름" className={cn("mt-1", input)} maxLength={100} value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
-              <ThemeSourceDetails source={selectedTheme ? provenanceOf(selectedTheme) : newDraftProvenance ?? analysisSnapshot} />
+            <section className={panel} aria-label="테마 편집"><div className="mb-5"><h2 className="font-semibold">{selectedId === null ? "새 테마" : "테마 편집"}</h2><p className="text-xs text-[var(--text-muted)]">저장과 실제 적용은 별개입니다.{selectedTheme?.active && !isBuiltInSelected && " 활성 테마를 수정해 저장하면 비활성 복제본이 생성됩니다."}</p></div>
+              <label className="block text-sm font-medium">테마 이름<input disabled={busy || isBuiltInSelected} aria-label="테마 이름" className={cn("mt-1", input)} maxLength={100} value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value, themeData: normalizeThemeColors(draft.themeData) })} /></label>
+              {isBuiltInSelected ? <p className="mt-4 text-xs text-[var(--text-muted)]">{isMaySelected ? "2026년 5월 일반 화면의 색상을 현재 테마 형식에 맞춘 기본 시안입니다. 쉼터는 현재 기본색을 유지합니다." : "처음 제공된 색상입니다."} 수정하려면 복제해 주세요. 적용해도 포스터·로고·배경 이미지는 바뀌지 않습니다.</p> : <ThemeSourceDetails source={selectedTheme ? provenanceOf(selectedTheme) : newDraftProvenance ?? analysisSnapshot} />}
               <div className="mt-5 flex flex-wrap items-center gap-2 border-y border-[var(--border-base)] py-4" aria-label="테마 편집 작업">
                 {!dirty && !busy ? <span aria-label="저장 상태" className="inline-flex items-center rounded-full border border-[var(--border-base)] bg-[var(--ds-neutral-hover)] px-3 py-1.5 text-xs font-medium text-[var(--text-muted)]">변경사항 없음</span>
                   : <button type="button" className={cn(ADMIN_THEME_PRIMARY_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={() => void save()} disabled={busy || recommending || !dirty} aria-busy={busy}>{busy ? "처리 중…" : <><Save className="h-4 w-4" />저장</>}</button>}
                 {selectedTheme && (selectedTheme.active
                   ? <span aria-label="테마 적용 상태" className="inline-flex items-center gap-1 rounded-full border border-[var(--admin-theme-action-outline)] bg-[var(--admin-theme-action-hover)] px-3 py-1.5 text-xs font-semibold text-[var(--admin-theme-action-outline)]"><Check className="h-3.5 w-3.5" aria-hidden="true" />적용 중</span>
-                  : <button type="button" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={() => void activate()} disabled={busy || recommending || dirty}><Check className="h-4 w-4" />저장된 테마 적용</button>)}
+                  : <button type="button" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={() => void activate()} disabled={busy || recommending || dirty}><Check className="h-4 w-4" />{isDefaultSelected ? "Tangerine Cream 적용" : isMaySelected ? "Coastal Sunset 적용" : "저장된 테마 적용"}</button>)}
                 {selectedTheme && <button type="button" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={() => createDraft(selectedTheme)} disabled={busy || recommending}><Copy className="h-4 w-4" />복제</button>}
-                {selectedTheme && <button type="button" className={cn(ADMIN_THEME_DESTRUCTIVE_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={() => void remove()} disabled={busy || recommending || selectedTheme.active} title={selectedTheme.active ? "활성 테마는 삭제할 수 없습니다" : undefined}><Trash2 className="h-4 w-4" />삭제</button>}
+                {selectedTheme && !isBuiltInSelected && <button type="button" className={cn(ADMIN_THEME_DESTRUCTIVE_ACTION_CLASS, "inline-flex items-center gap-1.5 text-sm")} onClick={() => void remove()} disabled={busy || recommending || selectedTheme.active} title={selectedTheme.active ? "활성 테마는 삭제할 수 없습니다" : undefined}><Trash2 className="h-4 w-4" />삭제</button>}
                 {dirty && selectedTheme && !selectedTheme.active && <p className="w-full text-xs text-[var(--text-muted)]">변경사항을 저장한 뒤 적용할 수 있습니다.</p>}
               </div>
-              <div className="mt-6 space-y-6">{THEME_FIELDS.map((group) => <details key={group.key} open={group.key === "brand"} className="rounded-xl border border-[var(--border-base)] p-4"><summary className="cursor-pointer text-sm font-semibold">{group.title}<span className="ml-2 text-xs font-normal text-[var(--text-muted)]">{group.colors.length}가지 색상</span></summary><div className="mt-4 grid gap-3 sm:grid-cols-2">{group.colors.map(([key, label]) => {
+              <p className="mt-4 text-xs text-[var(--text-muted)]">주점은 메인 색상(Primary)을 따릅니다. 상태색과 나머지 지도 색상은 고정입니다. 기존 테마도 수정해 저장하면 이 규칙이 적용됩니다.</p>
+              <div className="mt-6 space-y-6">{THEME_FIELDS.map((group) => <details key={group.key} open className="rounded-xl border border-[var(--border-base)] p-4"><summary className="cursor-pointer text-sm font-semibold">{group.title}<span className="ml-2 text-xs font-normal text-[var(--text-muted)]">{group.colors.length}가지 색상</span></summary><div className="mt-4 grid gap-3 sm:grid-cols-2">{group.colors.map(([key, label]) => {
                 const value = getThemeColor(draft.themeData, group.key, key);
                 const valid = isHexColor(value);
+                const locked = group.key !== "brand";
                 return <label key={key} className="flex min-w-0 items-center gap-3 rounded-xl border border-[var(--border-base)] p-3 text-sm">
-                  <input disabled={busy} type="color" aria-label={`${label} 색상 선택`} value={valid ? value : DESIGN_SYSTEM_BLACK} onChange={(event) => changeColor(group.key, key, event.target.value)} className="h-9 w-10 shrink-0 cursor-pointer rounded border-0 bg-transparent" />
-                  <span className="min-w-0 flex-1"><span className="mb-1 block font-medium">{label}</span><input disabled={busy} type="text" aria-label={`${label} HEX`} value={value} onChange={(event) => changeColor(group.key, key, event.target.value)} maxLength={7} spellCheck={false} aria-invalid={!valid} className={cn("w-full rounded-lg border px-2 py-1 font-mono text-xs", valid ? "border-[var(--border-base)]" : "border-[var(--semantic-status-danger)]")} /></span>
+                  <input disabled={busy || isBuiltInSelected || locked} type="color" aria-label={`${label} 색상 선택`} value={valid ? value : DESIGN_SYSTEM_BLACK} onChange={(event) => changeColor(group.key, key, event.target.value)} className="h-9 w-10 shrink-0 cursor-pointer rounded border-0 bg-transparent" />
+                  <span className="min-w-0 flex-1"><span className="mb-1 block font-medium">{label}</span><input disabled={busy || isBuiltInSelected || locked} type="text" aria-label={`${label} HEX`} value={value} onChange={(event) => changeColor(group.key, key, event.target.value)} maxLength={7} spellCheck={false} aria-invalid={!valid} className={cn("w-full rounded-lg border px-2 py-1 font-mono text-xs", valid ? "border-[var(--border-base)]" : "border-[var(--semantic-status-danger)]")} /></span>
                   <span className="h-7 w-7 shrink-0 rounded-full border border-[var(--border-base)]" style={{ backgroundColor: valid ? value : "transparent" }} aria-hidden="true" />
                 </label>;
               })}</div></details>)}</div>
@@ -517,9 +583,13 @@ export default function AdminTheme() {
     </AdminShell>
               <DialogContent showCloseButton={false} style={adminActionStyle} onCloseAutoFocus={(event) => { event.preventDefault(); previewTriggerRef.current?.focus(); }} className="flex h-[min(94dvh,960px)] max-h-[94dvh] w-[calc(100%-1rem)] max-w-[min(760px,calc(100%-1rem))] flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-[760px]">
                 <DialogHeader className="shrink-0 border-b border-[var(--border-base)] px-5 py-4 text-left sm:px-6"><div className="flex items-start justify-between gap-4"><div><DialogTitle>사용자 화면 미리보기</DialogTitle><DialogDescription className="mt-2 text-xs text-[var(--text-muted)]">선택한 색상과 배경을 미리 확인하세요. 전체 적용 전에는 사용자 화면이 바뀌지 않습니다.</DialogDescription></div><DialogClose asChild><button type="button" className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "shrink-0 whitespace-nowrap")}>닫기</button></DialogClose></div></DialogHeader>
-                <div className="min-h-0 overflow-y-auto px-3 py-4 sm:px-6"><ThemeScreenPreview homeImageUrl={homeBanner?.ready ? homeBanner.previewUrl : homeBanner?.previewUrl ?? undefined} data={draft?.themeData ?? activeTheme?.themeData ?? readBundledThemeData()} branding={branding} backgrounds={selectedRecommendationId && bundle && bundle.poster === analysisSnapshot?.sourcePosterUrl ? { ticket: posterBundleImage(bundle.data.ticket), closed: posterBundleImage(bundle.data.closed) } : undefined} embedded /></div>
+                <div className="min-h-0 overflow-y-auto px-3 py-4 sm:px-6"><ThemeScreenPreview homeImageUrl={homeBanner?.expectedFirstImageUrl ?? null} data={draft?.themeData ?? activeTheme?.themeData ?? readBundledThemeData()} branding={branding} backgrounds={selectedRecommendationId && bundle && sameImageReference(bundle.poster, analysisSnapshot?.sourcePosterUrl) ? { ticket: posterBundleImage(bundle.data.ticket), closed: posterBundleImage(bundle.data.closed) } : undefined} embedded /></div>
               </DialogContent>
     </Dialog>
     </div>
   </>;
+}
+
+function analysisKey(snapshot: PosterAnalysisSnapshot | null) {
+  return JSON.stringify(snapshot && { ...snapshot, sourcePosterUrl: imageReferenceKey(snapshot.sourcePosterUrl) });
 }

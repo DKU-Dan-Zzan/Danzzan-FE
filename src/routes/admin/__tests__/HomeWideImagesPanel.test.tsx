@@ -47,7 +47,8 @@ describe("HomeWideImagesPanel", () => {
     await render();
     expect(host.querySelectorAll('img[alt$="홈 배너 이미지 미리보기"]')).toHaveLength(3);
     expect(host.querySelectorAll('button[aria-label$="이미지 확대 보기"]')).toHaveLength(3);
-    expect(host.querySelector('button[aria-label="1번 이미지 확대 보기"]')?.className).toContain("aspect-[16/7]");
+    expect(host.querySelector('button[aria-label="1번 이미지 확대 보기"]')?.className).toContain("aspect-[9/16]");
+    expect(host.querySelector<HTMLImageElement>('img[alt="1번 홈 배너 이미지 미리보기"]')?.className).toContain("object-contain");
     expect(host.textContent).toContain("총 4개 등록됨");
     await act(async () => root.unmount());
     root = createRoot(host);

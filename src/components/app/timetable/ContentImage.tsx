@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/common/ui/dialog"
 import { useT } from "@/i18n"
+import { AzureImage } from "@/components/common/AzureImage"
 
 type ContentImageSectionProps = {
   images: ContentImageDto[]
@@ -73,7 +74,7 @@ export default function ContentImageSection({
             className="block w-full overflow-hidden rounded-[30px] bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(247,249,255,0.86))] shadow-[0_30px_56px_-38px_rgba(23,34,68,0.46),inset_0_1px_0_rgba(255,255,255,0.92)] ring-1 ring-[rgba(255,255,255,0.76)]"
             onClick={() => onSelectImage(image)}
           >
-            <img
+            <AzureImage
               src={image.previewImageUrl}
               alt={image.name}
               className="h-100 w-full object-cover"
@@ -101,7 +102,7 @@ export default function ContentImageSection({
             <DialogTitle className="sr-only">{selectedImage.name}</DialogTitle>
             <div className="h-full overflow-y-auto overscroll-contain px-3 py-[max(env(safe-area-inset-top),0.75rem)] sm:max-h-[90vh] sm:px-4 sm:py-3">
               <div className="mx-auto flex min-h-full w-full max-w-none items-center justify-center sm:max-w-[430px]">
-                <img
+                <AzureImage
                   src={selectedImage.detailImageUrl}
                   alt={selectedImage.name}
                   className="h-auto w-full rounded-xl object-contain"

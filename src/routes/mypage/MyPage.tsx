@@ -216,6 +216,7 @@ function MyPage() {
           <img
             src={posterImage.src}
             onError={posterImage.onError}
+            onLoad={posterImage.onLoad}
             alt=""
             aria-hidden
             className={cn("absolute inset-0 h-full w-full object-cover", posterImage.useUploaded ? "object-top" : "object-[50%_38%]")}
@@ -346,6 +347,7 @@ function MyPage() {
           <img
             src={posterImage.src}
             onError={posterImage.onError}
+            onLoad={posterImage.onLoad}
             alt=""
             aria-hidden
             className={cn("h-full w-full object-cover", posterImage.useUploaded ? "object-top" : "object-[50%_44%]")}

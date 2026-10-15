@@ -2,6 +2,7 @@
 import { clsx } from "clsx"
 import { useCallback, useEffect, useMemo, useRef, useState, type TouchEvent } from "react"
 import { useT } from "@/i18n"
+import { AzureImage } from "@/components/common/AzureImage"
 
 export type LineupBanner = {
   id: string
@@ -173,7 +174,7 @@ export default function LineupCarousel({
                 style={{ width: `${LINEUP_CARD_WIDTH_PX}px` }}
               >
                 <div style={{ aspectRatio: aspect }}>
-                  <img
+                  <AzureImage
                     src={banner.imageUrl}
                     alt={banner.alt ?? t("home.lineupFallbackAlt")}
                     className="h-full w-full object-cover"

@@ -10,6 +10,7 @@ import { cn } from "@/components/common/ui/utils";
 import { useDebouncedValue } from "@/hooks/app/useDebouncedValue";
 import { useLanguage, useT } from "@/i18n";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
+import { AzureImage } from "@/components/common/AzureImage";
 
 type CategoryKey = "ALL" | "GENERAL" | "EVENT";
 
@@ -443,7 +444,7 @@ function Notice() {
                           }
                         }}
                       >
-                        <img
+                        <AzureImage
                           src={detailNotice.imageUrls?.[activeImageIndex]}
                           alt={detailNotice.title}
                           className="h-auto w-full object-contain"
@@ -473,7 +474,7 @@ function Notice() {
                     </div>
                   ) : detailNotice.thumbnailImageUrl ? (
                     <div className="mt-3 overflow-hidden rounded-2xl border border-[var(--home-card-border)]">
-                      <img
+                      <AzureImage
                         src={detailNotice.thumbnailImageUrl}
                         alt={detailNotice.title}
                         className="h-auto w-full object-contain"

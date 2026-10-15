@@ -37,7 +37,7 @@ export type ActiveThemeResponse = {
   sourceColors?: string[] | null;
 };
 
-/** A 204 response intentionally returns null, leaving the bundled Theme Core untouched. */
+/** A 204 response returns null so callers restore the bundled Theme Core. */
 export async function getActiveTheme(festivalSettingId: number): Promise<ActiveThemeResponse | null> {
   const response = await http.get<ActiveThemeResponse>(
     `/festival/${festivalSettingId}/themes/active`,

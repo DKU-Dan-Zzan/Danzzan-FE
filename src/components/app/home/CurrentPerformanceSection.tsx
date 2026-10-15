@@ -10,6 +10,7 @@ import {
 import { useLanguage, useT } from "@/i18n";
 import { appQueryKeys, useAppQuery } from "@/lib/query";
 import { cn } from "@/components/common/ui/utils";
+import { AzureImage } from "@/components/common/AzureImage";
 
 const CARD_WIDTH = 314.4;
 const CARD_HEIGHT = 94;
@@ -85,7 +86,7 @@ export default function CurrentPerformanceSection() {
           {status === "active" && currentPerformance ? (
             <div className="flex h-full items-center gap-4">
               <div className="h-[68px] w-[68px] shrink-0 overflow-hidden rounded-full bg-[var(--surface_container_lowest)]">
-                <img
+                <AzureImage
                   src={currentPerformance.artistImageUrl || "/images/default-artist.png"}
                   alt={currentPerformance.artistName}
                   className="h-full w-full object-cover"

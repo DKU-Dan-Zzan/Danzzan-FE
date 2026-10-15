@@ -188,7 +188,7 @@ function PreviewMyPage({ backgroundOverride }: { backgroundOverride?: string }) 
   const background = useFestivalPortraitBackground(backgroundOverride);
   return <div className="min-h-0 flex-1 overflow-y-auto bg-[var(--poster-bg)]">
     <div className="relative h-64 overflow-hidden">
-      {background.src && <img src={background.src} onError={background.onError} alt="내 정보 추천 배경" className="absolute inset-0 h-full w-full object-cover object-top" />}
+      {background.src && <img src={background.src} onError={background.onError} onLoad={background.onLoad} alt="내 정보 추천 배경" className="absolute inset-0 h-full w-full object-cover object-top" />}
       <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,.58), rgba(0,0,0,.62) 50%, var(--poster-bg))" }} />
       <div className="absolute bottom-6 left-5 flex items-end gap-3 text-white"><div className="rounded-full border border-white/30 bg-white/20 p-4"><User size={36} /></div><div><p className="text-2xl font-bold">축제 참여자</p><p className="mt-1 text-sm text-white/80">단국대학교 재학생</p></div></div>
     </div>

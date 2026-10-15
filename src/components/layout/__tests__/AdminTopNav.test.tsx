@@ -92,10 +92,13 @@ describe("AdminTopNav staff menu", () => {
     expect(button("공지·광고")).toBeDefined();
   });
 
-  it("keeps theme recommendation and management on one anchored page", async () => {
+  it("opens the dedicated theme selection screen and keeps creation links on the management page", async () => {
     await render("/admin/theme");
     await act(async () => button("테마").dispatchEvent(new MouseEvent("mouseover", { bubbles: true })));
     expect(button("테마").getAttribute("aria-expanded")).toBe("true");
+    await act(async () => button("테마 선택").click());
+    expect(locationPath).toBe("/admin/theme/select");
+    await act(async () => button("테마").dispatchEvent(new MouseEvent("mouseover", { bubbles: true })));
     await act(async () => button("AI 테마 추천").click());
     expect(locationPath).toBe("/admin/theme#theme-ai");
     await act(async () => button("테마").dispatchEvent(new MouseEvent("mouseover", { bubbles: true })));

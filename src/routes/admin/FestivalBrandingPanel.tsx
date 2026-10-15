@@ -1,3 +1,4 @@
+import { AzureImage } from "@/components/common/AzureImage";
 import { useCallback, useEffect, useRef, useState, type ReactNode, type CSSProperties } from "react";
 import { Check, Info, LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -41,7 +42,7 @@ function ImageField({ kind, title, description, url, busy, uploading, onUpload }
       if (file) onUpload(kind, file);
     }} />
     <div className="mt-4 flex min-h-32 items-center justify-center overflow-hidden rounded-xl bg-[var(--surface-subtle)] p-3 sm:min-h-28">
-      {url ? <img src={url} alt={`현재 ${title}`} className="max-h-52 max-w-full object-contain sm:max-h-48" /> : <p className="text-sm text-[var(--text-muted)]">등록된 {title}가 없습니다.</p>}
+      {url ? <AzureImage src={url} alt={`현재 ${title}`} className="max-h-52 max-w-full object-contain sm:max-h-48" /> : <p className="text-sm text-[var(--text-muted)]">등록된 {title}가 없습니다.</p>}
     </div>
   </div>;
 }

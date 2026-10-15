@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useAzureImageUrl } from "@/hooks/app/useAzureImageUrl"
 import { useFestivalBranding } from "@/lib/app/festival/festivalBrandingContext"
 import { resolveBrandingImageUrl } from "@/lib/app/festival/brandingImageUrl"
 
@@ -11,10 +12,8 @@ export function usePosterBackground(custom: string | null | undefined, fallback:
   const [failure, setFailure] = useState<{ key: string; urls: string[] }>({ key, urls: [] })
   const failed = failure.key === key ? failure.urls : []
   const src = sources.find(value => !failed.includes(value))
-  return {
-    src,
-    onError: () => {
-      if (src) setFailure(previous => ({ key, urls: [...(previous.key === key ? previous.urls : []), src] }))
-    },
-  }
+  const image = useAzureImageUrl(src, () => {
+    if (src) setFailure(previous => ({ key, urls: [...(previous.key === key ? previous.urls : []), src] }))
+  })
+  return { ...image, src: src ? image.src : undefined }
 }

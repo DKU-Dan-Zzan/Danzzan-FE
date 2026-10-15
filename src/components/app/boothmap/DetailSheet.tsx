@@ -10,6 +10,7 @@ import { formatBoothOperatingLabel } from "@/utils/app/boothmap/formatBoothOpera
 import { formatDescription } from "@/utils/app/boothmap/formatDescription";
 import { formatOperatingTime } from "@/utils/app/boothmap/formatOperatingTime";
 import { useT } from "@/i18n";
+import { AzureImage } from "@/components/common/AzureImage";
 
 const INSTAGRAM_HANDLE_PATTERN = /^[A-Za-z0-9._]+$/;
 
@@ -92,7 +93,7 @@ function DetailSheet({
       <DialogContent className="max-h-[92vh] w-fit max-w-[92vw] border-0 bg-transparent p-0 shadow-none">
         <DialogTitle className="sr-only">{t("boothmap.imageDetailTitle")}</DialogTitle>
         {viewerImage && (
-          <img
+          <AzureImage
             src={viewerImage}
             alt={t("boothmap.detailImageAlt")}
             decoding="async"
@@ -176,7 +177,7 @@ function DetailSheet({
                 aria-label={t("boothmap.boothImageDetailAria")}
                 className="mx-auto block max-h-[320px] w-auto max-w-full cursor-pointer rounded-xl"
               >
-                <img
+                <AzureImage
                   src={boothThumbnailUrl}
                   data-fallback-src={boothImageUrl}
                   alt={t("boothmap.boothImageAlt", { name: boothDetail.name })}
@@ -279,7 +280,7 @@ function DetailSheet({
                         aria-label={t("boothmap.pubImageDetailAria", { index: index + 1 })}
                         className="block w-full cursor-pointer rounded-[22px]"
                       >
-                        <img
+                        <AzureImage
                           src={displayImageUrl}
                           data-fallback-src={imageUrl}
                           alt={t("boothmap.pubImageAlt", { name: pubDetail.name, index: index + 1 })}
