@@ -152,3 +152,24 @@ GitHub `quality-check`와 `structure-check`는 테스트 실행 전 `LAYER_LIB_N
 로컬 검증은 전체 130개 파일·670개 테스트 및 커버리지 기준을 통과했다. 커버리지는 statements 49.46%, branches 47.41%, functions 46.74%, lines 49.24%다. 전체 ESLint, 전체/변경 파일 구조 검사, 순환 의존성 검사, 앱·테스트 타입 검사, 프로덕션 빌드 및 번들 예산 검사도 통과했다. 앱 엔트리 번들은 278.52 KiB / 488.28 KiB다. 기존 allowlist 만료 경고는 남아 있지만 구조 위반은 0건이다.
 
 이번 수정은 테스트와 문서만 변경하며 서비스 코드·Azure 설정·운영 데이터는 변경하지 않는다. 원격 GitHub 검사 결과는 PR의 최신 커밋 상태를 기준으로 확인한다.
+
+## 동료 변경 반영: AI 배경 대기·회원가입 복구 배포 (2026-10-15)
+
+배포 ID `20261015-colleague-signup-background`로 기존 FE 작업 브랜치의 동료 커밋 3개를 fast-forward로 가져와 Azure에 반영했다. FE는 `2ab73ad6`에서 `f1e0839da0e27e5391e25c166d99932dd8ffa8ed`, BE는 `4e807f8`에서 `e16c05a559187a94c675aa629ab7a637c32819ab`로 갱신했다. 충돌이나 추가 로컬 코드 수정은 없었다.
+
+### 사용자 화면에서 달라진 점
+
+- AI 배경 생성 요청 대기를 60초에서 180초로 늘렸다. 배경 생성 Promise를 공유하고 전체 적용 과정이 필요한 결과를 기다리도록 개선했다. BE도 공식 포스터를 참고한 새 AI 이미지 생성 방식으로 함께 배포했다.
+- Nginx의 `/api/admin/festival/ticketing-background/recommend` 전용 경로에 `proxy_read_timeout 180s`를 적용했다. BE의 외부 생성 요청 제한은 150초다. 타임아웃 확대가 실제 AI 요청 성공이나 모델 사용 권한을 보장하지는 않는다.
+- 모바일 티켓팅 OFF 안내 배경의 과도한 어두운 오버레이를 완화했다. 저장된 배경 이미지 자체를 교체하는 변경은 아니다.
+- 회원가입 마지막 단계의 네이버 ID·재입력 필드와 API 전송을 복구했다. BE의 필수값·길이·일치 검증 및 저장과 함께 반영했다. 기존 Azure `users.naver_id` 컬럼을 사용할 수 있어 스키마 이관은 실행하지 않았다.
+
+### 검증 결과와 범위
+
+로컬에서 `npm run lint`, `npm run typecheck`, `npm run typecheck:test`, `npm test`, `npm run build`가 모두 통과했다. 전체 테스트는 **131개 파일·679개**다. Browserslist 데이터 갱신 안내는 남아 있다. 해당 HEAD의 [quality CI](https://github.com/DKU-Dan-Zzan/Danzzan-FE/actions/runs/38697435431/job/116297233294), [구조 검사 CI](https://github.com/DKU-Dan-Zzan/Danzzan-FE/actions/runs/38697435456/job/116297232958), GitGuardian 성공도 확인했다. BE 검증은 같은 배포 HEAD의 CI 테스트·bootJar 성공과 VM 이미지 빌드로 확인했다.
+
+VM에서 BE·FE Docker 빌드 후 app의 healthy를 확인하고 frontend를 교체했다. Nginx 설정 검사와 전용 180초 설정을 확인했다. HTTPS 홈·공지·관리자 테마·테마 선택·회원가입·health·축제 설정·홈 이미지 조회의 8개 경로는 모두 200이었다. 실제 브라우저에서는 홈 로고·포스터의 정상 로드와 회원가입 첫 인증 화면을 확인했다. 학교 인증·SMS·회원가입 완료, 유료 AI 생성 및 테마 적용은 실행하지 않았다.
+
+배포 전후 20개 콘텐츠 테이블의 데이터 해시가 같고 MySQL·Redis·Kafka 컨테이너 ID 및 Compose·비공개 설정 파일 해시가 유지됐다. 기존 게시물·이미지에 쓰기 요청을 보내지 않았다. 전체 빌드 입력 979개 경로의 해시 일치로 배포 소스를 확인했다.
+
+복구 자료는 VM `/opt/danzzan/deployment-backups/20261015-colleague-signup-background/`에 보관한다. 이전 FE 이미지 태그는 `danzzan-fe:rollback-20261015-colleague-signup-background`, 이전 BE는 `danzzan-be:rollback-20261015-colleague-signup-background`다. 이전 이미지로 app·frontend만 재생성하며 DB·볼륨을 되돌릴 필요는 없다. 세부 기록과 복구 범위는 [BE 배포 문서](../../Danzzan-BE/docs/azure-vm-deployment.md)의 같은 배포 ID 절을 참고한다. 비밀키·비밀번호·DB 덤프는 문서에 포함하지 않는다.
