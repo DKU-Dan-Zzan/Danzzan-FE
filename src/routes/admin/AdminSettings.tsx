@@ -560,7 +560,7 @@ export default function AdminSettings({ ticketingOnly = false }: { ticketingOnly
               )}
             </div>
           )}
-          {!settings.ticketingEnabled && <p className="mt-4 rounded-xl bg-[var(--surface-subtle)] p-3 text-sm text-[var(--text-muted)]">티켓팅을 OFF로 저장하면 예매와 내 티켓 화면이 입장 안내로 바뀝니다. 로그인·회원가입·내정보와 팔찌 배부 관리는 이용할 수 있습니다. 기존 회차와 발급 티켓은 보관되며, 다시 ON으로 저장하면 조회할 수 있습니다. 아래 배경은 입장 안내와 내 정보 화면에 함께 적용됩니다.</p>}
+          {!settings.ticketingEnabled && <p className="mt-4 rounded-xl bg-[var(--surface-subtle)] p-3 text-sm text-[var(--text-muted)]">티켓팅을 OFF로 저장하면 예매와 내 티켓 화면이 입장 안내로 바뀝니다. 로그인·회원가입·내정보와 팔찌 배부 관리는 이용할 수 있습니다. 기존 회차와 발급 티켓은 보관되며, 다시 ON으로 저장하면 조회할 수 있습니다. 아래 배경은 티켓팅 OFF 입장 안내에 적용됩니다. 내 정보는 공식 축제 포스터를 사용합니다.</p>}
           <div className="mt-6" aria-label="사용자 화면 배경 설정">
           {settings.ticketingEnabled ? <TicketingBackgroundField key="ticket" mode="ticket" festivalName={settings.festivalName} url={settings.ticketCardBackgroundImageUrl} file={ticketCardBackgroundFile} previewUrl={ticketCardBackgroundImage?.previewUrl} disabled={isSaving || isLoading} onFile={(file) => { setTicketCardBackgroundImage({ file, previewUrl: URL.createObjectURL(file) }); setIsEditing(true) }} onReset={() => { setIsEditing(true); setTicketCardBackgroundImage(null); updateSettings({ ticketCardBackgroundImageUrl: null }) }} />
           : <TicketingBackgroundField key="closed" url={settings.ticketingBackgroundImageUrl} file={backgroundFile} previewUrl={backgroundImage?.previewUrl} disabled={isSaving || isLoading} onFile={handleBackgroundFile} onReset={() => { setIsEditing(true); setBackgroundImage(null); updateSettings({ ticketingBackgroundImageUrl: null }) }} />}

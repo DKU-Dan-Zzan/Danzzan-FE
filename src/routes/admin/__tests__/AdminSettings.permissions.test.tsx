@@ -198,7 +198,7 @@ describe("AdminSettings unified save", () => {
     api.get.mockResolvedValue({ ...settings, ...backgrounds, ticketingEnabled: enabled })
     await render()
     const expectEditor = (ticketingEnabled: boolean) => {
-      expect(container.textContent?.includes("아래 배경은 입장 안내와 내 정보 화면에 함께 적용됩니다.")).toBe(!ticketingEnabled)
+      expect(container.textContent?.includes("아래 배경은 티켓팅 OFF 입장 안내에 적용됩니다. 내 정보는 공식 축제 포스터를 사용합니다.")).toBe(!ticketingEnabled)
       expect(container.querySelectorAll('input[type="file"]')).toHaveLength(1)
       expect(container.querySelector('input[aria-label="발급 티켓 배경 사진 선택"]') !== null).toBe(ticketingEnabled)
       expect(container.querySelector('input[aria-label="입장 안내 배경 사진 선택"]') !== null).toBe(!ticketingEnabled)

@@ -230,7 +230,8 @@ function App() {
             <Route path="ticketing" element={withRouteSuspense(<AdminSettings key="ticketing" ticketingOnly />)} />
           </Route>
           <Route element={<ProtectedAdminPermissionRoute permission="OPERATIONS" />}>
-            <Route path="theme" element={withRouteSuspense(<AdminTheme />)} />
+            <Route path="theme/select" element={withRouteSuspense(<AdminTheme key="theme-select" mode="select" />)} />
+            <Route path="theme" element={withRouteSuspense(<AdminTheme key="theme-manage" mode="manage" />)} />
             <Route path="notices" element={withRouteSuspense(<Admin />)} />
             <Route path="ads" element={<Navigate to="/admin/notices#ad-banners" replace />} />
             <Route path="boothmap" element={<Navigate to="/admin/boothmap/layout" replace />} />

@@ -47,7 +47,7 @@ describe("FestivalBrandingImage", () => {
     expect(image.getAttribute("src")).toBe(branding.posterImageUrl);
     document.documentElement.style.removeProperty("--theme-brand-strong");
     await act(async () => image.dispatchEvent(new Event("error")));
-    expect(host.querySelector("img")?.getAttribute("src")).toBe("/posters/legend-poster-vertical.jpeg");
+    expect(host.querySelector("img")?.getAttribute("src")).toBe("/posters/legend-poster-홈화면와이드규격.jpeg");
   });
 
   it("uses bundled images when the API has no branding and accepts a changed URL", async () => {

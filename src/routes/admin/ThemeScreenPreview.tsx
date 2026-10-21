@@ -184,15 +184,15 @@ function PreviewIssuedTicket({ backgroundOverride }: { backgroundOverride?: stri
   </div>;
 }
 
-function PreviewMyPage({ backgroundOverride }: { backgroundOverride?: string }) {
-  const background = useFestivalPortraitBackground(backgroundOverride);
+function PreviewMyPage() {
+  const background = useFestivalPortraitBackground();
   return <div className="min-h-0 flex-1 overflow-y-auto bg-[var(--poster-bg)]">
     <div className="relative h-64 overflow-hidden">
-      {background.src && <img src={background.src} onError={background.onError} alt="내 정보 추천 배경" className="absolute inset-0 h-full w-full object-cover object-top" />}
+      {background.src && <img src={background.src} onError={background.onError} onLoad={background.onLoad} alt="내 정보 공식 포스터" className="absolute inset-0 h-full w-full object-cover object-top" />}
       <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,.58), rgba(0,0,0,.62) 50%, var(--poster-bg))" }} />
       <div className="absolute bottom-6 left-5 flex items-end gap-3 text-white"><div className="rounded-full border border-white/30 bg-white/20 p-4"><User size={36} /></div><div><p className="text-2xl font-bold">축제 참여자</p><p className="mt-1 text-sm text-white/80">단국대학교 재학생</p></div></div>
     </div>
-    <div className="m-4 rounded-2xl bg-white p-5 text-[var(--poster-navy)]"><h3 className="font-semibold">내 정보</h3><p className="mt-3 text-sm">계정 관리</p><p className="mt-5 text-xs text-[var(--text-muted)]">샘플 프로필입니다. 내 정보 배경은 티켓팅 ON/OFF와 관계없이 적용됩니다.</p></div>
+    <div className="m-4 rounded-2xl bg-white p-5 text-[var(--poster-navy)]"><h3 className="font-semibold">내 정보</h3><p className="mt-3 text-sm">계정 관리</p><p className="mt-5 text-xs text-[var(--text-muted)]">샘플 프로필입니다. 내 정보 배경에는 공식 축제 포스터가 표시됩니다.</p></div>
   </div>;
 }
 
@@ -219,7 +219,7 @@ export function ThemeScreenPreview({ data, branding = null, embedded = false, ba
           {tab === "home" ? <div className="min-h-0 flex-1 bg-[var(--surface)]">
             {homePreview ? <HomePosterImage src={homePreview} alt="홈 대표 이미지 미리보기" />
               : <div className="flex h-full items-center justify-center px-6 text-center text-sm text-[var(--text-muted)]">홈 대표 이미지를 준비하면 여기에 표시됩니다.</div>}
-          </div> : tab === "map" ? <PreviewBoothMap /> : tab === "mypage" ? <PreviewMyPage backgroundOverride={backgrounds?.closed} /> : tab === "issued" ? <PreviewIssuedTicket backgroundOverride={backgrounds?.ticket} /> : <PreviewTicketing backgroundOverride={backgrounds?.closed} forceClosed={false} />}
+          </div> : tab === "map" ? <PreviewBoothMap /> : tab === "mypage" ? <PreviewMyPage /> : tab === "issued" ? <PreviewIssuedTicket backgroundOverride={backgrounds?.ticket} /> : <PreviewTicketing backgroundOverride={backgrounds?.closed} forceClosed={false} />}
           <PreviewBottomNav active={tab === "issued" ? "ticketing" : tab} />
         </FestivalBrandingContext.Provider>
       </div>

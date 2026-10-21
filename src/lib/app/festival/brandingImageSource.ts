@@ -3,7 +3,7 @@ import { useFestivalBranding } from "@/lib/app/festival/festivalBrandingContext"
 import { resolveBrandingImageUrl } from "@/lib/app/festival/brandingImageUrl";
 
 export const DEFAULT_FESTIVAL_LOGO = "/legend-logo.png";
-export const DEFAULT_FESTIVAL_POSTER = "/posters/legend-poster-vertical.jpeg";
+export const DEFAULT_FESTIVAL_POSTER = "/posters/legend-poster-홈화면와이드규격.jpeg";
 
 export type FestivalBrandingImageKind = "logo" | "poster";
 

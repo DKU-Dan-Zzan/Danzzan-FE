@@ -4,11 +4,14 @@ import { renderToStaticMarkup } from "react-dom/server";
 import PosterCarousel from "@/components/app/home/PosterCarousel";
 
 describe("PosterCarousel", () => {
-  it("keeps the complete home poster visible above a blurred backdrop in fullscreen mode", () => {
+  it("fills the home hero like the May release without added image insets or a blurred backdrop", () => {
     const markup = renderToStaticMarkup(<PosterCarousel posters={[{ id: "p1", imageUrl: "/whole-poster.jpg", alt: "공식 포스터 전체" }]} fillViewport />);
-    expect(markup).toContain('object-contain');
-    expect(markup).toContain('aria-hidden="true"');
-    expect(markup).toContain('blur-2xl');
+    expect(markup).toContain('h-full w-full object-cover');
+    expect(markup).not.toContain('object-contain');
+    expect(markup).not.toContain('top-[calc(68px');
+    expect(markup).not.toContain('bottom-[calc(var(--app-bottom-nav-height');
+    expect(markup).not.toContain('aria-hidden="true"');
+    expect(markup).not.toContain('blur-2xl');
     expect(markup.match(/alt="공식 포스터 전체"/g)).toHaveLength(1);
   });
 

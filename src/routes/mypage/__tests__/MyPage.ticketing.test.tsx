@@ -32,6 +32,7 @@ afterEach(async () => {
   client.clear();
   container.remove();
   authStore.clear();
+  setTicketingBackgroundImageUrl(null);
   setTicketingEnabled(false);
 });
 async function render(posterImageUrl: string | null = null) {
@@ -50,7 +51,7 @@ it("공식 포스터를 기존 상단 hero에 사용하고, 실패하면 정적 
   expect(container.textContent).toContain("테스트 학생");
   expect(container.textContent).toContain("내 정보");
   await act(async () => hero.dispatchEvent(new Event("error")));
-  expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.getAttribute("src")).toBe("/posters/legend-poster-vertical.jpeg");
+  expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.getAttribute("src")).toBe("/posters/legend-poster-홈화면와이드규격.jpeg");
   expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.className).toContain("object-[50%_44%]");
   expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.nextElementSibling?.getAttribute("style")).toContain("22%");
 });
@@ -62,7 +63,7 @@ it("비로그인 안내 화면도 공식 포스터와 정적 fallback을 사용�
   expect(poster.className).toContain("object-cover object-top");
   expect(poster.style.transform).toBe("none");
   await act(async () => poster.dispatchEvent(new Event("error")));
-  expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.getAttribute("src")).toBe("/posters/legend-poster-vertical.jpeg");
+  expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.getAttribute("src")).toBe("/posters/legend-poster-홈화면와이드규격.jpeg");
   expect(container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')?.className).toContain("object-[50%_38%]");
 });
 it("OFF여도 내정보와 계정 관리는 열리지만 티켓 조회 요청과 메뉴는 없다", async () => {
@@ -84,12 +85,17 @@ it("ON에서 조회한 티켓 수량도 OFF로 바뀌면 숨긴다", async () =>
   expect(container.textContent).toContain("테스트 학생");
 });
 
-it.each([true, false])("추천 세로 배경은 티켓팅 %s에서도 내 정보에 적용되며 실패 시 공식 포스터로 돌아간다", async (enabled) => {
+it.each([
+  [true, true], [true, false], [false, true], [false, false],
+])("티켓팅 %s, 로그인 %s에서도 OFF 배경 대신 공식 포스터를 사용한다", async (enabled, loggedIn) => {
   setTicketingEnabled(enabled);
-  setTicketingBackgroundImageUrl("http://localhost:8080/uploads/recommended-portrait.jpg");
-  await render("http://localhost:8080/uploads/official-poster.jpg");
+  if (!loggedIn) authStore.clear();
+  setTicketingBackgroundImageUrl("https://cdn.example.com/closed-background.jpg");
+  await render("https://cdn.example.com/official-poster.jpg");
   const hero = container.querySelector<HTMLImageElement>('img[aria-hidden="true"]')!;
-  expect(hero.getAttribute("src")).toBe("http://localhost:8080/uploads/recommended-portrait.jpg");
+  expect(hero.getAttribute("src")).toBe("https://cdn.example.com/official-poster.jpg");
+  await act(async () => setTicketingBackgroundImageUrl("https://cdn.example.com/changed-background.jpg"));
+  expect(hero.getAttribute("src")).toBe("https://cdn.example.com/official-poster.jpg");
   await act(async () => hero.dispatchEvent(new Event("error")));
-  expect(hero.getAttribute("src")).toBe("http://localhost:8080/uploads/official-poster.jpg");
+  expect(hero.getAttribute("src")).toBe("/posters/legend-poster-홈화면와이드규격.jpeg");
 });

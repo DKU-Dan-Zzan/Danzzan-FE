@@ -58,6 +58,7 @@ describe("adminThemeApi", () => {
     await adminThemeApi.update(7, payload);
     await adminThemeApi.delete(7);
     await adminThemeApi.activate(7);
+    await adminThemeApi.activateDefault();
     request.mockResolvedValue({ candidates: (["balanced", "vibrant", "deep"] as const).map((id) => ({
       id, name: id, description: id, themeData,
     })) });
@@ -70,6 +71,7 @@ describe("adminThemeApi", () => {
       [`${base}/7`, { method: "PUT", body: JSON.stringify(payload) }],
       [`${base}/7`, { method: "DELETE" }],
       [`${base}/7/activate`, { method: "PUT" }],
+      [`${base}/default/activate`, { method: "PUT" }],
       [`${base}/recommend`, { method: "POST", body: JSON.stringify({ sourceColors: ["#4EB15E"], selectedBaseColor: "#4EB15E" }) }],
     ]);
     expect(Object.values(themeData).flatMap((group) => Object.values(group))).toHaveLength(14);

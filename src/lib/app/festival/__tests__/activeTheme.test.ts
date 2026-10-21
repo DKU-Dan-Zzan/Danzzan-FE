@@ -9,6 +9,7 @@ import {
   loadActiveFestivalTheme,
   THEME_CORE_VARIABLES,
 } from "@/lib/app/festival/activeTheme";
+import { getDefaultThemeData } from "@/lib/app/festival/defaultTheme";
 import type { ThemeData } from "@/api/app/festival/activeThemeApi";
 
 const testTheme: ThemeData = {
@@ -42,6 +43,20 @@ afterEach(() => {
 });
 
 describe("active festival Theme", () => {
+  it("keeps the bundled default equal to all 14 original CSS colors, independent of active overrides", () => {
+    const css = fs.readFileSync(path.resolve(__dirname, "../../../../index.css"), "utf8");
+    applyThemeData(testTheme);
+    const defaults = getDefaultThemeData();
+    for (const group of Object.keys(THEME_CORE_VARIABLES) as Array<keyof ThemeData>) {
+      for (const [key, variable] of Object.entries(THEME_CORE_VARIABLES[group])) {
+        const cssValue = css.match(new RegExp(`${variable}:\\s*(#[a-fA-F0-9]{6});`))?.[1];
+        expect((defaults[group] as Record<string, string>)[key]).toBe(cssValue);
+      }
+    }
+    defaults.brand.primary = "#000000";
+    expect(getDefaultThemeData().brand.primary).toBe("#ff642d");
+  });
+
   it("maps all 14 Theme colors onto :root", () => {
     applyThemeData(testTheme);
 
@@ -74,14 +89,16 @@ describe("active festival Theme", () => {
     expect(document.documentElement.style.getPropertyValue("--theme-category-facility")).toBe("#EF0123");
   });
 
-  it("leaves bundled defaults untouched on 204", async () => {
-    document.documentElement.style.setProperty("--theme-brand-primary", "#ff642d");
+  it("restores bundled defaults on 204 even after a custom theme was applied", async () => {
+    applyThemeData(testTheme);
+    document.documentElement.style.setProperty("--unrelated-token", "keep");
     vi.spyOn(http, "get").mockResolvedValue({ status: 204, data: "" });
 
     await loadActiveFestivalTheme();
 
-    expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");
-    expect(document.documentElement.style.getPropertyValue("--theme-category-pub")).toBe("");
+    for (const variable of allVariables) expect(document.documentElement.style.getPropertyValue(variable)).toBe("");
+    expect(document.documentElement.style.getPropertyValue("--unrelated-token")).toBe("keep");
+    document.documentElement.style.removeProperty("--unrelated-token");
   });
 
   it("keeps existing colors on request failure", async () => {

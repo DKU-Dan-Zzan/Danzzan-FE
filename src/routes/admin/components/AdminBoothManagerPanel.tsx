@@ -1,4 +1,5 @@
 ﻿import { useEffect, useMemo, useState, type ChangeEvent, type ReactNode } from "react";
+import { AzureImage } from "@/components/common/AzureImage";
 import {CheckCircle2, ImagePlus, Plus, RefreshCcw, Save, Search, Star, Trash2, X} from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -1668,7 +1669,7 @@ export default function AdminBoothManagerPanel({
                               )}
                             >
                               <div className="relative aspect-[4/3] bg-[var(--surface-subtle)]">
-                                <img
+                                <AzureImage
                                   src={image.previewUrl}
                                   alt={image.file.name}
                                   className="h-full w-full object-cover"
@@ -1746,7 +1747,7 @@ export default function AdminBoothManagerPanel({
                             )}
                           >
                             <div className="relative aspect-[4/3] bg-[var(--surface-subtle)]">
-                              <img
+                              <AzureImage
                                 src={image.imageUrl}
                                 alt={`${selectedPub?.name ?? "주점"} 이미지 ${image.id}`}
                                 className="h-full w-full object-cover"

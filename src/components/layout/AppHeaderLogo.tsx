@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { cn } from "@/components/common/ui/utils";
 import { useFestivalBrandingImageSource } from "@/lib/app/festival/brandingImageSource";
+import { AzureImage } from "@/components/common/AzureImage";
 type AppHeaderLogoProps = {
   className?: string;
 };
@@ -19,7 +20,7 @@ export function AppHeaderLogo({ className }: AppHeaderLogoProps) {
   const sizeClassName = paddedWideLogo ? "h-11 w-[120px]" : "h-7 w-[98px]";
 
   return (
-    <img
+    <AzureImage
       src={logo.src}
       alt={logo.useUploaded ? "축제 로고" : "LEGEND"}
       className={cn(BASE_CLASS_NAME, sizeClassName, className)}

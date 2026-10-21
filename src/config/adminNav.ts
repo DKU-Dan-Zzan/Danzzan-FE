@@ -31,6 +31,7 @@ export const ADMIN_NAV_MENUS: AdminNavMenu[] = [
     label: "테마",
     path: "/admin/theme",
     items: [
+      { label: "테마 선택", path: "/admin/theme/select", description: "저장된 테마를 미리 보고 적용" },
       { label: "AI 테마 추천", path: "/admin/theme#theme-ai", description: "포스터 분석과 추천 시안" },
       { label: "테마 관리", path: "/admin/theme#theme-management", description: "편집·저장·활성화" },
     ],

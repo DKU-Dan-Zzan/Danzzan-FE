@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { cn } from "@/components/common/ui/utils"
 import { useT } from "@/i18n"
+import { AzureImage } from "@/components/common/AzureImage"
 
 export interface AdSlide {
   imageUrl: string
@@ -152,7 +153,7 @@ export function AdCarousel({
     const url = buildVersionedUrl(slide.imageUrl, slide.updatedAt)
     const safeLinkUrl = sanitizeExternalHttpsUrl(slide.linkUrl)
     const img = (
-      <img
+      <AzureImage
         src={url}
         alt={slide.alt ?? t("common.adBannerAlt")}
         className={imageClassName}
@@ -205,7 +206,7 @@ export function AdCarousel({
           const safeLinkUrl = sanitizeExternalHttpsUrl(slide.linkUrl)
           const isCurrent = idx === displayIndex
           const img = (
-            <img
+            <AzureImage
               src={url}
               alt={slide.alt ?? t("common.adBannerAlt")}
               className={imageClassName}

@@ -3,6 +3,7 @@ import { ChevronRight, Clock3 } from "lucide-react";
 import type { Pub } from "@/types/app/boothmap/boothmap.types";
 import { formatOperatingTime } from "@/utils/app/boothmap/formatOperatingTime";
 import { useT } from "@/i18n";
+import { AzureImage } from "@/components/common/AzureImage";
 
 function PubList({
   pubs,
@@ -87,7 +88,7 @@ function PubList({
             </div>
 
             {(pub.thumbnailUrl || pub.mainImageUrl) && (
-              <img
+              <AzureImage
                 src={pub.thumbnailUrl || pub.mainImageUrl}
                 data-fallback-src={pub.mainImageUrl}
                 loading="lazy"

@@ -95,6 +95,7 @@ export function PaperTicketCard({ ticket, backgroundImageUrl }: PaperTicketCardP
         {background.src && <image
           href={background.src}
           onError={background.onError}
+          onLoad={background.onLoad}
           x="0" y="0"
           width="400" height="180"
           preserveAspectRatio="xMidYMid slice"

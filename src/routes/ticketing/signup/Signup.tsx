@@ -9,10 +9,13 @@ import {
   Check,
   RefreshCw,
   CheckCircle2,
+  XCircle,
   Send,
   X,
   Eye,
   EyeOff,
+  ArrowDown,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { Checkbox } from "@/components/common/ui/checkbox";
@@ -109,7 +112,7 @@ const CONSENT_ITEMS: { id: number; title: string; required: boolean; content: Re
           <ul className="mt-1 space-y-1">
             <li>
               - 이용자 본인 확인 및 서비스 제공에 관한 정보: 학번, 본 서비스 비밀번호(암호화 저장),
-              연락처(휴대전화번호), 학적정보(재학·수료·졸업 구분), 소속(전공)
+              연락처(휴대전화번호), 학적정보(재학·수료·졸업 구분), 소속(전공), 네이버 아이디
             </li>
             <li>
               - 회원가입 과정에서 일시적으로 수집 후 즉시 폐기되는 정보: 단국대학교 포털 비밀번호
@@ -195,6 +198,11 @@ const AUTH_PLACEHOLDER_CLASS =
   "text-[0.96rem] sm:text-[0.98rem] placeholder:text-[0.8rem] sm:placeholder:text-[0.84rem] placeholder:tracking-[-0.01em]";
 
 const STEP_LABELS = ["단국대 인증", "전화번호 인증", "가입 완료"] as const;
+const NAVER_ID_REQUIRED_ERROR_MESSAGE = "네이버 아이디를 입력해 주세요.";
+const NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE = "네이버 아이디가 서로 일치하지 않습니다.";
+const NAVER_ID_LABEL_CLASS_NAME = "text-[var(--naver-green)]";
+const NAVER_ID_INPUT_CLASS_NAME =
+  "border-[var(--naver-green)] focus-visible:border-[var(--naver-green)] focus-visible:shadow-[0_0_0_4px_rgba(3,199,90,0.18)]";
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
@@ -455,6 +463,8 @@ export default function Signup() {
   // ── Step 3 상태
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [naverId, setNaverId] = useState("");
+  const [naverIdConfirm, setNaverIdConfirm] = useState("");
   const [step3Error, setStep3Error] = useState<string | null>(null);
 
   // ── 비밀번호 표시 토글
@@ -463,6 +473,7 @@ export default function Signup() {
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(true);
 
   const passwordPolicy = getPasswordPolicyState(password, passwordConfirm);
+  const isNaverIdMatched = naverId.trim().length > 0 && naverId.trim() === naverIdConfirm.trim();
 
   // ── 타이머
   useEffect(() => {
@@ -630,12 +641,24 @@ export default function Signup() {
       return;
     }
 
+    if (!naverId.trim() || !naverIdConfirm.trim()) {
+      setStep3Error(NAVER_ID_REQUIRED_ERROR_MESSAGE);
+      return;
+    }
+
+    if (!isNaverIdMatched) {
+      setStep3Error(NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE);
+      return;
+    }
+
     setSubmitting(true);
     try {
       await signupApi.completeSignup(
         signupToken,
         password,
         passwordConfirm,
+        naverId.trim(),
+        naverIdConfirm.trim(),
         phoneVerificationSessionId,
       );
       setSignupComplete(true);
@@ -1194,6 +1217,97 @@ export default function Signup() {
                         </p>
                       </div>
 
+                      {/* May signup section; keep the brand token local and avoid the removed SVG asset. */}
+                      <div className="space-y-3 rounded-xl border border-[rgba(3,199,90,0.22)] bg-[rgba(3,199,90,0.03)] p-3.5 [--naver-green:rgb(3,199,90)]">
+                        <div className="flex items-center gap-2.5">
+                          <div aria-hidden="true" className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] bg-[var(--naver-green)] text-[13px] font-black text-white">
+                            N
+                          </div>
+                          <span className="text-[13px] font-bold text-[var(--text)]">입장 확인용 네이버 아이디 등록</span>
+                        </div>
+
+                        <div className="flex items-start gap-2 rounded-lg bg-[rgba(3,199,90,0.08)] px-3 py-2.5">
+                          <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--naver-green)]" strokeWidth={2.2} />
+                          <p className="text-[11.5px] leading-[1.6] text-[var(--text-muted)]">
+                            얼굴인식 입장(FaceSign)에 사용할 네이버 아이디를 정확히 확인해 주세요.<br />
+                            오입력을 방지하기 위해 동일한 아이디를 한 번 더 입력합니다.
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="naverId" className={cn("text-sm font-semibold", NAVER_ID_LABEL_CLASS_NAME)}>
+                            네이버 아이디
+                          </Label>
+                          <div className="relative">
+                            <Input
+                              id="naverId"
+                              value={naverId}
+                              onChange={(e) => {
+                                if (step3Error === NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE || step3Error === NAVER_ID_REQUIRED_ERROR_MESSAGE) setStep3Error(null);
+                                setNaverId(e.target.value);
+                              }}
+                              placeholder="네이버 아이디 입력 (@naver.com 제외)"
+                              className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS, NAVER_ID_INPUT_CLASS_NAME, "pr-10")}
+                              autoComplete="username"
+                              autoCapitalize="none"
+                              spellCheck={false}
+                              required
+                              disabled={submitting}
+                            />
+                            {naverId.trim().length > 0 && (
+                              naverIdConfirm.trim().length > 0 && !isNaverIdMatched
+                                ? <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--status-danger-text)]" strokeWidth={2} />
+                                : <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--naver-green)]" strokeWidth={2} />
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex justify-center">
+                          <ArrowDown className="h-4 w-4 text-[var(--naver-green)]" strokeWidth={2.2} />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="naverIdConfirm" className={cn("text-sm font-semibold", NAVER_ID_LABEL_CLASS_NAME)}>
+                            네이버 아이디 재입력
+                          </Label>
+                          <div className="relative">
+                            <Input
+                              id="naverIdConfirm"
+                              value={naverIdConfirm}
+                              onChange={(e) => {
+                                if (step3Error === NAVER_ID_CONFIRM_MISMATCH_ERROR_MESSAGE || step3Error === NAVER_ID_REQUIRED_ERROR_MESSAGE) setStep3Error(null);
+                                setNaverIdConfirm(e.target.value);
+                              }}
+                              placeholder="네이버 아이디를 다시 입력해 주세요"
+                              className={cn(TICKETING_AUTH_INPUT_CLASS_NAME, AUTH_PLACEHOLDER_CLASS, NAVER_ID_INPUT_CLASS_NAME, "pr-10")}
+                              autoComplete="off"
+                              autoCapitalize="none"
+                              spellCheck={false}
+                              required
+                              disabled={submitting}
+                            />
+                            {naverIdConfirm.trim().length > 0 && (
+                              !isNaverIdMatched
+                                ? <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--status-danger-text)]" strokeWidth={2} />
+                                : <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--naver-green)]" strokeWidth={2} />
+                            )}
+                          </div>
+
+                          {isNaverIdMatched && (
+                            <div className="flex items-center gap-1.5 pl-0.5">
+                              <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[var(--naver-green)]" strokeWidth={2.2} />
+                              <span className="text-[11.5px] font-medium text-[var(--naver-green)]">입력한 네이버 아이디가 일치합니다.</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex items-start gap-2 rounded-lg bg-[var(--status-danger-bg)] px-3 py-2.5">
+                          <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--status-danger-text)]" strokeWidth={2} />
+                          <p className="text-[11.5px] leading-[1.6] text-[var(--status-danger-text)]">
+                            빠른 단국존 입장을 위해서는 네이버 Face Sign 사전 인증이 필요합니다.
+                          </p>
+                        </div>
+                      </div>
                     </section>
 
                     {step3Error && <ErrorBox message={step3Error} />}

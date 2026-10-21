@@ -3,6 +3,7 @@ import { HomePosterImage } from "@/components/app/home/HomePosterImage"
 import { clsx } from "clsx"
 import { useEffect, useMemo, useState } from "react"
 import { useT } from "@/i18n"
+import { AzureImage } from "@/components/common/AzureImage"
 
 export type Poster = {
   id: string
@@ -91,7 +92,7 @@ export default function PosterCarousel({
           >
             {posters.map((p) => (
               <div key={p.id} className="relative h-full min-w-full">
-                {fillViewport ? <HomePosterImage src={p.imageUrl} alt={p.alt ?? t("home.posterFallbackAlt")} safeArea /> : <img
+                {fillViewport ? <HomePosterImage src={p.imageUrl} alt={p.alt ?? t("home.posterFallbackAlt")} /> : <AzureImage
                   src={p.imageUrl}
                   alt={p.alt ?? t("home.posterFallbackAlt")}
                   className="h-full w-full object-cover"
