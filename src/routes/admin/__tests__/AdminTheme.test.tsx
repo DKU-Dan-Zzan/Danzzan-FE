@@ -380,6 +380,30 @@ describe("AdminTheme", () => {
     expect(adminThemeApi.activate).not.toHaveBeenCalled();
   });
 
+  it("keeps a palette recommendation alive through 150 seconds and aborts it at 180 seconds", async () => {
+    vi.useFakeTimers();
+    try {
+      let signal: AbortSignal | undefined;
+      vi.mocked(adminThemeApi.recommend).mockImplementation(async (_payload, requestSignal) => {
+        signal = requestSignal;
+        return await new Promise<ThemeRecommendationResponse>(() => {});
+      });
+
+      await prepareRecommendation();
+      await act(async () => { buttons("다시 추천받기")[0].click(); });
+      expect(signal).toBeDefined();
+
+      await act(async () => { await vi.advanceTimersByTimeAsync(60_000); });
+      expect(signal?.aborted).toBe(false);
+      await act(async () => { await vi.advanceTimersByTimeAsync(90_000); });
+      expect(signal?.aborted).toBe(false);
+      await act(async () => { await vi.advanceTimersByTimeAsync(30_000); });
+      expect(signal?.aborted).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("saves only the first home image without recommendations or ticketing permission and reuses staged upload after failure", async () => {
     permissions.role = "manager"; permissions.permissions = ["OPERATIONS"];
     vi.mocked(festivalBrandingApi.get).mockResolvedValue({ festivalSettingId: 1, posterImageUrl: "https://cdn.example.com/poster.png", logoImageUrl: null });

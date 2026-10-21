@@ -254,7 +254,7 @@ export default function AdminTheme({ mode = "manage" }: { mode?: "manage" | "sel
     recommendationRequest.current = controller;
     const version = ++recommendationVersion.current;
     const current = () => version === recommendationVersion.current && !controller.signal.aborted;
-    const timeout = setTimeout(() => controller.abort(), 60_000);
+    const timeout = setTimeout(() => controller.abort(), 180_000);
     setRecommending(true);
     setRecommendationError(null);
     setBundleError(null);
