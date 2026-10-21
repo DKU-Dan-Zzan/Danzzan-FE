@@ -173,3 +173,28 @@ VM에서 BE·FE Docker 빌드 후 app의 healthy를 확인하고 frontend를 교
 배포 전후 20개 콘텐츠 테이블의 데이터 해시가 같고 MySQL·Redis·Kafka 컨테이너 ID 및 Compose·비공개 설정 파일 해시가 유지됐다. 기존 게시물·이미지에 쓰기 요청을 보내지 않았다. 전체 빌드 입력 979개 경로의 해시 일치로 배포 소스를 확인했다.
 
 복구 자료는 VM `/opt/danzzan/deployment-backups/20261015-colleague-signup-background/`에 보관한다. 이전 FE 이미지 태그는 `danzzan-fe:rollback-20261015-colleague-signup-background`, 이전 BE는 `danzzan-be:rollback-20261015-colleague-signup-background`다. 이전 이미지로 app·frontend만 재생성하며 DB·볼륨을 되돌릴 필요는 없다. 세부 기록과 복구 범위는 [BE 배포 문서](../../Danzzan-BE/docs/azure-vm-deployment.md)의 같은 배포 ID 절을 참고한다. 비밀키·비밀번호·DB 덤프는 문서에 포함하지 않는다.
+
+## 내 정보·로그인 안내 배경 분리 배포 (2026-10-21)
+
+배포 ID는 `20261021-account-background-48d0e8a0`이며, FE 커밋 [`48d0e8a0`](https://github.com/DKU-Dan-Zzan/Danzzan-FE/commit/48d0e8a0f7ecca82c37165059030756625c5b9ce)를 기존 `DANZ-373-fe-azure-blob-storage-전환에-따른-이미지-업로드-연동-수정` 브랜치에 커밋·푸시한 뒤 Azure에 반영했다. main 병합은 실행하지 않았다.
+
+### 화면 변경
+
+기존에는 티켓팅 OFF 안내 배경을 바꾸면 내 정보와 비로그인 안내 배경도 함께 바뀌었다. 이제 두 계정 화면은 공식 축제 포스터를 사용하고, 포스터가 없거나 로드에 실패하면 기본 포스터로 대체한다. 티켓팅 ON/OFF나 OFF 배경 변경은 계정 화면의 이미지 선택에 영향을 주지 않는다.
+
+- `useFestivalPortraitBackground`에서 티켓팅 OFF 배경 구독을 제거했다. 기존 Azure 이미지 URL 갱신과 이미지 실패 시 대체 처리는 유지한다.
+- 관리자 내 정보 미리보기에도 공식 포스터를 사용한다. 추천된 OFF 배경을 미리보기로 전달하던 연결을 제거했다.
+- 관리자 테마·축제 설정의 안내 문구를 수정했다. 발급 티켓과 OFF 입장 안내의 전용 배경 설정은 유지한다.
+- DB의 이미지 참조나 Blob 파일을 교체하지 않고 FE의 이미지 선택만 변경했다. 기존 그라데이션·이미지 표시 스타일은 변경하지 않았다.
+
+### 검증 결과와 범위
+
+- 로컬에서 관련 **4개 테스트 파일·108개 테스트**, 앱·테스트 타입 검사, 변경 파일 ESLint, 프로덕션 빌드와 `git diff --check`가 통과했다. 전체 테스트·커버리지를 다시 실행한 것은 아니다.
+- 회귀 테스트는 로그인/비로그인 × 티켓팅 ON/OFF 네 조합, OFF 배경 변경 후 공식 포스터 유지, 공식 포스터 로드 실패 시 기본 이미지 사용을 확인한다. 관리자 추천 배경과 내 정보 미리보기의 분리 및 기존 티켓 배경 동작도 확인했다.
+- VM Docker 빌드 후 `frontend`만 교체했다. Nginx 설정 검사와 HTTPS `/`, `/mypage`, `/ticket`, `/admin/theme`, `/api/health` 요청이 성공했다. `/mypage`와 `/api/health`는 외부에서 HTTP 200을 별도로 확인했다.
+- 실제 운영 브라우저의 비로그인 `/mypage`에서 공식 포스터와 로고의 이미지 로드를 확인했다. 배포된 `MyPage-oes32tms.js`와 외부 HTTPS 응답의 SHA-256도 일치했다.
+- 로그인 후 내 정보 화면은 자동 테스트로 확인했으며, 이번 배포에서 운영 계정으로 로그인해 다시 확인하지는 않았다. 유료 AI 생성·테마 적용·이미지 업로드는 실행하지 않았다.
+
+BE·MySQL·Redis·Kafka 컨테이너 ID와 Compose·기존 비공개 환경 파일 해시는 배포 전후 동일했다. SQL 이관·DB 복원·데이터 초기화는 실행하지 않았다. 이번에는 DB 내용의 덤프 해시 비교를 별도로 수행하지 않았으므로, 컨테이너 보존 확인과 데이터 내용 비교를 구분한다.
+
+복구 자료는 `/opt/danzzan/deployment-backups/20261021-account-background-48d0e8a0/`, 이전 FE 이미지는 `danzzan-fe:rollback-20261021-account-background-48d0e8a0`이다. 복구 명령과 자료 목록은 [BE Azure 배포 문서](../../Danzzan-BE/docs/azure-vm-deployment.md)의 같은 날짜 기록을 참고한다. 이 상대 링크는 두 저장소를 나란히 둔 로컬 배치용이다.
