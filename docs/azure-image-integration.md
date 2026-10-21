@@ -198,3 +198,22 @@ VM에서 BE·FE Docker 빌드 후 app의 healthy를 확인하고 frontend를 교
 BE·MySQL·Redis·Kafka 컨테이너 ID와 Compose·기존 비공개 환경 파일 해시는 배포 전후 동일했다. SQL 이관·DB 복원·데이터 초기화는 실행하지 않았다. 이번에는 DB 내용의 덤프 해시 비교를 별도로 수행하지 않았으므로, 컨테이너 보존 확인과 데이터 내용 비교를 구분한다.
 
 복구 자료는 `/opt/danzzan/deployment-backups/20261021-account-background-48d0e8a0/`, 이전 FE 이미지는 `danzzan-fe:rollback-20261021-account-background-48d0e8a0`이다. 복구 명령과 자료 목록은 [BE Azure 배포 문서](../../Danzzan-BE/docs/azure-vm-deployment.md)의 같은 날짜 기록을 참고한다. 이 상대 링크는 두 저장소를 나란히 둔 로컬 배치용이다.
+
+## AI 색상 시안 생성 대기 시간 연장 배포 (2026-10-21)
+
+배포 ID `20261021-theme-timeout`으로 FE `59690e20`과 BE `05b18bf`를 각 기존 Azure 작업 브랜치에 커밋·푸시한 뒤 배포했다. 색상 생성이 약 45초에 반복해서 시간 초과되는 문제에 대해 사용자가 더 긴 대기를 허용한 변경이다. 지연의 근본 원인이나 생성 성공률 개선을 확정한 것은 아니다.
+
+- BE의 OpenAI 색상 요청 제한: 45초 → **150초**.
+- `AdminTheme.tsx`의 브라우저 요청 취소 타이머: 60초 → **180초**.
+- Azure Nginx의 `/api/admin/festival/1/themes/recommend`: 전용 경로를 추가해 **180초**를 적용한다. 현재 FE가 사용하는 축제 ID 1 경로이며 다른 축제 ID의 경로까지 확장한 것은 아니다.
+- 배경 생성은 기존 BE 150초·FE/Nginx 180초, 일반 API 프록시는 75초를 유지한다. 자동 재시도나 모델·색상 규칙 변경은 없다.
+
+### 검증과 배포 범위
+
+FE 관련 테스트 64개와 BE 관련 테스트 24개가 통과했다. 가상 시간 테스트에서 색상 요청이 60초·150초에도 유지되고 180초에 취소되는 것을 확인했다. FE 타입 검사·변경 파일 ESLint·프로덕션 빌드 및 diff 검사도 통과했다. 전체 테스트·커버리지를 새로 실행한 것은 아니다.
+
+VM에서 BE·FE Docker 빌드 후 app의 healthy를 확인하고 frontend를 교체했다. 운영 BE JAR의 150초 제한, 실행 AdminTheme 번들의 180초 타이머, Nginx의 전용 180초/일반 75초 설정을 확인했다. HTTPS 홈·내 정보·관리자 테마·health 요청과 Nginx 설정 검사가 성공했고, 외부 AdminTheme 번들 해시는 이미지 내부 파일과 일치했다.
+
+MySQL·Redis·Kafka 컨테이너와 기존 Compose·비공개 환경 파일은 유지했다. 이번 검증에서는 유료 AI 생성이나 전체 적용·이미지 업로드를 실행하지 않았다. 실제 생성 성공률은 이후 사용자 요청 결과로 확인해야 한다.
+
+복구 자료는 `/opt/danzzan/deployment-backups/20261021-theme-timeout/`에 있으며 이전 이미지 태그는 `danzzan-be:rollback-20261021-theme-timeout`, `danzzan-fe:rollback-20261021-theme-timeout`이다. 서버 소스 전송 범위와 검증 한계·복구 명령은 [BE Azure 배포 문서](../../Danzzan-BE/docs/azure-vm-deployment.md)의 같은 배포 ID 절을 참고한다. 상대 링크는 두 저장소를 나란히 둔 로컬 배치용이다.
