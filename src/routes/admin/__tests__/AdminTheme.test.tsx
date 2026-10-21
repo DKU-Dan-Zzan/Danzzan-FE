@@ -458,7 +458,7 @@ describe("AdminTheme", () => {
       await act(async () => buttons("추천 화면 확인")[0].click());
       const preview = document.querySelector('[data-testid="theme-screen-preview"]')!;
       await act(async () => [...preview.querySelectorAll<HTMLButtonElement>('[role="tab"]')].find(tab => tab.textContent === "내 정보")!.click());
-      expect(preview.querySelector('img[alt="내 정보 추천 배경"]')?.getAttribute("src")).toBe("data:image/jpeg;base64,/9j/2Q==");
+      expect(preview.querySelector('img[alt^="내 정보"]')?.getAttribute("src")).toBe("https://cdn.example.com/poster.png");
       await act(async () => document.querySelector<HTMLButtonElement>('[role="dialog"] button')!.click());
       await act(async () => buttons("전체 적용")[0].click());
       expect(adminThemeApi.applyBundle).toHaveBeenCalledWith(expect.objectContaining({
@@ -534,7 +534,7 @@ describe("AdminTheme", () => {
     expect(getTicketingBackgroundImageUrl()).toBe("https://cdn.example.com/poster-ai-closed.jpg");
   });
 
-  it("previews the recommended portrait in my info without publishing either background", async () => {
+  it("previews the official poster in my info independently of saved and recommended ticketing backgrounds", async () => {
     await prepareRecommendation();
     await act(async () => {
       setTicketingBackgroundImageUrl("https://cdn.example.com/saved-portrait.jpg");
@@ -546,7 +546,7 @@ describe("AdminTheme", () => {
     const preview = document.querySelector('[data-testid="theme-screen-preview"]')!;
     const myInfo = [...preview.querySelectorAll<HTMLButtonElement>('[role="tab"]')].find(tab => tab.textContent === "내 정보")!;
     await act(async () => myInfo.click());
-    expect(preview.querySelector('img[alt="내 정보 추천 배경"]')?.getAttribute("src")).toBe("data:image/jpeg;base64,/9j/2Q==");
+    expect(preview.querySelector('img[alt^="내 정보"]')?.getAttribute("src")).toBe("https://cdn.example.com/poster.png");
     expect(getTicketingBackgroundImageUrl()).toBe("https://cdn.example.com/saved-portrait.jpg");
     expect(getTicketCardBackgroundImageUrl()).toBe("https://cdn.example.com/saved-ticket.jpg");
     expect(document.documentElement.style.getPropertyValue("--theme-brand-primary")).toBe("#ff642d");

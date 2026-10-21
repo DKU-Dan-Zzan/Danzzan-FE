@@ -521,7 +521,7 @@ export default function AdminTheme({ mode = "manage" }: { mode?: "manage" | "sel
           selectedId={selectedRecommendationId} onChoose={chooseRecommendation} busy={busy || recommending} />}
         <section id="theme-apply" className={cn(panel, "scroll-mt-40 sm:scroll-mt-28")} aria-label="통합 추천과 적용">
           <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-lg font-semibold">3. 확인하고 전체 적용</h2><span className="rounded-full bg-[var(--surface-subtle)] px-3 py-1 text-xs text-[var(--text-muted)]">티켓팅 {ticketingEnabled ? "ON" : "OFF"}</span></div>
-          <p className="mt-2 text-sm text-[var(--text-muted)]">선택한 색상 테마와 내 정보·티켓 화면 배경을 확인한 뒤 한 번에 적용하세요.</p>
+          <p className="mt-2 text-sm text-[var(--text-muted)]">선택한 색상 테마와 발급 티켓·입장 안내 배경을 확인한 뒤 한 번에 적용하세요.</p>
           {!canBundle ? <p className="mt-3 text-sm">전체 추천·적용에는 축제 운영과 티켓팅 권한이 모두 필요합니다. 현재 권한으로 색상 테마는 추천받을 수 있습니다.</p> : <>
             {backgroundPending && <p role="status" className="mt-3 text-sm">AI가 포스터 분위기에 맞는 티켓·입장 안내 배경을 만들고 있습니다. 최대 3분 정도 걸릴 수 있어요…</p>}
             {bundleError && <div role="alert" className="mt-3 text-sm"><p>{bundleError}</p><button className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "mt-2")} onClick={() => { if (analysisSnapshot) loadBackgrounds(analysisSnapshot, recommendationVersion.current); }} disabled={busy || backgroundPending}>배경만 다시 추천</button></div>}
@@ -530,7 +530,7 @@ export default function AdminTheme({ mode = "manage" }: { mode?: "manage" | "sel
               <DialogTrigger asChild><button ref={previewTriggerRef} type="button" disabled={busy || recommending} className={cn(ADMIN_THEME_SECONDARY_ACTION_CLASS, "inline-flex items-center gap-2")}><MonitorSmartphone className="h-4 w-4" />추천 화면 확인</button></DialogTrigger>
               <button type="button" onClick={() => void applyBundle()} disabled={busy || recommending} className={ADMIN_THEME_PRIMARY_ACTION_CLASS} aria-busy={busy}>전체 적용</button>
             </div>}
-            <p className="mt-2 text-xs text-[var(--text-muted)]">전체 적용하면 선택한 색상 테마와 내 정보·티켓 배경이 함께 저장됩니다. 홈화면 이미지는 별도 저장으로만 바뀌며 추가 홈 이미지는 유지됩니다. 내 정보는 항상, 발급 티켓·입장 안내는 ON/OFF에 맞춰 표시됩니다. 팔찌 배부 색상도 함께 반영됩니다.</p>
+            <p className="mt-2 text-xs text-[var(--text-muted)]">전체 적용하면 선택한 색상 테마와 발급 티켓·입장 안내 배경이 함께 저장됩니다. 홈화면 이미지는 별도 저장으로만 바뀌며 추가 홈 이미지는 유지됩니다. 내 정보는 공식 축제 포스터를 사용하고, 발급 티켓·입장 안내는 ON/OFF에 맞춰 표시됩니다. 팔찌 배부 색상도 함께 반영됩니다.</p>
           </>}
         </section>
       </div>

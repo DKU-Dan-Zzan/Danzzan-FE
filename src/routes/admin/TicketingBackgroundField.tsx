@@ -25,7 +25,7 @@ export default function TicketingBackgroundField({ mode = "closed", festivalName
   const isTicket = mode === "ticket"
   return <FestivalBrandingContext.Provider value={branding}><div className="mt-5 border-t border-[var(--border-base)] pt-5">
     <h3 className="text-sm font-bold text-[var(--text)]">{isTicket ? "발급 티켓 배경" : "티켓팅 OFF 안내 배경"}</h3>
-    <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">{isTicket ? "예매 완료 후 내 티켓에 표시되는 카드 배경입니다. 티켓팅 페이지 전체 배경은 변경되지 않습니다." : "입장 안내와 내 정보가 함께 사용하는 배경입니다. 안내 문구와 버튼은 유지됩니다."} 사진을 선택한 뒤 상단의 저장을 누르면 사용자 화면에 적용됩니다.</p>
+    <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">{isTicket ? "예매 완료 후 내 티켓에 표시되는 카드 배경입니다. 티켓팅 페이지 전체 배경은 변경되지 않습니다." : "티켓팅 OFF 입장 안내에 사용하는 배경입니다. 안내 문구와 버튼은 유지됩니다."} 사진을 선택한 뒤 상단의 저장을 누르면 사용자 화면에 적용됩니다.</p>
     <div className="my-4 flex flex-wrap gap-2">
       <button type="button" disabled={disabled} className={ADMIN_PRIMARY_ACTION_BUTTON_CLASS} onClick={() => fileInput.current?.click()}>
         <ImagePlus aria-hidden="true" className="mr-1.5 inline-block h-4 w-4" />배경 사진 변경
